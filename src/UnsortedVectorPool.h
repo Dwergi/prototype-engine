@@ -58,7 +58,7 @@ public:
 		// already allocated!
 		if( Exists( entity ) )
 		{
-			assert( false );
+			ASSERT( false );
 			return nullptr;
 		}
 

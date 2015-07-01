@@ -28,4 +28,8 @@ public:
 		Position += 0.001f;
 		Position *= (float) iMultiplier;
 	}
+
+	BEGIN_MEMBERS( TransformComponent )
+		MEMBER( TransformComponent, Vector4, Position, "Position" );
+	END_MEMBERS
 };

@@ -7,8 +7,8 @@ private:
 
 	typedef Handle<TValue, TKey, TContainer> TThis;
 
-	TContainer* m_container;
 	TKey m_key;
+	TContainer* m_container;
 
 public:
 
@@ -44,35 +44,35 @@ public:
 
 	TValue* operator->()
 	{
-		assert( m_container != nullptr );
+		ASSERT( m_container != nullptr );
 
 		return &(*m_container)[ m_key ];
 	}
 
 	TValue& operator*()
 	{
-		assert( m_container != nullptr );
+		ASSERT( m_container != nullptr );
 
 		return (*m_container)[ m_key ];
 	}
 
 	const TValue* operator->() const
 	{
-		assert( m_container != nullptr );
+		ASSERT( m_container != nullptr );
 
 		return &(*m_container)[ m_key ];
 	}
 
 	const TValue& operator*() const
 	{
-		assert( m_container != nullptr );
+		ASSERT( m_container != nullptr );
 
 		return (*m_container)[ m_key ];
 	}
 
 	bool operator==( const TThis& other ) const
 	{
-		assert( m_container != nullptr );
+		ASSERT( m_container != nullptr );
 
 		return m_key == other.m_key;
 	}

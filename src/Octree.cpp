@@ -45,6 +45,11 @@ bool Octree::Entry::operator==( const Octree::Entry& other ) const
 	return ID == other.ID;
 }
 
+bool Octree::Entry::IsValid() const
+{
+	return ID != -1;
+}
+
 //===================================================================================
 
 Octree::CellInternal::CellInternal( const Vector4& pos, float size )
@@ -83,8 +88,8 @@ Octree::CellInternal& Octree::CellInternal::operator=( const CellInternal& other
 
 void Octree::CellInternal::Add( const Octree::Entry& entry )
 {
-	assert( !HasChildren() );
-	assert( Data.size() < MAX_CELL_ENTRIES );
+	ASSERT( !HasChildren() );
+	ASSERT( Data.size() < MAX_CELL_ENTRIES );
 
 	Data.push_back( entry );
 }
@@ -148,12 +153,12 @@ Octree::~Octree()
 //
 Octree::Entry Octree::Add( const Vector4& position )
 {
-	assert( position >= ORIGIN );
+	ASSERT( position >= ORIGIN );
 
 	// no root created
 	if( !m_root.IsValid() )
 	{
-		assert( m_cells.empty() );
+		ASSERT( m_cells.empty() );
 
 		m_root = CreateCell( ORIGIN, DEFAULT_SIZE );
 	}
@@ -173,10 +178,14 @@ Octree::Entry Octree::Add( const Vector4& position )
 
 	// find the lowest level cell that contains the position
 	const Octree::Entry& id = NextEntry();
+
+	ASSERT( id.IsValid() );
+
 	m_entries.insert( std::make_pair( id, position ) );
 
-	Cell cell = FindCell( position );
+	ASSERT( m_entries.find( Entry( -1 ) ) == m_entries.end() );
 
+	Cell cell = FindCell( position );
 	AddToCell( cell, id );
 
 	return id;
@@ -187,7 +196,7 @@ Octree::Entry Octree::Add( const Vector4& position )
 // 
 void Octree::AddToCell( Octree::Cell cell, const Octree::Entry& entry )
 {
-	assert( cell->Contains( m_entries[ entry ] ) );
+	ASSERT( cell->Contains( m_entries.at( entry ) ) );
 
 	cell->Add( entry );
 
@@ -246,13 +255,15 @@ void Octree::ExpandRoot()
 		Entry entry = m_root->Data.front();
 		m_root->Data.erase( m_root->Data.begin() );
 
-		Cell cell = FindCell( m_entries[ entry ] );
+		Cell cell = FindCell( m_entries.at( entry ) );
 		AddToCell( cell, entry );
 	}
 }
 
 void Octree::CreateChildren( Octree::Cell cell )
 {
+	ASSERT( cell.IsValid() );
+
 	// create new cells
 	float newSize	= cell->Size / 2;
 	Vector4 middle	= cell->Position + newSize;
@@ -280,6 +291,8 @@ void Octree::CreateChildren( Octree::Cell cell )
 //
 void Octree::SplitCell( Octree::Cell cell )
 {
+	ASSERT( cell.IsValid() );
+
 	CreateChildren( cell );
 
 	// assign existing entries into new cells
@@ -288,7 +301,7 @@ void Octree::SplitCell( Octree::Cell cell )
 		Entry entry = cell->Data.front();
 		cell->Data.erase( cell->Data.begin() );
 
-		Cell child = FindCell( m_entries[ entry ] );
+		Cell child = FindCell( m_entries.at( entry ) );
 		AddToCell( child, entry );
 	}
 }
@@ -303,8 +316,49 @@ void Octree::FreeCell( Cell cell )
 //
 void Octree::Remove( const Octree::Entry& entry )
 {
-	Cell cell = FindCell( m_entries[ entry ] );
+	// find the cell
+	Cell parent;
+	Cell cell = FindCell( entry, &parent );
+
 	cell->Remove( entry );
+
+	auto it = m_entries.find( entry );
+	if( it != m_entries.end() )
+		m_entries.erase( it );
+
+	ASSERT( m_entries.find( Entry( -1 ) ) == m_entries.end() );
+	
+	// check siblings to see if we should merge them into their parent
+	if( parent.IsValid() )
+	{
+		int child_count = 0;
+		for( Cell& child : parent->Children )
+		{
+			child_count += child->Data.size();
+		}
+
+		// give a 33% buffer so we don't end up merging too often
+		if( child_count < MAX_CELL_ENTRIES * 0.66f )
+		{
+			for( Cell& child : parent->Children )
+			{
+				// move childrens' data into the parent
+				while( !child->Data.empty() )
+				{
+					parent->Data.push_back( child->Data.back() );
+					child->Data.pop_back();
+				}
+
+				// free the cell
+				FreeCell( child );
+				
+				child.Invalidate();
+			}
+
+			ASSERT( !parent->HasChildren() );
+			ASSERT( parent->Data.size() == child_count );
+		}
+	}
 }
 
 //
@@ -312,45 +366,31 @@ void Octree::Remove( const Octree::Entry& entry )
 //
 const Vector4& Octree::GetPosition( const Octree::Entry& entry ) const
 {
+	ASSERT( entry.ID != -1 );
+
 	return m_entries.at( entry );
 }
 
-//
-// Update the position of the given entry.
-// 
-void Octree::Move( const Octree::Entry& entry, const Vector4& newPos )
-{
-	Remove( entry );
-
-	m_entries[ entry ] = newPos;
-
-	Cell newCell = FindCell( newPos );
-	AddToCell( newCell, entry );
-}
 
 //
 // Get the <count> nearest entries to the given entry.
 // 
 void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Octree::Entry>& output )
 {
-	assert( count > 0 );
-	assert( entry.ID != -1 );
+	ASSERT( count > 0 );
+	ASSERT( entry.ID != -1 );
+
+	output.clear();
+
+	Vector4 position = m_entries.at( entry );
 
 	Cell parent;
-
-	Vector4 position = m_entries[ entry ];
-	
-	Cell current = m_root;
-	while( current->HasChildren() )
-	{
-		parent = current;
-		current = current->GetCellContaining( position );
-	}
+	Cell cell = FindCell( entry, &parent );
 
 	// there are potentially 27 cells to consider
 	std::vector<Cell> to_consider;
 	to_consider.reserve( 27 );
-	to_consider.push_back( current );
+	to_consider.push_back( cell );
 
 	for( int i = 1; i < 8; ++i )
 	{
@@ -359,20 +399,20 @@ void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Oct
 
 		if( i & 4 )
 		{
-			less.X -= current->Size;
-			more.X += current->Size;
+			less.X -= cell->Size;
+			more.X += cell->Size;
 		}
-		
+
 		if( i & 2 )
 		{
-			less.Y -= current->Size;
-			more.Y += current->Size;
+			less.Y -= cell->Size;
+			more.Y += cell->Size;
 		}
 
 		if( i & 1 )
 		{
-			less.Z -= current->Size;
-			more.Z += current->Size;
+			less.Z -= cell->Size;
+			more.Z += cell->Size;
 		}
 
 		// clamp inside valid range
@@ -387,14 +427,17 @@ void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Oct
 	for( const Cell& cell : to_consider )
 	{
 		for( const Entry& entry : cell->Data )
+		{
+			ASSERT( entry.ID != -1 );
 			output.push_back( entry );
+		}
 	}
 
 	// sort by distance from the point
 	std::sort( output.begin(), output.end(), 
 		[&]( const Entry& a, const Entry& b )
 		{
-			return position.distanceSq( m_entries[ a ] ) < position.distanceSq( m_entries[ b ] );
+			return position.distanceSq( m_entries.at( a ) ) < position.distanceSq( m_entries.at( b ) );
 		} );
 
 	// drop the last elements
@@ -406,7 +449,20 @@ void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Oct
 //
 void Octree::GetWithinRange( const Octree::Entry& entry, float range, std::vector<Octree::Entry>& output )
 {
+	const Vector4& position = m_entries.at( entry );
+	float rangeSq = range * range;
 
+	BoundingBox box;
+	box.Include( position + range );
+	box.Include( position - range );
+
+	GetWithinBounds( box, output );
+
+	// our bounds check was a bit greedy, filter out the entries in the corners
+	std::remove_if( output.begin(), output.end(), [&]( const Octree::Entry& entry )
+	{
+		return position.distanceSq( m_entries.at( entry ) ) > rangeSq;
+	} );
 }
 
 //
@@ -414,7 +470,41 @@ void Octree::GetWithinRange( const Octree::Entry& entry, float range, std::vecto
 //
 void Octree::GetWithinBounds( const BoundingBox& bounds, std::vector<Octree::Entry>& output )
 {
-	
+	std::vector<Cell> leaf_cells;
+	std::vector<Cell> to_process;
+	to_process.push_back( m_root );
+
+	// breadth-first search of all cells that intersect with the bounds
+	while( !to_process.empty() )
+	{
+		Cell current = to_process.back();
+		to_process.pop_back();
+
+		if( bounds.Intersects( current->GetBounds() ) )
+		{
+			if( current->HasChildren() )
+			{
+				for( Cell& child : current->Children )
+				{
+					to_process.push_back( child );
+				}
+			}
+			else
+			{
+				leaf_cells.push_back( current );
+			}
+		}
+	}
+
+	// finer-grained filter to remove those that aren't inside the actual bounds
+	for( Cell& cell : leaf_cells )
+	{
+		for( Entry& entry : cell->Data )
+		{
+			if( bounds.Contains( m_entries.at( entry ) ) )
+				output.push_back( entry );
+		}
+	}
 }
 
 Octree::Entry Octree::NextEntry()
@@ -422,24 +512,32 @@ Octree::Entry Octree::NextEntry()
 	return Entry( m_lastID++ );
 }
 
-Octree::Cell Octree::FindCell( const Vector4& position ) const
+Octree::Cell Octree::FindCell( const Vector4& position, Cell* parent ) const
 {
-	assert( m_root->Contains( position ) );
+	ASSERT( m_root->Contains( position ) );
 
 	Cell current = m_root;
 	while( current->HasChildren() )
 	{
+		if( parent != nullptr )
+			*parent = current;
+
 		current = current->GetCellContaining( position );
 	}
 
-	assert( current->Contains( position ) );
+	ASSERT( current->Contains( position ) );
 
 	return current;
 }
 
-Octree::Cell Octree::FindCell( const Octree::Entry& entry ) const
+Octree::Cell Octree::FindCell( const Octree::Entry& entry, Cell* parent ) const
 {
-	return FindCell( m_entries.at( entry ) );
+	return FindCell( m_entries.at( entry ), parent );
+}
+
+int Octree::Count() const 
+{
+	return m_entries.size();
 }
 
 void Octree::Validate() const
@@ -450,13 +548,13 @@ void Octree::Validate() const
 
 		for( const CellInternal& cell : m_cells )
 		{
-			assert( cell.Data.empty() || !cell.HasChildren() ); // cells can't have both children and data
+			ASSERT( cell.Data.empty() || !cell.HasChildren() ); // cells can't have both children and data
 
 			auto it = std::find( cell.Data.begin(), cell.Data.end(), Entry( pair.first ) );
 			if( it != cell.Data.end() )
 			{
-				assert( !bPlaced ); // check that the entry is only in one cell
-				assert( cell.Contains( pair.second ) ); // check that the entry actually belongs in the cell
+				ASSERT( !bPlaced ); // check that the entry is only in one cell
+				ASSERT( cell.Contains( pair.second ) ); // check that the entry actually belongs in the cell
 
 				bPlaced = true;
 			}
