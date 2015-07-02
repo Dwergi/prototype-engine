@@ -19,6 +19,9 @@
     <Filter Include="Types">
       <UniqueIdentifier>{06b22fb7-75e1-4ff2-a844-0367f6eadbc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{91912b7c-2d97-42f4-999e-4976987ccb0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -105,6 +108,15 @@
     <ClInclude Include="src\PropertyList.h">
       <Filter>Properties</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tests.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Timer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentHandle.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -143,6 +155,27 @@
     </ClCompile>
     <ClCompile Include="src\PropertyList.cpp">
       <Filter>Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\Tests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\PropertyListTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\RecorderTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\OctreeTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScopedTimer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\TimerTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

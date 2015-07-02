@@ -36,32 +36,3 @@ public:
 
 	virtual ~PropertyList() {}
 };
-
-namespace tests
-{
-	struct TestStruct
-	{
-		int Int;
-		std::string Str;
-		float Flt;
-
-		BEGIN_MEMBERS( tests::TestStruct )
-			MEMBER( tests::TestStruct, int, Int, "Integer" );
-		MEMBER( tests::TestStruct, std::string, Str, "String" );
-		MEMBER( tests::TestStruct, float, Flt, "Float" );
-		END_MEMBERS
-	};
-
-	struct NestedStruct
-	{
-		TestStruct Struct;
-		int SecondInt;
-
-		BEGIN_MEMBERS( tests::NestedStruct )
-			MEMBER( tests::NestedStruct, tests::TestStruct, Struct, "Struct" );
-		MEMBER( tests::NestedStruct, int, SecondInt, "Second Integer" );
-		END_MEMBERS
-	};
-
-	void PropertyTests();
-}

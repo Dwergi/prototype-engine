@@ -2,6 +2,7 @@
 
 #include "Assert.h"
 #include "ComponentPoolBase.h"
+#include "ComponentHandle.h"
 
 //
 // A dense component pool is one for which the component is assumed to exist for all entities (eg. transform).
@@ -56,16 +57,16 @@ public:
 	// Create a new component of this type for the given entity and return the pointer to it.
 	// Returns null if the component already exists.
 	// 
-	T* Create( const EntityHandle& entity )
+	T* Create( const dd::EntityHandle& entity )
 	{
 		// already allocated!
 		if( Exists( entity ) )
 		{
-			ASSERT( false );
+			ASSERT( false, "Entity already exists!" );
 			return nullptr;
 		}
 
-		if( entity.ID >= (int) m_components.size() )
+		if( entity.ID < 0 || entity.ID >= (int) m_components.size() )
 		{
 			m_components.resize( entity.ID + 1 );
 			m_valid.resize( entity.ID + 1 );
@@ -77,15 +78,20 @@ public:
 		return &cmp;
 	}
 
+	dd::ComponentHandle<T> GetHandle( const dd::EntityHandle& entity )
+	{
+		return dd::ComponentHandle<T>( entity, *this );
+	}
+
 	//
 	// Find the component for the given entity.
 	// Returns null if the component hasn't been created.
 	// 
-	T* Find( const EntityHandle& entity )
+	T* Find( const dd::EntityHandle& entity )
 	{
 		if( !Exists( entity ) )
 		{
-			ASSERT( false );
+			ASSERT( false, "Entity does not exist!" );
 			return nullptr;
 		}
 
@@ -96,11 +102,11 @@ public:
 	//
 	// Remove the component associated with the given entity.
 	// 
-	void Remove( const EntityHandle& entity )
+	void Remove( const dd::EntityHandle& entity )
 	{
-		if( entity.ID >= (int) m_valid.size() )
+		if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
 		{
-			ASSERT( false );
+			ASSERT( false, "Entity ID outside of valid range!" );
 			return;
 		}
 
@@ -110,9 +116,9 @@ public:
 	// 
 	// Checks if the given entity has a component of this type.
 	// 
-	bool Exists( const EntityHandle& entity )
+	bool Exists( const dd::EntityHandle& entity )
 	{
-		if( entity.ID >= (int) m_valid.size() )
+		if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
 			return false;
 
 		bool isValid = m_valid[ entity.ID ];

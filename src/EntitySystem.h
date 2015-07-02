@@ -1,85 +1,87 @@
 #ifndef _ENTITYSYSTEM_H
 #define _ENTITYSYSTEM_H
 
-#include <vector>
 #include <queue>
 
 #include "EntityHandle.h"
 #include "Services.h"
 
-class EntitySystem
+namespace dd
 {
-public:
-
-	EntitySystem();
-	~EntitySystem();
-
-	EntityHandle CreateEntity();
-	void DestroyEntity( const EntityHandle& entity );
-
-	void DestroyAllEntities();
-	void ProcessCommands();
-
-private:
-
-	friend class EntityHandle;
-
-	// Flags for the state of each entity entry.
-	enum EntityState
+	class EntitySystem
 	{
-		// Newly created or freed.
-		None = 0,
-		
-		// Initialized, but inactive.
-		Valid = 1 << 0,
-		
-		// Active.
-		Active = 1 << 1,
+	public:
 
-		// Queued for destruction.
-		Destroyed = 1 << 2
-	};
+		EntitySystem();
+		~EntitySystem();
 
-	struct EntityEntry
-	{
-		EntityEntry( const EntityHandle& handle, int flags ) : 
-			Entity( handle ),
-			Flags( flags )
+		EntityHandle CreateEntity();
+		void DestroyEntity( const EntityHandle& entity );
+
+		void DestroyAllEntities();
+		void ProcessCommands();
+
+	private:
+
+		friend class EntityHandle;
+
+		// Flags for the state of each entity entry.
+		enum EntityState
 		{
-		}
+			// Newly created or freed.
+			None = 0,
+		
+			// Initialized, but inactive.
+			Valid = 1 << 0,
+		
+			// Active.
+			Active = 1 << 1,
 
-		EntityHandle Entity;
-		int Flags;
-	};
+			// Queued for destruction.
+			Destroyed = 1 << 2
+		};
 
-	enum class CommandType
-	{
-		Invalid,
-		Create,
-		Destroy
-	};
-
-	struct EntityCommand
-	{
-		EntityCommand( const EntityHandle& handle, CommandType type ) :
-			Entity( handle ),
-			Type( type )
+		struct EntityEntry
 		{
-		}
+			EntityEntry( const EntityHandle& handle, int flags ) : 
+				Entity( handle ),
+				Flags( flags )
+			{
+			}
 
-		CommandType Type;
-		EntityHandle Entity;
+			EntityHandle Entity;
+			int Flags;
+		};
+
+		enum class CommandType
+		{
+			Invalid,
+			Create,
+			Destroy
+		};
+
+		struct EntityCommand
+		{
+			EntityCommand( const EntityHandle& handle, CommandType type ) :
+				Entity( handle ),
+				Type( type )
+			{
+			}
+
+			CommandType Type;
+			EntityHandle Entity;
+		};
+
+		bool m_initialized;
+
+		std::queue<int> m_free;
+		std::vector<EntityEntry> m_entities;
+		std::vector<EntityCommand> m_commands;
+
+		int m_activeEntities;
+
+		bool IsEntityValid( const EntityHandle& entity );
 	};
-
-	bool m_initialized;
-
-	std::queue<int> m_free;
-	std::vector<EntityEntry> m_entities;
-	std::vector<EntityCommand> m_commands;
-
-	int m_activeEntities;
-
-	bool IsEntityValid( const EntityHandle& entity );
-};
+}
 
 #endif //_ENTITYSYSTEM_H

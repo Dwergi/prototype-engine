@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Component.h"
-
-template< typename T >
-class DenseVectorPool;
+#include "Vector.h"
+#include "DenseVectorPool.h"
 
 class TransformComponent : public Component
 {

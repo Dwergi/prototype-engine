@@ -2,41 +2,44 @@
 
 #include <functional>
 
+namespace dd
+{
 class EntitySystem;
 
-class EntityHandle
-{
-public:
+	class EntityHandle
+	{
+	public:
 
-	int ID;
-	int Version;
+		int ID;
+		int Version;
 
-	EntityHandle();
+		EntityHandle();
 
-	bool IsValid() const;
+		bool IsValid() const;
 
-	bool operator==( const EntityHandle& other ) const;
-	bool operator!=( const EntityHandle& other ) const;
+		bool operator==( const EntityHandle& other ) const;
+		bool operator!=( const EntityHandle& other ) const;
 
-private: 
+	private: 
 	
-	friend class EntitySystem;
-	friend std::hash<EntityHandle>;
+		friend class EntitySystem;
+		friend std::hash<EntityHandle>;
 
-	static const int Invalid = -1;
+		static const int Invalid = -1;
 
-	EntitySystem* m_system;
+		EntitySystem* m_system;
 
-	EntityHandle( int id, int version, EntitySystem* m_system );
-};
+		EntityHandle( int id, int version, EntitySystem* m_system );
+	};
+}
 
 // hash for STL containers
 namespace std
 {
 	template<>
-	struct hash<EntityHandle>
+	struct hash<dd::EntityHandle>
 	{
-		std::size_t operator()( const EntityHandle& entity ) const
+		std::size_t operator()( const dd::EntityHandle& entity ) const
 		{
 			return entity.ID;
 		}

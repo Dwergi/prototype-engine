@@ -105,13 +105,13 @@ public:
 	//
 	// Create a new component of this type for the given entity.
 	// 
-	T* Create( const EntityHandle& entity )
+	T* Create( const dd::EntityHandle& entity )
 	{
 		// already allocated!
 		T* pCmp = Find( entity );
 		if( pCmp != nullptr )
 		{
-			ASSERT( false );
+			ASSERT( false, "Component already allocated for given entity!" );
 			return nullptr;
 		}
 
@@ -123,7 +123,7 @@ public:
 	// Find the component for the given entity.
 	// Returns null if the component hasn't been created.
 	// 
-	T* Find( const EntityHandle& entity )
+	T* Find( const dd::EntityHandle& entity )
 	{
 		auto it = m_components.find( entity.ID );
 		if( it == m_components.end() )
@@ -138,7 +138,7 @@ public:
 	//
 	// Remove the component associated with the given entity.
 	// 
-	void Remove( const EntityHandle& entity )
+	void Remove( const dd::EntityHandle& entity )
 	{
 		auto it = m_components.find( entity.ID );
 		if( it == m_components.end() )
@@ -150,7 +150,7 @@ public:
 	// 
 	// Checks if the given entity has a component of this type.
 	// 
-	bool Exists( const EntityHandle& entity ) const
+	bool Exists( const dd::EntityHandle& entity ) const
 	{
 		T* cmp = Find( entity );
 

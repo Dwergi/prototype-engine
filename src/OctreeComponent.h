@@ -1,22 +1,15 @@
 #pragma once
 
 #include "Component.h"
-
-template< typename T >
-class UnorderedMapPool;
-
-class Octree::Entry;
+#include "Octree.h"
+#include "UnorderedMapPool.h"
 
 class OctreeComponent : public Component
 {
 public:
+	typedef UnorderedMapPool<OctreeComponent> Pool;
 
 	Octree::Entry Entry;
 
-	typedef UnorderedMapPool<OctreeComponent> Pool;
-
-	OctreeComponent()
-	{
-
-	}
+	OctreeComponent() {}
 };

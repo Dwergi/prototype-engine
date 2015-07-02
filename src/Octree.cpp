@@ -9,6 +9,7 @@
 
 #define ORIGIN Vector4( 0, 0, 0 )
 
+const float EPSILON = 0.0001f;
 const float DEFAULT_SIZE = 10.0f;
 const int MAX_CELL_ENTRIES = 32;
 
@@ -420,6 +421,10 @@ void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Oct
 		less.Y = std::max( ORIGIN.X, less.X );
 		less.Z = std::max( ORIGIN.X, less.X );
 
+		more.X = std::min( more.X, m_root->Size - EPSILON );
+		more.Y = std::min( more.Y, m_root->Size - EPSILON );
+		more.Z = std::min( more.Z, m_root->Size - EPSILON );
+
 		push_back_unique( to_consider, FindCell( less ) );
 		push_back_unique( to_consider, FindCell( more ) );
 	}
@@ -514,7 +519,7 @@ Octree::Entry Octree::NextEntry()
 
 Octree::Cell Octree::FindCell( const Vector4& position, Cell* parent ) const
 {
-	ASSERT( m_root->Contains( position ) );
+	ASSERT( m_root->Contains( position ), "Position is not in the tree!" );
 
 	Cell current = m_root;
 	while( current->HasChildren() )

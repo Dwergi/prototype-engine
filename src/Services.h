@@ -5,58 +5,54 @@
 #include <typeinfo>
 #include <typeindex>
 
-class Services
+namespace dd
 {
-public:
-
-	Services()
+	class Services
 	{
+	public:
 
-	}
+		Services() {}
+		~Services() {}
 
-	~Services()
-	{
-		
-	}
+		template<typename T>
+		void Register( T* service  )
+		{
+			ASSERT( service != nullptr );
 
-	template<typename T>
-	void Register( T* service  )
-	{
-		ASSERT( service != nullptr );
+			m_services.insert( std::make_pair( std::type_index( typeid( T ) ), service ) );
+		}
 
-		m_services.insert( std::make_pair( std::type_index( typeid( T ) ), service ) );
-	}
+		template<typename T>
+		bool Exists()
+		{
+			return GetPtr() != nullptr;
+		}
 
-	template<typename T>
-	bool Exists()
-	{
-		return GetPtr() != nullptr;
-	}
+		template<typename T>
+		T* GetPtr() const
+		{
+			auto it = m_services.find( std::type_index( typeid( T ) ) );
 
-	template<typename T>
-	T* GetPtr() const
-	{
-		auto it = m_services.find( std::type_index( typeid( T ) ) );
+			if( it == m_services.end() )
+				return nullptr;
 
-		if( it == m_services.end() )
-			return nullptr;
+			return reinterpret_cast<T*>( it->second );
+		}
 
-		return reinterpret_cast<T*>( it->second );
-	}
+		template<typename T>
+		T& Get() const
+		{
+			T* ret = GetPtr<T>();
 
-	template<typename T>
-	T& Get() const
-	{
-		T* ret = GetPtr<T>();
+			// just crash
+			if( ret == nullptr )
+				(*(int*) ret) = 0;
 
-		// just crash
-		if( ret == nullptr )
-			(*(int*) ret) = 0;
+			return *ret;
+		}
 
-		return *ret;
-	}
+	private:
 
-private:
-
-	std::unordered_map<std::type_index, void*> m_services;
-};
+		std::unordered_map<std::type_index, void*> m_services;
+	};
+}

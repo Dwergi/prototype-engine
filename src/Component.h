@@ -1,19 +1,12 @@
-#ifndef _COMPONENT_H
-#define _COMPONENT_H
+#pragma once
 
 class Component
 {
 protected:
 
-	Component()
-	{
-	}
+	Component() {}
 
 public:
 
-	virtual ~Component()
-	{
-	}
+	virtual ~Component() {}
 };
-
-#endif //_COMPONENT_H

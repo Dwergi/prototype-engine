@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AutoList.h"
+
 class MemberBase;
 
 template< typename T >

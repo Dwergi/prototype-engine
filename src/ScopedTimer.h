@@ -8,25 +8,17 @@
 
 #include <ctime>
 
-class ScopedTimer
+namespace dd
 {
-public:
-	ScopedTimer( float& elapsed_ms )
-		: m_result( elapsed_ms )
+	class ScopedTimer
 	{
-		m_start = std::clock();
-	}
+	public:
+		ScopedTimer( float& elapsed_ms );
+		~ScopedTimer();
 
-	~ScopedTimer()
-	{
-		std::clock_t duration = std::clock() - m_start;
+	private:
 
-		m_result = duration / (float) CLOCKS_PER_SEC;
-	}
-
-
-private:
-
-	float& m_result;
-	std::clock_t m_start;
-};
+		float& m_result;
+		std::clock_t m_start;
+	};
+}

@@ -17,12 +17,12 @@ namespace
 	const int DefaultCommandCount = 32;
 }
 
-EntitySystem::EntitySystem()
+dd::EntitySystem::EntitySystem()
 {
 	m_initialized = true;
 }
 
-EntitySystem::~EntitySystem()
+dd::EntitySystem::~EntitySystem()
 {
 	ProcessCommands();
 
@@ -37,7 +37,7 @@ EntitySystem::~EntitySystem()
 	m_free.swap( std::queue<int>() );
 }
 
-void EntitySystem::ProcessCommands()
+void dd::EntitySystem::ProcessCommands()
 {
 	for( const EntityCommand& command : m_commands )
 	{
@@ -79,7 +79,7 @@ void EntitySystem::ProcessCommands()
 //
 // Create an entity and return its handle.
 // 
-EntityHandle EntitySystem::CreateEntity()
+dd::EntityHandle dd::EntitySystem::CreateEntity()
 {
 	if( m_free.empty() )
 	{
@@ -105,7 +105,7 @@ EntityHandle EntitySystem::CreateEntity()
 //
 // Destroy an entity.
 // 
-void EntitySystem::DestroyEntity( const EntityHandle& handle )
+void dd::EntitySystem::DestroyEntity( const dd::EntityHandle& handle )
 {
 	if( !IsEntityValid( handle ) )
 		return;
@@ -118,7 +118,7 @@ void EntitySystem::DestroyEntity( const EntityHandle& handle )
 	m_commands.push_back( command );
 }
 
-void EntitySystem::DestroyAllEntities()
+void dd::EntitySystem::DestroyAllEntities()
 {
 	for( EntityEntry& entry : m_entities )
 	{
@@ -126,7 +126,7 @@ void EntitySystem::DestroyAllEntities()
 	}
 }
 
-bool EntitySystem::IsEntityValid( const EntityHandle& handle )
+bool dd::EntitySystem::IsEntityValid( const dd::EntityHandle& handle )
 {
 	if( handle.ID == EntityHandle::Invalid )
 		return false;
