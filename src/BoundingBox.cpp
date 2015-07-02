@@ -38,7 +38,6 @@ void BoundingBox::Include( const Vector4& pos )
 		m_minimum = pos;
 		m_maximum = pos;
 
-		m_initialized = true;
 		return;
 	}
 
@@ -49,6 +48,8 @@ void BoundingBox::Include( const Vector4& pos )
 	m_maximum.X = std::max( m_maximum.X, pos.X );
 	m_maximum.Y = std::max( m_maximum.Y, pos.Y );
 	m_maximum.Z = std::max( m_maximum.Z, pos.Z );
+
+	m_initialized = true;
 }
 
 void BoundingBox::Include( const BoundingBox& box )

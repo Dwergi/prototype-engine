@@ -17,15 +17,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Random C++ crap
-*.ipch
-*.obj
-*.ilk
-*.suo
-*.sdf
-Debug/
-Release/
-
 # =========================
 # Operating System Files
 # =========================

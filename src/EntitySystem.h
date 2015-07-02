@@ -14,6 +14,9 @@ public:
 	EntitySystem();
 	~EntitySystem();
 
+	void Initialize( const Services& services );
+	void Cleanup();
+
 	EntityHandle CreateEntity();
 	void DestroyEntity( const EntityHandle& entity );
 

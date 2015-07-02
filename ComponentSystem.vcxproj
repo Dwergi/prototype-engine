@@ -67,24 +67,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Assert.h" />
-    <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\EigenExtensions.h" />
     <ClInclude Include="src\Handle.h" />
-    <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
-    <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PrecompiledHeader.h" />
-    <ClInclude Include="src\Property.h" />
-    <ClInclude Include="src\PropertyList.h" />
-    <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
-    <ClInclude Include="src\TypeInfo.h" />
     <ClInclude Include="src\UnorderedMapPool.h" />
     <ClInclude Include="src\UnsortedVectorPool.h" />
     <ClInclude Include="src\DenseVectorPool.h" />
@@ -93,28 +85,19 @@
     <ClInclude Include="src\Services.h" />
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\Recorder.h" />
-    <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\VectorPairIterator.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Member.cpp" />
     <ClCompile Include="src\Octree.cpp" />
-    <ClCompile Include="src\PP_Assert.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="src\PrecompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Property.cpp" />
-    <ClCompile Include="src\PropertyList.cpp" />
-    <ClCompile Include="src\Recorder.cpp" />
-    <ClCompile Include="src\TypeInfo.cpp" />
-    <ClCompile Include="src\Vector.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

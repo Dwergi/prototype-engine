@@ -1,151 +1,102 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Entities">
-      <UniqueIdentifier>{e6bb35dd-2203-4178-90ef-e4b2b9a1e0b3}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Components">
-      <UniqueIdentifier>{14cc0615-506d-4cb2-b805-c376da85f96c}</UniqueIdentifier>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{5041b3a0-580e-481d-bd74-5a0e6d491357}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Properties">
-      <UniqueIdentifier>{6522278c-e1d9-463f-becf-ed055a2d201f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{5d4c57c0-6e9b-4f15-85b0-411fd508f5cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Types">
-      <UniqueIdentifier>{06b22fb7-75e1-4ff2-a844-0367f6eadbc6}</UniqueIdentifier>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\EntityHandle.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\EntitySystem.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Component.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentPoolBase.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DenseVectorPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TransformComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BoundingBox.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UnorderedMapPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UnsortedVectorPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Handle.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RemoveQualifiers.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assert.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AutoList.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PP_Assert.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Recorder.h">
-      <Filter>Properties</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Services.h">
-      <Filter>Core</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="src\EntityHandle.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SortedVectorPool.h">
-      <Filter>Components</Filter>
+    <ClInclude Include="src\Component.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OctreeComponent.h">
-      <Filter>Components</Filter>
+    <ClInclude Include="src\TransformComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\EigenExtensions.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PrecompiledHeader.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vector.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VectorPairIterator.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Octree.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="src\ComponentPoolBase.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ScopedTimer.h">
-      <Filter>Core</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TypeInfo.h">
-      <Filter>Types</Filter>
+    <ClInclude Include="src\DenseVectorPool.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Member.h">
-      <Filter>Types</Filter>
+    <ClInclude Include="src\UnorderedMapPool.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Property.h">
-      <Filter>Properties</Filter>
+    <ClInclude Include="src\SortedVectorPool.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PropertyList.h">
-      <Filter>Properties</Filter>
+    <ClInclude Include="src\UnsortedVectorPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VectorPairIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PrecompiledHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EigenExtensions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Octree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OctreeComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\EntityHandle.cpp">
-      <Filter>Entities</Filter>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntitySystem.cpp">
-      <Filter>Entities</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BoundingBox.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Recorder.cpp">
-      <Filter>Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Octree.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PP_Assert.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="src\EntityHandle.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PrecompiledHeader.cpp">
-      <Filter>Core</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Vector.cpp">
-      <Filter>Math</Filter>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TypeInfo.cpp">
-      <Filter>Types</Filter>
+    <ClCompile Include="src\Octree.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Member.cpp">
-      <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Property.cpp">
-      <Filter>Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyList.cpp">
-      <Filter>Properties</Filter>
+    <ClCompile Include="src\BoundingBox.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

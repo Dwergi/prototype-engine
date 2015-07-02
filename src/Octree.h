@@ -36,6 +36,11 @@ public:
 	void Remove( const Octree::Entry& entry );
 
 	//
+	// Update the position of the given entry.
+	// 
+	void Move( const Octree::Entry& entry, const Vector4& newPos );
+
+	//
 	// Get the <count> nearest entries to the given handle.
 	// 
 	void GetKNearest( const Octree::Entry& entry, int count, std::vector<Octree::Entry>& output );
@@ -59,11 +64,6 @@ public:
 	// Get the position associated with the given entry.
 	//
 	const Vector4& GetPosition( const Octree::Entry& entry ) const;
-	
-	//
-	// Gets the number of entries in the tree.
-	//
-	int Count() const;
 
 	//
 	// An entry in the octree. Used to reference entries in the tree.
@@ -81,7 +81,6 @@ public:
 		Entry();
 		Entry( const Entry& other );
 		bool operator==( const Entry& other ) const;
-		bool IsValid() const;
 
 		struct hash
 		{
@@ -151,8 +150,8 @@ private:
 
 	void FreeCell( Octree::Cell cell );
 
-	Octree::Cell FindCell( const Vector4& position, Octree::Cell* parent = nullptr ) const;
-	Octree::Cell FindCell( const Octree::Entry& position, Octree::Cell* parent = nullptr ) const;
+	Octree::Cell FindCell( const Vector4& position ) const;
+	Octree::Cell FindCell( const Octree::Entry& position ) const;
 
 	Octree::Entry NextEntry();
 };

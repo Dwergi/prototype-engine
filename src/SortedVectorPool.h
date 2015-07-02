@@ -63,7 +63,7 @@ public:
 			if( it->first == entity.ID )
 			{
 				// already exists
-				ASSERT( false );
+				assert( false );
 				return nullptr;
 			}
 

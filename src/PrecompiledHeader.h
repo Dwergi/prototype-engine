@@ -3,19 +3,9 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <iostream>
-
-typedef unsigned int uint;
-
-#include "Assert.h"
-#include "Utility.h"
-#include "AutoList.h"
-#include "TypeInfo.h"
-#include "Member.h"
 
 //#define USE_EIGEN
 
-#ifdef USE_EIGEN
 #define EIGEN_MATRIXBASE_PLUGIN "EigenExtensions.h"
 
 #include "Eigen/Eigen"
@@ -38,6 +28,10 @@ class aligned_vector
 
 };
 
-#else
+#ifndef USE_EIGEN
+
 #include "Vector.h"
+
 #endif
+
+#include "Utility.h"
