@@ -78,9 +78,6 @@
     <ClInclude Include="src\OctreeComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\EigenExtensions.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\PrecompiledHeader.h">
       <Filter>Core</Filter>
     </ClInclude>
