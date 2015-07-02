@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Assert.h"
 #include "ComponentPoolBase.h"
 
 //
@@ -60,7 +61,7 @@ public:
 		// already allocated!
 		if( Exists( entity ) )
 		{
-			assert( false );
+			ASSERT( false );
 			return nullptr;
 		}
 
@@ -84,7 +85,7 @@ public:
 	{
 		if( !Exists( entity ) )
 		{
-			assert( false );
+			ASSERT( false );
 			return nullptr;
 		}
 
@@ -99,7 +100,7 @@ public:
 	{
 		if( entity.ID >= (int) m_valid.size() )
 		{
-			assert( false );
+			ASSERT( false );
 			return;
 		}
 

@@ -16,184 +16,302 @@
 #include "SortedVectorPool.h"
 #include "Octree.h"
 #include "OctreeComponent.h"
+#include "Recorder.h"
+#include "PropertyList.h"
 
 #include <iostream>
+//---------------------------------------------------------------------------
 
-const int EntityCount = 10000;
-const int FrameCount = 100;
+Services g_services;
 
-template< typename PoolType >
-void profile( PoolType pool, const char* pool_name, std::vector<EntityHandle>& handles )
+namespace tests
 {
-	float create;
+	const int EntityCount = 10000;
+	const int FrameCount = 100;
+
+	void profile_octree( const std::vector<EntityHandle>& handles )
 	{
-		ScopedTimer timer( create );
+		Random rngEntity( 0, EntityCount );
+		Random rngPosition( 0, 100 );
 
-		for( EntityHandle handle : handles )
+		TransformComponent::Pool& transform_pool = g_services.Get<TransformComponent::Pool>();
+		OctreeComponent::Pool& octree_pool = g_services.Get<OctreeComponent::Pool>();
+
+		Octree octree;
+		float octree_add;
 		{
-			auto cmp = pool.Create( handle );
-		}
-	}
+			ScopedTimer timer( octree_add );
 
-	std::cout << "[" << pool_name << "] Component CREATE took " << create << "s for " << EntityCount << " components." << std::endl;
+			int added = 0;
 
-	float update;
-	{
-		ScopedTimer timer( update );
-
-		for( int i = 0; i < FrameCount; ++i )
-		{
-			int iComponentCount = 0;
-
-			for( auto& cmp : pool )
+			for( const EntityHandle& handle : handles )
 			{
-				cmp.Update( iComponentCount );
+				TransformComponent* transform_cmp = transform_pool.Find( handle );
+				transform_cmp->Position = Vector4( (float) rngPosition.Next(), (float) rngPosition.Next(), (float) rngPosition.Next() );
 
-				++iComponentCount;
+				auto octree_cmp = octree_pool.Create( handle );
+				octree_cmp->Entry = octree.Add( transform_cmp->Position );
+
+				++added;
+
+				ASSERT( octree.Count() == added );
+
+				ASSERT( octree_cmp->Entry.IsValid() );
 			}
 		}
-	}
 
-	std::cout << "[" << pool_name << "] Component UPDATE took " << update << "s for " << EntityCount << " components." << std::endl;
+		std::cout << "[Octree] ADD took " << octree_add << "s for " << EntityCount << " components." << std::endl;
 
-	Random rng( 0, EntityCount - 1 );
-
-	float find;
-	{
-		ScopedTimer timer( find );
-
-		for( int i = 0; i < EntityCount; ++i )
+		float octree_find_nearest;
 		{
-			EntityHandle handle = handles[ rng.Next() ];
+			ScopedTimer timer( octree_find_nearest );
 
-			auto cmp = pool.Find( handle );
-			if( cmp == nullptr )
-				assert( false );
+			std::vector<Octree::Entry> output;
+			output.reserve( 50 );
+
+			for( int i = 0; i < 100; ++i )
+			{
+				const EntityHandle& entity = handles[ rngEntity.Next() ];
+				auto octree_cmp = octree_pool.Find( entity );
+				auto transform_cmp = transform_pool.Find( entity );
+
+				octree.GetKNearest( octree_cmp->Entry, 50, output );
+			}
 		}
-	}
 
-	std::cout << "[" << pool_name << "] Component FIND took " << find << "s for " << EntityCount << " components." << std::endl;
+		std::cout << "[Octree] FIND NEAREST took " << octree_find_nearest << "s for " << 100 << " components." << std::endl;
 
-	float clear;
-	{
-		ScopedTimer timer( clear );
+		ASSERT( octree.Count() == EntityCount );
 
-		for( EntityHandle handle : handles )
+		float octree_find_range;
 		{
-			pool.Remove( handle );
-		}
-	}
+			ScopedTimer timer( octree_find_range );
 
-	std::cout << "[" << pool_name << "] Component REMOVE took " << clear << "s for " << EntityCount << " components." << std::endl;
+			for( int i = 0; i < 100; ++i )
+			{
+				std::vector<Octree::Entry> output;
+				output.reserve( 50 );
+
+				const EntityHandle& entity = handles[ rngEntity.Next() ];
+				auto octree_cmp = octree_pool.Find( entity );
+				auto transform_cmp = transform_pool.Find( entity );
+
+				octree.GetWithinRange( octree_cmp->Entry, 10, output );
+			}
+		}
+
+		std::cout << "[Octree] FIND RANGE took " << octree_find_range << "s for " << 100 << " components." << std::endl;
+
+		ASSERT( octree.Count() == EntityCount );
+
+		float octree_remove;
+		{
+			ScopedTimer timer( octree_remove );
+
+			int removed = 0;
+
+			for( int i = 0; i < EntityCount / 2; ++i )
+			{
+				const EntityHandle& entity = handles[ rngEntity.Next() ];
+				OctreeComponent* octree_cmp = octree_pool.Find( entity );
+
+				if( octree_cmp->Entry.IsValid() )
+				{
+					octree.Remove( octree_cmp->Entry );
+
+					octree_cmp->Entry = Octree::Entry();
+
+					++removed;
+				}
+			}
+
+			ASSERT( octree.Count() == EntityCount - removed );
+		}
+
+		std::cout << "[Octree] REMOVE took " << octree_remove << "s for " << EntityCount / 2 << " components." << std::endl;
+	}
+	//---------------------------------------------------------------------------
+
+	template< typename PoolType >
+	void profile( PoolType pool, const char* pool_name, std::vector<EntityHandle>& handles )
+	{
+		float create;
+		{
+			ScopedTimer timer( create );
+
+			for( EntityHandle handle : handles )
+			{
+				auto cmp = pool.Create( handle );
+			}
+		}
+
+		std::cout << "[" << pool_name << "] Component CREATE took " << create << "s for " << EntityCount << " components." << std::endl;
+
+		float update;
+		{
+			ScopedTimer timer( update );
+
+			for( int i = 0; i < FrameCount; ++i )
+			{
+				int iComponentCount = 0;
+
+				for( auto& cmp : pool )
+				{
+					cmp.Update( iComponentCount );
+
+					++iComponentCount;
+				}
+			}
+		}
+
+		std::cout << "[" << pool_name << "] Component UPDATE took " << update << "s for " << EntityCount << " components." << std::endl;
+
+		Random rng( 0, EntityCount - 1 );
+
+		float find;
+		{
+			ScopedTimer timer( find );
+
+			for( int i = 0; i < EntityCount; ++i )
+			{
+				EntityHandle handle = handles[ rng.Next() ];
+
+				auto cmp = pool.Find( handle );
+				if( cmp == nullptr )
+					ASSERT( false );
+			}
+		}
+
+		std::cout << "[" << pool_name << "] Component FIND took " << find << "s for " << EntityCount << " components." << std::endl;
+
+		float clear;
+		{
+			ScopedTimer timer( clear );
+
+			for( EntityHandle handle : handles )
+			{
+				pool.Remove( handle );
+			}
+		}
+
+		std::cout << "[" << pool_name << "] Component REMOVE took " << clear << "s for " << EntityCount << " components." << std::endl;
+	}
+	//---------------------------------------------------------------------------
+
+	void create_entities( std::vector<EntityHandle>& handles )
+	{
+		EntitySystem& entitySystem = g_services.Get<EntitySystem>();
+
+		TransformComponent::Pool& transform_pool = g_services.Get<TransformComponent::Pool>();
+
+		Random entityRNG( 0, EntityCount );
+
+		float entity_create;
+		{
+			ScopedTimer timer( entity_create );
+
+			// create twice as many as we want
+			for( int i = 0; i < EntityCount * 2; ++i )
+			{
+				EntityHandle handle = entitySystem.CreateEntity();
+				handles.push_back( handle );
+			}
+			entitySystem.ProcessCommands();
+
+			// then remove roughly half
+			for( int i = 0; i < EntityCount; ++i )
+			{
+				size_t index = (size_t) entityRNG.Next();
+
+				auto it = handles.begin() + index;
+
+				entitySystem.DestroyEntity( *it );
+
+				erase_unordered( handles, it );
+			}
+			entitySystem.ProcessCommands();
+		}
+
+		std::cout << "[DenseVector] Entity CREATE took " << entity_create << "s for " << EntityCount << " entities." << std::endl;
+
+		//profile( transform_pool, "DenseVector", handles );
+
+		float create;
+		{
+			ScopedTimer timer( create );
+
+			for( EntityHandle handle : handles )
+			{
+				auto cmp = transform_pool.Create( handle );
+			}
+		}
+		std::cout << "[DenseVector] Component CREATE took " << create << "s for " << EntityCount << " components." << std::endl;
+	}
+	//---------------------------------------------------------------------------
+
+	void destroy_entities( std::vector<EntityHandle>& handles )
+	{
+		EntitySystem& entitySystem = g_services.Get<EntitySystem>();
+
+		float entity_clear;
+		{
+			ScopedTimer timer( entity_clear );
+
+			for( EntityHandle handle : handles )
+			{
+				entitySystem.DestroyEntity( handle );
+			}
+
+			entitySystem.ProcessCommands();
+		}
+
+		std::cout << "[DenseVector] Entity CLEAR took " << entity_clear << "s for " << EntityCount << " entities." << std::endl;
+	}
+	//---------------------------------------------------------------------------
 }
 
 int main( int argc, const char* argv[] )
 {
 	EntitySystem entitySystem;
-
-	Services services;
-	services.Register<EntitySystem>( &entitySystem );
-
-	entitySystem.Initialize( services );
-
-	std::vector<EntityHandle> handles;
+	g_services.Register<EntitySystem>( &entitySystem );
 
 	TransformComponent::Pool transform_pool;
+	g_services.Register( &transform_pool );
+
 	OctreeComponent::Pool octree_pool;
+	g_services.Register( &octree_pool );
 
-	Random entityRNG( 0, EntityCount );
+	std::vector<EntityHandle> handles;
+	tests::create_entities( handles );
+	tests::profile_octree( handles );
+	tests::destroy_entities( handles );
 
-	float entity_create;
-	{
-		ScopedTimer timer( entity_create );
+	tests::RecorderTests();
+	tests::FullRecorderTests();
 
-		// create twice as many as we want
-		for( int i = 0; i < EntityCount * 2; ++i )
-		{
-			EntityHandle handle = entitySystem.CreateEntity();
-			handles.push_back( handle );
-		}
-		entitySystem.ProcessCommands();
+	tests::PropertyTests();
 
-		// then remove roughly half
-		for( int i = 0; i < EntityCount; ++i )
-		{
-			size_t index = (size_t) entityRNG.Next();
+	Vector4::RegisterType();
+	TransformComponent::RegisterType();
 
-			auto it = handles.begin() + index;
+	TransformComponent cmp;
+	cmp.Position.X = 500;
 
-			entitySystem.DestroyEntity( *it );
+	PropertyList<TransformComponent> transform_list( cmp );
+	Recorder<float> x_recorder( transform_list.Find( "X" ) );
 
-			erase_unordered( handles, it );
-		}
-		entitySystem.ProcessCommands();
-	}
+	float value = 0;
+	value = x_recorder;
+	ASSERT( value == 500 );
 
-	std::cout << "Entity CREATE took " << entity_create << "s for " << EntityCount << " entities." << std::endl;
+	x_recorder = 200;
+	value = x_recorder;
+	ASSERT( value == 200 );
 
-	//profile( transform_pool, "DenseVector", handles );
+	x_recorder.Undo();
+	ASSERT( x_recorder == 500.f );
 
-	Random rng( 0, 100 );
-	float create;
-	{
-		ScopedTimer timer( create );
-
-		for( EntityHandle handle : handles )
-		{
-			auto cmp = transform_pool.Create( handle );
-		}
-	}
-	std::cout << "[DenseVector] Component CREATE took " << create << "s for " << EntityCount << " components." << std::endl;
-	
-	Octree octree;
-	float octree_add;
-	{
-		ScopedTimer timer( octree_add );
-
-		for( const EntityHandle& handle : handles )
-		{
-			TransformComponent* transform_cmp = transform_pool.Find( handle );
-			transform_cmp->Position = Vector4( (float) rng.Next(), (float) rng.Next(), (float) rng.Next() );
-
-			auto octree_cmp = octree_pool.Create( handle );
-			octree_cmp->Entry = octree.Add( transform_cmp->Position );
-		}
-	}
-
-	std::cout << "[Octree] ADD took " << octree_add << "s for " << EntityCount << " components." << std::endl;
-
-	float octree_find_nearest;
-	{
-		ScopedTimer timer( octree_find_nearest );
-
-		std::vector<Octree::Entry> output;
-		output.resize( 50 );
-
-		for( int i = 0; i < 100; ++i )
-		{
-			const EntityHandle& entity = handles[ entityRNG.Next() ];
-			auto octree_cmp = octree_pool.Find( entity );
-			auto transform_cmp = transform_pool.Find( entity );
-			
-			octree.GetKNearest( octree_cmp->Entry, 50, output );
-		}
-	}
-	
-	std::cout << "[Octree] FIND_NEAREST took " << octree_add << "s for " << 100 << " components." << std::endl;
-
-	float entity_clear;
-	{
-		ScopedTimer timer( entity_clear );
-
-		for( EntityHandle handle : handles )
-		{
-			entitySystem.DestroyEntity( handle );
-		}
-
-		entitySystem.ProcessCommands();
-	}
-
-	std::cout << "Entity CLEAR took " << entity_clear << "s for " << EntityCount << " entities." << std::endl;
-
+	ASSERT( false, "DONE!" );
 	return 0;
 }
+//===========================================================================

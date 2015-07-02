@@ -111,7 +111,7 @@ public:
 		T* pCmp = Find( entity );
 		if( pCmp != nullptr )
 		{
-			assert( false );
+			ASSERT( false );
 			return nullptr;
 		}
 

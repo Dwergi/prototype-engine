@@ -29,3 +29,5 @@ public:
 		return distribution( engine );
 	}
 };
+
+bool operator==( const std::string& a, const std::string& b );

@@ -19,22 +19,10 @@ namespace
 
 EntitySystem::EntitySystem()
 {
-
-}
-
-EntitySystem::~EntitySystem()
-{
-
-}
-
-void EntitySystem::Initialize( const Services& services )
-{
-	Cleanup();
-
 	m_initialized = true;
 }
 
-void EntitySystem::Cleanup()
+EntitySystem::~EntitySystem()
 {
 	ProcessCommands();
 
@@ -70,9 +58,9 @@ void EntitySystem::ProcessCommands()
 				EntityEntry& entry = m_entities[ command.Entity.ID ];
 
 				// ensure that this entity has actually lived a full, productive life
-				assert( entry.Flags & EntityState::Valid );
-				assert( entry.Flags & EntityState::Active );
-				assert( entry.Flags & EntityState::Destroyed );
+				ASSERT( entry.Flags & EntityState::Valid );
+				ASSERT( entry.Flags & EntityState::Active );
+				ASSERT( entry.Flags & EntityState::Destroyed );
 
 				entry.Flags = EntityState::None;
 
