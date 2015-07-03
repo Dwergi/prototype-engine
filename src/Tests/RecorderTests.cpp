@@ -13,7 +13,7 @@ TEST_CASE( "[recorder] Recorder" )
 
 	int value = -1;
 	std::vector<int> values;
-	Recorder<int> test( value, HISTORY_SIZE );
+	dd::Recorder<int> test( value, HISTORY_SIZE );
 	values.push_back( test );
 
 	for( int i = 0; i < ITERATION_COUNT; ++i )
@@ -43,7 +43,7 @@ TEST_CASE( "[recorder] FullRecorder" )
 {
 	int value = -1;
 	std::vector<int> values;
-	FullRecorder<int> test( value, HISTORY_SIZE );
+	dd::FullRecorder<int> test( value, HISTORY_SIZE );
 	values.push_back( test );
 
 	for( int i = 0; i < ITERATION_COUNT; ++i )

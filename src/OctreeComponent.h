@@ -4,12 +4,15 @@
 #include "Octree.h"
 #include "UnorderedMapPool.h"
 
-class OctreeComponent : public Component
+namespace dd
 {
-public:
-	typedef UnorderedMapPool<OctreeComponent> Pool;
+	class OctreeComponent : public dd::Component
+	{
+	public:
+		typedef dd::UnorderedMapPool<OctreeComponent> Pool;
 
-	Octree::Entry Entry;
+		Octree::Entry Entry;
 
-	OctreeComponent() {}
-};
+		OctreeComponent() {}
+	};
+}

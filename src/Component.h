@@ -1,12 +1,15 @@
 #pragma once
 
-class Component
+namespace dd
 {
-protected:
+	class Component
+	{
+	protected:
 
-	Component() {}
+		Component() {}
 
-public:
+	public:
 
-	virtual ~Component() {}
-};
+		virtual ~Component() {}
+	};
+}

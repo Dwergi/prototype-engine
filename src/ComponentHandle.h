@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EntityHandle.h"
+
 namespace dd
 {
 	template< typename ComponentType >
@@ -62,6 +64,7 @@ namespace dd
 
 			return *m_pool->Find( m_entity );
 		}
+
 	private:
 
 		const PoolType& m_pool;

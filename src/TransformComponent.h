@@ -4,31 +4,28 @@
 #include "Vector.h"
 #include "DenseVectorPool.h"
 
-class TransformComponent : public Component
+namespace dd
 {
-public:
-
-#ifdef USE_EIGEN 
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-#endif
-
-	Vector4 Position;
-
-	typedef DenseVectorPool<TransformComponent> Pool;
-
-	TransformComponent()
-		: Position( 0, 0, 0, 0 )
+	class TransformComponent : public Component
 	{
+	public:
+		Vector4 Position;
 
-	}
+		typedef DenseVectorPool<TransformComponent> Pool;
 
-	void Update( int iMultiplier )
-	{
-		Position += 0.001f;
-		Position *= (float) iMultiplier;
-	}
+		TransformComponent()
+			: Position( 0, 0, 0, 0 )
+		{ 
+		}
 
-	BEGIN_MEMBERS( TransformComponent )
-		MEMBER( TransformComponent, Vector4, Position, "Position" );
-	END_MEMBERS
-};
+		void Update( int iMultiplier )
+		{
+			Position += 0.001f;
+			Position *= (float) iMultiplier;
+		}
+
+		BEGIN_MEMBERS( TransformComponent )
+			MEMBER( TransformComponent, Vector4, Position, "Position" );
+		END_MEMBERS
+	};
+}

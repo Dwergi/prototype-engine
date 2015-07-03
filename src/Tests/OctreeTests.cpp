@@ -28,21 +28,21 @@ TEST_CASE( "Octree", "[octree]")
 
 	create_handles( EntityCount, handles, system );
 
-	TransformComponent::Pool transform_pool;
-	OctreeComponent::Pool octree_pool;
+	dd::TransformComponent::Pool transform_pool;
+	dd::OctreeComponent::Pool octree_pool;
 
-	Octree octree;
+	dd::Octree octree;
 
 	int added = 0;
 
-	Random rngPosition( 0, 100 );
+	dd::Random rngPosition( 0, 100 );
 
 	for( const dd::EntityHandle& handle : handles )
 	{
-		TransformComponent* transform_cmp = transform_pool.Create( handle );
-		transform_cmp->Position = Vector4( (float) rngPosition.Next(), (float) rngPosition.Next(), (float) rngPosition.Next() );
+		dd::TransformComponent* transform_cmp = transform_pool.Create( handle );
+		transform_cmp->Position = dd::Vector4( (float) rngPosition.Next(), (float) rngPosition.Next(), (float) rngPosition.Next() );
 
-		OctreeComponent* octree_cmp = octree_pool.Create( handle );
+		dd::OctreeComponent* octree_cmp = octree_pool.Create( handle );
 		octree_cmp->Entry = octree.Add( transform_cmp->Position );
 
 		++added;
@@ -52,10 +52,10 @@ TEST_CASE( "Octree", "[octree]")
 		REQUIRE( octree_cmp->Entry.IsValid() );
 	}
 
-	std::vector<Octree::Entry> output;
+	std::vector<dd::Octree::Entry> output;
 	output.reserve( 50 );
 
-	Random rngEntity( 0, EntityCount );
+	dd::Random rngEntity( 0, EntityCount );
 
 	for( int i = 0; i < 100; ++i )
 	{
@@ -74,7 +74,7 @@ TEST_CASE( "Octree", "[octree]")
 
 		for( int i = 0; i < 100; ++i )
 		{
-			std::vector<Octree::Entry> output;
+			std::vector<dd::Octree::Entry> output;
 			output.reserve( 50 );
 
 			const dd::EntityHandle& entity = handles[ rngEntity.Next() ];
@@ -92,13 +92,13 @@ TEST_CASE( "Octree", "[octree]")
 	for( int i = 0; i < EntityCount / 2; ++i )
 	{
 		const dd::EntityHandle& entity = handles[ rngEntity.Next() ];
-		OctreeComponent* octree_cmp = octree_pool.Find( entity );
+		dd::OctreeComponent* octree_cmp = octree_pool.Find( entity );
 
 		if( octree_cmp->Entry.IsValid() )
 		{
 			octree.Remove( octree_cmp->Entry );
 
-			octree_cmp->Entry = Octree::Entry();
+			octree_cmp->Entry = dd::Octree::Entry();
 
 			++removed;
 		}

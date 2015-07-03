@@ -2,37 +2,40 @@
 
 #include "Property.h"
 
-class PropertyListBase
+namespace dd
 {
-public: 
-	PropertyListBase();
-	virtual ~PropertyListBase();
-
-	void Add( const Property& entry );
-	Property* Find( const std::string& name );
-
-protected:
-	std::vector<Property> m_properties;
-
-	void AddMembers( TypeInfo* typeInfo, size_t offset );
-};
-
-template<typename T>
-class PropertyList
-	: public PropertyListBase
-{
-public:
-	PropertyList( T& instance )
+	class PropertyListBase
 	{
-		// recursively add members
-		AddMembers( TypeInfo::GetType<T>(), 0 );
+	public: 
+		PropertyListBase();
+		virtual ~PropertyListBase();
 
-		// bind to this instance
-		for( Property& prop : m_properties )
+		void Add( const Property& entry );
+		Property* Find( const std::string& name );
+
+	protected:
+		std::vector<Property> m_properties;
+
+		void AddMembers( TypeInfo* typeInfo, size_t offset );
+	};
+
+	template<typename T>
+	class PropertyList
+		: public PropertyListBase
+	{
+	public:
+		PropertyList( T& instance )
 		{
-			prop.Bind( instance );
-		}
-	}
+			// recursively add members
+			AddMembers( TypeInfo::GetType<T>(), 0 );
 
-	virtual ~PropertyList() {}
-};
+			// bind to this instance
+			for( Property& prop : m_properties )
+			{
+				prop.Bind( instance );
+			}
+		}
+
+		virtual ~PropertyList() {}
+	};
+}

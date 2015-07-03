@@ -3,12 +3,12 @@
 
 #include "Property.h"
 
-MemberBase::MemberBase()
+dd::MemberBase::MemberBase()
 {
 
 }
 
-MemberBase::~MemberBase()
+dd::MemberBase::~MemberBase()
 {
 
 }

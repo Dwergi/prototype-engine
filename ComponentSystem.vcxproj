@@ -115,6 +115,7 @@
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
+    <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Handle.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Octree.h" />
@@ -126,6 +127,8 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
+    <ClInclude Include="src\SwarmAgentComponent.h" />
+    <ClInclude Include="src\SwarmSystem.h" />
     <ClInclude Include="src\Tests.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\TypeInfo.h" />
@@ -158,6 +161,8 @@
     <ClCompile Include="src\PropertyList.cpp" />
     <ClCompile Include="src\Recorder.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
+    <ClCompile Include="src\SwarmAgentComponent.cpp" />
+    <ClCompile Include="src\SwarmSystem.cpp" />
     <ClCompile Include="src\Tests\OctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
     <ClCompile Include="src\Tests\RecorderTests.cpp" />

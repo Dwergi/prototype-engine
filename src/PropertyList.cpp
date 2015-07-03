@@ -1,20 +1,20 @@
 #include "PrecompiledHeader.h"
 #include "PropertyList.h"
 
-PropertyListBase::PropertyListBase()
+dd::PropertyListBase::PropertyListBase()
 {
 }
 
-PropertyListBase::~PropertyListBase()
+dd::PropertyListBase::~PropertyListBase()
 {
 }
 
-void PropertyListBase::Add( const Property& entry )
+void dd::PropertyListBase::Add( const Property& entry )
 {
 	m_properties.push_back( entry );
 }
 
-Property* PropertyListBase::Find( const std::string& name )
+dd::Property* dd::PropertyListBase::Find( const std::string& name )
 {
 	for( Property& prop : m_properties )
 	{
@@ -31,7 +31,7 @@ Property* PropertyListBase::Find( const std::string& name )
 //
 // Recursively add members to the property list.
 //
-void PropertyListBase::AddMembers( TypeInfo* typeInfo, uint offset )
+void dd::PropertyListBase::AddMembers( dd::TypeInfo* typeInfo, uint offset )
 {
 	if( typeInfo == nullptr )
 		return;
@@ -39,9 +39,9 @@ void PropertyListBase::AddMembers( TypeInfo* typeInfo, uint offset )
 	const std::vector<MemberBase*>& members = typeInfo->GetMembers();
 	for( MemberBase* member : members )
 	{
-		m_properties.emplace_back( Property( member, offset ) );
+		m_properties.emplace_back( dd::Property( member, offset ) );
 
-		TypeInfo* nested = TypeInfo::GetType( member->m_typeName );
+		dd::TypeInfo* nested = dd::TypeInfo::GetType( member->m_typeName );
 		AddMembers( nested, offset + member->m_offset );
 	}
 }

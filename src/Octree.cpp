@@ -23,43 +23,43 @@ void push_back_unique( TContainer& container, const TValue& value )
 
 //===================================================================================
 
-Octree::Entry::Entry( int id )
+dd::Octree::Entry::Entry( int id )
 	: ID( id )
 {
 
 }
 
-Octree::Entry::Entry()
+dd::Octree::Entry::Entry()
 	: ID( -1 )
 {
 
 }
 
-Octree::Entry::Entry( const Octree::Entry& other )
+dd::Octree::Entry::Entry( const dd::Octree::Entry& other )
 	: ID( other.ID )
 {
 
 }
 
-bool Octree::Entry::operator==( const Octree::Entry& other ) const
+bool dd::Octree::Entry::operator==( const dd::Octree::Entry& other ) const
 {
 	return ID == other.ID;
 }
 
-bool Octree::Entry::IsValid() const
+bool dd::Octree::Entry::IsValid() const
 {
 	return ID != -1;
 }
 
 //===================================================================================
 
-Octree::CellInternal::CellInternal( const Vector4& pos, float size )
+dd::Octree::CellInternal::CellInternal( const dd::Vector4& pos, float size )
 {
 	Position = pos;
 	Size = size;
 }
 
-Octree::CellInternal::CellInternal( const CellInternal& other )
+dd::Octree::CellInternal::CellInternal( const CellInternal& other )
 	: Data( other.Data )
 {
 	Position = other.Position;
@@ -69,13 +69,13 @@ Octree::CellInternal::CellInternal( const CellInternal& other )
 		Children[ i ] = other.Children[ i ];
 }
 
-Octree::CellInternal::~CellInternal()
+dd::Octree::CellInternal::~CellInternal()
 {
 	for( int i = 0; i < 8; ++i )
 		Children[ i ].Invalidate();
 }
 
-Octree::CellInternal& Octree::CellInternal::operator=( const CellInternal& other )
+dd::Octree::CellInternal& dd::Octree::CellInternal::operator=( const CellInternal& other )
 {
 	Data = other.Data;
 	Position = other.Position;
@@ -87,7 +87,7 @@ Octree::CellInternal& Octree::CellInternal::operator=( const CellInternal& other
 	return *this;
 }
 
-void Octree::CellInternal::Add( const Octree::Entry& entry )
+void dd::Octree::CellInternal::Add( const dd::Octree::Entry& entry )
 {
 	ASSERT( !HasChildren() );
 	ASSERT( Data.size() < MAX_CELL_ENTRIES );
@@ -95,7 +95,7 @@ void Octree::CellInternal::Add( const Octree::Entry& entry )
 	Data.push_back( entry );
 }
 
-void Octree::CellInternal::Remove( const Octree::Entry& entry )
+void dd::Octree::CellInternal::Remove( const dd::Octree::Entry& entry )
 {
 	auto it = std::find( Data.begin(), Data.end(), entry );
 
@@ -103,12 +103,12 @@ void Octree::CellInternal::Remove( const Octree::Entry& entry )
 		Data.erase( it );
 }
 
-bool Octree::CellInternal::Contains( const Vector4& pos ) const
+bool dd::Octree::CellInternal::Contains( const dd::Vector4& pos ) const
 {
 	return pos >= Position && pos < Position + Size;
 }
 
-Octree::Cell Octree::CellInternal::GetCellContaining( const Vector4& pos ) const
+dd::Octree::Cell dd::Octree::CellInternal::GetCellContaining( const dd::Vector4& pos ) const
 {
 	int index = 0;
 
@@ -125,25 +125,25 @@ Octree::Cell Octree::CellInternal::GetCellContaining( const Vector4& pos ) const
 	return Children[ index ];
 }
 
-bool Octree::CellInternal::HasChildren() const
+bool dd::Octree::CellInternal::HasChildren() const
 {
 	// can't have a single child valid without all children being valid
 	return Children[ 0 ].IsValid();
 }
 
-BoundingBox Octree::CellInternal::GetBounds() const
+dd::BoundingBox dd::Octree::CellInternal::GetBounds() const
 {
 	return BoundingBox( Position, Position + Size );
 }
 
 //===================================================================================
 
-Octree::Octree()
+dd::Octree::Octree()
 {
 	m_lastID = 0;
 }
 
-Octree::~Octree()
+dd::Octree::~Octree()
 {
 	m_cells.clear();
 }
@@ -152,7 +152,7 @@ Octree::~Octree()
 // Add an entry at the given position. 
 // Returns a entry used to reference the given object.
 //
-Octree::Entry Octree::Add( const Vector4& position )
+dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 {
 	ASSERT( position >= ORIGIN );
 
@@ -193,9 +193,9 @@ Octree::Entry Octree::Add( const Vector4& position )
 }
 
 //
-// Once we've found the current lowest level cell, we call this which entrys all the potential splits that may result from the add.
+// Once we've found the current lowest level cell, we call this which performs all the potential splits that may result from the add.
 // 
-void Octree::AddToCell( Octree::Cell cell, const Octree::Entry& entry )
+void dd::Octree::AddToCell( dd::Octree::Cell cell, const dd::Octree::Entry& entry )
 {
 	ASSERT( cell->Contains( m_entries.at( entry ) ) );
 
@@ -211,7 +211,7 @@ void Octree::AddToCell( Octree::Cell cell, const Octree::Entry& entry )
 //
 // Create a new cell at the given position with the given size.
 // 
-Octree::Cell Octree::CreateCell( const Vector4& pos, float size )
+dd::Octree::Cell dd::Octree::CreateCell( const dd::Vector4& pos, float size )
 {
 	if( m_free.empty() )
 	{
@@ -233,7 +233,7 @@ Octree::Cell Octree::CreateCell( const Vector4& pos, float size )
 	}
 }
 
-void Octree::ExpandRoot()
+void dd::Octree::ExpandRoot()
 {
 	// copy the old root to the end
 	Cell oldRoot = CreateCell( m_root->Position, m_root->Size );
@@ -261,7 +261,7 @@ void Octree::ExpandRoot()
 	}
 }
 
-void Octree::CreateChildren( Octree::Cell cell )
+void dd::Octree::CreateChildren( dd::Octree::Cell cell )
 {
 	ASSERT( cell.IsValid() );
 
@@ -290,7 +290,7 @@ void Octree::CreateChildren( Octree::Cell cell )
 // 
 // Split a cell into 8 new subcells. 
 //
-void Octree::SplitCell( Octree::Cell cell )
+void dd::Octree::SplitCell( dd::Octree::Cell cell )
 {
 	ASSERT( cell.IsValid() );
 
@@ -307,7 +307,7 @@ void Octree::SplitCell( Octree::Cell cell )
 	}
 }
 
-void Octree::FreeCell( Cell cell )
+void dd::Octree::FreeCell( Cell cell )
 {
 	m_free.push( cell );
 }
@@ -315,7 +315,7 @@ void Octree::FreeCell( Cell cell )
 //
 // Remove the given entry.
 //
-void Octree::Remove( const Octree::Entry& entry )
+void dd::Octree::Remove( const dd::Octree::Entry& entry )
 {
 	// find the cell
 	Cell parent;
@@ -365,7 +365,7 @@ void Octree::Remove( const Octree::Entry& entry )
 //
 // Get the position for the given entry.
 //
-const Vector4& Octree::GetPosition( const Octree::Entry& entry ) const
+const dd::Vector4& dd::Octree::GetPosition( const dd::Octree::Entry& entry ) const
 {
 	ASSERT( entry.ID != -1 );
 
@@ -376,7 +376,7 @@ const Vector4& Octree::GetPosition( const Octree::Entry& entry ) const
 //
 // Get the <count> nearest entries to the given entry.
 // 
-void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Octree::Entry>& output )
+void dd::Octree::GetKNearest( const dd::Octree::Entry& entry, int count, std::vector<dd::Octree::Entry>& output )
 {
 	ASSERT( count > 0 );
 	ASSERT( entry.ID != -1 );
@@ -452,7 +452,7 @@ void Octree::GetKNearest( const Octree::Entry& entry, int count, std::vector<Oct
 //
 // Get all the entries within <range> of the given entry.
 //
-void Octree::GetWithinRange( const Octree::Entry& entry, float range, std::vector<Octree::Entry>& output )
+void dd::Octree::GetWithinRange( const dd::Octree::Entry& entry, float range, std::vector<dd::Octree::Entry>& output )
 {
 	const Vector4& position = m_entries.at( entry );
 	float rangeSq = range * range;
@@ -473,7 +473,7 @@ void Octree::GetWithinRange( const Octree::Entry& entry, float range, std::vecto
 //
 // Get all the entries within the given bounding box.
 //
-void Octree::GetWithinBounds( const BoundingBox& bounds, std::vector<Octree::Entry>& output )
+void dd::Octree::GetWithinBounds( const dd::BoundingBox& bounds, std::vector<dd::Octree::Entry>& output )
 {
 	std::vector<Cell> leaf_cells;
 	std::vector<Cell> to_process;
@@ -512,12 +512,12 @@ void Octree::GetWithinBounds( const BoundingBox& bounds, std::vector<Octree::Ent
 	}
 }
 
-Octree::Entry Octree::NextEntry()
+dd::Octree::Entry dd::Octree::NextEntry()
 {
 	return Entry( m_lastID++ );
 }
 
-Octree::Cell Octree::FindCell( const Vector4& position, Cell* parent ) const
+dd::Octree::Cell dd::Octree::FindCell( const dd::Vector4& position, Cell* parent ) const
 {
 	ASSERT( m_root->Contains( position ), "Position is not in the tree!" );
 
@@ -535,17 +535,17 @@ Octree::Cell Octree::FindCell( const Vector4& position, Cell* parent ) const
 	return current;
 }
 
-Octree::Cell Octree::FindCell( const Octree::Entry& entry, Cell* parent ) const
+dd::Octree::Cell dd::Octree::FindCell( const Octree::Entry& entry, Cell* parent ) const
 {
 	return FindCell( m_entries.at( entry ), parent );
 }
 
-int Octree::Count() const 
+int dd::Octree::Count() const 
 {
 	return m_entries.size();
 }
 
-void Octree::Validate() const
+void dd::Octree::Validate() const
 {
 	for( auto pair : m_entries )
 	{

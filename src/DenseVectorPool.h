@@ -4,139 +4,153 @@
 #include "ComponentPoolBase.h"
 #include "ComponentHandle.h"
 
-//
-// A dense component pool is one for which the component is assumed to exist for all entities (eg. transform).
-// Uses much more space than a sparse component pool for large numbers of entities.
-//
-template<typename T>
-class DenseVectorPool : public ComponentPoolBase
+namespace dd
 {
-public:
-
-	static_assert( std::is_base_of<Component, T>::value, "Not derived from Component." );
-
-#ifdef USE_EIGEN
-	typedef typename aligned_vector<T> Storage;
-#else
-	typedef typename std::vector<T> Storage;
-#endif
-
-	typedef typename Storage::iterator ComponentIterator;
-
-	DenseVectorPool()
-	{
-
-	}
-
-	~DenseVectorPool()
-	{
-		Cleanup();
-	}
-
-	void Cleanup()
-	{
-		m_components.swap( Storage() );
-		m_valid.swap( std::vector<bool>() );
-	}
-
 	//
-	// Checks if this component pool is empty or not.
-	// 
-	bool Empty()
-	{
-		bool any = false;
-		for( bool valid : m_valid )
-		{
-			any |= valid;
-		}
-
-		return any;
-	}
-
+	// A dense component pool is one for which the component is assumed to exist for all entities (eg. transform).
+	// Uses much more space than a sparse component pool for large numbers of entities.
 	//
-	// Create a new component of this type for the given entity and return the pointer to it.
-	// Returns null if the component already exists.
-	// 
-	T* Create( const dd::EntityHandle& entity )
+	template<typename T>
+	class DenseVectorPool : public dd::ComponentPoolBase
 	{
-		// already allocated!
-		if( Exists( entity ) )
+	public:
+		static_assert( std::is_base_of<dd::Component, T>::value, "Not derived from Component." );
+
+		typedef typename std::vector<T> Storage;
+		typedef typename Storage::iterator ComponentIterator;
+		typedef typename Storage::const_iterator ComponentConstIterator;
+
+		DenseVectorPool()
 		{
-			ASSERT( false, "Entity already exists!" );
-			return nullptr;
+
 		}
 
-		if( entity.ID < 0 || entity.ID >= (int) m_components.size() )
+		~DenseVectorPool()
 		{
-			m_components.resize( entity.ID + 1 );
-			m_valid.resize( entity.ID + 1 );
+			Cleanup();
 		}
 
-		m_valid[ entity.ID ] = true;
-
-		T& cmp = m_components[ entity.ID ];
-		return &cmp;
-	}
-
-	dd::ComponentHandle<T> GetHandle( const dd::EntityHandle& entity )
-	{
-		return dd::ComponentHandle<T>( entity, *this );
-	}
-
-	//
-	// Find the component for the given entity.
-	// Returns null if the component hasn't been created.
-	// 
-	T* Find( const dd::EntityHandle& entity )
-	{
-		if( !Exists( entity ) )
+		void Cleanup()
 		{
-			ASSERT( false, "Entity does not exist!" );
-			return nullptr;
+			m_components.swap( Storage() );
+			m_valid.swap( std::vector<bool>() );
 		}
 
-		T& cmp = m_components[ entity.ID ];
-		return &cmp;
-	}
-
-	//
-	// Remove the component associated with the given entity.
-	// 
-	void Remove( const dd::EntityHandle& entity )
-	{
-		if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
+		//
+		// Checks if this component pool is empty or not.
+		// 
+		bool Empty()
 		{
-			ASSERT( false, "Entity ID outside of valid range!" );
-			return;
+			bool any = false;
+			for( bool valid : m_valid )
+			{
+				any |= valid;
+			}
+
+			return any;
 		}
 
-		m_valid[ entity.ID ] = false;
-	}
+		//
+		// Create a new component of this type for the given entity and return the pointer to it.
+		// Returns null if the component already exists.
+		// 
+		T* Create( const dd::EntityHandle& entity )
+		{
+			// already allocated!
+			if( Exists( entity ) )
+			{
+				ASSERT( false, "Entity already exists!" );
+				return nullptr;
+			}
 
-	// 
-	// Checks if the given entity has a component of this type.
-	// 
-	bool Exists( const dd::EntityHandle& entity )
-	{
-		if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
-			return false;
+			if( entity.ID < 0 || entity.ID >= (int) m_components.size() )
+			{
+				m_components.resize( entity.ID + 1 );
+				m_valid.resize( entity.ID + 1 );
+			}
 
-		bool isValid = m_valid[ entity.ID ];
-		return isValid;
-	}
+			m_valid[ entity.ID ] = true;
 
-	ComponentIterator begin()
-	{
-		return m_components.begin();
-	}
+			T& cmp = m_components[ entity.ID ];
+			return &cmp;
+		}
 
-	ComponentIterator end()
-	{
-		return m_components.end();
-	}
+		dd::ComponentHandle<T> GetHandle( const dd::EntityHandle& entity )
+		{
+			return dd::ComponentHandle<T>( entity, *this );
+		}
 
-private:
+		//
+		// Find the component for the given entity.
+		// Returns null if the component hasn't been created.
+		// 
+		T* Find( const dd::EntityHandle& entity )
+		{
+			if( !Exists( entity ) )
+			{
+				ASSERT( false, "Entity does not exist!" );
+				return nullptr;
+			}
 
-	Storage m_components;
-	std::vector<bool> m_valid;
-};
+			T& cmp = m_components[ entity.ID ];
+			return &cmp;
+		}
+
+		//
+		// Remove the component associated with the given entity.
+		// 
+		void Remove( const dd::EntityHandle& entity )
+		{
+			if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
+			{
+				ASSERT( false, "Entity ID outside of valid range!" );
+				return;
+			}
+
+			m_valid[ entity.ID ] = false;
+		}
+
+		// 
+		// Checks if the given entity has a component of this type.
+		// 
+		bool Exists( const dd::EntityHandle& entity )
+		{
+			if( entity.ID < 0 || entity.ID >= (int) m_valid.size() )
+				return false;
+
+			bool isValid = m_valid[ entity.ID ];
+			return isValid;
+		}
+
+		ComponentIterator begin()
+		{
+			return m_components.begin();
+		}
+
+		ComponentIterator end()
+		{
+			return m_components.end();
+		}
+
+		ComponentConstIterator begin() const
+		{
+			return m_components.begin();
+		}
+
+		ComponentConstIterator end() const
+		{
+			return m_components.end();
+		}
+
+		void operator=( const DenseVectorPool<T>& other )
+		{
+			m_components = other.m_components;
+			m_valid = other.m_valid;
+		}
+
+	private:
+
+		Storage m_components;
+		std::vector<bool> m_valid;
+	};
+}

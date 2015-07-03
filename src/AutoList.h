@@ -1,26 +1,29 @@
 #pragma once
 
-template <typename T>
-class AutoList
+namespace dd
 {
-public:
-	AutoList()
+	template <typename T>
+	class AutoList
 	{
-		m_next = Head();
-		Head() = static_cast<const T *>( this );
-	}
+	public:
+		AutoList()
+		{
+			m_next = Head();
+			Head() = static_cast<const T *>( this );
+		}
 
-	const T* Next() const
-	{
-		return m_next;
-	}
+		const T* Next() const
+		{
+			return m_next;
+		}
 
-	static const T*& Head()
-	{
-		static const T* m_head = nullptr;
-		return m_head;
-	}
+		static const T*& Head()
+		{
+			static const T* m_head = nullptr;
+			return m_head;
+		}
 
-private:
-	const T* m_next;
-};
+	private:
+		const T* m_next;
+	};
+}

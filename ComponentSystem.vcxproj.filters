@@ -22,6 +22,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{91912b7c-2d97-42f4-999e-4976987ccb0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{74210990-6148-4e02-995f-ab11859b19ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -117,6 +120,15 @@
     <ClInclude Include="src\ComponentHandle.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\SwarmAgentComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwarmSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DoubleBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -176,6 +188,12 @@
     </ClCompile>
     <ClCompile Include="src\Tests\TimerTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwarmAgentComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwarmSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

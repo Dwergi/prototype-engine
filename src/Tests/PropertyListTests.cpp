@@ -29,7 +29,7 @@ struct NestedStruct
 	END_MEMBERS
 };
 
-void test_int_prop( Property* int_prop )
+void test_int_prop( dd::Property* int_prop )
 {
 	int i = 5;
 	int_prop->Set( i );
@@ -55,8 +55,8 @@ TEST_CASE( "[property] Integer properties" )
 
 	SECTION( "Simple" )
 	{
-		PropertyList<SimpleStruct> props( test_struct );
-		Property* int_prop = props.Find( "Integer" );
+		dd::PropertyList<SimpleStruct> props( test_struct );
+		dd::Property* int_prop = props.Find( "Integer" );
 
 		test_int_prop( int_prop );
 
@@ -69,18 +69,18 @@ TEST_CASE( "[property] Integer properties" )
 
 		NestedStruct::RegisterType();
 		NestedStruct nested;
-		PropertyList<NestedStruct> nested_props( nested );
+		dd::PropertyList<NestedStruct> nested_props( nested );
 
 		SECTION( "Nested" )
 		{
-			Property* nested_int = nested_props.Find( "Integer" );
+			dd::Property* nested_int = nested_props.Find( "Integer" );
 			test_int_prop( nested_int );
 
 			REQUIRE( nested.Struct.Int == 20 );
 		}
 		SECTION( "Offset" )
 		{
-			Property* second_int = nested_props.Find( "SecondInt" );
+			dd::Property* second_int = nested_props.Find( "SecondInt" );
 			test_int_prop( second_int );
 
 			REQUIRE( nested.SecondInt == 20 );
@@ -90,14 +90,14 @@ TEST_CASE( "[property] Integer properties" )
 
 TEST_CASE( "[property] Recorder" )
 {
-	Vector4::RegisterType();
-	TransformComponent::RegisterType();
+	dd::Vector4::RegisterType();
+	dd::TransformComponent::RegisterType();
 
-	TransformComponent cmp;
+	dd::TransformComponent cmp;
 	cmp.Position.X = 500;
 
-	PropertyList<TransformComponent> transform_list( cmp );
-	Recorder<float> x_recorder( transform_list.Find( "X" ) );
+	dd::PropertyList<dd::TransformComponent> transform_list( cmp );
+	dd::Recorder<float> x_recorder( transform_list.Find( "X" ) );
 
 	float value = 0;
 

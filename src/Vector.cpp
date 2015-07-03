@@ -3,23 +3,23 @@
 //
 // Constructors
 //
-Vector4::Vector4()
+dd::Vector4::Vector4()
 {
 
 }
 
-Vector4::Vector4( float x, float y, float z, float w )
+dd::Vector4::Vector4( float x, float y, float z, float w )
 	: X( x ), Y( y ), Z( z ), W( w )
 {
 
 }
 
-Vector4::~Vector4()
+dd::Vector4::~Vector4()
 {
 
 }
 
-Vector4::Vector4( const Vector4& other )
+dd::Vector4::Vector4( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 	{
@@ -27,7 +27,7 @@ Vector4::Vector4( const Vector4& other )
 	}
 }
 
-Vector4& Vector4::operator=( const Vector4& other )
+dd::Vector4& dd::Vector4::operator=( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 	{
@@ -40,39 +40,39 @@ Vector4& Vector4::operator=( const Vector4& other )
 //
 // Scalar operators
 //
-Vector4 Vector4::operator+( float scalar ) const
+dd::Vector4 dd::Vector4::operator+( float scalar ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp += scalar;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator-( float scalar ) const
+dd::Vector4 dd::Vector4::operator-( float scalar ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp -= scalar;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator*( float scalar ) const
+dd::Vector4 dd::Vector4::operator*( float scalar ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp *= scalar;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator/( float scalar ) const
+dd::Vector4 dd::Vector4::operator/( float scalar ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp /= scalar;
 
 	return tmp;
 }
 
-Vector4& Vector4::operator+=( float scalar )
+dd::Vector4& dd::Vector4::operator+=( float scalar )
 {
 	for( float& comp : m_data )
 		comp += scalar;
@@ -80,7 +80,7 @@ Vector4& Vector4::operator+=( float scalar )
 	return *this;
 }
 
-Vector4& Vector4::operator-=( float scalar )
+dd::Vector4& dd::Vector4::operator-=( float scalar )
 {
 	for( float& comp : m_data )
 		comp -= scalar;
@@ -88,7 +88,7 @@ Vector4& Vector4::operator-=( float scalar )
 	return *this;
 }
 
-Vector4& Vector4::operator*=( float scalar )
+dd::Vector4& dd::Vector4::operator*=( float scalar )
 {
 	for( float& comp : m_data )
 		comp *= scalar;
@@ -96,7 +96,7 @@ Vector4& Vector4::operator*=( float scalar )
 	return *this;
 }
 
-Vector4& Vector4::operator/=( float scalar )
+dd::Vector4& dd::Vector4::operator/=( float scalar )
 {
 	for( float& comp : m_data )
 		comp /= scalar;
@@ -107,39 +107,39 @@ Vector4& Vector4::operator/=( float scalar )
 //
 // Component-wise vector operators
 //
-Vector4 Vector4::operator+( const Vector4& other ) const
+dd::Vector4 dd::Vector4::operator+( const dd::Vector4& other ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp += other;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator-( const Vector4& other ) const
+dd::Vector4 dd::Vector4::operator-( const dd::Vector4& other ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp -= other;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator*( const Vector4& other ) const
+dd::Vector4 dd::Vector4::operator*( const dd::Vector4& other ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp *= other;
 
 	return tmp;
 }
 
-Vector4 Vector4::operator/( const Vector4& other ) const
+dd::Vector4 dd::Vector4::operator/( const dd::Vector4& other ) const
 {
-	Vector4 tmp( *this );
+	dd::Vector4 tmp( *this );
 	tmp /= other;
 
 	return tmp;
 }
 
-Vector4& Vector4::operator+=( const Vector4& other )
+dd::Vector4& dd::Vector4::operator+=( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 		m_data[ i ] += other.m_data[ i ];
@@ -147,7 +147,7 @@ Vector4& Vector4::operator+=( const Vector4& other )
 	return *this;
 }
 
-Vector4& Vector4::operator-=( const Vector4& other )
+dd::Vector4& dd::Vector4::operator-=( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 		m_data[ i ] -= other.m_data[ i ];
@@ -155,7 +155,7 @@ Vector4& Vector4::operator-=( const Vector4& other )
 	return *this;
 }
 
-Vector4& Vector4::operator*=( const Vector4& other )
+dd::Vector4& dd::Vector4::operator*=( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 		m_data[ i ] += other.m_data[ i ];
@@ -163,7 +163,7 @@ Vector4& Vector4::operator*=( const Vector4& other )
 	return *this;
 }
 
-Vector4& Vector4::operator/=( const Vector4& other )
+dd::Vector4& dd::Vector4::operator/=( const dd::Vector4& other )
 {
 	for( int i = 0; i < DEGREE; ++i )
 		m_data[ i ] += other.m_data[ i ];
@@ -174,27 +174,27 @@ Vector4& Vector4::operator/=( const Vector4& other )
 //
 // Comparisons
 //
-bool Vector4::operator==( const Vector4& other ) const
+bool dd::Vector4::operator==( const dd::Vector4& other ) const
 {
 	return X == other.X && Y == other.Y && Z == other.Z;
 }
 
-bool Vector4::operator>( const Vector4& other ) const
+bool dd::Vector4::operator>( const dd::Vector4& other ) const
 {
 	return X > other.X && Y > other.Y && Z > other.Z;
 }
 
-bool Vector4::operator<( const Vector4& other ) const
+bool dd::Vector4::operator<( const dd::Vector4& other ) const
 {
 	return X < other.X && Y < other.Y && Z < other.Z;
 }
 
-bool Vector4::operator<=( const Vector4& other ) const
+bool dd::Vector4::operator<=( const dd::Vector4& other ) const
 {
 	return X <= other.X && Y <= other.Y && Z <= other.Z;
 }
 
-bool Vector4::operator>=( const Vector4& other ) const
+bool dd::Vector4::operator>=( const dd::Vector4& other ) const
 {
 	return X >= other.X && Y >= other.Y && Z >= other.Z;
 }
@@ -202,12 +202,12 @@ bool Vector4::operator>=( const Vector4& other ) const
 //
 // Vector math
 //
-float Vector4::length() const
+float dd::Vector4::length() const
 {
 	return sqrt( lengthSq() );
 }
 
-float Vector4::lengthSq() const
+float dd::Vector4::lengthSq() const
 {
 	float result = 0;
 
@@ -219,20 +219,20 @@ float Vector4::lengthSq() const
 	return result;
 }
 
-float Vector4::distance( const Vector4& other ) const
+float dd::Vector4::distance( const dd::Vector4& other ) const
 {
 	return sqrt( distanceSq( other ) );
 }
 
-float Vector4::distanceSq( const Vector4& other ) const
+float dd::Vector4::distanceSq( const dd::Vector4& other ) const
 {
-	Vector4 diff = *this - other;
+	dd::Vector4 diff = *this - other;
 	
 	return diff.lengthSq();
 }
 
 
-float Vector4::dot( const Vector4& other ) const
+float dd::Vector4::dot( const dd::Vector4& other ) const
 {
 	float result = 0;
 
@@ -244,9 +244,9 @@ float Vector4::dot( const Vector4& other ) const
 	return result;
 }
 
-Vector4 Vector4::cross( const Vector4& other ) const
+dd::Vector4 dd::Vector4::cross( const dd::Vector4& other ) const
 {
-	Vector4 result;
+	dd::Vector4 result;
 
 	result.X = Y * other.Z - other.Y * Z;
 	result.Y = Z * other.X - other.Z * X;
@@ -255,15 +255,15 @@ Vector4 Vector4::cross( const Vector4& other ) const
 	return result;
 }
 
-Vector4 Vector4::getNormalized() const
+dd::Vector4 dd::Vector4::getNormalized() const
 {
-	Vector4 result( *this );
+	dd::Vector4 result( *this );
 	result.normalize();
 
 	return result;
 }
 
-Vector4& Vector4::normalize()
+dd::Vector4& dd::Vector4::normalize()
 {
 	float length = this->length();
 
@@ -275,12 +275,12 @@ Vector4& Vector4::normalize()
 	return *this;
 }
 
-float& Vector4::operator[]( unsigned int component )
+float& dd::Vector4::operator[]( unsigned int component )
 {
 	return m_data[ component ];
 }
 
-float Vector4::operator[]( unsigned int component ) const
+float dd::Vector4::operator[]( unsigned int component ) const
 {
 	return m_data[ component ];
 }

@@ -1,20 +1,20 @@
 #include "PrecompiledHeader.h"
 #include "BoundingBox.h"
 
-BoundingBox::BoundingBox()
+dd::BoundingBox::BoundingBox()
 	: m_initialized( false )
 {
 
 }
 
-BoundingBox::BoundingBox( const Vector4& min, const Vector4& max )
+dd::BoundingBox::BoundingBox( const dd::Vector4& min, const dd::Vector4& max )
 	: m_initialized( true )
 {
 	m_minimum = min;
 	m_maximum = max;
 }
 
-BoundingBox::BoundingBox( const BoundingBox& other )
+dd::BoundingBox::BoundingBox( const dd::BoundingBox& other )
 	: m_minimum( other.m_minimum ),
 	m_maximum( other.m_maximum ),
 	m_initialized( other.m_initialized )
@@ -22,7 +22,7 @@ BoundingBox::BoundingBox( const BoundingBox& other )
 	
 }
 
-BoundingBox& BoundingBox::operator=( const BoundingBox& other )
+dd::BoundingBox& dd::BoundingBox::operator=( const dd::BoundingBox& other )
 {
 	m_minimum = other.m_minimum;
 	m_maximum = other.m_maximum;
@@ -31,7 +31,7 @@ BoundingBox& BoundingBox::operator=( const BoundingBox& other )
 	return *this;
 }
 
-void BoundingBox::Include( const Vector4& pos )
+void dd::BoundingBox::Include( const dd::Vector4& pos )
 {
 	if( !m_initialized )
 	{
@@ -51,23 +51,23 @@ void BoundingBox::Include( const Vector4& pos )
 	m_maximum.Z = std::max( m_maximum.Z, pos.Z );
 }
 
-void BoundingBox::Include( const BoundingBox& box )
+void dd::BoundingBox::Include( const BoundingBox& box )
 {
 	Include( box.m_minimum );
 	Include( box.m_maximum );
 }
 
-bool BoundingBox::Contains( const Vector4& pos ) const
+bool dd::BoundingBox::Contains( const dd::Vector4& pos ) const
 {
 	return pos >= m_minimum && pos <= m_maximum;
 }
 
-bool BoundingBox::Intersects( const BoundingBox& other ) const
+bool dd::BoundingBox::Intersects( const dd::BoundingBox& other ) const
 {
 	return m_maximum > other.m_minimum && m_minimum < other.m_maximum;
 }
 
-Vector4 BoundingBox::GetCenter() const
+dd::Vector4 dd::BoundingBox::GetCenter() const
 {
 	return (m_minimum + m_maximum) * 0.5f;
 }

@@ -2,6 +2,28 @@
 
 #include <random>
 
+namespace dd
+{
+	class Random
+	{
+		std::mt19937 engine;
+		std::uniform_int_distribution<unsigned int> distribution;
+
+	public:
+
+		Random( unsigned int min, unsigned int max ) 
+			: distribution( min, max )
+		{
+
+		}
+
+		int Next()
+		{
+			return distribution( engine );
+		}
+	};
+}
+
 template< typename TVector, typename TIterator >
 void erase_unordered( TVector& container, TIterator it )
 {
@@ -10,24 +32,5 @@ void erase_unordered( TVector& container, TIterator it )
 
 	container.pop_back();
 }
-
-class Random
-{
-	std::mt19937 engine;
-	std::uniform_int_distribution<unsigned int> distribution;
-
-public:
-
-	Random( unsigned int min, unsigned int max ) 
-		: distribution( min, max )
-	{
-
-	}
-
-	int Next()
-	{
-		return distribution( engine );
-	}
-};
 
 bool operator==( const std::string& a, const std::string& b );

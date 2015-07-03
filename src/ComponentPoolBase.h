@@ -1,16 +1,14 @@
 #pragma once
 
-#include <type_traits>
-
-#include "Component.h"
-#include "EntityHandle.h"
-
-class ComponentPoolBase
+namespace dd
 {
-public:
-
-protected:
-	ComponentPoolBase()
+	class ComponentPoolBase
 	{
-	}
-};
+	public:
+
+	protected:
+		ComponentPoolBase()
+		{
+		}
+	};
+}

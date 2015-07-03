@@ -8,45 +8,48 @@
 
 #include "Vector.h"
 
-class BoundingBox
+namespace dd
 {
-public:
+	class BoundingBox
+	{
+	public:
 
-	BoundingBox();
-	BoundingBox( const Vector4& min, const Vector4& max );
-	BoundingBox( const BoundingBox& other );
+		BoundingBox();
+		BoundingBox( const dd::Vector4& min, const dd::Vector4& max );
+		BoundingBox( const BoundingBox& other );
 
-	BoundingBox& operator=( const BoundingBox& other );
+		BoundingBox& operator=( const BoundingBox& other );
 
-	//
-	// Expand the bounds to include the given point.
-	//
-	void Include( const Vector4& pos );
+		//
+		// Expand the bounds to include the given point.
+		//
+		void Include( const dd::Vector4& pos );
 
-	//
-	// Expand the bounds to include the given bounding box.
-	//
-	void Include( const BoundingBox& box );
+		//
+		// Expand the bounds to include the given bounding box.
+		//
+		void Include( const BoundingBox& box );
 
-	//
-	// Check if the given point is inside the bounds.
-	//
-	bool Contains( const Vector4& pos ) const;
+		//
+		// Check if the given point is inside the bounds.
+		//
+		bool Contains( const dd::Vector4& pos ) const;
 
-	//
-	// Check if this bounding box with another.
-	//
-	bool Intersects( const BoundingBox& other ) const;
+		//
+		// Check if this bounding box with another.
+		//
+		bool Intersects( const BoundingBox& other ) const;
 
-	//
-	// Get the center point of this bounding box.
-	//
-	Vector4 GetCenter() const;
+		//
+		// Get the center point of this bounding box.
+		//
+		dd::Vector4 GetCenter() const;
 
-private:
+	private:
 
-	Vector4 m_minimum;
-	Vector4 m_maximum;
+		dd::Vector4 m_minimum;
+		dd::Vector4 m_maximum;
 
-	bool m_initialized;
-};
+		bool m_initialized;
+	};
+}

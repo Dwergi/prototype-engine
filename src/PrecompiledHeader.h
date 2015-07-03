@@ -5,6 +5,9 @@
 #include <vector>
 #include <iostream>
 
+#include "glm/fwd.hpp"
+#include "glm/glm.hpp"
+
 typedef unsigned int uint;
 
 #include "Assert.h"
