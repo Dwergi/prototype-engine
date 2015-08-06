@@ -1,3 +1,9 @@
+//
+// PropertyListTests.cpp - Tests for PropertyList.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 

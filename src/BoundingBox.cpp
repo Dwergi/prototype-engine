@@ -1,5 +1,24 @@
+//
+// BoundingBox.cpp - A basic bounding box.
+// Copyright (C) Sebastian Nordgren 
+// February 12th 2015
+//
+
 #include "PrecompiledHeader.h"
 #include "BoundingBox.h"
+
+namespace
+{
+	float min( float a, float b )
+	{
+		return a < b ? a : b;
+	}
+
+	float max( float a, float b )
+	{
+		return a > b ? a : b;
+	}
+}
 
 dd::BoundingBox::BoundingBox()
 	: m_initialized( false )
@@ -42,13 +61,13 @@ void dd::BoundingBox::Include( const dd::Vector4& pos )
 		return;
 	}
 
-	m_minimum.X = std::min( m_minimum.X, pos.X );
-	m_minimum.Y = std::min( m_minimum.Y, pos.Y );
-	m_minimum.Z = std::min( m_minimum.Z, pos.Z );
+	m_minimum.X = min( m_minimum.X, pos.X );
+	m_minimum.Y = min( m_minimum.Y, pos.Y );
+	m_minimum.Z = min( m_minimum.Z, pos.Z );
 
-	m_maximum.X = std::max( m_maximum.X, pos.X );
-	m_maximum.Y = std::max( m_maximum.Y, pos.Y );
-	m_maximum.Z = std::max( m_maximum.Z, pos.Z );
+	m_maximum.X = max( m_maximum.X, pos.X );
+	m_maximum.Y = max( m_maximum.Y, pos.Y );
+	m_maximum.Z = max( m_maximum.Z, pos.Z );
 }
 
 void dd::BoundingBox::Include( const BoundingBox& box )

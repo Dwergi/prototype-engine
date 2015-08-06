@@ -1,12 +1,10 @@
 //
-// Bounding Box.h - A naive implementation of an octree.
+// BoundingBox.h - A basic bounding box.
 // Copyright (C) Sebastian Nordgren 
 // February 12th 2015
 //
 
 #pragma once
-
-#include "Vector.h"
 
 namespace dd
 {

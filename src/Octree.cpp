@@ -215,11 +215,11 @@ dd::Octree::Cell dd::Octree::CreateCell( const dd::Vector4& pos, float size )
 {
 	if( m_free.empty() )
 	{
-		int index = m_cells.size();
+		size_t index = m_cells.size();
 
 		m_cells.emplace_back( CellInternal( pos, size ) );
 
-		return Cell( index, &m_cells );
+		return Cell( (int) index, m_cells );
 	}
 	else
 	{
@@ -335,7 +335,7 @@ void dd::Octree::Remove( const dd::Octree::Entry& entry )
 		int child_count = 0;
 		for( Cell& child : parent->Children )
 		{
-			child_count += child->Data.size();
+			child_count += (int) child->Data.size();
 		}
 
 		// give a 33% buffer so we don't end up merging too often
@@ -343,7 +343,7 @@ void dd::Octree::Remove( const dd::Octree::Entry& entry )
 		{
 			for( Cell& child : parent->Children )
 			{
-				// move childrens' data into the parent
+				// move children's data into the parent
 				while( !child->Data.empty() )
 				{
 					parent->Data.push_back( child->Data.back() );
@@ -542,7 +542,7 @@ dd::Octree::Cell dd::Octree::FindCell( const Octree::Entry& entry, Cell* parent 
 
 int dd::Octree::Count() const 
 {
-	return m_entries.size();
+	return (int) m_entries.size();
 }
 
 void dd::Octree::Validate() const

@@ -1,3 +1,9 @@
+//
+// DenseVectorPool.h - A pool that holds components in a vector.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "Assert.h"

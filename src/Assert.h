@@ -1,3 +1,9 @@
+//
+// Assert.h - Wrappers around PPK assert macros.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "PP_Assert.h"

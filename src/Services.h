@@ -1,7 +1,13 @@
+//
+// Services.h - A service registry to keep track of global instances of certain types.
+// TODO: Convert to use DD versions of TypeInfo and DenseMap.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include <unordered_map>
-#include <cassert>
 #include <typeinfo>
 #include <typeindex>
 

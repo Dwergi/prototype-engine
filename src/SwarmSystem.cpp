@@ -1,3 +1,9 @@
+//
+// SwarmSystem.cpp - System to handle swarm simulation.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #include "PrecompiledHeader.h"
 #include "SwarmSystem.h"
 

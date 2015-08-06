@@ -1,3 +1,9 @@
+//
+// TimerTests.h - Tests for Timer.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
@@ -25,38 +31,38 @@ void wait( float f )
 TEST_CASE( "Timer", "[timer]" )
 {
 	dd::Timer timer;
-	float start = timer.time();
+	float start = timer.Time();
 	REQUIRE( start == 0 );
 
 	SECTION( "Counts up" )
 	{
-		timer.start();
+		timer.Start();
 		
 		wait( 0.01f );
 
-		float t = timer.time();
+		float t = timer.Time();
 
 		REQUIRE( start < t );
 	}
 
 	SECTION( "Stops" )
 	{
-		timer.start();
+		timer.Start();
 
-		float stopped = timer.stop();
+		float stopped = timer.Stop();
 
 		wait( 0.01f );
 
-		REQUIRE( stopped == timer.time() );
+		REQUIRE( stopped == timer.Time() );
 
 		SECTION( "Resumes" )
 		{
-			float resumed = timer.time();
-			timer.start();
+			float resumed = timer.Time();
+			timer.Start();
 
 			wait( 0.01f );
 
-			REQUIRE( timer.time() > resumed );
+			REQUIRE( timer.Time() > resumed );
 		}
 	}
 }

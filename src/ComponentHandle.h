@@ -1,3 +1,9 @@
+//
+// ComponentHandle.h - A handle to a component.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "EntityHandle.h"

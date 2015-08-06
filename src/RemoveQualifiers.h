@@ -1,3 +1,9 @@
+//
+// RemoveQualifiers.h - Gets the value type of a variable, minus references, pointers and class membership.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #pragma once
 
 template <typename T>

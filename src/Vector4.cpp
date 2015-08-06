@@ -1,4 +1,11 @@
+//
+// Vector4.h - Vector implementations.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #include "PrecompiledHeader.h"
+#include "Vector4.h"
 
 //
 // Constructors

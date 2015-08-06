@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component.h"
-#include "Vector.h"
 #include "DenseVectorPool.h"
 
 namespace dd

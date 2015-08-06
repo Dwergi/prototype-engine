@@ -22,9 +22,13 @@
 #include "DoubleBuffer.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
+#include "Window.h"
+#include "Input.h"
 
 #endif
 //---------------------------------------------------------------------------
+
+#ifndef _TEST
 
 template<typename T>
 void RegisterComponent()
@@ -53,7 +57,6 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 	return buffer;
 }
 
-#ifndef _TEST
 	dd::Services g_services;
 #endif
 
@@ -113,6 +116,33 @@ int main( int argc, char* const argv[] )
 	octree_db.Duplicate();
 
 	dd::SwarmSystem swarm_system( swarm_db );
+
+	dd::Window window( 640, 480, "Neutrino" );
+
+	dd::Input input( window );
+
+	while( !window.ShouldClose() )
+	{
+		input.Update();
+
+		dd::MousePosition mouse_pos = input.GetMousePosition();
+
+		dd::StackArray<dd::InputEvent, 64> events;
+		input.GetKeyEvents( events );
+
+		for( int i = 0; i < events.Size(); ++i )
+		{
+			if( events[ i ].Type == dd::InputType::PRESSED )
+				std::cout << "Pressed a key!" << std::endl;
+
+			if( events[ i ].Type == dd::InputType::RELEASED )
+				std::cout << "Released a key!" << std::endl;
+		}
+
+		window.Swap();
+	}
+
+	window.Close();
 	
 	ASSERT( false, "DONE!" );
 	return 0;

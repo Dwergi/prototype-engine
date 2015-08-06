@@ -1,3 +1,10 @@
+//
+// SortedVectorPool.h - A pool for components that is kept sorted and uses binary search to find entries.
+// Performs atrociously for adds/removes.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "ComponentPoolBase.h"

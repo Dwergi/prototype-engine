@@ -1,3 +1,9 @@
+//
+// RecorderTests.cpp - Tests for Recorder.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
@@ -6,7 +12,7 @@
 int ITERATION_COUNT = 64;
 int HISTORY_SIZE = 32;
 
-TEST_CASE( "[recorder] Recorder" )
+TEST_CASE( "[Recorder] Recorder" )
 {
 	int ITERATION_COUNT = 64;
 	int HISTORY_SIZE = 32;
@@ -39,7 +45,7 @@ TEST_CASE( "[recorder] Recorder" )
 	REQUIRE( test.GetUndoHistorySize() == 0 );
 }
 
-TEST_CASE( "[recorder] FullRecorder" )
+TEST_CASE( "[Recorder] FullRecorder" )
 {
 	int value = -1;
 	std::vector<int> values;

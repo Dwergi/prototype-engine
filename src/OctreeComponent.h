@@ -1,3 +1,9 @@
+//
+// OctreeComponent.h - Component for entities in an octree.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "Component.h"

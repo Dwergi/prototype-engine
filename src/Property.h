@@ -1,3 +1,9 @@
+//
+// Property.h - A wrapper around a member that can be used to create a property editor.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #pragma once
 
 #define PTR_OFFSET( Pointer, Bytes ) ((char*) (Pointer) + (Bytes))

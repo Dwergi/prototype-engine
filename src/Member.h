@@ -1,3 +1,9 @@
+//
+// Member.h - Encapsulates a member pointer and associates it with friendly names and stuff.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #pragma once
 
 #define OFFSET_OF( ClassName, MemberName ) ((uint) &(((ClassName*) nullptr)->MemberName))

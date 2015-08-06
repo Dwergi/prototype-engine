@@ -1,3 +1,9 @@
+//
+// PrecompiledHeader.h
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include <unordered_map>
@@ -14,4 +20,5 @@ typedef unsigned int uint;
 #include "Utility.h"
 #include "TypeInfo.h"
 #include "Member.h"
-#include "Vector.h"
+#include "Vector4.h"
+#include "Containers.h"

@@ -1,3 +1,9 @@
+//
+// PropertyList.h - A list of properties that can be instantiated from a type and bound to an instance.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #pragma once
 
 #include "Property.h"
@@ -14,9 +20,9 @@ namespace dd
 		Property* Find( const std::string& name );
 
 	protected:
-		std::vector<Property> m_properties;
+		dd::Vector<Property> m_properties;
 
-		void AddMembers( TypeInfo* typeInfo, size_t offset );
+		void AddMembers( TypeInfo* typeInfo, uint offset );
 	};
 
 	template<typename T>

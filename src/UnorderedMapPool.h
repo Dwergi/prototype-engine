@@ -1,3 +1,9 @@
+//
+// UnorderedMapPool.h - Component pool that uses an unordered map for storage.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "ComponentPoolBase.h"

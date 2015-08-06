@@ -1,3 +1,9 @@
+//
+// Utility.h - A random selection of utility methods.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include <random>

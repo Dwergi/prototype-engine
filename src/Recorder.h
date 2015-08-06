@@ -1,3 +1,9 @@
+//
+// Recorder.h - A wrapper class that transparently records the history of a certain property.
+// Copyright (C) Sebastian Nordgren 
+// February 17th 2015
+//
+
 #pragma once
 
 #include "Property.h"
@@ -80,9 +86,9 @@ namespace dd
 			return *m_current == other;
 		}
 
-		int GetUndoHistorySize() const
+		uint GetUndoHistorySize() const
 		{
-			return m_undo.size();
+			return (uint) m_undo.size();
 		}
 	};
 	//---------------------------------------------------------------------------
@@ -134,9 +140,9 @@ namespace dd
 			m_redo.pop_back();
 		}
 
-		int GetRedoHistorySize() const
+		uint GetRedoHistorySize() const
 		{
-			return m_redo.size();
+			return (uint) m_redo.size();
 		}
 	};
 }

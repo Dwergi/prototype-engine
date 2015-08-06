@@ -1,8 +1,13 @@
+//
+// SwarmAgentComponent.h - Component for swarm agents.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "Component.h"
 #include "UnorderedMapPool.h"
-#include "Vector.h"
 
 namespace dd
 {

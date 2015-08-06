@@ -1,6 +1,12 @@
-#include "PrecompiledHeader.h"
+//
+// EntityHandle.cpp - Handles for entities. This should be the only way that entities are accessed. 
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
 
+#include "PrecompiledHeader.h"
 #include "EntityHandle.h"
+
 #include "EntitySystem.h"
 
 dd::EntityHandle::EntityHandle() : 

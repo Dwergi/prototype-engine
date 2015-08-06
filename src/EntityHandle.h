@@ -1,3 +1,9 @@
+//
+// EntityHandle.h - Handles for entities. This should be the only way that entities are accessed. 
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include <functional>

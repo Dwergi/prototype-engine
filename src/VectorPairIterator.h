@@ -1,8 +1,11 @@
+//
+// VectorPairIterator.h - Iterator for vectors of pairs.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
-//
-// Pair iterator.
-// 
 template<typename TKey, typename TValue>
 class vector_pair_iterator
 	: public std::iterator<std::forward_iterator_tag, TValue*>

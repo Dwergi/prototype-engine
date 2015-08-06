@@ -1,3 +1,9 @@
+//
+// UnsortedVectorPool.h - A completely naive pool. Minimal memory footprint, fast adds, slow finds/deletes.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
 #pragma once
 
 #include "ComponentPoolBase.h"

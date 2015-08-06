@@ -25,6 +25,18 @@
     <Filter Include="Systems">
       <UniqueIdentifier>{74210990-6148-4e02-995f-ab11859b19ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{e0d133c6-bccb-4633-bf28-f4ea9348d5d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{00f2688a-c546-4b01-8678-895e6ec79ab4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{82b0b89f-8e41-45a0-824a-405d47c4450e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{11e0d14b-e6f4-40dd-9b8e-afe2cacc3d00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -54,16 +66,7 @@
     <ClInclude Include="src\UnsortedVectorPool.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\Handle.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RemoveQualifiers.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Assert.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AutoList.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\PP_Assert.h">
@@ -86,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="src\PrecompiledHeader.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vector.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\VectorPairIterator.h">
       <Filter>Components</Filter>
@@ -126,8 +126,50 @@
     <ClInclude Include="src\SwarmSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="src\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vector.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AutoList.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DenseMap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
     <ClInclude Include="src\DoubleBuffer.h">
-      <Filter>Core</Filter>
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Handle.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hash.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackArray.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputAction.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RemoveQualifiers.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Script.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="src\String_dd.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Containers.h">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,9 +194,6 @@
     </ClCompile>
     <ClCompile Include="src\PrecompiledHeader.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vector.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\TypeInfo.cpp">
       <Filter>Types</Filter>
@@ -194,6 +233,33 @@
     </ClCompile>
     <ClCompile Include="src\SwarmSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackArrayTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hash.cpp">
+      <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Script.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="src\String_dd.cpp">
+      <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VectorTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utility.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

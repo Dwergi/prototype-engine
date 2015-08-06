@@ -1,11 +1,10 @@
 //
-// EntitySystem.cpp - Entity management system.
+// EntitySystem.cpp - System that handles the batched creation/deletion of entities and stores all entities.
 // Copyright (C) Sebastian Nordgren 
-// February 12th 2015
+// August 6th 2015
 //
 
 #include "PrecompiledHeader.h"
-
 #include "EntitySystem.h"
 
 namespace
@@ -83,7 +82,7 @@ dd::EntityHandle dd::EntitySystem::CreateEntity()
 {
 	if( m_free.empty() )
 	{
-		EntityHandle handle( m_entities.size(), 0, this );
+		EntityHandle handle( (int) m_entities.size(), 0, this );
 
 		EntityEntry entry( handle, EntityState::None );
 

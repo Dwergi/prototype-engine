@@ -1,5 +1,10 @@
-#ifndef _ENTITYSYSTEM_H
-#define _ENTITYSYSTEM_H
+//
+// EntitySystem.h - System that handles the batched creation/deletion of entities and stores all entities.
+// Copyright (C) Sebastian Nordgren 
+// August 6th 2015
+//
+
+#pragma once
 
 #include <queue>
 
@@ -83,5 +88,3 @@ namespace dd
 		bool IsEntityValid( const EntityHandle& entity );
 	};
 }
-
-#endif //_ENTITYSYSTEM_H
