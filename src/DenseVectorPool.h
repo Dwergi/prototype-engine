@@ -148,10 +148,12 @@ namespace dd
 			return m_components.end();
 		}
 
-		void operator=( const DenseVectorPool<T>& other )
+		DenseVectorPool& operator=( const DenseVectorPool<T>& other )
 		{
 			m_components = other.m_components;
 			m_valid = other.m_valid;
+
+			return *this;
 		}
 
 	private:

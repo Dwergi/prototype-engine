@@ -245,9 +245,11 @@ namespace dd
 			return ComponentConstIterator( m_components.end() );
 		}
 
-		void operator=( const UnorderedMapPool<T>& other )
+		UnorderedMapPool& operator=( const UnorderedMapPool<T>& other )
 		{
 			m_components = other.m_components;
+
+			return *this;
 		}
 
 	private:

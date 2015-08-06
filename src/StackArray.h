@@ -16,13 +16,15 @@ namespace dd
 		}
 
 		template< int OtherSize >
-		void operator=( StackArray< TValue, OtherSize >& other )
+		StackArray<TValue, MaxSize>& operator=( const StackArray<TValue, OtherSize>& other )
 		{
 			ASSERT( other.Size() <= MaxSize );
 
 			// clear, then push the entire other array
 			Clear();
 			PushAll( other );
+
+			return *this;
 		}
 
 		const TValue& operator[]( int index ) const
@@ -32,9 +34,11 @@ namespace dd
 			return m_data[ index ];
 		}
 
-		void operator+=( const TValue& value )
+		StackArray<TValue, MaxSize>& operator+=( const TValue& value )
 		{
 			Push( value );
+
+			return *this;
 		}
 
 		int Size() const
