@@ -25,6 +25,9 @@ $RECYCLE.BIN/
 *.sdf
 Debug/
 Release/
+bin/
+build/
+ipch/
 
 # =========================
 # Operating System Files
