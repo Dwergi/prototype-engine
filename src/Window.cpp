@@ -10,10 +10,16 @@
 #include "GLFW/glfw3.h"
 
 dd::Window::Window( int resX, int resY, const dd::StringBase& title )
-	: m_title( title )
+	: m_title( title ),
+	m_sizeX( resX ),
+	m_sizeY( resY )
 {
 	if( !glfwInit() )
 		return;
+
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	m_glfwWindow = glfwCreateWindow( resX, resY, m_title.c_str(), NULL, NULL);
 
@@ -64,6 +70,10 @@ void dd::Window::Close()
 
 void dd::Window::Swap()
 {
+	glViewport( 0, 0, m_sizeX, m_sizeY );
+	glClearColor( 0, 0, 0, 1 );
+	glClear( GL_COLOR_BUFFER_BIT );
+
 	glfwSwapBuffers( m_glfwWindow );
 	glfwPollEvents();
 }

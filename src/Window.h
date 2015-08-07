@@ -31,5 +31,6 @@ namespace dd
 	private:
 		GLFWwindow* m_glfwWindow;
 		dd::String<32> m_title;
+		float m_sizeX, m_sizeY;
 	};
 }
