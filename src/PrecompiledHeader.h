@@ -18,7 +18,5 @@ typedef unsigned int uint;
 
 #include "Assert.h"
 #include "Utility.h"
-#include "TypeInfo.h"
-#include "Member.h"
-#include "Vector4.h"
 #include "Containers.h"
+#include "TypeInfo.h"

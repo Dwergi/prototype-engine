@@ -10,19 +10,35 @@
 #include "PropertyList.h"
 #include "TransformComponent.h"
 #include "Recorder.h"
+#include "Vector4.h"
 
 struct SimpleStruct
 {
 	int Int;
-	std::string Str;
+	dd::String Str;
 	float Flt;
+
+	void Double();
+	int Multiply( int x );
 
 	BEGIN_MEMBERS( SimpleStruct )
 		MEMBER( SimpleStruct, int, Int, "Integer" );
-		MEMBER( SimpleStruct, std::string, Str, "String" );
+		MEMBER( SimpleStruct, dd::String, Str, "String" );
 		MEMBER( SimpleStruct, float, Flt, "Float" );
+		METHOD( SimpleStruct, Double, void, void );
+		METHOD( SimpleStruct, Multiply, int, int );
 	END_MEMBERS
 };
+
+void SimpleStruct::Double()
+{
+
+}
+
+int SimpleStruct::Multiply( int x )
+{
+	return x;
+}
 
 struct NestedStruct
 {
@@ -69,10 +85,8 @@ TEST_CASE( "[property] Integer properties" )
 		REQUIRE( test_struct.Int == 20 );
 	}
 
-
 	SECTION( "Nested Struct ")
 	{
-
 		NestedStruct::RegisterType();
 		NestedStruct nested;
 		dd::PropertyList<NestedStruct> nested_props( nested );

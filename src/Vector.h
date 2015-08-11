@@ -74,7 +74,8 @@ namespace dd
 				Resize( m_capacity * 2 );
 			}
 
-			m_data[ m_entries ] = value;
+			new (&m_data[ m_entries ]) T( value );
+
 			++m_entries;
 		}
 
@@ -98,7 +99,8 @@ namespace dd
 			else
 			{
 				memcpy( &m_data[ index ] + 1, &m_data[ index ], (m_entries - index) * sizeof( T ) );
-				m_data[ index ] = value;
+				
+				new (&m_data[ m_entries ]) T( value );
 			}
 		}
 
@@ -154,7 +156,9 @@ namespace dd
 				Resize( m_capacity * 2 );
 			}
 
-			m_data[ m_entries++ ] = entry;
+			new (&m_data[ m_entries ]) T( entry );
+
+			++m_entries;
 		}
 
 		void Swap( Vector<T>& other )
@@ -229,7 +233,7 @@ namespace dd
 			if( m_data != nullptr )
 			{
 				memcpy( new_data, m_data, m_capacity * sizeof( T ) );
-				delete[] m_data;
+				delete[] (char*) m_data;
 			}
 
 			m_data = new_data;

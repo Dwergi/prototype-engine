@@ -19,7 +19,7 @@ dd::TypeInfo::~TypeInfo()
 		delete ptr;
 }
 
-dd::TypeInfo* dd::TypeInfo::GetType( const std::string& name )
+dd::TypeInfo* dd::TypeInfo::GetType( const dd::StringBase& name )
 {
 	const dd::TypeInfo* ptr = dd::TypeInfo::Head();
 	while( ptr != nullptr )

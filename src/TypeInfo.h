@@ -7,11 +7,11 @@
 #pragma once
 
 #include "AutoList.h"
+#include "Member.h"
+#include "Method.h"
 
 namespace dd
 {
-	class MemberBase;
-
 	template< typename T >
 	class HasTypeInfo
 	{
@@ -36,7 +36,7 @@ namespace dd
 			return &s_typeInfo;
 		}
 
-		static TypeInfo* GetType( const std::string& name );
+		static TypeInfo* GetType( const dd::StringBase& name );
 
 		template< typename T >
 		static void Register( const char* name )
@@ -45,7 +45,7 @@ namespace dd
 			type->Init<T>( name, sizeof( T ) );
 		}
 
-		const std::vector<dd::MemberBase*>& GetMembers()
+		inline const dd::Vector<dd::MemberBase*>& GetMembers()
 		{
 			return m_members;
 		}
@@ -53,8 +53,9 @@ namespace dd
 	private:
 
 		size_t m_size;
-		std::string m_name;
-		std::vector<dd::MemberBase*> m_members;
+		dd::String m_name;
+		dd::Vector<dd::MemberBase*> m_members;
+		dd::Vector<dd::MethodBase*> m_methods;
 
 		template< typename T >
 		void Init( const char* name, size_t size )
@@ -65,7 +66,7 @@ namespace dd
 			m_size = size;
 			m_name = name;
 
-			T::RegisterMembers( m_members );
+			T::RegisterMembers( m_members, m_methods );
 		}
 	};
 }

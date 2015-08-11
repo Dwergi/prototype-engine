@@ -14,10 +14,12 @@ namespace dd
 	{
 	public:
 
-		Window( int resX, int resY, const dd::StringBase& title );
+		Window( int resX, int resY, const char* title );
 		~Window();
 
 		void Close();
+
+		void Resize( int resX, int resY );
 
 		bool IsValid() const;
 		bool ShouldClose() const;
@@ -30,7 +32,7 @@ namespace dd
 
 	private:
 		GLFWwindow* m_glfwWindow;
-		dd::String<32> m_title;
-		float m_sizeX, m_sizeY;
+		dd::String  m_title;
+		int m_sizeX, m_sizeY;
 	};
 }

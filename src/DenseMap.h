@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "Exception.h"
 #include "Hash.h"
 
 namespace dd
@@ -35,6 +36,8 @@ namespace dd
 
 		void Add( const TKey& key, const TValue& value )
 		{
+			ASSERT( m_capacity > 0 );
+
 			if( m_entries == m_capacity )
 			{
 				Resize( m_capacity * 2 );
@@ -45,28 +48,51 @@ namespace dd
 
 		void Remove( const TKey& key )
 		{
+			ASSERT( m_entries > 0 );
+
 			Entry& entry = GetEntry( key );
+			if( IsEmpty( entry ) )
+				throw dd::Exception( "Key not found!" );
+
 			Clear( entry );
+
+			--m_entries;
 		}
 
-		TValue* operator[]( const TKey& key )
+		bool Contains( const TKey& key ) const
 		{
 			Entry& entry = GetEntry( key );
 
-			if( IsEmpty( entry ) )
-				return nullptr;
-
-			return &entry.Value;
+			return !IsEmpty( entry );
 		}
 
-		const TValue* operator[]( const TKey& key ) const
+		TValue& operator[]( const TKey& key )
 		{
+			ASSERT( m_entries > 0 );
+
 			Entry& entry = GetEntry( key );
 
 			if( IsEmpty( entry ) )
-				return nullptr;
+				throw dd::Exception( "Key not found!" );
 
-			return &entry.Value;
+			return entry.Value;
+		}
+
+		const TValue& operator[]( const TKey& key ) const
+		{
+			ASSERT( m_entries > 0 );
+
+			Entry& entry = GetEntry( key );
+
+			if( IsEmpty( entry ) )
+				throw dd::Exception( "Key not found!" );
+
+			return entry.Value;
+		}
+
+		uint Size() const
+		{
+			return m_entries;
 		}
 
 	private:
@@ -74,7 +100,7 @@ namespace dd
 		void Resize( uint new_size )
 		{
 			Entry* new_data = new Entry[ new_size ];
-			memset( new_data, 0xFF, m_capacity * sizeof( Entry ) );
+			memset( new_data, 0xFF, new_size * sizeof( Entry ) );
 
 			Entry* old_data = m_data;
 			uint old_capacity = m_capacity;
@@ -118,6 +144,8 @@ namespace dd
 
 		void Clear( Entry& entry ) const
 		{
+			entry.~Entry();
+
 			memset( &entry, 0xFF, sizeof( Entry ) );
 		}
 
@@ -126,9 +154,9 @@ namespace dd
 			Entry& entry = GetEntry( key );
 			if( IsEmpty( entry ) )
 			{
-				// slot is free
-				entry.Key = key;
-				entry.Value = value;
+				// slot is free, use placement new to construct it there
+				new( &entry.Key ) TKey( key );
+				new( &entry.Value ) TValue( value );
 			}
 			else
 			{
@@ -147,6 +175,8 @@ namespace dd
 					++current;
 				}
 			}
+
+			++m_entries;
 		}
 
 		Entry& GetEntry( const TKey& key ) const

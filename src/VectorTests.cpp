@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
+#include "String_dd.h"
 #include "Vector.h"
 
 TEST_CASE( "[Vector] Add" )
@@ -87,7 +88,7 @@ struct SimpleStruct
 {
 	int Integer;
 	float Float;
-	std::string String;
+	dd::String  String;
 };
 
 struct ComplexStruct
@@ -135,5 +136,42 @@ TEST_CASE( "[Vector] Iteration" )
 	{
 		REQUIRE( i == current );
 		++current;
+	}
+}
+
+TEST_CASE( "[Vector] Assignment" )
+{
+	dd::Vector<int> a;
+	dd::Vector<int> b;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		a.Add( i );
+	}
+
+	b = a;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		REQUIRE( a[ i ] == b[ i ] );
+	}
+}
+
+TEST_CASE( "[Vector] Out of Scope" )
+{
+	dd::Vector<int> b;
+	{
+		dd::Vector<int> a;
+		for( int i = 0; i < 128; ++i )
+		{
+			a.Add( i );
+		}
+
+		b = a;
+	}
+
+	for( int i = 0; i < 128; ++i )
+	{
+		REQUIRE( b[ i ] == i );
 	}
 }

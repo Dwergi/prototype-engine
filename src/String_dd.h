@@ -6,28 +6,26 @@
 
 #pragma once
 
+#include "Iteration.h"
+
 namespace dd
 {
 	class StringBase
 	{
-	private:
+	protected:
 		void Initialize();
 
 		typedef unsigned int uint;
 
 	protected:
 		StringBase();
-		StringBase( uint size );
-		StringBase( const char* other );
-		StringBase( const char* other, uint size );
-		StringBase( StringBase&& other );
-		StringBase( const StringBase& other );
-
 		~StringBase();
 
 	public:
 
+		StringBase& operator=( const char* other );
 		StringBase& operator=( const StringBase& other );
+		bool operator==( const char* other ) const;
 		bool operator==( const StringBase& other ) const;
 		StringBase& operator+=( const StringBase& other );
 
@@ -42,78 +40,74 @@ namespace dd
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
 
-		//
-		// Iteration
-		//
-		class const_iterator
-		{
-		public:
-			const char* Pointer;
-
-			const_iterator() : Pointer( nullptr ) {}
-			const_iterator( const char* ptr ) : Pointer( ptr ) {}
-
-			inline const char& operator*() const { return *Pointer; }
-			inline const_iterator& operator++() { ++Pointer; return *this; }
-			inline const_iterator& operator+( size_t count ) { Pointer += count; return *this; }
-			inline bool operator!=( const const_iterator& other ) const { return Pointer != other.Pointer; }
-		};
-
-		class iterator : public const_iterator
-		{
-		public:
-			iterator() : const_iterator() {}
-			iterator( char* ptr ) : const_iterator( ptr ) {}
-
-			inline char& operator*() const { return *const_cast<char*>( Pointer ); }
-		};
-
-		inline const_iterator begin() const { return const_iterator( m_buffer ); }
-		inline const_iterator end() const { return const_iterator( m_buffer + m_length ); }
-
-		inline iterator begin() { return iterator( m_buffer ); }
-		inline iterator end() { return iterator( m_buffer + m_length ); }
+		DEFINE_ITERATORS( char );
 
 	protected:
 
 		uint m_length;
-		char* m_buffer;
 
 		uint m_capacity;
+		char* m_buffer;
+		
 		uint m_stackCapacity;
 		char* m_stackBuffer;
 
 		void Resize( uint length );
-
-	private:
-
 		void SetString( const char* data, uint length );
+		bool Equals( const char* other, uint length ) const;
 	};
 
-
-	template< int Size >
-	class String
+	//
+	// An in-place implementation of string which always allocates a fixed size buffer. 
+	//
+	template< int Size = 32 >
+	class StackString
 		: public StringBase
 	{
 	public:
 
-		String()
+		StackString()
 		{
-			m_stackBuffer = m_stackData;
-			m_stackCapacity = Size;
-			m_capacity = m_stackCapacity;
+			Initialize();
 		}
 
-		String( const StringBase& other )
+		StackString( const char* other )
+		{
+			Initialize();
+			SetString( other, (uint) strlen( other ) );
+		}
+
+		StackString( const StringBase& other )
+		{
+			Initialize();
+			SetString( other.c_str(), other.Length() );
+		}
+
+		virtual ~StackString()
+		{
+
+		}
+
+	protected:
+
+		void Initialize()
 		{
 			m_stackBuffer = m_stackData;
 			m_stackCapacity = Size;
-			m_capacity = m_stackCapacity;
 
-			*this = other;
+			m_capacity = m_stackCapacity;
+			m_buffer = m_stackBuffer;
 		}
 
 	private:
+
 		char m_stackData[ Size ];
 	};
+
+	typedef StackString<> String;
+	typedef StackString<16> String16;
+	typedef StackString<32> String32;
+	typedef StackString<64> String64;
+	typedef StackString<128> String128;
+	typedef StackString<256> String256;
 }

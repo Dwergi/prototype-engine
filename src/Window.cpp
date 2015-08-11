@@ -9,7 +9,7 @@
 
 #include "GLFW/glfw3.h"
 
-dd::Window::Window( int resX, int resY, const dd::StringBase& title )
+dd::Window::Window( int resX, int resY, const char* title )
 	: m_title( title ),
 	m_sizeX( resX ),
 	m_sizeY( resY )
@@ -21,7 +21,7 @@ dd::Window::Window( int resX, int resY, const dd::StringBase& title )
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-	m_glfwWindow = glfwCreateWindow( resX, resY, m_title.c_str(), NULL, NULL);
+	m_glfwWindow = glfwCreateWindow( m_sizeX, m_sizeY, m_title.c_str(), NULL, NULL);
 
 	if( m_glfwWindow != nullptr )
 	{
@@ -32,6 +32,14 @@ dd::Window::Window( int resX, int resY, const dd::StringBase& title )
 dd::Window::~Window()
 {
 	glfwTerminate();
+}
+
+void dd::Window::Resize( int resX, int resY )
+{
+	m_sizeX = resX;
+	m_sizeY = resY;
+
+	glfwSetWindowSize( m_glfwWindow, m_sizeX, m_sizeY );
 }
 
 void dd::Window::MakeBorderless()

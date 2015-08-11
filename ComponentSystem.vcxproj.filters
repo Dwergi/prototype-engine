@@ -171,6 +171,18 @@
     <ClInclude Include="src\Containers.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Exception.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Iteration.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Method.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StringTests.cpp">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -260,6 +272,15 @@
     </ClCompile>
     <ClCompile Include="src\Utility.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DenseMapTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exception.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScriptTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

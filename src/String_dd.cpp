@@ -14,20 +14,6 @@ dd::StringBase::StringBase()
 	Initialize();
 }
 
-dd::StringBase::StringBase( const StringBase& other )
-{
-	Initialize();
-
-	SetString( other.m_buffer, other.m_length );
-}
-
-dd::StringBase::StringBase( const char* data, uint length )
-{
-	Initialize();
-
-	SetString( data, length );
-}
-
 dd::StringBase::~StringBase()
 {
 	// delete stack buffer
@@ -58,9 +44,49 @@ const char* dd::StringBase::c_str() const
 	return m_buffer;
 }
 
+bool dd::StringBase::Equals( const char* other, uint length ) const
+{
+	if( m_length != length )
+		return false;
+
+	for( uint i = 0; i < m_length; ++i )
+	{
+		if( other[ i ] == '\0' )
+			return false;
+
+		if( m_buffer[ i ] != other[ i ] )
+			return false;
+	}
+
+	return true;
+}
+
+bool dd::StringBase::operator==( const char* other ) const
+{
+	ASSERT( other != nullptr );
+
+	size_t length = strlen( other );
+
+	return Equals( other, (uint) length );
+}
+
+bool dd::StringBase::operator==( const StringBase& other ) const
+{
+	return Equals( other.m_buffer, other.m_length );
+}
+
 dd::StringBase& dd::StringBase::operator=( const StringBase& other )
 {
 	SetString( other.m_buffer, other.m_length );
+
+	return *this;
+}
+
+dd::StringBase& dd::StringBase::operator=( const char* other )
+{
+	ASSERT( other != nullptr );
+
+	SetString( other, m_capacity - 1 );
 
 	return *this;
 }
@@ -70,9 +96,10 @@ void dd::StringBase::SetString( const char* data, uint length )
 	ASSERT( m_buffer != nullptr );
 	ASSERT( data != nullptr );
 
-	Resize( length + 1 );
+	Resize( length );
 
 	memcpy( m_buffer, data, length );
+	m_length = length;
 
 	// null-terminate
 	m_buffer[ m_length ] = 0;
@@ -86,7 +113,7 @@ void dd::StringBase::Resize( uint length )
 {
 	// keep growing string until we hit a size that fits
 	uint new_capacity = m_capacity;
-	while( length > new_capacity )
+	while( length + 1 > new_capacity )
 	{
 		new_capacity = (uint) (new_capacity * GrowthFactor);
 	}

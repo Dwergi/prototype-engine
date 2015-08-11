@@ -95,10 +95,8 @@ void dd::InputBindings::Register( int key, InputAction action )
 
 dd::InputAction dd::InputBindings::GetAction( int key ) const
 {
-	const dd::InputAction* action = m_bindings[ key ];
-
-	if( action == nullptr )
+	if( !m_bindings.Contains( key ) )
 		return dd::InputAction::NONE;
 
-	return *action;
+	return m_bindings[ key ];
 }

@@ -7,8 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
-#include "StackArray.h"
-
 TEST_CASE( "[StackArray] Push" )
 {
 	dd::StackArray<int, 64> container;
@@ -80,7 +78,7 @@ struct SimpleStruct
 {
 	int Integer;
 	float Float;
-	std::string String;
+	dd::String  String;
 };
 
 struct ComplexStruct
@@ -99,4 +97,41 @@ TEST_CASE( "[StackArray] Struct" )
 	}
 
 	REQUIRE( container.Size() == 128 );
+}
+
+TEST_CASE( "[StackArray] Copy" )
+{
+	dd::StackArray<int, 128> int_a;
+	dd::StackArray<int, 128> int_b;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		int_a.Push( i );
+	}
+
+	int_b = int_a;
+
+	REQUIRE( int_a.Size() == int_b.Size() );
+
+	for( int i = 0; i < int_a.Size(); ++i )
+	{
+		REQUIRE( int_a[ i ] == int_b[ i ] );
+	}
+
+	dd::StackArray<ComplexStruct, 128> complex_a;
+	dd::StackArray<ComplexStruct, 128> complex_b;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		ComplexStruct s;
+		s.OtherInt = i;
+		complex_a.Push( s );
+	}
+
+	complex_b = complex_a;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		REQUIRE( complex_a[ i ].OtherInt == complex_b[ i ].OtherInt );
+	}
 }

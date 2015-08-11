@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "DenseVectorPool.h"
+#include "Vector4.h"
 
 namespace dd
 {

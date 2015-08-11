@@ -7,8 +7,14 @@
 #pragma once
 
 #define OFFSET_OF( ClassName, MemberName ) ((uint) &(((ClassName*) nullptr)->MemberName))
-#define BEGIN_MEMBERS( ClassName ) static void RegisterType() { dd::TypeInfo::Register<ClassName>( #ClassName ); } static void RegisterMembers( std::vector<dd::MemberBase*>& members ) {
-#define MEMBER( ClassName, TypeName, MemberName, FriendlyName ) members.emplace_back( new dd::Member<ClassName, TypeName>( &ClassName::MemberName, #MemberName, FriendlyName, #TypeName ) );
+
+#define BEGIN_MEMBERS( ClassName ) static void RegisterType() { dd::TypeInfo::Register<ClassName>( #ClassName ); } static void RegisterMembers( dd::Vector<dd::MemberBase*>& members, dd::Vector<dd::MethodBase*>& methods ) {
+
+// Declare a member of the given class.
+#define MEMBER( ClassName, TypeName, MemberName, FriendlyName ) members.Allocate( new dd::Member<ClassName, TypeName>( &ClassName::MemberName, #MemberName, FriendlyName, #TypeName ) );
+
+// Declare a script-callable method of the given class. Parameters, if there are multiple, must be submitted in the format "(int, float)". If there is only one, then "int" is fine.
+#define METHOD( ClassName, MethodName, ReturnType, ParamType ) methods.Allocate( new dd::Method<ClassName, ReturnType (ClassName::*) (ParamType)>( &ClassName::MethodName, #ClassName, #MethodName, #ReturnType " " #MethodName "(" #ParamType ")" ) );
 #define END_MEMBERS }
 //---------------------------------------------------------------------------
 
@@ -19,9 +25,9 @@ namespace dd
 	class MemberBase
 	{
 	public:
-		std::string m_fieldName;
-		std::string m_friendlyName;
-		std::string m_typeName;
+		dd::String m_fieldName;
+		dd::String m_friendlyName;
+		dd::String m_typeName;
 		uint m_offset;
 
 		MemberBase();

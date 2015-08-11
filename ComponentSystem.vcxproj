@@ -233,12 +233,15 @@
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\Containers.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
+    <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\Handle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\Member.h" />
+    <ClInclude Include="src\Method.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
@@ -250,6 +253,7 @@
     <ClInclude Include="src\Script.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\StackArray.h" />
+    <ClInclude Include="src\StringTests.cpp" />
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
@@ -272,8 +276,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\DenseMapTests.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
+    <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\Hash.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -292,6 +298,7 @@
     <ClCompile Include="src\Recorder.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />
+    <ClCompile Include="src\ScriptTests.cpp" />
     <ClCompile Include="src\StackArrayTests.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
     <ClCompile Include="src\SwarmAgentComponent.cpp" />

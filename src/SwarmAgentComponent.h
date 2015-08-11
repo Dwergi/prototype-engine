@@ -8,6 +8,7 @@
 
 #include "Component.h"
 #include "UnorderedMapPool.h"
+#include "Vector4.h"
 
 namespace dd
 {

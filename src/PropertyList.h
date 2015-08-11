@@ -17,7 +17,7 @@ namespace dd
 		virtual ~PropertyListBase();
 
 		void Add( const Property& entry );
-		Property* Find( const std::string& name );
+		Property* Find( const char* name );
 
 	protected:
 		dd::Vector<Property> m_properties;

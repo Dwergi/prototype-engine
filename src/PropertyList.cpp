@@ -20,14 +20,14 @@ void dd::PropertyListBase::Add( const Property& entry )
 	m_properties.Add( entry );
 }
 
-dd::Property* dd::PropertyListBase::Find( const std::string& name )
+dd::Property* dd::PropertyListBase::Find( const char* name )
 {
 	for( Property& prop : m_properties )
 	{
-		if( name == prop.GetName() )
+		if( prop.GetName() == name )
 			return &prop;
 
-		if( name == prop.GetDisplayName() )
+		if( prop.GetDisplayName() == name )
 			return &prop;
 	}
 
@@ -42,7 +42,7 @@ void dd::PropertyListBase::AddMembers( dd::TypeInfo* typeInfo, uint offset )
 	if( typeInfo == nullptr )
 		return;
 
-	const std::vector<MemberBase*>& members = typeInfo->GetMembers();
+	const dd::Vector<MemberBase*>& members = typeInfo->GetMembers();
 	for( MemberBase* member : members )
 	{
 		m_properties.Allocate( dd::Property( member, offset ) );

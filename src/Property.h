@@ -59,7 +59,7 @@ namespace dd
 			return reinterpret_cast<T*>( m_data );
 		}
 
-		const std::string& GetName() const;
-		const std::string& GetDisplayName() const;
+		const dd::StringBase& GetName() const;
+		const dd::StringBase& GetDisplayName() const;
 	}; 
 }

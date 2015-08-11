@@ -33,6 +33,8 @@ namespace dd
 		Script& LoadScript( const char* script );
 		void UnloadScript( Script& );
 
+		void RegisterMethod( dd::MethodBase& method );
+
 	private:
 
 		Vector<Script> m_vecScripts;

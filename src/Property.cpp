@@ -26,12 +26,12 @@ dd::Property::~Property()
 	m_data = nullptr;
 }
 
-const std::string& dd::Property::GetName() const
+const dd::StringBase& dd::Property::GetName() const
 {
 	return m_member->m_fieldName;
 }
 
-const std::string& dd::Property::GetDisplayName() const
+const dd::StringBase& dd::Property::GetDisplayName() const
 {
 	return m_member->m_friendlyName;
 }
