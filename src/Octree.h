@@ -3,12 +3,15 @@
 // Copyright (C) Sebastian Nordgren 
 // February 12th 2015
 //
+
 #pragma once
 
 #include "Handle.h"
 #include "BoundingBox.h"
 
-#include <queue>
+#include "DenseMap.h"
+#include "Vector.h"
+
 #include <functional>
 
 namespace dd
@@ -40,17 +43,17 @@ namespace dd
 		//
 		// Get the <count> nearest entries to the given handle.
 		// 
-		void GetKNearest( const Octree::Entry& entry, int count, std::vector<Octree::Entry>& output );
+		void GetKNearest( const Octree::Entry& entry, uint count, dd::Vector<Octree::Entry>& output );
 
 		//
 		// Get all the entries within <range> of the given handle.
 		//
-		void GetWithinRange( const Octree::Entry& entry, float range, std::vector<Octree::Entry>& output );
+		void GetWithinRange( const Octree::Entry& entry, float range, dd::Vector<Octree::Entry>& output );
 
 		//
 		// Get all the entries within the given (axis-aligned) bounding box.
 		//
-		void GetWithinBounds( const BoundingBox& bounds, std::vector<Octree::Entry>& output );
+		void GetWithinBounds( const BoundingBox& bounds, dd::Vector<Octree::Entry>& output );
 
 		// 
 		// Validate that the octree is well-formed.
@@ -96,7 +99,7 @@ namespace dd
 
 	private:
 
-		typedef Handle<CellInternal, int, std::vector<CellInternal>> Cell;
+		typedef Handle<CellInternal, int, dd::Vector<CellInternal>> Cell;
 		friend class Cell;
 
 		//
@@ -108,7 +111,7 @@ namespace dd
 			Vector4 Position;
 			float Size;
 			Octree::Cell Children[ 8 ];
-			std::vector<Octree::Entry> Data;
+			dd::Vector<Octree::Entry> Data;
 
 			CellInternal( const Vector4& pos, float size );
 			CellInternal( const CellInternal& other );
@@ -125,16 +128,16 @@ namespace dd
 		};
 
 		// Map of entry IDs to positions.
-		std::unordered_map<Entry, Vector4, Entry::hash> m_entries;
+		dd::DenseMap<Entry, Vector4> m_entries;
 
 		// List of all existing cells.
-		std::vector<Octree::CellInternal> m_cells;
+		dd::Vector<Octree::CellInternal> m_cells;
 
 		// The root cell.
 		Octree::Cell m_root;
 	
 		// List of free cells.
-		std::queue<Cell> m_free;
+		dd::Vector<Cell> m_free;
 
 		// The last created ID.
 		int m_lastID;

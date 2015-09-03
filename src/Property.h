@@ -1,65 +1,52 @@
 //
 // Property.h - A wrapper around a member that can be used to create a property editor.
 // Copyright (C) Sebastian Nordgren 
-// February 17th 2015
+// September 2nd 2015
+// Significantly influenced by Randy Gaul (http://RandyGaul.net)
 //
 
 #pragma once
 
-#define PTR_OFFSET( Pointer, Bytes ) ((char*) (Pointer) + (Bytes))
-
 namespace dd
 {
-	class MemberBase;
-
 	class Property
 	{
-	private:
-		// the raw data pointer
-		void* m_data;
-
-		// used for nested classes, where the TypeInfo's given pointer needs to be shifted to compensate for earlier members it doesn't know about
-		uint m_offset;
-
-		// the member this property is bound to
-		MemberBase* m_member;
-
 	public:
-		Property( MemberBase* member, uint offset );
-		Property( Property&& entry );
-		~Property();
+		Property();
+		Property( const Function& get, const Function& set );
 
-		template< typename T >
-		void Get( T& value )
-		{
-			ASSERT( m_data != nullptr, "Must bind property before getting its value!" );
+		// Get or set the member this property wraps
+		template <typename T>
+		void Get( T& ret );
+		template <typename T>
+		void Set( T val );
 
-			value = *reinterpret_cast<T*>( m_data );
-		}
+		// Bind an object to use this property with
+		template <typename T>
+		void Bind( T& self );
 
-		template< typename T >
-		void Set( const T& value )
-		{
-			ASSERT( m_data != nullptr, "Must bind property before setting its value!" );
+	private:
+		Function m_get;
+		Function m_set;
+	};
 
-			*(reinterpret_cast<T*>( m_data )) = value;
-		}
+	template <typename T>
+	void Property::Get( T& ret )
+	{
+		Variable v( ret );
+		return m_get( v );
+	}
 
-		template< typename T >
-		void Bind( T& instance )
-		{
-			m_data = PTR_OFFSET( m_member->BindProperty( &instance ), m_offset );
-		}
+	template <typename T>
+	void Property::Set( T val )
+	{
+		m_set( val );
+	}
 
-		template< typename T >
-		T* GetPtr() const
-		{
-			ASSERT( m_data != nullptr, "Must bind property before getting a reference to its data." );
-
-			return reinterpret_cast<T*>( m_data );
-		}
-
-		const dd::StringBase& GetName() const;
-		const dd::StringBase& GetDisplayName() const;
-	}; 
+	template <typename T>
+	void Property::Bind( T& self )
+	{
+		m_get.Bind( self );
+		m_set.Bind( self );
+	}
 }

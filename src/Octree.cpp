@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "Octree.h"
 
+#include <algorithm>
+
 #define ORIGIN Vector4( 0, 0, 0 )
 
 const float EPSILON = 0.0001f;
@@ -90,17 +92,14 @@ dd::Octree::CellInternal& dd::Octree::CellInternal::operator=( const CellInterna
 void dd::Octree::CellInternal::Add( const dd::Octree::Entry& entry )
 {
 	ASSERT( !HasChildren() );
-	ASSERT( Data.size() < MAX_CELL_ENTRIES );
+	ASSERT( Data.Size() < MAX_CELL_ENTRIES );
 
-	Data.push_back( entry );
+	Data.Push( entry );
 }
 
 void dd::Octree::CellInternal::Remove( const dd::Octree::Entry& entry )
 {
-	auto it = std::find( Data.begin(), Data.end(), entry );
-
-	if( it != Data.end() )
-		Data.erase( it );
+	Data.Remove( entry );
 }
 
 bool dd::Octree::CellInternal::Contains( const dd::Vector4& pos ) const
@@ -145,7 +144,7 @@ dd::Octree::Octree()
 
 dd::Octree::~Octree()
 {
-	m_cells.clear();
+	m_cells.Clear();
 }
 
 // 
@@ -159,7 +158,7 @@ dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 	// no root created
 	if( !m_root.IsValid() )
 	{
-		ASSERT( m_cells.empty() );
+		ASSERT( m_cells.Size() == 0 );
 
 		m_root = CreateCell( ORIGIN, DEFAULT_SIZE );
 	}
@@ -167,7 +166,7 @@ dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 	// root is mis-sized
 	while( !m_root->Contains( position ) )
 	{
-		if( m_entries.empty() )
+		if( m_entries.Size() == 0 )
 		{
 			m_root->Size += m_root->Size;
 		}
@@ -182,9 +181,7 @@ dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 
 	ASSERT( id.IsValid() );
 
-	m_entries.insert( std::make_pair( id, position ) );
-
-	ASSERT( m_entries.find( Entry( -1 ) ) == m_entries.end() );
+	m_entries.Add( id, position );
 
 	Cell cell = FindCell( position );
 	AddToCell( cell, id );
@@ -197,12 +194,12 @@ dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 // 
 void dd::Octree::AddToCell( dd::Octree::Cell cell, const dd::Octree::Entry& entry )
 {
-	ASSERT( cell->Contains( m_entries.at( entry ) ) );
+	ASSERT( cell->Contains( m_entries[ entry ] ) );
 
 	cell->Add( entry );
 
 	// check if we need to split the cell
-	if( cell->Data.size() >= MAX_CELL_ENTRIES )
+	if( cell->Data.Size() >= MAX_CELL_ENTRIES )
 	{
 		SplitCell( cell );
 	}
@@ -213,18 +210,18 @@ void dd::Octree::AddToCell( dd::Octree::Cell cell, const dd::Octree::Entry& entr
 // 
 dd::Octree::Cell dd::Octree::CreateCell( const dd::Vector4& pos, float size )
 {
-	if( m_free.empty() )
+	if( m_free.Size() == 0 )
 	{
-		size_t index = m_cells.size();
+		size_t index = m_cells.Size();
 
-		m_cells.emplace_back( CellInternal( pos, size ) );
+		m_cells.Allocate( CellInternal( pos, size ) );
 
 		return Cell( (int) index, m_cells );
 	}
 	else
 	{
-		Cell cell = m_free.front();
-		m_free.pop();
+		Cell cell = m_free[ m_free.Size() - 1 ];
+		m_free.Pop();
 
 		cell->Position = pos;
 		cell->Size = size;
@@ -233,12 +230,15 @@ dd::Octree::Cell dd::Octree::CreateCell( const dd::Vector4& pos, float size )
 	}
 }
 
+//
+// Double the size of the root by adding a node above it.
+//
 void dd::Octree::ExpandRoot()
 {
 	// copy the old root to the end
 	Cell oldRoot = CreateCell( m_root->Position, m_root->Size );
 	*oldRoot = *m_root;
-	oldRoot->Data.clear();
+	oldRoot->Data.Clear();
 
 	// expand the new root
 	m_root->Size += m_root->Size;
@@ -251,12 +251,12 @@ void dd::Octree::ExpandRoot()
 	m_root->Children[ 0 ] = oldRoot;
 
 	// re-add all the entries
-	while( !m_root->Data.empty() )
+	while( !m_root->Data.Size() == 0 )
 	{
-		Entry entry = m_root->Data.front();
-		m_root->Data.erase( m_root->Data.begin() );
+		Entry entry = m_root->Data[ 0 ];
+		m_root->Data.Remove( 0 );
 
-		Cell cell = FindCell( m_entries.at( entry ) );
+		Cell cell = FindCell( m_entries[ entry ] );
 		AddToCell( cell, entry );
 	}
 }
@@ -297,19 +297,19 @@ void dd::Octree::SplitCell( dd::Octree::Cell cell )
 	CreateChildren( cell );
 
 	// assign existing entries into new cells
-	while( !cell->Data.empty() )
+	while( !cell->Data.Size() == 0 )
 	{
-		Entry entry = cell->Data.front();
-		cell->Data.erase( cell->Data.begin() );
+		Entry entry = cell->Data[ 0 ];
+		cell->Data.Remove( 0 );
 
-		Cell child = FindCell( m_entries.at( entry ) );
+		Cell child = FindCell( m_entries[ entry ] );
 		AddToCell( child, entry );
 	}
 }
 
 void dd::Octree::FreeCell( Cell cell )
 {
-	m_free.push( cell );
+	m_free.Push( cell );
 }
 
 //
@@ -323,19 +323,15 @@ void dd::Octree::Remove( const dd::Octree::Entry& entry )
 
 	cell->Remove( entry );
 
-	auto it = m_entries.find( entry );
-	if( it != m_entries.end() )
-		m_entries.erase( it );
-
-	ASSERT( m_entries.find( Entry( -1 ) ) == m_entries.end() );
+	m_entries.Remove( entry );
 	
 	// check siblings to see if we should merge them into their parent
 	if( parent.IsValid() )
 	{
-		int child_count = 0;
+		uint child_count = 0;
 		for( Cell& child : parent->Children )
 		{
-			child_count += (int) child->Data.size();
+			child_count += child->Data.Size();
 		}
 
 		// give a 33% buffer so we don't end up merging too often
@@ -344,10 +340,10 @@ void dd::Octree::Remove( const dd::Octree::Entry& entry )
 			for( Cell& child : parent->Children )
 			{
 				// move children's data into the parent
-				while( !child->Data.empty() )
+				while( !child->Data.Size() == 0 )
 				{
-					parent->Data.push_back( child->Data.back() );
-					child->Data.pop_back();
+					parent->Data.Push( child->Data[ 0 ] );
+					child->Data.Pop();
 				}
 
 				// free the cell
@@ -357,7 +353,7 @@ void dd::Octree::Remove( const dd::Octree::Entry& entry )
 			}
 
 			ASSERT( !parent->HasChildren() );
-			ASSERT( parent->Data.size() == child_count );
+			ASSERT( parent->Data.Size() == child_count );
 		}
 	}
 }
@@ -369,21 +365,20 @@ const dd::Vector4& dd::Octree::GetPosition( const dd::Octree::Entry& entry ) con
 {
 	ASSERT( entry.ID != -1 );
 
-	return m_entries.at( entry );
+	return m_entries[ entry ];
 }
 
 
 //
 // Get the <count> nearest entries to the given entry.
 // 
-void dd::Octree::GetKNearest( const dd::Octree::Entry& entry, int count, std::vector<dd::Octree::Entry>& output )
+void dd::Octree::GetKNearest( const dd::Octree::Entry& entry, uint count, dd::Vector<dd::Octree::Entry>& output )
 {
-	ASSERT( count > 0 );
 	ASSERT( entry.ID != -1 );
 
-	output.clear();
+	output.Clear();
 
-	Vector4 position = m_entries.at( entry );
+	Vector4 position( m_entries[ entry ] );
 
 	Cell parent;
 	Cell cell = FindCell( entry, &parent );
@@ -434,7 +429,7 @@ void dd::Octree::GetKNearest( const dd::Octree::Entry& entry, int count, std::ve
 		for( const Entry& entry : cell->Data )
 		{
 			ASSERT( entry.ID != -1 );
-			output.push_back( entry );
+			output.Push( entry );
 		}
 	}
 
@@ -442,19 +437,19 @@ void dd::Octree::GetKNearest( const dd::Octree::Entry& entry, int count, std::ve
 	std::sort( output.begin(), output.end(), 
 		[&]( const Entry& a, const Entry& b )
 		{
-			return position.distanceSq( m_entries.at( a ) ) < position.distanceSq( m_entries.at( b ) );
+			return position.distanceSq( m_entries[ a ] ) < position.distanceSq( m_entries[ b ] );
 		} );
 
 	// drop the last elements
-	output.resize( count );
+	output.Resize( count );
 }
 
 //
 // Get all the entries within <range> of the given entry.
 //
-void dd::Octree::GetWithinRange( const dd::Octree::Entry& entry, float range, std::vector<dd::Octree::Entry>& output )
+void dd::Octree::GetWithinRange( const dd::Octree::Entry& entry, float range, dd::Vector<dd::Octree::Entry>& output )
 {
-	const Vector4& position = m_entries.at( entry );
+	const Vector4& position = m_entries[ entry ];
 	float rangeSq = range * range;
 
 	BoundingBox box;
@@ -464,16 +459,20 @@ void dd::Octree::GetWithinRange( const dd::Octree::Entry& entry, float range, st
 	GetWithinBounds( box, output );
 
 	// our bounds check was a bit greedy, filter out the entries in the corners
-	std::remove_if( output.begin(), output.end(), [&]( const Octree::Entry& entry )
+	dd::Vector<Octree::Entry> to_remove;
+	for( const Octree::Entry& entry : output )
 	{
-		return position.distanceSq( m_entries.at( entry ) ) > rangeSq;
-	} );
+		if( position.distanceSq( m_entries[ entry ] ) > rangeSq )
+			to_remove.Add( entry );
+	}
+
+	output.RemoveAll( to_remove );
 }
 
 //
 // Get all the entries within the given bounding box.
 //
-void dd::Octree::GetWithinBounds( const dd::BoundingBox& bounds, std::vector<dd::Octree::Entry>& output )
+void dd::Octree::GetWithinBounds( const dd::BoundingBox& bounds, dd::Vector<dd::Octree::Entry>& output )
 {
 	std::vector<Cell> leaf_cells;
 	std::vector<Cell> to_process;
@@ -506,8 +505,8 @@ void dd::Octree::GetWithinBounds( const dd::BoundingBox& bounds, std::vector<dd:
 	{
 		for( Entry& entry : cell->Data )
 		{
-			if( bounds.Contains( m_entries.at( entry ) ) )
-				output.push_back( entry );
+			if( bounds.Contains( m_entries[ entry ] ) )
+				output.Add( entry );
 		}
 	}
 }
@@ -537,29 +536,29 @@ dd::Octree::Cell dd::Octree::FindCell( const dd::Vector4& position, Cell* parent
 
 dd::Octree::Cell dd::Octree::FindCell( const Octree::Entry& entry, Cell* parent ) const
 {
-	return FindCell( m_entries.at( entry ), parent );
+	return FindCell( m_entries[ entry ], parent );
 }
 
 int dd::Octree::Count() const 
 {
-	return (int) m_entries.size();
+	return (int) m_entries.Size();
 }
 
 void dd::Octree::Validate() const
 {
-	for( auto pair : m_entries )
+	for( auto entry : m_entries )
 	{
 		bool bPlaced = false;
 
 		for( const CellInternal& cell : m_cells )
 		{
-			ASSERT( cell.Data.empty() || !cell.HasChildren() ); // cells can't have both children and data
+			ASSERT( cell.Data.Size() == 0 || !cell.HasChildren() ); // cells can't have both children and data
 
-			auto it = std::find( cell.Data.begin(), cell.Data.end(), Entry( pair.first ) );
-			if( it != cell.Data.end() )
+			int index = cell.Data.IndexOf( Entry( entry.Key ) );
+			if( index >= 0 )
 			{
 				ASSERT( !bPlaced ); // check that the entry is only in one cell
-				ASSERT( cell.Contains( pair.second ) ); // check that the entry actually belongs in the cell
+				ASSERT( cell.Contains( entry.Value ) ); // check that the entry actually belongs in the cell
 
 				bPlaced = true;
 			}

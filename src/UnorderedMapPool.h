@@ -9,6 +9,8 @@
 #include "ComponentPoolBase.h"
 #include "EntityHandle.h"
 
+#include <unordered_map>
+
 template<typename T>
 class UnorderedMapPool;
 

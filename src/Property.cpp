@@ -7,7 +7,22 @@
 #include "PrecompiledHeader.h"
 #include "Property.h"
 
-dd::Property::Property( dd::MemberBase* member, uint offset )
+namespace dd
+{
+	Property::Property()
+	{
+
+	}
+
+	Property::Property( const Function& get, const Function& set )
+		: m_get( get ),
+		m_set( set )
+	{
+
+	}
+}
+
+/*dd::Property::Property( dd::MemberBase* member, uint offset )
 	: m_data( nullptr ),
 	m_member( member ),
 	m_offset( offset )
@@ -34,4 +49,4 @@ const dd::StringBase& dd::Property::GetName() const
 const dd::StringBase& dd::Property::GetDisplayName() const
 {
 	return m_member->m_friendlyName;
-}
+}*/

@@ -1,25 +1,135 @@
 #pragma once
 
-#define DEFINE_ITERATORS( Type ) \
-class const_iterator { \
-public: \
-	const Type* Pointer; \
-	const_iterator() : Pointer( nullptr ) {} \
-	const_iterator( const Type* ptr ) : Pointer( ptr ) {} \
-	inline const Type& operator*() const { return *Pointer; } \
-	inline const_iterator& operator++() { ++Pointer; return *this; } \
-	inline const_iterator& operator+( size_t count ) { Pointer += count; return *this; } \
-	inline bool operator!=( const const_iterator& other ) const { return Pointer != other.Pointer; } \
-}; \
-\
-class iterator : public const_iterator { \
-public: \
-	iterator() : const_iterator() {} \
-	iterator( Type* ptr ) : const_iterator( ptr ) {} \
-	inline Type& operator*() const { return *const_cast<char*>( Pointer ); } \
-}; \
-inline const_iterator begin() const { return const_iterator( m_buffer ); } \
-inline const_iterator end() const { return const_iterator( m_buffer + m_length ); } \
-inline iterator begin() { return iterator( m_buffer ); } \
-inline iterator end() { return iterator( m_buffer + m_length ); }
+#define DEFINE_ITERATORS( Type, Buffer, Size )												\
+	dd::Iterator<Type> begin() const { return dd::Iterator<Type>( (Type*) Buffer ); }		\
+	dd::Iterator<Type> end() const { return dd::Iterator<Type>( (Type*) Buffer + Size ); }	
 
+namespace dd
+{
+	template <typename T>
+	class Iterator : public std::iterator<std::random_access_iterator_tag, T>
+	{
+	public:
+		Iterator();
+		Iterator( T* data );
+
+		T& operator*() const;
+		T* operator->() const;
+		Iterator& operator++();
+		Iterator& operator--();
+		Iterator operator++( int );
+		Iterator operator--( int );
+		Iterator operator+( size_t x ) const;
+		Iterator operator-( size_t x ) const;
+		size_t operator-( const Iterator& rhs ) const;
+		Iterator& operator+=( size_t x );
+		Iterator& operator-=( size_t x );
+		bool operator<( const Iterator& rhs ) const;
+
+		bool operator==( const Iterator &rhs ) const;
+		bool operator!=( const Iterator &rhs ) const;
+
+	private:
+		T* m_data;
+	};
+
+	template <typename T>
+	Iterator<T>::Iterator()
+		: m_data( NULL )
+	{
+	}
+
+	template <typename T>
+	Iterator<T>::Iterator( T* data )
+		: m_data( data )
+	{
+	}
+
+	template <typename T>
+	T& Iterator<T>::operator*() const
+	{
+		return *m_data;
+	}
+
+	template <typename T>
+	T *Iterator<T>::operator->() const
+	{
+		return m_data;
+	}
+
+	template <typename T>
+	typename Iterator<T>& Iterator<T>::operator++()
+	{
+		++m_data;
+		return *this;
+	}
+
+	template <typename T>
+	typename Iterator<T>& Iterator<T>::operator--()
+	{
+		--m_data;
+		return *this;
+	}
+
+	template <typename T>
+	typename Iterator<T> Iterator<T>::operator++( int )
+	{
+		return Iterator( m_data++ );
+	}
+
+	template <typename T>
+	typename Iterator<T> Iterator<T>::operator--( int )
+	{
+		return Iterator( m_data-- );
+	}
+
+	template <typename T>
+	bool Iterator<T>::operator==( const Iterator &rhs ) const
+	{
+		return m_data == rhs.m_data;
+	}
+
+	template <typename T>
+	bool Iterator<T>::operator!=( const Iterator &rhs ) const
+	{
+		return m_data != rhs.m_data;
+	}
+
+	template <typename T>
+	typename Iterator<T> Iterator<T>::operator+( size_t x ) const
+	{
+		return Iterator( m_data + x );
+	}
+
+	template <typename T>
+	typename Iterator<T> Iterator<T>::operator-( size_t x ) const
+	{
+		return Iterator( m_data - x );
+	}
+
+	template <typename T>
+	size_t Iterator<T>::operator-( const Iterator& rhs ) const
+	{
+		return m_data - rhs.m_data;
+	}
+
+	template <typename T>
+	typename Iterator<T>& Iterator<T>::operator+=( size_t x )
+	{
+		m_data += x;
+		return *this;
+	}
+
+	template <typename T>
+	typename Iterator<T>& Iterator<T>::operator-=( size_t x )
+	{
+		m_data -= x;
+		return *this;
+	}
+
+	template <typename T>
+	bool Iterator<T>::operator<( const Iterator& rhs ) const
+	{
+		return m_data < rhs.m_data;
+	}
+}

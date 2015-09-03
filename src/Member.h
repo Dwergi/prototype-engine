@@ -5,6 +5,7 @@
 //
 
 #pragma once
+/*
 
 #define OFFSET_OF( ClassName, MemberName ) ((uint) &(((ClassName*) nullptr)->MemberName))
 
@@ -63,5 +64,6 @@ namespace dd
 
 	private:
 		ValueType InstanceType::* m_ptr;
+		InstanceType* m_instance;
 	};
-}
+}*/

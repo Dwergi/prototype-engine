@@ -9,21 +9,20 @@
 #include <string>
 
 typedef unsigned long long uint64;
-typedef unsigned char byte;
 
 namespace dd
 {
-	uint64 HashBytes( const byte* data, uint64 size );
+	uint64 HashBytes( const uint8* data, uint64 size );
 
 	template< typename T >
-	uint64 Hash( const T& value )
+	inline uint64 Hash( const T& value )
 	{
 		return HashBytes( (const byte*)((const void*) &value), sizeof( T ) );
 	}
 
 	template<>
-	inline uint64 Hash( const std::string& value )
+	inline uint64 Hash( const dd::String& value )
 	{
-		HashBytes( (const byte*) value.c_str(), value.size() );
+		return HashBytes( (const uint8*) value.c_str(), value.Length() );
 	}
 }

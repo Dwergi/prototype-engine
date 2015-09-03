@@ -8,247 +8,388 @@
 
 namespace dd
 {
-	template< typename T >
-	class Vector
+	class VectorBase
 	{
-	private:
+	public:
+		VectorBase();
+		uint Size() const;
 
-		static const uint DefaultSize = 64;
+	protected:
+		uint m_capacity;
+		uint m_size;
 
+		static const uint DefaultSize = 8;
+
+		// growth factor and growth fudge defines 
+		static const float GrowthFactor;
+		static const uint GrowthFudge;
+	};
+
+	template< typename T >
+	class Vector : public VectorBase
+	{
 	public:
 
-		Vector()
-			: m_data( nullptr ),
-			m_entries( 0 ),
-			m_capacity( 0 )
-		{
-			Resize( DefaultSize );
-		}
+		Vector();
+		Vector( uint reserved_size );
+		Vector( const Vector& other );
+		Vector( Vector&& other );
 
-		Vector( uint reserved_size )
-			: m_data( nullptr ),
-			m_entries( 0 ),
-			m_capacity( 0 )
-		{
-			Resize( reserved_size );
-		}
+		T& operator[]( uint index ) const;
 
-		T& operator[]( uint index )
-		{
-			return GetEntry( index );
-		}
+		void Remove( const T& value );
+		void Remove( uint index );
+		void RemoveAll( const Vector<T>& to_remove );
+		void Clear();
+		T Pop();
 
-		const T& operator[]( uint index ) const
-		{
-			return GetEntry( index );
-		}
-
-		void Remove( uint index )
-		{
-			ASSERT( index < m_entries );
-
-			// destruct the entry
-			m_data[ index ].~T();
-
-			--m_entries;
-			
-			if( index != m_entries )
-				memcpy( &m_data[ index ], &m_data[ index ] + 1, (m_entries - index) * sizeof( T ) );
-		}
-
-		void Clear()
-		{
-			// call in-place destructors
-			for( uint i = 0; i < m_entries; ++i )
-			{
-				m_data[ i ].~T();
-			}
-
-			m_entries = 0;
-		}
-
-		void Add( const T& value )
-		{
-			if( m_entries == m_capacity )
-			{
-				Resize( m_capacity * 2 );
-			}
-
-			new (&m_data[ m_entries ]) T( value );
-
-			++m_entries;
-		}
-
-		void Push( const T& value )
-		{
-			Add( value );
-		}
+		void Add( T&& value );
+		void Add( const T& value );
+		void Push( T&& value );
+		void Push( const T& value );
 
 		//
 		// Insert at the given index. 
 		// Index must be <= Size()
 		//
-		void Insert( const T& value, uint index )
-		{
-			ASSERT( index <= m_entries );
-
-			if( index == m_entries )
-			{
-				Add( value );
-			}
-			else
-			{
-				memcpy( &m_data[ index ] + 1, &m_data[ index ], (m_entries - index) * sizeof( T ) );
-				
-				new (&m_data[ m_entries ]) T( value );
-			}
-		}
-
-		T Pop()
-		{
-			ASSERT( m_entries > 0 );
-
-			--m_entries;
-
-			return m_data[ m_entries ];
-		}
+		void Insert( const T&& value, uint index );
 
 		//
 		// Add all the entries from the given vector to the end of this vector.
 		//
-		void AddAll( const Vector<T>& other )
-		{
-			uint new_size = Size() + other.Size();
+		void AddAll( const Vector<T>& other );
 
-			uint new_capacity = m_capacity;
-			while( new_size > new_capacity )
-			{
-				new_capacity *= 2;
-			}
+		//
+		// Create a new entry at the back and return a reference to it. 
+		//
+		T& Allocate();
+		T& Allocate( T&& entry );
 
-			if( new_capacity > m_capacity )
-			{
-				Resize( new_capacity );
-			}
-			
-			for( uint i = 0; i < other.Size(); ++i )
-			{
-				m_data[ m_entries + i ] = other[ i ];
-			}
+		void Swap( Vector<T>& other );
 
-			m_entries += other.Size();
-		}
+		int IndexOf( const T& entry ) const;
+		bool Contains( const T& entry ) const;
 
-		T& Allocate()
-		{
-			if( m_entries == m_capacity )
-			{
-				Resize( m_capacity * 2 );
-			}
-
-			return m_data[ m_entries++ ];
-		}
-
-		void Allocate( T&& entry )
-		{
-			if( m_entries == m_capacity )
-			{
-				Resize( m_capacity * 2 );
-			}
-
-			new (&m_data[ m_entries ]) T( entry );
-
-			++m_entries;
-		}
-
-		void Swap( Vector<T>& other )
-		{
-			std::swap( m_data, other.m_data ); 
-			std::swap( m_entries, other.m_entries );
-			std::swap( m_capacity, other.m_capacity );
-		}
-
-		int IndexOf( const T& entry ) const
-		{
-			for( uint i = 0; i < m_entries; ++i )
-			{
-				if( m_data[ i ] == entry )
-					return (int) i;
-			}
-
-			return -1;
-		}
-
-		bool Contains( const T& entry ) const
-		{
-			return IndexOf( entry ) != -1;
-		}
-
-		uint Size() const
-		{
-			return m_entries;
-		}
+		void Resize( uint capacity );
+		void ShrinkToFit();
 
 		//
 		// Iteration
 		//
-		class const_iterator
-		{
-		public:
-			const T* Pointer;
-
-			const_iterator() : Pointer( nullptr ) {}
-			const_iterator( const T* ptr ) : Pointer( ptr ) {}
-
-			inline const T& operator*() const { return *Pointer; }
-			inline const_iterator& operator++() { ++Pointer; return *this; }
-			inline const_iterator& operator+( size_t count ) { Pointer += count; return *this; }
-
-			inline bool operator!=( const const_iterator& other ) const { return Pointer != other.Pointer; }
-		};
-
-		class iterator : public const_iterator
-		{
-		public:
-			iterator() : const_iterator() {}
-			iterator( T* ptr ) : const_iterator( ptr ) {}
-
-			inline T& operator*() const { return *const_cast<T*>( Pointer ); }
-		};
-
-		inline const_iterator begin() const { return const_iterator( m_data ); }
-		inline const_iterator end() const { return const_iterator( m_data + m_entries ); }
-
-		inline iterator begin() { return iterator( m_data ); }
-		inline iterator end() { return iterator( m_data + m_entries ); }
+		DEFINE_ITERATORS( T, m_data, m_size );
 
 	private:
 
-		void Resize( uint new_capacity )
-		{
-			ASSERT( new_capacity > m_capacity );
+		// 
+		// Grows the vector to contain at least target elements.
+		// The actual capacity will depend on the growth factor.
+		//
+		void Grow( uint target );
+		void Grow();
 
-			T* new_data = reinterpret_cast<T*>( new char[ new_capacity * sizeof( T ) ] );
+		void Reallocate( uint new_capacity );
 
-			if( m_data != nullptr )
-			{
-				memcpy( new_data, m_data, m_capacity * sizeof( T ) );
-				delete[] (char*) m_data;
-			}
+		T& GetEntry( uint index ) const;
 
-			m_data = new_data;
-			m_capacity = new_capacity;
-		}
-
-		T& GetEntry( uint index ) const
-		{
-			ASSERT( index < m_entries );
-
-			return m_data[ index ];
-		}
-
-		uint m_entries;
-		uint m_capacity;
 		T* m_data;
 	};
+
+	//
+	// Function definitions follow...
+	//
+
+	template<typename T> 
+	Vector<T>::Vector()
+		: m_data( nullptr )
+	{
+		
+	}
+
+	template<typename T> 
+	Vector<T>::Vector( uint reserved )
+		: m_data( nullptr )
+	{
+		Resize( reserved );
+	}
+
+	template<typename T> 
+	Vector<T>::Vector( const Vector<T>& other )
+		: m_data( nullptr )
+	{
+		Reallocate( other.m_capacity );
+		CopyRange( other.m_data, m_data, other.m_size );
+		m_size = other.m_size;
+	}
+
+	template<typename T> 
+	Vector<T>::Vector( Vector<T>&& other )
+	{
+		Swap( other );
+
+		other.m_data = nullptr;
+		other.m_size = 0;
+		other.m_capacity = 0;
+	}
+
+	template<typename T> 
+	T& Vector<T>::operator[]( uint index ) const
+	{
+		return GetEntry( index );
+	}
+
+	template<typename T>
+	void Vector<T>::Remove( uint index )
+	{
+		ASSERT( index < m_size );
+
+		// destruct the entry
+		m_data[ index ].~T();
+
+		--m_size;
+
+		if( index != m_size )
+		{
+			MoveRange( (&m_data[ index ]) + 1, &m_data[ index ], (m_size - index) );
+		}
+	}
+
+	template<typename T> 
+	void Vector<T>::Remove( const T& value )
+	{
+		int index = IndexOf( value );
+		if( index < 0 )
+			return;
+
+		Remove( (uint) index );
+	}
+
+	template<typename T> 
+	void Vector<T>::RemoveAll( const Vector<T>& to_remove )
+	{
+		for( const T& entry : to_remove )
+		{
+			int index = IndexOf( entry );
+			if( index >= 0 )
+				Remove( (uint) index );
+		}
+	}
+
+	template<typename T>
+	T Vector<T>::Pop()
+	{
+		ASSERT( m_size > 0 );
+
+		--m_size;
+
+		T entry = m_data[ m_size ];
+
+		m_data[ m_size ].~T();
+
+		return entry;
+	}
+
+	template<typename T>
+	void Vector<T>::Clear()
+	{
+		DestroyRange( m_data, m_size );
+
+		m_size = 0;
+	}
+
+	template<typename T>
+	void Vector<T>::Add( T&& entry )
+	{
+		if( m_size == m_capacity )
+		{
+			Grow();
+		}
+
+		new (&m_data[ m_size ]) T( entry );
+
+		++m_size;
+	}
+
+	template<typename T>
+	void Vector<T>::Add( const T& entry )
+	{
+		if( m_size == m_capacity )
+		{
+			Grow();
+		}
+
+		new (&m_data[ m_size ]) T( entry );
+
+		++m_size;
+	}
+
+	template<typename T>
+	void Vector<T>::Push( T&& entry )
+	{
+		Add( std::move( entry ) );
+	}
+
+	template<typename T>
+	void Vector<T>::Push( const T& entry )
+	{
+		Add( entry );
+	}
+
+	template<typename T>
+	void Vector<T>::Insert( const T&& entry, uint index )
+	{
+		ASSERT( index <= m_size );
+
+		if( index == m_size )
+		{
+			Add( entry );
+		}
+		else
+		{
+			MoveRange( &m_data[ index ], &m_data[ index ] + 1, m_size - index );
+
+			new (&m_data[ m_size ]) T( entry );
+		}
+	}
+
+	template<typename T>
+	void Vector<T>::AddAll( const Vector<T>& other )
+	{
+		uint new_size = Size() + other.Size();
+
+		Grow( new_size );
+
+		for( uint i = 0; i < other.Size(); ++i )
+		{
+			m_data[ m_size + i ] = other[ i ];
+		}
+
+		m_size += other.Size();
+	}
+
+	template<typename T>
+	T& Vector<T>::Allocate()
+	{
+		if( m_size == m_capacity )
+		{
+			Grow();
+		}
+
+		return m_data[ m_size++ ];
+	}
+
+	template<typename T>
+	T& Vector<T>::Allocate( T&& to_add )
+	{
+		if( m_size == m_capacity )
+		{
+			Resize( m_capacity * 2 );
+		}
+
+		new (&m_data[ m_size ]) T( to_add );
+
+		++m_size;
+
+		return m_data[ m_size ];
+	}
+
+	template<typename T>
+	void Vector<T>::Swap( Vector<T>& other )
+	{
+		std::swap( m_data, other.m_data ); 
+		std::swap( m_size, other.m_size );
+		std::swap( m_capacity, other.m_capacity );
+	}
+
+	template<typename T>
+	int Vector<T>::IndexOf( const T& entry ) const
+	{
+		for( uint i = 0; i < m_size; ++i )
+		{
+			if( m_data[ i ] == entry )
+				return (int) i;
+		}
+
+		return -1;
+	}
+
+	template<typename T>
+	bool Vector<T>::Contains( const T& entry ) const
+	{
+		return IndexOf( entry ) != -1;
+	}
+
+	template<typename T>
+	void Vector<T>::Resize( uint size )
+	{
+		if( size == m_capacity )
+			return;
+
+		if( size < m_capacity )
+		{
+			if( size < m_size )
+				DestroyRange( &m_data[ size ], m_size - size );
+
+			m_size = size;
+
+			Reallocate( size );
+		}
+
+		if( size > m_capacity )
+		{
+			Reallocate( size );
+		}
+	}
+
+	template<typename T>
+	void Vector<T>::ShrinkToFit()
+	{
+		Reallocate( m_size );
+	}
+
+	template<typename T>
+	void Vector<T>::Grow()
+	{
+		// an unparametrized grow just grows by the default growth factor
+		Reallocate( ((uint) (m_capacity * GrowthFactor)) + GrowthFudge );
+	}
+
+	template<typename T>
+	void Vector<T>::Grow( uint target )
+	{
+		if( target < m_capacity )
+			return;
+
+		uint new_capacity = m_capacity;
+		while( new_capacity < target )
+		{
+			new_capacity = ((uint) (m_capacity * GrowthFactor)) + GrowthFudge;
+		}
+
+		Reallocate( new_capacity );
+	}
+
+	template<typename T>
+	void Vector<T>::Reallocate( uint new_capacity )
+	{
+		T* new_data = reinterpret_cast<T*>( new char[ new_capacity * sizeof( T ) ] );
+
+		if( m_data != nullptr )
+		{
+			CopyRange( m_data, new_data, std::min( m_size, new_capacity ) );
+			DestroyRange( m_data, m_size );
+
+			delete[] (char*) m_data;
+		}
+
+		m_data = new_data;
+		m_capacity = new_capacity;
+	}
+
+	template<typename T>
+	T& Vector<T>::GetEntry( uint index ) const
+	{
+		ASSERT( index < m_size );
+
+		return m_data[ index ];
+	}
 }

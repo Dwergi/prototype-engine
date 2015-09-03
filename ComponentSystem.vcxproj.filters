@@ -147,9 +147,6 @@
     <ClInclude Include="src\Hash.h">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\StackArray.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -182,6 +179,33 @@
     </ClInclude>
     <ClInclude Include="src\StringTests.cpp">
       <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Function.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Variable.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FunctionPtr.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FunctionSignature.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Typedefs.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TypeInfoMacros.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Array.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ContainerHelpers.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TypeInfoHelpers.h">
+      <Filter>Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -281,6 +305,24 @@
     </ClCompile>
     <ClCompile Include="src\ScriptTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Variable.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionPtr.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vector.cpp">
+      <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Array.cpp">
+      <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionSignature.cpp">
+      <Filter>Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

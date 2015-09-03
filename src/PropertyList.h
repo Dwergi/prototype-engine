@@ -10,6 +10,7 @@
 
 namespace dd
 {
+/*
 	class PropertyListBase
 	{
 	public: 
@@ -43,5 +44,5 @@ namespace dd
 		}
 
 		virtual ~PropertyList() {}
-	};
+	};*/
 }

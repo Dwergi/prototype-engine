@@ -1,5 +1,5 @@
 //
-// StackArrayTests.h - Tests for StackArray.
+// StackArrayTests.h - Tests for Array.
 // Copyright (C) Sebastian Nordgren 
 // August 6th 2015
 //
@@ -7,9 +7,9 @@
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
-TEST_CASE( "[StackArray] Push" )
+TEST_CASE( "[Array] Push" )
 {
-	dd::StackArray<int, 64> container;
+	dd::Array<int, 64> container;
 
 	REQUIRE( container.Size() == 0 );
 
@@ -19,10 +19,10 @@ TEST_CASE( "[StackArray] Push" )
 	REQUIRE( container[ 0 ] == 123 );
 }
 
-TEST_CASE( "[StackArray] PushAll" )
+TEST_CASE( "[Array] PushAll" )
 {
-	dd::StackArray<int, 64> container;
-	dd::StackArray<int, 32> other;
+	dd::Array<int, 64> container;
+	dd::Array<int, 32> other;
 
 	for( int i = 0; i < 32; ++i )
 	{
@@ -43,9 +43,9 @@ TEST_CASE( "[StackArray] PushAll" )
 	REQUIRE( container[ 63 ] == 31 );
 }
 
-TEST_CASE( "[StackArray] Pop" )
+TEST_CASE( "[Array] Pop" )
 {
-	dd::StackArray<int, 32> container;
+	dd::Array<int, 32> container;
 
 	container.Push( 0 );
 
@@ -61,9 +61,9 @@ TEST_CASE( "[StackArray] Pop" )
 	REQUIRE( container.Size() == 31 );
 }
 
-TEST_CASE( "[StackArray] Contains" )
+TEST_CASE( "[Array] Contains" )
 {
-	dd::StackArray<int, 32> container;
+	dd::Array<int, 32> container;
 
 	for( int i = 0; i < 32; ++i )
 	{
@@ -87,9 +87,9 @@ struct ComplexStruct
 	int OtherInt;
 };
 
-TEST_CASE( "[StackArray] Struct" )
+TEST_CASE( "[Array] Struct" )
 {
-	dd::StackArray<ComplexStruct, 128> container;
+	dd::Array<ComplexStruct, 128> container;
 
 	for( int i = 0; i < 128; ++i )
 	{
@@ -99,10 +99,10 @@ TEST_CASE( "[StackArray] Struct" )
 	REQUIRE( container.Size() == 128 );
 }
 
-TEST_CASE( "[StackArray] Copy" )
+TEST_CASE( "[Array] Copy" )
 {
-	dd::StackArray<int, 128> int_a;
-	dd::StackArray<int, 128> int_b;
+	dd::Array<int, 128> int_a;
+	dd::Array<int, 128> int_b;
 
 	for( int i = 0; i < 128; ++i )
 	{
@@ -113,13 +113,13 @@ TEST_CASE( "[StackArray] Copy" )
 
 	REQUIRE( int_a.Size() == int_b.Size() );
 
-	for( int i = 0; i < int_a.Size(); ++i )
+	for( uint i = 0; i < int_a.Size(); ++i )
 	{
 		REQUIRE( int_a[ i ] == int_b[ i ] );
 	}
 
-	dd::StackArray<ComplexStruct, 128> complex_a;
-	dd::StackArray<ComplexStruct, 128> complex_b;
+	dd::Array<ComplexStruct, 128> complex_a;
+	dd::Array<ComplexStruct, 128> complex_b;
 
 	for( int i = 0; i < 128; ++i )
 	{

@@ -19,9 +19,10 @@ namespace dd
 
 	protected:
 		StringBase();
-		~StringBase();
 
 	public:
+
+		virtual ~StringBase();
 
 		StringBase& operator=( const char* other );
 		StringBase& operator=( const StringBase& other );
@@ -40,7 +41,7 @@ namespace dd
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
 
-		DEFINE_ITERATORS( char );
+		DEFINE_ITERATORS( char, m_buffer, m_length );
 
 	protected:
 
@@ -104,7 +105,7 @@ namespace dd
 		char m_stackData[ Size ];
 	};
 
-	typedef StackString<> String;
+	typedef StackString<32> String;
 	typedef StackString<16> String16;
 	typedef StackString<32> String32;
 	typedef StackString<64> String64;

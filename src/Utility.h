@@ -30,7 +30,7 @@ namespace dd
 	};
 }
 
-template< typename TVector, typename TIterator >
+/*template< typename TVector, typename TIterator >
 void erase_unordered( TVector& container, TIterator it )
 {
 	auto item = container.back();
@@ -39,4 +39,4 @@ void erase_unordered( TVector& container, TIterator it )
 	container.pop_back();
 }
 
-bool operator==( const std::string& a, const std::string& b );
+bool operator==( const std::string& a, const std::string& b );*/

@@ -37,10 +37,11 @@ dd::ScriptEngine::ScriptEngine()
 	int r = m_engine->SetMessageCallback( asMETHOD( dd::ScriptEngine, MessageCallback ), this, asCALL_CDECL );
 	ASSERT( r != 0 );
 }
+/*
 
 void dd::ScriptEngine::RegisterMethod( dd::MethodBase& method )
 {
 	int r = method.RegisterMethod( m_engine );
 
 	ASSERT( r >= 0 );
-}
+}*/

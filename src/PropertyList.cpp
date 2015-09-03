@@ -6,6 +6,7 @@
 
 #include "PrecompiledHeader.h"
 #include "PropertyList.h"
+/*
 
 dd::PropertyListBase::PropertyListBase()
 {
@@ -50,4 +51,4 @@ void dd::PropertyListBase::AddMembers( dd::TypeInfo* typeInfo, uint offset )
 		dd::TypeInfo* nested = dd::TypeInfo::GetType( member->m_typeName );
 		AddMembers( nested, offset + member->m_offset );
 	}
-}
+}*/

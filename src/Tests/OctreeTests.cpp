@@ -58,8 +58,7 @@ TEST_CASE( "Octree", "[octree]")
 		REQUIRE( octree_cmp->Entry.IsValid() );
 	}
 
-	std::vector<dd::Octree::Entry> output;
-	output.reserve( 50 );
+	dd::Vector<dd::Octree::Entry> output( 50 );
 
 	dd::Random rngEntity( 0, EntityCount );
 
@@ -80,8 +79,7 @@ TEST_CASE( "Octree", "[octree]")
 
 		for( int i = 0; i < 100; ++i )
 		{
-			std::vector<dd::Octree::Entry> output;
-			output.reserve( 50 );
+			dd::Vector<dd::Octree::Entry> output( 50 );
 
 			const dd::EntityHandle& entity = handles[ rngEntity.Next() ];
 			auto octree_cmp = octree_pool.Find( entity );

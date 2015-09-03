@@ -215,6 +215,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -231,9 +232,13 @@
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
+    <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\Containers.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\Function.h" />
+    <ClInclude Include="src\FunctionPtr.h" />
+    <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\Handle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
@@ -252,14 +257,17 @@
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
-    <ClInclude Include="src\StackArray.h" />
+    <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\StringTests.cpp" />
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
     <ClInclude Include="src\Tests.h" />
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\Typedefs.h" />
     <ClInclude Include="src\TypeInfo.h" />
+    <ClInclude Include="src\TypeInfoHelpers.h" />
+    <ClInclude Include="src\TypeInfoMacros.h" />
     <ClInclude Include="src\UnorderedMapPool.h" />
     <ClInclude Include="src\UnsortedVectorPool.h" />
     <ClInclude Include="src\DenseVectorPool.h" />
@@ -269,17 +277,22 @@
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Recorder.h" />
+    <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Vector4.h" />
     <ClInclude Include="src\VectorPairIterator.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\DenseMapTests.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
     <ClCompile Include="src\Exception.cpp" />
+    <ClCompile Include="src\Function.cpp" />
+    <ClCompile Include="src\FunctionPtr.cpp" />
+    <ClCompile Include="src\FunctionSignature.cpp" />
     <ClCompile Include="src\Hash.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -311,6 +324,8 @@
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\TypeInfo.cpp" />
     <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\Variable.cpp" />
+    <ClCompile Include="src\Vector.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="src\VectorTests.cpp" />
     <ClCompile Include="src\Window.cpp" />

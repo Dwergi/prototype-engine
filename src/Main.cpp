@@ -127,7 +127,7 @@ int main( int argc, char* const argv[] )
 
 		dd::MousePosition mouse_pos = input.GetMousePosition();
 
-		dd::StackArray<dd::InputEvent, 64> events;
+		dd::Array<dd::InputEvent, 64> events;
 		input.GetKeyEvents( events );
 
 		for( int i = 0; i < events.Size(); ++i )

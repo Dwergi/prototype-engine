@@ -6,17 +6,23 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <utility>
-#include <vector>
 #include <iostream>
 
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
-typedef unsigned int uint;
+#include "Typedefs.h"
 
 #include "Assert.h"
 #include "Utility.h"
+#include "ContainerHelpers.h"
 #include "Containers.h"
+
+#include "Variable.h"
+#include "FunctionSignature.h"
+#include "FunctionPtr.h"
+#include "Function.h"
+#include "Property.h"
 #include "TypeInfo.h"
+#include "TypeInfoMacros.h"

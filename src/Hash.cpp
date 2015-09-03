@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "Hash.h"
 
-uint64 dd::HashBytes( const byte* data, uint64 size )
+uint64 dd::HashBytes( const uint8* data, uint64 size )
 {
 	const uint64_t fnv_prime = 1099511628211u;
 	const uint64_t fnv_offset_basis = 14695981039346656037u;

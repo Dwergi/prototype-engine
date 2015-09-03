@@ -21,6 +21,12 @@ struct Vector2Key
 {
 	int X;
 	int Y;
+
+	bool operator==( const Vector2Key& other ) const
+	{
+		return X == other.X
+			&& Y == other.Y;
+	}
 };
 
 TEST_CASE( "[DenseMap] Complex Keys" )

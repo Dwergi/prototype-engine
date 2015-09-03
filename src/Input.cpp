@@ -64,7 +64,7 @@ void dd::Input::Update()
 	m_pendingEvents.Clear();
 }
 
-void dd::Input::GetKeyEvents( dd::StackArray<InputEvent, 64>& events ) const
+void dd::Input::GetKeyEvents( dd::Array<InputEvent, 64>& events ) const
 {
 	for( uint i = 0; i < m_currentEvents.Size(); ++i )
 	{

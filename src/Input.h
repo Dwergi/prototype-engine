@@ -7,7 +7,7 @@
 #pragma once
 
 #include "DenseMap.h"
-#include "StackArray.h"
+#include "Array.h"
 #include "Vector.h"
 
 #include "InputAction.h"
@@ -53,7 +53,7 @@ namespace dd
 
 		void Update();
 		MousePosition GetMousePosition() const;
-		void GetKeyEvents( StackArray<InputEvent, 64>& out ) const;
+		void GetKeyEvents( Array<InputEvent, 64>& out ) const;
 
 	private:
 
