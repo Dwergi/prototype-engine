@@ -282,7 +282,7 @@ namespace dd
 	{
 		if( m_size == m_capacity )
 		{
-			Resize( m_capacity * 2 );
+			Grow();
 		}
 
 		new (&m_data[ m_size ]) T( to_add );
@@ -362,7 +362,7 @@ namespace dd
 		uint new_capacity = m_capacity;
 		while( new_capacity < target )
 		{
-			new_capacity = ((uint) (m_capacity * GrowthFactor)) + GrowthFudge;
+			new_capacity = ((uint) (new_capacity * GrowthFactor)) + GrowthFudge;
 		}
 
 		Reallocate( new_capacity );

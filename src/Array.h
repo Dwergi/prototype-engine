@@ -115,7 +115,7 @@ namespace dd
 	template<typename T>
 	void ArrayBase<T>::PushAll( const ArrayBase<T>& other )
 	{
-		ASSERT( m_capacity - m_size > other.Size() );
+		ASSERT( m_capacity - m_size >= other.Size() );
 
 		for( uint i = 0; i < other.m_size; ++i )
 		{

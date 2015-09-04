@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "Vector.h"
 
-const float dd::VectorBase::GrowthFactor = 1.75f;
+const float dd::VectorBase::GrowthFactor = 2.0f;
 const uint dd::VectorBase::GrowthFudge = 8;
 
 dd::VectorBase::VectorBase()

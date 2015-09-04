@@ -68,7 +68,7 @@ namespace dd
 		//
 		// Gets the number of entries in the tree.
 		//
-		int Count() const;
+		uint Count() const;
 
 		//
 		// An entry in the octree. Used to reference entries in the tree.

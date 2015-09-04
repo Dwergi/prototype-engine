@@ -75,15 +75,15 @@ namespace dd
 	}
 
 	template <typename T>
-	inline void NewCopy( void* *dest, const void* src )
+	inline void NewCopy( void** dest, const void* src )
 	{
-		T* newData = (T*)malloc( sizeof( T ) );
+		T* newData = (T*) malloc( sizeof( T ) );
 		new (newData) T( *Cast<T>( src ) );
 		*dest = newData;
 	}
 
 	template <typename T>
-	inline void PODNewCopy( void* *dest, const void* src )
+	inline void PODNewCopy( void** dest, const void* src )
 	{
 		*dest = malloc( sizeof( T ) );
 		std::memcpy( *dest, src, sizeof( T ) );

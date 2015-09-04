@@ -14,7 +14,7 @@ namespace dd
 	template< typename TKey, typename TValue >
 	class DenseMap
 	{
-		static const uint DefaultSize = 128;
+		static const uint DefaultSize = 16;
 
 	public:
 
@@ -73,9 +73,9 @@ namespace dd
 		{
 		public:
 			iterator() : const_iterator() {}
-			iterator( Entry* ptr ) : const_iterator( ptr ) {}
+			iterator( Entry& ptr ) : const_iterator( ptr ) {}
 
-			inline Entry& operator*() const { return *const_cast<Entry*>( Pointer ); }
+			inline Entry& operator*() const { return *const_cast<Entry&>( Pointer ); }
 		};
 
 		inline const_iterator begin() const { return const_iterator( m_data, *this ); }
@@ -89,10 +89,12 @@ namespace dd
 		void Clear( Entry& entry ) const;
 		void Insert( const TKey& key, const TValue& value );
 
-		Entry& GetEntry( const TKey& key ) const;
+		Entry* FindEntry( const TKey& key ) const;
+		Entry& GetEntry( const TKey& key, uint* pIndex = nullptr ) const;
 		bool IsMatch( const Entry& entry, const TKey& key ) const;
 		bool IsEmpty( const Entry& entry ) const;
 
+		void Grow();
 		void Resize( uint new_size );
 		void Rehash( const Entry* data, uint capacity );		
 
@@ -125,7 +127,7 @@ namespace dd
 
 		if( m_entries == m_capacity )
 		{
-			Resize( m_capacity * 2 );
+			Grow();
 		}
 
 		Insert( key, value );
@@ -136,11 +138,11 @@ namespace dd
 	{
 		ASSERT( m_entries > 0 );
 
-		Entry& entry = GetEntry( key );
-		if( !IsMatch( entry, key ) )
+		Entry* entry = FindEntry( key );
+		if( entry == nullptr )
 			throw dd::Exception( "Key not found!" );
 
-		Clear( entry );
+		Clear( *entry );
 
 		--m_entries;
 	}
@@ -148,35 +150,63 @@ namespace dd
 	template<typename TKey, typename TValue>
 	bool DenseMap<TKey, TValue>::Contains( const TKey& key ) const
 	{
-		Entry& entry = GetEntry( key );
-
-		return IsMatch( entry, key );
+		return Find( key ) != nullptr;
 	}
 
 	template<typename TKey, typename TValue>
 	TValue* DenseMap<TKey, TValue>::Find( const TKey& key ) const
 	{
-		Entry& entry = GetEntry( key );
+		Entry* entry = FindEntry( key );
 
-		if( !IsMatch( entry, key ) )
-		{
+		if( entry == nullptr )
 			return nullptr;
+
+		// not found
+		return &entry->Value;
+	}
+
+	template<typename TKey, typename TValue>
+	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
+	{
+		uint index = 0;
+		Entry& entry = GetEntry( key, &index );
+
+		if( IsMatch( entry, key ) )
+		{
+			// simple case - no collision
+			return &entry;
+		}
+		else
+		{
+			// hard case - collision, so linearly search for the next free slot
+			Entry* current = &entry + 1;
+			Entry* last = &m_data[ m_capacity - 1 ];
+
+			while( current <= last )
+			{
+				if( IsMatch( *current, key ) )
+				{
+					return current;
+				}
+
+				++current;
+			}
 		}
 
-		return &entry.Value;
+		// not found
+		return nullptr;
 	}
 
 	template<typename TKey, typename TValue>
 	TValue& DenseMap<TKey, TValue>::operator[]( const TKey& key ) const
 	{
-		ASSERT( m_entries > 0 );
+		return *Find( key );
+	}
 
-		Entry& entry = GetEntry( key );
-
-		if( !IsMatch( entry, key ) )
-			throw dd::Exception( "Key not found!" );
-
-		return entry.Value;
+	template<typename TKey, typename TValue>
+	void DenseMap<TKey, TValue>::Grow()
+	{
+		Resize( m_capacity * 2 );
 	}
 
 	template<typename TKey, typename TValue>
@@ -224,6 +254,8 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Rehash( const typename DenseMap<TKey, TValue>::Entry* data, uint capacity )
 	{
+		m_entries = 0; // clear this here, because we're going to be re-inserting everything
+
 		for( uint i = 0; i < capacity; ++i ) 
 		{
 			if( !IsEmpty( data[ i ] ) )
@@ -244,24 +276,32 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Insert( const TKey& key, const TValue& value )
 	{
-		Entry& entry = GetEntry( key );
+		uint index;
+		Entry& entry = GetEntry( key, &index );
+
 		if( IsEmpty( entry ) )
 		{
 			// slot is free, use placement new to construct it there
-			new( &entry.Key ) TKey( key );
-			new( &entry.Value ) TValue( value );
+			new (&entry.Key) TKey( key );
+			new (&entry.Value) TValue( value );
+
+			++m_entries;
+			return;
 		}
 		else
 		{
 			// find a new slot by linearly searching for the next free one
 			Entry* current = &entry + 1;
+			Entry* last = &m_data[ m_capacity - 1 ];
 
-			while( current - m_data < m_capacity )
+			while( current <= last )
 			{
 				if( IsEmpty( *current ) )
 				{
-					current->Key = key;
-					current->Value = value;
+					new (&current->Key) TKey( key );
+					new (&current->Value) TValue( value );
+					
+					++m_entries;
 					return;
 				}
 
@@ -269,15 +309,23 @@ namespace dd
 			}
 		}
 
-		++m_entries;
+		// couldn't find a slot, need to grow and try again
+		Grow();
+		Insert( key, value );
+		
 	}
 
 	template<typename TKey, typename TValue>
-	typename DenseMap<TKey, TValue>::Entry& DenseMap<TKey, TValue>::GetEntry( const TKey& key ) const
+	typename DenseMap<TKey, TValue>::Entry& DenseMap<TKey, TValue>::GetEntry( const TKey& key, uint* pIndex ) const
 	{
 		uint64 hash = m_hash( key );
 
 		uint index = hash % m_capacity;
+
+		if( pIndex != nullptr )
+		{
+			*pIndex = index;
+		}
 
 		return m_data[ index ];
 	}

@@ -194,8 +194,6 @@ dd::Octree::Entry dd::Octree::Add( const dd::Vector4& position )
 // 
 void dd::Octree::AddToCell( dd::Octree::Cell cell, const dd::Octree::Entry& entry )
 {
-	ASSERT( cell->Contains( m_entries[ entry ] ) );
-
 	cell->Add( entry );
 
 	// check if we need to split the cell
@@ -302,7 +300,8 @@ void dd::Octree::SplitCell( dd::Octree::Cell cell )
 		Entry entry = cell->Data[ 0 ];
 		cell->Data.Remove( 0 );
 
-		Cell child = FindCell( m_entries[ entry ] );
+		Vector4& pos = m_entries[ entry ];
+		Cell child = FindCell( pos );
 		AddToCell( child, entry );
 	}
 }
@@ -539,9 +538,9 @@ dd::Octree::Cell dd::Octree::FindCell( const Octree::Entry& entry, Cell* parent 
 	return FindCell( m_entries[ entry ], parent );
 }
 
-int dd::Octree::Count() const 
+uint dd::Octree::Count() const 
 {
-	return (int) m_entries.Size();
+	return m_entries.Size();
 }
 
 void dd::Octree::Validate() const
