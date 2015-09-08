@@ -3,52 +3,61 @@
 // Copyright (C) Sebastian Nordgren 
 // February 17th 2015
 //
-
 #include "PrecompiledHeader.h"
 #include "PropertyList.h"
-/*
 
-dd::PropertyListBase::PropertyListBase()
+namespace 
 {
-}
-
-dd::PropertyListBase::~PropertyListBase()
-{
-}
-
-void dd::PropertyListBase::Add( const Property& entry )
-{
-	m_properties.Add( entry );
-}
-
-dd::Property* dd::PropertyListBase::Find( const char* name )
-{
-	for( Property& prop : m_properties )
+	void* AddPointer( void* base, uint offset )
 	{
-		if( prop.GetName() == name )
-			return &prop;
+		return (void*) (((byte*) base) + offset);
+	}
+}
 
-		if( prop.GetDisplayName() == name )
-			return &prop;
+namespace dd
+{
+	PropertyList::PropertyList( const PropertyList& other )
+	{
+		ASSERT( m_type == other.m_type );
+
+		m_base = other.m_base;
+		m_properties = other.m_properties;
 	}
 
-	return nullptr;
-}
-
-//
-// Recursively add members to the property list.
-//
-void dd::PropertyListBase::AddMembers( dd::TypeInfo* typeInfo, uint offset )
-{
-	if( typeInfo == nullptr )
-		return;
-
-	const dd::Vector<MemberBase*>& members = typeInfo->GetMembers();
-	for( MemberBase* member : members )
+	PropertyList::~PropertyList()
 	{
-		m_properties.Allocate( dd::Property( member, offset ) );
-
-		dd::TypeInfo* nested = dd::TypeInfo::GetType( member->m_typeName );
-		AddMembers( nested, offset + member->m_offset );
+		m_base = nullptr;
+		m_type = nullptr;
+		m_properties.Clear();
 	}
-}*/
+
+	Property* PropertyList::Find( const char* name )
+	{
+		for( Property& prop : m_properties )
+		{
+			if( prop.Name() == name )
+				return &prop;
+		}
+
+		return nullptr;
+	}
+
+	//
+	// Recursively add members to the property list.
+	//
+	void PropertyList::AddMembers( const TypeInfo* typeInfo, void* base )
+	{
+		if( typeInfo == nullptr )
+			return;
+
+		const Vector<Member>& members = typeInfo->GetMembers();
+		for( Member& member : members )
+		{
+			void* ptr = AddPointer( base, member.Offset() );
+
+			m_properties.Allocate( Property( member, ptr ) );
+
+			AddMembers( member.Type(), ptr );
+		}
+	} 
+}

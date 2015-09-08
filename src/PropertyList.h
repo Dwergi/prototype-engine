@@ -7,42 +7,33 @@
 #pragma once
 
 #include "Property.h"
+#include "TypeInfo.h"
+#include "Vector.h"
 
 namespace dd
 {
-/*
-	class PropertyListBase
+	class PropertyList
 	{
 	public: 
-		PropertyListBase();
-		virtual ~PropertyListBase();
-
-		void Add( const Property& entry );
-		Property* Find( const char* name );
-
-	protected:
-		dd::Vector<Property> m_properties;
-
-		void AddMembers( TypeInfo* typeInfo, uint offset );
-	};
-
-	template<typename T>
-	class PropertyList
-		: public PropertyListBase
-	{
-	public:
-		PropertyList( T& instance )
+		template<typename T>
+		PropertyList( T& host )
+			: m_base( &host )
 		{
-			// recursively add members
-			AddMembers( TypeInfo::GetType<T>(), 0 );
-
-			// bind to this instance
-			for( Property& prop : m_properties )
-			{
-				prop.Bind( instance );
-			}
+			AddMembers( GET_TYPE( T ), &host );
 		}
 
-		virtual ~PropertyList() {}
-	};*/
+		PropertyList( const PropertyList& other );
+		~PropertyList();
+
+		Property* Find( const char* name );
+
+		void* Instance() { return m_base; }
+
+	protected:
+		Vector<Property> m_properties;
+		const TypeInfo* m_type;
+		void* m_base;
+
+		void AddMembers( const TypeInfo* typeInfo, void* base );
+	};
 }

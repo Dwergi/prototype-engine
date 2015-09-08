@@ -7,46 +7,61 @@
 
 #pragma once
 
+#include "Member.h"
+
 namespace dd
 {
+	template<typename T>
+	class Recorder;
+
+	template<typename T>
+	class FullRecorder;
+
 	class Property
 	{
 	public:
+
 		Property();
-		Property( const Function& get, const Function& set );
+		Property( Member& self, void* ptr );
+		Property( Property&& other );
+		Property( const Property& other );
+		~Property();
 
 		// Get or set the member this property wraps
-		template <typename T>
+		template<typename T>
 		void Get( T& ret );
-		template <typename T>
-		void Set( T val );
+		template<typename T>
+		void Set( const T& val );
 
-		// Bind an object to use this property with
-		template <typename T>
-		void Bind( T& self );
+		const String32& Name() { return m_member->Name(); }
 
 	private:
-		Function m_get;
-		Function m_set;
+
+		Member* m_member;
+		void* m_ptr;
+
+		void* GetPtr() const { return m_ptr; }
+
+		template<typename T>
+		friend class Recorder;
+
+		template<typename T>
+		friend class FullRecorder;
 	};
 
-	template <typename T>
-	void Property::Get( T& ret )
+	template<typename T>
+	void Property::Get( T& out )
 	{
-		Variable v( ret );
-		return m_get( v );
+		ASSERT( m_ptr != nullptr );
+
+		out = *reinterpret_cast<const T*>( m_ptr );
 	}
 
-	template <typename T>
-	void Property::Set( T val )
+	template<typename T>
+	void Property::Set( const T& val )
 	{
-		m_set( val );
-	}
+		ASSERT( m_ptr != nullptr );
 
-	template <typename T>
-	void Property::Bind( T& self )
-	{
-		m_get.Bind( self );
-		m_set.Bind( self );
+		*reinterpret_cast<T*>( m_ptr ) = val;
 	}
 }

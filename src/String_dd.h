@@ -10,28 +10,27 @@
 
 namespace dd
 {
-	class StringBase
+	class String
 	{
 	protected:
 		void Initialize();
 
-		typedef unsigned int uint;
-
 	protected:
-		StringBase();
+		String();
 
 	public:
 
-		virtual ~StringBase();
+		virtual ~String();
 
-		StringBase& operator=( const char* other );
-		StringBase& operator=( const StringBase& other );
+		String& operator=( const char* other );
+		String& operator=( const String& other );
 		bool operator==( const char* other ) const;
-		bool operator==( const StringBase& other ) const;
-		StringBase& operator+=( const StringBase& other );
+		bool operator==( const String& other ) const;
+		String& operator+=( const String& other );
+		String& operator+=( const char* other );
 
-		int Find( const StringBase& other ) const;
-		StringBase& Substring( uint start, uint end );
+		int Find( const String& other ) const;
+		String& Substring( uint start, uint end );
 
 		void Clear() { m_length = 0; }
 
@@ -55,6 +54,7 @@ namespace dd
 
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
+		void Concatenate( const char* other, uint length );
 		bool Equals( const char* other, uint length ) const;
 	};
 
@@ -62,29 +62,29 @@ namespace dd
 	// An in-place implementation of string which always allocates a fixed size buffer. 
 	//
 	template< int Size = 32 >
-	class StackString
-		: public StringBase
+	class InplaceString
+		: public String
 	{
 	public:
 
-		StackString()
+		InplaceString()
 		{
 			Initialize();
 		}
 
-		StackString( const char* other )
+		InplaceString( const char* other )
 		{
 			Initialize();
 			SetString( other, (uint) strlen( other ) );
 		}
 
-		StackString( const StringBase& other )
+		InplaceString( const String& other )
 		{
 			Initialize();
 			SetString( other.c_str(), other.Length() );
 		}
 
-		virtual ~StackString()
+		virtual ~InplaceString()
 		{
 
 		}
@@ -105,10 +105,10 @@ namespace dd
 		char m_stackData[ Size ];
 	};
 
-	typedef StackString<32> String;
-	typedef StackString<16> String16;
-	typedef StackString<32> String32;
-	typedef StackString<64> String64;
-	typedef StackString<128> String128;
-	typedef StackString<256> String256;
+	typedef InplaceString<8> String8;
+	typedef InplaceString<16> String16;
+	typedef InplaceString<32> String32;
+	typedef InplaceString<64> String64;
+	typedef InplaceString<128> String128;
+	typedef InplaceString<256> String256;
 }

@@ -11,13 +11,13 @@
 
 // Introspection macros
 #define REGISTER_TYPE( TypeName ) \
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName, false )
+	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
 
 #define REGISTER_POD( TypeName ) \
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName, true )
+	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
 
 #define REGISTER_POINTER( TypeName ) \
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName, true )
+	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
 
 #define GET_TYPE( TypeName ) \
 	dd::TypeInfo::GetType<dd::RemoveQualifiers<TypeName>::type>()
@@ -26,16 +26,24 @@
 	dd::TypeInfo::GetType<dd::RemoveQualifiers<decltype( Object )>::type>()
 
 #define GET_TYPE_OF_MEMBER( TypeName, MemberName ) \
-	dd::RemoveQualifiers<SEL::StripMemberness<decltype( &TypeName::MemberName )>::type>::type
+	dd::TypeInfo::GetType<dd::RemoveQualifiers<dd::StripMemberness<decltype( &TypeName::MemberName )>::type>::type>()
 
 #define OFFSET_OF( TypeName, MemberName ) \
 	((unsigned int) (&((((TypeName*) nullptr))->MemberName)))
 
-#define GET_STR_TYPE( NameString ) \
+#define GET_TYPE_STR( NameString ) \
 	dd::TypeInfo::GetType( NameString )
 
-#define ADD_MEMBER( TypeName, MemberName ) \
-	((dd::TypeInfo*) GET_TYPE( TypeName ))->AddMember( GET_TYPE( GET_TYPE_OF_MEMBER( TypeName, MemberName ) ), #MemberName, OFFSET_OF( TypeName, MemberName ) )
+#define BEGIN_MEMBERS \
+	static void RegisterMembers() {
+
+#define MEMBER( TypeName, MemberName ) \
+	((dd::TypeInfo*) GET_TYPE( TypeName ))->AddMember( GET_TYPE_OF_MEMBER( TypeName, MemberName ), #MemberName, OFFSET_OF( TypeName, MemberName ) )
+
+#define END_MEMBERS }
+
+#define NO_MEMBERS \
+	static void RegisterMembers() {}
 
 #define SET_SERIALIZER( TypeName, Serializer ) \
 	((dd::TypeInfo*) GET_TYPE( TypeName ))->SetSerializer( Serializer )

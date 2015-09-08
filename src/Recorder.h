@@ -29,7 +29,7 @@ namespace dd
 	public:
 
 		Recorder( dd::Property* prop )
-			: m_current( prop->GetPtr<T>() )
+			: m_current( (T*) prop->GetPtr() )
 		{
 		}
 

@@ -60,7 +60,7 @@ TEST_CASE( "[Vector] Remove" )
 		container.Add( i );
 	}
 
-	container.Remove( 0 );
+	container.RemoveOrdered( 0 );
 
 	REQUIRE( container[ 0 ] == 1 );
 	REQUIRE( container[ 30 ] == 31 );
@@ -80,32 +80,33 @@ TEST_CASE( "[Vector] Contains" )
 		container.Add( i );
 	}
 
-	REQUIRE( container.IndexOf( 15 ) == 15 );
+	REQUIRE( container.Find( 15 ) == 15 );
 	REQUIRE( container.Contains( 15 ) );
 }
 
-struct SimpleStruct
+namespace
 {
-	int Integer;
-	float Float;
-	dd::String  String;
-};
+	struct SimpleStruct
+	{
+		int Integer;
+		float Float;
+		dd::String32  String;
+	};
 
-struct ComplexStruct
-{
-	SimpleStruct Nested;
-	int OtherInt;
-
-	~ComplexStruct();
-};
+	struct ComplexStruct
+	{
+		::SimpleStruct Nested;
+		int OtherInt;
+	};
+}
 
 TEST_CASE( "[Vector] Struct" )
 {
-	dd::Vector<ComplexStruct> container;
+	dd::Vector<::ComplexStruct> container;
 
 	for( int i = 0; i < 128; ++i )
 	{
-		container.Add( ComplexStruct() );
+		container.Add( ::ComplexStruct() );
 	}
 
 	REQUIRE( container.Size() == 128 );

@@ -20,7 +20,7 @@ namespace dd
 	{
 	private:
 
-		class CellInternal;
+		class Cell;
 
 	public:
 
@@ -84,6 +84,7 @@ namespace dd
 
 		public:
 			Entry();
+			Entry( Entry&& other );
 			Entry( const Entry& other );
 			bool operator==( const Entry& other ) const;
 			bool IsValid() const;
@@ -99,30 +100,49 @@ namespace dd
 
 	private:
 
-		typedef Handle<CellInternal, int, dd::Vector<CellInternal>> Cell;
-		friend class Cell;
+		class CellRef
+		{
+		public:
+			CellRef();
+			CellRef( const CellRef& other );
+			CellRef( CellRef&& other );
+			CellRef( Octree* octree, uint index );
+			~CellRef();
+
+			Cell* operator->() const;
+			Cell& operator*() const;
+			CellRef& operator=( const Octree::CellRef& other );
+
+			void Invalidate();
+			bool IsValid() const;
+			int Index() const;
+
+		private:
+			int m_index;
+			Octree* m_octree;
+		};
 
 		//
 		// Internal cell implementation.
 		// 
-		class CellInternal
+		class Cell
 		{
 		public:
 			Vector4 Position;
 			float Size;
-			Octree::Cell Children[ 8 ];
+			CellRef Children[ 8 ];
 			dd::Vector<Octree::Entry> Data;
 
-			CellInternal( const Vector4& pos, float size );
-			CellInternal( const CellInternal& other );
-			~CellInternal();
-			CellInternal& operator=( const CellInternal& other );
+			Cell( const Vector4& pos, float size );
+			Cell( const Cell& other );
+			~Cell();
+			Cell& operator=( const Cell& other );
 
 			void Add( const Octree::Entry& entry );
 			void Remove( const Octree::Entry& entry );
 
 			bool Contains( const Vector4& pos ) const;
-			Octree::Cell GetCellContaining( const Vector4& pos ) const;
+			const CellRef& GetCellContaining( const Vector4& pos ) const;
 			bool HasChildren() const;
 			BoundingBox GetBounds() const;
 		};
@@ -131,33 +151,37 @@ namespace dd
 		dd::DenseMap<Entry, Vector4> m_entries;
 
 		// List of all existing cells.
-		dd::Vector<Octree::CellInternal> m_cells;
+		dd::Vector<Octree::Cell> m_cells;
 
 		// The root cell.
-		Octree::Cell m_root;
+		CellRef m_root;
 	
 		// List of free cells.
-		dd::Vector<Cell> m_free;
+		dd::Vector<int> m_free;
 
 		// The last created ID.
 		int m_lastID;
 
-		// Split a cell into 8 sub-cells.
-		void SplitCell( Octree::Cell cell );
+		// Split a cell CellRefo 8 sub-cells.
+		void SplitCell( const CellRef& cell );
 
 		// Expand the root node of the octree to encompass more space.
 		void ExpandRoot();
 
 		// Create the children for the given cell.
-		void CreateChildren( Octree::Cell cell );
-		Octree::Cell CreateCell( const Vector4& position, float size );
-		void AddToCell( Octree::Cell cell, const Octree::Entry& entry );
+		void CreateChildren( const CellRef& cell );
+		CellRef CreateCell( const Vector4& position, float size );
+		void AddToCell( const CellRef& cell, const Octree::Entry& entry );
 
-		void FreeCell( Octree::Cell cell );
+		void FreeCell( CellRef& cell );
+		
+		void MergeChildren( CellRef& cell );
 
-		Octree::Cell FindCell( const Vector4& position, Octree::Cell* parent = nullptr ) const;
-		Octree::Cell FindCell( const Octree::Entry& position, Octree::Cell* parent = nullptr ) const;
+		CellRef FindCell( const Vector4& position, CellRef* parent = nullptr ) const;
+		CellRef FindCell( const Octree::Entry& position, CellRef* parent = nullptr ) const;
 
-		Octree::Entry NextEntry();
+		Entry NextEntry();
+
+		Cell& GetCell( int cell ) const;
 	};
 }

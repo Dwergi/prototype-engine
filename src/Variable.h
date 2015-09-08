@@ -39,7 +39,7 @@ namespace dd
 		template <typename T>
 		Variable( const T *rhs );
 		template <typename T>
-		Variable( T *rhs );
+		Variable( T* rhs );
 
 		void* GetData() const;
 		const TypeInfo* GetTypeInfo() const;
@@ -69,22 +69,22 @@ namespace dd
 
 	template <typename T>
 	Variable::Variable( const T& rhs )
-		: m_data( (T *)&rhs )
-		, m_typeInfo( SEL_TYPE( T ) )
+		: m_data( (T*) &rhs )
+		, m_typeInfo( GET_TYPE( T ) )
 	{
 	}
 
 	template <typename T>
 	Variable::Variable( const T *rhs )
-		: m_data( (T *)rhs )
-		, m_typeInfo( SEL_TYPE( T *)  )
+		: m_data( (T*) rhs )
+		, m_typeInfo( GET_TYPE( T* )  )
 	{
 	}
 
 	template <typename T>
-	Variable::Variable( T *rhs )
-		: m_data( (T *)rhs )
-		, m_typeInfo( SEL_TYPE( T *)  )
+	Variable::Variable( T* rhs )
+		: m_data( rhs )
+		, m_typeInfo( GET_TYPE( T* )  )
 	{
 	}
 
@@ -94,16 +94,16 @@ namespace dd
 	{
 		static T& Cast( void* & data )
 		{
-			return *(T *&)(data);
+			return *(T*&) (data);
 		}
 	};
 
 	template <typename T>
-	struct CastHelper<T *>
+	struct CastHelper<T*>
 	{
-		static T *& Cast( void* & data )
+		static T*& Cast( void* & data )
 		{
-			return (T *&)data;
+			return (T*&) data;
 		}
 	};
 
@@ -112,8 +112,9 @@ namespace dd
 	{
 #ifdef _DEBUG
 		// Type mismatch! You cannot convert a data type to another type with this function.
-		assert( SEL_TYPE( T ) == m_typeInfo );
+		ASSERT( GET_TYPE( T ) == m_typeInfo );
 #endif // _DEBUG
+
 		return CastHelper<T>::Cast( m_data );
 	}
 

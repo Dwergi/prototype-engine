@@ -16,9 +16,9 @@ namespace dd
 	{
 	public:
 
-		dd::String m_className;
-		dd::String m_methodName;
-		dd::String m_methodSignature;
+		dd::String32 m_className;
+		dd::String32 m_methodName;
+		dd::String32 m_methodSignature;
 
 		virtual int RegisterMethod( asIScriptEngine* engine ) = 0;
 	};

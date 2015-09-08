@@ -92,12 +92,11 @@ namespace dd
 		float& operator[]( unsigned int component );
 		float operator[]( unsigned int component ) const;
 
-/*
-		BEGIN_MEMBERS( Vector4 )
-			MEMBER( Vector4, float, X, "X" );
-			MEMBER( Vector4, float, Y, "Y" );
-			MEMBER( Vector4, float, Z, "Z" );
-			MEMBER( Vector4, float, W, "W" );
-		END_MEMBERS*/
+		BEGIN_MEMBERS
+			MEMBER( Vector4, X );
+			MEMBER( Vector4, Y );
+			MEMBER( Vector4, Z );
+			MEMBER( Vector4, W );
+		END_MEMBERS
 	};
 }

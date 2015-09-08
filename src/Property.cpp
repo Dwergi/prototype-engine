@@ -10,43 +10,37 @@
 namespace dd
 {
 	Property::Property()
+		: m_ptr( nullptr ),
+		m_member( nullptr )
 	{
 
 	}
 
-	Property::Property( const Function& get, const Function& set )
-		: m_get( get ),
-		m_set( set )
+	Property::Property( Member& self, void* ptr )
+		: m_member( &self ),
+		m_ptr( ptr )
 	{
 
 	}
-}
 
-/*dd::Property::Property( dd::MemberBase* member, uint offset )
-	: m_data( nullptr ),
-	m_member( member ),
-	m_offset( offset )
-{
-}
+	Property::Property( const Property& other )
+		: m_member( other.m_member ),
+		m_ptr( other.m_ptr )
+	{
 
-dd::Property::Property( Property&& entry )
-	: m_data( entry.m_data ),
-	m_member( entry.m_member ),
-	m_offset( entry.m_offset )
-{
-}
+	}
 
-dd::Property::~Property()
-{
-	m_data = nullptr;
-}
+	Property::Property( Property&& other )
+		: m_member( other.m_member ),
+		m_ptr( other.m_ptr )
+	{
+		other.m_member = nullptr;
+		other.m_ptr = nullptr;
+	}
 
-const dd::StringBase& dd::Property::GetName() const
-{
-	return m_member->m_fieldName;
+	Property::~Property()
+	{
+		m_ptr = nullptr;
+		m_member = nullptr;
+	}
 }
-
-const dd::StringBase& dd::Property::GetDisplayName() const
-{
-	return m_member->m_friendlyName;
-}*/

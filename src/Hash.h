@@ -21,7 +21,7 @@ namespace dd
 	}
 
 	template<>
-	inline uint64 Hash( const dd::String& value )
+	inline uint64 Hash( const dd::String32& value )
 	{
 		return HashBytes( (const uint8*) value.c_str(), value.Length() );
 	}

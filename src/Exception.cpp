@@ -12,7 +12,7 @@ dd::Exception::Exception( const char* message )
 	Message = message;
 }
 
-dd::Exception::Exception( const dd::StringBase& message )
+dd::Exception::Exception( const dd::String& message )
 {
 	Message = message;
 }

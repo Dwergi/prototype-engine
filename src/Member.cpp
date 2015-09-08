@@ -6,16 +6,28 @@
 
 #include "PrecompiledHeader.h"
 #include "Member.h"
-/*
 
-#include "Property.h"
-
-dd::MemberBase::MemberBase()
+namespace dd
 {
+	Member::Member()
+		: m_typeInfo( nullptr ),
+		m_offset( 0 )
+	{
+		
+	}
 
+	const TypeInfo* Member::Type() const
+	{
+		return m_typeInfo;
+	}
+
+	uint Member::Offset() const
+	{
+		return m_offset;
+	}
+
+	const String32& Member::Name() const
+	{
+		return m_name;
+	}
 }
-
-dd::MemberBase::~MemberBase()
-{
-
-}*/

@@ -482,7 +482,7 @@ namespace dd
 		{
 		}
 
-		FunctionPtr( const dd::String& functionName )
+		FunctionPtr( const dd::String32& functionName )
 			: m_sig()
 			, m_call( CallHelper<const char* > )
 		{

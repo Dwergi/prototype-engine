@@ -15,7 +15,7 @@ namespace dd
 	public:
 
 		Exception( const char* message );
-		Exception( const dd::StringBase& message );
+		Exception( const dd::String& message );
 
 		dd::String256 Message;
 	};

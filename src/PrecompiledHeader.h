@@ -23,6 +23,5 @@
 #include "FunctionSignature.h"
 #include "FunctionPtr.h"
 #include "Function.h"
-#include "Property.h"
 #include "TypeInfo.h"
 #include "TypeInfoMacros.h"

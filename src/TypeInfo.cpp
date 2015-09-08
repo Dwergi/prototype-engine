@@ -10,34 +10,10 @@
 
 namespace dd
 {
-	DenseMap<String,TypeInfo*> TypeInfo::sm_typeMap;
+	DenseMap<String32,TypeInfo*> TypeInfo::sm_typeMap;
 
-	const TypeInfo* Member::Type() const
-	{
-		return m_typeInfo;
-	}
-
-	unsigned Member::Offset() const
-	{
-		return m_offset;
-	}
-
-	const dd::String& Member::Name() const
-	{
-		return m_name;
-	}
-
-	Property Member::GetProperty() const
-	{
-		return m_property;
-	}
-
-	TypeInfo::TypeInfo()/*
-		: m_serialize( NULL )
-		, m_deserialize( NULL )
-		, m_toLua( NULL )
-		, m_fromLua( NULL )
-		, m_metatable( NULL )*/
+	TypeInfo::TypeInfo()
+		: m_size( 0 )
 	{
 	}
 
@@ -49,19 +25,18 @@ namespace dd
 
 	void TypeInfo::AddMember( const TypeInfo* typeInfo, const char* name, unsigned offset )
 	{
-		Member mem;
-		mem.m_name = name;
-		mem.m_offset = offset;
-		mem.m_typeInfo = typeInfo;
-		m_members.Push( mem );
+		Member& member = m_members.Allocate();
+		member.m_name = name;
+		member.m_offset = offset;
+		member.m_typeInfo = typeInfo;
 	}
 
 	const Member* TypeInfo::GetMember( const char* memberName ) const
 	{
-		for( uint i = 0; i < m_members.Size(); ++i )
+		for( const Member& member : m_members )
 		{
-			if( m_members[i].m_name == memberName )
-				return &m_members[i];
+			if( member.m_name == memberName )
+				return &member;
 		}
 
 		return nullptr;
@@ -125,28 +100,12 @@ namespace dd
 	return m_metatable;
 	}*/
 
-	void TypeInfo::AddProperty( const char* memberName, const Property& prop )
-	{
-		Member* m = (Member*) GetMember( memberName );
-		m->m_property = prop;
-	}
-
-	unsigned TypeInfo::Size() const
-	{
-		return m_size;
-	}
-
-	const char* TypeInfo::Name() const
-	{
-		return m_name.c_str();
-	}
-
 	const TypeInfo* TypeInfo::GetType( const char* typeName )
 	{
-		return GetType( String( typeName ) );
+		return GetType( String32( typeName ) );
 	}
 
-	const TypeInfo* TypeInfo::GetType( const String& typeName )
+	const TypeInfo* TypeInfo::GetType( const String32& typeName )
 	{
 		ASSERT( sm_typeMap.Contains( typeName ) );
 
@@ -180,7 +139,6 @@ namespace dd
 		REGISTER_POD( float );
 		REGISTER_POD( double );
 		
-		REGISTER_POD( const char*  );
-		REGISTER_TYPE( String );
+		REGISTER_POD( const char* );
 	}
 }

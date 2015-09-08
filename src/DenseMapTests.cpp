@@ -51,8 +51,8 @@ TEST_CASE( "[DenseMap] Complex Keys" )
 	REQUIRE( map.Contains( keyB ) );
 	REQUIRE( map[ keyB ] == 10 );
 
-	dd::DenseMap<dd::String , int> string_map;
-	dd::String  test( "test string" );
+	dd::DenseMap<dd::String32 , int> string_map;
+	dd::String32  test( "test string" );
 
 	string_map.Add( test, 20 );
 	

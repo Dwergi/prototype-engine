@@ -35,13 +35,31 @@ namespace dd
 		Vector( const Vector& other );
 		Vector( Vector&& other );
 
+		Vector<T>& operator=( const Vector& other );
 		T& operator[]( uint index ) const;
 
-		void Remove( const T& value );
+		//
+		// Remove from the given index in an unordered way. 
+		// Swaps the last element with the given index.
+		//
 		void Remove( uint index );
+		void Remove( int index );
+
+		//
+		// Remove from the given index in an ordered way.
+		// This will invalidate indices or pointers into the vector after the given index.
+		//
+		void RemoveOrdered( uint index );
 		void RemoveAll( const Vector<T>& to_remove );
 		void Clear();
 		T Pop();
+
+		//
+		// Zero the entry by calling the destructor on it. 
+		// Extremely unsafe, because this does not decrement the size of the container. 
+		// You're basically on your own at this point.
+		//
+		void Zero( uint index ) const;
 
 		void Add( T&& value );
 		void Add( const T& value );
@@ -67,7 +85,7 @@ namespace dd
 
 		void Swap( Vector<T>& other );
 
-		int IndexOf( const T& entry ) const;
+		int Find( const T& entry ) const;
 		bool Contains( const T& entry ) const;
 
 		void Resize( uint capacity );
@@ -131,19 +149,54 @@ namespace dd
 		other.m_capacity = 0;
 	}
 
+	template<typename T>
+	Vector<T>& Vector<T>::operator=( const Vector& other )
+	{
+		Clear();
+		Reallocate( other.m_capacity );
+		CopyRange( other.m_data, m_data, other.m_size );
+		m_size = other.m_size;
+
+		return *this;
+	}
+
 	template<typename T> 
 	T& Vector<T>::operator[]( uint index ) const
 	{
 		return GetEntry( index );
 	}
 
-	template<typename T>
+	template<typename T> 
 	void Vector<T>::Remove( uint index )
 	{
+		ASSERT( m_size > 0 );
+		ASSERT( index < m_size );
+
+		--m_size;
+
+		// replace with the back
+		new (&m_data[ index ]) T( m_data[ m_size ] );
+		
+		Zero( m_size );
+	}
+
+	template<typename T> 
+	void Vector<T>::Remove( int index )
+	{
+		if( index < 0 )
+			return;
+
+		Remove( (uint) index );
+	}
+
+	template<typename T>
+	void Vector<T>::RemoveOrdered( uint index )
+	{
+		ASSERT( m_size > 0 );
 		ASSERT( index < m_size );
 
 		// destruct the entry
-		m_data[ index ].~T();
+		Zero( index );
 
 		--m_size;
 
@@ -154,21 +207,13 @@ namespace dd
 	}
 
 	template<typename T> 
-	void Vector<T>::Remove( const T& value )
-	{
-		int index = IndexOf( value );
-		if( index < 0 )
-			return;
-
-		Remove( (uint) index );
-	}
-
-	template<typename T> 
 	void Vector<T>::RemoveAll( const Vector<T>& to_remove )
 	{
+		ASSERT( m_size > 0 );
+
 		for( const T& entry : to_remove )
 		{
-			int index = IndexOf( entry );
+			int index = Find( entry );
 			if( index >= 0 )
 				Remove( (uint) index );
 		}
@@ -183,7 +228,7 @@ namespace dd
 
 		T entry = m_data[ m_size ];
 
-		m_data[ m_size ].~T();
+		Zero( m_size );
 
 		return entry;
 	}
@@ -193,7 +238,19 @@ namespace dd
 	{
 		DestroyRange( m_data, m_size );
 
+		memset( m_data, 0xffffffff, sizeof( T ) * m_capacity );
+
 		m_size = 0;
+	}
+
+	template<typename T>
+	void Vector<T>::Zero( uint index ) const
+	{
+		ASSERT( index < m_capacity );
+		
+		m_data[ index ].~T();
+
+		memset( &m_data[ index ], 0xffffffff, sizeof( T ) );
 	}
 
 	template<typename T>
@@ -274,7 +331,11 @@ namespace dd
 			Grow();
 		}
 
-		return m_data[ m_size++ ];
+		T* ptr = new (&m_data[ m_size ]) T;
+
+		++m_size;
+
+		return *ptr;
 	}
 
 	template<typename T>
@@ -285,11 +346,11 @@ namespace dd
 			Grow();
 		}
 
-		new (&m_data[ m_size ]) T( to_add );
+		T* ptr = new (&m_data[ m_size ]) T( std::move( to_add ) );
 
 		++m_size;
 
-		return m_data[ m_size ];
+		return *ptr;
 	}
 
 	template<typename T>
@@ -301,7 +362,7 @@ namespace dd
 	}
 
 	template<typename T>
-	int Vector<T>::IndexOf( const T& entry ) const
+	int Vector<T>::Find( const T& entry ) const
 	{
 		for( uint i = 0; i < m_size; ++i )
 		{
@@ -315,7 +376,7 @@ namespace dd
 	template<typename T>
 	bool Vector<T>::Contains( const T& entry ) const
 	{
-		return IndexOf( entry ) != -1;
+		return Find( entry ) != -1;
 	}
 
 	template<typename T>
@@ -371,7 +432,12 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Reallocate( uint new_capacity )
 	{
+		if( new_capacity == 0 )
+			return;
+
 		T* new_data = reinterpret_cast<T*>( new char[ new_capacity * sizeof( T ) ] );
+
+		memset( new_data, 0xffffffff, new_capacity * sizeof( T ) );
 
 		if( m_data != nullptr )
 		{

@@ -78,7 +78,7 @@ struct SimpleStruct
 {
 	int Integer;
 	float Float;
-	dd::String  String;
+	dd::String32  String;
 };
 
 struct ComplexStruct
