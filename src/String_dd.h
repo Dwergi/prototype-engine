@@ -15,11 +15,9 @@ namespace dd
 	protected:
 		void Initialize();
 
-	protected:
-		String();
-
 	public:
 
+		String();
 		virtual ~String();
 
 		String& operator=( const char* other );
@@ -39,6 +37,8 @@ namespace dd
 
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
+
+		static void RegisterMembers() { }
 
 		DEFINE_ITERATORS( char, m_buffer, m_length );
 

@@ -13,8 +13,8 @@
 #define REGISTER_TYPE( TypeName ) \
 	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
 
-#define REGISTER_POD( TypeName ) \
-	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
+#define REGISTER_POD( TypeName, Format ) \
+	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName, Format )
 
 #define REGISTER_POINTER( TypeName ) \
 	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
@@ -34,22 +34,22 @@
 #define GET_TYPE_STR( NameString ) \
 	dd::TypeInfo::GetType( NameString )
 
-#define BEGIN_MEMBERS \
-	static void RegisterMembers() {
+#define BEGIN_MEMBERS( TypeName ) \
+	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
-#define MEMBER( TypeName, MemberName ) \
-	((dd::TypeInfo*) GET_TYPE( TypeName ))->AddMember( GET_TYPE_OF_MEMBER( TypeName, MemberName ), #MemberName, OFFSET_OF( TypeName, MemberName ) )
+#define MEMBER( MemberName ) \
+	typeInfo->AddMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint(&instance.MemberName) - uint(&instance)) )
+
+#define METHOD( MethodName ) \
+	typeInfo->AddMethod( FUNCTION( MethodName ), &MethodName, #MethodName );
 
 #define END_MEMBERS }
 
-#define NO_MEMBERS \
-	static void RegisterMembers() {}
+#define NO_MEMBERS( TypeName ) \
+	static void RegisterMembers() { GET_TYPE( TypeName ); }
 
-#define SET_SERIALIZER( TypeName, Serializer ) \
-	((dd::TypeInfo*) GET_TYPE( TypeName ))->SetSerializer( Serializer )
-
-#define SET_DESERIALIZER( TypeName, Deserializer ) \
-	((dd::TypeInfo*) GET_TYPE( TypeName ))->SetDeserializer( Deserializer )
+#define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
+	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( &Serializer, &Deserializer )
 
 #define FUNCTION( FN ) \
 	dd::BuildFunction<decltype( &FN ), &FN>( &FN )

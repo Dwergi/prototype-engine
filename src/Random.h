@@ -1,5 +1,5 @@
 //
-// Utility.h - A random selection of utility methods.
+// Utility.h - A random number generator.
 // Copyright (C) Sebastian Nordgren 
 // August 6th 2015
 //
@@ -29,14 +29,3 @@ namespace dd
 		}
 	};
 }
-
-/*template< typename TVector, typename TIterator >
-void erase_unordered( TVector& container, TIterator it )
-{
-	auto item = container.back();
-	std::swap( *it, item );
-
-	container.pop_back();
-}
-
-bool operator==( const std::string& a, const std::string& b );*/

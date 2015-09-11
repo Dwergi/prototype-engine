@@ -22,12 +22,11 @@ struct SimpleStruct
 	void Double();
 	int Multiply( int x );
 
-	BEGIN_MEMBERS
-		MEMBER( SimpleStruct, Int );
-		MEMBER( SimpleStruct, Str );
-		MEMBER( SimpleStruct, Flt );
-		/*METHOD( SimpleStruct, Double, void, void );
-		METHOD( SimpleStruct, Multiply, int, int );*/
+	BEGIN_MEMBERS( SimpleStruct )
+		MEMBER( Int );
+		MEMBER( Str );
+		MEMBER( Flt );
+		METHOD( Multiply );
 	END_MEMBERS
 };
 
@@ -46,9 +45,9 @@ struct NestedStruct
 	SimpleStruct Struct;
 	int SecondInt;
 
-	BEGIN_MEMBERS
-		MEMBER( NestedStruct, Struct );
-		MEMBER( NestedStruct, SecondInt );
+	BEGIN_MEMBERS( NestedStruct )
+		MEMBER( Struct );
+		MEMBER( SecondInt );
 	END_MEMBERS
 };
 

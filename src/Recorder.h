@@ -24,7 +24,7 @@ namespace dd
 		static const int HISTORY_SIZE = 32;
 
 		T* m_current;
-		std::vector<T> m_undo;
+		Vector<T> m_undo;
 
 	public:
 
@@ -36,17 +36,17 @@ namespace dd
 		Recorder( T& value, int size = HISTORY_SIZE )
 			: m_current( &value )
 		{
-			m_undo.reserve( HISTORY_SIZE );
+			m_undo.Resize( HISTORY_SIZE );
 		}
 
 		Recorder<T>& operator=( const T& newValue )
 		{
-			if( m_undo.size() == HISTORY_SIZE )
+			if( m_undo.Size() == HISTORY_SIZE )
 			{
-				m_undo.erase( m_undo.begin() );
+				m_undo.RemoveOrdered( 0 );
 			}
 
-			m_undo.push_back( *m_current );
+			m_undo.Add( *m_current );
 
 			*m_current = newValue;
 
@@ -55,10 +55,9 @@ namespace dd
 
 		void Undo()
 		{
-			ASSERT( m_undo.size() > 0 );
+			ASSERT( m_undo.Size() > 0 );
 
-			*m_current = m_undo.back();
-			m_undo.pop_back();
+			*m_current = m_undo.Pop();
 		}
 
 		operator T()
@@ -88,7 +87,7 @@ namespace dd
 
 		uint GetUndoHistorySize() const
 		{
-			return (uint) m_undo.size();
+			return (uint) m_undo.Size();
 		}
 	};
 	//---------------------------------------------------------------------------
@@ -99,7 +98,7 @@ namespace dd
 	{
 	protected:
 
-		std::vector<T> m_redo;
+		Vector<T> m_redo;
 
 		typedef Recorder<T> base;
 
@@ -108,12 +107,12 @@ namespace dd
 		FullRecorder( T& value, int history_size = Recorder<T>::HISTORY_SIZE )
 			: base( value, history_size )
 		{
-			m_redo.reserve( history_size );
+			m_redo.Resize( history_size );
 		}
 
 		FullRecorder<T>& operator=( const T& newValue )
 		{
-			m_redo.clear();
+			m_redo.Clear();
 
 			base::operator=( newValue );
 
@@ -122,27 +121,26 @@ namespace dd
 
 		void Undo()
 		{
-			if( m_redo.size() == HISTORY_SIZE )
+			if( m_redo.Size() == HISTORY_SIZE )
 			{
-				m_redo.erase( m_redo.begin() );
+				m_redo.RemoveOrdered( 0 );
 			}
 
-			m_redo.push_back( *m_current );
+			m_redo.Add( *m_current );
 
 			base::Undo();
 		}
 
 		void Redo()
 		{
-			ASSERT( m_redo.size() > 0 );
+			ASSERT( m_redo.Size() > 0 );
 
-			base::operator=( m_redo.back() );
-			m_redo.pop_back();
+			base::operator=( m_redo.Pop() );
 		}
 
 		uint GetRedoHistorySize() const
 		{
-			return (uint) m_redo.size();
+			return (uint) m_redo.Size();
 		}
 	};
 }

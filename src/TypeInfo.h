@@ -7,28 +7,33 @@
 
 #pragma once
 
-#include "RemoveQualifiers.h"
-#include "TypeInfoHelpers.h"
+#include "Function.h"
 #include "Member.h"
+#include "TypeInfoHelpers.h"
+#include "Script.h"
 
 namespace dd
 {
-	class Variable;
-	class TypeInfo;
+	enum class SerializationMode : uint;
 
-/*
-	typedef void (*SerializeCB)( File&, Variable );
-	typedef void (*DeserializeCB)( File&, Variable );*/
+	typedef String&& (*SerializeFn)( SerializationMode mode, const void* data );
+	typedef void (*DeserializeFn)( SerializationMode mode, const String& src, void* data );
 
 	class TypeInfo : public AutoList<TypeInfo>
 	{
 	public:
 		TypeInfo();
 		void Init( const char* name, uint size );
+
 		void AddMember( const TypeInfo* typeInfo, const char* name, uint offset );
+		
+		template <typename T>
+		void AddMethod( Function f, T fn, const char* name );
 
 		inline const dd::Vector<Member>& GetMembers() const { return m_members; }
 		const Member* GetMember( const char* memberName ) const;
+
+		const Function* GetMethod( const char* methodName ) const;
 
 		inline uint Size() const { return m_size; }
 		inline const String32& Name() const { return m_name; }
@@ -48,7 +53,7 @@ namespace dd
 		static const TypeInfo* RegisterType( uint size, const char* name );
 
 		template<typename T>
-		static const TypeInfo* RegisterPOD( uint size, const char* name );
+		static const TypeInfo* RegisterPOD( uint size, const char* name, const char* format );
 
 		template <typename T>
 		static const TypeInfo* GetType();
@@ -58,33 +63,36 @@ namespace dd
 		template <typename T>
 		static TypeInfo* AccessType();
 
-		/*
-		void SetSerializer( SerializeCB cb );
-		void SetDeserializer( DeserializeCB cb );
-		void Serialize( File& file, Variable var ) const;
-		void Deserialize( File& file, Variable var ) const;
-		*/
+		bool HasCustomSerializers() const;
+		void SetCustomSerializers( SerializeFn serializer, DeserializeFn deserializer );
+
+		String&& SerializePOD( SerializationMode mode, const void* data ) const;
+		SerializeFn SerializeCustom;
+
+		void DeserializePOD( SerializationMode mode, const String& src, void* data ) const;
+		DeserializeFn DeserializeCustom;
+
 
 	private:
 		uint m_size;
 		String32 m_name;
-		Vector<Member> m_members;
 		bool m_isPOD;
 
+		struct Method
+		{
+			String32 Name;
+			Function Function;
+		};
+
+		Vector<Member> m_members;
+		Vector<Method> m_methods;
+
+		String8 m_format;
+
 		static DenseMap<String32, TypeInfo*> sm_typeMap;
-
-		/*
-		SerializeCB m_serialize;
-		DeserializeCB m_deserialize;
-
-		ToLuaCB m_toLua;
-		FromLuaCB m_fromLua;
-		const char* m_metatable;
-		Array<luaL_Reg> m_luaMethods;
-
-		friend class TextSerializer;
-		friend class Engine;*/
 	};
+
+	void RegisterDefaultTypes();
 
 	template<typename T>
 	const TypeInfo* TypeInfo::GetType()
@@ -93,7 +101,7 @@ namespace dd
 		return &instance;
 	}
 
-	template<typename T>
+	template <typename T>
 	TypeInfo* TypeInfo::AccessType()
 	{
 		return const_cast<TypeInfo*>( GetType<T>() );
@@ -117,6 +125,7 @@ namespace dd
 		typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void(*)( void*, const void* ), &dd::PlacementCopy<new_type>>::Get();
 		typeInfo->PlacementDelete = dd::PlacementDelete<T>;
 		typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void(*)( void**, const void* ), &dd::NewCopy<new_type>>::Get();
+		typeInfo->SerializeCustom = nullptr;
 
 		sm_typeMap.Add( name, typeInfo );
 
@@ -126,7 +135,7 @@ namespace dd
 	}
 
 	template <typename T>
-	const TypeInfo* TypeInfo::RegisterPOD( uint size, const char* name )
+	const TypeInfo* TypeInfo::RegisterPOD( uint size, const char* name, const char* format )
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
 		typeInfo->Init( name, size );
@@ -139,11 +148,24 @@ namespace dd
 		typeInfo->PlacementNew = PODPlacementNew<T>;
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
+		typeInfo->SerializeCustom = nullptr;
 
 		sm_typeMap.Add( name, typeInfo );
 
 		return typeInfo;
 	}
 
-	static void RegisterDefaultTypes();
+	template <typename FnType>
+	void TypeInfo::AddMethod( Function f, FnType fn, const char* name )
+	{
+		Method m;
+		m.Name = name;
+		m.Function = f;
+		m_methods.Add( m );
+
+		const FunctionSignature* sig = f.Signature();
+		String128 signature = sig->GetSignature();
+
+		ScriptEngine::GetInstance()->RegisterMethod( sig->GetContext()->Name(), signature, fn );
+	}
 };

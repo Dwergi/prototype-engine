@@ -24,8 +24,8 @@ namespace dd
 			Position *= (float) iMultiplier;
 		}
 
-		BEGIN_MEMBERS
-			MEMBER( TransformComponent, Position );
+		BEGIN_MEMBERS( TransformComponent )
+			MEMBER( Position );
 		END_MEMBERS
 	};
 }

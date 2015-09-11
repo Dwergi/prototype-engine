@@ -96,11 +96,15 @@ namespace dd
 	String& String::operator+=( const String& other )
 	{
 		Concatenate( other.m_buffer, other.m_length );
+
+		return *this;
 	}
 
 	String& String::operator+=( const char* other )
 	{
 		Concatenate( other, (uint) strlen( other ) );
+
+		return *this;
 	}
 
 	void String::Concatenate( const char* buffer, uint other_length )

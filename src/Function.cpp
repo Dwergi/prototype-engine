@@ -66,7 +66,7 @@ namespace dd
 
 	Function::Function( 
 		void (*fn)(),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable* , void* , Variable* , uint )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -83,12 +83,12 @@ namespace dd
 		m_callHelper( NULL, m_context.GetData(), NULL, 0 );
 	}
 
-	void Function::operator()( Variable& ret, Variable* args, unsigned argCount ) const
+	void Function::operator()( Variable& ret, Variable* args, uint argCount ) const
 	{
 		m_callHelper( &ret, m_context.GetData(), args, argCount );
 	}
 
-	void Function::operator()( Variable& ret, Variable* args, unsigned argCount )
+	void Function::operator()( Variable& ret, Variable* args, uint argCount )
 	{
 		m_callHelper( &ret, m_context.GetData(), args, argCount );
 	}

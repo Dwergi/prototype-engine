@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include "Vector.h"
-
-class asIScriptEngine;
-struct asSMessageInfo;
+#include "angelscript/include/angelscript.h"
 
 namespace dd
 {
@@ -27,19 +24,37 @@ namespace dd
 	class ScriptEngine
 	{
 	public:
-		ScriptEngine();
+		static ScriptEngine* GetInstance()
+		{
+			static ScriptEngine s_instance;
+			return &s_instance;
+		}
+
 		~ScriptEngine();
 
 		Script& LoadScript( const char* script );
 		void UnloadScript( Script& );
 
-		//void RegisterMethod( dd::MethodBase& method );
+		template <typename FnType>
+		void RegisterMethod( const String& className, const String& signature, FnType method );
 
 	private:
 
 		Vector<Script> m_vecScripts;
 		asIScriptEngine* m_engine;
 
+		ScriptEngine();
+
 		void MessageCallback( const asSMessageInfo* msg, void* param );
 	};
+
+	template <typename FnType>
+	void ScriptEngine::RegisterMethod( const String& className, const String& signature, FnType method )
+	{
+		class DummyClass {};
+		const int METHOD_SIZE = sizeof(void (DummyClass::*)());
+
+		int r = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
+		ASSERT( r >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
+	}
 }

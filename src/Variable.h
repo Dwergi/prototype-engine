@@ -55,13 +55,6 @@ namespace dd
 		void Delete();
 		Variable& operator=( const Variable& rhs );
 
-/*
-		void Serialize( File& file ) const;
-		void Deserialize( File& file );
-		void ToLua( lua_State* L ) const;
-		void FromLua( lua_State* L, int index );
-*/
-
 	private:
 		void* m_data;
 		const TypeInfo* m_typeInfo;
@@ -92,7 +85,7 @@ namespace dd
 	template <typename T>
 	struct CastHelper
 	{
-		static T& Cast( void* & data )
+		static T& Cast( void*& data )
 		{
 			return *(T*&) (data);
 		}
@@ -101,7 +94,7 @@ namespace dd
 	template <typename T>
 	struct CastHelper<T*>
 	{
-		static T*& Cast( void* & data )
+		static T*& Cast( void*& data )
 		{
 			return (T*&) data;
 		}
@@ -110,10 +103,8 @@ namespace dd
 	template <typename T>
 	T& Variable::GetValue()
 	{
-#ifdef _DEBUG
 		// Type mismatch! You cannot convert a data type to another type with this function.
 		ASSERT( GET_TYPE( T ) == m_typeInfo );
-#endif // _DEBUG
 
 		return CastHelper<T>::Cast( m_data );
 	}

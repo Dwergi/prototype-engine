@@ -6,6 +6,8 @@
 
 #pragma once 
 
+#include "ContainerHelpers.h"
+
 #include "AutoList.h"
 #include "DenseMap.h"
 #include "DoubleBuffer.h"

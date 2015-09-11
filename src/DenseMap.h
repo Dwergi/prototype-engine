@@ -312,7 +312,6 @@ namespace dd
 		// couldn't find a slot, need to grow and try again
 		Grow();
 		Insert( key, value );
-		
 	}
 
 	template<typename TKey, typename TValue>

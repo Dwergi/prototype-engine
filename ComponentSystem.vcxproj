@@ -124,7 +124,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include\;$(SolutionDir)include\;$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -160,7 +160,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include\;$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include\;$(SolutionDir)include\;$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -198,7 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_MBCS;_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include\;$(SolutionDir)include\;$(SolutionDir)src\;$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -226,6 +226,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\base64\include\cdecode.h" />
+    <ClInclude Include="include\base64\include\cencode.h" />
+    <ClInclude Include="include\base64\include\decode.h" />
+    <ClInclude Include="include\base64\include\encode.h" />
     <ClInclude Include="src\Assert.h" />
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
@@ -245,8 +249,8 @@
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Iteration.h" />
+    <ClInclude Include="src\JSONSerializer.h" />
     <ClInclude Include="src\Member.h" />
-    <ClInclude Include="src\Method.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
@@ -256,6 +260,8 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
+    <ClInclude Include="src\Serialization.h" />
+    <ClInclude Include="src\Serializers.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\StringTests.cpp" />
@@ -275,7 +281,7 @@
     <ClInclude Include="src\EntitySystem.h" />
     <ClInclude Include="src\Services.h" />
     <ClInclude Include="src\TransformComponent.h" />
-    <ClInclude Include="src\Utility.h" />
+    <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\Vector.h" />
@@ -284,6 +290,8 @@
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\base64\src\cdecode.c" />
+    <ClCompile Include="include\base64\src\cencode.c" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\DenseMapTests.cpp" />
@@ -295,6 +303,7 @@
     <ClCompile Include="src\FunctionSignature.cpp" />
     <ClCompile Include="src\Hash.cpp" />
     <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\JSONSerializer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />
     <ClCompile Include="src\Octree.cpp" />
@@ -312,6 +321,8 @@
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />
     <ClCompile Include="src\ScriptTests.cpp" />
+    <ClCompile Include="src\Serializers.cpp" />
+    <ClCompile Include="src\SerializerTests.cpp" />
     <ClCompile Include="src\StackArrayTests.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
     <ClCompile Include="src\SwarmAgentComponent.cpp" />
@@ -323,7 +334,7 @@
     <ClCompile Include="src\Tests\TimerTests.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\TypeInfo.cpp" />
-    <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Variable.cpp" />
     <ClCompile Include="src\Vector.cpp" />
     <ClCompile Include="src\Vector4.cpp" />

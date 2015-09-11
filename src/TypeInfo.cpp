@@ -8,6 +8,8 @@
 #include "PrecompiledHeader.h"
 #include "TypeInfo.h"
 
+#include "Serializers.h"
+
 namespace dd
 {
 	DenseMap<String32,TypeInfo*> TypeInfo::sm_typeMap;
@@ -42,63 +44,16 @@ namespace dd
 		return nullptr;
 	}
 
-/*
-	void TypeInfo::SetSerializer( SerializeCB cb )
+	const Function* TypeInfo::GetMethod( const char* methodName ) const
 	{
-		m_serialize = cb;
-	}
+		for( const Method& m : m_methods )
+		{
+			if( m.Name == methodName )
+				return &m.Function;
+		}
 
-	void TypeInfo::SetDeserializer( DeserializeCB cb )
-	{
-		m_deserialize = cb;
+		return nullptr;
 	}
-
-	void TypeInfo::Serialize( File& file, Variable var ) const
-	{
-		if(m_serialize)
-			m_serialize( file, var );
-		else
-			TextSerializer::Get()->Serialize( file, var );
-	}
-
-	void TypeInfo::Deserialize( File& file, Variable var ) const
-	{
-		if(m_deserialize)
-			m_deserialize( file, var );
-		else
-			TextSerializer::Get()->Deserialize( file, var );
-	}
-
-	void TypeInfo::SetToLua( ToLuaCB cb )
-	{
-	m_toLua = cb;
-	}
-
-	void TypeInfo::SetFromLua( FromLuaCB cb )
-	{
-	m_fromLua = cb;
-	}
-
-	void TypeInfo::ToLua( lua_State* L, Variable var ) const
-	{
-	if(m_toLua)
-	m_toLua( L, var );
-	else
-	Lua::GenericToLua( L, var );
-	}
-
-	void TypeInfo::FromLua( lua_State* L, int index, Variable* var ) const
-	{
-	if(m_fromLua)
-	m_fromLua( L, index, var );
-	else
-	Lua::GenericFromLua( L, index, var );
-	}
-
-	const char* TypeInfo::LuaMetaTable() const
-	{
-	return m_metatable;
-	}*/
 
 	const TypeInfo* TypeInfo::GetType( const char* typeName )
 	{
@@ -117,28 +72,47 @@ namespace dd
 		return *pType;
 	}
 
+	String&& TypeInfo::SerializePOD( SerializationMode mode, const void* data ) const
+	{
+		return std::move( String256( dd::SerializePOD( mode, data, m_format.c_str(), m_size ) ) );
+	}
+
+	bool TypeInfo::HasCustomSerializers() const
+	{
+		return SerializeCustom != nullptr && DeserializeCustom != nullptr;
+	}
+
+	void TypeInfo::SetCustomSerializers( SerializeFn serializer, DeserializeFn deserializer )
+	{
+		SerializeCustom = serializer;
+		DeserializeCustom = deserializer;
+	}
+
 	void RegisterDefaultTypes()
 	{
 		// integers
-		REGISTER_POD( int );
-		REGISTER_POD( int8 );
-		REGISTER_POD( int16 );
-		REGISTER_POD( int32 );
-		REGISTER_POD( int64 );
-		REGISTER_POD( char );
+		REGISTER_POD( int, "%d" );
+		REGISTER_POD( int8, "%hhd" );
+		REGISTER_POD( int16, "%hd" );
+		REGISTER_POD( int32, "%d" );
+		REGISTER_POD( int64, "%lld" );
+		REGISTER_POD( char, "%c" );
 
 		// unsigned integers
-		REGISTER_POD( uint );
-		REGISTER_POD( uint8 );
-		REGISTER_POD( uint16 );
-		REGISTER_POD( uint32 );
-		REGISTER_POD( uint64 );
-		REGISTER_POD( unsigned int );
-		REGISTER_POD( byte );
+		REGISTER_POD( uint, "%u" );
+		REGISTER_POD( uint8, "%hhu" );
+		REGISTER_POD( uint16, "%hu" );
+		REGISTER_POD( uint32, "%u" );
+		REGISTER_POD( uint64, "%llu" );
+		REGISTER_POD( byte, "%hhu" );
 
-		REGISTER_POD( float );
-		REGISTER_POD( double );
+		REGISTER_POD( float, "%f" );
+		REGISTER_POD( double, "%lf" );
 		
-		REGISTER_POD( const char* );
+		REGISTER_POD( char*, "%s" );
+
+		REGISTER_TYPE( String );
+
+		SET_SERIALIZERS( String, SerializeString, DeserializeString );
 	}
 }

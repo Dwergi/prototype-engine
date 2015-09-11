@@ -24,6 +24,8 @@ Purpose       :
 
 #pragma once
 
+#include "TypeInfoMacros.h"
+
 namespace dd
 {
 	class TypeInfo;
@@ -31,10 +33,11 @@ namespace dd
 	class FunctionSignature
 	{
 	public:
-		unsigned ArgCount() const;
+		uint ArgCount() const;
 		const TypeInfo* GetRet() const;
 		const TypeInfo* GetArg( unsigned i ) const;
 		const TypeInfo* GetContext() const;
+		String64 GetSignature() const;
 
 		FunctionSignature();
 		FunctionSignature( const FunctionSignature& rhs );
@@ -43,79 +46,79 @@ namespace dd
 		// Static function with return value
 		template <typename R>
 		FunctionSignature( R (*fn)() )
-			: m_ret( SEL_TYPE( R ) )
-			, m_args( NULL )
+			: m_ret( GET_TYPE( R ) )
+			, m_args( nullptr )
 			, m_argCount( 0 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 		}
 
 		template <typename R, typename Arg1>
 		FunctionSignature( R (*fn)( Arg1 ) )
-			: m_ret( SEL_TYPE( R ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 1 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 )
+				GET_TYPE( Arg1 )
 			};
 			m_args = args;
 		}
 
 		template <typename R, typename Arg1, typename Arg2>
 		FunctionSignature( R (*fn)( Arg1, Arg2 ) )
-			: m_ret( SEL_TYPE( R ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 2 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename R, typename Arg1, typename Arg2, typename Arg3>
 		FunctionSignature( R (*fn)( Arg1, Arg2, Arg3 ) )
-			: m_ret( SEL_TYPE( R ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 3 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		FunctionSignature( R (*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-			: m_ret( SEL_TYPE( R ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 4 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		FunctionSignature( R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-			: m_ret( SEL_TYPE( R ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 5 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
@@ -125,398 +128,398 @@ namespace dd
 
 		template <typename Arg1>
 		FunctionSignature( void (*fn)( Arg1 ) )
-			: m_ret( NULL )
+			: m_ret( nullptr )
 			, m_argCount( 1 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
+				GET_TYPE( Arg1 ),
 			};
 			m_args = args;
 		}
 
 		template <typename Arg1, typename Arg2>
 		FunctionSignature( void (*fn)( Arg1, Arg2 ) )
-			: m_ret( NULL )
+			: m_ret( nullptr )
 			, m_argCount( 2 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename Arg1, typename Arg2, typename Arg3>
 		FunctionSignature( void (*fn)( Arg1, Arg2, Arg3 ) )
-			: m_ret( NULL )
+			: m_ret( nullptr )
 			, m_argCount( 3 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		FunctionSignature( void (*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-			: m_ret( NULL )
+			: m_ret( nullptr )
 			, m_argCount( 4 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		FunctionSignature( void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-			: m_ret( NULL )
+			: m_ret( nullptr )
 			, m_argCount( 5 )
-			, m_context( NULL )
+			, m_context( nullptr )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
 
 		// Method with return value, non-const
 		template <typename C, typename R>
-		FunctionSignature( R (C::*)() )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)() )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 0 )
-			, m_args( NULL )
-			, m_context( SEL_TYPE( C ) )
+			, m_args( nullptr )
+			, m_context( GET_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename R, typename Arg1>
-		FunctionSignature( R (C::*)( Arg1 ) )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1 ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 1 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
+				GET_TYPE( Arg1 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2>
-		FunctionSignature( R (C::*)( Arg1, Arg2 ) )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2 ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 2 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3 ) )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3 ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 3 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3, Arg4 ) )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 4 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 5 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
 
 		// Method without return value, non-const
 		template <typename C>
-		FunctionSignature( void (C::*)() )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)() )
+			: m_ret( nullptr )
 			, m_argCount( 0 )
-			, m_args( NULL )
-			, m_context( SEL_TYPE( C ) )
+			, m_args( nullptr )
+			, m_context( GET_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename Arg1>
-		FunctionSignature( void (C::*)( Arg1 ) )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1 ) )
+			: m_ret( nullptr )
 			, m_argCount( 1 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
+				GET_TYPE( Arg1 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2>
-		FunctionSignature( void (C::*)( Arg1, Arg2 ) )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2 ) )
+			: m_ret( nullptr )
 			, m_argCount( 2 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3 ) )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3 ) )
+			: m_ret( nullptr )
 			, m_argCount( 3 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3, Arg4 ) )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) )
+			: m_ret( nullptr )
 			, m_argCount( 4 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
+			: m_ret( nullptr )
 			, m_argCount( 5 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
 
 		// Method with return value, const
 		template <typename C, typename R>
-		FunctionSignature( R (C::*)() const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)() const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 0 )
-			, m_args( NULL )
-			, m_context( SEL_TYPE( C ) )
+			, m_args( nullptr )
+			, m_context( GET_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename R, typename Arg1>
-		FunctionSignature( R (C::*)( Arg1 ) const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1 ) const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 1 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
+				GET_TYPE( Arg1 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2>
-		FunctionSignature( R (C::*)( Arg1, Arg2 ) const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2 ) const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 2 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3 ) const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3 ) const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 3 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3, Arg4 ) const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 4 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		FunctionSignature( R (C::*)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
-			: m_ret( SEL_TYPE( R ) )
+		FunctionSignature( R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
+			: m_ret( GET_TYPE( R ) )
 			, m_argCount( 5 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
 
 		// Method without return value, const
 		template <typename C>
-		FunctionSignature( void (C::*)() const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)() const )
+			: m_ret( nullptr )
 			, m_argCount( 0 )
-			, m_args( NULL )
-			, m_context( SEL_TYPE( C ) )
+			, m_args( nullptr )
+			, m_context( GET_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename Arg1>
-		FunctionSignature( void (C::*)( Arg1 ) const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1 ) const )
+			: m_ret( nullptr )
 			, m_argCount( 1 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
+				GET_TYPE( Arg1 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2>
-		FunctionSignature( void (C::*)( Arg1, Arg2 ) const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2 ) const )
+			: m_ret( nullptr )
 			, m_argCount( 2 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3 ) const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3 ) const )
+			: m_ret( nullptr )
 			, m_argCount( 3 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3, Arg4 ) const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const )
+			: m_ret( nullptr )
 			, m_argCount( 4 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
 			};
 			m_args = args;
 		}
 
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		FunctionSignature( void (C::*)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
-			: m_ret( NULL )
+		FunctionSignature( void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
+			: m_ret( nullptr )
 			, m_argCount( 5 )
-			, m_context( SEL_TYPE( C ) )
+			, m_context( GET_TYPE( C ) )
 		{
 			static const TypeInfo* args[] = {
-				SEL_TYPE( Arg1 ),
-				SEL_TYPE( Arg2 ),
-				SEL_TYPE( Arg3 ),
-				SEL_TYPE( Arg4 ),
-				SEL_TYPE( Arg5 ),
+				GET_TYPE( Arg1 ),
+				GET_TYPE( Arg2 ),
+				GET_TYPE( Arg3 ),
+				GET_TYPE( Arg4 ),
+				GET_TYPE( Arg5 ),
 			};
 			m_args = args;
 		}
 
 	private:
 		const TypeInfo* m_ret;
-		const TypeInfo* *m_args;
+		const TypeInfo** m_args;
 		const TypeInfo* m_context;
-		unsigned m_argCount;
+		uint m_argCount;
 	};
 }

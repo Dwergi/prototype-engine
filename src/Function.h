@@ -24,13 +24,17 @@ Purpose       :
 
 #pragma once
 
+#include "FunctionPtr.h"
+#include "FunctionSignature.h"
+#include "Variable.h"
+
 namespace dd
 {
 	// Static functions with return value
 	template <typename FunctionType, FunctionType FunctionPtr, typename R>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 0 );
+		ASSERT( argCount == 0 );
 
 		ret->GetValue<R>() = (*FunctionPtr)();
 	}
@@ -38,7 +42,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 1 );
+		ASSERT( argCount == 1 );
 
 		ret->GetValue<R>() = (*FunctionPtr)(
 			args[0].GetValue<Arg1>()
@@ -48,7 +52,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 2 );
+		ASSERT( argCount == 2 );
 
 		ret->GetValue<R>() = (*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -59,7 +63,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 3 );
+		ASSERT( argCount == 3 );
 
 		ret->GetValue<R>() = (*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -71,7 +75,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 4 );
+		ASSERT( argCount == 4 );
 
 		ret->GetValue<R>() = (*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -84,7 +88,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void Call( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 5 );
+		ASSERT( argCount == 5 );
 
 		ret->GetValue<R>() = (*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -99,7 +103,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 0 );
+		ASSERT( argCount == 0 );
 
 		(*FunctionPtr)();
 	}
@@ -107,7 +111,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 1 );
+		ASSERT( argCount == 1 );
 
 		(*FunctionPtr)(
 			args[0].GetValue<Arg1>()
@@ -117,7 +121,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 2 );
+		ASSERT( argCount == 2 );
 
 		(*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -128,7 +132,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 3 );
+		ASSERT( argCount == 3 );
 
 		(*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -140,7 +144,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 4 );
+		ASSERT( argCount == 4 );
 
 		(*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -153,7 +157,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 5 );
+		ASSERT( argCount == 5 );
 
 		(*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
@@ -168,15 +172,15 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 0 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)();
+		ASSERT( argCount == 0 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)();
 	}
 
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 1 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 1 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>()
 			);
 	}
@@ -184,8 +188,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 2 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 2 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>()
 			);
@@ -194,8 +198,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 3 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 3 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>()
@@ -205,8 +209,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 4 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 4 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>(),
@@ -217,8 +221,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallMethod( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 5 );
-		ret->GetValue<R>() = (((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 5 );
+		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>(),
@@ -231,15 +235,15 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 0 );
-		(((C *)context)->*FunctionPtr)();
+		ASSERT( argCount == 0 );
+		(((C*) context)->*FunctionPtr)();
 	}
 
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 1 );
-		(((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 1 );
+		(((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>()
 			);
 	}
@@ -247,8 +251,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 2 );
-		(((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 2 );
+		(((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>()
 			);
@@ -257,8 +261,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 3 );
-		(((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 3 );
+		(((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>()
@@ -268,8 +272,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 4 );
-		(((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 4 );
+		(((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>(),
@@ -280,8 +284,8 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		assert( argCount == 5 );
-		(((C *)context)->*FunctionPtr)(
+		ASSERT( argCount == 5 );
+		(((C*) context)->*FunctionPtr)(
 			args[0].GetValue<Arg1>(),
 			args[1].GetValue<Arg2>(),
 			args[2].GetValue<Arg3>(),
@@ -293,7 +297,7 @@ namespace dd
 	class Function
 	{
 	public:
-		const FunctionSignature *Signature() const;
+		const FunctionSignature* Signature() const;
 
 		Function();
 		Function(const Function& rhs );
@@ -307,7 +311,7 @@ namespace dd
 		}
 
 		template <typename Context>
-		void Bind( Context *c )
+		void Bind( Context* c )
 		{
 			m_context = c;
 		}
@@ -320,191 +324,191 @@ namespace dd
 		template <typename R>
 		Function(
 			R (*fn)(),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename Arg1>
 		Function(
 			R (*fn)( Arg1 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename Arg1, typename Arg2>
 		Function(
 			R (*fn)( Arg1, Arg2 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			R (*fn)( Arg1, Arg2, Arg3 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			R (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		// Static functions without return values
 		Function(
 			void (*fn)(),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename Arg1>
 		Function(
 			void (*fn)( Arg1 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename Arg1, typename Arg2>
 		Function(
 			void (*fn)( Arg1, Arg2 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			void (*fn)( Arg1, Arg2, Arg3 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			void (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		// Methods with return values, non-const
 		template <typename R, typename C>
 		Function(
 			R (C::*fn)(),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1>
 		Function(
 			R (C::*fn)( Arg1 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2>
 		Function(
 			R (C::*fn)( Arg1, Arg2 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		// Methods without return values, non-const
 		template <typename C>
 		Function(
 			void (C::*fn)(),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1>
 		Function(
 			void (C::*fn)( Arg1 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2>
 		Function(
 			void (C::*fn)( Arg1, Arg2 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		// Methods with return values, const
 		template <typename R, typename C>
 		Function(
 			R (C::*fn)() const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1>
 		Function(
 			R (C::*fn)( Arg1 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2>
 		Function(
 			R (C::*fn)( Arg1, Arg2 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		// Methods without return values, const
 		template <typename C>
 		Function(
 			void (C::*fn)() const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1>
 		Function(
 			void (C::*fn)( Arg1 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2>
 		Function(
 			void (C::*fn)( Arg1, Arg2 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 		Function(
 			void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-			void (*helper)( Variable* , void* , Variable* , unsigned )
+			void (*helper)( Variable*, void*, Variable*, unsigned )
 			);
 
 		void operator()( Variable& ret, Variable* args, unsigned argCount ) const;
@@ -537,14 +541,14 @@ namespace dd
 	private:
 		Variable m_context;
 		FunctionSignature m_sig;
-		void (*m_callHelper)( Variable* , void* , Variable* , unsigned );
+		void (*m_callHelper)( Variable*, void*, Variable*, unsigned );
 	};
 
 	// Static functions with return value
 	template <typename R>
 	Function::Function(
 		R (*fn)(),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -554,7 +558,7 @@ namespace dd
 	template <typename R, typename Arg1>
 	Function::Function(
 		R (*fn)( Arg1 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -564,7 +568,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2>
 	Function::Function(
 		R (*fn)( Arg1, Arg2 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -574,7 +578,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		R (*fn)( Arg1, Arg2, Arg3 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -584,7 +588,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		R (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -594,7 +598,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -605,7 +609,7 @@ namespace dd
 	template <typename Arg1>
 	Function::Function(
 		void (*fn)( Arg1 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -615,7 +619,7 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	Function::Function(
 		void (*fn)( Arg1, Arg2 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -625,7 +629,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		void (*fn)( Arg1, Arg2, Arg3 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -635,7 +639,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		void (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -645,7 +649,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -656,7 +660,7 @@ namespace dd
 	template <typename R, typename C>
 	Function::Function(
 		R (C::*fn)(),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -666,7 +670,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1>
 	Function::Function(
 		R (C::*fn)( Arg1 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -676,7 +680,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -686,7 +690,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -696,7 +700,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -706,7 +710,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -717,7 +721,7 @@ namespace dd
 	template <typename C>
 	Function::Function(
 		void (C::*fn)(),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -727,7 +731,7 @@ namespace dd
 	template <typename C, typename Arg1>
 	Function::Function(
 		void (C::*fn)( Arg1 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -737,7 +741,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -747,7 +751,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -757,7 +761,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -767,7 +771,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -778,7 +782,7 @@ namespace dd
 	template <typename R, typename C>
 	Function::Function(
 		R (C::*fn)() const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -788,7 +792,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1>
 	Function::Function(
 		R (C::*fn)( Arg1 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -798,7 +802,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -808,7 +812,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -818,7 +822,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -828,7 +832,7 @@ namespace dd
 	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -839,7 +843,7 @@ namespace dd
 	template <typename C>
 	Function::Function(
 		void (C::*fn)() const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -849,7 +853,7 @@ namespace dd
 	template <typename C, typename Arg1>
 	Function::Function(
 		void (C::*fn)( Arg1 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -859,7 +863,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -869,7 +873,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -879,7 +883,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -889,7 +893,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	Function::Function(
 		void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-		void (*helper)( Variable* , void* , Variable* , unsigned )
+		void (*helper)( Variable*, void*, Variable*, unsigned )
 		)
 		: m_sig( fn )
 		, m_callHelper( helper )
@@ -1122,8 +1126,8 @@ namespace dd
 	template <typename Arg1>
 	void Function::operator()( Variable& ret, Arg1 arg1 ) const
 	{
-		assert( m_sig.ArgCount() == 1 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.ArgCount() == 1 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
 
 		Variable argStack[1];
 
@@ -1135,9 +1139,9 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2 ) const
 	{
-		assert( m_sig.ArgCount() == 2 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.ArgCount() == 2 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
 
 		Variable argStack[2];
 
@@ -1150,10 +1154,10 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
 	{
-		assert( m_sig.ArgCount() == 3 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.ArgCount() == 3 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
 
 		Variable argStack[3];
 
@@ -1167,11 +1171,11 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
 	{
-		assert( m_sig.ArgCount() == 4 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		assert( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		ASSERT( m_sig.ArgCount() == 4 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
 
 		Variable argStack[4];
 
@@ -1186,12 +1190,12 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
 	{
-		assert( m_sig.ArgCount() == 5 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		assert( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
-		assert( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
+		ASSERT( m_sig.ArgCount() == 5 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
 
 		Variable argStack[5];
 
@@ -1208,8 +1212,8 @@ namespace dd
 	template <typename Arg1>
 	void Function::operator()( Arg1 arg1 ) const
 	{
-		assert( m_sig.ArgCount() == 1 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.ArgCount() == 1 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
 
 		Variable argStack[1];
 
@@ -1221,9 +1225,9 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	void Function::operator()( Arg1 arg1, Arg2 arg2 ) const
 	{
-		assert( m_sig.ArgCount() == 2 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.ArgCount() == 2 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
 
 		Variable argStack[2];
 
@@ -1236,10 +1240,10 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
 	{
-		assert( m_sig.ArgCount() == 3 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.ArgCount() == 3 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
 
 		Variable argStack[3];
 
@@ -1253,11 +1257,11 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
 	{
-		assert( m_sig.ArgCount() == 4 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		assert( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		ASSERT( m_sig.ArgCount() == 4 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
 
 		Variable argStack[4];
 
@@ -1272,12 +1276,12 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
 	{
-		assert( m_sig.ArgCount() == 5 );
-		assert( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		assert( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		assert( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		assert( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
-		assert( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
+		ASSERT( m_sig.ArgCount() == 5 );
+		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
 
 		Variable argStack[5];
 

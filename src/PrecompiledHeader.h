@@ -15,13 +15,7 @@
 #include "Typedefs.h"
 
 #include "Assert.h"
-#include "Utility.h"
-#include "ContainerHelpers.h"
 #include "Containers.h"
 
-#include "Variable.h"
-#include "FunctionSignature.h"
-#include "FunctionPtr.h"
-#include "Function.h"
 #include "TypeInfo.h"
 #include "TypeInfoMacros.h"

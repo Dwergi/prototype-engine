@@ -76,28 +76,6 @@ namespace dd
 		m_typeInfo->Delete( m_data );
 	}
 
-/*
-	void Variable::Serialize( File& file ) const
-	{
-		m_typeInfo->Serialize( file, *this );
-	}
-
-	void Variable::Deserialize( File& file )
-	{
-		m_typeInfo->Deserialize( file, *this );
-	}
-
-	void Variable::ToLua( lua_State* L ) const
-	{
-		m_typeInfo->ToLua( L, *this );
-	}
-
-	void Variable::FromLua( lua_State* L, int index )
-	{
-		m_typeInfo->FromLua( L, index, this );
-	}
-*/
-
 	Variable& Variable::operator=( const Variable& rhs )
 	{
 		m_data = rhs.m_data;

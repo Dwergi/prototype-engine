@@ -13,6 +13,7 @@
 #include "DenseVectorPool.h"
 #include "UnorderedMapPool.h"
 #include "ScopedTimer.h"
+#include "Random.h"
 
 const int EntityCount = 1000;
 const int FrameCount = 100;

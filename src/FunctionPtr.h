@@ -24,6 +24,9 @@ Purpose       :
 
 #pragma once
 
+#include "FunctionSignature.h"
+#include "Variable.h"
+
 namespace dd
 {
 	struct GenericBase1 {};

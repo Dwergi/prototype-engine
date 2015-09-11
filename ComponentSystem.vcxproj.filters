@@ -37,6 +37,12 @@
     <Filter Include="Script">
       <UniqueIdentifier>{11e0d14b-e6f4-40dd-9b8e-afe2cacc3d00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{7eb4d0ac-91be-4912-8f53-b90ac3bc0db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base64">
+      <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -76,9 +82,6 @@
       <Filter>Properties</Filter>
     </ClInclude>
     <ClInclude Include="src\Services.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utility.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\SortedVectorPool.h">
@@ -174,9 +177,6 @@
     <ClInclude Include="src\Iteration.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Method.h">
-      <Filter>Types</Filter>
-    </ClInclude>
     <ClInclude Include="src\StringTests.cpp">
       <Filter>Tests</Filter>
     </ClInclude>
@@ -206,6 +206,30 @@
     </ClInclude>
     <ClInclude Include="src\TypeInfoHelpers.h">
       <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Serializers.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base64\include\cdecode.h">
+      <Filter>Base64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base64\include\cencode.h">
+      <Filter>Base64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base64\include\decode.h">
+      <Filter>Base64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base64\include\encode.h">
+      <Filter>Base64</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JSONSerializer.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Serialization.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Random.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -294,9 +318,6 @@
     <ClCompile Include="src\VectorTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\DenseMapTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -323,6 +344,24 @@
     </ClCompile>
     <ClCompile Include="src\FunctionSignature.cpp">
       <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Serializers.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="include\base64\src\cdecode.c">
+      <Filter>Base64</Filter>
+    </ClCompile>
+    <ClCompile Include="include\base64\src\cencode.c">
+      <Filter>Base64</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONSerializer.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SerializerTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Random.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
