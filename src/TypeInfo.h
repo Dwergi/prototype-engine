@@ -175,7 +175,7 @@ namespace dd
 		signature += " ";
 		signature += name;
 
-		signature += " (";
+		signature += "(";
 
 		uint argCount = sig->ArgCount();
 		for( uint i = 0; i < argCount; ++i )
