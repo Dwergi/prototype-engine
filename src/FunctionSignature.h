@@ -37,7 +37,6 @@ namespace dd
 		const TypeInfo* GetRet() const;
 		const TypeInfo* GetArg( unsigned i ) const;
 		const TypeInfo* GetContext() const;
-		String64 GetSignature() const;
 
 		FunctionSignature();
 		FunctionSignature( const FunctionSignature& rhs );

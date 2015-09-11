@@ -91,6 +91,8 @@ namespace dd
 
 		Entry* FindEntry( const TKey& key ) const;
 		Entry& GetEntry( const TKey& key, uint* pIndex = nullptr ) const;
+		void CreateEntry( Entry* ptr, const TKey& key, const TValue& value );
+
 		bool IsMatch( const Entry& entry, const TKey& key ) const;
 		bool IsEmpty( const Entry& entry ) const;
 
@@ -281,11 +283,8 @@ namespace dd
 
 		if( IsEmpty( entry ) )
 		{
-			// slot is free, use placement new to construct it there
-			new (&entry.Key) TKey( key );
-			new (&entry.Value) TValue( value );
-
-			++m_entries;
+			// slot is free, create entry
+			CreateEntry( &entry, key, value );
 			return;
 		}
 		else
@@ -298,10 +297,7 @@ namespace dd
 			{
 				if( IsEmpty( *current ) )
 				{
-					new (&current->Key) TKey( key );
-					new (&current->Value) TValue( value );
-					
-					++m_entries;
+					CreateEntry( current, key, value );
 					return;
 				}
 
@@ -312,6 +308,15 @@ namespace dd
 		// couldn't find a slot, need to grow and try again
 		Grow();
 		Insert( key, value );
+	}
+
+	template<typename TKey, typename TValue>
+	void DenseMap<TKey, TValue>::CreateEntry( Entry* ptr, const TKey& key, const TValue& value )
+	{
+		new (&ptr->Key) TKey( key );
+		new (&ptr->Value) TValue( value );
+
+		++m_entries;
 	}
 
 	template<typename TKey, typename TValue>

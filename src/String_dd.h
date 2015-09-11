@@ -12,12 +12,18 @@ namespace dd
 {
 	class String
 	{
+	private:
+
+		// disable
+		String( const String& other ) 
+			: m_stackBuffer( nullptr ), m_stackCapacity( 0 ) {}
+
 	protected:
-		void Initialize();
+
+		String( char* stackBuffer, uint stackCapacity );
 
 	public:
 
-		String();
 		virtual ~String();
 
 		String& operator=( const char* other );
@@ -37,6 +43,10 @@ namespace dd
 
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
+		void ShrinkToFit();
+
+		bool StartsWith( const char* other ) const;
+		bool StartsWith( const String& other ) const;
 
 		static void RegisterMembers() { }
 
@@ -44,14 +54,12 @@ namespace dd
 
 	protected:
 
-		uint m_length;
-
-		uint m_capacity;
+		char* const m_stackBuffer;
+		const uint m_stackCapacity;
 		char* m_buffer;
+		uint m_length;
+		uint m_capacity;	
 		
-		uint m_stackCapacity;
-		char* m_stackBuffer;
-
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
 		void Concatenate( const char* other, uint length );
@@ -68,36 +76,39 @@ namespace dd
 	public:
 
 		InplaceString()
+			: String( m_stackData, Size )
 		{
-			Initialize();
+			m_stackData[ 0 ] = '\0';
 		}
 
 		InplaceString( const char* other )
+			: String( m_stackData, Size )
 		{
-			Initialize();
 			SetString( other, (uint) strlen( other ) );
 		}
 
 		InplaceString( const String& other )
+			: String( m_stackData, Size )
 		{
-			Initialize();
+			SetString( other.c_str(), other.Length() );
+		}
+
+		InplaceString( const dd::InplaceString<Size>& other )
+			: String( m_stackData, Size )
+		{
+			SetString( other.c_str(), other.Length() );
+		}
+
+		template <int OtherSize>
+		InplaceString( const InplaceString<OtherSize>& other )
+			: String( m_stackData, Size )
+		{
 			SetString( other.c_str(), other.Length() );
 		}
 
 		virtual ~InplaceString()
 		{
 
-		}
-
-	protected:
-
-		void Initialize()
-		{
-			m_stackBuffer = m_stackData;
-			m_stackCapacity = Size;
-
-			m_capacity = m_stackCapacity;
-			m_buffer = m_stackBuffer;
 		}
 
 	private:

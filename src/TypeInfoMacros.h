@@ -49,7 +49,7 @@
 	static void RegisterMembers() { GET_TYPE( TypeName ); }
 
 #define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
-	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( &Serializer, &Deserializer )
+	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )
 
 #define FUNCTION( FN ) \
 	dd::BuildFunction<decltype( &FN ), &FN>( &FN )

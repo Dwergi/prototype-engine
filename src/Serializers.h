@@ -8,18 +8,41 @@
 
 namespace dd
 {
-	enum class SerializationMode : uint
+	namespace Serialize
 	{
-		STRING = 0,
-		BINARY = 1,
-		BASE64 = 2,
-		JSON = 4
-	};
+		enum class Mode : uint
+		{
+			STRING = 0,
+			BINARY = 1,
+			BASE64 = 2,
+			JSON = 4
+		};
 
-	void ResetSerializer();
+		void ResetSerializers();
 
-	const char* SerializePOD( SerializationMode mode, const void* data, const char* format, uint size );
+		void SerializeString( Mode mode, String& out, const void* data );
+		void DeserializeString( Mode mode, const String& src, void* data );
 
-	String&& SerializeString( SerializationMode mode, const void* data );
-	void DeserializeString( SerializationMode mode, const String& src, void* data );
+		namespace JSON
+		{
+			template<typename T>
+			void SerializePOD( String& out, const T& data, const char* format )
+			{
+				__declspec(thread) static char temp[ 64 ];
+
+				sprintf_s( temp, format, data );
+
+				out += temp;
+			}
+		}
+
+		namespace Binary
+		{
+			template<typename T>
+			void SerializePOD( void* out, const T& data )
+			{
+				memcpy( out, &data, sizeof( T ) );
+			}
+		}
+	}
 }

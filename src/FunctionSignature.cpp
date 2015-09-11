@@ -78,31 +78,6 @@ namespace dd
 		return m_context;
 	}
 
-	String64 FunctionSignature::GetSignature() const
-	{
-		String64 signature;
-
-		if( m_ret != nullptr )
-			signature += m_ret->Name();
-		else
-			signature += "void";
-
-		signature += " (";
-
-		uint argCount = ArgCount();
-		for( uint i = 0; i < argCount; ++i )
-		{
-			signature += GetArg( i )->Name();
-
-			if( i < (argCount - 1) )
-				signature += ",";
-		}
-
-		signature += ")";
-
-		return signature;
-	}
-
 	const FunctionSignature* Function::Signature() const
 	{
 		return &m_sig;

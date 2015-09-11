@@ -62,6 +62,14 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 
 int main( int argc, char* const argv[] )
 {
+	for( int i = 1; i < argc; ++i )
+	{
+		if( strcmp( argv[ i ], "-noassert" ) == 0 )
+		{
+			pempek::assert::implementation::ignoreAllAsserts( true );
+		}
+	}
+
 #ifdef _TEST
 	int iError = tests::RunTests( argc, argv );
 

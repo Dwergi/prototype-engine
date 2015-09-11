@@ -12,68 +12,49 @@
 
 namespace dd
 {
-	base64::encoder s_encoder;
-	base64::decoder s_decoder;
-
-	void ResetSerializer()
+	namespace Serialize
 	{
-		std::swap( s_encoder, base64::encoder() );
-		std::swap( s_decoder, base64::decoder() );
-	}
+		base64::encoder s_encoder;
+		base64::decoder s_decoder;
 
-	const char* SerializePOD( SerializationMode mode, const void* data, const char* format, uint size )
-	{
-		__declspec(thread) static char temp[ 256 ];
-
-		if( mode == SerializationMode::STRING || mode == SerializationMode::JSON )
+		void ResetSerializers()
 		{
-			sprintf_s( temp, format, data );
-		}
-		else if( mode == SerializationMode::BASE64 )
-		{
-			const char* bytes = (const char*) data;
-			s_encoder.encode( bytes, (int) size, temp );
-		}
-		else if( mode == SerializationMode::BINARY )
-		{
-			memcpy( temp, data, size );
-			temp[ size ] = '\0';
+			std::swap( s_encoder, base64::encoder() );
+			std::swap( s_decoder, base64::decoder() );
 		}
 
-		return temp;
-	}
-
-	String&& SerializeString( SerializationMode mode, const void* data )
-	{
-		__declspec(thread) static char temp[ 256 ];
-
-		const String* str = (const String*) data;
-
-		if( mode == SerializationMode::BASE64 )
+		void SerializeString( Serialize::Mode mode, String& out, const void* data )
 		{
-			s_encoder.encode( str->c_str(), str->Length(), temp );
+			__declspec(thread) static char temp[ 256 ];
 
-			return std::move( String256( temp ) );
+			const String* str = (const String*) data;
+
+			if( mode == Serialize::Mode::BASE64 )
+			{
+				s_encoder.encode( str->c_str(), str->Length(), temp );
+			}
+			else
+			{
+				out += *str;
+			}
 		}
-		
-		return std::move( String256( *str ) );
-	}
 
-	void DeserializeString( SerializationMode mode, const String& src, void* data )
-	{
-		__declspec(thread) static char temp[ 256 ];
-
-		String* str = (String*) data;
-
-		strncpy_s( temp, src.c_str(), 256 );
-
-		if( mode == SerializationMode::BASE64 )
+		void DeserializeString( Serialize::Mode mode, const String& src, void* data )
 		{
+			__declspec(thread) static char temp[ 256 ];
+
+			String* str = (String*) data;
+
+			strncpy_s( temp, src.c_str(), 256 );
+
+			if( mode == Serialize::Mode::BASE64 )
+			{
+				*str = temp;
+
+				s_decoder.decode( str->c_str(), 256, temp );
+			}
+
 			*str = temp;
-
-			s_decoder.decode( str->c_str(), 256, temp );
 		}
-
-		*str = temp;
 	}
 }

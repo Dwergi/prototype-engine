@@ -224,6 +224,13 @@
       <AdditionalDependencies>imgui.lib;angelscript64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Run Unit Tests</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\base64\include\cdecode.h" />

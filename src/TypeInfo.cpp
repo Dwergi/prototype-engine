@@ -72,11 +72,6 @@ namespace dd
 		return *pType;
 	}
 
-	String&& TypeInfo::SerializePOD( SerializationMode mode, const void* data ) const
-	{
-		return std::move( String256( dd::SerializePOD( mode, data, m_format.c_str(), m_size ) ) );
-	}
-
 	bool TypeInfo::HasCustomSerializers() const
 	{
 		return SerializeCustom != nullptr && DeserializeCustom != nullptr;
@@ -92,27 +87,19 @@ namespace dd
 	{
 		// integers
 		REGISTER_POD( int, "%d" );
-		REGISTER_POD( int8, "%hhd" );
-		REGISTER_POD( int16, "%hd" );
-		REGISTER_POD( int32, "%d" );
-		REGISTER_POD( int64, "%lld" );
 		REGISTER_POD( char, "%c" );
-
+		REGISTER_POD( int16, "%hd" );
+		REGISTER_POD( int64, "%lld" );
+		
 		// unsigned integers
 		REGISTER_POD( uint, "%u" );
-		REGISTER_POD( uint8, "%hhu" );
-		REGISTER_POD( uint16, "%hu" );
-		REGISTER_POD( uint32, "%u" );
-		REGISTER_POD( uint64, "%llu" );
 		REGISTER_POD( byte, "%hhu" );
+		REGISTER_POD( uint16, "%hu" );
+		REGISTER_POD( uint64, "%llu" );
 
 		REGISTER_POD( float, "%f" );
 		REGISTER_POD( double, "%lf" );
 		
 		REGISTER_POD( char*, "%s" );
-
-		REGISTER_TYPE( String );
-
-		SET_SERIALIZERS( String, SerializeString, DeserializeString );
 	}
 }

@@ -11,31 +11,24 @@ const float GrowthFactor = 2.0f;
 
 namespace dd
 {
-	String::String()
+	String::String( char* stackBuffer, uint stackCapacity )
+		: m_stackCapacity( stackCapacity ),
+		m_stackBuffer( stackBuffer )
 	{
-		Initialize();
+		m_length = 0;
+		m_capacity = m_stackCapacity;
+		m_buffer = m_stackBuffer;
+
+		m_buffer[ 0 ] = '\0';
 	}
 
 	String::~String()
 	{
-		// delete stack buffer
+		// delete heap buffer
 		if( m_buffer != m_stackBuffer )
 		{
 			delete[] m_buffer;
 		}
-
-		Initialize();
-	}
-
-	void String::Initialize()
-	{
-		m_length = 0;
-
-		m_capacity = 0;
-		m_buffer = nullptr;
-
-		m_stackCapacity = 0;
-		m_stackBuffer = nullptr;
 	}
 
 	const char* String::c_str() const
@@ -107,6 +100,24 @@ namespace dd
 		return *this;
 	}
 
+	bool String::StartsWith( const char* other ) const
+	{
+		size_t len = strlen( other );
+
+		for( size_t i = 0; i < len; ++i )
+		{
+			if( m_buffer[ i ] != other[ i ] )
+				return false;
+		}
+
+		return true;
+	}
+
+	bool String::StartsWith( const String& other ) const
+	{
+		return StartsWith( other.c_str() );
+	}
+
 	void String::Concatenate( const char* buffer, uint other_length )
 	{
 		uint new_length = m_length + other_length;
@@ -115,12 +126,11 @@ namespace dd
 		memcpy( &m_buffer[ m_length ], buffer, other_length );
 
 		m_length = new_length;
-		m_buffer[ new_length ] = 0;		
+		m_buffer[ new_length ] = '\0';		
 	}
 
 	void String::SetString( const char* data, uint length )
 	{
-		ASSERT( m_buffer != nullptr );
 		ASSERT( data != nullptr );
 
 		Resize( length );
@@ -129,7 +139,7 @@ namespace dd
 		m_length = length;
 
 		// null-terminate
-		m_buffer[ m_length ] = 0;
+		m_buffer[ m_length ] = '\0';
 	}
 
 	//
@@ -161,5 +171,32 @@ namespace dd
 		{
 			delete[] old_buffer;
 		}
+	}
+
+	void String::ShrinkToFit()
+	{
+		if( m_buffer == m_stackBuffer )
+			return;
+
+		// check if we could fit in the local array
+		if( (m_length + 1) < m_stackCapacity )
+		{
+			memcpy( m_stackBuffer, m_buffer, m_length );
+
+			delete[] m_buffer;
+
+			m_buffer = m_stackBuffer;
+		}
+		else
+		{
+			char* old_buffer = m_buffer;
+			m_buffer = new char[ m_length + 1 ];
+
+			memcpy( m_buffer, old_buffer, m_length );
+
+			delete[] old_buffer;
+		}
+
+		m_buffer[ m_length ] = '\0';
 	}
 }

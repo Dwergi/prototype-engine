@@ -48,7 +48,7 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 	{
 		float x = 5.0f;
 		serializer.Serialize( x );
-		REQUIRE( out == "5.0" );
+		REQUIRE( out.StartsWith( "5.0" ) );
 	}
 
 	SECTION( "String" )
@@ -56,5 +56,12 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 		String8 x = "test";
 		serializer.Serialize( x );
 		REQUIRE( out == "test" );
+	}
+
+	SECTION( "Long String" )
+	{
+		String256 x = "testing the string serialization\ntesting the string serialization\ntesting the string serialization\ntesting the string serialization";
+		serializer.Serialize( x );
+		REQUIRE( out == x );
 	}
 }

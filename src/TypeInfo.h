@@ -14,10 +14,13 @@
 
 namespace dd
 {
-	enum class SerializationMode : uint;
-
-	typedef String&& (*SerializeFn)( SerializationMode mode, const void* data );
-	typedef void (*DeserializeFn)( SerializationMode mode, const String& src, void* data );
+	namespace Serialize
+	{
+		enum class Mode : uint;
+	}
+	
+	typedef void (*SerializeFn)( Serialize::Mode mode, String& out, const void* data );
+	typedef void (*DeserializeFn)( Serialize::Mode mode, const String& src, void* data );
 
 	class TypeInfo : public AutoList<TypeInfo>
 	{
@@ -38,6 +41,7 @@ namespace dd
 		inline uint Size() const { return m_size; }
 		inline const String32& Name() const { return m_name; }
 		inline bool IsPOD() const { return m_isPOD; };
+		inline const char* GetFormat() const { return m_format.c_str(); }
 
 		bool Registered() { return m_size != 0; }
 
@@ -66,12 +70,8 @@ namespace dd
 		bool HasCustomSerializers() const;
 		void SetCustomSerializers( SerializeFn serializer, DeserializeFn deserializer );
 
-		String&& SerializePOD( SerializationMode mode, const void* data ) const;
 		SerializeFn SerializeCustom;
-
-		void DeserializePOD( SerializationMode mode, const String& src, void* data ) const;
 		DeserializeFn DeserializeCustom;
-
 
 	private:
 		uint m_size;
@@ -140,6 +140,7 @@ namespace dd
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
 		typeInfo->Init( name, size );
 		typeInfo->m_isPOD = true;
+		typeInfo->m_format = format;
 
 		typeInfo->New = PODNew<T>;
 		typeInfo->Copy = PODCopy<T>;
@@ -164,8 +165,29 @@ namespace dd
 		m_methods.Add( m );
 
 		const FunctionSignature* sig = f.Signature();
-		String128 signature = sig->GetSignature();
+		String128 signature;
 
+		if( sig->GetRet() != nullptr )
+			signature += sig->GetRet()->Name();
+		else
+			signature += "void";
+
+		signature += " ";
+		signature += name;
+
+		signature += " (";
+
+		uint argCount = sig->ArgCount();
+		for( uint i = 0; i < argCount; ++i )
+		{
+			signature += sig->GetArg( i )->Name();
+
+			if( i < (argCount - 1) )
+				signature += ",";
+		}
+
+		signature += ")";
+		
 		ScriptEngine::GetInstance()->RegisterMethod( sig->GetContext()->Name(), signature, fn );
 	}
 };

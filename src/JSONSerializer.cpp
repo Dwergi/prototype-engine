@@ -13,7 +13,7 @@ namespace dd
 		: m_buffer( buffer ),
 		m_offset( 0 )
 	{
-
+		dd::Serialize::ResetSerializers();
 	}
 
 	JSONSerializer::~JSONSerializer()
