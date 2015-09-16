@@ -11,16 +11,12 @@
 #include "Member.h"
 #include "TypeInfoHelpers.h"
 #include "Script.h"
+#include "Serializers.h"
 
 namespace dd
 {
-	namespace Serialize
-	{
-		enum class Mode : uint;
-	}
-	
-	typedef void (*SerializeFn)( Serialize::Mode mode, String& out, const void* data );
-	typedef void (*DeserializeFn)( Serialize::Mode mode, const String& src, void* data );
+	typedef void (*SerializeFn)( Serialize::Mode mode, WriteStream& dst, Variable src );
+	typedef void (*DeserializeFn)( Serialize::Mode mode, ReadStream& src, Variable dst );
 
 	class TypeInfo : public AutoList<TypeInfo>
 	{
@@ -41,9 +37,8 @@ namespace dd
 		inline uint Size() const { return m_size; }
 		inline const String32& Name() const { return m_name; }
 		inline bool IsPOD() const { return m_isPOD; };
-		inline const char* GetFormat() const { return m_format.c_str(); }
 
-		bool Registered() { return m_size != 0; }
+		bool Registered() const { return m_size != 0; }
 
 		void* (*New)();
 		void (*Copy)( void* data, const void* src );
@@ -54,10 +49,10 @@ namespace dd
 		void (*PlacementCopy)( void* data, const void* src );
 
 		template<typename T>
-		static const TypeInfo* RegisterType( uint size, const char* name );
+		static const TypeInfo* RegisterType( const char* name );
 
 		template<typename T>
-		static const TypeInfo* RegisterPOD( uint size, const char* name, const char* format );
+		static const TypeInfo* RegisterPOD( const char* name, SerializeFn serializer, DeserializeFn deserializer );
 
 		template <typename T>
 		static const TypeInfo* GetType();
@@ -87,8 +82,6 @@ namespace dd
 		Vector<Member> m_members;
 		Vector<Method> m_methods;
 
-		String8 m_format;
-
 		static DenseMap<String32, TypeInfo*> sm_typeMap;
 	};
 
@@ -108,24 +101,25 @@ namespace dd
 	}
 
 	template<typename T>
-	const TypeInfo* TypeInfo::RegisterType( uint size, const char* name )
+	const TypeInfo* TypeInfo::RegisterType( const char* name )
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
 		if( typeInfo->Registered() )
 			return typeInfo;
 
-		typeInfo->Init( name, size );
+		typeInfo->Init( name, sizeof( T ) );
 		typeInfo->m_isPOD = false;
 
 		typedef std::conditional<HasDefaultCtor<T>::value, T, EmptyType<T>>::type new_type;
 		typeInfo->New = SetFunc<HasDefaultCtor<T>::value, void*(*)(), &dd::New<new_type>>::Get();
-		typeInfo->PlacementNew = SetFunc<HasDefaultCtor<T>::value, void (*)( void* ), &dd::PlacementNew<new_type>>::Get();
-		typeInfo->Copy = SetFunc<HasCopyCtor<T>::value, void(*)( void*, const void* ), &dd::Copy<new_type>>::Get();
+		typeInfo->PlacementNew = SetFunc<HasDefaultCtor<T>::value, void (*)(void*), &dd::PlacementNew<new_type>>::Get();
+		typeInfo->Copy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::Copy<new_type>>::Get();
 		typeInfo->Delete = dd::Delete<T>;
-		typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void(*)( void*, const void* ), &dd::PlacementCopy<new_type>>::Get();
+		typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::PlacementCopy<new_type>>::Get();
 		typeInfo->PlacementDelete = dd::PlacementDelete<T>;
-		typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void(*)( void**, const void* ), &dd::NewCopy<new_type>>::Get();
+		typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void**, const void*), &dd::NewCopy<new_type>>::Get();
 		typeInfo->SerializeCustom = nullptr;
+		typeInfo->DeserializeCustom = nullptr;
 
 		sm_typeMap.Add( name, typeInfo );
 
@@ -135,12 +129,11 @@ namespace dd
 	}
 
 	template <typename T>
-	const TypeInfo* TypeInfo::RegisterPOD( uint size, const char* name, const char* format )
+	const TypeInfo* TypeInfo::RegisterPOD( const char* name, SerializeFn serializer, DeserializeFn deserializer )
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
-		typeInfo->Init( name, size );
+		typeInfo->Init( name, sizeof( T ) );
 		typeInfo->m_isPOD = true;
-		typeInfo->m_format = format;
 
 		typeInfo->New = PODNew<T>;
 		typeInfo->Copy = PODCopy<T>;
@@ -149,7 +142,8 @@ namespace dd
 		typeInfo->PlacementNew = PODPlacementNew<T>;
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
-		typeInfo->SerializeCustom = nullptr;
+		typeInfo->SerializeCustom = serializer;
+		typeInfo->DeserializeCustom = deserializer;
 
 		sm_typeMap.Add( name, typeInfo );
 

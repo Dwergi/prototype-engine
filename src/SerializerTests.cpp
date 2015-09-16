@@ -55,13 +55,36 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 	{
 		String8 x = "test";
 		serializer.Serialize( x );
-		REQUIRE( out == "test" );
+
+		// strings should have extra quotes around them
+		REQUIRE( out == "\"test\"" );
 	}
 
 	SECTION( "Long String" )
 	{
 		String256 x = "testing the string serialization\ntesting the string serialization\ntesting the string serialization\ntesting the string serialization";
 		serializer.Serialize( x );
-		REQUIRE( out == x );
+		
+		String256 y;
+		y += "\"";
+		y += x;
+		y += "\"";
+
+		REQUIRE( out == y );
+	}
+
+	SECTION( "Struct" )
+	{
+		REGISTER_TYPE( SimpleStruct );
+
+		SimpleStruct s;
+		s.Flt = 111.0f;
+		s.Int = 222;
+		s.Str = "LOL";
+		s.Vec.Add( 1 );
+		s.Vec.Add( 2 );
+		s.Vec.Add( 3 );
+
+		serializer.Serialize( s );
 	}
 }

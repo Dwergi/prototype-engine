@@ -45,12 +45,12 @@ namespace dd
 		m_typeInfo = rhs.m_typeInfo;
 	}
 
-	void* Variable::GetData() const
+	void* Variable::Data() const
 	{
 		return m_data;
 	}
 
-	const TypeInfo* Variable::GetTypeInfo() const
+	const TypeInfo* Variable::Type() const
 	{
 		return m_typeInfo;
 	}

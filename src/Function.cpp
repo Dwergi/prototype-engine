@@ -75,21 +75,21 @@ namespace dd
 
 	void Function::operator()( Variable& ret ) const
 	{
-		m_callHelper( &ret, m_context.GetData(), NULL, 0 );
+		m_callHelper( &ret, m_context.Data(), NULL, 0 );
 	}
 
 	void Function::operator()() const
 	{
-		m_callHelper( NULL, m_context.GetData(), NULL, 0 );
+		m_callHelper( NULL, m_context.Data(), NULL, 0 );
 	}
 
 	void Function::operator()( Variable& ret, Variable* args, uint argCount ) const
 	{
-		m_callHelper( &ret, m_context.GetData(), args, argCount );
+		m_callHelper( &ret, m_context.Data(), args, argCount );
 	}
 
 	void Function::operator()( Variable& ret, Variable* args, uint argCount )
 	{
-		m_callHelper( &ret, m_context.GetData(), args, argCount );
+		m_callHelper( &ret, m_context.Data(), args, argCount );
 	}
 }

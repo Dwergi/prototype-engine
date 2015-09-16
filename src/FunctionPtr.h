@@ -516,7 +516,7 @@ namespace dd
 		// void return
 		inline void operator()() const
 		{
-			m_call( &m_ptr, NULL, m_context.GetData(), NULL, 0 );
+			m_call( &m_ptr, NULL, m_context.Data(), NULL, 0 );
 		}
 		template <typename Arg1>
 		void operator()( Arg1 arg1 ) const;
@@ -532,7 +532,7 @@ namespace dd
 		// non void return
 		inline void operator()( Variable& ret ) const
 		{
-			m_call( &m_ptr, &ret, m_context.GetData(), NULL, 0 );
+			m_call( &m_ptr, &ret, m_context.Data(), NULL, 0 );
 		}
 		template <typename Arg1>
 		void operator()( Variable& ret, Arg1 arg1 ) const;
@@ -564,7 +564,7 @@ namespace dd
 
 		new (argStack) Variable( arg1 );
 
-		m_call( &m_ptr, NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2>
@@ -579,7 +579,7 @@ namespace dd
 		new (argStack) Variable( arg1 );
 		new (argStack) Variable( arg2 );
 
-		m_call( &m_ptr, NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3>
@@ -596,7 +596,7 @@ namespace dd
 		new (argStack) Variable( arg2 );
 		new (argStack) Variable( arg3 );
 
-		m_call( &m_ptr, NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -615,7 +615,7 @@ namespace dd
 		new (argStack) Variable( arg3 );
 		new (argStack) Variable( arg4 );
 
-		m_call( &m_ptr, NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
@@ -636,7 +636,7 @@ namespace dd
 		new (argStack) Variable( arg4 );
 		new (argStack) Variable( arg5 );
 
-		m_call( &m_ptr, NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	// non void return
@@ -650,7 +650,7 @@ namespace dd
 
 		new (argStack) Variable( arg1 );
 
-		m_call( &m_ptr, &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2>
@@ -665,7 +665,7 @@ namespace dd
 		new (argStack) Variable( arg1 );
 		new (argStack) Variable( arg2 );
 
-		m_call( &m_ptr, &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3>
@@ -682,7 +682,7 @@ namespace dd
 		new (argStack) Variable( arg2 );
 		new (argStack) Variable( arg3 );
 
-		m_call( &m_ptr, &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -701,7 +701,7 @@ namespace dd
 		new (argStack) Variable( arg3 );
 		new (argStack) Variable( arg4 );
 
-		m_call( &m_ptr, &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
@@ -722,6 +722,6 @@ namespace dd
 		new (argStack) Variable( arg4 );
 		new (argStack) Variable( arg5 );
 
-		m_call( &m_ptr, &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_call( &m_ptr, &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 }

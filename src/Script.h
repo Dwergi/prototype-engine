@@ -54,7 +54,7 @@ namespace dd
 		class DummyClass {};
 		const int METHOD_SIZE = sizeof(void (DummyClass::*)());
 
-		int r = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
-		ASSERT( r >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
+		//int r = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
+		//ASSERT( r >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
 	}
 }

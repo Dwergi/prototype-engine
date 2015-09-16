@@ -1133,7 +1133,7 @@ namespace dd
 
 		new (argStack) Variable( arg1 );
 
-		m_callHelper( &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2>
@@ -1148,7 +1148,7 @@ namespace dd
 		new (argStack)     Variable( arg1 );
 		new (argStack + 1) Variable( arg2 );
 
-		m_callHelper( &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3>
@@ -1165,7 +1165,7 @@ namespace dd
 		new (argStack + 1) Variable( arg2 );
 		new (argStack + 2) Variable( arg3 );
 
-		m_callHelper( &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -1184,7 +1184,7 @@ namespace dd
 		new (argStack + 2) Variable( arg3 );
 		new (argStack + 3) Variable( arg4 );
 
-		m_callHelper( ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
@@ -1205,7 +1205,7 @@ namespace dd
 		new (argStack + 3) Variable( arg4 );
 		new (argStack + 4) Variable( arg5 );
 
-		m_callHelper( &ret, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	// Call without return value
@@ -1219,7 +1219,7 @@ namespace dd
 
 		new (argStack) Variable( arg1 );
 
-		m_callHelper( NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2>
@@ -1234,7 +1234,7 @@ namespace dd
 		new (argStack)     Variable( arg1 );
 		new (argStack + 1) Variable( arg2 );
 
-		m_callHelper( NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3>
@@ -1251,7 +1251,7 @@ namespace dd
 		new (argStack + 1) Variable( arg2 );
 		new (argStack + 2) Variable( arg3 );
 
-		m_callHelper( NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -1270,7 +1270,7 @@ namespace dd
 		new (argStack + 2) Variable( arg3 );
 		new (argStack + 3) Variable( arg4 );
 
-		m_callHelper( NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
@@ -1291,6 +1291,6 @@ namespace dd
 		new (argStack + 3) Variable( arg4 );
 		new (argStack + 4) Variable( arg5 );
 
-		m_callHelper( NULL, m_context.GetData(), argStack, m_sig.ArgCount() );
+		m_callHelper( NULL, m_context.Data(), argStack, m_sig.ArgCount() );
 	}
 }

@@ -231,6 +231,9 @@
     <ClInclude Include="src\Random.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Stream.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -293,9 +296,6 @@
     </ClCompile>
     <ClCompile Include="src\SwarmSystem.cpp">
       <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\StackArrayTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Vector4.cpp">
       <Filter>Math</Filter>
@@ -362,6 +362,12 @@
     </ClCompile>
     <ClCompile Include="src\Random.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArrayTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Stream.cpp">
+      <Filter>Serialization</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

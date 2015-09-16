@@ -11,13 +11,15 @@
 
 // Introspection macros
 #define REGISTER_TYPE( TypeName ) \
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
+	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
 
-#define REGISTER_POD( TypeName, Format ) \
-	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName, Format )
+#define REGISTER_POD( TypeName ) \
+	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( #TypeName, dd::Serialize::SerializePOD< TypeName >, dd::Serialize::DeserializePOD< TypeName > )
 
+/*
 #define REGISTER_POINTER( TypeName ) \
 	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
+*/
 
 #define GET_TYPE( TypeName ) \
 	dd::TypeInfo::GetType<dd::RemoveQualifiers<TypeName>::type>()

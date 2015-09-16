@@ -120,7 +120,7 @@ namespace dd
 	Vector<T>::Vector()
 		: m_data( nullptr )
 	{
-		
+
 	}
 
 	template<typename T> 

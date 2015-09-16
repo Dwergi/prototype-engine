@@ -70,7 +70,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -216,6 +216,7 @@
       <PreprocessorDefinitions>_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
+      <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -271,6 +272,7 @@
     <ClInclude Include="src\Serializers.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
+    <ClInclude Include="src\Stream.h" />
     <ClInclude Include="src\StringTests.cpp" />
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
@@ -330,7 +332,8 @@
     <ClCompile Include="src\ScriptTests.cpp" />
     <ClCompile Include="src\Serializers.cpp" />
     <ClCompile Include="src\SerializerTests.cpp" />
-    <ClCompile Include="src\StackArrayTests.cpp" />
+    <ClCompile Include="src\ArrayTests.cpp" />
+    <ClCompile Include="src\Stream.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
     <ClCompile Include="src\SwarmAgentComponent.cpp" />
     <ClCompile Include="src\SwarmSystem.cpp" />

@@ -10,51 +10,51 @@
 
 namespace dd
 {
+	class ScopedJSONObject;
+
 	class JSONSerializer
 	{
 	public:
 		JSONSerializer( String& buffer );
 		~JSONSerializer();
 
+		void Serialize( Variable var );
+
 		template <typename T>
 		void Serialize( const T& obj );
-
-		template<int S>
-		void Serialize( const InplaceString<S>& str );
 
 		template <typename T>
 		void Deserialize( T& obj );
 
 	private:
-		String& m_buffer;
+		friend class ScopedJSONObject;
+
+		ScopedJSONObject* m_currentObject;
+		WriteStream m_stream;
 		uint m_offset;
+		uint m_indent;
+
+		void Indent();
+		void AddKey( const String& key );
+		void AddString( const char* key, const String& value );
+	};
+
+	class ScopedJSONObject
+	{
+	public:
+		ScopedJSONObject( JSONSerializer& serializer );
+		~ScopedJSONObject();
+		void Indent() const;
+
+	private:
+
+		JSONSerializer& m_host;
+		ScopedJSONObject* m_previous;
 	};
 
 	template <typename T>
 	void JSONSerializer::Serialize( const T& obj )
 	{
-		const TypeInfo* type = GET_TYPE( T );
-
-		ASSERT( type != nullptr );
-
-		if( type->IsPOD() )
-		{
-			Serialize::JSON::SerializePOD( m_buffer, obj, type->GetFormat() );
-		}
-		else if( type->HasCustomSerializers() )
-		{
-			type->SerializeCustom( Serialize::Mode::JSON, m_buffer, &obj );
-		}
-		else
-		{
-			// composite object
-		}
-	}
-
-	template<int Size>
-	void JSONSerializer::Serialize( const InplaceString<Size>& str )
-	{
-		Serialize::SerializeString( Serialize::Mode::JSON, m_buffer, &str );
+		Serialize( Variable( GET_TYPE( T ), const_cast<T*>( &obj ) ) );
 	}
 }
-

@@ -150,7 +150,7 @@ namespace dd
 	{
 		// keep growing string until we hit a size that fits
 		uint new_capacity = m_capacity;
-		while( length + 1 > new_capacity )
+		while( length >= new_capacity )
 		{
 			new_capacity = (uint) (new_capacity * GrowthFactor);
 		}
@@ -161,6 +161,7 @@ namespace dd
 		char* old_buffer = m_buffer;
 
 		m_buffer = new char[ new_capacity ];
+		m_capacity = new_capacity;
 
 		// copy old data over if required
 		if( m_length > 0 )

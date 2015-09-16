@@ -6,8 +6,13 @@
 
 #pragma once
 
+#include "Stream.h"
+
 namespace dd
 {
+	const void* PointerAdd( const void* base, uint offset );
+	void* PointerAdd( void* base, uint offset );
+
 	namespace Serialize
 	{
 		enum class Mode : uint
@@ -20,29 +25,71 @@ namespace dd
 
 		void ResetSerializers();
 
-		void SerializeString( Mode mode, String& out, const void* data );
-		void DeserializeString( Mode mode, const String& src, void* data );
+		void SerializeString( Mode mode, WriteStream& dst, Variable src );
+		void DeserializeString( Mode mode, ReadStream& src, Variable dst );
 
-		namespace JSON
+		template<typename T>
+		void CopyPOD( T value, Stream& out )
 		{
-			template<typename T>
-			void SerializePOD( String& out, const T& data, const char* format )
-			{
-				__declspec(thread) static char temp[ 64 ];
-
-				sprintf_s( temp, format, data );
-
-				out += temp;
-			}
+			memcpy( out, &value, sizeof( T ) );
 		}
 
-		namespace Binary
+		template<typename T>
+		void SerializePOD( Mode mode, WriteStream& dst, Variable src )
 		{
-			template<typename T>
-			void SerializePOD( void* out, const T& data )
-			{
-				memcpy( out, &data, sizeof( T ) );
-			}
+			ASSERT( "Should never hit this!");
 		}
+
+		template<>
+		void SerializePOD<int>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<char>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<int16>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<int64>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<uint>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<byte>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<uint16>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<uint64>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<float>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<double>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<char*>( Mode mode, WriteStream& dst, Variable src );
+
+		template<typename T>
+		void DeserializePOD( Mode mode, ReadStream& src, Variable dst )
+		{
+			ASSERT( "Should never hit this!");
+		}
+
+		template<>
+		void DeserializePOD<int>( Mode mode, ReadStream& dst, Variable src );
+		template<>
+		void DeserializePOD<char>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<int16>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<int64>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<uint>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<byte>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<uint16>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<uint64>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<float>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst );
 	}
 }

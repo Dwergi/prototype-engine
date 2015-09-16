@@ -15,6 +15,7 @@ namespace dd
 		uint Capacity() const { return m_capacity; }
 		uint Size() const { return m_size; }
 
+		virtual ~ArrayBase();
 		ArrayBase<T>& operator=( const ArrayBase<T>& other );
 
 		void Push( const T& value );
@@ -53,6 +54,8 @@ namespace dd
 		Array();
 		Array( const Array<T, MaxCapacity>& other );
 
+		virtual ~Array();
+
 	private:
 
 		T m_buffer[ MaxCapacity ];
@@ -73,6 +76,20 @@ namespace dd
 		: ArrayBase( m_buffer, MaxCapacity )
 	{
 		CopyRange( other.m_buffer, m_buffer, other.m_size );
+	}
+
+	template<typename T, uint MaxCapacity>
+	Array<T, MaxCapacity>::~Array()
+	{
+
+	}
+
+	template <typename T>
+	ArrayBase<T>::~ArrayBase()
+	{
+		m_data = nullptr;
+		m_capacity = 0;
+		m_size = 0;
 	}
 
 	template<typename T>
@@ -108,7 +125,7 @@ namespace dd
 	{
 		ASSERT( m_size < m_capacity );
 
-		m_data[ m_size ] = value;
+		new (&m_data[ m_size ]) T( value );
 		++m_size;
 	}
 
@@ -138,6 +155,8 @@ namespace dd
 	{
 		ASSERT( index < m_size );
 
+		m_data[ index ].~T();
+
 		MoveRange( &m_data[ index ] + 1, m_data[ index ], (m_size - index) - 1 );
 	}
 
@@ -154,6 +173,10 @@ namespace dd
 	template<typename T>
 	void ArrayBase<T>::Clear()
 	{
+		for( uint i = 0; i < m_size; ++i )
+		{
+			m_data[ i ].~T();
+		}
 		m_size = 0;
 	}
 

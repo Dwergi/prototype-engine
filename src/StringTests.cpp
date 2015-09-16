@@ -73,3 +73,13 @@ TEST_CASE( "[String] Concatenation" )
 	REQUIRE( first == "foobar" );
 	REQUIRE( second == "bar" );
 }
+
+TEST_CASE( "[String] Grow" )
+{
+	dd::String8 start;
+
+	for( int i = 0; i < 500; ++i )
+	{
+		start += "x";
+	}
+}

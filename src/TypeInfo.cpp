@@ -8,8 +8,6 @@
 #include "PrecompiledHeader.h"
 #include "TypeInfo.h"
 
-#include "Serializers.h"
-
 namespace dd
 {
 	DenseMap<String32,TypeInfo*> TypeInfo::sm_typeMap;
@@ -86,20 +84,35 @@ namespace dd
 	void RegisterDefaultTypes()
 	{
 		// integers
-		REGISTER_POD( int, "%d" );
-		REGISTER_POD( char, "%c" );
-		REGISTER_POD( int16, "%hd" );
-		REGISTER_POD( int64, "%lld" );
+		REGISTER_POD( int );
+		REGISTER_POD( char );
+		REGISTER_POD( int16 );
+		REGISTER_POD( int64 );
 		
 		// unsigned integers
-		REGISTER_POD( uint, "%u" );
-		REGISTER_POD( byte, "%hhu" );
-		REGISTER_POD( uint16, "%hu" );
-		REGISTER_POD( uint64, "%llu" );
+		REGISTER_POD( uint );
+		REGISTER_POD( byte );
+		REGISTER_POD( uint16 );
+		REGISTER_POD( uint64 );
 
-		REGISTER_POD( float, "%f" );
-		REGISTER_POD( double, "%lf" );
+		REGISTER_POD( float );
+		REGISTER_POD( double );
 		
-		REGISTER_POD( char*, "%s" );
+		REGISTER_POD( char* );
+
+		REGISTER_TYPE( String );
+		SET_SERIALIZERS( String, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String8 );
+		SET_SERIALIZERS( String8, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String16 );
+		SET_SERIALIZERS( String16, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String32 );
+		SET_SERIALIZERS( String32, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String64 );
+		SET_SERIALIZERS( String64, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String128 );
+		SET_SERIALIZERS( String128, Serialize::SerializeString, Serialize::DeserializeString );
+		REGISTER_TYPE( String256 );
+		SET_SERIALIZERS( String256, Serialize::SerializeString, Serialize::DeserializeString );
 	}
 }

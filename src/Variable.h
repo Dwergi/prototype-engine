@@ -41,8 +41,8 @@ namespace dd
 		template <typename T>
 		Variable( T* rhs );
 
-		void* GetData() const;
-		const TypeInfo* GetTypeInfo() const;
+		void* Data() const;
+		const TypeInfo* Type() const;
 		bool IsValid() const;
 
 		template <typename T>
