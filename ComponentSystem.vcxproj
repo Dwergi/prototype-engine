@@ -241,6 +241,7 @@
     <ClInclude Include="src\Assert.h" />
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
+    <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
@@ -303,6 +304,7 @@
     <ClCompile Include="include\base64\src\cencode.c" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\DenseMapTests.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />

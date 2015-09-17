@@ -25,6 +25,7 @@ struct SimpleStruct
 		MEMBER( Int );
 		MEMBER( Str );
 		MEMBER( Flt );
+		MEMBER( Vec );
 		METHOD( Multiply );
 	END_MEMBERS
 };
@@ -62,7 +63,12 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 
 	SECTION( "Long String" )
 	{
-		String256 x = "testing the string serialization\ntesting the string serialization\ntesting the string serialization\ntesting the string serialization";
+		String256 x = "testing the string serialization\ntesting the string serialization\n"
+			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
+			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
+			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
+			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n";
+
 		serializer.Serialize( x );
 		
 		String256 y;
@@ -78,13 +84,27 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 		REGISTER_TYPE( SimpleStruct );
 
 		SimpleStruct s;
-		s.Flt = 111.0f;
 		s.Int = 222;
 		s.Str = "LOL";
+		s.Flt = 111.0f;
 		s.Vec.Add( 1 );
 		s.Vec.Add( 2 );
 		s.Vec.Add( 3 );
 
 		serializer.Serialize( s );
+
+		const char* result = 
+		"{\n"
+		"	\"type\" : \"SimpleStruct\",\n"
+		"	\"members\" : \n"
+		"	{\n"
+		"		\"Int\" : 222,\n"
+		"		\"Str\" : \"LOL\",\n"
+		"		\"Flt\" : 111.000000,\n"
+		"		\"Vec\" : [1,2,3]\n"
+		"	}\n"
+		"}\n";
+
+		REQUIRE( out == result );
 	}
 }

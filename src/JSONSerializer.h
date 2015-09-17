@@ -6,37 +6,59 @@
 
 #pragma once
 
-#include "Serializers.h"
-
 namespace dd
 {
 	class ScopedJSONObject;
 
-	class JSONSerializer
+	class SerializerBase
 	{
 	public:
-		JSONSerializer( String& buffer );
-		~JSONSerializer();
 
-		void Serialize( Variable var );
+		virtual void Serialize( Variable var ) = 0;
+	};
+
+	class DeserializerBase
+	{
+	public:
+
+		virtual void Deserialize( Variable var ) = 0;
+	};
+
+	class JSONSerializer : public SerializerBase
+	{
+	public:
+		JSONSerializer( WriteStream& stream );
+		JSONSerializer( String& buffer );
+		virtual ~JSONSerializer();
+
+		virtual void Serialize( Variable var );
 
 		template <typename T>
 		void Serialize( const T& obj );
-
-		template <typename T>
-		void Deserialize( T& obj );
 
 	private:
 		friend class ScopedJSONObject;
 
 		ScopedJSONObject* m_currentObject;
 		WriteStream m_stream;
-		uint m_offset;
 		uint m_indent;
 
 		void Indent();
 		void AddKey( const String& key );
-		void AddString( const char* key, const String& value );
+		void AddString( const char* key, const String& value, bool last = false );
+	};
+
+	class JSONDeserializer : public DeserializerBase
+	{
+	public:
+		JSONDeserializer( ReadStream& stream );
+		JSONDeserializer( const String& buffer );
+		virtual ~JSONDeserializer();
+
+		virtual void Deserialize( Variable var );
+
+		template <typename T>
+		void Deserialize( T& obj );
 	};
 
 	class ScopedJSONObject

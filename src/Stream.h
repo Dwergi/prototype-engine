@@ -30,6 +30,7 @@ namespace dd
 
 		ReadStream( const String& in );
 		ReadStream( const void* in, uint capacity );
+		ReadStream( const ReadStream& other );
 
 		void Read( String& dst );
 		void Read( void* dst, uint bytes );
@@ -47,6 +48,7 @@ namespace dd
 
 		WriteStream( String& out );
 		WriteStream( void* out, uint capacity );
+		WriteStream( const WriteStream& other );
 
 		void Write( const String& str );
 		void Write( const void* src, uint bytes );

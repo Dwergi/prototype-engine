@@ -7,14 +7,16 @@
 
 #pragma once
 
-#include "Function.h"
-#include "Member.h"
-#include "TypeInfoHelpers.h"
-#include "Script.h"
-#include "Serializers.h"
-
 namespace dd
 {
+	namespace Serialize
+	{
+		enum class Mode : uint;
+	}
+
+	class WriteStream;
+	class ReadStream;
+
 	typedef void (*SerializeFn)( Serialize::Mode mode, WriteStream& dst, Variable src );
 	typedef void (*DeserializeFn)( Serialize::Mode mode, ReadStream& src, Variable dst );
 
@@ -25,20 +27,16 @@ namespace dd
 		void Init( const char* name, uint size );
 
 		void AddMember( const TypeInfo* typeInfo, const char* name, uint offset );
+		const Vector<Member>& GetMembers() const { return m_members; }
+		const Member* GetMember( const char* memberName ) const;
 		
 		template <typename T>
 		void AddMethod( Function f, T fn, const char* name );
-
-		inline const dd::Vector<Member>& GetMembers() const { return m_members; }
-		const Member* GetMember( const char* memberName ) const;
-
 		const Function* GetMethod( const char* methodName ) const;
 
 		inline uint Size() const { return m_size; }
-		inline const String32& Name() const { return m_name; }
-		inline bool IsPOD() const { return m_isPOD; };
-
-		bool Registered() const { return m_size != 0; }
+		inline const String& Name() const { return m_name; }
+		inline const TypeInfo* ContainedType() const { return m_containedType; }
 
 		void* (*New)();
 		void (*Copy)( void* data, const void* src );
@@ -48,16 +46,28 @@ namespace dd
 		void (*PlacementDelete)( void* data );
 		void (*PlacementCopy)( void* data, const void* src );
 
+		inline bool IsRegistered() const { return m_size != 0; }
+
+		//
+		// Register a non-POD, non-container type (eg. a class).
+		//
 		template<typename T>
 		static const TypeInfo* RegisterType( const char* name );
 
 		template<typename T>
-		static const TypeInfo* RegisterPOD( const char* name, SerializeFn serializer, DeserializeFn deserializer );
+		static const TypeInfo* RegisterContainer( const char* container, const TypeInfo* containing );
+
+		//
+		// Register a POD type - these are the basic types like ints, floats and char*.
+		// If it can be printed with a printf format string, it's POD.
+		//
+		template<typename T>
+		static const TypeInfo* RegisterPOD( const char* name );
 
 		template <typename T>
 		static const TypeInfo* GetType();
 		static const TypeInfo* GetType( const char* typeName );
-		static const TypeInfo* GetType( const String32& typeName );
+		static const TypeInfo* GetType( const String& typeName );
 
 		template <typename T>
 		static TypeInfo* AccessType();
@@ -71,7 +81,7 @@ namespace dd
 	private:
 		uint m_size;
 		String32 m_name;
-		bool m_isPOD;
+		const TypeInfo* m_containedType;
 
 		struct Method
 		{
@@ -104,11 +114,10 @@ namespace dd
 	const TypeInfo* TypeInfo::RegisterType( const char* name )
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
-		if( typeInfo->Registered() )
+		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
 		typeInfo->Init( name, sizeof( T ) );
-		typeInfo->m_isPOD = false;
 
 		typedef std::conditional<HasDefaultCtor<T>::value, T, EmptyType<T>>::type new_type;
 		typeInfo->New = SetFunc<HasDefaultCtor<T>::value, void*(*)(), &dd::New<new_type>>::Get();
@@ -129,11 +138,13 @@ namespace dd
 	}
 
 	template <typename T>
-	const TypeInfo* TypeInfo::RegisterPOD( const char* name, SerializeFn serializer, DeserializeFn deserializer )
+	const TypeInfo* TypeInfo::RegisterPOD( const char* name )
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
+		if( typeInfo->IsRegistered() )
+			return typeInfo;
+
 		typeInfo->Init( name, sizeof( T ) );
-		typeInfo->m_isPOD = true;
 
 		typeInfo->New = PODNew<T>;
 		typeInfo->Copy = PODCopy<T>;
@@ -142,10 +153,45 @@ namespace dd
 		typeInfo->PlacementNew = PODPlacementNew<T>;
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
-		typeInfo->SerializeCustom = serializer;
-		typeInfo->DeserializeCustom = deserializer;
+
+		typeInfo->SerializeCustom = dd::Serialize::SerializePOD<T>;
+		typeInfo->DeserializeCustom = dd::Serialize::DeserializePOD<T>;
 
 		sm_typeMap.Add( name, typeInfo );
+
+		RegisterContainer<Vector<T>>( "Vector", typeInfo );
+
+		return typeInfo;
+	}
+
+	template<typename T>
+	const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeInfo* containing )
+	{
+		TypeInfo* typeInfo = const_cast<TypeInfo*>( GetType<T>() );
+		if( typeInfo->IsRegistered() )
+			return typeInfo;
+
+		String32 finalName( container );
+		finalName += "<";
+		finalName += containing->Name();
+		finalName += ">";
+
+		typeInfo->Init( finalName.c_str(), sizeof( T ) );
+		typeInfo->m_containedType = containing;
+
+		typedef std::conditional<HasDefaultCtor<T>::value, T, EmptyType<T>>::type new_type;
+		typeInfo->New = SetFunc<HasDefaultCtor<T>::value, void*(*)(), &dd::New<new_type>>::Get();
+		typeInfo->PlacementNew = SetFunc<HasDefaultCtor<T>::value, void (*)(void*), &dd::PlacementNew<new_type>>::Get();
+		typeInfo->Copy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::Copy<new_type>>::Get();
+		typeInfo->Delete = dd::Delete<T>;
+		typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::PlacementCopy<new_type>>::Get();
+		typeInfo->PlacementDelete = dd::PlacementDelete<T>;
+		typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void**, const void*), &dd::NewCopy<new_type>>::Get();
+
+		typeInfo->SerializeCustom = dd::Serialize::SerializeContainer<T>;
+		typeInfo->DeserializeCustom = dd::Serialize::DeserializeContainer<T>;
+
+		sm_typeMap.Add( finalName, typeInfo );
 
 		return typeInfo;
 	}
@@ -153,10 +199,9 @@ namespace dd
 	template <typename FnType>
 	void TypeInfo::AddMethod( Function f, FnType fn, const char* name )
 	{
-		Method m;
+		Method& m = m_methods.Allocate();
 		m.Name = name;
 		m.Function = f;
-		m_methods.Add( m );
 
 		const FunctionSignature* sig = f.Signature();
 		String128 signature;
@@ -182,6 +227,6 @@ namespace dd
 
 		signature += ")";
 		
-		ScriptEngine::GetInstance()->RegisterMethod( sig->GetContext()->Name(), signature, fn );
+		//ScriptEngine::GetInstance()->RegisterMethod( sig->GetContext()->Name(), signature, fn );
 	}
 };

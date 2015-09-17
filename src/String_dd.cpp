@@ -33,6 +33,9 @@ namespace dd
 
 	const char* String::c_str() const
 	{
+		if( m_buffer == nullptr )
+			return nullptr;
+
 		// check that we're null-terminated
 		ASSERT( m_buffer[ m_length ] == 0 );
 
@@ -131,7 +134,18 @@ namespace dd
 
 	void String::SetString( const char* data, uint length )
 	{
-		ASSERT( data != nullptr );
+		if( data == nullptr || length == 0 )
+		{
+			if( m_buffer != m_stackBuffer )
+			{
+				delete[] m_buffer;
+				m_buffer = m_stackBuffer;
+			}
+
+			m_length = 0;
+
+			return;
+		}
 
 		Resize( length );
 

@@ -38,13 +38,19 @@ namespace dd
 			m_host.m_stream.Write( "\t", 1 );
 	}
 
+	JSONSerializer::JSONSerializer( WriteStream& stream )
+		: m_currentObject( nullptr ),
+		m_stream( stream )
+	{
+
+	}
+
 	JSONSerializer::JSONSerializer( String& buffer )
 		: m_currentObject( nullptr ),
 		m_stream( buffer ),
-		m_offset( 0 ),
 		m_indent( 0 )
 	{
-		dd::Serialize::ResetSerializers();
+		
 	}
 
 	JSONSerializer::~JSONSerializer()
@@ -65,10 +71,13 @@ namespace dd
 		m_stream.Write( " : ", 3 );
 	}
 
-	void JSONSerializer::AddString( const char* key, const String& value )
+	void JSONSerializer::AddString( const char* key, const String& value, bool last )
 	{
 		AddKey( String16( key ) );
 		Serialize( value );
+
+		if( !last )
+			m_stream.Write( ",", 1 );
 
 		m_stream.Write( "\n", 1 );
 	}
@@ -77,8 +86,8 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 		
-		ASSERT( type->Registered() );
-		if( !type->Registered() )
+		ASSERT( type->IsRegistered() );
+		if( !type->IsRegistered() )
 			return;
 
 		if( type->HasCustomSerializers() )
@@ -92,27 +101,50 @@ namespace dd
 			// composite object
 			ScopedJSONObject obj( *this );
 			AddString( "type", type->Name() );
+
 			AddKey( String16( "members" ) );
+			m_stream.Write( "\n", 1 );
 
 			{
 				ScopedJSONObject members( *this );
 
+				uint index = 0;
 				uint member_count = type->GetMembers().Size();
-				for( uint i = 0; i < member_count; ++i )
+				for( const Member& member : type->GetMembers() )
 				{
-					if( i <= (member_count - 1) )
-						m_stream.Write( ",", 1 );
-
-					const Member& member = type->GetMembers()[ i ];
-
 					AddKey( member.Name() );
 
 					void* data = PointerAdd( var.Data(), member.Offset() );
 					Serialize( Variable( member.Type(), data ) );
 
+					if( index < (member_count - 1) )
+						m_stream.Write( ",", 1 );
+
 					m_stream.Write( "\n", 1 );
+
+					++index;
 				}
 			}
 		}
+	}
+
+	JSONDeserializer::JSONDeserializer( ReadStream& stream )
+	{
+
+	}
+
+	JSONDeserializer::JSONDeserializer( const String& buffer )
+	{
+
+	}
+
+	JSONDeserializer::~JSONDeserializer()
+	{
+
+	}
+
+	void JSONDeserializer::Deserialize( Variable var )
+	{
+
 	}
 }

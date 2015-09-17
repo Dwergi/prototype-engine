@@ -50,8 +50,7 @@ namespace dd
 		if( typeInfo == nullptr )
 			return;
 
-		const Vector<Member>& members = typeInfo->GetMembers();
-		for( Member& member : members )
+		for( Member& member : typeInfo->GetMembers() )
 		{
 			void* ptr = AddPointer( base, member.Offset() );
 

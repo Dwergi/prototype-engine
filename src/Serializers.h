@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "Stream.h"
-
 namespace dd
 {
 	const void* PointerAdd( const void* base, uint offset );
@@ -22,8 +20,6 @@ namespace dd
 			BASE64 = 2,
 			JSON = 4
 		};
-
-		void ResetSerializers();
 
 		void SerializeString( Mode mode, WriteStream& dst, Variable src );
 		void DeserializeString( Mode mode, ReadStream& src, Variable dst );
@@ -91,5 +87,37 @@ namespace dd
 		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst );
 		template<>
 		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst );
+
+		template<typename T>
+		void SerializeContainer( Mode mode, WriteStream& dst, Variable src )
+		{
+			T& container = src.GetValue<T>();
+
+			if( mode == Mode::JSON )
+			{
+				JSONSerializer json( dst );
+
+				dst.Write( "[", 1 );
+
+				bool first = true;
+				for( auto& elem : container )
+				{
+					if( !first )
+						dst.Write( ", ", 1 );
+
+					json.Serialize( Variable( elem ) );
+
+					first = false;
+				}
+
+				dst.Write( "]", 1 );
+			}
+		}
+
+		template<typename T>
+		void DeserializeContainer( Mode mode, ReadStream& src, Variable dst )
+		{
+
+		}
 	}
 }

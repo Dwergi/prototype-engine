@@ -24,10 +24,6 @@ Purpose       :
 
 #pragma once
 
-#include "FunctionPtr.h"
-#include "FunctionSignature.h"
-#include "Variable.h"
-
 namespace dd
 {
 	// Static functions with return value

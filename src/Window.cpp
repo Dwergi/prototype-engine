@@ -9,79 +9,82 @@
 
 #include "GLFW/glfw3.h"
 
-dd::Window::Window( int resX, int resY, const char* title )
-	: m_title( title ),
-	m_sizeX( resX ),
-	m_sizeY( resY )
+namespace dd
 {
-	if( !glfwInit() )
-		return;
-
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
-	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-
-	m_glfwWindow = glfwCreateWindow( m_sizeX, m_sizeY, m_title.c_str(), NULL, NULL);
-
-	if( m_glfwWindow != nullptr )
+	Window::Window( int resX, int resY, const char* title )
+		: m_title( title ),
+		m_sizeX( resX ),
+		m_sizeY( resY )
 	{
-		glfwMakeContextCurrent( m_glfwWindow );
-	}
-}
+		if( !glfwInit() )
+			return;
 
-dd::Window::~Window()
-{
-	glfwTerminate();
-}
+		glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-void dd::Window::Resize( int resX, int resY )
-{
-	m_sizeX = resX;
-	m_sizeY = resY;
+		m_glfwWindow = glfwCreateWindow( m_sizeX, m_sizeY, m_title.c_str(), NULL, NULL);
 
-	glfwSetWindowSize( m_glfwWindow, m_sizeX, m_sizeY );
-}
-
-void dd::Window::MakeBorderless()
-{
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* mode = glfwGetVideoMode( monitor );
-
-	glfwWindowHint( GLFW_RED_BITS, mode->redBits );
-	glfwWindowHint( GLFW_GREEN_BITS, mode->greenBits );
-	glfwWindowHint( GLFW_BLUE_BITS, mode->blueBits );
-	glfwWindowHint( GLFW_REFRESH_RATE, mode->refreshRate );
-
-	if( m_glfwWindow != nullptr )
-	{
-		Close();
+		if( m_glfwWindow != nullptr )
+		{
+			glfwMakeContextCurrent( m_glfwWindow );
+		}
 	}
 
-	m_glfwWindow = glfwCreateWindow( mode->width, mode->height, m_title.c_str(), monitor, NULL );
-}
+	Window::~Window()
+	{
+		glfwTerminate();
+	}
 
-bool dd::Window::IsValid() const
-{
-	return m_glfwWindow != nullptr;
-}
+	void Window::Resize( int resX, int resY )
+	{
+		m_sizeX = resX;
+		m_sizeY = resY;
 
-bool dd::Window::ShouldClose() const
-{
-	return glfwWindowShouldClose( m_glfwWindow ) != 0;
-}
+		glfwSetWindowSize( m_glfwWindow, m_sizeX, m_sizeY );
+	}
 
-void dd::Window::Close()
-{
-	glfwDestroyWindow( m_glfwWindow );
-	m_glfwWindow = nullptr;
-}
+	void Window::MakeBorderless()
+	{
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode( monitor );
 
-void dd::Window::Swap()
-{
-	glViewport( 0, 0, m_sizeX, m_sizeY );
-	glClearColor( 0, 0, 0, 1 );
-	glClear( GL_COLOR_BUFFER_BIT );
+		glfwWindowHint( GLFW_RED_BITS, mode->redBits );
+		glfwWindowHint( GLFW_GREEN_BITS, mode->greenBits );
+		glfwWindowHint( GLFW_BLUE_BITS, mode->blueBits );
+		glfwWindowHint( GLFW_REFRESH_RATE, mode->refreshRate );
 
-	glfwSwapBuffers( m_glfwWindow );
-	glfwPollEvents();
+		if( m_glfwWindow != nullptr )
+		{
+			Close();
+		}
+
+		m_glfwWindow = glfwCreateWindow( mode->width, mode->height, m_title.c_str(), monitor, NULL );
+	}
+
+	bool Window::IsValid() const
+	{
+		return m_glfwWindow != nullptr;
+	}
+
+	bool Window::ShouldClose() const
+	{
+		return glfwWindowShouldClose( m_glfwWindow ) != 0;
+	}
+
+	void Window::Close()
+	{
+		glfwDestroyWindow( m_glfwWindow );
+		m_glfwWindow = nullptr;
+	}
+
+	void Window::Swap()
+	{
+		glViewport( 0, 0, m_sizeX, m_sizeY );
+		glClearColor( 0, 0, 0, 1 );
+		glClear( GL_COLOR_BUFFER_BIT );
+
+		glfwSwapBuffers( m_glfwWindow );
+		glfwPollEvents();
+	}
 }

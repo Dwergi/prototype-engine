@@ -94,7 +94,7 @@ namespace dd
 		//
 		// Iteration
 		//
-		DEFINE_ITERATORS( T, m_data, m_size );
+		DEFINE_ITERATORS( T, m_data, m_size )
 
 	private:
 
@@ -120,7 +120,7 @@ namespace dd
 	Vector<T>::Vector()
 		: m_data( nullptr )
 	{
-
+		// we need to register this type so we have serializers available
 	}
 
 	template<typename T> 

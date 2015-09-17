@@ -27,6 +27,9 @@ namespace dd
 
 	uint Stream::Remaining() const
 	{
+		if( m_capacity == -1 )
+			return -1;
+
 		return m_capacity - m_current;
 	}
 
@@ -46,20 +49,12 @@ namespace dd
 
 	}
 
-	WriteStream::WriteStream( String& out )
-		: Stream( -1 ),
-		m_pDest( nullptr ),
-		m_strDest( &out )
+	ReadStream::ReadStream( const ReadStream& other )
+		: Stream( other.m_capacity ),
+		m_pSource( other.m_pSource ),
+		m_strSource( other.m_strSource )
 	{
-
-	}
-
-	WriteStream::WriteStream( void* out, uint capacity )
-		: Stream( capacity ),
-		m_pDest( out ),
-		m_strDest( nullptr )
-	{
-
+		m_current = other.m_current;
 	}
 
 	void ReadStream::Read( String& dst )
@@ -103,6 +98,31 @@ namespace dd
 			Advance( read );
 		}
 	}
+	//----------------------------------------------------------------------------
+
+	WriteStream::WriteStream( String& out )
+		: Stream( -1 ),
+		m_pDest( nullptr ),
+		m_strDest( &out )
+	{
+
+	}
+
+	WriteStream::WriteStream( void* out, uint capacity )
+		: Stream( capacity ),
+		m_pDest( out ),
+		m_strDest( nullptr )
+	{
+
+	}
+
+	WriteStream::WriteStream( const WriteStream& other )
+		: Stream( other.m_capacity ),
+		m_pDest( other.m_pDest ),
+		m_strDest( other.m_strDest )
+	{
+		m_current = other.m_current;
+	}
 
 	void WriteStream::Write( const String& str )
 	{
@@ -113,8 +133,8 @@ namespace dd
 			void* dest = PointerAdd( m_pDest, m_current );
 			memcpy( dest, str.c_str(), str.Length() );
 
-			void* end = PointerAdd( dest, str.Length() + 1 );
-			*(char*)end = 0;
+			void* end = PointerAdd( dest, str.Length() );
+			*(char*) end = 0;
 		}
 		else
 		{
@@ -138,7 +158,9 @@ namespace dd
 		{
 			memcpy( temp, src, bytes );
 
-			*(temp + bytes + 1) = 0;
+			*(temp + bytes) = 0;
+
+			*m_strDest += temp;
 		}
 
 		Advance( bytes );

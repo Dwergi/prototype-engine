@@ -14,12 +14,10 @@
 	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
 
 #define REGISTER_POD( TypeName ) \
-	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( #TypeName, dd::Serialize::SerializePOD< TypeName >, dd::Serialize::DeserializePOD< TypeName > )
+	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
 
-/*
-#define REGISTER_POINTER( TypeName ) \
-	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( sizeof( TypeName ), #TypeName )
-*/
+#define REGISTER_CONTAINER( Container, Containing ) \
+	dd::TypeInfo::RegisterContainer<dd::RemoveQualifiers<Container<Containing>>::type>( #Container, GET_TYPE( Containing ) )
 
 #define GET_TYPE( TypeName ) \
 	dd::TypeInfo::GetType<dd::RemoveQualifiers<TypeName>::type>()
@@ -48,7 +46,7 @@
 #define END_MEMBERS }
 
 #define NO_MEMBERS( TypeName ) \
-	static void RegisterMembers() { GET_TYPE( TypeName ); }
+	static void RegisterMembers() { }
 
 #define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
 	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )

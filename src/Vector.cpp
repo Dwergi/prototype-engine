@@ -7,17 +7,21 @@
 #include "PrecompiledHeader.h"
 #include "Vector.h"
 
-const float dd::VectorBase::GrowthFactor = 2.0f;
-const uint dd::VectorBase::GrowthFudge = 8;
-
-dd::VectorBase::VectorBase()
-	: m_size( 0 ),
-	m_capacity( 0 )
+namespace dd
 {
 
-}
+	const float VectorBase::GrowthFactor = 2.0f;
+	const uint VectorBase::GrowthFudge = 8;
 
-uint dd::VectorBase::Size() const
-{
-	return m_size;
+	VectorBase::VectorBase()
+		: m_size( 0 ),
+		m_capacity( 0 )
+	{
+
+	}
+
+	uint VectorBase::Size() const
+	{
+		return m_size;
+	}
 }

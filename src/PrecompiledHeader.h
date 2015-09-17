@@ -12,10 +12,28 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
-#include "Typedefs.h"
-
 #include "Assert.h"
-#include "Containers.h"
-
-#include "TypeInfo.h"
+#include "Typedefs.h"
 #include "TypeInfoMacros.h"
+
+#include "Buffer.h"
+#include "String_dd.h"
+#include "Array.h"
+#include "Vector.h"
+
+#include "Variable.h"
+#include "Member.h"
+#include "FunctionPtr.h"
+#include "FunctionSignature.h"
+#include "Function.h"
+
+#include "AutoList.h"
+#include "DenseMap.h"
+
+#include "TypeInfoHelpers.h"
+#include "TypeInfo.h"
+
+#include "Containers.h"
+#include "Serialization.h"
+
+#include "Script.h"

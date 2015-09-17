@@ -234,6 +234,9 @@
     <ClInclude Include="src\Stream.h">
       <Filter>Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="src\Buffer.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -368,6 +371,9 @@
     </ClCompile>
     <ClCompile Include="src\Stream.cpp">
       <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Buffer.cpp">
+      <Filter>Containers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

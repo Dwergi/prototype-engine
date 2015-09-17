@@ -103,9 +103,6 @@ namespace dd
 	template <typename T>
 	T& Variable::GetValue()
 	{
-		// Type mismatch! You cannot convert a data type to another type with this function.
-		ASSERT( GET_TYPE( T ) == m_typeInfo );
-
 		return CastHelper<T>::Cast( m_data );
 	}
 

@@ -32,7 +32,7 @@ namespace dd
 
 	private:
 		GLFWwindow* m_glfwWindow;
-		dd::String32  m_title;
+		String32  m_title;
 		int m_sizeX, m_sizeY;
 	};
 }

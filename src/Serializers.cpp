@@ -28,12 +28,6 @@ namespace dd
 		base64::encoder s_encoder;
 		base64::decoder s_decoder;
 
-		void ResetSerializers()
-		{
-			std::swap( s_encoder, base64::encoder() );
-			std::swap( s_decoder, base64::decoder() );
-		}
-
 		void SerializeString( Mode mode, WriteStream& dst, Variable src )
 		{
 			const String& str = src.GetValue<String>();
@@ -214,7 +208,7 @@ namespace dd
 		{
 			if( mode == Serialize::Mode::BINARY )
 			{
-				dst.Write( src.Data(), strlen( src.GetValue<char*>() ) );
+				dst.Write( src.Data(), (uint) strlen( src.GetValue<char*>() ) );
 			}
 			else
 			{

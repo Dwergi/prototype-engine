@@ -21,9 +21,10 @@ namespace dd
 	{
 		m_name = name;
 		m_size = size;
+		m_containedType = nullptr;
 	}
 
-	void TypeInfo::AddMember( const TypeInfo* typeInfo, const char* name, unsigned offset )
+	void TypeInfo::AddMember( const TypeInfo* typeInfo, const char* name, uint offset )
 	{
 		Member& member = m_members.Allocate();
 		member.m_name = name;
@@ -58,7 +59,7 @@ namespace dd
 		return GetType( String32( typeName ) );
 	}
 
-	const TypeInfo* TypeInfo::GetType( const String32& typeName )
+	const TypeInfo* TypeInfo::GetType( const String& typeName )
 	{
 		ASSERT( sm_typeMap.Contains( typeName ) );
 

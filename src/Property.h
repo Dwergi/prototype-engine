@@ -33,7 +33,7 @@ namespace dd
 		template<typename T>
 		void Set( const T& val );
 
-		const String32& Name() { return m_member->Name(); }
+		const String& Name() { return m_member->Name(); }
 
 	private:
 
