@@ -181,6 +181,8 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
       <PreprocessorDefinitions />
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -217,6 +219,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -300,11 +304,21 @@
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\base64\src\cdecode.c" />
-    <ClCompile Include="include\base64\src\cencode.c" />
+    <ClCompile Include="include\base64\src\cdecode.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\base64\src\cencode.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
-    <ClCompile Include="src\Buffer.cpp" />
+    <None Include="src\Buffer.inl">
+      <FileType>CppCode</FileType>
+    </None>
     <ClCompile Include="src\DenseMapTests.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
@@ -321,10 +335,14 @@
     <ClCompile Include="src\PP_Assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\PrecompiledHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />

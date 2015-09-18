@@ -372,8 +372,10 @@
     <ClCompile Include="src\Stream.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="src\Buffer.cpp">
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Buffer.inl">
       <Filter>Containers</Filter>
-    </ClCompile>
+    </None>
   </ItemGroup>
 </Project>

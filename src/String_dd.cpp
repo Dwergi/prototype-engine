@@ -12,34 +12,27 @@ const float GrowthFactor = 2.0f;
 namespace dd
 {
 	String::String( char* stackBuffer, uint stackCapacity )
-		: m_stackCapacity( stackCapacity ),
-		m_stackBuffer( stackBuffer )
+		: m_stack( stackBuffer, stackCapacity )
 	{
 		m_length = 0;
-		m_capacity = m_stackCapacity;
-		m_buffer = m_stackBuffer;
+		m_buffer = m_stack;
 
-		m_buffer[ 0 ] = '\0';
+		NullTerminate();
 	}
 
 	String::~String()
 	{
 		// delete heap buffer
-		if( m_buffer != m_stackBuffer )
+		if( m_buffer != m_stack )
 		{
-			delete[] m_buffer;
+			char* buf = m_buffer.Release();
+			delete[] buf;
 		}
 	}
 
 	const char* String::c_str() const
 	{
-		if( m_buffer == nullptr )
-			return nullptr;
-
-		// check that we're null-terminated
-		ASSERT( m_buffer[ m_length ] == 0 );
-
-		return m_buffer;
+		return m_buffer.Get();
 	}
 
 	bool String::Equals( const char* other, uint length ) const
@@ -84,7 +77,7 @@ namespace dd
 	{
 		ASSERT( other != nullptr );
 
-		SetString( other, m_capacity - 1 );
+		SetString( other, m_buffer.Size() - 1 );
 
 		return *this;
 	}
@@ -109,7 +102,7 @@ namespace dd
 
 		for( size_t i = 0; i < len; ++i )
 		{
-			if( m_buffer[ i ] != other[ i ] )
+			if( m_buffer[ (uint) i ] != other[ i ] )
 				return false;
 		}
 
@@ -129,17 +122,18 @@ namespace dd
 		memcpy( &m_buffer[ m_length ], buffer, other_length );
 
 		m_length = new_length;
-		m_buffer[ new_length ] = '\0';		
+		NullTerminate();
 	}
 
 	void String::SetString( const char* data, uint length )
 	{
 		if( data == nullptr || length == 0 )
 		{
-			if( m_buffer != m_stackBuffer )
+			if( m_buffer != m_stack )
 			{
-				delete[] m_buffer;
-				m_buffer = m_stackBuffer;
+				void* ptr = m_buffer.Release();
+				delete[] ptr;
+				m_buffer = m_stack;
 			}
 
 			m_length = 0;
@@ -152,8 +146,7 @@ namespace dd
 		memcpy( m_buffer, data, length );
 		m_length = length;
 
-		// null-terminate
-		m_buffer[ m_length ] = '\0';
+		NullTerminate();
 	}
 
 	//
@@ -163,26 +156,25 @@ namespace dd
 	void String::Resize( uint length )
 	{
 		// keep growing string until we hit a size that fits
-		uint new_capacity = m_capacity;
+		uint new_capacity = m_buffer.Size();
 		while( length >= new_capacity )
 		{
 			new_capacity = (uint) (new_capacity * GrowthFactor);
 		}
 
-		if( m_capacity == new_capacity )
+		if( m_buffer.Size() == new_capacity )
 			return;
 
-		char* old_buffer = m_buffer;
+		char* old_buffer = m_buffer.Release();
 
-		m_buffer = new char[ new_capacity ];
-		m_capacity = new_capacity;
+		m_buffer.Set( new char[ new_capacity ], new_capacity );
 
 		// copy old data over if required
 		if( m_length > 0 )
 			SetString( old_buffer, m_length );
 
 		// delete old buffer if not stack-allocated
-		if( old_buffer != m_stackBuffer )
+		if( old_buffer != m_stack.Get() )
 		{
 			delete[] old_buffer;
 		}
@@ -190,28 +182,34 @@ namespace dd
 
 	void String::ShrinkToFit()
 	{
-		if( m_buffer == m_stackBuffer )
+		if( m_buffer == m_stack )
 			return;
 
 		// check if we could fit in the local array
-		if( (m_length + 1) < m_stackCapacity )
+		if( (m_length + 1) < m_stack.Size() )
 		{
-			memcpy( m_stackBuffer, m_buffer, m_length );
+			memcpy( m_stack.Get(), m_buffer.Get(), m_length );
 
-			delete[] m_buffer;
-
-			m_buffer = m_stackBuffer;
+			void* ptr = m_buffer.Release();
+			delete[] ptr;
+			m_buffer = m_stack;
 		}
 		else
 		{
-			char* old_buffer = m_buffer;
-			m_buffer = new char[ m_length + 1 ];
+			void* old_buffer = m_buffer.Release();
+			
+			m_buffer.Set( new char[ m_length + 1 ], m_length + 1 );
 
 			memcpy( m_buffer, old_buffer, m_length );
 
 			delete[] old_buffer;
 		}
 
+		NullTerminate();
+	}
+
+	void String::NullTerminate()
+	{
 		m_buffer[ m_length ] = '\0';
 	}
 }

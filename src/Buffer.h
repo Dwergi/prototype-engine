@@ -8,25 +8,35 @@
 
 namespace dd
 {
+	template<typename T>
 	class Buffer
 	{
 	public:
 
 		Buffer();
-		Buffer( Buffer&& other );
+		Buffer( T* ptr, uint size );
+		Buffer( const Buffer<T>& other );
+		Buffer( Buffer<T>&& other );
 		~Buffer();
 
-		void Set( const void* ptr, uint size );
-		const void* Get() const;
+		operator T*() const;
+		T& operator[]( uint idx ) const;
 
-		void Resize( uint size );
+		Buffer<T>& operator=( const Buffer<T>& other );
+		void Set( T* ptr, uint size );
+
+		T* Get() const;
+		T* Release();
 		uint Size() const;
+
+		bool operator==( const Buffer<T>& other ) const;
+		bool operator!=( const Buffer<T>& other ) const;
 
 	private:
 
-		const void* m_ptr;
+		T* m_ptr;
 		uint m_size;
-
-		Buffer( const Buffer& other ) {} // copying disallowed
 	};
+
+	#include "Buffer.inl"
 }

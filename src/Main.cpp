@@ -22,6 +22,7 @@
 #include "DoubleBuffer.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
+#include "Random.h"
 #include "Window.h"
 #include "Input.h"
 
@@ -57,7 +58,7 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 	return buffer;
 }
 
-	dd::Services g_services;
+dd::Services g_services;
 #endif
 
 int main( int argc, char* const argv[] )
@@ -138,7 +139,7 @@ int main( int argc, char* const argv[] )
 		dd::Array<dd::InputEvent, 64> events;
 		input.GetKeyEvents( events );
 
-		for( int i = 0; i < events.Size(); ++i )
+		for( uint i = 0; i < events.Size(); ++i )
 		{
 			if( events[ i ].Type == dd::InputType::PRESSED )
 				std::cout << "Pressed a key!" << std::endl;

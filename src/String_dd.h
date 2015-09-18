@@ -15,8 +15,7 @@ namespace dd
 	private:
 
 		// disable
-		String( const String& other ) 
-			: m_stackBuffer( nullptr ), m_stackCapacity( 0 ) {}
+		String( const String& other ) {}
 
 	protected:
 
@@ -50,20 +49,20 @@ namespace dd
 
 		static void RegisterMembers() { }
 
-		DEFINE_ITERATORS( char, m_buffer, m_length );
+		DEFINE_ITERATORS( const char, m_buffer, m_length );
 
 	protected:
 
-		char* const m_stackBuffer;
-		const uint m_stackCapacity;
-		char* m_buffer;
+		Buffer<char> m_stack;
+		Buffer<char> m_buffer;
 		uint m_length;
-		uint m_capacity;	
 		
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
 		void Concatenate( const char* other, uint length );
 		bool Equals( const char* other, uint length ) const;
+
+		void NullTerminate();
 	};
 
 	//
