@@ -6,3 +6,24 @@
 
 #include "PrecompiledHeader.h"
 #include "Random.h"
+
+#include <random>
+#include <ctime>
+
+#include "pcg/pcg_extras.hpp"
+
+namespace dd
+{
+	Random::Random( uint min, uint max, uint seed )
+	{
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
+
+	int Random::Next()
+	{
+		
+	}
+}

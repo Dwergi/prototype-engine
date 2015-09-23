@@ -6,26 +6,22 @@
 
 #pragma once
 
-#include <random>
+#include "pcg/pcg_random.hpp"
 
 namespace dd
 {
 	class Random
 	{
-		std::mt19937 engine;
-		std::uniform_int_distribution<unsigned int> distribution;
-
 	public:
 
-		Random( unsigned int min, unsigned int max ) 
-			: distribution( min, max )
-		{
+		const uint DEFAULT_SEED = -1;
 
-		}
+		Random( uint min, uint max, uint seed = DEFAULT_SEED );
 
-		int Next()
-		{
-			return distribution( engine );
-		}
+		int Next();
+
+	private:
+
+		pcg64 m_rng;
 	};
 }
