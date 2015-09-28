@@ -86,6 +86,7 @@ namespace dd
 			Entry();
 			Entry( Entry&& other );
 			Entry( const Entry& other );
+			Entry& operator=( const Entry& other );
 			bool operator==( const Entry& other ) const;
 			bool IsValid() const;
 

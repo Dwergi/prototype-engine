@@ -46,6 +46,13 @@ namespace dd
 
 	}
 
+	Octree::Entry& Octree::Entry::operator=( const Entry& other )
+	{
+		ID = other.ID;
+
+		return *this;
+	}
+
 	bool Octree::Entry::operator==( const Octree::Entry& other ) const
 	{
 		return ID == other.ID;

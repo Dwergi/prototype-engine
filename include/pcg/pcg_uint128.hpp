@@ -52,6 +52,8 @@
  * This ugliness attempts to do so.
  */
 
+#define __x86_64 1
+
 #ifndef PCG_LITTLE_ENDIAN
     #if defined(__BYTE_ORDER__)
         #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -158,7 +160,7 @@ inline bitcount_t trailingzeros(uint32_t v)
       31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
     };
 
-    return multiplyDeBruijnBitPos[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
+    return multiplyDeBruijnBitPos[((uint32_t)((v & -INT_MIN) * 0x077CB531U)) >> 27];
 }
 
 inline bitcount_t flog2(uint64_t v)

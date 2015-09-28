@@ -11,15 +11,15 @@
    redistribute it freely, subject to the following restrictions:
 
    1. The origin of this software must not be misrepresented; you
-      must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product
-      documentation would be appreciated but is not required.
+	  must not claim that you wrote the original software. If you use
+	  this software in a product, an acknowledgment in the product
+	  documentation would be appreciated but is not required.
 
    2. Altered source versions must be plainly marked as such, and
-      must not be misrepresented as being the original software.
+	  must not be misrepresented as being the original software.
 
    3. This notice may not be removed or altered from any source
-      distribution.
+	  distribution.
 
    The original version of this library can be located at:
    http://www.angelcode.com/angelscript/
@@ -121,11 +121,11 @@ void asCByteCode::GetVarsUsed(asCArray<int> &vars)
 			InsertIfNotExists(vars, curr->wArg[2]);
 		}
 		else if( asBCInfo[curr->op].type == asBCTYPE_rW_ARG    ||
-			     asBCInfo[curr->op].type == asBCTYPE_wW_ARG    ||
+				 asBCInfo[curr->op].type == asBCTYPE_wW_ARG    ||
 				 asBCInfo[curr->op].type == asBCTYPE_wW_W_ARG  ||
-			     asBCInfo[curr->op].type == asBCTYPE_rW_DW_ARG ||
-			     asBCInfo[curr->op].type == asBCTYPE_wW_DW_ARG ||
-			     asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG ||
+				 asBCInfo[curr->op].type == asBCTYPE_rW_DW_ARG ||
+				 asBCInfo[curr->op].type == asBCTYPE_wW_DW_ARG ||
+				 asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG ||
 				 asBCInfo[curr->op].type == asBCTYPE_rW_W_DW_ARG ||
 				 asBCInfo[curr->op].type == asBCTYPE_rW_DW_DW_ARG )
 		{
@@ -433,11 +433,11 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 	{
 		// The value is immediately used and then never again
 		if( (curr->next->op == asBC_CMPi ||
-		     curr->next->op == asBC_CMPf ||
-		     curr->next->op == asBC_CMPu) &&
-		    curr->wArg[0] == curr->next->wArg[1] &&
-		    IsTemporary(curr->wArg[0]) &&                       // The variable is temporary and never used again
-		    !IsTempVarRead(curr->next, curr->wArg[0]) )
+			 curr->next->op == asBC_CMPf ||
+			 curr->next->op == asBC_CMPu) &&
+			curr->wArg[0] == curr->next->wArg[1] &&
+			IsTemporary(curr->wArg[0]) &&                       // The variable is temporary and never used again
+			!IsTempVarRead(curr->next, curr->wArg[0]) )
 		{
 			if(      curr->next->op == asBC_CMPi ) curr->next->op = asBC_CMPIi;
 			else if( curr->next->op == asBC_CMPf ) curr->next->op = asBC_CMPIf;
@@ -668,11 +668,11 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			// T??, ClrHi -> T??
 			if( instr &&
 				(instr->op == asBC_TZ  ||
-			     instr->op == asBC_TNZ ||
-			     instr->op == asBC_TS  ||
-			     instr->op == asBC_TNS ||
-			     instr->op == asBC_TP  ||
-		 	     instr->op == asBC_TNP) )
+				 instr->op == asBC_TNZ ||
+				 instr->op == asBC_TS  ||
+				 instr->op == asBC_TNS ||
+				 instr->op == asBC_TP  ||
+				 instr->op == asBC_TNP) )
 			{
 				// Remove the ClrHi instruction since the test
 				// instructions always clear the top bytes anyway
@@ -753,7 +753,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			// PGA, CHKREF -> PGA
 			// PSF, CHKREF -> PSF
 			else if( instr &&
-				     (instr->op == asBC_ADDSi ||
+					 (instr->op == asBC_ADDSi ||
 					  instr->op == asBC_PGA ||
 					  instr->op == asBC_PSF) )
 			{
@@ -763,7 +763,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			}
 			// PGA, ChkRefS, CHKREF -> PGA, ChkRefS
 			else if( instr && instr->op == asBC_ChkRefS &&
-				     instr->prev && instr->prev->op == asBC_PGA )
+					 instr->prev && instr->prev->op == asBC_PGA )
 			{
 				// Delete CHKREF since PGA always pushes a valid address on the stack
 				instr = GoForward(DeleteInstruction(curr));
@@ -791,7 +791,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			// PshNull  , PopPtr -> nothing
 			// PshRPtr  , PopPtr -> nothing
 			else if( instr &&
-				     (instr->op == asBC_PshRPtr ||
+					 (instr->op == asBC_PshRPtr ||
 					  instr->op == asBC_PSF     ||
 					  instr->op == asBC_VAR     ||
 					  instr->op == asBC_PshVPtr ||
@@ -804,7 +804,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			}
 			// PSF, ChkRefS, PopPtr -> ChkNullV
 			else if( instr && instr->op == asBC_ChkRefS &&
-				     instr->prev && instr->prev->op == asBC_PSF )
+					 instr->prev && instr->prev->op == asBC_PSF )
 			{
 				instr = instr->prev;
 				instr->op = asBC_ChkNullV;
@@ -902,8 +902,8 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 		{
 			// PshVPtr 0, ADDSi, PopRPtr -> LoadThisR
 			if( instr && instr->op == asBC_ADDSi &&
-			    instr->prev && instr->prev->op == asBC_PshVPtr &&
-			    instr->prev->wArg[0] == 0 )
+				instr->prev && instr->prev->op == asBC_PshVPtr &&
+				instr->prev->wArg[0] == 0 )
 			{
 				DeleteInstruction(instr->prev);
 				ChangeFirstDeleteNext(instr, asBC_LoadThisR);
@@ -927,7 +927,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 			}
 			// PSF x, ADDSi, PopRPtr -> LoadVObjR
 			else if( instr && instr->op == asBC_ADDSi &&
-				     instr->prev && instr->prev->op == asBC_PSF )
+					 instr->prev && instr->prev->op == asBC_PSF )
 			{
 				instr = instr->prev;
 				instr->op = asBC_LoadVObjR;
@@ -956,7 +956,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 		{
 			// T**; J** +x -> J** +x
 			if( (instr->op == asBC_TZ && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
-			    (instr->op == asBC_TNZ && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				(instr->op == asBC_TNZ && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
 				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JNZ));
 			else if( (instr->op == asBC_TNZ && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
 					 (instr->op == asBC_TZ && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
@@ -1030,47 +1030,47 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 		short tempVar = last->wArg[0];
 		asCArray<short> freedVars;
 
-		asCByteInstruction *instr = last->prev;
-		asASSERT( instr && instr->op == asBC_Block );
-		instr = instr->prev;
-		while( instr && instr->op == asBC_FREE )
+		asCByteInstruction *instruction = last->prev;
+		asASSERT( instruction && instruction->op == asBC_Block );
+		instruction = instruction->prev;
+		while( instruction && instruction->op == asBC_FREE )
 		{
-			freedVars.PushLast(instr->wArg[0]);
-			instr = instr->prev;
+			freedVars.PushLast(instruction->wArg[0]);
+			instruction = instruction->prev;
 		}
 
 		// If there is any non-trivial cleanups, e.g. call to destructors, then we skip this optimizations
 		// TODO: runtime optimize: Do we need to skip it? Is there really a chance the local variable
 		//                         will be invalidated while the destructor, or any other function for
 		//                         that matter, is being called?
-		if( instr && instr->op == asBC_Block )
+		if( instruction && instruction->op == asBC_Block )
 		{
 			// We expect a sequence PshVPtr, RefCpyV, PopPtr just before the clean up block
-			instr = instr->prev;
-			if( instr && instr->op == asBC_PopPtr ) instr = instr->prev;
-			if( instr && instr->op == asBC_RefCpyV && instr->wArg[0] == tempVar ) instr = instr->prev;
-			if( instr && instr->op == asBC_PshVPtr && freedVars.Exists(instr->wArg[0]) )
+			instruction = instruction->prev;
+			if( instruction && instruction->op == asBC_PopPtr ) instruction = instruction->prev;
+			if( instruction && instruction->op == asBC_RefCpyV && instruction->wArg[0] == tempVar ) instruction = instruction->prev;
+			if( instruction && instruction->op == asBC_PshVPtr && freedVars.Exists(instruction->wArg[0]) )
 			{
 				// Update the LOADOBJ to load the local variable directly
-				tempVar = instr->wArg[0];
+				tempVar = instruction->wArg[0];
 				last->wArg[0] = tempVar;
 
 				// Remove the copy of the local variable into the temp
-				DeleteInstruction(instr->next); // deletes RefCpyV
-				DeleteInstruction(instr->next); // deletes PopPtr
-				DeleteInstruction(instr);       // deletes PshVPtr
+				DeleteInstruction(instruction->next); // deletes RefCpyV
+				DeleteInstruction(instruction->next); // deletes PopPtr
+				DeleteInstruction(instruction);       // deletes PshVPtr
 
 				// Find and remove the FREE instruction for the local variable too
-				instr = last->prev->prev;
-				while( instr )
+				instruction = last->prev->prev;
+				while( instruction )
 				{
-					asASSERT( instr->op == asBC_FREE );
-					if( instr->wArg[0] == tempVar )
+					asASSERT( instruction->op == asBC_FREE );
+					if( instruction->wArg[0] == tempVar )
 					{
-						DeleteInstruction(instr);
+						DeleteInstruction(instruction);
 						break;
 					}
-					instr = instr->prev;
+					instruction = instruction->prev;
 				}
 			}
 		}
@@ -1273,7 +1273,7 @@ bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 				break;
 			}
 			else if( curr->op == asBC_JZ    || curr->op == asBC_JNZ    ||
-				     curr->op == asBC_JS    || curr->op == asBC_JNS    ||
+					 curr->op == asBC_JS    || curr->op == asBC_JNS    ||
 					 curr->op == asBC_JP    || curr->op == asBC_JNP    ||
 					 curr->op == asBC_JLowZ || curr->op == asBC_JLowNZ )
 			{
@@ -1631,8 +1631,8 @@ void asCByteCode::Call(asEBCInstr instr, int funcID, int pop)
 	last->stackInc = -pop; // BC_CALL and BC_CALLBND doesn't pop the argument but when the callee returns the arguments are already popped
 	*((int*)ARG_DW(last->arg)) = funcID;
 
-    // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    InstrPTR(asBC_JitEntry, 0);
+	// Add a JitEntry instruction after function calls so that JIT's can resume execution
+	InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::CallPtr(asEBCInstr instr, int funcPtrVar, int pop)
@@ -1647,8 +1647,8 @@ void asCByteCode::CallPtr(asEBCInstr instr, int funcPtrVar, int pop)
 	last->stackInc = -pop;
 	last->wArg[0] = (short)funcPtrVar;
 
-    // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    InstrPTR(asBC_JitEntry, 0);
+	// Add a JitEntry instruction after function calls so that JIT's can resume execution
+	InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::Alloc(asEBCInstr instr, void *objID, int funcID, int pop)
@@ -1664,8 +1664,8 @@ void asCByteCode::Alloc(asEBCInstr instr, void *objID, int funcID, int pop)
 	*ARG_PTR(last->arg) = (asPWORD)objID;
 	*((int*)(ARG_DW(last->arg)+AS_PTR_SIZE)) = funcID;
 
-    // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    InstrPTR(asBC_JitEntry, 0);
+	// Add a JitEntry instruction after function calls so that JIT's can resume execution
+	InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::Ret(int pop)
@@ -1724,8 +1724,8 @@ void asCByteCode::Line(int line, int column, int scriptIdx)
 	*((int*)ARG_DW(last->arg)) = (line & 0xFFFFF)|((column & 0xFFF)<<20);
 	*((int*)ARG_DW(last->arg)+1) = scriptIdx;
 
-    // Add a JitEntry after the line instruction to allow the JIT function to resume after a suspend
-    InstrPTR(asBC_JitEntry, 0);
+	// Add a JitEntry after the line instruction to allow the JIT function to resume after a suspend
+	InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::ObjInfo(int offset, int info)
@@ -2459,7 +2459,7 @@ int asCByteCode::InstrW_W_W(asEBCInstr bc, int a, int b, int c)
 int asCByteCode::InstrW_W(asEBCInstr bc, int a, int b)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_rW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_rW_rW_ARG);
+			 asBCInfo[bc].type == asBCTYPE_rW_rW_ARG);
 	asASSERT(asBCInfo[bc].stackInc == 0);
 
 	if( AddInstruction() < 0 )
@@ -2494,7 +2494,7 @@ int asCByteCode::InstrW_PTR(asEBCInstr bc, short a, void *param)
 int asCByteCode::InstrW_DW(asEBCInstr bc, asWORD a, asDWORD b)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_DW_ARG ||
-             asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
 			 asBCInfo[bc].type == asBCTYPE_W_DW_ARG);
 	asASSERT(asBCInfo[bc].stackInc == 0);
 
@@ -2531,7 +2531,7 @@ int asCByteCode::InstrSHORT_DW_DW(asEBCInstr bc, short a, asDWORD b, asDWORD c)
 int asCByteCode::InstrSHORT_B(asEBCInstr bc, short a, asBYTE b)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_DW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
 			 asBCInfo[bc].type == asBCTYPE_W_DW_ARG);
 	asASSERT(asBCInfo[bc].stackInc == 0);
 
@@ -2559,7 +2559,7 @@ int asCByteCode::InstrSHORT_B(asEBCInstr bc, short a, asBYTE b)
 int asCByteCode::InstrSHORT_W(asEBCInstr bc, short a, asWORD b)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_DW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
 			 asBCInfo[bc].type == asBCTYPE_W_DW_ARG);
 	asASSERT(asBCInfo[bc].stackInc == 0);
 
@@ -2585,7 +2585,7 @@ int asCByteCode::InstrSHORT_W(asEBCInstr bc, short a, asWORD b)
 int asCByteCode::InstrSHORT_DW(asEBCInstr bc, short a, asDWORD b)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_DW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
 			 asBCInfo[bc].type == asBCTYPE_W_DW_ARG);
 
 	if( AddInstruction() < 0 )
@@ -2654,8 +2654,8 @@ int asCByteCode::InstrW_FLOAT(asEBCInstr bc, asWORD a, float b)
 int asCByteCode::InstrSHORT(asEBCInstr bc, short param)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_rW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_wW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_W_ARG);
+			 asBCInfo[bc].type == asBCTYPE_wW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_W_ARG);
 	asASSERT(asBCInfo[bc].stackInc != 0xFFFF);
 
 	if( AddInstruction() < 0 )
@@ -2736,8 +2736,8 @@ int asCByteCode::InstrQWORD(asEBCInstr bc, asQWORD param)
 int asCByteCode::InstrWORD(asEBCInstr bc, asWORD param)
 {
 	asASSERT(asBCInfo[bc].type == asBCTYPE_W_ARG  ||
-	         asBCInfo[bc].type == asBCTYPE_rW_ARG ||
-	         asBCInfo[bc].type == asBCTYPE_wW_ARG);
+			 asBCInfo[bc].type == asBCTYPE_rW_ARG ||
+			 asBCInfo[bc].type == asBCTYPE_wW_ARG);
 	asASSERT(asBCInfo[bc].stackInc != 0xFFFF);
 
 	if( AddInstruction() < 0 )

@@ -8,6 +8,7 @@
 
 #include <utility>
 #include <iostream>
+#include <algorithm>
 
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"

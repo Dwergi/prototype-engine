@@ -11,15 +11,15 @@
    redistribute it freely, subject to the following restrictions:
 
    1. The origin of this software must not be misrepresented; you
-      must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product
-      documentation would be appreciated but is not required.
+	  must not claim that you wrote the original software. If you use
+	  this software in a product, an acknowledgment in the product
+	  documentation would be appreciated but is not required.
 
    2. Altered source versions must be plainly marked as such, and
-      must not be misrepresented as being the original software.
+	  must not be misrepresented as being the original software.
 
    3. This notice may not be removed or altered from any source
-      distribution.
+	  distribution.
 
    The original version of this library can be located at:
    http://www.angelcode.com/angelscript/
@@ -368,17 +368,17 @@ typedef unsigned int   asUINT;
 	typedef uintptr_t      asPWORD;
 #endif
 #ifdef __LP64__
-    typedef unsigned int  asDWORD;
-    typedef unsigned long asQWORD;
-    typedef long asINT64;
+	typedef unsigned int  asDWORD;
+	typedef unsigned long asQWORD;
+	typedef long asINT64;
 #else
-    typedef unsigned long asDWORD;
+	typedef unsigned long asDWORD;
   #if defined(__GNUC__) || defined(__MWERKS__) || defined(__SUNPRO_CC) || defined(__psp2__)
-    typedef uint64_t asQWORD;
-    typedef int64_t asINT64;
+	typedef uint64_t asQWORD;
+	typedef int64_t asINT64;
   #else
-    typedef unsigned __int64 asQWORD;
-    typedef __int64 asINT64;
+	typedef unsigned __int64 asQWORD;
+	typedef __int64 asINT64;
   #endif
 #endif
 
@@ -523,17 +523,17 @@ struct asSMessageInfo
 
 #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
   #if defined(ANGELSCRIPT_EXPORT)
-    #define AS_API __declspec(dllexport)
+	#define AS_API __declspec(dllexport)
   #elif defined(ANGELSCRIPT_DLL_LIBRARY_IMPORT)
-    #define AS_API __declspec(dllimport)
+	#define AS_API __declspec(dllimport)
   #else // statically linked library
-    #define AS_API
+	#define AS_API
   #endif
 #elif defined(__GNUC__)
   #if defined(ANGELSCRIPT_EXPORT)
-    #define AS_API __attribute__((visibility ("default")))
+	#define AS_API __attribute__((visibility ("default")))
   #else
-    #define AS_API
+	#define AS_API
   #endif
 #else
   #define AS_API

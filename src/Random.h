@@ -14,7 +14,7 @@ namespace dd
 	{
 	public:
 
-		const uint DEFAULT_SEED = -1;
+		static const uint DEFAULT_SEED = -1;
 
 		Random( uint min, uint max, uint seed = DEFAULT_SEED );
 

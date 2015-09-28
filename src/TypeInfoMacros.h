@@ -38,7 +38,7 @@
 	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
 #define MEMBER( MemberName ) \
-	typeInfo->AddMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint(&instance.MemberName) - uint(&instance)) )
+	typeInfo->AddMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
 
 #define METHOD( MethodName ) \
 	typeInfo->AddMethod( FUNCTION( MethodName ), &MethodName, #MethodName );

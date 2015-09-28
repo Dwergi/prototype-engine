@@ -24,6 +24,8 @@ namespace dd
 
 	int Random::Next()
 	{
-		
+		uint64_t out = m_rng();
+
+		return (int) out;
 	}
 }
