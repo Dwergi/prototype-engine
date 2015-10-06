@@ -164,6 +164,7 @@
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(ProjectName)64d.lib</OutputFile>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -8,6 +8,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "angelscript", "include\angelscript\projects\msvc2013\angelscript.vcxproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DD", "DD.vcxproj", "{FDC55983-C586-4390-908C-4B19AC8B90E0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60D06B70-22A9-41B4-A681-FEBED15B77CB} = {60D06B70-22A9-41B4-A681-FEBED15B77CB}
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD} = {39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

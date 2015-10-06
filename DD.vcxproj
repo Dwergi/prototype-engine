@@ -56,7 +56,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>FastLTCG</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
@@ -137,22 +137,26 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions />
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>angelscript64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui_d.lib;angelscript64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y $(SolutionDir)include\glfw\lib\glfw3.dll $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -174,14 +178,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
-      <PreprocessorDefinitions />
+      <PreprocessorDefinitions>_NDEBUG;_RELEASE</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -189,9 +193,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>angelscript64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>angelscript64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;imgui.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y $(SolutionDir)include\glfw\lib\glfw3.dll $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <ClCompile>
@@ -217,7 +224,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -231,11 +238,11 @@
       <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\angelscript\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy /Y $(SolutionDir)include\glfw\lib\glfw3.dll $(OutDir)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Run Unit Tests</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -243,7 +250,8 @@
     <ClInclude Include="include\base64\include\cencode.h" />
     <ClInclude Include="include\base64\include\decode.h" />
     <ClInclude Include="include\base64\include\encode.h" />
-    <ClInclude Include="src\Assert.h" />
+    <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
+    <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
@@ -252,6 +260,7 @@
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\Containers.h" />
+    <ClInclude Include="src\DebugUI.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\Function.h" />
@@ -272,6 +281,7 @@
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
     <ClInclude Include="src\Serialization.h" />
@@ -315,11 +325,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="include\gl3w\src\gl3w.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <None Include="src\Buffer.inl">
       <FileType>CppCode</FileType>
     </None>
+    <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="src\DenseMapTests.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
@@ -348,6 +364,7 @@
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
     <ClCompile Include="src\Recorder.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />
     <ClCompile Include="src\ScriptTests.cpp" />

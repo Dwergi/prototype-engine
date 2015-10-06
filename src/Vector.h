@@ -45,6 +45,8 @@ namespace dd
 		void Remove( uint index );
 		void Remove( int index );
 
+		void RemoveItem( const T& item );
+
 		//
 		// Remove from the given index in an ordered way.
 		// This will invalidate indices or pointers into the vector after the given index.
@@ -187,6 +189,22 @@ namespace dd
 			return;
 
 		Remove( (uint) index );
+	}
+
+	template<typename T>
+	void Vector<T>::RemoveItem( const T& item )
+	{
+		int index = -1;
+		for( uint i = 0; i < m_size; ++i )
+		{
+			if( m_data[i] == item )
+			{
+				index = i;
+				break;
+			}
+		}
+
+		Remove( index );
 	}
 
 	template<typename T>
