@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"classas_i_script_module.html#a06582e57e7101df4157ee36c81867c13":[3,0,8,44],
 "classas_i_script_module.html#a0998d375ca1de02bc72f4544806da58c":[3,0,8,7],
 "classas_i_script_module.html#a0d857ff9bb2fd6c4632c3af5dc28488a":[3,0,8,10],
 "classas_i_script_module.html#a0e6a69be59f16c8b51d1e21d3905d95c":[3,0,8,6],
@@ -217,6 +218,7 @@ var NAVTREEINDEX3 =
 "doc_compile_lib.html#doc_compile_msvc_sdk":[0,1,2,2,1],
 "doc_compile_lib.html#doc_compile_platforms":[0,1,2,2],
 "doc_compile_lib.html#doc_compile_pocketpc":[0,1,2,2,3],
+"doc_compile_lib.html#doc_compile_size":[0,1,2,3],
 "doc_compile_lib.html#doc_compile_win64":[0,1,2,2,0],
 "doc_compile_script.html":[0,2,2],
 "doc_compile_script.html#doc_compile_script_load":[0,2,2,1],
@@ -232,6 +234,7 @@ var NAVTREEINDEX3 =
 "doc_datatypes_dictionary.html#doc_datatypes_dictionary_addon_mthd":[0,3,3,1,2,0,1],
 "doc_datatypes_dictionary.html#doc_datatypes_dictionary_addon_ops":[0,3,3,1,2,0,0],
 "doc_datatypes_funcptr.html":[0,3,3,0,2],
+"doc_datatypes_funcptr.html#doc_datatypes_delegate":[0,3,3,0,2,0],
 "doc_datatypes_obj.html":[0,3,3,0,1],
 "doc_datatypes_obj.html#handles":[0,3,3,0,1,1],
 "doc_datatypes_obj.html#objects":[0,3,3,0,1,0],
@@ -246,8 +249,5 @@ var NAVTREEINDEX3 =
 "doc_datatypes_strings.html":[0,3,3,1,0],
 "doc_datatypes_strings.html#doc_datatypes_strings_addon":[0,3,3,1,0,0],
 "doc_datatypes_strings.html#doc_datatypes_strings_addon_funcs":[0,3,3,1,0,0,2],
-"doc_datatypes_strings.html#doc_datatypes_strings_addon_mthd":[0,3,3,1,0,0,1],
-"doc_datatypes_strings.html#doc_datatypes_strings_addon_ops":[0,3,3,1,0,0,0],
-"doc_datatypes_weakref.html":[0,3,3,1,4],
-"doc_datatypes_weakref.html#doc_datatypes_array_addon_mthd":[0,3,3,1,4,0,1]
+"doc_datatypes_strings.html#doc_datatypes_strings_addon_mthd":[0,3,3,1,0,0,1]
 };

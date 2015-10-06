@@ -45,16 +45,16 @@ BEGIN_AS_NAMESPACE
 asCScriptCode::asCScriptCode()
 {
 	lineOffset = 0;
-	code = 0;
+	m_code = 0;
 	codeLength = 0;
 	sharedCode = false;
 }
 
 asCScriptCode::~asCScriptCode()
 {
-	if( !sharedCode && code ) 
+	if( !sharedCode && m_code ) 
 	{
-		asDELETEARRAY(code);
+		asDELETEARRAY(m_code);
 	}
 }
 
@@ -66,9 +66,9 @@ int asCScriptCode::SetCode(const char *name, const char *code, bool makeCopy)
 int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bool makeCopy)
 {
 	if( !code ) return asINVALID_ARG;
-	this->name = name ? name : "";
-	if( !sharedCode && this->code ) 
-		asDELETEARRAY(this->code);
+	m_name = name ? name : "";
+	if( !sharedCode && this->m_code ) 
+		asDELETEARRAY(this->m_code);
 
 	if( length == 0 )
 		length = strlen(code);
@@ -76,15 +76,15 @@ int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bo
 	{
 		codeLength = length;
 		sharedCode = false;
-		this->code = asNEWARRAY(char,length);
-		if( this->code == 0 )
+		m_code = asNEWARRAY(char,length);
+		if( m_code == 0 )
 			return asOUT_OF_MEMORY;
-		memcpy((char*)this->code, code, length);
+		memcpy((char*)m_code, code, length);
 	}
 	else
 	{
 		codeLength = length;
-		this->code = const_cast<char*>(code);
+		this->m_code = const_cast<char*>(code);
 		sharedCode = true;
 	}
 
@@ -143,7 +143,7 @@ void asCScriptCode::ConvertPosToRowCol(size_t pos, int *row, int *col)
 bool asCScriptCode::TokenEquals(size_t pos, size_t len, const char *str)
 {
 	if( pos + len > codeLength ) return false;
-	if( strncmp(code + pos, str, len) == 0 && strlen(str) == len )
+	if( strncmp(m_code + pos, str, len) == 0 && strlen(str) == len )
 		return true;
 	return false;
 }

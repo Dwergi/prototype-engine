@@ -31,7 +31,10 @@ var doc_advanced =
     ] ],
     [ "Fine tuning", "doc_finetuning.html", [
       [ "Cache the functions and types", "doc_finetuning.html#doc_finetuning_1", null ],
-      [ "Reuse the context object", "doc_finetuning.html#doc_finetuning_2", null ],
+      [ "Reuse the context object", "doc_finetuning.html#doc_finetuning_2", [
+        [ "Context pool", "doc_finetuning.html#doc_finetuning_2_1", null ],
+        [ "Nested calls", "doc_finetuning.html#doc_finetuning_2_2", null ]
+      ] ],
       [ "Compile scripts without line cues", "doc_finetuning.html#doc_finetuning_3", null ],
       [ "Disable thread safety", "doc_finetuning.html#doc_finetuning_4", null ],
       [ "Turn off automatic garbage collection", "doc_finetuning.html#doc_finetuning_5", null ],

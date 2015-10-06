@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -482,25 +482,20 @@ int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 
 		// Report the object as not being properly destroyed
 		asCString msg;
-		msg.Format(TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s_REF_COUNT_d, gcObj.seqNbr, gcObj.type->name.AddressOf(), refCount - 1);
+		msg.Format(TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s_REF_COUNT_d, gcObj.seqNbr, gcObj.type->m_name.AddressOf(), refCount - 1);
 		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 
 		// Add additional info for builtin types
-		if( gcObj.type->name == "_builtin_function_" )
+		if( gcObj.type->m_name == "$func" )
 		{
 			// Unfortunately we can't show the function declaration here, because the engine may have released the parameter list already so the declaration would only be misleading
 			// We need to show the function type too as for example delegates do not have a name
 			msg.Format(TXT_PREV_FUNC_IS_NAMED_s_TYPE_IS_d, reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetName(), reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetFuncType());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
 		}
-		else if( gcObj.type->name == "_builtin_objecttype_" )
+		else if( gcObj.type->m_name == "$obj" )
 		{
 			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCObjectType*>(gcObj.obj)->GetName());
-			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
-		}
-		else if( gcObj.type->name == "_builtin_globalprop_" )
-		{
-			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCGlobalProperty*>(gcObj.obj)->name.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
 		}
 
@@ -555,7 +550,7 @@ int asCGarbageCollector::DestroyOldGarbage()
 					// will be forced to skip the destruction of the objects, so as not to 
 					// crash the application.
 					asCString msg;
-					msg.Format(TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.seqNbr, gcObj.type->name.AddressOf());
+					msg.Format(TXT_d_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.seqNbr, gcObj.type->m_name.AddressOf());
 					engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 
 					// Just remove the object, as we will not bother to destroy it

@@ -267,7 +267,8 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Aborts the current execution of a script. </p>
+<p>Aborts the current execution of a script.</p>
+<p>If the call to Abort is done from within a function called by the script, it will only take effect after that function returns. </p>
 
 </div>
 </div>
@@ -2164,6 +2165,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Suspends the current execution of a script. The execution can then be resumed by calling <a class="el" href="classas_i_script_context.html#a8e52894432737acac2e1a422e496bf84">Execute</a> again.</p>
+<p>If the call to Suspend is done from within a function called by the script, it will only take effect after that function returns.</p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="doc_call_script_func.html">Calling a script function</a> </dd></dl>
 
 </div>
@@ -2208,7 +2210,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classas_i_script_context.html">asIScriptContext</a></li>
-    <li class="footer">Generated on Sun Feb 22 2015 11:44:44 for AngelScript by
+    <li class="footer">Generated on Sun Aug 30 2015 14:21:22 for AngelScript by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

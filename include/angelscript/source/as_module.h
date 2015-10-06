@@ -197,10 +197,10 @@ public:
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
 	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, asSNameSpace *ns);
 
-	asCString name;
+	asCString m_name;
 
-	asCScriptEngine  *engine;
-	asCBuilder       *builder;
+	asCScriptEngine  *m_engine;
+	asCBuilder       *m_builder;
 	asCArray<asPWORD> userData;
 	asDWORD           accessMask;
 	asSNameSpace     *defaultNamespace;

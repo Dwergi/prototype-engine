@@ -85,7 +85,7 @@ public:
 	size_t RecalculateLength();
 
 protected:
-	unsigned int length;
+	unsigned int m_length;
 	union
 	{
 		char *dynamic;

@@ -468,10 +468,10 @@ bool asCArray<T>::Concatenate(const asCArray<T> &other)
 }
 
 template <class T>
-void asCArray<T>::Concatenate(T* array, unsigned int count)
+void asCArray<T>::Concatenate(T* arr, unsigned int count)
 {
 	for( unsigned int c = 0; c < count; c++ )
-		PushLast(array[c]);
+		PushLast(arr[c]);
 }
 
 template <class T>

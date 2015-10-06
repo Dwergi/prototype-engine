@@ -43,42 +43,42 @@
 
 asCString::asCString()
 {
-	length = 0;
+	m_length = 0;
 	local[0] = 0;
 }
 
 // Copy constructor
 asCString::asCString(const asCString &str)
 {
-	length = 0;
+	m_length = 0;
 	local[0] = 0;
 
-	Assign(str.AddressOf(), str.length);
+	Assign(str.AddressOf(), str.m_length);
 }
 
 #ifdef AS_CAN_USE_CPP11
 asCString::asCString(asCString &&str)
 {
-	if( str.length <= 11 )
+	if( str.m_length <= 11 )
 	{
-		length = str.length;
-		memcpy(local, str.local, length);
-		local[length] = 0;
+		m_length = str.m_length;
+		memcpy(local, str.local, m_length);
+		local[m_length] = 0;
 	}
 	else
 	{
 		dynamic = str.dynamic;
-		length = str.length;
+		m_length = str.m_length;
 	}
 
 	str.dynamic = 0;
-	str.length = 0;
+	str.m_length = 0;
 }
 #endif // c++11
 
 asCString::asCString(const char *str, size_t len)
 {
-	length = 0;
+	m_length = 0;
 	local[0] = 0;
 
 	Assign(str, len);
@@ -86,7 +86,7 @@ asCString::asCString(const char *str, size_t len)
 
 asCString::asCString(const char *str)
 {
-	length = 0;
+	m_length = 0;
 	local[0] = 0;
 
 	size_t len = strlen(str);
@@ -95,7 +95,7 @@ asCString::asCString(const char *str)
 
 asCString::asCString(char ch)
 {
-	length = 0;
+	m_length = 0;
 	local[0] = 0;
 
 	Assign(&ch, 1);
@@ -103,7 +103,7 @@ asCString::asCString(char ch)
 
 asCString::~asCString()
 {
-	if( length > 11 && dynamic )
+	if( m_length > 11 && dynamic )
 	{
 		asDELETEARRAY(dynamic);
 	}
@@ -111,7 +111,7 @@ asCString::~asCString()
 
 char *asCString::AddressOf()
 {
-	if( length <= 11 )
+	if( m_length <= 11 )
 		return local;
 	else
 		return dynamic;
@@ -119,7 +119,7 @@ char *asCString::AddressOf()
 
 const char *asCString::AddressOf() const
 {
-	if( length <= 11 )
+	if( m_length <= 11 )
 		return local;
 	else
 		return dynamic;
@@ -139,7 +139,7 @@ void asCString::Allocate(size_t len, bool keepData)
 	// of these options, and it turned out that the current choice is what best balanced
 	// the number of allocations against the size of the allocations.
 
-	if( len > 11 && len > length )
+	if( len > 11 && len > m_length )
 	{
 		// Allocate a new dynamic buffer if the new one is larger than the old
 		char *buf = asNEWARRAY(char,len+1);
@@ -151,18 +151,18 @@ void asCString::Allocate(size_t len, bool keepData)
 
 		if( keepData )
 		{
-			int l = (int)len < (int)length ? (int)len : (int)length;
+			int l = (int)len < (int)m_length ? (int)len : (int)m_length;
 			memcpy(buf, AddressOf(), l);
 		}
 
-		if( length > 11 )
+		if( m_length > 11 )
 		{
 			asDELETEARRAY(dynamic);
 		}
 
 		dynamic = buf;
 	}
-	else if( len <= 11 && length > 11 )
+	else if( len <= 11 && m_length > 11 )
 	{
 		// Free the dynamic buffer, since it is no longer needed
 		char *buf = dynamic;
@@ -173,10 +173,10 @@ void asCString::Allocate(size_t len, bool keepData)
 		asDELETEARRAY(buf);
 	}
 
-	length = (int)len;
+	m_length = (int)len;
 
 	// Make sure the buffer is null terminated
-	AddressOf()[length] = 0;
+	AddressOf()[m_length] = 0;
 }
 
 void asCString::Assign(const char *str, size_t len)
@@ -184,8 +184,8 @@ void asCString::Assign(const char *str, size_t len)
 	Allocate(len, false);
 
 	// Copy the string
-	memcpy(AddressOf(), str, length);
-	AddressOf()[length] = 0;
+	memcpy(AddressOf(), str, m_length);
+	AddressOf()[m_length] = 0;
 }
 
 asCString &asCString::operator =(const char *str)
@@ -198,7 +198,7 @@ asCString &asCString::operator =(const char *str)
 
 asCString &asCString::operator =(const asCString &str)
 {
-	Assign(str.AddressOf(), str.length);
+	Assign(str.AddressOf(), str.m_length);
 
 	return *this;
 }
@@ -208,26 +208,26 @@ asCString &asCString::operator =(asCString &&str)
 {
 	if( this != &str )
 	{
-		if( length > 11 && dynamic )
+		if( m_length > 11 && dynamic )
 		{
 			asDELETEARRAY(dynamic);
 		}
 
-		if ( str.length <= 11 )
+		if ( str.m_length <= 11 )
 		{
-			length = str.length;
+			m_length = str.m_length;
 
-			memcpy(local, str.local, length);
-			local[length] = 0;
+			memcpy(local, str.local, m_length);
+			local[m_length] = 0;
 		}
 		else
 		{
 			dynamic = str.dynamic;
-			length = str.length;
+			m_length = str.m_length;
 		}
 
 		str.dynamic = 0;
-		str.length = 0;
+		str.m_length = 0;
 	}
 
 	return *this;
@@ -243,11 +243,11 @@ asCString &asCString::operator =(char ch)
 
 void asCString::Concatenate(const char *str, size_t len)
 {
-	asUINT oldLength = length;
-	SetLength(length + len);
+	asUINT oldLength = m_length;
+	SetLength(m_length + len);
 
 	memcpy(AddressOf() + oldLength, str, len);
-	AddressOf()[length] = 0;
+	AddressOf()[m_length] = 0;
 }
 
 asCString &asCString::operator +=(const char *str)
@@ -260,7 +260,7 @@ asCString &asCString::operator +=(const char *str)
 
 asCString &asCString::operator +=(const asCString &str)
 {
-	Concatenate(str.AddressOf(), str.length);
+	Concatenate(str.AddressOf(), str.m_length);
 
 	return *this;
 }
@@ -274,7 +274,7 @@ asCString &asCString::operator +=(char ch)
 
 size_t asCString::GetLength() const
 {
-	return length;
+	return m_length;
 }
 
 // Returns the length
@@ -307,19 +307,19 @@ size_t asCString::Format(const char *format, ...)
 
 	va_end(args);
 
-	return length;
+	return m_length;
 }
 
 char &asCString::operator [](size_t index) 
 {
-	asASSERT(index < length);
+	asASSERT(index < m_length);
 
 	return AddressOf()[index];
 }
 
 const char &asCString::operator [](size_t index) const
 {
-	asASSERT(index < length);
+	asASSERT(index < m_length);
 
 	return AddressOf()[index];
 }
@@ -339,24 +339,24 @@ asCString asCString::SubString(size_t start, size_t length) const
 
 int asCString::Compare(const char *str) const
 {
-	return asCompareStrings(AddressOf(), length, str, strlen(str));
+	return asCompareStrings(AddressOf(), m_length, str, strlen(str));
 }
 
 int asCString::Compare(const asCString &str) const
 {
-	return asCompareStrings(AddressOf(), length, str.AddressOf(), str.GetLength());
+	return asCompareStrings(AddressOf(), m_length, str.AddressOf(), str.GetLength());
 }
 
 int asCString::Compare(const char *str, size_t len) const
 {
-	return asCompareStrings(AddressOf(), length, str, len);
+	return asCompareStrings(AddressOf(), m_length, str, len);
 }
 
 size_t asCString::RecalculateLength()
 {
 	SetLength(strlen(AddressOf()));
 
-	return length;
+	return m_length;
 }
 
 int asCString::FindLast(const char *str, int *count) const

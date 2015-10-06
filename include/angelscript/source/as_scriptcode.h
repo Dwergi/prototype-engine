@@ -58,8 +58,8 @@ public:
 
 	bool TokenEquals(size_t pos, size_t len, const char *str);
 
-	asCString        name;
-	char            *code;
+	asCString        m_name;
+	char            *m_code;
 	size_t           codeLength;
 	bool             sharedCode;
 	int              idx;

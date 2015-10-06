@@ -130,10 +130,11 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 				internal->callConv = (internalCallConv)(thisCallConv + 2);
 #endif
 			internal->baseOffset = ( int )MULTI_BASE_OFFSET(ptr);
-#if defined(AS_ARM) && (defined(__GNUC__) || defined(AS_PSVITA))
+#if (defined(AS_ARM) || defined(AS_MIPS)) && (defined(__GNUC__) || defined(AS_PSVITA))
 			// As the least significant bit in func is used to switch to THUMB mode
 			// on ARM processors, the LSB in the __delta variable is used instead of
 			// the one in __pfn on ARM processors.
+			// MIPS also appear to use the base offset to indicate virtual method.
 			if( (size_t(internal->baseOffset) & 1) )
 				internal->callConv = (internalCallConv)(thisCallConv + 2);
 #endif
@@ -246,7 +247,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
 			asCString str;
-			str.Format(TXT_CANNOT_RET_TYPE_s_BY_VAL, func->returnType.GetObjectType()->name.AddressOf());
+			str.Format(TXT_CANNOT_RET_TYPE_s_BY_VAL, func->returnType.GetObjectType()->m_name.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 			engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 		}
@@ -409,7 +410,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 	
 				asCString str;
-				str.Format(TXT_CANNOT_PASS_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->name.AddressOf());
+				str.Format(TXT_CANNOT_PASS_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->m_name.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
@@ -432,7 +433,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
 				asCString str;
-				str.Format(TXT_DONT_SUPPORT_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->name.AddressOf());
+				str.Format(TXT_DONT_SUPPORT_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->m_name.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
@@ -577,10 +578,11 @@ int CallSystemFunction(int id, asCContext *context)
 			}
 
 			// Add the base offset for multiple inheritance
-#if (defined(__GNUC__) && defined(AS_ARM)) || defined(AS_PSVITA)
+#if (defined(__GNUC__) && (defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
 			// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
 			// and the whole offset is thus shifted one bit left to keep the original
 			// offset resolution
+			// MIPS also work like ARM in this regard
 			obj = (void*)(asPWORD(obj) + (sysFunc->baseOffset>>1));
 #else
 			obj = (void*)(asPWORD(obj) + sysFunc->baseOffset);
@@ -634,10 +636,11 @@ int CallSystemFunction(int id, asCContext *context)
 			}
 
 			// Add the base offset for multiple inheritance
-#if (defined(__GNUC__) && defined(AS_ARM)) || defined(AS_PSVITA)
+#if (defined(__GNUC__) && (defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
 			// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
 			// and the whole offset is thus shifted one bit left to keep the original
 			// offset resolution
+			// MIPS also work like ARM in this regard
 			tempPtr = (void*)(asPWORD(tempPtr) + (sysFunc->baseOffset>>1));
 #else
 			tempPtr = (void*)(asPWORD(tempPtr) + sysFunc->baseOffset);
@@ -822,7 +825,15 @@ int CallSystemFunction(int id, asCContext *context)
 	if( cleanCount )
 	{
 		args = context->m_regs.stackPointer;
-		if( callConv >= ICC_THISCALL )
+
+		// Skip the hidden argument for the return pointer
+		// TODO: runtime optimize: This check and increment should have been done in PrepareSystemFunction
+		if( descr->DoesReturnOnStack() )
+			args += AS_PTR_SIZE;
+
+		// Skip the object pointer on the stack
+		// TODO: runtime optimize: This check and increment should have been done in PrepareSystemFunction
+		if( callConv >= ICC_THISCALL && sysFunc->objForThiscall == 0 )
 			args += AS_PTR_SIZE;
 
 		asSSystemFunctionInterface::SClean *clean = sysFunc->cleanArgs.AddressOf();

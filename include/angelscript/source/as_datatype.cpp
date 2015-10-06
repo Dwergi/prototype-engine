@@ -191,11 +191,11 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 	}
 	else if( funcDef )
 	{
-		str += funcDef->name;
+		str += funcDef->m_name;
 	}
 	else if( objectType )
 	{
-		str += objectType->name;
+		str += objectType->m_name;
 		if( objectType->templateSubTypes.GetLength() > 0 )
 		{
 			str += "<";
@@ -227,7 +227,7 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 			str += "const";
 	}
 
-    if( isReference )
+	if( isReference )
 		str += "&";
 
 	return str;
@@ -431,7 +431,7 @@ bool asCDataType::IsArrayType() const
 {
 	// This is only true if the type used is the default array type, i.e. the one used for the [] syntax form
 	if( objectType && objectType->engine->defaultArrayObjectType )
-		return objectType->name == objectType->engine->defaultArrayObjectType->name;
+		return objectType->m_name == objectType->engine->defaultArrayObjectType->m_name;
 	
 	return false;
 }
@@ -666,7 +666,7 @@ asSTypeBehaviour *asCDataType::GetBehaviour() const
 bool asCDataType::IsEnumType() const
 {
 	// Do a sanity check on the objectType, to verify that we aren't trying to access memory after it has been released
-	asASSERT( objectType == 0 || objectType->name.GetLength() < 100 );
+	asASSERT( objectType == 0 || objectType->m_name.GetLength() < 100 );
 
 	if( objectType && (objectType->flags & asOBJ_ENUM) )
 		return true;

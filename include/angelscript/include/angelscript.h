@@ -11,15 +11,15 @@
    redistribute it freely, subject to the following restrictions:
 
    1. The origin of this software must not be misrepresented; you
-	  must not claim that you wrote the original software. If you use
-	  this software in a product, an acknowledgment in the product
-	  documentation would be appreciated but is not required.
+      must not claim that you wrote the original software. If you use
+      this software in a product, an acknowledgment in the product
+      documentation would be appreciated but is not required.
 
    2. Altered source versions must be plainly marked as such, and
-	  must not be misrepresented as being the original software.
+      must not be misrepresented as being the original software.
 
    3. This notice may not be removed or altered from any source
-	  distribution.
+      distribution.
 
    The original version of this library can be located at:
    http://www.angelcode.com/angelscript/
@@ -58,8 +58,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        23000
-#define ANGELSCRIPT_VERSION_STRING "2.30.0 WIP"
+#define ANGELSCRIPT_VERSION        23002
+#define ANGELSCRIPT_VERSION_STRING "2.30.2"
 
 // Data types
 
@@ -368,17 +368,17 @@ typedef unsigned int   asUINT;
 	typedef uintptr_t      asPWORD;
 #endif
 #ifdef __LP64__
-	typedef unsigned int  asDWORD;
-	typedef unsigned long asQWORD;
-	typedef long asINT64;
+    typedef unsigned int  asDWORD;
+    typedef unsigned long asQWORD;
+    typedef long asINT64;
 #else
-	typedef unsigned long asDWORD;
+    typedef unsigned long asDWORD;
   #if defined(__GNUC__) || defined(__MWERKS__) || defined(__SUNPRO_CC) || defined(__psp2__)
-	typedef uint64_t asQWORD;
-	typedef int64_t asINT64;
+    typedef uint64_t asQWORD;
+    typedef int64_t asINT64;
   #else
-	typedef unsigned __int64 asQWORD;
-	typedef __int64 asINT64;
+    typedef unsigned __int64 asQWORD;
+    typedef __int64 asINT64;
   #endif
 #endif
 
@@ -523,17 +523,17 @@ struct asSMessageInfo
 
 #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
   #if defined(ANGELSCRIPT_EXPORT)
-	#define AS_API __declspec(dllexport)
+    #define AS_API __declspec(dllexport)
   #elif defined(ANGELSCRIPT_DLL_LIBRARY_IMPORT)
-	#define AS_API __declspec(dllimport)
+    #define AS_API __declspec(dllimport)
   #else // statically linked library
-	#define AS_API
+    #define AS_API
   #endif
 #elif defined(__GNUC__)
   #if defined(ANGELSCRIPT_EXPORT)
-	#define AS_API __attribute__((visibility ("default")))
+    #define AS_API __attribute__((visibility ("default")))
   #else
-	#define AS_API
+    #define AS_API
   #endif
 #else
   #define AS_API
@@ -543,7 +543,7 @@ struct asSMessageInfo
 extern "C"
 {
 	// Engine
-	AS_API asIScriptEngine *asCreateScriptEngine(asDWORD version);
+	AS_API asIScriptEngine *asCreateScriptEngine(asDWORD version = ANGELSCRIPT_VERSION);
 	AS_API const char      *asGetLibraryVersion();
 	AS_API const char      *asGetLibraryOptions();
 
@@ -584,21 +584,21 @@ BEGIN_AS_NAMESPACE
 template<typename T>
 asUINT asGetTypeTraits()
 {
-#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS)
-	// MSVC & XCode/Clang
+#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5)
+	// MSVC, XCode/Clang, and gnuc 5+
 	// C++11 compliant code
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
 	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::is_trivially_copy_assignable<T>::value;
 	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::is_trivially_copy_constructible<T>::value;
 #elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
-	// gnuc 4.8+
-	// gnuc is using a mix of C++11 standard and pre-standard templates
+	// gnuc 4.8 is using a mix of C++11 standard and pre-standard templates
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
 	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
 	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::has_trivial_copy_assign<T>::value;
 	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::has_trivial_copy_constructor<T>::value;
 #else
+	// All other compilers and versions are assumed to use non C++11 compliant code until proven otherwise
 	// Not fully C++11 compliant. The has_trivial checks were used while the standard was still
 	// being elaborated, but were then removed in favor of the above is_trivially checks
 	// http://stackoverflow.com/questions/12702103/writing-code-that-works-when-has-trivial-destructor-is-defined-instead-of-is
@@ -1556,8 +1556,8 @@ enum asEBCInstr
 	asBC_POWdi			= 197,
 	asBC_POWi64			= 198,
 	asBC_POWu64			= 199,
-
-	asBC_MAXBYTECODE	= 200,
+	asBC_Thiscall1		= 200,
+	asBC_MAXBYTECODE	= 201,
 
 	// Temporary tokens. Can't be output to the final program
 	asBC_VarDecl		= 251,
@@ -1851,8 +1851,8 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(POWdi,		wW_rW_rW_ARG,	0),
 	asBCINFO(POWi64,	wW_rW_rW_ARG,	0),
 	asBCINFO(POWu64,	wW_rW_rW_ARG,	0),
+	asBCINFO(Thiscall1, DW_ARG,			-AS_PTR_SIZE-1),
 
-	asBCINFO_DUMMY(200),
 	asBCINFO_DUMMY(201),
 	asBCINFO_DUMMY(202),
 	asBCINFO_DUMMY(203),
