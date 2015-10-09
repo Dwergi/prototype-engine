@@ -63,18 +63,24 @@ namespace dd
 			{
 				temp[0] = '\0';
 				src.ReadFormat( "\"%s\"", temp );
-				
+
 				size_t iRead = strlen( temp );
 				if( iRead > 0 )
 					src.Advance( (uint) iRead + 2 );
 
-				if( mode == Serialize::Mode::BASE64 )
-				{
-					str = temp;
-					s_decoder.decode( str.c_str(), TEMP_BUFFER_SIZE, temp );
-				}
+				// remove trailing quote which the reader will greedily read in
+				if( temp[iRead - 1] == '"' )
+					temp[iRead - 1] = '\0';
+
+				--iRead;
 
 				str = temp;
+
+				if( mode == Serialize::Mode::BASE64 )
+				{
+					s_decoder.decode( str.c_str(), TEMP_BUFFER_SIZE, temp );
+					str = temp;
+				}
 			}
 		}
 
