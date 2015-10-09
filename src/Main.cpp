@@ -63,7 +63,6 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 }
 
 dd::Services g_services;
-#endif
 
 bool s_bDrawFPS;
 
@@ -78,6 +77,7 @@ void DrawFPS( float delta_t )
 	ImGui::Text( "FPS: %.1f", 1.0f / delta_t );
 	ImGui::End();
 }
+#endif
 
 int main( int argc, char* const argv[] )
 {

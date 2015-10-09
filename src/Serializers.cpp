@@ -61,7 +61,12 @@ namespace dd
 			}
 			else
 			{
+				temp[0] = '\0';
 				src.ReadFormat( "\"%s\"", temp );
+				
+				size_t iRead = strlen( temp );
+				if( iRead > 0 )
+					src.Advance( (uint) iRead + 2 );
 
 				if( mode == Serialize::Mode::BASE64 )
 				{

@@ -30,6 +30,7 @@ namespace dd
 
 		DenseMap<int, InputAction> m_bindings;
 	};
+	//===================================================================================
 
 	struct MousePosition
 	{
@@ -38,12 +39,14 @@ namespace dd
 		float X;
 		float Y;
 	};
+	//===================================================================================
 
 	struct InputEvent
 	{
 		InputAction Action;
 		InputType Type;
 	};
+	//===================================================================================
 
 	class Input
 	{

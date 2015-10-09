@@ -32,6 +32,7 @@ namespace dd
 
 		return m_capacity - m_current;
 	}
+	//----------------------------------------------------------------------------
 
 	ReadStream::ReadStream( const String& in )
 		: Stream( in.Length() ),
@@ -55,6 +56,21 @@ namespace dd
 		m_strSource( other.m_strSource )
 	{
 		m_current = other.m_current;
+	}
+
+	char ReadStream::PeekByte()
+	{
+		char dst;
+		Read( &dst, 1 );
+		--m_current;
+		return dst;
+	}
+
+	char ReadStream::ReadByte()
+	{
+		char dst;
+		Read( &dst, 1 );
+		return dst;
 	}
 
 	void ReadStream::Read( String& dst )
@@ -90,13 +106,8 @@ namespace dd
 
 		va_list args;
 		va_start( args, format );
-		int read = sscanf_s( src, format, args );
+		int read = vsscanf_s( src, format, args );
 		va_end( args );
-
-		if( read != -1 )
-		{
-			Advance( read );
-		}
 	}
 	//----------------------------------------------------------------------------
 
