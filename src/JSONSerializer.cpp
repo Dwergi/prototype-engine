@@ -159,14 +159,6 @@ namespace dd
 
 	}
 
-	bool IsWhiteSpace( char c )
-	{
-		if( c == ' ' || c == '\t' || c == '\n' || c == '\r' )
-			return true;
-
-		return false;
-	}
-
 	void ReadUntil( ReadStream& stream, char until, String& result )
 	{
 		if( stream.Remaining() == 0 )
@@ -190,7 +182,7 @@ namespace dd
 		char c = stream.PeekByte();
 		while( stream.Remaining() > 0
 			&& c != until
-			&& !IsWhiteSpace( c ) )
+			&& !isspace( c ) )
 		{
 			result += c;
 			stream.ReadByte();
@@ -201,7 +193,7 @@ namespace dd
 	void SkipWhitespace( ReadStream& stream )
 	{
 		while( stream.Remaining() > 0
-			&& IsWhiteSpace( stream.PeekByte() ) )
+			&& isspace( stream.PeekByte() ) )
 		{
 			stream.ReadByte();
 		}
