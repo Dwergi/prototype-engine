@@ -79,7 +79,7 @@ public:
 	void  SetRegisteredAddress(void *p);
 	void *GetRegisteredAddress() const;
 
-	asCString          name;
+	asCString          m_name;
 	asCDataType        type;
 	asUINT             id;
 	asSNameSpace      *nameSpace;
@@ -95,7 +95,7 @@ public:
 	void       *memory;
 	asQWORD     storage;
 
-	asCScriptFunction *initFunc;
+	asCScriptFunction *m_initFunc;
 
 	asDWORD accessMask;
 

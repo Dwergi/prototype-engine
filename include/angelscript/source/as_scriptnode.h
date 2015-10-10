@@ -121,7 +121,7 @@ public:
 	size_t tokenLength;
 
 	asCScriptNode *parent;
-	asCScriptNode *next;
+	asCScriptNode *m_next;
 	asCScriptNode *prev;
 	asCScriptNode *firstChild;
 	asCScriptNode *lastChild;

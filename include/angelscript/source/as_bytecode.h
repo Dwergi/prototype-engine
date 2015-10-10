@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -130,6 +130,8 @@ public:
 	int InstrW_W(asEBCInstr bc, int w, int b);
 	int InstrSHORT_DW_DW(asEBCInstr bc, short a, asDWORD b, asDWORD c);
 
+	asCScriptEngine *GetEngine() const { return m_engine; };
+
 	asCArray<int> lineNumbers;
 	asCArray<int> sectionIdxs;
 	int largestStackUsed;
@@ -164,7 +166,7 @@ protected:
 
 	const asCArray<int> *temporaryVariables;
 
-	asCScriptEngine *engine;
+	asCScriptEngine *m_engine;
 };
 
 class asCByteInstruction

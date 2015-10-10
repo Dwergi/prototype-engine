@@ -43,6 +43,12 @@
     <Filter Include="Base64">
       <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DebugUI">
+      <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{9b1b5c97-b823-4ea1-a5bb-de504eedf166}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -71,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="src\UnsortedVectorPool.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Assert.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\PP_Assert.h">
       <Filter>Core</Filter>
@@ -237,6 +240,18 @@
     <ClInclude Include="src\Buffer.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\DDAssert.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DebugUI.h">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gl3w\include\GL\gl3w.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\CommandLine.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -375,14 +390,17 @@
     <ClCompile Include="src\Stream.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="src\RandomTests.cpp">
-      <Filter>Tests</Filter>
+    <ClCompile Include="src\DebugUI.cpp">
+      <Filter>DebugUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="include\gl3w\src\gl3w.c">
+      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\CommandLine.cpp">
       <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandLineTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

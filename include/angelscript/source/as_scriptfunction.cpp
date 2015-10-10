@@ -105,7 +105,7 @@ static void ScriptFunction_CreateDelegate_Generic(asIScriptGeneric *gen)
 	gen->SetReturnAddress(CreateDelegate(func, obj));
 }
 
-// TODO: 2.29.0: operator==
+// TODO: operator==
 /*static void ScriptFunction_opEquals_Generic(asIScriptGeneric *gen)
 {
 	asCScriptFunction *funcSelf = (asCScriptFunction*)gen->GetObject();
@@ -124,7 +124,7 @@ void RegisterScriptFunction(asCScriptEngine *engine)
 	UNUSED_VAR(r); // It is only used in debug mode
 	engine->functionBehaviours.engine = engine;
 	engine->functionBehaviours.flags = asOBJ_REF | asOBJ_GC | asOBJ_SCRIPT_FUNCTION;
-	engine->functionBehaviours.name = "_builtin_function_";
+	engine->functionBehaviours.m_name = "$func";
 #ifndef AS_MAX_PORTABILITY
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_ADDREF, "void f()", asMETHOD(asCScriptFunction,AddRef), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_RELEASE, "void f()", asMETHOD(asCScriptFunction,Release), asCALL_THISCALL, 0); asASSERT( r >= 0 );
@@ -133,7 +133,7 @@ void RegisterScriptFunction(asCScriptEngine *engine)
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_GETGCFLAG, "bool f()", asMETHOD(asCScriptFunction,GetFlag), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_ENUMREFS, "void f(int&in)", asMETHOD(asCScriptFunction,EnumReferences), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_RELEASEREFS, "void f(int&in)", asMETHOD(asCScriptFunction,ReleaseAllHandles), asCALL_THISCALL, 0); asASSERT( r >= 0 );
-	// TODO: 2.29.0: Need some way to allow the arg type to adapt when the funcdefs are instantiated
+	// TODO: Need some way to allow the arg type to adapt when the funcdefs are instantiated
 //	r = engine->RegisterMethodToObjectType(&engine->functionBehaviours, "bool opEquals(const int &in)", asMETHOD(asCScriptFunction,operator==), asCALL_THISCALL); asASSERT( r >= 0 );
 #else
 	r = engine->RegisterBehaviourToObjectType(&engine->functionBehaviours, asBEHAVE_ADDREF, "void f()", asFUNCTION(ScriptFunction_AddRef_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
@@ -159,7 +159,7 @@ void RegisterScriptFunction(asCScriptEngine *engine)
 	// Rename the function so that it cannot be called manually by the script
 	int idx = engine->registeredGlobalFuncs.GetIndex(engine->scriptFunctions[r]);
 	engine->registeredGlobalFuncs.Erase(idx);
-	engine->scriptFunctions[r]->name = DELEGATE_FACTORY;
+	engine->scriptFunctions[r]->m_name = DELEGATE_FACTORY;
 	engine->registeredGlobalFuncs.Put(engine->scriptFunctions[r]);
 
 	// Change the return type so the VM will know the function really returns a handle
@@ -226,7 +226,7 @@ asIScriptFunction *asCScriptFunction::GetDelegateFunction() const
 	return funcForDelegate;
 }
 
-// TODO: 2.29.0: operator==
+// TODO: operator==
 /*
 // internal
 bool asCScriptFunction::operator==(const asCScriptFunction &other) const
@@ -322,7 +322,7 @@ int asCScriptFunction::ParseListPattern(asSListPatternNode *&target, const char 
 			return -1;
 		}
 
-		listNodes = listNodes->next;
+		listNodes = listNodes->m_next;
 	}
 
 	target = node;
@@ -349,7 +349,7 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	this->scriptData       = 0;
 	module                 = mod;
 	objectType             = 0;
-	name                   = "";
+	m_name                   = "";
 	isReadOnly             = false;
 	isPrivate              = false;
 	isProtected            = false;
@@ -419,7 +419,6 @@ asCScriptFunction::~asCScriptFunction()
 	// If the engine pointer is 0, then DestroyInternal has already been called and there is nothing more to do
 	if( engine == 0 ) return;
 
-	// TODO: 2.30.0: redesign: Shouldn't this have been done already?
 	DestroyInternal();
 
 	// Finally set the engine pointer to 0 because it must not be accessed again
@@ -582,7 +581,7 @@ const char *asCScriptFunction::GetModuleName() const
 {
 	if( module )
 	{
-		return module->name.AddressOf();
+		return module->m_name.AddressOf();
 	}
 
 	return 0;
@@ -612,7 +611,7 @@ const char *asCScriptFunction::GetObjectName() const
 // interface
 const char *asCScriptFunction::GetName() const
 {
-	return name.AddressOf();
+	return m_name.AddressOf();
 }
 
 // interface
@@ -677,8 +676,8 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 	// Don't add the return type for constructors and destructors
 	if( !(returnType.GetTokenType() == ttVoid &&
 		  objectType &&
-		  (name == objectType->name || (name.GetLength() > 0 && name[0] == '~') ||
-		   name == "_beh_0_" || name == "_beh_2_")) )
+		  (m_name == objectType->m_name || (m_name.GetLength() > 0 && m_name[0] == '~') ||
+		   m_name == "$beh0" || m_name == "$beh2")) )
 	{
 		str = returnType.Format(nameSpace, includeNamespace);
 		str += " ";
@@ -688,8 +687,8 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 		if( includeNamespace && objectType->nameSpace->name != "" )
 			str += objectType->nameSpace->name + "::";
 
-		if( objectType->name != "" )
-			str += objectType->name + "::";
+		if( objectType->m_name != "" )
+			str += objectType->m_name + "::";
 		else
 			str += "_unnamed_type_::";
 	}
@@ -697,21 +696,21 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 	{
 		str += nameSpace->name + "::";
 	}
-	if( name == "" )
+	if( m_name == "" )
 		str += "_unnamed_function_(";
-	else if( name.SubString(0,5) == "_beh_" && name.GetLength() == 7 )
+	else if( m_name.SubString(0,4) == "$beh" && m_name.GetLength() == 5 )
 	{
-		if( name[5] == '0' + asBEHAVE_CONSTRUCT )
-			str += objectType->name + "(";
-		else if( name[5] == '0' + asBEHAVE_FACTORY )
-			str += returnType.GetObjectType()->name + "(";
-		else if( name[5] == '0' + asBEHAVE_DESTRUCT )
-			str += "~" + objectType->name + "(";
+		if( m_name[4] == '0' + asBEHAVE_CONSTRUCT )
+			str += objectType->m_name + "(";
+		else if( m_name[4] == '0' + asBEHAVE_FACTORY )
+			str += returnType.GetObjectType()->m_name + "(";
+		else if( m_name[4] == '0' + asBEHAVE_DESTRUCT )
+			str += "~" + objectType->m_name + "(";
 		else
-			str += name + "(";
+			str += m_name + "(";
 	}
 	else
-		str += name + "(";
+		str += m_name + "(";
 
 	if( parameterTypes.GetLength() > 0 )
 	{
@@ -818,7 +817,7 @@ int asCScriptFunction::FindNextLineWithCode(int line) const
 
 	// The line numbers for constructors are not in order due to the way
 	// class members can be initialized directly in the declaration
-	if( objectType && objectType->name == name )
+	if( objectType && objectType->m_name == m_name )
 	{
 		// Sort all line numbers before looking for the next
 		asCArray<int> lineNbrs;
@@ -1008,7 +1007,7 @@ void asCScriptFunction::ComputeSignatureId()
 // internal
 bool asCScriptFunction::IsSignatureEqual(const asCScriptFunction *func) const
 {
-	if( !IsSignatureExceptNameEqual(func) || name != func->name ) return false;
+	if( m_name != func->m_name || !IsSignatureExceptNameEqual(func) ) return false;
 
 	return true;
 }
@@ -1043,9 +1042,9 @@ bool asCScriptFunction::IsSignatureExceptNameAndReturnTypeEqual(const asCScriptF
 bool asCScriptFunction::IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &paramInOut, const asCObjectType *objType, bool readOnly) const
 {
 	if( this->isReadOnly        != readOnly       ) return false;
+	if( (this->objectType != 0) != (objType != 0) ) return false;
 	if( this->inOutFlags        != paramInOut     ) return false;
 	if( this->parameterTypes    != paramTypes     ) return false;
-	if( (this->objectType != 0) != (objType != 0) ) return false;
 
 	return true;
 }
@@ -1299,7 +1298,11 @@ void asCScriptFunction::ReleaseReferences()
 					if( group != 0 ) group->Release();
 
 					if( funcId )
-						engine->scriptFunctions[funcId]->ReleaseInternal();
+					{
+						asCScriptFunction *fptr = engine->scriptFunctions[funcId];
+						if( fptr )
+							fptr->ReleaseInternal();
+					}
 				}
 				break;
 

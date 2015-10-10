@@ -77,7 +77,7 @@ namespace dd
 	{
 		ASSERT( other != nullptr );
 
-		SetString( other, m_buffer.Size() - 1 );
+		SetString( other, (uint) strlen( other ) );
 
 		return *this;
 	}
@@ -130,6 +130,18 @@ namespace dd
 		uint location = (uint) (ptr - m_buffer);
 
 		return location;
+	}
+
+	String& String::operator+=( char other )
+	{
+		Resize( m_length + 1 );
+
+		m_buffer[m_length] = other;
+		++m_length;
+
+		NullTerminate();
+
+		return *this;
 	}
 
 	bool String::StartsWith( const char* other ) const

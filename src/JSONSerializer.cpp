@@ -37,6 +37,7 @@ namespace dd
 		for( uint i = 0; i < m_host.m_indent; ++i ) 
 			m_host.m_stream.Write( "\t", 1 );
 	}
+	//===================================================================================
 
 	JSONSerializer::JSONSerializer( WriteStream& stream )
 		: m_currentObject( nullptr ),
@@ -82,13 +83,13 @@ namespace dd
 		m_stream.Write( "\n", 1 );
 	}
 
-	void JSONSerializer::Serialize( Variable var )
+	bool JSONSerializer::Serialize( Variable var )
 	{
 		const TypeInfo* type = var.Type();
 		
 		ASSERT( type->IsRegistered() );
 		if( !type->IsRegistered() )
-			return;
+			return false;
 
 		if( type->HasCustomSerializers() )
 		{
@@ -115,7 +116,9 @@ namespace dd
 					AddKey( member.Name() );
 
 					void* data = PointerAdd( var.Data(), member.Offset() );
-					Serialize( Variable( member.Type(), data ) );
+					
+					if( !Serialize( Variable( member.Type(), data ) ) )
+						return false;
 
 					if( index < (member_count - 1) )
 						m_stream.Write( ",", 1 );
@@ -126,14 +129,27 @@ namespace dd
 				}
 			}
 		}
+
+		return true;
 	}
+	//===================================================================================
+
+	struct JSONKeyValuePair
+	{
+		String32 Key;
+		String32 Value;
+
+		bool HasChildren;
+	};
 
 	JSONDeserializer::JSONDeserializer( ReadStream& stream )
+		: m_stream( stream )
 	{
 
 	}
 
 	JSONDeserializer::JSONDeserializer( const String& buffer )
+		: m_stream( buffer )
 	{
 
 	}
@@ -143,8 +159,157 @@ namespace dd
 
 	}
 
-	void JSONDeserializer::Deserialize( Variable var )
+	void ReadUntil( ReadStream& stream, char until, String& result )
 	{
+		if( stream.Remaining() == 0 )
+			return;
 
+		char c = stream.PeekByte();
+		while( stream.Remaining() > 0 
+			&& c != until )
+		{
+			result += c;
+			stream.ReadByte();
+			c = stream.PeekByte();
+		}
+	}
+
+	void ReadUntilWhitespaceOr( ReadStream& stream, char until, String& result )
+	{
+		if( stream.Remaining() == 0 )
+			return;
+
+		char c = stream.PeekByte();
+		while( stream.Remaining() > 0
+			&& c != until
+			&& !isspace( c ) )
+		{
+			result += c;
+			stream.ReadByte();
+			c = stream.PeekByte();
+		}
+	}
+
+	void SkipWhitespace( ReadStream& stream )
+	{
+		while( stream.Remaining() > 0
+			&& isspace( stream.PeekByte() ) )
+		{
+			stream.ReadByte();
+		}
+	}
+
+	void SkipUntil( ReadStream& stream, char until )
+	{
+		while( stream.Remaining() > 0
+			&& stream.PeekByte() != until )
+		{
+			stream.ReadByte();
+		}
+	}
+
+	void ReadNextPair( ReadStream& stream, JSONKeyValuePair& kvp )
+	{
+		kvp.Key.Clear();
+		kvp.Value.Clear();
+		kvp.HasChildren = false;
+
+		char current = stream.ReadByte();
+
+		SkipWhitespace( stream );
+
+		// expecting a name here
+		current = stream.ReadByte();
+		ASSERT( current == '"' );
+
+		ReadUntil( stream, '"', kvp.Key );
+
+		current = stream.ReadByte();
+		ASSERT( current == '"' );
+
+		SkipUntil( stream, ':' );
+
+		current = stream.ReadByte();
+		ASSERT( current == ':' );
+
+		SkipWhitespace( stream );
+			
+		current = stream.PeekByte();
+		if( current == '{' )
+		{
+			kvp.HasChildren = true;
+		}
+		else if( current == '"' )
+		{
+			// serialized as string
+			kvp.Value += stream.ReadByte();
+
+			ReadUntil( stream, '"', kvp.Value );
+
+			current = stream.ReadByte();
+			kvp.Value += current;
+			ASSERT( current == '"' );
+		}
+		else
+		{
+			ReadUntilWhitespaceOr( stream, ',', kvp.Value );
+		}
+	}
+
+	bool JSONDeserializer::Deserialize( Variable var )
+	{
+		const TypeInfo* type = var.Type();
+		
+		ASSERT( type->IsRegistered() );
+		if( !type->IsRegistered() )
+			return false;
+
+		if( type->HasCustomSerializers() )
+			type->DeserializeCustom( Serialize::Mode::JSON, m_stream, var );
+		else
+		{
+			ASSERT( type->GetMembers().Size() > 0 );
+
+			// composite object
+			char c = m_stream.ReadByte();
+			ASSERT( c == '{' );
+
+			{
+				// check the type
+				JSONKeyValuePair pair;
+				ReadNextPair( m_stream, pair );
+
+				ASSERT( pair.Key == "type" );
+
+				{
+					String64 strType;
+					JSONDeserializer nested( pair.Value );
+					nested.Deserialize( strType );
+
+					ASSERT( strType == type->Name() );
+				}
+			}
+
+			// has to be another member in there
+			ASSERT( m_stream.ReadByte() == ',' );
+
+			for( Member& member : type->GetMembers() )
+			{
+				JSONKeyValuePair pair;
+				ReadNextPair( m_stream, pair );
+
+				ASSERT( pair.Key == member.Name() );
+
+				Variable member_var( member.Type(), PointerAdd( var.Data(), member.Offset() ) );
+
+				JSONDeserializer nested( pair.Value );
+				nested.Deserialize( member_var );
+
+				char c = m_stream.ReadByte();
+				ASSERT( c == ',' || c == '}' );
+			}
+		}
+
+		return true;
 	}
 }

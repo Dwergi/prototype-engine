@@ -134,8 +134,9 @@ Functions</h2>
 <li>string join(const array&lt;string&gt; &amp;in arr, const string &amp;in delimiter)</li>
 <li>int64 parseInt(const string &amp;in, uint base = 10, uint &amp;out byteCount = 0)</li>
 <li>double parseFloat(const string &amp;in, uint &amp;out byteCount = 0)</li>
-<li>string formatInt(int64 val, const string &amp;in options, uint width = 0)</li>
-<li>string formatFloat(double val, const string &amp;in options, uint width = 0, uint precision = 0)</li>
+<li>string formatInt(int64 val, const string &amp;in options = '', uint width = 0)</li>
+<li>string formatUInt(uint64 val, const string &amp;in options = '', uint width = 0)</li>
+<li>string formatFloat(double val, const string &amp;in options = '', uint width = 0, uint precision = 0)</li>
 </ul>
 <p>The format functions takes a string that defines how the number should be formatted. The string is a combination of the following characters:</p>
 <ul>
@@ -159,7 +160,7 @@ Functions</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Feb 22 2015 11:44:44 for AngelScript by
+    <li class="footer">Generated on Sun Aug 30 2015 14:21:21 for AngelScript by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

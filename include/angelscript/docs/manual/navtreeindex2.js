@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classas_i_lockable_shared_bool.html#a1dae71f6f1141b5b16520232a9ea5fb2":[3,0,2,3],
 "classas_i_lockable_shared_bool.html#a863984c1b271df84f71fb5ba978ce2b8":[3,0,2,5],
 "classas_i_lockable_shared_bool.html#aa29488ac2f1c38788d5e79545fdfc8c7":[3,0,2,4],
 "classas_i_lockable_shared_bool.html#abab39fc60f00ae8941423258ffc2c3c6":[3,0,2,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "classas_i_script_generic.html#afd8ead96f17d6e77f3a26c70c3a1d80c":[3,0,7,17],
 "classas_i_script_generic.html#afdb602c3c2e285c5f34bc477ebbd1534":[3,0,7,11],
 "classas_i_script_module.html":[3,0,8],
-"classas_i_script_module.html#a00cff95b43c256cc6b9062e135a473a2":[3,0,8,22],
-"classas_i_script_module.html#a06582e57e7101df4157ee36c81867c13":[3,0,8,44]
+"classas_i_script_module.html#a00cff95b43c256cc6b9062e135a473a2":[3,0,8,22]
 };

@@ -13,16 +13,16 @@ namespace dd
 	class SerializerBase
 	{
 	public:
-
-		virtual void Serialize( Variable var ) = 0;
+		virtual bool Serialize( Variable var ) = 0;
 	};
+	//===================================================================================
 
 	class DeserializerBase
 	{
 	public:
-
-		virtual void Deserialize( Variable var ) = 0;
+		virtual bool Deserialize( Variable var ) = 0;
 	};
+	//===================================================================================
 
 	class JSONSerializer : public SerializerBase
 	{
@@ -31,10 +31,10 @@ namespace dd
 		JSONSerializer( String& buffer );
 		virtual ~JSONSerializer();
 
-		virtual void Serialize( Variable var );
+		virtual bool Serialize( Variable var ) override;
 
 		template <typename T>
-		void Serialize( const T& obj );
+		bool Serialize( const T& obj );
 
 	private:
 		friend class ScopedJSONObject;
@@ -47,6 +47,7 @@ namespace dd
 		void AddKey( const String& key );
 		void AddString( const char* key, const String& value, bool last = false );
 	};
+	//===================================================================================
 
 	class JSONDeserializer : public DeserializerBase
 	{
@@ -55,11 +56,18 @@ namespace dd
 		JSONDeserializer( const String& buffer );
 		virtual ~JSONDeserializer();
 
-		virtual void Deserialize( Variable var );
+		virtual bool Deserialize( Variable var ) override;
 
 		template <typename T>
-		void Deserialize( T& obj );
+		bool Deserialize( T& obj );
+
+	private:
+
+		ReadStream m_stream;
+
+		void ReadNestedScope();
 	};
+	//===================================================================================
 
 	class ScopedJSONObject
 	{
@@ -73,10 +81,17 @@ namespace dd
 		JSONSerializer& m_host;
 		ScopedJSONObject* m_previous;
 	};
+	//===================================================================================
 
 	template <typename T>
-	void JSONSerializer::Serialize( const T& obj )
+	bool JSONSerializer::Serialize( const T& obj )
 	{
-		Serialize( Variable( GET_TYPE( T ), const_cast<T*>( &obj ) ) );
+		return Serialize( Variable( GET_TYPE( T ), const_cast<T*>( &obj ) ) );
+	}
+
+	template <typename T>
+	bool JSONDeserializer::Deserialize( T& obj )
+	{
+		return Deserialize( Variable( GET_TYPE( T ), &obj ) );
 	}
 }

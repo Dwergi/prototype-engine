@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -173,6 +173,24 @@ static void ScriptObject_ReleaseAllHandles_Generic(asIScriptGeneric *gen)
 	self->ReleaseAllHandles(engine);
 }
 
+static void ScriptObject_Assignment_Generic(asIScriptGeneric *gen)
+{
+	asCScriptObject *other = *(asCScriptObject**)gen->GetAddressOfArg(0);
+	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
+
+	*self = *other;
+
+	*(asCScriptObject**)gen->GetAddressOfReturnLocation() = self;
+}
+
+static void ScriptObject_Construct_Generic(asIScriptGeneric *gen)
+{
+	asCObjectType *objType = *(asCObjectType**)gen->GetAddressOfArg(0);
+	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
+
+	ScriptObject_Construct(objType, self);
+}
+
 #endif
 
 void RegisterScriptObject(asCScriptEngine *engine)
@@ -182,7 +200,7 @@ void RegisterScriptObject(asCScriptEngine *engine)
 	UNUSED_VAR(r); // It is only used in debug mode
 	engine->scriptTypeBehaviours.engine = engine;
 	engine->scriptTypeBehaviours.flags = asOBJ_SCRIPT_OBJECT | asOBJ_REF | asOBJ_GC;
-	engine->scriptTypeBehaviours.name = "_builtin_object_";
+	engine->scriptTypeBehaviours.m_name = "$obj";
 #ifndef AS_MAX_PORTABILITY
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_CONSTRUCT, "void f(int&in)", asFUNCTION(ScriptObject_Construct), asCALL_CDECL_OBJLAST, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_ADDREF, "void f()", asMETHOD(asCScriptObject,AddRef), asCALL_THISCALL, 0); asASSERT( r >= 0 );
@@ -216,14 +234,6 @@ void RegisterScriptObject(asCScriptEngine *engine)
 #endif
 }
 
-void ScriptObject_Construct_Generic(asIScriptGeneric *gen)
-{
-	asCObjectType *objType = *(asCObjectType**)gen->GetAddressOfArg(0);
-	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
-
-	ScriptObject_Construct(objType, self);
-}
-
 void ScriptObject_Construct(asCObjectType *objType, asCScriptObject *self)
 {
 	new(self) asCScriptObject(objType);
@@ -237,28 +247,28 @@ void ScriptObject_ConstructUnitialized(asCObjectType *objType, asCScriptObject *
 asCScriptObject::asCScriptObject(asCObjectType *ot, bool doInitialize)
 {
 	refCount.set(1);
-	objType = ot;
-	objType->AddRef();
+	m_objType = ot;
+	m_objType->AddRef();
 	isDestructCalled = false;
 	extra = 0;
 	hasRefCountReachedZero = false;
 
 	// Notify the garbage collector of this object
-	if( objType->flags & asOBJ_GC )
-		objType->engine->gc.AddScriptObjectToGC(this, objType);
+	if( m_objType->flags & asOBJ_GC )
+		m_objType->engine->gc.AddScriptObjectToGC(this, m_objType);
 
 	// Initialize members to zero. Technically we only need to zero the pointer
 	// members, but just the memset is faster than having to loop and check the datatypes
-	memset((void*)(this+1), 0, objType->size - sizeof(asCScriptObject));
+	memset((void*)(this+1), 0, m_objType->size - sizeof(asCScriptObject));
 
 	if( doInitialize )
 	{
 #ifdef AS_NO_MEMBER_INIT
 		// When member initialization is disabled the constructor must make sure
 		// to allocate and initialize all members with the default constructor
-		for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+		for( asUINT n = 0; n < m_objType->properties.GetLength(); n++ )
 		{
-			asCObjectProperty *prop = objType->properties[n];
+			asCObjectProperty *prop = m_objType->properties[n];
 			if( prop->type.IsObject() && !prop->type.IsObjectHandle() )
 			{
 				if( prop->type.IsReference() || prop->type.GetObjectType()->flags & asOBJ_REF )
@@ -276,10 +286,10 @@ asCScriptObject::asCScriptObject(asCObjectType *ot, bool doInitialize)
 	else
 	{
 		// When the object is created without initialization, all non-handle members must be allocated, but not initialized
-		asCScriptEngine *engine = objType->engine;
-		for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+		asCScriptEngine *engine = m_objType->engine;
+		for( asUINT n = 0; n < m_objType->properties.GetLength(); n++ )
 		{
-			asCObjectProperty *prop = objType->properties[n];
+			asCObjectProperty *prop = m_objType->properties[n];
 			if( prop->type.IsObject() && !prop->type.IsObjectHandle() )
 			{
 				if( prop->type.IsReference() || (prop->type.GetObjectType()->flags & asOBJ_REF) )
@@ -317,16 +327,16 @@ asCScriptObject::~asCScriptObject()
 			extra->weakRefFlag = 0;
 		}
 
-		if( objType->engine )
+		if( m_objType->engine )
 		{
 			// Clean the user data
 			for( asUINT n = 0; n < extra->userData.GetLength(); n += 2 )
 			{
 				if( extra->userData[n+1] )
 				{
-					for( asUINT c = 0; c < objType->engine->cleanScriptObjectFuncs.GetLength(); c++ )
-						if( objType->engine->cleanScriptObjectFuncs[c].type == extra->userData[n] )
-							objType->engine->cleanScriptObjectFuncs[c].cleanFunc(this);
+					for( asUINT c = 0; c < m_objType->engine->cleanScriptObjectFuncs.GetLength(); c++ )
+						if( m_objType->engine->cleanScriptObjectFuncs[c].type == extra->userData[n] )
+							m_objType->engine->cleanScriptObjectFuncs[c].cleanFunc(this);
 				}
 			}
 		}
@@ -335,7 +345,7 @@ asCScriptObject::~asCScriptObject()
 	}
 
 	// The engine pointer should be available from the objectType
-	asCScriptEngine *engine = objType->engine;
+	asCScriptEngine *engine = m_objType->engine;
 
 	// Destroy all properties
 	// In most cases the members are initialized in the order they have been declared, 
@@ -343,9 +353,9 @@ asCScriptObject::~asCScriptObject()
 	// depending on the use of inheritance and or initialization in the declaration.
 	// TODO: Should the order of initialization be stored by the compiler so that the 
 	//       reverse order can be guaranteed during the destruction?
-	for( int n = (int)objType->properties.GetLength()-1; n >= 0; n-- )
+	for( int n = (int)m_objType->properties.GetLength()-1; n >= 0; n-- )
 	{
-		asCObjectProperty *prop = objType->properties[n];
+		asCObjectProperty *prop = m_objType->properties[n];
 		if( prop->type.IsObject() )
 		{
 			// Destroy the object
@@ -373,8 +383,8 @@ asCScriptObject::~asCScriptObject()
 		}
 	}
 
-	objType->Release();
-	objType = 0;
+	m_objType->Release();
+	m_objType = 0;
 
 	// Something is really wrong if the refCount is not 0 by now
 	asASSERT( refCount.get() == 0 );
@@ -472,7 +482,7 @@ void *asCScriptObject::SetUserData(void *data, asPWORD type)
 
 asIScriptEngine *asCScriptObject::GetEngine() const
 {
-	return objType->engine;
+	return m_objType->engine;
 }
 
 int asCScriptObject::AddRef() const
@@ -483,11 +493,11 @@ int asCScriptObject::AddRef() const
 	// crashes if members that have already been destroyed are accessed accidentally.
 	if( hasRefCountReachedZero )
 	{
-		if( objType && objType->engine )
+		if( m_objType && m_objType->engine )
 		{
 			asCString msg;
-			msg.Format(TXT_RESURRECTING_SCRIPTOBJECT_s, objType->name.AddressOf());
-			objType->engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+			msg.Format(TXT_RESURRECTING_SCRIPTOBJECT_s, m_objType->m_name.AddressOf());
+			m_objType->engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 		}
 	}
 
@@ -559,7 +569,7 @@ void asCScriptObject::CallDestructor()
 	isDestructCalled = true;
 
 	// Call the destructor for this class and all the super classes
-	asCObjectType *ot = objType;
+	asCObjectType *ot = m_objType;
 	while( ot )
 	{
 		int funcIndex = ot->beh.destruct;
@@ -572,7 +582,7 @@ void asCScriptObject::CallDestructor()
 				ctx = asGetActiveContext();
 				if( ctx )
 				{
-					if( ctx->GetEngine() == objType->GetEngine() && ctx->PushState() == asSUCCESS )
+					if( ctx->GetEngine() == m_objType->GetEngine() && ctx->PushState() == asSUCCESS )
 						isNested = true;
 					else
 						ctx = 0;
@@ -581,7 +591,7 @@ void asCScriptObject::CallDestructor()
 				if( ctx == 0 )
 				{
 					// Request a context from the engine
-					ctx = objType->engine->RequestContext();
+					ctx = m_objType->engine->RequestContext();
 					if( ctx == 0 )
 					{
 						// TODO: How to best report this failure?
@@ -590,7 +600,7 @@ void asCScriptObject::CallDestructor()
 				}
 			}
 
-			int r = ctx->Prepare(objType->engine->scriptFunctions[funcIndex]);
+			int r = ctx->Prepare(m_objType->engine->scriptFunctions[funcIndex]);
 			if( r >= 0 )
 			{
 				ctx->SetObject(this);
@@ -632,14 +642,14 @@ void asCScriptObject::CallDestructor()
 		else
 		{
 			// Return the context to engine
-			objType->engine->ReturnContext(ctx);
+			m_objType->engine->ReturnContext(ctx);
 		}
 	}
 }
 
 asIObjectType *asCScriptObject::GetObjectType() const
 {
-	return objType;
+	return m_objType;
 }
 
 int asCScriptObject::GetRefCount()
@@ -660,51 +670,51 @@ bool asCScriptObject::GetFlag()
 // interface
 int asCScriptObject::GetTypeId() const
 {
-	asCDataType dt = asCDataType::CreateObject(objType, false);
-	return objType->engine->GetTypeIdFromDataType(dt);
+	asCDataType dt = asCDataType::CreateObject(m_objType, false);
+	return m_objType->engine->GetTypeIdFromDataType(dt);
 }
 
 asUINT asCScriptObject::GetPropertyCount() const
 {
-	return asUINT(objType->properties.GetLength());
+	return asUINT(m_objType->properties.GetLength());
 }
 
 int asCScriptObject::GetPropertyTypeId(asUINT prop) const
 {
-	if( prop >= objType->properties.GetLength() )
+	if( prop >= m_objType->properties.GetLength() )
 		return asINVALID_ARG;
 
-	return objType->engine->GetTypeIdFromDataType(objType->properties[prop]->type);
+	return m_objType->engine->GetTypeIdFromDataType(m_objType->properties[prop]->type);
 }
 
 const char *asCScriptObject::GetPropertyName(asUINT prop) const
 {
-	if( prop >= objType->properties.GetLength() )
+	if( prop >= m_objType->properties.GetLength() )
 		return 0;
 
-	return objType->properties[prop]->name.AddressOf();
+	return m_objType->properties[prop]->name.AddressOf();
 }
 
 void *asCScriptObject::GetAddressOfProperty(asUINT prop)
 {
-	if( prop >= objType->properties.GetLength() )
+	if( prop >= m_objType->properties.GetLength() )
 		return 0;
 
 	// Objects are stored by reference, so this must be dereferenced
-	asCDataType *dt = &objType->properties[prop]->type;
+	asCDataType *dt = &m_objType->properties[prop]->type;
 	if( dt->IsObject() && !dt->IsObjectHandle() &&
 		(dt->IsReference() || dt->GetObjectType()->flags & asOBJ_REF) )
-		return *(void**)(((char*)this) + objType->properties[prop]->byteOffset);
+		return *(void**)(((char*)this) + m_objType->properties[prop]->byteOffset);
 
-	return (void*)(((char*)this) + objType->properties[prop]->byteOffset);
+	return (void*)(((char*)this) + m_objType->properties[prop]->byteOffset);
 }
 
 void asCScriptObject::EnumReferences(asIScriptEngine *engine)
 {
 	// We'll notify the GC of all object handles that we're holding
-	for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+	for( asUINT n = 0; n < m_objType->properties.GetLength(); n++ )
 	{
-		asCObjectProperty *prop = objType->properties[n];
+		asCObjectProperty *prop = m_objType->properties[n];
 		if( prop->type.IsObject() )
 		{
 			// TODO: gc: The members of the value type needs to be enumerated
@@ -723,9 +733,9 @@ void asCScriptObject::EnumReferences(asIScriptEngine *engine)
 
 void asCScriptObject::ReleaseAllHandles(asIScriptEngine *engine)
 {
-	for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+	for( asUINT n = 0; n < m_objType->properties.GetLength(); n++ )
 	{
-		asCObjectProperty *prop = objType->properties[n];
+		asCObjectProperty *prop = m_objType->properties[n];
 
 		// TODO: gc: The members of the members needs to be released
 		//           too, since they may be holding a reference. Even
@@ -744,16 +754,6 @@ void asCScriptObject::ReleaseAllHandles(asIScriptEngine *engine)
 	}
 }
 
-void ScriptObject_Assignment_Generic(asIScriptGeneric *gen)
-{
-	asCScriptObject *other = *(asCScriptObject**)gen->GetAddressOfArg(0);
-	asCScriptObject *self = (asCScriptObject*)gen->GetObject();
-
-	*self = *other;
-
-	*(asCScriptObject**)gen->GetAddressOfReturnLocation() = self;
-}
-
 asCScriptObject &ScriptObject_Assignment(asCScriptObject *other, asCScriptObject *self)
 {
 	return (*self = *other);
@@ -763,7 +763,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 {
 	if( &other != this )
 	{
-		if( !other.objType->DerivesFrom(objType) )
+		if( !other.m_objType->DerivesFrom(m_objType) )
 		{
 			// We cannot allow a value assignment from a type that isn't the same or 
 			// derives from this type as the member properties may not have the same layout
@@ -773,14 +773,14 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 		}
 
 		// If the script class implements the opAssign method, it should be called
-		asCScriptEngine *engine = objType->engine;
-		asCScriptFunction *func = engine->scriptFunctions[objType->beh.copy];
+		asCScriptEngine *engine = m_objType->engine;
+		asCScriptFunction *func = engine->scriptFunctions[m_objType->beh.copy];
 		if( func->funcType == asFUNC_SYSTEM )
 		{
 			// Copy all properties
-			for( asUINT n = 0; n < objType->properties.GetLength(); n++ )
+			for( asUINT n = 0; n < m_objType->properties.GetLength(); n++ )
 			{
-				asCObjectProperty *prop = objType->properties[n];
+				asCObjectProperty *prop = m_objType->properties[n];
 				if( prop->type.IsObject() )
 				{
 					void **dst = (void**)(((char*)this) + prop->byteOffset);
@@ -830,7 +830,7 @@ asCScriptObject &asCScriptObject::operator=(const asCScriptObject &other)
 				}
 			}
 
-			r = ctx->Prepare(engine->scriptFunctions[objType->beh.copy]);
+			r = ctx->Prepare(engine->scriptFunctions[m_objType->beh.copy]);
 			if( r < 0 )
 			{
 				if( isNested )

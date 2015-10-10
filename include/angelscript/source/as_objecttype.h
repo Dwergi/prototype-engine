@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -185,12 +185,13 @@ public:
 	asCObjectProperty *AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate, bool isProtected, bool isInherited);
 	void ReleaseAllProperties();
 
-	asCString                    name;
+	asCString                    m_name;
 	asSNameSpace                *nameSpace;
 	int                          size;
 #ifdef WIP_16BYTE_ALIGN
 	int                          alignment;
 #endif
+	mutable int                  m_typeId;
 	asCArray<asCObjectProperty*> properties;
 	asCArray<int>                methods;
 	asCArray<asCObjectType*>     interfaces;
@@ -200,7 +201,7 @@ public:
 	asCArray<asCScriptFunction*> virtualFunctionTable;
 
 	asDWORD flags;
-	asDWORD accessMask;
+	asDWORD m_accessMask;
 
 	asSTypeBehaviour beh;
 

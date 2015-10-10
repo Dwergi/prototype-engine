@@ -32,6 +32,8 @@ namespace dd
 		ReadStream( const void* in, uint capacity );
 		ReadStream( const ReadStream& other );
 
+		char PeekByte();
+		char ReadByte();
 		void Read( String& dst );
 		void Read( void* dst, uint bytes );
 		void ReadFormat( const char* format, ... );

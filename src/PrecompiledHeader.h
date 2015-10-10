@@ -6,6 +6,11 @@
 
 #pragma once
 
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #include <utility>
 #include <iostream>
 #include <algorithm>
@@ -13,7 +18,7 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
-#include "Assert.h"
+#include "DDAssert.h"
 #include "Typedefs.h"
 #include "TypeInfoMacros.h"
 

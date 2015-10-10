@@ -50,7 +50,7 @@ asCScriptNode::asCScriptNode(eScriptNode type)
 	tokenLength = 0;
 
 	parent      = 0;
-	next        = 0;
+	m_next        = 0;
 	prev        = 0;
 	firstChild  = 0;
 	lastChild   = 0;
@@ -64,7 +64,7 @@ void asCScriptNode::Destroy(asCScriptEngine *engine)
 
 	while( node )
 	{
-		next = node->next;
+		next = node->m_next;
 		node->Destroy(engine);
 		node = next;
 	}
@@ -93,7 +93,7 @@ asCScriptNode *asCScriptNode::CreateCopy(asCScriptEngine *engine)
 	while( child )
 	{
 		node->AddChildLast(child->CreateCopy(engine));
-		child = child->next;
+		child = child->m_next;
 	}
 
 	return node;
@@ -135,8 +135,8 @@ void asCScriptNode::AddChildLast(asCScriptNode *node)
 
 	if( lastChild )
 	{
-		lastChild->next = node;
-		node->next      = 0;
+		lastChild->m_next = node;
+		node->m_next      = 0;
 		node->prev      = lastChild;
 		node->parent    = this;
 		lastChild       = node;
@@ -145,7 +145,7 @@ void asCScriptNode::AddChildLast(asCScriptNode *node)
 	{
 		firstChild   = node;
 		lastChild    = node;
-		node->next   = 0;
+		node->m_next   = 0;
 		node->prev   = 0;
 		node->parent = this;
 	}
@@ -158,19 +158,19 @@ void asCScriptNode::DisconnectParent()
 	if( parent )
 	{
 		if( parent->firstChild == this )
-			parent->firstChild = next;
+			parent->firstChild = m_next;
 		if( parent->lastChild == this )
 			parent->lastChild = prev;
 	}
 
-	if( next )
-		next->prev = prev;
+	if( m_next )
+		m_next->prev = prev;
 
 	if( prev )
-		prev->next = next;
+		prev->m_next = m_next;
 
 	parent = 0;
-	next = 0;
+	m_next = 0;
 	prev = 0;
 }
 

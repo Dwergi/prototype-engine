@@ -65,9 +65,14 @@ Cache the functions and types</h1>
 <h1><a class="anchor" id="doc_finetuning_2"></a>
 Reuse the context object</h1>
 <p>The context object is a heavy weight object and you should avoid allocating new instances for each call. The object has been designed to be reused for multiple calls.</p>
+<h2><a class="anchor" id="doc_finetuning_2_1"></a>
+Context pool</h2>
 <p>Ideally the application will keep a simple memory pool of allocated context objects, where new objects are only allocated if the is no free objects in the pool.</p>
+<p>By using the engine's <a class="el" href="classas_i_script_engine.html#ae5ba9fe99b72c60392cdaeef164f2c65">context callbacks</a>, this context pool will also be automatically available to the engine for use in internal calls and the add-ons.</p>
+<p>The code that wants to use a context from the pool should use the <a class="el" href="classas_i_script_engine.html#a32391ee83e58083b406ba068ab2ee049">RequestContext</a> and <a class="el" href="classas_i_script_engine.html#a22e42bf32902cbd6885731a6beeaca20">ReturnContext</a> methods instead of the <a class="el" href="classas_i_script_engine.html#a2630e1cd03ffab0fee9b820bf0afe42a">CreateContext</a> method.</p>
+<p>Here's a simple implementation of a context pool.</p>
 <div class="fragment"><div class="line">std::vector&lt;asIScriptContext *&gt; pool;</div>
-<div class="line"><a class="code" href="classas_i_script_context.html" title="The interface to the virtual machine.">asIScriptContext</a> *GetContextFromPool()</div>
+<div class="line"><a class="code" href="classas_i_script_context.html" title="The interface to the virtual machine.">asIScriptContext</a> *RequestContextCallback(<a class="code" href="classas_i_script_engine.html" title="The engine interface.">asIScriptEngine</a> *engine, <span class="keywordtype">void</span> *param)</div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// Get a context from the pool, or create a new</span></div>
 <div class="line">  <a class="code" href="classas_i_script_context.html" title="The interface to the virtual machine.">asIScriptContext</a> *ctx = 0;</div>
@@ -82,14 +87,17 @@ Reuse the context object</h1>
 <div class="line">  <span class="keywordflow">return</span> ctx;</div>
 <div class="line">}</div>
 <div class="line"></div>
-<div class="line"><span class="keywordtype">void</span> ReturnContextToPool(<a class="code" href="classas_i_script_context.html" title="The interface to the virtual machine.">asIScriptContext</a> *ctx)</div>
+<div class="line"><span class="keywordtype">void</span> ReturnContextToPool(<a class="code" href="classas_i_script_engine.html" title="The engine interface.">asIScriptEngine</a> *engine, <a class="code" href="classas_i_script_context.html" title="The interface to the virtual machine.">asIScriptContext</a> *ctx, <span class="keywordtype">void</span> *param)</div>
 <div class="line">{</div>
 <div class="line">  pool.push_back(ctx);</div>
 <div class="line">  </div>
 <div class="line">  <span class="comment">// Unprepare the context to free non-reusable resources</span></div>
 <div class="line">  ctx-&gt;<a class="code" href="classas_i_script_context.html#ae3c18a2cc66c56f840e6ee4310287f65" title="Frees resources held by the context.">Unprepare</a>();</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Whenever an application registered function that is called from a script needs to execute another script it can reuse the already active context for a nested call. This way it is not look for an available context from a pool or allocate a new context just for this call.</p>
+</div><!-- fragment --><h2><a class="anchor" id="doc_finetuning_2_2"></a>
+Nested calls</h2>
+<p>Another form of reusing a context is to use nested calls.</p>
+<p>Whenever an application registered function that is called from a script needs to execute another script it can reuse the already active context for a nested call. This way it is not necessary to look for an available context from a pool or allocate a new context just for this call.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> Func()</div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// Get the active context</span></div>
@@ -131,7 +139,7 @@ Compare native calling convention versus generic calling convention</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Feb 22 2015 11:44:44 for AngelScript by
+    <li class="footer">Generated on Sun Aug 30 2015 14:21:21 for AngelScript by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

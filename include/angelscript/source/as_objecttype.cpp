@@ -53,6 +53,7 @@ asCObjectType::asCObjectType()
 	module      = 0;
 	derivedFrom = 0;
 	size        = 0;
+	m_typeId      = -1; // start as -1 to signal that it hasn't been defined
 
 	acceptValueSubType = true;
 	acceptRefSubType   = true;
@@ -60,7 +61,7 @@ asCObjectType::asCObjectType()
 	scriptSectionIdx = -1;
 	declaredAt       = 0;
 
-	accessMask = 0xFFFFFFFF;
+	m_accessMask = 0xFFFFFFFF;
 	nameSpace  = 0;
 #ifdef WIP_16BYTE_ALIGN
 	alignment  = 4;
@@ -74,6 +75,7 @@ asCObjectType::asCObjectType(asCScriptEngine *engine)
 	this->engine = engine; 
 	module       = 0;
 	derivedFrom  = 0;
+	m_typeId      = -1; // start as -1 to signal that it hasn't been defined
 
 	acceptValueSubType = true;
 	acceptRefSubType   = true;
@@ -81,7 +83,7 @@ asCObjectType::asCObjectType(asCScriptEngine *engine)
 	scriptSectionIdx = -1;
 	declaredAt       = 0;
 
-	accessMask = 0xFFFFFFFF;
+	m_accessMask = 0xFFFFFFFF;
 	nameSpace  = engine->nameSpaces[0];
 #ifdef WIP_16BYTE_ALIGN
 	alignment  = 4;
@@ -241,7 +243,8 @@ void asCObjectType::DestroyInternal()
 	userData.SetLength(0);
 
 	// Remove the type from the engine
-	engine->RemoveFromTypeIdMap(this);
+	if( m_typeId != -1 )
+		engine->RemoveFromTypeIdMap(this);
 
 	// Clear the engine pointer to mark the object type as invalid
 	engine = 0;
@@ -252,7 +255,6 @@ asCObjectType::~asCObjectType()
 	if( engine == 0 )
 		return;
 
-	// TODO: 2.30.0: redesign: Shouldn't this have been done already?
 	DestroyInternal();
 }
 
@@ -298,7 +300,7 @@ bool asCObjectType::IsShared() const
 // interface
 const char *asCObjectType::GetName() const
 {
-	return name.AddressOf();
+	return m_name.AddressOf();
 }
 
 // interface
@@ -322,12 +324,18 @@ asUINT asCObjectType::GetSize() const
 // interface
 int asCObjectType::GetTypeId() const
 {
-	// We need a non const pointer to create the asCDataType object.
-	// We're not breaking anything here because this function is not
-	// modifying the object, so this const cast is safe.
-	asCObjectType *ot = const_cast<asCObjectType*>(this);
+	if( m_typeId == -1 )
+	{
+		// We need a non const pointer to create the asCDataType object.
+		// We're not breaking anything here because this function is not
+		// modifying the object, so this const cast is safe.
+		asCObjectType *ot = const_cast<asCObjectType*>(this);
 
-	return engine->GetTypeIdFromDataType(asCDataType::CreateObject(ot, false));
+		// The engine will define the typeId for this object type
+		engine->GetTypeIdFromDataType(asCDataType::CreateObject(ot, false));
+	}
+
+	return m_typeId;
 }
 
 // interface
@@ -434,7 +442,7 @@ asIScriptFunction *asCObjectType::GetMethodByName(const char *name, bool getVirt
 	int id = -1;
 	for( asUINT n = 0; n < methods.GetLength(); n++ )
 	{
-		if( engine->scriptFunctions[methods[n]]->name == name )
+		if( engine->scriptFunctions[methods[n]]->m_name == name )
 		{
 			if( id == -1 )
 				id = methods[n];
@@ -666,7 +674,7 @@ const char *asCObjectType::GetConfigGroup() const
 // interface
 asDWORD asCObjectType::GetAccessMask() const
 {
-	return accessMask;
+	return m_accessMask;
 }
 
 // internal

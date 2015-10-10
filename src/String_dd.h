@@ -31,6 +31,7 @@ namespace dd
 		bool operator==( const String& other ) const;
 		String& operator+=( const String& other );
 		String& operator+=( const char* other );
+		String& operator+=( char other );
 
 		int Find( const char* other, uint offset = 0 ) const;
 		int Find( const String& other, uint offset = 0 ) const;

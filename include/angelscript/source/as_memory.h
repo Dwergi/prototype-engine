@@ -72,7 +72,7 @@ bool isAligned(const void* const pointer, asUINT alignment);
 #ifndef AS_DEBUG
 
 	#define asNEW(x)        new(userAlloc(sizeof(x))) x
-	#define asDELETE(ptr,x) {void *tmp = ptr; (ptr)->~x(); userFree(tmp);}
+	#define asDELETE(ptr,x) {void *_tmp = ptr; (ptr)->~x(); userFree(_tmp);}
 
 	#define asNEWARRAY(x,cnt)  (x*)userAlloc(sizeof(x)*cnt)
 	#define asDELETEARRAY(ptr) userFree(ptr)
@@ -87,7 +87,7 @@ bool isAligned(const void* const pointer, asUINT alignment);
 	typedef void *(*asALLOCFUNCDEBUG_t)(size_t, const char *, unsigned int);
 
 	#define asNEW(x)        new(((asALLOCFUNCDEBUG_t)(userAlloc))(sizeof(x), __FILE__, __LINE__)) x
-	#define asDELETE(ptr,x) {void *tmp = ptr; (ptr)->~x(); userFree(tmp);}
+	#define asDELETE(ptr,x) {void *_tmp = ptr; (ptr)->~x(); userFree(_tmp);}
 
 	#define asNEWARRAY(x,cnt)  (x*)((asALLOCFUNCDEBUG_t)(userAlloc))(sizeof(x)*cnt, __FILE__, __LINE__)
 	#define asDELETEARRAY(ptr) userFree(ptr)

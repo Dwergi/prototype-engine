@@ -69,7 +69,7 @@ int asCConfigGroup::Release()
 asCObjectType *asCConfigGroup::FindType(const char *obj)
 {
 	for( asUINT n = 0; n < objTypes.GetLength(); n++ )
-		if( objTypes[n]->name == obj )
+		if( objTypes[n]->m_name == obj )
 			return objTypes[n];
 
 	return 0;
@@ -173,7 +173,7 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 		{
 			asCObjectType *t = objTypes[n];
 			asSMapNode<asSNameSpaceNamePair, asCObjectType*> *cursor;
-			if( engine->allRegisteredTypes.MoveTo(&cursor, asSNameSpaceNamePair(t->nameSpace, t->name)) &&
+			if( engine->allRegisteredTypes.MoveTo(&cursor, asSNameSpaceNamePair(t->nameSpace, t->m_name)) &&
 				cursor->value == t )
 			{
 				engine->allRegisteredTypes.Erase(cursor);

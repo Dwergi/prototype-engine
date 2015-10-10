@@ -108,3 +108,37 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 		REQUIRE( out == result );
 	}
 }
+
+TEST_CASE( "[Serialization] Deserialize from JSON" )
+{
+	RegisterDefaultTypes();
+
+	String256 in;
+
+	SECTION( "Int" )
+	{
+		in = "125";
+		JSONDeserializer deserializer( in );
+		
+		int i = 0;
+		deserializer.Deserialize( i );
+	}
+
+	SECTION( "Struct" )
+	{
+		SimpleStruct s;
+		s.Int = 0;
+		s.Str = "LOL";
+		s.Flt = 111.0f;
+
+		JSONSerializer serializer( in );
+		serializer.Serialize( s );
+		
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( s );
+
+		REQUIRE( s.Int == 0 );
+		REQUIRE( s.Str == "LOL" );
+		REQUIRE( s.Flt == 111.0f );
+	}
+}

@@ -428,7 +428,7 @@ asUINT asCSymbolTable<T>::Put(T *entry)
 template<class T>
 void asCSymbolTable<T>::GetKey(const T *entry, asSNameSpaceNamePair &key) const
 {
-	key = asSNameSpaceNamePair(entry->nameSpace, entry->name);
+	key = asSNameSpaceNamePair(entry->nameSpace, entry->m_name);
 }
 
 

@@ -42,7 +42,7 @@ asCGlobalProperty::asCGlobalProperty()
 	memory          = &storage; 
 	memoryAllocated = false; 
 	realAddress     = 0; 
-	initFunc        = 0;
+	m_initFunc        = 0;
 	accessMask      = 0xFFFFFFFF;
 
 	refCount.set(1);
@@ -56,8 +56,8 @@ asCGlobalProperty::~asCGlobalProperty()
 	if( memoryAllocated ) { asDELETEARRAYALIGNED(memory); } 
 #endif
 
-	if( initFunc )
-		initFunc->ReleaseInternal();
+	if( m_initFunc )
+		m_initFunc->ReleaseInternal();
 }
 
 void asCGlobalProperty::AddRef()
@@ -73,10 +73,10 @@ void asCGlobalProperty::Release()
 
 void asCGlobalProperty::DestroyInternal()
 {
-	if( initFunc )
+	if( m_initFunc )
 	{
-		initFunc->ReleaseInternal();
-		initFunc = 0;
+		m_initFunc->ReleaseInternal();
+		m_initFunc = 0;
 	}
 }
 
@@ -123,15 +123,15 @@ void *asCGlobalProperty::GetRegisteredAddress() const
 void asCGlobalProperty::SetInitFunc(asCScriptFunction *initFunc)
 {
 	// This should only be done once
-	asASSERT( this->initFunc == 0 );
+	asASSERT( this->m_initFunc == 0 );
 
-	this->initFunc = initFunc;
-	this->initFunc->AddRefInternal();
+	m_initFunc = initFunc;
+	m_initFunc->AddRefInternal();
 }
 
 asCScriptFunction *asCGlobalProperty::GetInitFunc()
 {
-	return initFunc;
+	return m_initFunc;
 }
 
 END_AS_NAMESPACE
