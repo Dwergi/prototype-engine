@@ -1,5 +1,5 @@
 //
-// Script.h - Tests for the scripting.
+// ScriptTests.h - Tests for the scripting.
 // Copyright (C) Sebastian Nordgren 
 // August 11th 2015
 //

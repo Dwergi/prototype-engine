@@ -77,8 +77,8 @@ namespace dd
 
 			m_valid[ entity.ID ] = true;
 
-			T& cmp = m_components[ entity.ID ];
-			return &cmp;
+			T* cmp = new (&m_components[ entity.ID ]) T();
+			return cmp;
 		}
 
 		dd::ComponentHandle<T> GetHandle( const dd::EntityHandle& entity )

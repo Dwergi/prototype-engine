@@ -6,14 +6,16 @@
 
 #include "PrecompiledHeader.h"
 
+#include "CommandLine.h"
+#include "Services.h"
+
 #ifdef _TEST
 
 #include "Tests.h"
 
-#else
+#endif
 
 #include "EntitySystem.h"
-#include "Services.h"
 #include "TransformComponent.h"
 #include "ScopedTimer.h"
 #include "OctreeComponent.h"
@@ -25,11 +27,7 @@
 #include "Random.h"
 #include "Window.h"
 #include "Input.h"
-
-#endif
 //---------------------------------------------------------------------------
-
-#ifndef _TEST
 
 template<typename T>
 void RegisterComponent()
@@ -59,26 +57,40 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 }
 
 dd::Services g_services;
-#endif
 
+//
+// ENTRY POINT
+//
 int main( int argc, char* const argv[] )
 {
-	for( int i = 1; i < argc; ++i )
-	{
-		if( strcmp( argv[ i ], "-noassert" ) == 0 )
-		{
-			pempek::assert::implementation::ignoreAllAsserts( true );
-		}
-	}
+	dd::CommandLine cmdLine( argv, argc );
+
+	g_services.Register<dd::CommandLine>( &cmdLine );
+	
+	if( cmdLine.Exists( "noassert" ) )
+		pempek::assert::implementation::ignoreAllAsserts( true );
 
 #ifdef _TEST
+	return TestMain( argc, argv );
+#else
+	return GameMain();
+#endif
+}
+
+int TestMain( int argc, char* const argv[] )
+{
 	int iError = tests::RunTests( argc, argv );
 
 	if( iError != 0 )
 		ASSERT( false, "Tests failed!" );
+	else
+		printf( "Tests passed!" );
 
 	return iError;
-#else
+}
+
+int GameMain()
+{
 	dd::EntitySystem entitySystem;
 	g_services.Register<dd::EntitySystem>( &entitySystem );
 
@@ -94,8 +106,8 @@ int main( int argc, char* const argv[] )
 	auto& swarm_pool = swarm_db.GetWrite();
 	auto& octree_pool = octree_db.GetWrite();
 
-	dd::Random rngPos( 0, 100 );
-	dd::Random rngVelocity( 0, 100 );
+	dd::Random32 rngPos( 0, 100 );
+	dd::Random32 rngVelocity( 0, 100 );
 
 	dd::Octree octree;
 
@@ -141,10 +153,10 @@ int main( int argc, char* const argv[] )
 
 		for( uint i = 0; i < events.Size(); ++i )
 		{
-			if( events[ i ].Type == dd::InputType::PRESSED )
+			if( events[i].Type == dd::InputType::PRESSED )
 				std::cout << "Pressed a key!" << std::endl;
 
-			if( events[ i ].Type == dd::InputType::RELEASED )
+			if( events[i].Type == dd::InputType::RELEASED )
 				std::cout << "Released a key!" << std::endl;
 		}
 
@@ -152,8 +164,7 @@ int main( int argc, char* const argv[] )
 	}
 
 	window.Close();
-	
+
 	ASSERT( false, "DONE!" );
 	return 0;
-#endif
 }

@@ -32,8 +32,8 @@ namespace dd
 		String& operator+=( const String& other );
 		String& operator+=( const char* other );
 
-		int Find( const String& other ) const;
-		String& Substring( uint start, uint end );
+		int Find( const char* other, uint offset = 0 ) const;
+		int Find( const String& other, uint offset = 0 ) const;
 
 		void Clear() { m_length = 0; }
 
@@ -110,6 +110,8 @@ namespace dd
 
 		}
 
+		InplaceString <Size> Substring( uint start, uint count = -1 );
+
 	private:
 
 		char m_stackData[ Size ];
@@ -121,4 +123,19 @@ namespace dd
 	typedef InplaceString<64> String64;
 	typedef InplaceString<128> String128;
 	typedef InplaceString<256> String256;
+
+	template<int Size>
+	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count )
+	{
+		ASSERT( start < m_length );
+		ASSERT( count > 0 );
+
+		count = std::min( m_length - start, count );
+
+		InplaceString<Size> substring;
+		substring.SetString( m_buffer + start, count );
+
+		return substring;
+	}
+
 }

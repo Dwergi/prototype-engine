@@ -42,10 +42,10 @@ namespace dd
 
 		for( uint i = 0; i < m_length; ++i )
 		{
-			if( other[ i ] == '\0' )
+			if( other[i] == '\0' )
 				return false;
 
-			if( m_buffer[ i ] != other[ i ] )
+			if( m_buffer[i] != other[i] )
 				return false;
 		}
 
@@ -96,13 +96,49 @@ namespace dd
 		return *this;
 	}
 
+	int String::Find( const char* other, uint offset ) const
+	{
+		ASSERT( m_buffer != nullptr );
+		ASSERT( other != nullptr );
+
+		if( other == nullptr || offset >= m_length )
+			return -1;
+
+		const char* ptr = strstr( m_buffer, other );
+
+		if( ptr == nullptr )
+			return -1;
+
+		uint location = (uint) (ptr - m_buffer);
+
+		return location;
+	}
+
+	int String::Find( const String& other, uint offset ) const
+	{
+		ASSERT( m_buffer != nullptr );
+		ASSERT( other.m_buffer != nullptr );
+
+		if( offset >= m_length )
+			return -1;
+
+		const char* ptr = strstr( m_buffer, other.m_buffer );
+
+		if( ptr == nullptr )
+			return -1;
+
+		uint location = (uint) (ptr - m_buffer);
+
+		return location;
+	}
+
 	bool String::StartsWith( const char* other ) const
 	{
 		size_t len = strlen( other );
 
 		for( size_t i = 0; i < len; ++i )
 		{
-			if( m_buffer[ (uint) i ] != other[ i ] )
+			if( m_buffer[(uint) i] != other[i] )
 				return false;
 		}
 
@@ -119,7 +155,7 @@ namespace dd
 		uint new_length = m_length + other_length;
 		Resize( new_length );
 
-		memcpy( &m_buffer[ m_length ], buffer, other_length );
+		memcpy( &m_buffer[m_length], buffer, other_length );
 
 		m_length = new_length;
 		NullTerminate();
@@ -167,7 +203,7 @@ namespace dd
 
 		char* old_buffer = m_buffer.Release();
 
-		m_buffer.Set( new char[ new_capacity ], new_capacity );
+		m_buffer.Set( new char[new_capacity], new_capacity );
 
 		// copy old data over if required
 		if( m_length > 0 )
@@ -197,8 +233,8 @@ namespace dd
 		else
 		{
 			void* old_buffer = m_buffer.Release();
-			
-			m_buffer.Set( new char[ m_length + 1 ], m_length + 1 );
+
+			m_buffer.Set( new char[m_length + 1], m_length + 1 );
 
 			memcpy( m_buffer, old_buffer, m_length );
 
@@ -210,6 +246,6 @@ namespace dd
 
 	void String::NullTerminate()
 	{
-		m_buffer[ m_length ] = '\0';
+		m_buffer[m_length] = '\0';
 	}
 }

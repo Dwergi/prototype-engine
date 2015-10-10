@@ -83,3 +83,27 @@ TEST_CASE( "[String] Grow" )
 		start += "x";
 	}
 }
+
+TEST_CASE( "[String] Find" )
+{
+	dd::String32 test( "A test string." );
+	
+	REQUIRE( test.Find( "elephant" ) == -1 );
+	REQUIRE( test.Find( "test" ) == 2 );
+	REQUIRE( test.Find( "A" ) == 0 );
+	REQUIRE( test.Find( "." ) == test.Length() - 1 );
+}
+
+TEST_CASE( "[String] Substring" )
+{
+	dd::String32 test( "A test string." );
+
+	dd::String32 res = test.Substring( 2, 4 );
+	REQUIRE( res == "test" );
+	
+	res = test.Substring( 8, 6 );
+	REQUIRE( res == "string" );
+
+	res = test.Substring( 8 );
+	REQUIRE( res == "string." );
+}

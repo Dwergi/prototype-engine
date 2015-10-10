@@ -237,6 +237,9 @@
     <ClInclude Include="src\Buffer.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\CommandLine.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -371,6 +374,15 @@
     </ClCompile>
     <ClCompile Include="src\Stream.cpp">
       <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RandomTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandLine.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandLineTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
