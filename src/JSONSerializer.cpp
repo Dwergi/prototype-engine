@@ -254,6 +254,8 @@ namespace dd
 		{
 			ReadUntilWhitespaceOr( stream, ',', kvp.Value );
 		}
+
+		SkipWhitespace( stream );
 	}
 
 	bool JSONDeserializer::Deserialize( Variable var )
@@ -274,9 +276,10 @@ namespace dd
 			char c = m_stream.ReadByte();
 			ASSERT( c == '{' );
 
-			{
-				// check the type
-				JSONKeyValuePair pair;
+			JSONKeyValuePair pair;
+
+			// check the type
+			{			
 				ReadNextPair( m_stream, pair );
 
 				ASSERT( pair.Key == "type" );
@@ -290,12 +293,18 @@ namespace dd
 				}
 			}
 
-			// has to be another member in there
-			ASSERT( m_stream.ReadByte() == ',' );
+			// has to have a "members" entry
+			{
+				ASSERT( m_stream.ReadByte() == ',' );
+
+				ReadNextPair( m_stream, pair );
+
+				ASSERT( pair.Key == "members" && pair.HasChildren );
+				ASSERT( m_stream.ReadByte() == '{' );
+			}
 
 			for( Member& member : type->GetMembers() )
 			{
-				JSONKeyValuePair pair;
 				ReadNextPair( m_stream, pair );
 
 				ASSERT( pair.Key == member.Name() );
