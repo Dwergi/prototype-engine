@@ -12,44 +12,7 @@
 #include "Recorder.h"
 #include "Vector4.h"
 
-struct SimpleStruct
-{
-	int Int;
-	dd::String32 Str;
-	float Flt;
-	dd::Vector<int> Vec;
-
-	void Double();
-	int Multiply( int x );
-
-	BEGIN_MEMBERS( SimpleStruct )
-		MEMBER( Int );
-		MEMBER( Str );
-		MEMBER( Flt );
-		METHOD( Multiply );
-	END_MEMBERS
-};
-
-void SimpleStruct::Double()
-{
-
-}
-
-int SimpleStruct::Multiply( int x )
-{
-	return x;
-}
-
-struct NestedStruct
-{
-	SimpleStruct Struct;
-	int SecondInt;
-
-	BEGIN_MEMBERS( NestedStruct )
-		MEMBER( Struct );
-		MEMBER( SecondInt );
-	END_MEMBERS
-};
+#include "TestTypes.h"
 
 void test_int_prop( dd::Property* int_prop )
 {
@@ -72,8 +35,8 @@ void test_int_prop( dd::Property* int_prop )
 
 TEST_CASE( "[property] Integer properties" )
 {
-	REGISTER_TYPE( SimpleStruct );
-	SimpleStruct test_struct;
+	REGISTER_TYPE( Test::SimpleStruct );
+	Test::SimpleStruct test_struct;
 
 	SECTION( "Simple" )
 	{
@@ -89,8 +52,8 @@ TEST_CASE( "[property] Integer properties" )
 
 	SECTION( "Nested Struct ")
 	{
-		REGISTER_TYPE( NestedStruct );
-		NestedStruct nested;
+		REGISTER_TYPE( Test::NestedStruct );
+		Test::NestedStruct nested;
 		dd::PropertyList nested_props( nested );
 
 		SECTION( "Nested" )
@@ -101,7 +64,7 @@ TEST_CASE( "[property] Integer properties" )
 
 			test_int_prop( nested_int );
 
-			REQUIRE( nested.Struct.Int == 20 );
+			REQUIRE( nested.Nested.Int == 20 );
 		}
 		SECTION( "Offset" )
 		{

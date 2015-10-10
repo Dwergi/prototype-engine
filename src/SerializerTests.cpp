@@ -9,30 +9,15 @@
 
 #include "JSONSerializer.h"
 
+#include "TestTypes.h"
+
 using namespace dd;
-
-struct SimpleStruct
-{
-	int Int;
-	dd::String32 Str;
-	float Flt;
-	dd::Vector<int> Vec;
-
-	void Double();
-	int Multiply( int x );
-
-	BEGIN_MEMBERS( SimpleStruct )
-		MEMBER( Int );
-		MEMBER( Str );
-		MEMBER( Flt );
-		MEMBER( Vec );
-		METHOD( Multiply );
-	END_MEMBERS
-};
 
 TEST_CASE( "[Serialization] Serialize to JSON" )
 {
 	RegisterDefaultTypes();
+	REGISTER_TYPE( Test::SimpleStruct );
+	REGISTER_TYPE( Test::NestedStruct );
 
 	String256 out;
 
@@ -79,58 +64,92 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 		REQUIRE( out == y );
 	}
 
+	Test::SimpleStruct simple;
+	simple.Int = 222;
+	simple.Str = "LOL";
+	simple.Flt = 111.0f;
+	simple.Vec.Add( 1 );
+	simple.Vec.Add( 2 );
+	simple.Vec.Add( 3 );
+
 	SECTION( "Struct" )
 	{
-		REGISTER_TYPE( SimpleStruct );
+		serializer.Serialize( simple );
 
-		SimpleStruct s;
-		s.Int = 222;
-		s.Str = "LOL";
-		s.Flt = 111.0f;
-		s.Vec.Add( 1 );
-		s.Vec.Add( 2 );
-		s.Vec.Add( 3 );
-
-		serializer.Serialize( s );
-
-		const char* result = 
-		"{\n"
-		"	\"type\" : \"SimpleStruct\",\n"
-		"	\"members\" : \n"
-		"	{\n"
-		"		\"Int\" : 222,\n"
-		"		\"Str\" : \"LOL\",\n"
-		"		\"Flt\" : 111.000000,\n"
-		"		\"Vec\" : [1,2,3]\n"
-		"	}\n"
-		"}\n";
+		const char* result =
+			"{\n"
+			"	\"type\" : \"Test::SimpleStruct\",\n"
+			"	\"members\" : \n"
+			"	{\n"
+			"		\"Int\" : 222,\n"
+			"		\"Str\" : \"LOL\",\n"
+			"		\"Flt\" : 111.000000,\n"
+			"		\"Vec\" : [1,2,3]\n"
+			"	}\n"
+			"}";
 
 		REQUIRE( out == result );
+	}
+
+	SECTION( "Nested Struct" )
+	{
+		Test::NestedStruct nested;
+		nested.SecondInt = 333;
+		nested.Nested = simple;
+
+		serializer.Serialize( nested );
+
+		const char* nested_result =
+			"{\n"
+			"	\"type\" : \"Test::NestedStruct\",\n"
+			"	\"members\" : \n"
+			"	{\n"
+			"		\"Nested\" : \n"
+			"		{\n"
+			"			\"type\" : \"Test::SimpleStruct\",\n"
+			"			\"members\" : \n"
+			"			{\n"
+			"				\"Int\" : 222,\n"
+			"				\"Str\" : \"LOL\",\n"
+			"				\"Flt\" : 111.000000,\n"
+			"				\"Vec\" : [1,2,3]\n"
+			"			}\n"
+			"		},\n"
+			"		\"SecondInt\" : 333\n"
+			"	}\n"
+			"}";
+
+		REQUIRE( out == nested_result );
 	}
 }
 
 TEST_CASE( "[Serialization] Deserialize from JSON" )
 {
 	RegisterDefaultTypes();
+	REGISTER_TYPE( Test::SimpleStruct );
+	REGISTER_TYPE( Test::NestedStruct );
 
 	String256 in;
 
 	SECTION( "Int" )
 	{
 		in = "125";
-		JSONDeserializer deserializer( in );
-		
+
 		int i = 0;
+		JSONDeserializer deserializer( in );
 		deserializer.Deserialize( i );
 	}
 
+	Test::SimpleStruct s;
+	s.Int = 0;
+	s.Str = "LOL";
+	s.Flt = 111.0f;
+	s.Vec.Add( 1 );
+	s.Vec.Add( 2 );
+	s.Vec.Add( 3 );
+
 	SECTION( "Struct" )
 	{
-		SimpleStruct s;
-		s.Int = 0;
-		s.Str = "LOL";
-		s.Flt = 111.0f;
-
 		JSONSerializer serializer( in );
 		serializer.Serialize( s );
 		
@@ -140,5 +159,22 @@ TEST_CASE( "[Serialization] Deserialize from JSON" )
 		REQUIRE( s.Int == 0 );
 		REQUIRE( s.Str == "LOL" );
 		REQUIRE( s.Flt == 111.0f );
+	}
+
+
+	SECTION( "Nested Struct" )
+	{
+		Test::NestedStruct complex;
+		complex.SecondInt = 50;
+		complex.Nested = s;
+
+		JSONSerializer serializer( in );
+		serializer.Serialize( complex );
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( complex );
+
+		REQUIRE( complex.Nested == s );
+		REQUIRE( complex.SecondInt == 50 );
 	}
 }

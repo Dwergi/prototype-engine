@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
+#include "TestTypes.h"
+
 namespace ArrayTests
 {
 	TEST_CASE( "[Array] Push" )
@@ -76,34 +78,20 @@ namespace ArrayTests
 		REQUIRE( container.Contains( 15 ) );
 	}
 
-
-	struct SimpleStruct
-	{
-		int Integer;
-		float Float;
-		dd::String32 String;
-	};
-
-	struct ComplexStruct
-	{
-		SimpleStruct Nested;
-		int OtherInt;
-	};
-
 	TEST_CASE( "[Array] Struct" )
 	{
-		dd::Array<ArrayTests::ComplexStruct, 32> container;
+		dd::Array<Test::NestedStruct, 32> container;
 	
-		ASSERT( sizeof( ArrayTests::ComplexStruct ) > sizeof( ArrayTests::SimpleStruct ) );
-		ASSERT( sizeof( dd::Array<ArrayTests::ComplexStruct, 32> ) > sizeof( ArrayTests::ComplexStruct ) * 32 );
+		ASSERT( sizeof( Test::NestedStruct ) > sizeof( Test::SimpleStruct ) );
+		ASSERT( sizeof( dd::Array<Test::NestedStruct, 32> ) > sizeof( Test::NestedStruct ) * 32 );
 
 		for( int i = 0; i < 32; ++i )
 		{
-			ArrayTests::ComplexStruct s;
-			s.Nested.Integer = i;
-			s.Nested.Float = (float) i;
-			s.Nested.String = "test";
-			s.OtherInt = i;
+			Test::NestedStruct s;
+			s.Nested.Int = i;
+			s.Nested.Flt = (float) i;
+			s.Nested.Str = "test";
+			s.SecondInt = i;
 			container.Push( s );
 		}
 
@@ -129,13 +117,13 @@ namespace ArrayTests
 			REQUIRE( int_a[ i ] == int_b[ i ] );
 		}
 
-		dd::Array<ArrayTests::ComplexStruct, 128> complex_a;
-		dd::Array<ArrayTests::ComplexStruct, 128> complex_b;
+		dd::Array<Test::NestedStruct, 128> complex_a;
+		dd::Array<Test::NestedStruct, 128> complex_b;
 
 		for( int i = 0; i < 128; ++i )
 		{
-			ArrayTests::ComplexStruct s;
-			s.OtherInt = i;
+			Test::NestedStruct s;
+			s.SecondInt = i;
 			complex_a.Push( s );
 		}
 
@@ -143,7 +131,7 @@ namespace ArrayTests
 
 		for( int i = 0; i < 128; ++i )
 		{
-			REQUIRE( complex_a[ i ].OtherInt == complex_b[ i ].OtherInt );
+			REQUIRE( complex_a[ i ].SecondInt == complex_b[ i ].SecondInt );
 		}
 	}
 }

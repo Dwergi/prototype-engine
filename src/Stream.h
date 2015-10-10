@@ -16,6 +16,7 @@ namespace dd
 
 		uint Remaining() const;
 		void Advance( uint bytes );
+		uint Offset() const { return m_current; }
 
 	protected:
 
@@ -52,6 +53,7 @@ namespace dd
 		WriteStream( void* out, uint capacity );
 		WriteStream( const WriteStream& other );
 
+		void WriteByte( char c );
 		void Write( const String& str );
 		void Write( const void* src, uint bytes );
 		void WriteFormat( const char* format, ... );

@@ -27,7 +27,7 @@ namespace dd
 		--m_host.m_indent;
 		Indent();
 
-		m_host.m_stream.Write( "}\n", 2 );
+		m_host.m_stream.WriteByte( '}' );
 
 		m_host.m_currentObject = m_previous;
 	}
@@ -78,9 +78,9 @@ namespace dd
 		Serialize( value );
 
 		if( !last )
-			m_stream.Write( ",", 1 );
+			m_stream.WriteByte( ',' );
 
-		m_stream.Write( "\n", 1 );
+		m_stream.WriteByte( '\n' );
 	}
 
 	bool JSONSerializer::Serialize( Variable var )
@@ -104,7 +104,7 @@ namespace dd
 			AddString( "type", type->Name() );
 
 			AddKey( String16( "members" ) );
-			m_stream.Write( "\n", 1 );
+			m_stream.WriteByte( '\n' );
 
 			{
 				ScopedJSONObject members( *this );
@@ -116,18 +116,23 @@ namespace dd
 					AddKey( member.Name() );
 
 					void* data = PointerAdd( var.Data(), member.Offset() );
-					
+
+					if( !member.Type()->IsPOD() )
+						m_stream.WriteByte( '\n' );
+
 					if( !Serialize( Variable( member.Type(), data ) ) )
 						return false;
 
 					if( index < (member_count - 1) )
-						m_stream.Write( ",", 1 );
+						m_stream.WriteByte( ',' );
 
-					m_stream.Write( "\n", 1 );
+					m_stream.WriteByte( '\n' );
 
 					++index;
 				}
 			}
+
+			m_stream.WriteByte( '\n' );
 		}
 
 		return true;
@@ -250,6 +255,12 @@ namespace dd
 			kvp.Value += current;
 			ASSERT( current == '"' );
 		}
+		else if( current == '[' )
+		{
+			// lists
+			ReadUntil( stream, ']', kvp.Value );
+			kvp.Value += stream.ReadByte();
+		}
 		else
 		{
 			ReadUntilWhitespaceOr( stream, ',', kvp.Value );
@@ -311,8 +322,24 @@ namespace dd
 
 				Variable member_var( member.Type(), PointerAdd( var.Data(), member.Offset() ) );
 
-				JSONDeserializer nested( pair.Value );
-				nested.Deserialize( member_var );
+				if( pair.HasChildren )
+				{
+					// having children means there's potentially a lot of data for this pair, so pass in the stream
+					JSONDeserializer nested( m_stream );
+					nested.Deserialize( member_var );
+
+					// skip ahead to wherever the nested serializer called it quits
+					uint offset = nested.m_stream.Offset();
+					m_stream.Advance( offset - m_stream.Offset() );
+
+					SkipWhitespace( m_stream );
+				}
+				else
+				{
+					// just deserialize the value
+					JSONDeserializer nested( pair.Value );
+					nested.Deserialize( member_var );
+				}
 
 				char c = m_stream.ReadByte();
 				ASSERT( c == ',' || c == '}' );

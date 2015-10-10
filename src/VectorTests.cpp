@@ -10,6 +10,8 @@
 #include "String_dd.h"
 #include "Vector.h"
 
+#include "TestTypes.h"
+
 TEST_CASE( "[Vector] Add" )
 {
 	dd::Vector<int> container;
@@ -84,29 +86,13 @@ TEST_CASE( "[Vector] Contains" )
 	REQUIRE( container.Contains( 15 ) );
 }
 
-namespace
-{
-	struct SimpleStruct
-	{
-		int Integer;
-		float Float;
-		dd::String32  String;
-	};
-
-	struct ComplexStruct
-	{
-		::SimpleStruct Nested;
-		int OtherInt;
-	};
-}
-
 TEST_CASE( "[Vector] Struct" )
 {
-	dd::Vector<::ComplexStruct> container;
+	dd::Vector<Test::NestedStruct> container;
 
 	for( int i = 0; i < 128; ++i )
 	{
-		container.Add( ::ComplexStruct() );
+		container.Add( Test::NestedStruct() );
 	}
 
 	REQUIRE( container.Size() == 128 );

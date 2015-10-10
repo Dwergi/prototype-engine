@@ -295,6 +295,7 @@
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
     <ClInclude Include="src\Tests.h" />
+    <ClInclude Include="src\TestTypes.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Typedefs.h" />
     <ClInclude Include="src\TypeInfo.h" />
@@ -382,6 +383,7 @@
     <ClCompile Include="src\Tests\RecorderTests.cpp" />
     <ClCompile Include="src\Tests\Tests.cpp" />
     <ClCompile Include="src\Tests\TimerTests.cpp" />
+    <ClCompile Include="src\TestTypes.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\TypeInfo.cpp" />
     <ClCompile Include="src\Random.cpp" />

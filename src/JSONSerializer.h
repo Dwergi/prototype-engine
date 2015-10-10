@@ -64,8 +64,6 @@ namespace dd
 	private:
 
 		ReadStream m_stream;
-
-		void ReadNestedScope();
 	};
 	//===================================================================================
 

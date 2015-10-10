@@ -93,6 +93,8 @@ namespace dd
 		void Resize( uint capacity );
 		void ShrinkToFit();
 
+		bool operator==( const Vector<T>& other ) const;
+
 		//
 		// Iteration
 		//
@@ -475,5 +477,20 @@ namespace dd
 		ASSERT( index < m_size );
 
 		return m_data[ index ];
+	}
+
+	template<typename T>
+	bool Vector<T>::operator==( const Vector<T>& other ) const
+	{
+		if( m_size != other.m_size )
+			return false;
+
+		for( uint i = 0; i < m_size; ++i )
+		{
+			if( m_data[i] != other.m_data[i] )
+				return false;
+		}
+
+		return true;
 	}
 }

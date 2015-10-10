@@ -255,6 +255,9 @@
     <ClInclude Include="src\CommandLine.h">
       <Filter>Application</Filter>
     </ClInclude>
+    <ClInclude Include="src\TestTypes.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -401,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="src\CommandLine.cpp">
       <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestTypes.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

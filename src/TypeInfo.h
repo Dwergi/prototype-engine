@@ -38,6 +38,8 @@ namespace dd
 		inline const String& Name() const { return m_name; }
 		inline const TypeInfo* ContainedType() const { return m_containedType; }
 
+		inline bool IsPOD() const { return m_members.Size() == 0; }
+
 		void* (*New)();
 		void (*Copy)( void* data, const void* src );
 		void (*Delete)( void* data );
