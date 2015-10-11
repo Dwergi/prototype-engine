@@ -431,5 +431,8 @@
     <None Include="src\Array.inl">
       <Filter>Containers</Filter>
     </None>
+    <None Include="src\Recorder.inl">
+      <Filter>Properties</Filter>
+    </None>
   </ItemGroup>
 </Project>
