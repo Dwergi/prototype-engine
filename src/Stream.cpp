@@ -11,7 +11,7 @@
 
 namespace dd
 {
-	__declspec(thread) static char temp[ 2048 ];
+	__declspec(thread) static char s_temp[ 2048 ];
 
 	Stream::Stream( uint capacity )
 		: m_capacity( capacity ),
@@ -172,11 +172,11 @@ namespace dd
 		}
 		else
 		{
-			memcpy( temp, src, bytes );
+			memcpy( s_temp, src, bytes );
 
-			*(temp + bytes) = 0;
+			*(s_temp + bytes) = 0;
 
-			*m_strDest += temp;
+			*m_strDest += s_temp;
 		}
 
 		Advance( bytes );
@@ -188,7 +188,7 @@ namespace dd
 	{
 		ASSERT( Remaining() > 0 );
 
-		void* dest = m_pDest != nullptr ? PointerAdd( m_pDest, m_current ) : temp;
+		void* dest = m_pDest != nullptr ? PointerAdd( m_pDest, m_current ) : s_temp;
 
 		va_list args;
 		va_start( args, format );
@@ -197,7 +197,7 @@ namespace dd
 
 		if( m_strDest != nullptr )
 		{
-			*m_strDest += temp;
+			*m_strDest += s_temp;
 		}
 
 		if( written != -1 )

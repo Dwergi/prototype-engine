@@ -97,7 +97,7 @@ namespace dd
 		}
 		else
 		{
-			ASSERT( type->GetMembers().Size() > 0 );
+			ASSERT( type->Members().Size() > 0 );
 
 			// composite object
 			ScopedJSONObject obj( *this );
@@ -110,8 +110,8 @@ namespace dd
 				ScopedJSONObject members( *this );
 
 				uint index = 0;
-				uint member_count = type->GetMembers().Size();
-				for( const Member& member : type->GetMembers() )
+				uint member_count = type->Members().Size();
+				for( const Member& member : type->Members() )
 				{
 					AddKey( member.Name() );
 
@@ -278,10 +278,12 @@ namespace dd
 			return false;
 
 		if( type->HasCustomSerializers() )
+		{
 			type->DeserializeCustom( Serialize::Mode::JSON, m_stream, var );
+		}
 		else
 		{
-			ASSERT( type->GetMembers().Size() > 0 );
+			ASSERT( type->Members().Size() > 0 );
 
 			// composite object
 			char c = m_stream.ReadByte();
@@ -314,7 +316,7 @@ namespace dd
 				ASSERT( m_stream.ReadByte() == '{' );
 			}
 
-			for( Member& member : type->GetMembers() )
+			for( Member& member : type->Members() )
 			{
 				ReadNextPair( m_stream, pair );
 

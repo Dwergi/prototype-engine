@@ -255,6 +255,9 @@
     <ClInclude Include="src\Tests\TestTypes.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="src\RefCounter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -418,6 +421,9 @@
   <ItemGroup>
     <None Include="src\Buffer.inl">
       <Filter>Containers</Filter>
+    </None>
+    <None Include="src\TypeInfo.inl">
+      <Filter>Types</Filter>
     </None>
   </ItemGroup>
 </Project>

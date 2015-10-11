@@ -25,8 +25,8 @@ namespace Test
 			MEMBER( Str );
 			MEMBER( Flt );
 			MEMBER( Vec );
-			METHOD( Double );
-			METHOD( Multiply );
+			//METHOD( Double );
+			//METHOD( Multiply );
 		END_MEMBERS
 	};
 

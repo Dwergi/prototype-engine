@@ -24,8 +24,15 @@ namespace dd
 			Position *= (float) iMultiplier;
 		}
 
-		BEGIN_MEMBERS( TransformComponent )
+		void SetPosition( float x, float y )
+		{
+			Position.X = x;
+			Position.Y = y;
+		}
+
+		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			MEMBER( Position );
+			METHOD( SetPosition );
 		END_MEMBERS
 	};
 }

@@ -43,4 +43,10 @@ namespace dd
 		m_engine->ShutDownAndRelease();
 		m_engine = nullptr;
 	}
+
+	void ScriptEngine::RegisterMember( const String& className, const String& sig, uint offset )
+	{
+		int res = m_engine->RegisterObjectProperty( className.c_str(), sig.c_str(), (int) offset );
+		ASSERT( res >= 0 );
+	}
 }

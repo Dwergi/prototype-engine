@@ -221,6 +221,8 @@ int main( int argc, char* const argv[] )
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
+	dd::TypeInfo::RegisterDefaultTypes();
+
 #ifdef _TEST
 	return TestMain( argc, argv );
 #else

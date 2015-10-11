@@ -16,7 +16,7 @@
 namespace dd
 {
 	const int TEMP_BUFFER_SIZE = 2048;
-	__declspec(thread) static char temp[ TEMP_BUFFER_SIZE ];
+	__declspec(thread) static char s_temp[ TEMP_BUFFER_SIZE ];
 
 	void* PointerAdd( void* base, uint offset )
 	{
@@ -40,14 +40,14 @@ namespace dd
 			{
 				if( mode == Mode::BASE64 )
 				{
-					s_encoder.encode( str.c_str(), str.Length(), temp );
+					s_encoder.encode( str.c_str(), str.Length(), s_temp );
 				}
 				else
 				{
-					strcpy_s( temp, str.c_str() );
+					strcpy_s( s_temp, str.c_str() );
 				}
 
-				dst.WriteFormat( "\"%s\"", temp );
+				dst.WriteFormat( "\"%s\"", s_temp );
 			}
 		}
 
@@ -61,23 +61,27 @@ namespace dd
 			}
 			else
 			{
-				temp[0] = '\0';
-				src.ReadFormat( "\"%s\"", temp );
+				char c = src.PeekByte();
+				ASSERT( c == '"' );
+				src.Advance( 1 );
 
-				size_t iRead = strlen( temp );
-				if( iRead > 0 )
-					src.Advance( (uint) iRead + 2 );
+				int iCount = 0;
+				
+				while( (c = src.ReadByte()) != '"' )
+				{
+					s_temp[iCount] = c;
+					++iCount;
+				}
 
-				// remove trailing quote which the reader will greedily read in
-				if( temp[iRead - 1] == '"' )
-					temp[iRead - 1] = '\0';
+				ASSERT( iCount + 1 < TEMP_BUFFER_SIZE );
+				s_temp[iCount] = '\0';
 
-				str = temp;
+				str = s_temp;
 
 				if( mode == Serialize::Mode::BASE64 )
 				{
-					s_decoder.decode( str.c_str(), TEMP_BUFFER_SIZE, temp );
-					str = temp;
+					s_decoder.decode( str.c_str(), TEMP_BUFFER_SIZE, s_temp );
+					str = s_temp;
 				}
 			}
 		}

@@ -15,7 +15,6 @@ using namespace dd;
 
 TEST_CASE( "[Serialization] Serialize to JSON" )
 {
-	RegisterDefaultTypes();
 	REGISTER_TYPE( Test::SimpleStruct );
 	REGISTER_TYPE( Test::NestedStruct );
 
@@ -125,7 +124,6 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 
 TEST_CASE( "[Serialization] Deserialize from JSON" )
 {
-	RegisterDefaultTypes();
 	REGISTER_TYPE( Test::SimpleStruct );
 	REGISTER_TYPE( Test::NestedStruct );
 

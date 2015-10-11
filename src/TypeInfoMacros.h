@@ -37,11 +37,15 @@
 #define BEGIN_MEMBERS( TypeName ) \
 	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
+#define BEGIN_SCRIPT_OBJECT( TypeName ) \
+	dd::RefCounter<TypeName> m_refCount; \
+	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName ); typeInfo->RegisterScriptObject<TypeName>( #TypeName );
+
 #define MEMBER( MemberName ) \
-	typeInfo->AddMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
+	typeInfo->RegisterMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
 
 #define METHOD( MethodName ) \
-	typeInfo->AddMethod( FUNCTION( MethodName ), &MethodName, #MethodName );
+	typeInfo->RegisterMethod( FUNCTION( MethodName ), &MethodName, #MethodName )
 
 #define END_MEMBERS }
 

@@ -60,7 +60,7 @@ TEST_CASE( "[String] Concatenation" )
 
 	first += "baz";
 
-	REQUIRE( first == "foorbarbaz" );
+	REQUIRE( first == "foobarbaz" );
 
 	first = "foo";
 
@@ -101,9 +101,30 @@ TEST_CASE( "[String] Substring" )
 	dd::String32 res = test.Substring( 2, 4 );
 	REQUIRE( res == "test" );
 	
-	res = test.Substring( 8, 6 );
+	res = test.Substring( 7, 6 );
 	REQUIRE( res == "string" );
 
-	res = test.Substring( 8 );
+	res = test.Substring( 7 );
 	REQUIRE( res == "string." );
+}
+
+TEST_CASE( "[String] Shrink To Fit" )
+{
+	dd::String8 start;
+	start = "0123456789";
+
+	// capacity has to have grown
+	REQUIRE( start.Length() == 10 );
+
+	start.ShrinkToFit();
+
+	REQUIRE( start.Length() == 10 );
+	REQUIRE( start.IsOnHeap() );
+	REQUIRE( start == "0123456789" );
+
+	start = "01234";
+	start.ShrinkToFit();
+	
+	REQUIRE( start == "01234" );
+	REQUIRE( !start.IsOnHeap() );
 }

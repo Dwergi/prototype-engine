@@ -57,3 +57,5 @@ ComponentSystem.opensdf
 *.opensdf
 include/angelscript/lib/angelscript64d.lib
 include/imgui/lib/imgui_d.lib
+AS_DEBUG/
+include/angelscript/lib/angelscript64.lib

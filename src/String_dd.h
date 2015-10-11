@@ -38,12 +38,13 @@ namespace dd
 
 		void Clear() { m_length = 0; }
 
-		const char& operator[]( uint index ) { ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
+		const char& operator[]( uint index ) const { ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
 		const char* c_str() const;
 
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
 		void ShrinkToFit();
+		bool IsOnHeap() const { return m_buffer.Get() != m_stack.Get(); }
 
 		bool StartsWith( const char* other ) const;
 		bool StartsWith( const String& other ) const;
@@ -54,9 +55,9 @@ namespace dd
 
 	protected:
 
-		Buffer<char> m_stack;
 		Buffer<char> m_buffer;
 		uint m_length;
+		Buffer<char> m_stack;
 		
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
@@ -138,5 +139,4 @@ namespace dd
 
 		return substring;
 	}
-
 }

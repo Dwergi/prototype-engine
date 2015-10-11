@@ -12,6 +12,8 @@ namespace dd
 {
 	DenseMap<String32,TypeInfo*> TypeInfo::sm_typeMap;
 
+	bool TypeInfo::sm_defaultsRegistered = false;
+
 	TypeInfo::TypeInfo()
 		: m_size( 0 )
 	{
@@ -24,12 +26,22 @@ namespace dd
 		m_containedType = nullptr;
 	}
 
-	void TypeInfo::AddMember( const TypeInfo* typeInfo, const char* name, uint offset )
+	void TypeInfo::RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset )
 	{
 		Member& member = m_members.Allocate();
 		member.m_name = name;
 		member.m_offset = offset;
 		member.m_typeInfo = typeInfo;
+
+		if( m_scriptObject )
+		{
+			String64 signature;
+			signature += typeInfo->GetNameWithoutNamespace();
+			signature += " ";
+			signature += name;
+
+			ScriptEngine::GetInstance()->RegisterMember( GetNameWithoutNamespace(), signature, offset );
+		}
 	}
 
 	const Member* TypeInfo::GetMember( const char* memberName ) const
@@ -82,8 +94,31 @@ namespace dd
 		DeserializeCustom = deserializer;
 	}
 
-	void RegisterDefaultTypes()
+	String32 TypeInfo::GetNameWithoutNamespace() const
 	{
+		uint iColon = 0;
+		for( uint i = m_name.Length(); i > 0; --i )
+		{
+			if( m_name[i - 1] == ':' )
+			{
+				iColon = i - 1;
+				break;
+			}
+		}
+
+		if( iColon > 0 )
+		{
+			String32 result = m_name.c_str() + iColon + 1;
+			return result;
+		}
+
+		return m_name;
+	}
+
+	void TypeInfo::RegisterDefaultTypes()
+	{
+		sm_defaultsRegistered = true;
+
 		// integers
 		REGISTER_POD( int );
 		REGISTER_POD( char );
