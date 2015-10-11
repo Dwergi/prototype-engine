@@ -180,9 +180,6 @@
     <ClInclude Include="src\Iteration.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\StringTests.cpp">
-      <Filter>Tests</Filter>
-    </ClInclude>
     <ClInclude Include="src\Function.h">
       <Filter>Types</Filter>
     </ClInclude>
@@ -255,7 +252,7 @@
     <ClInclude Include="src\CommandLine.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestTypes.h">
+    <ClInclude Include="src\Tests\TestTypes.h">
       <Filter>Tests</Filter>
     </ClInclude>
   </ItemGroup>
@@ -339,17 +336,8 @@
     <ClCompile Include="src\String_dd.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\VectorTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DenseMapTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\Exception.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScriptTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Function.cpp">
       <Filter>Types</Filter>
@@ -381,14 +369,8 @@
     <ClCompile Include="src\JSONSerializer.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="src\SerializerTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\Random.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ArrayTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Stream.cpp">
       <Filter>Serialization</Filter>
@@ -405,7 +387,31 @@
     <ClCompile Include="src\CommandLine.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestTypes.cpp">
+    <ClCompile Include="src\Tests\ArrayTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\CommandLineTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\DenseMapTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\RandomTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\ScriptTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\SerializerTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\StringTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\TestTypes.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\VectorTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
