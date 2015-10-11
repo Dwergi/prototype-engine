@@ -345,6 +345,7 @@
     </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
       <FileType>CppCode</FileType>
     </None>
@@ -407,6 +408,7 @@
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\TypeInfo.inl" />
+    <None Include="src\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
