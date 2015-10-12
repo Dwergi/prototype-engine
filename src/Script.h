@@ -27,12 +27,7 @@ namespace dd
 	class ScriptEngine
 	{
 	public:
-		static ScriptEngine* GetInstance()
-		{
-			static ScriptEngine s_instance;
-			return &s_instance;
-		}
-
+		ScriptEngine();
 		~ScriptEngine();
 
 		Script& LoadScript( const char* script );
@@ -48,12 +43,16 @@ namespace dd
 
 		bool IsObjectRegistered( const String& className );
 
+		bool Evaluate( const String& script, String& output );
+
+		void RegisterConsoleHelpers();
+
+		asIScriptEngine* GetInternalEngine() const { return m_engine; }
+
 	private:
 
 		Vector<Script> m_vecScripts;
 		asIScriptEngine* m_engine;
-
-		ScriptEngine();
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
 		static String64 GetWithoutNamespace( const String& className );

@@ -49,6 +49,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{9b1b5c97-b823-4ea1-a5bb-de504eedf166}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Script\Add-Ons">
+      <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -258,6 +261,21 @@
     <ClInclude Include="src\RefCounter.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
+      <Filter>Script\Add-Ons</Filter>
+    </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.h">
+      <Filter>Script\Add-Ons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DebugConsole.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Globals.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
+      <Filter>Script\Add-Ons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -416,6 +434,21 @@
     </ClCompile>
     <ClCompile Include="src\Tests\VectorTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
+      <Filter>Script\Add-Ons</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.cpp">
+      <Filter>Script\Add-Ons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Globals.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DebugConsole.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
+      <Filter>Script\Add-Ons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

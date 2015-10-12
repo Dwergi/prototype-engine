@@ -18,7 +18,8 @@ namespace dd
 		UP,
 		DOWN,
 		SHOOT,
-		BOOST
+		BOOST,
+		CONSOLE
 	};
 
 	enum class InputType : unsigned int

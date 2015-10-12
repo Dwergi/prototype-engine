@@ -39,7 +39,8 @@
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter<TypeName> m_refCount; \
-	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName ); typeInfo->RegisterScriptObject<TypeName>( #TypeName );
+	BEGIN_MEMBERS( TypeName ) \
+	typeInfo->RegisterScriptObject<TypeName>( #TypeName );
 
 #define MEMBER( MemberName ) \
 	typeInfo->RegisterMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
@@ -50,7 +51,7 @@
 #define END_MEMBERS }
 
 #define NO_MEMBERS( TypeName ) \
-	static void RegisterMembers() { }
+	static void RegisterMembers() {}
 
 #define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
 	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )

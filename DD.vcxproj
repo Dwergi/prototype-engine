@@ -237,6 +237,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -257,6 +258,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h" />
+    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h" />
+    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.h" />
     <ClInclude Include="include\base64\include\cdecode.h" />
     <ClInclude Include="include\base64\include\cencode.h" />
     <ClInclude Include="include\base64\include\decode.h" />
@@ -272,12 +276,14 @@
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\Containers.h" />
+    <ClInclude Include="src\DebugConsole.h" />
     <ClInclude Include="src\DebugUI.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\Function.h" />
     <ClInclude Include="src\FunctionPtr.h" />
     <ClInclude Include="src\FunctionSignature.h" />
+    <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Handle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
@@ -328,6 +334,23 @@
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="include\base64\src\cdecode.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -350,6 +373,7 @@
       <FileType>CppCode</FileType>
     </None>
     <ClCompile Include="src\CommandLine.cpp" />
+    <ClCompile Include="src\DebugConsole.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
     <ClCompile Include="src\EntitySystem.cpp" />
@@ -357,6 +381,7 @@
     <ClCompile Include="src\Function.cpp" />
     <ClCompile Include="src\FunctionPtr.cpp" />
     <ClCompile Include="src\FunctionSignature.cpp" />
+    <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\Hash.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\JSONSerializer.cpp" />

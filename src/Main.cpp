@@ -30,6 +30,8 @@
 #include "DebugUI.h"
 #include "Timer.h"
 
+#include "DebugConsole.h"
+
 #include "imgui/imgui.h"
 //---------------------------------------------------------------------------
 
@@ -37,32 +39,30 @@ template<typename T>
 void RegisterComponent()
 {
 	dd::DoubleBuffer<typename T::Pool>* double_buffer = new dd::DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
-	g_services.Register( double_buffer );
+	dd::g_services.Register( *double_buffer );
 }
 
 template<typename T>
 typename T::Pool* GetWritePool()
 {
-	return g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetWrite();
+	return dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetWrite();
 }
 
 template<typename T>
 typename T::Pool* GetReadPool()
 {
-	return g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetRead();
+	return dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetRead();
 }
 
 template<typename T>
 dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 {
-	dd::DoubleBuffer<typename T::Pool>& buffer = g_services.Get<dd::DoubleBuffer<typename T::Pool>>();
+	dd::DoubleBuffer<typename T::Pool>& buffer = dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>();
 
 	return buffer;
 }
 
-dd::Services g_services;
-
-bool s_bDrawFPS;
+bool s_bDrawFPS = true;
 
 void DrawFPS( float delta_t )
 {
@@ -75,6 +75,8 @@ void DrawFPS( float delta_t )
 	ImGui::Text( "FPS: %.1f", 1.0f / delta_t );
 	ImGui::End();
 }
+
+bool s_bDrawConsole = true;
 
 #ifdef _TEST
 
@@ -95,7 +97,7 @@ int TestMain( int argc, char* const argv[] )
 int GameMain()
 {
 	dd::EntitySystem entitySystem;
-	g_services.Register<dd::EntitySystem>( &entitySystem );
+	dd::g_services.Register( entitySystem );
 
 	RegisterComponent<dd::TransformComponent>();
 	RegisterComponent<dd::OctreeComponent>();
@@ -149,6 +151,8 @@ int GameMain()
 
 	dd::DebugUI debugUI( window.GetInternalWindow() );
 
+	dd::DebugConsole console;
+
 	input.AddKeyboardCallback( &dd::DebugUI::KeyCallback );
 	input.AddScrollCallback( &dd::DebugUI::ScrollCallback );
 	input.AddMouseCallback( &dd::DebugUI::MouseButtonCallback );
@@ -162,6 +166,8 @@ int GameMain()
 	float delta_t = 0.0f;
 
 	const float min_delta = 0.01f; // 100 FPS cap
+
+	input.BindKey( '`', dd::InputAction::CONSOLE );
 
 	while( !window.ShouldClose() )
 	{
@@ -183,10 +189,13 @@ int GameMain()
 
 			if( events[i].Type == dd::InputType::RELEASED )
 				std::cout << "Released a key!" << std::endl;
+
+			if( events[i].Action == dd::InputAction::CONSOLE && events[i].Type == dd::InputType::RELEASED )
+				s_bDrawConsole = !s_bDrawConsole;
 		}
 
 		debugUI.SetMousePosition( input.GetMousePosition().X, input.GetMousePosition().Y );
-		debugUI.SetFocused( window.IsFocused());
+		debugUI.SetFocused( window.IsFocused() );
 		debugUI.SetDisplaySize( window.GetWidth(), window.GetHeight() );
 
 		debugUI.Update( delta_t );
@@ -194,6 +203,9 @@ int GameMain()
 		ImGui::ShowTestWindow( &opened );
 
 		DrawFPS( delta_t );
+
+		if( s_bDrawConsole )
+			console.Draw( "Console", s_bDrawConsole );
 
 		ImGui::Render();
 
@@ -215,11 +227,13 @@ int GameMain()
 int main( int argc, char* const argv[] )
 {
 	dd::CommandLine cmdLine( argv, argc );
-
-	g_services.Register<dd::CommandLine>( &cmdLine );
+	dd::g_services.Register( cmdLine );
 
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
+
+	dd::ScriptEngine scriptEngine;
+	dd::g_services.Register( scriptEngine );
 
 	dd::TypeInfo::RegisterDefaultTypes();
 

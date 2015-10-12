@@ -64,6 +64,8 @@ namespace dd
 		MousePosition GetMousePosition() const;
 		void GetKeyEvents( Array<InputEvent, 64>& out ) const;
 
+		void BindKey( char c, InputAction action );
+
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );
 		void AddMouseCallback( MouseButtonCallbackFunction cb );
 		void AddScrollCallback( ScrollCallbackFunction cb );

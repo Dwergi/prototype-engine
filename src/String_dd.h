@@ -27,11 +27,18 @@ namespace dd
 
 		String& operator=( const char* other );
 		String& operator=( const String& other );
-		bool operator==( const char* other ) const;
-		bool operator==( const String& other ) const;
+
 		String& operator+=( const String& other );
 		String& operator+=( const char* other );
 		String& operator+=( char other );
+
+		String& Prepend( const String& other );
+
+		bool operator==( const char* other ) const;
+		bool operator==( const String& other ) const;
+
+		bool EqualsCaseless( const char* other ) const;
+		bool EqualsCaseless( const String& other ) const;
 
 		int Find( const char* other, uint offset = 0 ) const;
 		int Find( const String& other, uint offset = 0 ) const;
@@ -62,7 +69,7 @@ namespace dd
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
 		void Concatenate( const char* other, uint length );
-		bool Equals( const char* other, uint length ) const;
+		bool Equals( const char* other, uint length, bool caseless ) const;
 
 		void NullTerminate();
 	};

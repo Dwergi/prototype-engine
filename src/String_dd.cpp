@@ -35,7 +35,7 @@ namespace dd
 		return m_buffer.Get();
 	}
 
-	bool String::Equals( const char* other, uint length ) const
+	bool String::Equals( const char* other, uint length, bool caseless ) const
 	{
 		if( m_length != length )
 			return false;
@@ -45,11 +45,30 @@ namespace dd
 			if( other[i] == '\0' )
 				return false;
 
-			if( m_buffer[i] != other[i] )
-				return false;
+			if( caseless )
+			{
+				if( tolower( m_buffer[i] ) != tolower( other[i] ) )
+					return false;
+			}
+			else
+			{
+				if( m_buffer[i] != other[i] )
+					return false;
+			}
 		}
 
 		return true;
+	}
+
+	bool String::EqualsCaseless( const String& other ) const
+	{
+		return Equals( other.m_buffer, other.m_length, true );
+	}
+
+	bool String::EqualsCaseless( const char* other ) const
+	{
+		size_t length = strlen( other );
+		return Equals( other, (uint) length, true );
 	}
 
 	bool String::operator==( const char* other ) const
@@ -58,12 +77,12 @@ namespace dd
 
 		size_t length = strlen( other );
 
-		return Equals( other, (uint) length );
+		return Equals( other, (uint) length, false );
 	}
 
 	bool String::operator==( const String& other ) const
 	{
-		return Equals( other.m_buffer, other.m_length );
+		return Equals( other.m_buffer, other.m_length, false );
 	}
 
 	String& String::operator=( const String& other )
@@ -92,6 +111,22 @@ namespace dd
 	String& String::operator+=( const char* other )
 	{
 		Concatenate( other, (uint) strlen( other ) );
+
+		return *this;
+	}
+
+	String& String::Prepend( const String& other )
+	{
+		Resize( m_length + other.m_length );
+
+		// shift everything currently in the buffer over by the other's length
+		memcpy( m_buffer + other.m_length, m_buffer, m_length );
+		
+		// copy from other string into the start of the buffer
+		memcpy( m_buffer, other.m_buffer, other.m_length );
+
+		m_length += other.m_length;
+		NullTerminate();
 
 		return *this;
 	}

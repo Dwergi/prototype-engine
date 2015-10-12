@@ -40,7 +40,7 @@ namespace dd
 			signature += " ";
 			signature += name;
 
-			ScriptEngine::GetInstance()->RegisterMember( GetNameWithoutNamespace(), signature, offset );
+			g_services.Get<ScriptEngine>().RegisterMember( GetNameWithoutNamespace(), signature, offset );
 		}
 	}
 

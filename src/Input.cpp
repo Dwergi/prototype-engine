@@ -123,6 +123,11 @@ namespace dd
 		m_charCallbacks.RemoveItem( cb );
 	}
 
+	void Input::BindKey( char c, InputAction action )
+	{
+		m_bindings.Register( (int) c, action );
+	}
+
 	void Input::Update()
 	{
 		double newX, newY;

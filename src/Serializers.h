@@ -31,6 +31,12 @@ namespace dd
 		}
 
 		template<typename T>
+		void SerializePOD( Mode mode, WriteStream& dst, const T& src )
+		{
+			SerializePOD<RemoveQualifiers<T>::type>( mode, dst, Variable( src ) );
+		}
+
+		template<typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, Variable src )
 		{
 			ASSERT( "Should never hit this!");

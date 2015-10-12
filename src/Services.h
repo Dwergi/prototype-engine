@@ -1,13 +1,11 @@
 //
 // Services.h - A service registry to keep track of global instances of certain types.
-// TODO: Convert to use DD versions of TypeInfo and DenseMap.
 // Copyright (C) Sebastian Nordgren 
 // August 6th 2015
 //
 
 #pragma once
 
-#include <unordered_map>
 #include <typeinfo>
 #include <typeindex>
 
@@ -21,44 +19,65 @@ namespace dd
 		~Services() {}
 
 		template<typename T>
-		void Register( T* service  )
-		{
-			ASSERT( service != nullptr );
-
-			m_services.insert( std::make_pair( std::type_index( typeid( T ) ), service ) );
-		}
+		void Register( T& service );
 
 		template<typename T>
-		bool Exists()
-		{
-			return GetPtr() != nullptr;
-		}
+		bool Exists() const;
 
 		template<typename T>
-		T* GetPtr() const
-		{
-			auto it = m_services.find( std::type_index( typeid( T ) ) );
-
-			if( it == m_services.end() )
-				return nullptr;
-
-			return reinterpret_cast<T*>( it->second );
-		}
+		T* GetPtr() const;
 
 		template<typename T>
-		T& Get() const
-		{
-			T* ret = GetPtr<T>();
-
-			// just crash
-			if( ret == nullptr )
-				(*(int*) ret) = 0;
-
-			return *ret;
-		}
+		T& Get() const;
 
 	private:
 
-		std::unordered_map<std::type_index, void*> m_services;
+		DenseMap<const char*, void*> m_services;
+
+		template<typename T>
+		const char* GetKey() const;
 	};
+
+	template <typename T>
+	void dd::Services::Register( T& service )
+	{
+		const char* key = GetKey<T>();
+		m_services.Add( key, &service );
+	}
+
+	template <typename T>
+	T* dd::Services::GetPtr() const
+	{
+		const char* key = GetKey<T>();
+		void** ptr = m_services.Find( key );
+
+		if( ptr == nullptr )
+			return nullptr;
+
+		return reinterpret_cast<T*>(*ptr);
+	}
+
+	template <typename T>
+	T& dd::Services::Get() const
+	{
+		T* ptr = GetPtr<T>();
+
+		// just crash
+		if( ptr == nullptr )
+			(*(int*) nullptr) = 0;
+
+		return *ptr;
+	}
+
+	template <typename T>
+	const char* dd::Services::GetKey() const
+	{
+		return std::type_index( typeid(RemovePtr< RemoveQualifiers<T>::type >::type) ).name();
+	}
+
+	template <typename T>
+	bool dd::Services::Exists() const
+	{
+		return GetPtr<T>() != nullptr;
+	}
 }

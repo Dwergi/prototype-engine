@@ -119,8 +119,10 @@ void TypeInfo::RegisterMethod( Function f, FnType fn, const char* name )
 	m.Name = name;
 	m.Function = f;
 
+	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+
 	// don't register with script if this isn't a script object
-	if( m_scriptObject )
+	if( m_scriptObject && script_engine != nullptr )
 	{
 		const FunctionSignature* sig = f.Signature();
 		String128 signature;
@@ -146,14 +148,20 @@ void TypeInfo::RegisterMethod( Function f, FnType fn, const char* name )
 
 		signature += ")";
 
-		ScriptEngine::GetInstance()->RegisterMethod( sig->GetContext()->GetNameWithoutNamespace(), signature, fn );
+		
+		script_engine->RegisterMethod( sig->GetContext()->GetNameWithoutNamespace(), signature, fn );
 	}
 }
 
 template <typename T>
 void TypeInfo::RegisterScriptObject( const char* name )
 {
-	m_scriptObject = true;
+	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+	ASSERT( script_engine != nullptr );
 
-	ScriptEngine::GetInstance()->RegisterObject<T>( GetNameWithoutNamespace() );
+	if( script_engine != nullptr )
+	{
+		m_scriptObject = true;
+		script_engine->RegisterObject<T>( GetNameWithoutNamespace() );
+	}
 }
