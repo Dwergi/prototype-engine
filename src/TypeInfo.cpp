@@ -28,6 +28,8 @@ namespace dd
 
 	void TypeInfo::RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset )
 	{
+		ASSERT( typeInfo->IsRegistered() );
+
 		Member& member = m_members.Allocate();
 		member.m_name = name;
 		member.m_offset = offset;
@@ -109,6 +111,8 @@ namespace dd
 		REGISTER_POD( double );
 		
 		REGISTER_POD( char* );
+
+		REGISTER_POD( bool );
 
 		REGISTER_TYPE( String );
 		SET_SERIALIZERS( String, Serialize::SerializeString, Serialize::DeserializeString );

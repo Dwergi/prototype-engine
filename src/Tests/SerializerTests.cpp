@@ -122,11 +122,8 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 	}
 }
 
-TEST_CASE( "[Serialization] Deserialize from JSON" )
+TEST_CASE( "[Deserialization] POD types" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::NestedStruct );
-
 	String256 in;
 
 	SECTION( "Int" )
@@ -134,9 +131,153 @@ TEST_CASE( "[Serialization] Deserialize from JSON" )
 		in = "125";
 
 		int i = 0;
+
 		JSONDeserializer deserializer( in );
 		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
 	}
+
+	SECTION( "Float" )
+	{
+		in = "125.0";
+
+		float i = 0;
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125.0f );
+	}
+
+	SECTION( "Double" )
+	{
+		in = "125.0";
+
+		double i = 0;
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125.0 );
+	}
+
+	SECTION( "Uint" )
+	{
+		in = "125";
+
+		uint i = 0;
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
+	}
+
+	SECTION( "Char" )
+	{
+		in = "c";
+
+		char i = 0;
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 'c' );
+	}
+
+	SECTION( "Byte" )
+	{
+		in = "125";
+
+		byte i = 0;
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
+	}
+
+	SECTION( "Uint16" )
+	{
+		in = "125";
+		uint16 i = 0;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
+	}
+
+	SECTION( "Uint64" )
+	{
+		in = "125";
+		uint64 i = 0;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
+	}
+
+	SECTION( "Uint64" )
+	{
+		in = "\"125\"";
+		char c[256];
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( &c[0] );
+
+		REQUIRE( strcmp( c, "125" ) == 0 );
+	}
+
+	SECTION( "Int64" )
+	{
+		in = "125";
+		int64 i = 0;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 125 );
+	}
+
+	SECTION( "Negative" )
+	{
+		in = "-125";
+		int i = 0;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == -125 );
+	}
+
+	SECTION( "Zero" )
+	{
+		in = "0";
+		int i = 1111;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == 0 );
+	}
+
+	SECTION( "Negative float" )
+	{
+		in = "-125.0";
+
+		float i = 0;
+
+		JSONDeserializer deserializer( in );
+		deserializer.Deserialize( i );
+
+		REQUIRE( i == -125.0f );
+	}
+}
+
+TEST_CASE( "[Deserialization] Structs from JSON" )
+{
+	REGISTER_TYPE( Test::SimpleStruct );
+	REGISTER_TYPE( Test::NestedStruct );
+
+	String256 in;
 
 	Test::SimpleStruct s;
 	s.Int = 0;
@@ -150,13 +291,15 @@ TEST_CASE( "[Serialization] Deserialize from JSON" )
 	{
 		JSONSerializer serializer( in );
 		serializer.Serialize( s );
+
+		Test::SimpleStruct result;
 		
 		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( s );
+		deserializer.Deserialize( result );
 
-		REQUIRE( s.Int == 0 );
-		REQUIRE( s.Str == "LOL" );
-		REQUIRE( s.Flt == 111.0f );
+		REQUIRE( result.Int == 0 );
+		REQUIRE( result.Str == "LOL" );
+		REQUIRE( result.Flt == 111.0f );
 	}
 
 

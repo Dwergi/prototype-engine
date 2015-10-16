@@ -46,6 +46,7 @@ namespace dd
 		void Clear() { m_length = 0; }
 
 		const char& operator[]( uint index ) const { ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
+		char& operator[]( uint index ) { ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
 		const char* c_str() const;
 
 		uint Length() const { return m_length; }
@@ -133,6 +134,7 @@ namespace dd
 		InplaceString<Size>& operator=( const InplaceString<Size>& other )
 		{
 			SetString( other.c_str(), other.Length() );
+			return *this;
 		}
 
 		virtual ~InplaceString()

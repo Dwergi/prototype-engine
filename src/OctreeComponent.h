@@ -20,5 +20,8 @@ namespace dd
 		Octree::Entry Entry;
 
 		OctreeComponent() {}
+
+		BEGIN_MEMBERS( OctreeComponent )
+		END_MEMBERS
 	};
 }

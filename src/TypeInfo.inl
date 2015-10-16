@@ -31,16 +31,32 @@ const TypeInfo* TypeInfo::RegisterType( const char* name )
 
 	typedef std::conditional<HasDefaultCtor<T>::value, T, EmptyType<T>>::type new_type;
 	typeInfo->New = SetFunc<HasDefaultCtor<T>::value, void*(*)(), &dd::New<new_type>>::Get();
-	typeInfo->PlacementNew = SetFunc<HasDefaultCtor<T>::value, void( *)(void*), &dd::PlacementNew<new_type>>::Get();
-	typeInfo->Copy = SetFunc<HasCopyCtor<T>::value, void( *)(void*, const void*), &dd::Copy<new_type>>::Get();
+	typeInfo->PlacementNew = SetFunc<HasDefaultCtor<T>::value, void(*)(void*), &dd::PlacementNew<new_type>>::Get();
+	typeInfo->Copy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::Copy<new_type>>::Get();
 	typeInfo->Delete = dd::Delete<T>;
-	typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void( *)(void*, const void*), &dd::PlacementCopy<new_type>>::Get();
+	typeInfo->PlacementCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void*, const void*), &dd::PlacementCopy<new_type>>::Get();
 	typeInfo->PlacementDelete = dd::PlacementDelete<T>;
-	typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void( *)(void**, const void*), &dd::NewCopy<new_type>>::Get();
+	typeInfo->NewCopy = SetFunc<HasCopyCtor<T>::value, void(*)(void**, const void*), &dd::NewCopy<new_type>>::Get();
+
 	typeInfo->SerializeCustom = nullptr;
 	typeInfo->DeserializeCustom = nullptr;
 
 	sm_typeMap.Add( name, typeInfo );
+
+	// register pointer and references as well
+	{
+		String64 ptrName = name;
+		ptrName += "*";
+		TypeInfo* ptrInfo = const_cast<TypeInfo*>(GetType<T*>());
+		ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
+		sm_typeMap.Add( ptrName, ptrInfo );
+
+		String64 refName = name;
+		refName += "&";
+		TypeInfo* refInfo = const_cast<TypeInfo*>(GetType<T&>());
+		refInfo->Init( refName.c_str(), sizeof( T& ) );
+		sm_typeMap.Add( refName, refInfo );
+	}
 
 	T::RegisterMembers();
 

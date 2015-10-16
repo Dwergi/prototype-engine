@@ -22,6 +22,16 @@ namespace dd
 
 	}
 
+	WriteStream* s_output = nullptr;
+
+	void SetOutput( String* output )
+	{
+		if( output != nullptr )
+			s_output = new WriteStream( *output );
+		else
+			delete s_output;
+	}
+
 	void ScriptEngine::MessageCallback( const asSMessageInfo* msg, void* param )
 	{
 		const char* type = "ERR ";
@@ -30,15 +40,22 @@ namespace dd
 		else if( msg->type == asMSGTYPE_INFORMATION ) 
 			type = "INFO";
 
-		printf( "%s (%d, %d): %s - %s\n", msg->section, msg->row, msg->col, type, msg->message );
+		if( s_output == nullptr )
+		{
+			printf( "%s (%d, %d): %s - %s\n\n", msg->section, msg->row, msg->col, type, msg->message );
+		}
+		else
+		{
+			s_output->WriteFormat( "%s (%d, %d): %s - %s\n", msg->section, msg->row, msg->col, type, msg->message );
+		}
 	}
 
 	ScriptEngine::ScriptEngine()
 	{
 		m_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 
-		int r = m_engine->SetMessageCallback( asMETHOD( dd::ScriptEngine, MessageCallback ), this, asCALL_CDECL );
-		ASSERT( r != 0 );
+		int r = m_engine->SetMessageCallback( asMETHOD( dd::ScriptEngine, MessageCallback ), this, asCALL_THISCALL );
+		ASSERT( r >= 0 );
 
 		RegisterScriptMath( m_engine );
 	}
@@ -62,18 +79,20 @@ namespace dd
 		ASSERT( res >= 0 );
 	}
 
-	bool ScriptEngine::Evaluate( const String& script )
+	bool ScriptEngine::Evaluate( const String& script, String& output )
 	{
+		SetOutput( &output );
+
 		int r = ExecuteString( m_engine, script.c_str(), m_engine->GetModule( "console", asGM_CREATE_IF_NOT_EXISTS ), nullptr );
+
+		SetOutput( nullptr );
 
 		if( r < 0 )
 		{
-			ASSERT( false, "Invalid script statement!" );
 			return false;
 		}
 		else if( r == asEXECUTION_EXCEPTION )
 		{
-			ASSERT( false, "A script exception was raised." );
 			return false;
 		}
 
@@ -111,6 +130,8 @@ namespace dd
 
 	String64 ScriptEngine::GetWithoutNamespace( const String& typeName )
 	{
+		String64 result( typeName );
+
 		uint afterColon = 0;
 		while( true )
 		{
@@ -123,10 +144,32 @@ namespace dd
 
 		if( afterColon > 0 )
 		{
-			String64 result = typeName.c_str() + afterColon;
+			result = typeName.c_str() + afterColon;
 			return result;
 		}
 
-		return typeName;
+		uint ptr = 0;
+		while( true )
+		{
+			ptr = result.Find( "*", ptr );
+			if( ptr == -1 )
+				break;
+
+			result[ptr] = '@';
+			++ptr;
+		}
+
+		return result;
+	}
+
+	void ScriptEngine::RegisterGlobalVariable( const String& name, const Variable& var )
+	{
+		String128 signature;
+		signature += GetWithoutNamespace( var.Type()->Name() );
+		signature += " ";
+		signature += name;
+
+		int res = m_engine->RegisterGlobalProperty( signature.c_str(), var.Data() );
+		ASSERT( res >= 0 );
 	}
 }

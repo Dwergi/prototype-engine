@@ -53,6 +53,27 @@ namespace
 
 namespace dd
 {
+	void RegisterScriptCommands( Vector<String64>& commands )
+	{
+		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
+		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
+		{
+			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
+
+			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
+			if( func->GetName()[0] != '_' )
+				commands.Add( func->GetName() );
+		}
+
+		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
+		{
+			const char* name;
+			int res = engine->GetGlobalPropertyByIndex( i, &name );
+			if( res >= 0 )
+				commands.Add( name );
+		}
+	}
+
 	void RegisterConsoleHelpers()
 	{
 		ScriptEngine* engine = dd::g_services.GetPtr<ScriptEngine>();
@@ -86,6 +107,7 @@ namespace dd
 		m_commands.Add( "Variables" );
 
 		RegisterConsoleHelpers();
+		RegisterScriptCommands( m_commands );
 	}
 
 	DebugConsole::~DebugConsole()
@@ -245,6 +267,10 @@ namespace dd
 		{
 			ListFunctions();
 		}
+		else if( command_line.EqualsCaseless( "Variables" ) )
+		{
+			ListVariables();
+		}
 		else
 		{
 			EvaluateScript( command_line );			
@@ -263,14 +289,16 @@ namespace dd
 		completeString += ")";
 
 		// reset output buffer
-		::s_scriptOutput.Clear();
-		::s_stream.Reset();
+		s_scriptOutput.Clear();
+		s_stream.Reset();
+
+		String256 errors;
 
 		// pass to AngelScript to evaluate 
-		if( !script_engine->Evaluate( script ) )
+		if( script_engine->Evaluate( completeString, errors ) )
 			AddLog( "\t%s\n", s_scriptOutput.c_str() );
 		else
-			AddLog( "\tScript error!" );
+			AddLog( "\tScript error: %s!", errors );
 	}
 
 	void DebugConsole::ListFunctions()
@@ -280,11 +308,41 @@ namespace dd
 		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
-			asIScriptFunction *func = engine->GetGlobalFunctionByIndex( i );
+			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
 
 			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
 			if( func->GetName()[0] != '_' )
 				AddLog( "\t- %s\n", func->GetDeclaration() );
+		}
+	}
+
+	void DebugConsole::ListVariables()
+	{
+		AddLog( "Variables:\n" );
+
+		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
+		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
+		{
+			const char* name;
+			const char* scope;
+			int typeId;
+			bool isConst;
+			void* ptr;
+
+			int res = engine->GetGlobalPropertyByIndex( i, &name, &scope, &typeId, &isConst, nullptr, &ptr );
+			if( res >= 0 )
+			{
+				const char* type_declaration = engine->GetTypeDeclaration( typeId );
+
+				if( strlen( scope ) > 0 )
+				{
+					AddLog( "\t- %s %s::%s\n", type_declaration, scope, name );
+				}
+				else
+				{
+					AddLog( "\t- %s %s\n", type_declaration, name );
+				}
+			}
 		}
 	}
 

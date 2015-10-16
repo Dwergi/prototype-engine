@@ -217,6 +217,20 @@ namespace dd
 		}
 
 		template<>
+		void SerializePOD<bool>( Mode mode, WriteStream& dst, Variable src )
+		{
+			if( mode == Serialize::Mode::BINARY )
+			{
+				dst.Write( src.Data(), sizeof( bool ) );
+			}
+			else
+			{
+				String8 value( src.GetValue<bool>() ? "true" : "false" );
+				dst.Write( value );
+			}
+		}
+
+		template<>
 		void SerializePOD<char*>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -229,70 +243,116 @@ namespace dd
 			}
 		}
 
+		template <typename T>
+		void DeserializePODInternal( Mode mode, ReadStream& src, Variable dst, const char* format )
+		{
+			if( mode == Serialize::Mode::BINARY )
+			{
+				src.Read( &dst.GetValue<T>(), sizeof( T ) );
+			}
+			else
+			{
+				src.ReadFormat( format, &dst.GetValue<T>() );
+			}
+		}
+
 		template<>
 		void DeserializePOD<int>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<int>( mode, src, dst, "%d" );
 		}
 
 		template<>
 		void DeserializePOD<char>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<char>( mode, src, dst, "%c" );
 		}
 
 		template<>
 		void DeserializePOD<int16>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<int16>( mode, src, dst, "%hd" );
 		}
 
 		template<>
 		void DeserializePOD<int64>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<int64>( mode, src, dst, "%lld" );
 		}
 
 		template<>
 		void DeserializePOD<uint>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<uint>( mode, src, dst, "%u" );
 		}
 
 		template<>
 		void DeserializePOD<byte>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<byte>( mode, src, dst, "%hhu" );
 		}
 
 		template<>
 		void DeserializePOD<uint16>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<uint16>( mode, src, dst, "%hu" );
 		}
 
 		template<>
 		void DeserializePOD<uint64>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<uint64>( mode, src, dst, "%llu" );
 		}
 
 		template<>
 		void DeserializePOD<float>( Mode mode, ReadStream& src, Variable dst )
 		{
-
+			DeserializePODInternal<float>( mode, src, dst, "%f" );
 		}
 
 		template<>
 		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst )
 		{
+			DeserializePODInternal<double>( mode, src, dst, "%lf" );
+		}
 
+		template<>
+		void DeserializePOD<bool>( Mode mode, ReadStream& src, Variable dst )
+		{
+			if( mode == Serialize::Mode::BINARY )
+			{
+				src.Read( &dst.GetValue<bool>(), sizeof( bool ) );
+			}
+			else
+			{
+				char out[5];
+				src.Read( out, 4 );
+
+				if( strcmp( out, "true" ) )
+				{
+					dst.GetValue<bool>() = true;
+					return;
+				}
+				
+				src.Read( out + 4, 1 );
+
+				if( strcmp( out, "false" ) )
+				{
+					dst.GetValue<bool>() = false;
+				}
+			}
 		}
 
 		template<>
 		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst )
 		{
+			String64 out;
+			DeserializeString( mode, src, Variable( out ) );
+		
+			char* dest = dst.GetValue<char*>();
+			memcpy( dest, out.c_str(), out.Length() );
 
+			dest[out.Length()] = '\0';
 		}
 	}
 }

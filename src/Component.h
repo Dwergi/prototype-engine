@@ -13,8 +13,6 @@ namespace dd
 	protected:
 		Component() {}
 
-		NO_MEMBERS( Component )
-
 	public:
 		virtual ~Component() {}
 	};

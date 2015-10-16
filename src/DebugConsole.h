@@ -34,5 +34,6 @@ namespace dd
 		void ClearLog();
 		void ListFunctions();
 		void EvaluateScript( const String& script );
+		void ListVariables();
 	};
 }

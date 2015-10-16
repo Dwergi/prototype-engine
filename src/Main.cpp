@@ -35,63 +35,100 @@
 #include "imgui/imgui.h"
 //---------------------------------------------------------------------------
 
+using namespace dd;
+
 template<typename T>
 void RegisterComponent()
 {
-	dd::DoubleBuffer<typename T::Pool>* double_buffer = new dd::DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
-	dd::g_services.Register( *double_buffer );
+	DoubleBuffer<typename T::Pool>* double_buffer = new DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
+	g_services.Register( *double_buffer );
 }
 
 template<typename T>
 typename T::Pool* GetWritePool()
 {
-	return dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetWrite();
+	return g_services.Get<DoubleBuffer<typename T::Pool>>().GetWrite();
 }
 
 template<typename T>
 typename T::Pool* GetReadPool()
 {
-	return dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>().GetRead();
+	return g_services.Get<DoubleBuffer<typename T::Pool>>().GetRead();
 }
 
 template<typename T>
-dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
+DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 {
-	dd::DoubleBuffer<typename T::Pool>& buffer = dd::g_services.Get<dd::DoubleBuffer<typename T::Pool>>();
+	DoubleBuffer<typename T::Pool>& buffer = g_services.Get<DoubleBuffer<typename T::Pool>>();
 
 	return buffer;
 }
 
+float s_maxFPS = 100.0f;
+
 bool s_drawFPS = true;
 
-dd::Vector<dd::EntityHandle> s_entitites;
+Vector<EntityHandle> s_entitites;
+
+float s_rollingAverageFPS = s_maxFPS;
+float s_rollingAverageMultiplier = 0.8f;
 
 void DrawFPS( float delta_t )
 {
+	if( delta_t > 0 )
+	{
+		s_rollingAverageFPS *= s_rollingAverageMultiplier;
+		s_rollingAverageFPS += (1.0f / delta_t) * (1.0f - s_rollingAverageMultiplier);
+	}
+
 	ImGui::SetNextWindowPos( ImVec2( 2, 2 ) );
 	if( !ImGui::Begin( "", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
 	{
 		ImGui::End();
 		return;
 	}
-	ImGui::Text( "FPS: %.1f", 1.0f / delta_t );
+
+	ImGui::Text( "FPS: %.1f", s_rollingAverageFPS );
 	ImGui::End();
 }
 
 bool s_drawConsole = true;
 
-dd::TransformComponent* GetTransformComponent( dd::EntityHandle entity )
+TransformComponent* GetTransformComponent( EntityHandle* entity )
 {
-	auto& transform_pool = GetDoubleBuffer<dd::TransformComponent>().GetRead();
+	auto& transform_pool = GetDoubleBuffer<TransformComponent>().GetRead();
 	
-	dd::TransformComponent* cmp = transform_pool.Find( entity );
+	TransformComponent* cmp = transform_pool.Find( *entity );
 
 	return cmp;
 }
 
 void RegisterGlobalScriptFunctions()
 {
-	dd::g_services.Get<dd::ScriptEngine>().RegisterGlobalFunction( dd::String16( "GetTransformComponent" ), FUNCTION( GetTransformComponent ), &GetTransformComponent );
+	REGISTER_TYPE( EntityHandle );
+
+	ScriptEngine& engine = g_services.Get<ScriptEngine>();
+
+	engine.RegisterGlobalFunction( String16( "GetTransformComponent" ), FUNCTION( GetTransformComponent ), &GetTransformComponent );
+	engine.RegisterGlobalVariable( String16( "s_drawFPS" ), Variable( s_drawFPS ) );
+	engine.RegisterGlobalVariable( String16( "s_maxFPS" ), Variable( s_maxFPS ) );
+	engine.RegisterGlobalVariable( String16( "s_rollingAverageFPS" ), Variable( s_rollingAverageFPS ) );
+	engine.RegisterGlobalVariable( String16( "s_rollingAverageMultiplier" ), Variable( s_rollingAverageMultiplier ) );
+}
+
+void RegisterGameTypes()
+{
+	REGISTER_TYPE( Vector4 );
+
+	REGISTER_TYPE( TransformComponent );
+	REGISTER_TYPE( OctreeComponent );
+	REGISTER_TYPE( SwarmAgentComponent );
+
+	RegisterComponent<TransformComponent>();
+	RegisterComponent<OctreeComponent>();
+	RegisterComponent<SwarmAgentComponent>();
+
+	RegisterGlobalScriptFunctions();
 }
 
 #ifdef _TEST
@@ -112,38 +149,36 @@ int TestMain( int argc, char* const argv[] )
 
 int GameMain()
 {
-	dd::EntitySystem entitySystem;
-	dd::g_services.Register( entitySystem );
+	EntitySystem entitySystem;
+	g_services.Register( entitySystem );
 
-	RegisterComponent<dd::TransformComponent>();
-	RegisterComponent<dd::OctreeComponent>();
-	RegisterComponent<dd::SwarmAgentComponent>();
+	RegisterGameTypes();
 
-	auto& transform_db = GetDoubleBuffer<dd::TransformComponent>();
-	auto& swarm_db = GetDoubleBuffer<dd::SwarmAgentComponent>();
-	auto& octree_db = GetDoubleBuffer<dd::OctreeComponent>();
+	auto& transform_db = GetDoubleBuffer<TransformComponent>();
+	auto& swarm_db = GetDoubleBuffer<SwarmAgentComponent>();
+	auto& octree_db = GetDoubleBuffer<OctreeComponent>();
 
 	auto& transform_pool = transform_db.GetWrite();
 	auto& swarm_pool = swarm_db.GetWrite();
 	auto& octree_pool = octree_db.GetWrite();
 
-	dd::Random32 rngPos( 0, 100 );
-	dd::Random32 rngVelocity( 0, 100 );
+	Random32 rngPos( 0, 100 );
+	Random32 rngVelocity( 0, 100 );
 
-	dd::Octree octree;
+	Octree octree;
 
 	// create a bunch of entities and components
 	for( int i = 0; i < 1000; ++i )
 	{
-		dd::EntityHandle entity = entitySystem.CreateEntity();
+		EntityHandle entity = entitySystem.CreateEntity();
 
-		dd::SwarmAgentComponent* swarm_cmp = swarm_pool.Create( entity );
-		dd::TransformComponent* transform_cmp = transform_pool.Create( entity );
-		dd::OctreeComponent* octree_cmp = octree_pool.Create( entity );
+		SwarmAgentComponent* swarm_cmp = swarm_pool.Create( entity );
+		TransformComponent* transform_cmp = transform_pool.Create( entity );
+		OctreeComponent* octree_cmp = octree_pool.Create( entity );
 
 		swarm_cmp->ID = i;
-		swarm_cmp->Velocity = dd::Vector4( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
-		transform_cmp->Position = dd::Vector4( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
+		swarm_cmp->Velocity = Vector4( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
+		transform_cmp->Position = Vector4( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
 
 		octree_cmp->Entry = octree.Add( transform_cmp->Position );
 	}
@@ -157,56 +192,56 @@ int GameMain()
 	swarm_db.Duplicate();
 	octree_db.Duplicate();
 
-	dd::SwarmSystem swarm_system( swarm_db );
+	SwarmSystem swarm_system( swarm_db );
 
-	dd::Window window( 1280, 960, "Neutrino" );
+	Window window( 1280, 960, "Neutrino" );
 
-	dd::Input input( window );
+	Input input( window );
 
 	bool opened;
 
-	dd::DebugUI debugUI( window.GetInternalWindow() );
+	DebugUI debugUI( window.GetInternalWindow() );
 
-	dd::DebugConsole console;
+	DebugConsole console;
 
-	input.AddKeyboardCallback( &dd::DebugUI::KeyCallback );
-	input.AddScrollCallback( &dd::DebugUI::ScrollCallback );
-	input.AddMouseCallback( &dd::DebugUI::MouseButtonCallback );
-	input.AddCharCallback( &dd::DebugUI::CharCallback );
+	input.AddKeyboardCallback( &DebugUI::KeyCallback );
+	input.AddScrollCallback( &DebugUI::ScrollCallback );
+	input.AddMouseCallback( &DebugUI::MouseButtonCallback );
+	input.AddCharCallback( &DebugUI::CharCallback );
 
-	dd::Timer timer;
+	Timer timer;
 	timer.Start();
 
+	float target_delta = 1.0f / s_maxFPS;
 	float last_frame = 0.0f;
-	float current_frame = 0.0f;
-	float delta_t = 0.0f;
+	float current_frame = -target_delta;
+	float delta_t = target_delta;
 
-	const float min_delta = 0.01f; // 100 FPS cap
-
-	input.BindKey( '`', dd::InputAction::CONSOLE );
+	input.BindKey( '`', InputAction::CONSOLE );
 
 	while( !window.ShouldClose() )
 	{
+		target_delta = 1.0f / s_maxFPS;
 		last_frame = current_frame;
 		current_frame = timer.Time();
 		delta_t = current_frame - last_frame;
 
 		input.Update();
 
-		dd::MousePosition mouse_pos = input.GetMousePosition();
+		MousePosition mouse_pos = input.GetMousePosition();
 
-		dd::Array<dd::InputEvent, 64> events;
+		Array<InputEvent, 64> events;
 		input.GetKeyEvents( events );
 
 		for( uint i = 0; i < events.Size(); ++i )
 		{
-			if( events[i].Type == dd::InputType::PRESSED )
+			if( events[i].Type == InputType::PRESSED )
 				std::cout << "Pressed a key!" << std::endl;
 
-			if( events[i].Type == dd::InputType::RELEASED )
+			if( events[i].Type == InputType::RELEASED )
 				std::cout << "Released a key!" << std::endl;
 
-			if( events[i].Action == dd::InputAction::CONSOLE && events[i].Type == dd::InputType::RELEASED )
+			if( events[i].Action == InputAction::CONSOLE && events[i].Type == InputType::RELEASED )
 				s_drawConsole = !s_drawConsole;
 		}
 
@@ -218,17 +253,23 @@ int GameMain()
 
 		ImGui::ShowTestWindow( &opened );
 
-		DrawFPS( delta_t );
-
 		if( s_drawConsole )
 			console.Draw( "Console", s_drawConsole );
+
+		if( s_drawFPS )
+			DrawFPS( delta_t );
 
 		ImGui::Render();
 
 		window.Swap();
 
-		while( (timer.Time() - last_frame) < min_delta )
+		float now = timer.Time();
+		while( now - last_frame < target_delta )
+		{
 			::Sleep( 1 );
+
+			now = timer.Time();
+		}
 	}
 
 	window.Close();
@@ -242,16 +283,16 @@ int GameMain()
 //
 int main( int argc, char* const argv[] )
 {
-	dd::CommandLine cmdLine( argv, argc );
-	dd::g_services.Register( cmdLine );
+	CommandLine cmdLine( argv, argc );
+	g_services.Register( cmdLine );
 
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
-	dd::ScriptEngine scriptEngine;
-	dd::g_services.Register( scriptEngine );
+	ScriptEngine scriptEngine;
+	g_services.Register( scriptEngine );
 
-	dd::TypeInfo::RegisterDefaultTypes();
+	TypeInfo::RegisterDefaultTypes();
 
 #ifdef _TEST
 	return TestMain( argc, argv );

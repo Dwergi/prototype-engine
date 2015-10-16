@@ -42,11 +42,13 @@ namespace dd
 		void RegisterMember( const String& className, const Member& member );
 
 		template <typename FnType>
-		void RegisterGlobalFunction( const String& name, const Function& function, FnType ptr );
+		void RegisterGlobalFunction( const String& name, const Function& function, FnType ptr, const char* explicit_sig = nullptr );
+
+		void RegisterGlobalVariable( const String& name, const Variable& var );
 
 		bool IsObjectRegistered( const String& className );
 
-		bool Evaluate( const String& script );
+		bool Evaluate( const String& script, String& output );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 
@@ -106,13 +108,16 @@ namespace dd
 	}
 
 	template <typename FnType>
-	void ScriptEngine::RegisterGlobalFunction( const String& name, const Function& function, FnType ptr )
+	void ScriptEngine::RegisterGlobalFunction( const String& name, const Function& function, FnType ptr, const char* explicit_sig )
 	{
-		const int FUNCTION_SIZE = sizeof( void (*)() );
+		String256 signature;
+		
+		if( explicit_sig != nullptr )
+			signature = explicit_sig;
+		else 
+			signature = GetFunctionSignatureString( name, function );
 
-		String256 signature = GetFunctionSignatureString( name, function );
-
-		int res = m_engine->RegisterGlobalFunction( signature.c_str(), asSMethodPtr<FUNCTION_SIZE>::Convert( ptr ), asCALL_CDECL );
+		int res = m_engine->RegisterGlobalFunction( signature.c_str(), asFUNCTION( ptr ), asCALL_CDECL );
 		ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
 	}
 }

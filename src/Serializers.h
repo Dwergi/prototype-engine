@@ -64,6 +64,8 @@ namespace dd
 		void SerializePOD<double>( Mode mode, WriteStream& dst, Variable src );
 		template<>
 		void SerializePOD<char*>( Mode mode, WriteStream& dst, Variable src );
+		template<>
+		void SerializePOD<bool>( Mode mode, WriteStream& dst, Variable src );
 
 		template<typename T>
 		void DeserializePOD( Mode mode, ReadStream& src, Variable dst )
@@ -93,6 +95,8 @@ namespace dd
 		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst );
 		template<>
 		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst );
+		template<>
+		void DeserializePOD<bool>( Mode mode, ReadStream& src, Variable dst );
 
 		template<typename T>
 		void SerializeContainer( Mode mode, WriteStream& dst, Variable src )
