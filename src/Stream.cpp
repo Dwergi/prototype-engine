@@ -135,6 +135,11 @@ namespace dd
 		m_current = other.m_current;
 	}
 
+	void WriteStream::Reset()
+	{
+		m_current = 0;
+	}
+
 	void WriteStream::WriteByte( char c )
 	{
 		Write( &c, 1 );

@@ -52,6 +52,12 @@
     <Filter Include="Script\Add-Ons">
       <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\Pools">
+      <UniqueIdentifier>{8d309a51-ff54-4264-b346-5a708869a8b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\Pools\Test Components">
+      <UniqueIdentifier>{fe77aabc-75a8-4829-a000-a8d493294d6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -63,23 +69,11 @@
     <ClInclude Include="src\Component.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComponentPoolBase.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DenseVectorPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\BoundingBox.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UnorderedMapPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UnsortedVectorPool.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\PP_Assert.h">
       <Filter>Core</Filter>
@@ -90,17 +84,11 @@
     <ClInclude Include="src\Services.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\SortedVectorPool.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\OctreeComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\PrecompiledHeader.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VectorPairIterator.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\Octree.h">
       <Filter>Math</Filter>
@@ -276,6 +264,27 @@
     <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
       <Filter>Script\Add-Ons</Filter>
     </ClInclude>
+    <ClInclude Include="src\ComponentPoolBase.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SortedVectorPool.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UnorderedMapPool.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UnsortedVectorPool.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentPairIterator.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DenseVectorPool.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentPoolTestComponent.h">
+      <Filter>Components\Pools\Test Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -450,6 +459,9 @@
     <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
       <Filter>Script\Add-Ons</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -466,6 +478,18 @@
     </None>
     <None Include="src\Recorder.inl">
       <Filter>Properties</Filter>
+    </None>
+    <None Include="src\DenseVectorPool.inl">
+      <Filter>Components\Pools</Filter>
+    </None>
+    <None Include="src\UnorderedMapPool.inl">
+      <Filter>Components\Pools</Filter>
+    </None>
+    <None Include="src\SortedVectorPool.inl">
+      <Filter>Components\Pools</Filter>
+    </None>
+    <None Include="src\UnsortedVectorPool.inl">
+      <Filter>Components\Pools</Filter>
     </None>
   </ItemGroup>
 </Project>

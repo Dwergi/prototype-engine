@@ -107,9 +107,30 @@ namespace dd
 			SetString( other.c_str(), other.Length() );
 		}
 
+		InplaceString( dd::InplaceString<Size>&& other )
+			: String( m_stackData, Size )
+		{
+			if( other.m_buffer == other.m_stackData )
+			{
+				SetString( other.c_str(), other.Length() );
+			}
+			else
+			{
+				m_buffer = other.m_buffer;
+				other.m_buffer.Release();
+
+				m_length = other.m_length;
+			}
+		}
+
 		template <int OtherSize>
 		InplaceString( const InplaceString<OtherSize>& other )
 			: String( m_stackData, Size )
+		{
+			SetString( other.c_str(), other.Length() );
+		}
+
+		InplaceString<Size>& operator=( const InplaceString<Size>& other )
 		{
 			SetString( other.c_str(), other.Length() );
 		}
@@ -119,8 +140,8 @@ namespace dd
 
 		}
 
-		InplaceString <Size> Substring( uint start, uint count = -1 );
-
+		InplaceString<Size> Substring( uint start, uint count = -1 );
+		
 	private:
 
 		char m_stackData[ Size ];

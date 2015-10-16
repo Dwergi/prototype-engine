@@ -139,7 +139,7 @@ namespace dd
 		if( other == nullptr || offset >= m_length )
 			return -1;
 
-		const char* ptr = strstr( m_buffer, other );
+		const char* ptr = strstr( m_buffer + offset, other );
 
 		if( ptr == nullptr )
 			return -1;

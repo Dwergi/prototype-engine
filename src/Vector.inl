@@ -17,7 +17,7 @@ namespace dd
 	Vector<T>::Vector( uint reserved )
 		: m_data( nullptr )
 	{
-		Resize( reserved );
+		Reserve( reserved );
 	}
 
 	template<typename T>
@@ -296,15 +296,25 @@ namespace dd
 			if( size < m_size )
 				DestroyRange( &m_data[size], m_size - size );
 
-			m_size = size;
-
 			Reallocate( size );
 		}
-
-		if( size > m_capacity )
+		else if( size > m_capacity )
 		{
 			Reallocate( size );
+
+			ConstructRange( &m_data[m_size], size - m_size );
 		}
+
+		m_size = size;
+	}
+
+	template<typename T>
+	void Vector<T>::Reserve( uint capacity )
+	{
+		if( capacity <= m_capacity )
+			return;
+
+		Reallocate( capacity );
 	}
 
 	template<typename T>
@@ -323,7 +333,7 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Grow( uint target )
 	{
-		if( target < m_capacity )
+		if( target <= m_capacity )
 			return;
 
 		uint new_capacity = m_capacity;
@@ -338,19 +348,20 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Reallocate( uint new_capacity )
 	{
-		if( new_capacity == 0 )
-			return;
+		T* new_data = nullptr;
 
-		T* new_data = reinterpret_cast<T*>(new char[new_capacity * sizeof( T )]);
-
-		memset( new_data, 0xffffffff, new_capacity * sizeof( T ) );
+		if( new_capacity > 0 )
+		{
+			new_data = reinterpret_cast<T*>(new char[new_capacity * sizeof( T )]);
+			memset( new_data, 0xffffffff, new_capacity * sizeof( T ) );
+		}
 
 		if( m_data != nullptr )
 		{
 			CopyRange( m_data, new_data, std::min( m_size, new_capacity ) );
 			DestroyRange( m_data, m_size );
 
-			delete[]( char* ) m_data;
+			delete[] ((char*) m_data);
 		}
 
 		m_data = new_data;
@@ -360,7 +371,7 @@ namespace dd
 	template<typename T>
 	T& Vector<T>::GetEntry( uint index ) const
 	{
-		ASSERT( index < m_size );
+		ASSERT( index < m_capacity );
 
 		return m_data[index];
 	}

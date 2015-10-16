@@ -62,12 +62,14 @@ dd::DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 	return buffer;
 }
 
-bool s_bDrawFPS = true;
+bool s_drawFPS = true;
+
+dd::Vector<dd::EntityHandle> s_entitites;
 
 void DrawFPS( float delta_t )
 {
 	ImGui::SetNextWindowPos( ImVec2( 2, 2 ) );
-	if( !ImGui::Begin( "", &s_bDrawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
+	if( !ImGui::Begin( "", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
 	{
 		ImGui::End();
 		return;
@@ -76,7 +78,21 @@ void DrawFPS( float delta_t )
 	ImGui::End();
 }
 
-bool s_bDrawConsole = true;
+bool s_drawConsole = true;
+
+dd::TransformComponent* GetTransformComponent( dd::EntityHandle entity )
+{
+	auto& transform_pool = GetDoubleBuffer<dd::TransformComponent>().GetRead();
+	
+	dd::TransformComponent* cmp = transform_pool.Find( entity );
+
+	return cmp;
+}
+
+void RegisterGlobalScriptFunctions()
+{
+	dd::g_services.Get<dd::ScriptEngine>().RegisterGlobalFunction( dd::String16( "GetTransformComponent" ), FUNCTION( GetTransformComponent ), &GetTransformComponent );
+}
 
 #ifdef _TEST
 
@@ -191,7 +207,7 @@ int GameMain()
 				std::cout << "Released a key!" << std::endl;
 
 			if( events[i].Action == dd::InputAction::CONSOLE && events[i].Type == dd::InputType::RELEASED )
-				s_bDrawConsole = !s_bDrawConsole;
+				s_drawConsole = !s_drawConsole;
 		}
 
 		debugUI.SetMousePosition( input.GetMousePosition().X, input.GetMousePosition().Y );
@@ -204,8 +220,8 @@ int GameMain()
 
 		DrawFPS( delta_t );
 
-		if( s_bDrawConsole )
-			console.Draw( "Console", s_bDrawConsole );
+		if( s_drawConsole )
+			console.Draw( "Console", s_drawConsole );
 
 		ImGui::Render();
 

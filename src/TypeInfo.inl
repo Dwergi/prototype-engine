@@ -111,7 +111,7 @@ const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeIn
 }
 
 template <typename FnType>
-void TypeInfo::RegisterMethod( Function f, FnType fn, const char* name )
+void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 {
 	ASSERT( sm_defaultsRegistered );
 
@@ -124,32 +124,7 @@ void TypeInfo::RegisterMethod( Function f, FnType fn, const char* name )
 	// don't register with script if this isn't a script object
 	if( m_scriptObject && script_engine != nullptr )
 	{
-		const FunctionSignature* sig = f.Signature();
-		String128 signature;
-
-		if( sig->GetRet() != nullptr )
-			signature += sig->GetRet()->GetNameWithoutNamespace();
-		else
-			signature += "void";
-
-		signature += " ";
-		signature += name;
-
-		signature += "(";
-
-		uint argCount = sig->ArgCount();
-		for( uint i = 0; i < argCount; ++i )
-		{
-			signature += sig->GetArg( i )->GetNameWithoutNamespace();
-
-			if( i < (argCount - 1) )
-				signature += ",";
-		}
-
-		signature += ")";
-
-		
-		script_engine->RegisterMethod( sig->GetContext()->GetNameWithoutNamespace(), signature, fn );
+		script_engine->RegisterMethod( m, fn );
 	}
 }
 
@@ -162,6 +137,6 @@ void TypeInfo::RegisterScriptObject( const char* name )
 	if( script_engine != nullptr )
 	{
 		m_scriptObject = true;
-		script_engine->RegisterObject<T>( GetNameWithoutNamespace() );
+		script_engine->RegisterObject<T>( m_name );
 	}
 }

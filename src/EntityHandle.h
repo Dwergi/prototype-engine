@@ -26,6 +26,10 @@ class EntitySystem;
 		bool operator==( const EntityHandle& other ) const;
 		bool operator!=( const EntityHandle& other ) const;
 
+		BEGIN_SCRIPT_OBJECT( EntityHandle )
+			MEMBER( ID );
+		END_MEMBERS
+
 	private: 
 	
 		friend class EntitySystem;

@@ -7,125 +7,9 @@
 #pragma once
 
 #include "ComponentPoolBase.h"
-#include "EntityHandle.h"
+#include "ComponentPairIterator.h"
 
 #include <unordered_map>
-
-template<typename T>
-class UnorderedMapPool;
-
-template<typename TKey, typename TValue>
-class unordered_map_pair_const_iterator
-	: std::iterator<std::forward_iterator_tag, TValue*>
-{
-private:
-	typedef unordered_map_pair_const_iterator<TKey, TValue> this_type;
-	typedef typename std::unordered_map<TKey, TValue>::const_iterator std_pair_iter;
-
-	std_pair_iter m_current;
-
-public:
-
-	unordered_map_pair_const_iterator( std_pair_iter& init )
-	{
-		m_current = init;
-	}
-
-	unordered_map_pair_const_iterator( const this_type& other )
-	{
-		m_current = other.m_current;
-	}
-
-	const TValue* operator&()
-	{
-		return &m_current->second;
-	}
-
-	const TValue& operator*() 
-	{ 
-		return m_current->second;
-	}
-	
-	bool operator==( const this_type& other ) const
-	{
-		return m_current == other.m_current;
-	}
-
-	bool operator!=( const this_type& other ) const
-	{
-		return !operator==( other );
-	}
-
-	this_type& operator++()
-	{
-		++m_current;
-
-		return *this;
-	}
-};
-
-//
-// Pair iterator.
-// 
-template<typename TKey, typename TValue>
-class unordered_map_pair_iterator
-	: std::iterator<std::forward_iterator_tag, TValue*>
-{
-private:
-	typedef unordered_map_pair_iterator<TKey, TValue> this_type;
-	typedef typename std::unordered_map<TKey, TValue>::iterator std_pair_iter;
-
-	std_pair_iter m_current;
-
-public:
-
-	unordered_map_pair_iterator( std_pair_iter& init )
-	{
-		m_current = init;
-	}
-
-	unordered_map_pair_iterator( const this_type& other )
-	{
-		m_current = other.m_current;
-	}
-
-	TValue* operator&()
-	{
-		return &m_current->second;
-	}
-
-	TValue& operator*() 
-	{ 
-		return m_current->second;
-	}
-
-	const TValue* operator&() const
-	{
-		return &m_current->second;
-	}
-
-	const TValue& operator*() const
-	{ 
-		return m_current->second;
-	}
-
-	bool operator==( const this_type& other ) const
-	{
-		return m_current == other.m_current;
-	}
-
-	bool operator!=( const this_type& other ) const
-	{
-		return !operator==( other );
-	}
-
-	this_type& operator++()
-	{
-		++m_current;
-
-		return *this;
-	}
-};
 
 //
 // A component pool for components that are rare(ish).
@@ -134,128 +18,58 @@ public:
 namespace dd
 {
 	template<typename T>
-	class UnorderedMapPool : public ComponentPoolBase
+	class UnorderedMapPool 
+		: public ComponentPool<T>
 	{
 	public:
 
-		static_assert( std::is_base_of<dd::Component, T>::value, "Not derived from Component." );
+		typedef typename ComponentPairIterator<typename std::unordered_map<int,T>::iterator, int, T> iterator;
+		typedef typename ComponentPairConstIterator<typename std::unordered_map<int, T>::const_iterator, int, T> const_iterator;
 
-	#ifdef USE_EIGEN
-		typedef typename std::unordered_map<int, T, std::hash<int>, std::equal_to<int>, Eigen::aligned_allocator< std::pair<int, T> > > Storage;
-	#else
-		typedef typename std::unordered_map<int, T> Storage;
-	#endif
+		UnorderedMapPool();
+		~UnorderedMapPool();
 
-		typedef typename unordered_map_pair_iterator<int, T> ComponentIterator;
-		typedef typename unordered_map_pair_const_iterator<int, T> ComponentConstIterator;
-
-		UnorderedMapPool()
-		{
-
-		}
-
-		~UnorderedMapPool()
-		{
-			Cleanup();
-		}
-
-		void Cleanup()
-		{
-			m_components.swap( Storage() );
-		}
+		//
+		// Clear this component pool.
+		//
+		virtual void Clear() override;
 
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		bool Empty() const
-		{
-			return m_components.empty();
-		}
+		uint Size() const override;
 
 		//
 		// Create a new component of this type for the given entity.
 		// 
-		T* Create( const dd::EntityHandle& entity )
-		{
-			// already allocated!
-			T* pCmp = Find( entity );
-			if( pCmp != nullptr )
-			{
-				ASSERT( false, "Component already allocated for given entity!" );
-				return nullptr;
-			}
-
-			auto res = m_components.insert( std::make_pair( entity.ID, T() ) );
-			return &res.first->second;
-		}
+		T* Create( const EntityHandle& entity ) override;
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		T* Find( const dd::EntityHandle& entity )
-		{
-			auto it = m_components.find( entity.ID );
-			if( it == m_components.end() )
-			{
-				return nullptr;
-			}
-
-			T& cmp = it->second;
-			return &cmp;
-		}
+		T* Find( const EntityHandle& entity ) const override;
 
 		//
 		// Remove the component associated with the given entity.
 		// 
-		void Remove( const dd::EntityHandle& entity )
-		{
-			auto it = m_components.find( entity.ID );
-			if( it == m_components.end() )
-				return;
-
-			m_components.erase( it );
-		}
+		void Remove( const EntityHandle& entity ) override;
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		bool Exists( const dd::EntityHandle& entity ) const
-		{
-			T* cmp = Find( entity );
+		bool Exists( const EntityHandle& entity ) const override;
 
-			return cmp != nullptr;
-		}
+		iterator begin();
+		iterator end();
 
-		ComponentIterator begin()
-		{
-			return ComponentIterator( m_components.begin() );
-		}
-
-		ComponentIterator end()
-		{
-			return ComponentIterator( m_components.end() );
-		}
-
-		ComponentConstIterator begin() const
-		{
-			return ComponentConstIterator( m_components.begin() );
-		}
-
-		ComponentConstIterator end() const
-		{
-			return ComponentConstIterator( m_components.end() );
-		}
-
-		UnorderedMapPool& operator=( const UnorderedMapPool<T>& other )
-		{
-			m_components = other.m_components;
-
-			return *this;
-		}
+		const_iterator begin() const;
+		const_iterator end() const;
 
 	private:
 
-		Storage m_components;	
+		std::unordered_map<int, T> m_components;
 	};
 }
+
+#include "UnorderedMapPool.inl"

@@ -10,16 +10,21 @@
 
 namespace dd
 {
+	template<typename T>
+	class ComponentPool;
+
+	//
+	// A component handle is meant to be stored for a long time. 
+	// It's not the most efficient way to access a component repeatedly in a short span,
+	// but it is more tolerant to components ceasing to exist.
+	//
 	template< typename ComponentType >
 	class ComponentHandle
 	{
-	private:
-		typedef typename ComponentType::Pool PoolType;
-
 	public:
 
-		ComponentHandle( dd::EntityHandle entity, const PoolType& pool )
-			: m_pool( pool ),
+		ComponentHandle( EntityHandle entity, const ComponentPool<ComponentType>& pool )
+			: m_pool( &pool ),
 			m_entity( entity )
 		{
 		}
@@ -32,22 +37,23 @@ namespace dd
 
 		bool IsValid() const
 		{
-			return m_entity.IsValid() && m_pool.Exists( m_entity );
+			return m_pool != nullptr && m_entity.IsValid() && m_pool->Exists( m_entity );
 		}
 
 		ComponentType* Get() const 
 		{
-			if( !m_entity.IsValid() )
+			ASSERT( m_pool != nullptr );
+			ASSERT( IsValid(), "Handle not valid!" );
+
+			if( !IsValid() )
 				return nullptr;
 
-			return m_pool.Find( m_entity )
+			return m_pool->Find( m_entity )
 		}
 
 		ComponentType* operator->()
 		{
-			ASSERT( IsValid(), "Handle not valid!" );
-
-			return m_pool->Find( m_entity );
+			return Get();
 		}
 
 		ComponentType& operator*()
@@ -73,7 +79,7 @@ namespace dd
 
 	private:
 
-		const PoolType& m_pool;
-		dd::EntityHandle m_entity;
+		const ComponentPool<ComponentType>* m_pool;
+		EntityHandle m_entity;
 	};
 }

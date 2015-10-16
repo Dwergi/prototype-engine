@@ -14,7 +14,7 @@ void CopyRange( const T* src, T* dest, uint count )
 }
 
 template<typename T>
-void ConstructRange( const T* src, uint count )
+void ConstructRange( T* src, uint count )
 {
 	for( uint i = 0; i < count; ++i )
 	{

@@ -20,6 +20,12 @@ namespace dd
 	typedef void (*SerializeFn)( Serialize::Mode mode, WriteStream& dst, Variable src );
 	typedef void (*DeserializeFn)( Serialize::Mode mode, ReadStream& src, Variable dst );
 
+	struct Method
+	{
+		String32 Name;
+		Function Function;
+	};
+
 	class TypeInfo : public AutoList<TypeInfo>
 	{
 	public:
@@ -33,7 +39,6 @@ namespace dd
 
 		inline uint Size() const { return m_size; }
 		inline const String& Name() const { return m_name; }
-		String32 GetNameWithoutNamespace() const;
 
 		inline bool IsPOD() const { return m_members.Size() == 0; }
 
@@ -57,7 +62,7 @@ namespace dd
 		static const TypeInfo* RegisterContainer( const char* container, const TypeInfo* containing );
 
 		template <typename T>
-		void RegisterMethod( Function f, T fn, const char* name );
+		void RegisterMethod( const Function& f, T fn, const char* name );
 
 		void RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset );
 
@@ -92,12 +97,6 @@ namespace dd
 		String32 m_name;
 		const TypeInfo* m_containedType;
 		bool m_scriptObject;
-
-		struct Method
-		{
-			String32 Name;
-			Function Function;
-		};
 
 		Vector<Member> m_members;
 		Vector<Method> m_methods;

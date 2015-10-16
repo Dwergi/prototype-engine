@@ -33,5 +33,6 @@ namespace dd
 		void ExecCommand( const String& command_line );
 		void ClearLog();
 		void ListFunctions();
+		void EvaluateScript( const String& script );
 	};
 }

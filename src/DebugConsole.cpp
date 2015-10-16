@@ -9,8 +9,69 @@
 
 #include "imgui/imgui.h"
 
+// script helpers
+namespace
+{
+	dd::String256 s_scriptOutput;
+	dd::WriteStream s_stream( s_scriptOutput );
+
+	void grabInt( int v )
+	{
+		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabUint( uint v )
+	{
+		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabBool( bool v )
+	{
+		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabFloat( float v )
+	{
+		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabDouble( double v )
+	{
+		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabString( const dd::String& v )
+	{
+		SerializeString( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grab()
+	{
+		// There is no value
+	}
+}
+
 namespace dd
 {
+	void RegisterConsoleHelpers()
+	{
+		ScriptEngine* engine = dd::g_services.GetPtr<ScriptEngine>();
+		if( engine == nullptr )
+			return;
+
+		// Register special function with overloads to catch any type.
+		// This is used by the exec command to output the resulting value from the statement.
+		String16 name( "_grab" );
+
+		engine->RegisterGlobalFunction( name, FUNCTION( grabBool ), &grabBool );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabInt ), &grabInt );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabUint ), &grabUint );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabFloat ), &grabFloat );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabDouble ), &grabDouble );
+		engine->RegisterGlobalFunction( name, FUNCTION( grab ), &grab );
+		/*engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
+	}
+
 	DebugConsole::DebugConsole()
 	{
 		ClearLog();
@@ -24,7 +85,7 @@ namespace dd
 		m_commands.Add( "Functions" );
 		m_commands.Add( "Variables" );
 
-		g_services.Get<ScriptEngine>().RegisterConsoleHelpers();
+		RegisterConsoleHelpers();
 	}
 
 	DebugConsole::~DebugConsole()
@@ -186,13 +247,30 @@ namespace dd
 		}
 		else
 		{
-			String256 output;
-
-			// pass to AngelScript to evaluate 
-			g_services.Get<ScriptEngine>().Evaluate( command_line, output );
-
-			AddLog( "\t%s\n", output.c_str() );
+			EvaluateScript( command_line );			
 		}
+	}
+
+	void DebugConsole::EvaluateScript( const String& script )
+	{
+		ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+		if( script_engine == nullptr )
+			return;
+
+		// add our grab commands
+		String256 completeString( "_grab(" );
+		completeString += script;
+		completeString += ")";
+
+		// reset output buffer
+		::s_scriptOutput.Clear();
+		::s_stream.Reset();
+
+		// pass to AngelScript to evaluate 
+		if( !script_engine->Evaluate( script ) )
+			AddLog( "\t%s\n", s_scriptOutput.c_str() );
+		else
+			AddLog( "\tScript error!" );
 	}
 
 	void DebugConsole::ListFunctions()

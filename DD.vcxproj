@@ -327,10 +327,11 @@
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
+    <ClInclude Include="src\ComponentPoolTestComponent.h" />
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Vector4.h" />
-    <ClInclude Include="src\VectorPairIterator.h" />
+    <ClInclude Include="src\ComponentPairIterator.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -413,6 +414,7 @@
     <ClCompile Include="src\SwarmSystem.cpp" />
     <ClCompile Include="src\Tests\ArrayTests.cpp" />
     <ClCompile Include="src\Tests\CommandLineTests.cpp" />
+    <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
     <ClCompile Include="src\Tests\OctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
@@ -432,8 +434,12 @@
     <ClCompile Include="src\Vector.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <None Include="src\DenseVectorPool.inl" />
     <None Include="src\Recorder.inl" />
+    <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
+    <None Include="src\UnorderedMapPool.inl" />
+    <None Include="src\UnsortedVectorPool.inl" />
     <None Include="src\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

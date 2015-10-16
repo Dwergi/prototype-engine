@@ -24,4 +24,9 @@ namespace dd
 	{
 		return m_size;
 	}
+
+	uint VectorBase::Capacity() const
+	{
+		return m_capacity;
+	}
 }

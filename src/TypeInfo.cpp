@@ -35,12 +35,7 @@ namespace dd
 
 		if( m_scriptObject )
 		{
-			String64 signature;
-			signature += typeInfo->GetNameWithoutNamespace();
-			signature += " ";
-			signature += name;
-
-			g_services.Get<ScriptEngine>().RegisterMember( GetNameWithoutNamespace(), signature, offset );
+			g_services.Get<ScriptEngine>().RegisterMember( m_name, member );
 		}
 	}
 
@@ -92,27 +87,6 @@ namespace dd
 	{
 		SerializeCustom = serializer;
 		DeserializeCustom = deserializer;
-	}
-
-	String32 TypeInfo::GetNameWithoutNamespace() const
-	{
-		uint iColon = 0;
-		for( uint i = m_name.Length(); i > 0; --i )
-		{
-			if( m_name[i - 1] == ':' )
-			{
-				iColon = i - 1;
-				break;
-			}
-		}
-
-		if( iColon > 0 )
-		{
-			String32 result = m_name.c_str() + iColon + 1;
-			return result;
-		}
-
-		return m_name;
 	}
 
 	void TypeInfo::RegisterDefaultTypes()

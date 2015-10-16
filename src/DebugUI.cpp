@@ -299,9 +299,15 @@ namespace dd
 
 	DebugUI::~DebugUI()
 	{
-		if( g_VaoHandle ) glDeleteVertexArrays( 1, &g_VaoHandle );
-		if( g_VboHandle ) glDeleteBuffers( 1, &g_VboHandle );
-		if( g_ElementsHandle ) glDeleteBuffers( 1, &g_ElementsHandle );
+		if( g_VaoHandle != 0 )
+			glDeleteVertexArrays( 1, &g_VaoHandle );
+
+		if( g_VboHandle != 0 )
+			glDeleteBuffers( 1, &g_VboHandle );
+
+		if( g_ElementsHandle != 0 )
+			glDeleteBuffers( 1, &g_ElementsHandle );
+
 		g_VaoHandle = g_VboHandle = g_ElementsHandle = 0;
 
 		glDetachShader( g_ShaderHandle, g_VertHandle );

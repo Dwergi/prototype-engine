@@ -13,6 +13,7 @@ namespace dd
 	public:
 		VectorBase();
 		uint Size() const;
+		uint Capacity() const;
 
 	protected:
 		uint m_capacity;
@@ -90,7 +91,19 @@ namespace dd
 		int Find( const T& entry ) const;
 		bool Contains( const T& entry ) const;
 
-		void Resize( uint capacity );
+		//
+		// Reserve at least capacity elements. 
+		// Does NOT change the size of the container.
+		// Does NOT destroy any elements, even if capacity is less than the current size.
+		//
+		void Reserve( uint capacity );
+
+		//
+		// Resize the vector to contain exactly size elements.
+		// Will destroy any outside it and create any missing ones.
+		//
+		void Resize( uint size );
+
 		void ShrinkToFit();
 
 		bool operator==( const Vector<T>& other ) const;
@@ -106,7 +119,7 @@ namespace dd
 		// Grows the vector to contain at least target elements.
 		// The actual capacity will depend on the growth factor.
 		//
-		void Grow( uint target );
+		void Grow( uint capacity );
 		void Grow();
 
 		void Reallocate( uint new_capacity );

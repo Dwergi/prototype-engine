@@ -10,65 +10,6 @@
 #include "angelscript/add_on/scriptmath/scriptmath.h"
 #include "angelscript/add_on/scripthelper/scripthelper.h"
 
-namespace
-{
-	dd::WriteStream* s_stream = nullptr;
-	void SetGrabInto( dd::String* out )
-	{
-		if( s_stream != nullptr )
-			delete s_stream;
-
-		s_stream = new dd::WriteStream( *out );
-	}
-
-	void grab( int v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializePOD( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab( asUINT v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializePOD( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab( bool v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializePOD( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab( float v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializePOD( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab( double v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializePOD( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab( const dd::String& v )
-	{
-		ASSERT( s_stream != nullptr );
-
-		SerializeString( dd::Serialize::Mode::JSON, *s_stream, v );
-	}
-
-	void grab()
-	{
-		// There is no value
-	}
-}
-
 namespace dd
 {
 	Script::Script()
@@ -108,59 +49,84 @@ namespace dd
 		m_engine = nullptr;
 	}
 
-	void ScriptEngine::RegisterMember( const String& className, const String& sig, uint offset )
+	void ScriptEngine::RegisterMember( const String& className, const Member& member )
 	{
-		int res = m_engine->RegisterObjectProperty( className.c_str(), sig.c_str(), (int) offset );
+		String64 objType( GetWithoutNamespace( className ) );
+
+		String128 signature;
+		signature += GetWithoutNamespace( member.Type()->Name() );
+		signature += " ";
+		signature += member.Name();
+
+		int res = m_engine->RegisterObjectProperty( objType.c_str(), signature.c_str(), (int) member.Offset() );
 		ASSERT( res >= 0 );
 	}
 
-	void ScriptEngine::RegisterConsoleHelpers()
+	bool ScriptEngine::Evaluate( const String& script )
 	{
-		int res = 0;
-
-		// Register special function with overloads to catch any type.
-		// This is used by the exec command to output the resulting value from the statement.
-		res = m_engine->RegisterGlobalFunction( "void _grab(bool)", asFUNCTIONPR( grab, (bool), void ), asCALL_CDECL ); 
-		ASSERT( res >= 0 );
-		res = m_engine->RegisterGlobalFunction( "void _grab(int)", asFUNCTIONPR( grab, (int), void ), asCALL_CDECL );
-		ASSERT( res >= 0 );
-		res = m_engine->RegisterGlobalFunction( "void _grab(uint)", asFUNCTIONPR( grab, (asUINT), void ), asCALL_CDECL );
-		ASSERT( res >= 0 );
-		res = m_engine->RegisterGlobalFunction( "void _grab(float)", asFUNCTIONPR( grab, (float), void ), asCALL_CDECL );
-		ASSERT( res >= 0 );
-		res = m_engine->RegisterGlobalFunction( "void _grab(double)", asFUNCTIONPR( grab, (double), void ), asCALL_CDECL );
-		ASSERT( res >= 0 );
-		res = m_engine->RegisterGlobalFunction( "void _grab()", asFUNCTIONPR( grab, (void), void ), asCALL_CDECL );
-		ASSERT( res >= 0 );
-		/*res = engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL ); 
-		ASSERT( res >= 0 );*/
-	}
-
-	bool ScriptEngine::Evaluate( const String& script, String& output )
-	{
-		String256 completeString( "_grab(" );
-		completeString += script;
-		completeString += ")";
-
-		output.Clear();
-
-		SetGrabInto( &output );
-
-		int r = ExecuteString( m_engine, completeString.c_str(), m_engine->GetModule( "console", asGM_CREATE_IF_NOT_EXISTS ), nullptr );
-
-		SetGrabInto( nullptr );
+		int r = ExecuteString( m_engine, script.c_str(), m_engine->GetModule( "console", asGM_CREATE_IF_NOT_EXISTS ), nullptr );
 
 		if( r < 0 )
 		{
-			output = "Invalid script statement!";
+			ASSERT( false, "Invalid script statement!" );
 			return false;
 		}
 		else if( r == asEXECUTION_EXCEPTION )
 		{
-			output = "A script exception was raised.";
+			ASSERT( false, "A script exception was raised." );
 			return false;
 		}
 
 		return true;
+	}
+
+	String256 ScriptEngine::GetFunctionSignatureString( const String& name, const Function& fn )
+	{
+		const FunctionSignature* sig = fn.Signature();
+		String256 signature;
+
+		if( sig->GetRet() != nullptr )
+			signature += GetWithoutNamespace( sig->GetRet()->Name() );
+		else
+			signature += "void";
+
+		signature += " ";
+		signature += name;
+
+		signature += "(";
+
+		uint argCount = sig->ArgCount();
+		for( uint i = 0; i < argCount; ++i )
+		{
+			signature += GetWithoutNamespace( sig->GetArg( i )->Name() );
+
+			if( i < (argCount - 1) )
+				signature += ",";
+		}
+
+		signature += ")";
+
+		return signature;
+	}
+
+	String64 ScriptEngine::GetWithoutNamespace( const String& typeName )
+	{
+		uint afterColon = 0;
+		while( true )
+		{
+			uint res = typeName.Find( "::", afterColon );
+			if( res == -1 )
+				break;
+
+			afterColon = res + 2;
+		}
+
+		if( afterColon > 0 )
+		{
+			String64 result = typeName.c_str() + afterColon;
+			return result;
+		}
+
+		return typeName;
 	}
 }

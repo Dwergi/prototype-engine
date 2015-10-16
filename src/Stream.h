@@ -53,6 +53,8 @@ namespace dd
 		WriteStream( void* out, uint capacity );
 		WriteStream( const WriteStream& other );
 
+		void Reset();
+
 		void WriteByte( char c );
 		void Write( const String& str );
 		void Write( const void* src, uint bytes );

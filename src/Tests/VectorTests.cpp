@@ -162,3 +162,51 @@ TEST_CASE( "[Vector] Out of Scope" )
 		REQUIRE( b[ i ] == i );
 	}
 }
+
+TEST_CASE( "[Vector] Reserve" )
+{
+	dd::Vector<int> a;
+	a.Reserve( 128 );
+
+	REQUIRE( a.Capacity() == 128 );
+	REQUIRE( a.Size() == 0 );
+
+	a.Reserve( 5 );
+
+	REQUIRE( a.Capacity() == 128 );
+	REQUIRE( a.Size() == 0 );
+
+	for( int i = 0; i < 100; ++i )
+	{
+		a.Add( i );
+	}
+
+	REQUIRE( a.Capacity() == 128 );
+	REQUIRE( a.Size() == 100 );
+}
+
+TEST_CASE( "[Vector] Resize" )
+{
+	dd::Vector<int> a;
+	a.Resize( 128 );
+
+	a[127] = 0;
+
+	REQUIRE( a.Size() == 128 );
+	REQUIRE( a.Capacity() == 128 );
+
+	a.Resize( 64 );
+
+	REQUIRE( a.Size() == 64 );
+	REQUIRE( a.Capacity() == 64 );
+
+	a.Resize( 0 );
+
+	REQUIRE( a.Size() == 0 );
+	REQUIRE( a.Capacity() == 0 );
+
+	a.Resize( 128 );
+
+	REQUIRE( a.Size() == 128 );
+	REQUIRE( a.Capacity() == 128 );
+}

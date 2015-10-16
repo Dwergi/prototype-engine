@@ -7,9 +7,8 @@
 #pragma once
 
 #include "ComponentPoolBase.h"
-#include "VectorPairIterator.h"
+#include "ComponentPairIterator.h"
 
-#include <utility>
 #include <vector>
 #include <set>
 
@@ -17,121 +16,61 @@
 // A component pool for components that are rare(ish).
 // All operations are somewhat more costly than for a dense component pool, but uses less space for large numbers of entities.
 //
-template<typename T>
-class UnsortedVectorPool : public ComponentPoolBase
+namespace dd
 {
-public:
-
-	static_assert( std::is_base_of<Component, T>::value, "Not derived from Component." );
-
-#ifdef USE_EIGEN
-	typedef typename aligned_vector<std::pair<int, T>> Storage;
-#else
-	typedef typename std::vector<std::pair<int, T>> Storage;
-#endif 
-
-	typedef typename vector_pair_iterator<int, T> ComponentIterator;
-
-	UnsortedVectorPool()
+	template<typename T>
+	class UnsortedVectorPool 
+		: public ComponentPool<T>
 	{
+	private:
+		typedef typename std::vector<std::pair<int, T>> Storage;
 
-	}
+		typedef typename ComponentPairIterator<typename Storage::iterator, int, T> iterator;
+		typedef typename ComponentPairConstIterator<typename Storage::const_iterator, int, T> const_iterator;
 
-	~UnsortedVectorPool()
-	{
-		Cleanup();
-	}
+	public:
+		UnsortedVectorPool();
+		~UnsortedVectorPool();
 
-	void Cleanup()
-	{
-		m_components.swap( Storage() );
-		m_existence.swap( std::set<int>() );
-	}
+		virtual void Clear() override;
 
-	//
-	// Checks if this component pool is empty or not.
-	// 
-	bool Empty() const
-	{
-		return m_components.empty();
-	}
+		//
+		// Checks if this component pool is empty or not.
+		// 
+		virtual uint Size() const override;
 
-	//
-	// Create a new component of this type for the given entity.
-	// 
-	T* Create( const EntityHandle& entity )
-	{
-		// already allocated!
-		if( Exists( entity ) )
-		{
-			ASSERT( false );
-			return nullptr;
-		}
+		//
+		// Create a new component of this type for the given entity.
+		// 
+		virtual T* Create( const EntityHandle& entity ) override;
 
-		m_components.push_back( std::make_pair( entity.ID, T() ) );
-		m_existence.insert( entity.ID );
+		//
+		// Find the component for the given entity.
+		// Returns null if the component hasn't been created.
+		// 
+		virtual T* Find( const EntityHandle& entity ) const override;
 
-		T& cmp = m_components.back().second;
-		return &cmp;
-	}
+		//
+		// Remove the component associated with the given entity.
+		// 
+		virtual void Remove( const EntityHandle& entity ) override;
 
-	//
-	// Find the component for the given entity.
-	// Returns null if the component hasn't been created.
-	// 
-	T* Find( const EntityHandle& entity ) const
-	{
-		for( auto pair : m_components )
-		{
-			if( pair.first == entity.ID )
-				return &pair.second;
-		}
+		// 
+		// Checks if the given entity has a component of this type.
+		// 
+		virtual bool Exists( const EntityHandle& entity ) const override;
 
-		return nullptr;
-	}
+		iterator begin();
+		iterator end();
 
-	//
-	// Remove the component associated with the given entity.
-	// 
-	void Remove( const EntityHandle& entity )
-	{
-		if( !Exists( entity ) )
-			return;
+		const_iterator begin() const;
+		const_iterator end() const;
 
-		auto it = m_components.begin();
-		for( ; it != m_components.end(); ++it )
-		{
-			if( it->first == entity.ID )
-				break;
-		}
+	private:
 
-		if( it == m_components.end() )
-			return;
+		std::set<int> m_existence;
+		Storage m_components;
+	};
+}
 
-		m_existence.erase( m_existence.find( it->first ) );
-		erase_unordered( m_components, it );
-	}
-
-	// 
-	// Checks if the given entity has a component of this type.
-	// 
-	bool Exists( const EntityHandle& entity ) const
-	{
-		return m_existence.find( entity.ID ) != m_existence.end();
-	}
-
-	ComponentIterator begin()
-	{
-		return ComponentIterator( m_components.begin() );
-	}
-
-	ComponentIterator end()
-	{
-		return ComponentIterator( m_components.end() );
-	}
-
-private:
-
-	std::set<int> m_existence;
-	Storage m_components;	
-};
+#include "UnsortedVectorPool.inl"

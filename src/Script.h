@@ -34,18 +34,19 @@ namespace dd
 		void UnloadScript( Script& );
 
 		template <typename FnType>
-		void RegisterMethod( const String& className, const String& signature, FnType method );
+		void RegisterMethod( const Method& method, FnType ptr );
 
 		template <typename ObjType>
 		void RegisterObject( const String& className );
 
-		void RegisterMember( const String& className, const String& sig, uint offset );
+		void RegisterMember( const String& className, const Member& member );
+
+		template <typename FnType>
+		void RegisterGlobalFunction( const String& name, const Function& function, FnType ptr );
 
 		bool IsObjectRegistered( const String& className );
 
-		bool Evaluate( const String& script, String& output );
-
-		void RegisterConsoleHelpers();
+		bool Evaluate( const String& script );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 
@@ -56,6 +57,8 @@ namespace dd
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
 		static String64 GetWithoutNamespace( const String& className );
+
+		static String256 GetFunctionSignatureString( const String& name, const Function& fn );
 	};
 	//---------------------------------------------------------------------------
 
@@ -68,10 +71,14 @@ namespace dd
 	}
 
 	template <typename FnType>
-	void ScriptEngine::RegisterMethod( const String& className, const String& signature, FnType method )
+	void ScriptEngine::RegisterMethod( const Method& method, FnType fnPtr )
 	{
 		class DummyClass {};
 		const int METHOD_SIZE = sizeof(void (DummyClass::*)());
+
+		String256 signature( GetFunctionSignatureString( method.Name, method.Function ) );
+
+		String64 className( GetWithoutNamespace( method.Function.Signature()->GetContext()->Name() ) );
 
 		int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
 		ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
@@ -80,19 +87,32 @@ namespace dd
 	template <typename ObjType>
 	void ScriptEngine::RegisterObject( const String& className )
 	{
-		int res = m_engine->RegisterObjectType( className.c_str(), 0, asOBJ_REF );
+		String64 objType( GetWithoutNamespace( className ) );
+
+		int res = m_engine->RegisterObjectType( objType.c_str(), 0, asOBJ_REF );
 		ASSERT( res >= 0 );
 
-		String32 strSig = className;
+		String32 strSig = objType;
 		strSig += "@ Factory()";
 
-		res = m_engine->RegisterObjectBehaviour( className.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<ObjType> ), asCALL_CDECL );
+		res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<ObjType> ), asCALL_CDECL );
 		ASSERT( res >= 0 );
 		
-		res = m_engine->RegisterObjectBehaviour( className.c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter<ObjType>, Increment ), asCALL_THISCALL );
+		res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter<ObjType>, Increment ), asCALL_THISCALL );
 		ASSERT( res >= 0 );
 
-		res = m_engine->RegisterObjectBehaviour( className.c_str(), asBEHAVE_RELEASE, "void Decrement()", asMETHOD( RefCounter<ObjType>, Decrement ), asCALL_THISCALL );
+		res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_RELEASE, "void Decrement()", asMETHOD( RefCounter<ObjType>, Decrement ), asCALL_THISCALL );
 		ASSERT( res >= 0 );
+	}
+
+	template <typename FnType>
+	void ScriptEngine::RegisterGlobalFunction( const String& name, const Function& function, FnType ptr )
+	{
+		const int FUNCTION_SIZE = sizeof( void (*)() );
+
+		String256 signature = GetFunctionSignatureString( name, function );
+
+		int res = m_engine->RegisterGlobalFunction( signature.c_str(), asSMethodPtr<FUNCTION_SIZE>::Convert( ptr ), asCALL_CDECL );
+		ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
 	}
 }

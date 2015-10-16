@@ -570,7 +570,7 @@ namespace dd
 		} );
 
 		// drop the last elements
-		output.Resize( count );
+		output.Reserve( count );
 	}
 
 	//

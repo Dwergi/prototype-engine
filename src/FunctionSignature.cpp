@@ -31,6 +31,7 @@ namespace dd
 		: m_ret( nullptr )
 		, m_args( nullptr )
 		, m_argCount( 0 )
+		, m_context( nullptr )
 	{
 	}
 
@@ -38,6 +39,7 @@ namespace dd
 		: m_ret( rhs.m_ret )
 		, m_args( rhs.m_args )
 		, m_argCount( rhs.m_argCount )
+		, m_context( rhs.m_context )
 	{
 	}
 
@@ -46,6 +48,7 @@ namespace dd
 		m_ret = rhs.m_ret;
 		m_args = rhs.m_args;
 		m_argCount = rhs.m_argCount;
+		m_context = rhs.m_context;
 
 		return *this;
 	}
