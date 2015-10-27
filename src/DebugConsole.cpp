@@ -7,6 +7,9 @@
 #include "PrecompiledHeader.h"
 #include "DebugConsole.h"
 
+#include "EntityHandle.h"
+#include "TransformComponent.h"
+
 #include "imgui/imgui.h"
 
 // script helpers
@@ -43,6 +46,18 @@ namespace
 	void grabString( const dd::String& v )
 	{
 		SerializeString( dd::Serialize::Mode::JSON, s_stream, v );
+	}
+
+	void grabEntityHandle( dd::EntityHandle handle )
+	{
+		dd::JSONSerializer serializer( s_stream );
+		serializer.Serialize( handle );
+	}
+
+	void grabTransformComponent( dd::TransformComponent* cmp )
+	{
+		dd::JSONSerializer serializer( s_stream );
+		serializer.Serialize( *cmp );
 	}
 
 	void grab()
@@ -89,6 +104,8 @@ namespace dd
 		engine->RegisterGlobalFunction( name, FUNCTION( grabUint ), &grabUint );
 		engine->RegisterGlobalFunction( name, FUNCTION( grabFloat ), &grabFloat );
 		engine->RegisterGlobalFunction( name, FUNCTION( grabDouble ), &grabDouble );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabEntityHandle ), &grabEntityHandle );
+		engine->RegisterGlobalFunction( name, FUNCTION( grabTransformComponent ), &grabTransformComponent );
 		engine->RegisterGlobalFunction( name, FUNCTION( grab ), &grab );
 		/*engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
 	}
@@ -298,7 +315,7 @@ namespace dd
 		if( script_engine->Evaluate( completeString, errors ) )
 			AddLog( "\t%s\n", s_scriptOutput.c_str() );
 		else
-			AddLog( "\tScript error: %s!", errors );
+			AddLog( "\tScript error: %s!", errors.c_str() );
 	}
 
 	void DebugConsole::ListFunctions()

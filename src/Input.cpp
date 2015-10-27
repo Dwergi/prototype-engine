@@ -53,9 +53,10 @@ namespace dd
 			new_event.Type = event_type;
 		}
 
+		// we didn't handle it, maybe someone else will
 		for( GLFWkeyfun fn : m_pInstance->m_keyboardCallbacks )
 		{
-			(*fn)( window, key, scancode, action, mods );
+			(*fn)(window, key, scancode, action, mods);
 		}
 	}
 

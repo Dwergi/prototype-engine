@@ -69,6 +69,9 @@ namespace dd
 		template <typename T>
 		void RegisterScriptObject( const char* name );
 
+		template <typename T>
+		void RegisterScriptStruct( const char* name );
+
 		//
 		// Register a POD type - these are the basic types like ints, floats and char*.
 		// If it can be printed with a printf format string, it's POD.

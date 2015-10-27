@@ -24,6 +24,8 @@ namespace dd
 
 	ScopedJSONObject::~ScopedJSONObject()
 	{
+		ASSERT( m_host.m_indent > 0 );
+
 		--m_host.m_indent;
 		Indent();
 
@@ -41,7 +43,8 @@ namespace dd
 
 	JSONSerializer::JSONSerializer( WriteStream& stream )
 		: m_currentObject( nullptr ),
-		m_stream( stream )
+		m_stream( stream ),
+		m_indent( 0 )
 	{
 
 	}

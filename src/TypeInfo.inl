@@ -140,7 +140,7 @@ void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 	// don't register with script if this isn't a script object
 	if( m_scriptObject && script_engine != nullptr )
 	{
-		script_engine->RegisterMethod( m, fn );
+		script_engine->RegisterMethod( name, f, fn );
 	}
 }
 
@@ -153,6 +153,21 @@ void TypeInfo::RegisterScriptObject( const char* name )
 	if( script_engine != nullptr )
 	{
 		m_scriptObject = true;
+
 		script_engine->RegisterObject<T>( m_name );
+	}
+}
+
+template <typename T>
+void TypeInfo::RegisterScriptStruct( const char* name )
+{
+	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+	ASSERT( script_engine != nullptr );
+
+	if( script_engine != nullptr )
+	{
+		m_scriptObject = true;
+
+		script_engine->RegisterStruct<T>( m_name );
 	}
 }

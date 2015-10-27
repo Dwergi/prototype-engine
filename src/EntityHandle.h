@@ -10,7 +10,7 @@
 
 namespace dd
 {
-class EntitySystem;
+	class EntitySystem;
 
 	class EntityHandle
 	{
@@ -20,14 +20,19 @@ class EntitySystem;
 		int Version;
 
 		EntityHandle();
+		EntityHandle( const EntityHandle& other );
+		EntityHandle( int id, int version, EntitySystem* m_system );
 
 		bool IsValid() const;
 
+		EntityHandle& operator=( const EntityHandle& other );
 		bool operator==( const EntityHandle& other ) const;
 		bool operator!=( const EntityHandle& other ) const;
 
-		BEGIN_SCRIPT_OBJECT( EntityHandle )
+		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( ID );
+			MEMBER( Version );
+			METHOD( IsValid );
 		END_MEMBERS
 
 	private: 
@@ -38,8 +43,6 @@ class EntitySystem;
 		static const int Invalid = -1;
 
 		EntitySystem* m_system;
-
-		EntityHandle( int id, int version, EntitySystem* m_system );
 	};
 }
 

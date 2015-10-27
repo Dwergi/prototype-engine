@@ -42,6 +42,10 @@
 	BEGIN_MEMBERS( TypeName ) \
 	typeInfo->RegisterScriptObject<TypeName>( #TypeName );
 
+#define BEGIN_SCRIPT_STRUCT( TypeName ) \
+	BEGIN_MEMBERS( TypeName ) \
+	typeInfo->RegisterScriptStruct<TypeName>( #TypeName );
+
 #define MEMBER( MemberName ) \
 	typeInfo->RegisterMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
 

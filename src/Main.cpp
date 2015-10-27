@@ -94,13 +94,20 @@ void DrawFPS( float delta_t )
 
 bool s_drawConsole = true;
 
-TransformComponent* GetTransformComponent( EntityHandle* entity )
+TransformComponent* GetTransformComponent( EntityHandle entity )
 {
 	auto& transform_pool = GetDoubleBuffer<TransformComponent>().GetRead();
 	
-	TransformComponent* cmp = transform_pool.Find( *entity );
+	TransformComponent* cmp = transform_pool.Find( entity );
 
 	return cmp;
+}
+
+EntityHandle GetEntityHandle( int id, int version )
+{
+	EntitySystem& system = g_services.Get<EntitySystem>();
+
+	return EntityHandle( id, version, &system );
 }
 
 void RegisterGlobalScriptFunctions()
@@ -110,6 +117,7 @@ void RegisterGlobalScriptFunctions()
 	ScriptEngine& engine = g_services.Get<ScriptEngine>();
 
 	engine.RegisterGlobalFunction( String16( "GetTransformComponent" ), FUNCTION( GetTransformComponent ), &GetTransformComponent );
+	engine.RegisterGlobalFunction( String16( "GetEntityHandle" ), FUNCTION( GetEntityHandle ), &GetEntityHandle );
 	engine.RegisterGlobalVariable( String16( "s_drawFPS" ), Variable( s_drawFPS ) );
 	engine.RegisterGlobalVariable( String16( "s_maxFPS" ), Variable( s_maxFPS ) );
 	engine.RegisterGlobalVariable( String16( "s_rollingAverageFPS" ), Variable( s_rollingAverageFPS ) );

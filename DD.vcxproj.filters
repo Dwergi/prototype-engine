@@ -156,9 +156,6 @@
     <ClInclude Include="src\RemoveQualifiers.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="src\Script.h">
-      <Filter>Script</Filter>
-    </ClInclude>
     <ClInclude Include="src\String_dd.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -285,6 +282,12 @@
     <ClInclude Include="src\ComponentPoolTestComponent.h">
       <Filter>Components\Pools\Test Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\ScriptEngine.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Script.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -359,9 +362,6 @@
     </ClCompile>
     <ClCompile Include="src\Window.cpp">
       <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Script.cpp">
-      <Filter>Script</Filter>
     </ClCompile>
     <ClCompile Include="src\String_dd.cpp">
       <Filter>Containers</Filter>
@@ -462,6 +462,12 @@
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScriptEngine.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Script.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -490,6 +496,9 @@
     </None>
     <None Include="src\UnsortedVectorPool.inl">
       <Filter>Components\Pools</Filter>
+    </None>
+    <None Include="src\ScriptEngine.inl">
+      <Filter>Script</Filter>
     </None>
   </ItemGroup>
 </Project>

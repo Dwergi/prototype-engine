@@ -159,8 +159,8 @@ namespace dd
 	template<int Size>
 	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count )
 	{
-		ASSERT( start < m_length );
-		ASSERT( count > 0 );
+		ASSERT( start <= m_length );
+		ASSERT( count >= 0 );
 
 		count = std::min( m_length - start, count );
 

@@ -303,6 +303,7 @@
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
+    <ClInclude Include="src\ScriptEngine.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\Serializers.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
@@ -407,6 +408,7 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />
+    <ClCompile Include="src\ScriptEngine.cpp" />
     <ClCompile Include="src\Serializers.cpp" />
     <ClCompile Include="src\Stream.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
@@ -436,6 +438,7 @@
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseVectorPool.inl" />
     <None Include="src\Recorder.inl" />
+    <None Include="src\ScriptEngine.inl" />
     <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\UnorderedMapPool.inl" />
