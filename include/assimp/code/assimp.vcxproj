@@ -1,0 +1,732 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{7A2583DC-2AFD-406E-94B0-DDBD1793E9EE}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>assimp</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:\testing\DD\include\assimp\bin\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">assimp.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">assimpd</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:\testing\DD\include\assimp\bin\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">assimp.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">assimp</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:\testing\DD\include\assimp\bin\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">assimp.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">assimp</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:\testing\DD\include\assimp\bin\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">assimp.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">assimp</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\Debug\zlibstaticd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/Debug/assimpd.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/Debug/assimpd.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\Release\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/Release/assimp.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/Release/assimp.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\MinSizeRel\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/MinSizeRel/assimp.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/MinSizeRel/assimp.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;ASSIMP_BUILD_DLL_EXPORT;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";assimp_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code\..\contrib\unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\RelWithDebInfo\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/RelWithDebInfo/assimp.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/RelWithDebInfo/assimp.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\assimp\code\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule W:/testing/DD/include/assimp/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:/testing/DD/include/assimp/code/CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule W:/testing/DD/include/assimp/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:/testing/DD/include/assimp/code/CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule W:/testing/DD/include/assimp/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:/testing/DD/include/assimp/code/CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule W:/testing/DD/include/assimp/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:/testing/DD/include/assimp/code/CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;W:\testing\DD\include\assimp\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:\testing\DD\include\assimp\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="W:\testing\DD\include\assimp\code\fast_atof.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\qnan.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BaseImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BaseProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Importer.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ScenePrivate.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ByteSwap.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DefaultProgressHandler.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DefaultIOStream.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DefaultIOSystem.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\CInterfaceIOWrapper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Hash.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IFF.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MemoryIOWrapper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ParsingUtils.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\StreamReader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\StringComparison.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SGSpatialSort.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\VertexTriangleAdjacency.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\GenericProperty.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SpatialSort.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SceneCombiner.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ScenePreprocessor.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SkeletonMeshBuilder.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SplitByBoneCountProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SmoothingGroups.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\StandardShapes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\TargetAnimation.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\RemoveComments.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Subdivision.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Vertex.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LineSplitter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\TinyFormatter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Profiler.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LogAux.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Bitmap.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\LogStream.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Logger.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Win32DebugLogStream.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FileLogStream.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\StdOStreamLogStream.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlobIOSystem.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\CalcTangentsProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ComputeUVMappingProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ConvertToLHProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FindDegenerates.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FindInstancesProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FindInvalidDataProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FixNormalsStep.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\GenFaceNormalsProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\GenVertexNormalsProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\PretransformVertices.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ImproveCacheLocality.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\JoinVerticesProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LimitBoneWeightsProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\RemoveRedundantMaterials.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\RemoveVCProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SortByPTypeProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SplitLargeMeshes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\TextureTransform.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\TriangulateProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ValidateDataStructure.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OptimizeGraph.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OptimizeMeshes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DeboneProcess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ProcessHelper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\PolyTools.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MakeVerboseFormat.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\3DSHelper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\3DSLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ACLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ASELoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ASEParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\B3DImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BVHLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ColladaHelper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ColladaLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ColladaParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ColladaExporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DXFLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\DXFHelper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\CSMLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\HMPFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\HMPLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\HalfLifeFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IRRLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IRRMeshLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IRRShared.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LWOAnimation.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LWOFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LWOLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\LWSLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD2FileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD2Loader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD2NormalTable.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD3FileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD3Loader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD5Loader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD5Parser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDCFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDCLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDCNormalTable.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDLDefaultColorMap.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDLFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MDLLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MaterialSystem.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\NFFLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OFFLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjFileImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjFileMtlImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjFileParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjTools.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\ObjExporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OgreImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OgreStructs.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OgreParsingUtils.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OgreBinarySerializer.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\OgreXmlSerializer.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\PlyLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\PlyParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\PlyExporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Q3DLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Q3BSPFileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Q3BSPFileParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Q3BSPFileImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\Q3BSPZipArchive.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\RawLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\SMDLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\STLLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\STLExporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\TerragenLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\UnrealLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\XFileHelper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\XFileImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\XFileParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MD4FileData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\MS3DLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\COBLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\COBScene.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderDNA.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderDNA.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderScene.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderSceneGen.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderIntermediate.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderModifier.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderBMesh.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BlenderTessellator.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\NDOLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IFCLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IFCReaderGen.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\IFCUtil.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\STEPFile.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\STEPFileReader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\STEPFileEncoding.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\XGLLoader.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXCompileConfig.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXParser.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXTokenizer.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXImportSettings.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXConverter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXUtil.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXDocument.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\FBXProperties.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\irrXMLWrapper.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\CXMLReaderImpl.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\heapsort.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\irrArray.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\irrString.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\irrTypes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\irrXML\irrXML.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\ConvertUTF\ConvertUTF.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\unzip\crypt.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\unzip\ioapi.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\unzip\unzip.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\common\shapes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\common\utils.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\advancing_front.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\cdt.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\sweep.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\sweep_context.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\clipper\clipper.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\math\common_factor_rt.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\foreach.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\format.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\scoped_array.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\scoped_ptr.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\shared_array.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\shared_ptr.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\make_shared.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\static_assert.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\code\BoostWorkaround\boost\tuple\tuple.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\anim.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\ai_assert.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\camera.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\color4.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\color4.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\config.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\defs.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\cfileio.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\light.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\material.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\material.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\matrix3x3.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\matrix3x3.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\matrix4x4.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\matrix4x4.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\mesh.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\postprocess.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\quaternion.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\quaternion.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\scene.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\metadata.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\texture.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\types.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\vector2.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\vector2.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\vector3.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\vector3.inl" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\version.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\cimport.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\importerdesc.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Importer.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\IOStream.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\cexport.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Exporter.hpp" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\include\assimp\Compiler\pstdint.h" />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Assimp.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BaseImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BaseProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\PostStepRegistry.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ImporterRegistry.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\DefaultIOStream.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\DefaultIOSystem.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Importer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SGSpatialSort.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\VertexTriangleAdjacency.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SpatialSort.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SceneCombiner.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ScenePreprocessor.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SkeletonMeshBuilder.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SplitByBoneCountProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\StandardShapes.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\TargetAnimation.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\RemoveComments.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Subdivision.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Bitmap.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\DefaultLogger.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Exporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\AssimpCExport.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\CalcTangentsProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ComputeUVMappingProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ConvertToLHProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FindDegenerates.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FindInstancesProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FindInvalidDataProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FixNormalsStep.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\GenFaceNormalsProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\GenVertexNormalsProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\PretransformVertices.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ImproveCacheLocality.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\JoinVerticesProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LimitBoneWeightsProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\RemoveRedundantMaterials.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\RemoveVCProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SortByPTypeProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SplitLargeMeshes.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\TextureTransform.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\TriangulateProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ValidateDataStructure.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OptimizeGraph.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OptimizeMeshes.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\DeboneProcess.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ProcessHelper.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MakeVerboseFormat.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\3DSConverter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\3DSLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ACLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ASELoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ASEParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\B3DImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BVHLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ColladaLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ColladaParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ColladaExporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\DXFLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\CSMLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\HMPLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IRRLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IRRMeshLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IRRShared.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LWOAnimation.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LWOBLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LWOLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LWOMaterial.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\LWSLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MD2Loader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MD3Loader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MD5Loader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MD5Parser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MDCLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MDLLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MDLMaterialLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MaterialSystem.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\NFFLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OFFLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ObjFileImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ObjFileMtlImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ObjFileParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\ObjExporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OgreImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OgreStructs.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OgreBinarySerializer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OgreXmlSerializer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\OgreMaterial.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\PlyLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\PlyParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\PlyExporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Q3DLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Q3BSPFileParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Q3BSPFileImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\Q3BSPZipArchive.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\RawLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\SMDLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\STLLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\STLExporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\TerragenLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\UnrealLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\XFileImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\XFileParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\MS3DLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\COBLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderDNA.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderScene.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderModifier.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderBMesh.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\BlenderTessellator.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\NDOLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCReaderGen.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCUtil.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCGeometry.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCMaterial.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCProfile.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCCurve.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCBoolean.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\IFCOpenings.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\STEPFileReader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\STEPFileEncoding.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\XGLLoader.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXParser.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXTokenizer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXConverter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXUtil.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXDocument.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXProperties.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXMeshGeometry.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXMaterial.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXModel.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXAnimation.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXNodeAttribute.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXDeformer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXBinaryTokenizer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\FBXDocumentUtil.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\irrXML\irrXML.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\ConvertUTF\ConvertUTF.c" >
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\unzip\ioapi.c" >
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\unzip\unzip.c" >
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\common\shapes.cc"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\advancing_front.cc"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\cdt.cc"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\sweep.cc"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\poly2tri\poly2tri\sweep\sweep_context.cc"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\clipper\clipper.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\code\AssimpPCH.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="W:/testing/DD/include/assimp/ZERO_CHECK.vcxproj">
+      <Project>DF723455-B543-4E26-B141-E11116BF8531</Project>
+    </ProjectReference>
+    <ProjectReference Include="W:/testing/DD/include/assimp/contrib/zlib/zlibstatic.vcxproj">
+      <Project>26715202-51EF-48FB-B18C-A050E96C69DF</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -15,20 +15,20 @@
 
 #endif
 
-#include "EntitySystem.h"
-#include "TransformComponent.h"
-#include "ScopedTimer.h"
-#include "OctreeComponent.h"
-#include "Recorder.h"
-#include "PropertyList.h"
+#include "DebugUI.h"
 #include "DoubleBuffer.h"
+#include "EntitySystem.h"
+#include "Input.h"
+#include "OctreeComponent.h"
+#include "PropertyList.h"
+#include "Random.h"
+#include "Recorder.h"
+#include "ScopedTimer.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
-#include "Random.h"
-#include "Window.h"
-#include "Input.h"
-#include "DebugUI.h"
 #include "Timer.h"
+#include "TransformComponent.h"
+#include "Window.h"
 
 #include "DebugConsole.h"
 

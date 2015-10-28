@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\CCompilerTest.c">
+      <Filter>unit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\Main.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\UnitTestPCH.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFindDegenerates.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFindInvalidData.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFixInfacingNormals.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utGenNormals.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utImporter.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utImproveCacheLocality.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utJoinVertices.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utLimitBoneWeights.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utMaterialSystem.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utPretransformVertices.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveComments.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveComponent.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveRedundantMaterials.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utScenePreprocessor.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSharedPPData.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSortByPType.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSplitLargeMeshes.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTargetAnimation.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTextureTransform.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTriangulate.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utVertexTriangleAdjacency.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utNoBoostTest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\BoostWorkaround\tupletest.cpp">
+      <Filter>unit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\AdditionalMessage.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Asserter.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\BeOsDynamicLibraryManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\BriefTestProgressListener.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\CompilerOutputter.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DefaultProtector.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DllMain.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DynamicLibraryManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DynamicLibraryManagerException.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Exception.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Message.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\PlugInManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\PlugInParameters.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Protector.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorChain.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\RepeatedTest.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ShlDynamicLibraryManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\SourceLine.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\StringTools.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\SynchronizedObject.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Test.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestAssert.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestCase.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestCaseDecorator.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestComposite.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestDecorator.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestFactoryRegistry.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestFailure.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestLeaf.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestNamer.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestPath.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestPlugInDefaultImpl.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestResult.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestResultCollector.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestRunner.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSetUp.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuccessListener.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuite.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuiteBuilderContext.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextOutputter.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestProgressListener.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestResult.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestRunner.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TypeInfoHelper.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\UnixDynamicLibraryManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Win32DynamicLibraryManager.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlDocument.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlElement.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlOutputter.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlOutputterHook.cpp">
+      <Filter>cppunit</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\UnitTestPCH.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utFindDegenerates.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utFindInvalidData.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utGenNormals.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utImporter.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utJoinVertices.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utLimitBoneWeights.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utMaterialSystem.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utPretransformVertices.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveComments.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveComponent.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveRedundantMaterials.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utScenePreprocessor.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSharedPPData.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSortByPType.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSplitLargeMeshes.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utTargetAnimation.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utTriangulate.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utVertexTriangleAdjacency.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utNoBoostTest.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DefaultProtector.h">
+      <Filter>cppunit</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorChain.h">
+      <Filter>cppunit</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorContext.h">
+      <Filter>cppunit</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\assimp\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="unit">
+      <UniqueIdentifier>{1721664B-761B-4F78-80D7-C4987257017E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cppunit">
+      <UniqueIdentifier>{95AE8CF4-2A85-4958-A53A-2D161E381E8E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{317D30E9-6995-4904-B8D3-B6BC2E03069A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

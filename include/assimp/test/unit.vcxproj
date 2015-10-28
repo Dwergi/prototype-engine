@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{D9F93201-B792-47D7-905C-B3035DF4A022}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>unit</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:\testing\DD\include\assimp\bin\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">unit.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">unit</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:\testing\DD\include\assimp\bin\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">unit.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">unit</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:\testing\DD\include\assimp\bin\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">unit.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">unit</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:\testing\DD\include\assimp\bin\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">unit.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">unit</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\Debug\assimpd.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3d9.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3dx9.lib;comctl32.lib;Winmm.lib;..\lib\Debug\zlibstaticd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>W:/testing/DD/include/assimp;W:/testing/DD/include/assimp/$(Configuration);/lib;/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/Debug/unit.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/Debug/unit.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\Release\assimp.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3d9.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3dx9.lib;comctl32.lib;Winmm.lib;..\lib\Release\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>W:/testing/DD/include/assimp;W:/testing/DD/include/assimp/$(Configuration);/lib;/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/Release/unit.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/Release/unit.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\MinSizeRel\assimp.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3d9.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3dx9.lib;comctl32.lib;Winmm.lib;..\lib\MinSizeRel\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>W:/testing/DD/include/assimp;W:/testing/DD/include/assimp/$(Configuration);/lib;/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/MinSizeRel/unit.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/MinSizeRel/unit.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ASSIMP_BUILD_BOOST_WORKAROUND;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>W:\testing\DD\include\assimp;W:\testing\DD\include\assimp\include;W:\testing\DD\include\assimp\code\BoostWorkaround;W:\testing\DD\include\assimp\contrib\zlib;W:\testing\DD\include\assimp\code;W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\lib\RelWithDebInfo\assimp.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3d9.lib;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64\d3dx9.lib;comctl32.lib;Winmm.lib;..\lib\RelWithDebInfo\zlibstatic.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>W:/testing/DD/include/assimp;W:/testing/DD/include/assimp/$(Configuration);/lib;/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>W:/testing/DD/include/assimp/lib/RelWithDebInfo/unit.lib</ImportLibrary>
+      <ProgramDataBaseFile>W:/testing/DD/include/assimp/bin/RelWithDebInfo/unit.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\assimp\test\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule W:/testing/DD/include/assimp/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:/testing/DD/include/assimp/test/CMakeLists.txt;W:\testing\DD\include\assimp\test\CMakeLists.txt;W:\testing\DD\include\assimp\cmake-modules\FindDirectX.cmake;W:\testing\DD\include\assimp\cmake-modules\FindPkgMacros.cmake;W:\testing\DD\include\assimp\test\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule W:/testing/DD/include/assimp/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:/testing/DD/include/assimp/test/CMakeLists.txt;W:\testing\DD\include\assimp\test\CMakeLists.txt;W:\testing\DD\include\assimp\cmake-modules\FindDirectX.cmake;W:\testing\DD\include\assimp\cmake-modules\FindPkgMacros.cmake;W:\testing\DD\include\assimp\test\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule W:/testing/DD/include/assimp/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:/testing/DD/include/assimp/test/CMakeLists.txt;W:\testing\DD\include\assimp\test\CMakeLists.txt;W:\testing\DD\include\assimp\cmake-modules\FindDirectX.cmake;W:\testing\DD\include\assimp\cmake-modules\FindPkgMacros.cmake;W:\testing\DD\include\assimp\test\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule W:/testing/DD/include/assimp/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HW:/testing/DD/include/assimp -BW:/testing/DD/include/assimp --check-stamp-file W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:/testing/DD/include/assimp/test/CMakeLists.txt;W:\testing\DD\include\assimp\test\CMakeLists.txt;W:\testing\DD\include\assimp\cmake-modules\FindDirectX.cmake;W:\testing\DD\include\assimp\cmake-modules\FindPkgMacros.cmake;W:\testing\DD\include\assimp\test\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">W:\testing\DD\include\assimp\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\UnitTestPCH.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utFindDegenerates.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utFindInvalidData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utGenNormals.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utImporter.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utJoinVertices.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utLimitBoneWeights.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utMaterialSystem.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utPretransformVertices.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveComments.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveComponent.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utRemoveRedundantMaterials.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utScenePreprocessor.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSharedPPData.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSortByPType.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utSplitLargeMeshes.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utTargetAnimation.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utTriangulate.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utVertexTriangleAdjacency.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\test\unit\utNoBoostTest.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DefaultProtector.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorChain.h" />
+    <ClInclude Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorContext.h" />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\CCompilerTest.c" >
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\Main.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\UnitTestPCH.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFindDegenerates.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFindInvalidData.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utFixInfacingNormals.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utGenNormals.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utImporter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utImproveCacheLocality.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utJoinVertices.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utLimitBoneWeights.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utMaterialSystem.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utPretransformVertices.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveComments.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveComponent.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utRemoveRedundantMaterials.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utScenePreprocessor.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSharedPPData.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSortByPType.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utSplitLargeMeshes.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTargetAnimation.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTextureTransform.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utTriangulate.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utVertexTriangleAdjacency.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\utNoBoostTest.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\test\unit\BoostWorkaround\tupletest.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\AdditionalMessage.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Asserter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\BeOsDynamicLibraryManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\BriefTestProgressListener.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\CompilerOutputter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DefaultProtector.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DllMain.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DynamicLibraryManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\DynamicLibraryManagerException.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Exception.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Message.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\PlugInManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\PlugInParameters.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Protector.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ProtectorChain.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\RepeatedTest.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\ShlDynamicLibraryManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\SourceLine.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\StringTools.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\SynchronizedObject.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Test.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestAssert.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestCase.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestCaseDecorator.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestComposite.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestDecorator.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestFactoryRegistry.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestFailure.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestLeaf.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestNamer.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestPath.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestPlugInDefaultImpl.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestResult.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestResultCollector.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestRunner.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSetUp.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuccessListener.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuite.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TestSuiteBuilderContext.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextOutputter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestProgressListener.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestResult.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TextTestRunner.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\TypeInfoHelper.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\UnixDynamicLibraryManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\Win32DynamicLibraryManager.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlDocument.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlElement.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlOutputter.cpp"  />
+    <ClCompile Include="W:\testing\DD\include\assimp\contrib\cppunit-1.12.1\src\cppunit\XmlOutputterHook.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="W:/testing/DD/include/assimp/ZERO_CHECK.vcxproj">
+      <Project>DF723455-B543-4E26-B141-E11116BF8531</Project>
+    </ProjectReference>
+    <ProjectReference Include="W:/testing/DD/include/assimp/code/assimp.vcxproj">
+      <Project>7A2583DC-2AFD-406E-94B0-DDBD1793E9EE</Project>
+    </ProjectReference>
+    <ProjectReference Include="W:/testing/DD/include/assimp/contrib/zlib/zlibstatic.vcxproj">
+      <Project>26715202-51EF-48FB-B18C-A050E96C69DF</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
