@@ -8,20 +8,19 @@
 
 #include "Component.h"
 #include "Octree.h"
-#include "SortedVectorPool.h"
+#include "UnorderedMapPool.h"
 
 namespace dd
 {
 	class OctreeComponent : public dd::Component
 	{
 	public:
-		typedef dd::SortedVectorPool<OctreeComponent> Pool;
+		typedef dd::UnorderedMapPool<OctreeComponent> Pool;
 
 		Octree::Entry Entry;
 
 		OctreeComponent() {}
 
-		BEGIN_MEMBERS( OctreeComponent )
-		END_MEMBERS
+		NO_MEMBERS( OctreeComponent )
 	};
 }

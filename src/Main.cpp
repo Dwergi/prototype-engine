@@ -103,11 +103,11 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 	return cmp;
 }
 
-EntityHandle GetEntityHandle( int id, int version )
+EntityHandle GetEntityHandle( unsigned int id )
 {
 	EntitySystem& system = g_services.Get<EntitySystem>();
 
-	return EntityHandle( id, version, &system );
+	return system.GetEntity( id );
 }
 
 void RegisterGlobalScriptFunctions()

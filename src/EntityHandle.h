@@ -16,12 +16,20 @@ namespace dd
 	{
 	public:
 
-		int ID;
-		int Version;
+		union
+		{
+			struct
+			{
+				uint ID : 20;
+				uint Version : 12;
+			};
 
+			uint Handle;
+		};
+		
 		EntityHandle();
 		EntityHandle( const EntityHandle& other );
-		EntityHandle( int id, int version, EntitySystem* m_system );
+		EntityHandle( uint id, EntitySystem* m_system );
 
 		bool IsValid() const;
 
@@ -30,8 +38,7 @@ namespace dd
 		bool operator!=( const EntityHandle& other ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
-			MEMBER( ID );
-			MEMBER( Version );
+			MEMBER( Handle );
 			METHOD( IsValid );
 		END_MEMBERS
 

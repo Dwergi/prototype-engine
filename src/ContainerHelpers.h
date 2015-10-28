@@ -4,12 +4,24 @@
 // September 3rd 2015
 //
 
+const int MAX_COUNT = 2048;
+
 template<typename T>
 void CopyRange( const T* src, T* dest, uint count )
 {
+	ASSERT( count <= MAX_COUNT );
+
+	static __declspec(thread) char buffer[sizeof(T) * MAX_COUNT];
+	T* temp = (T*) buffer;
+
 	for( uint i = 0; i < count; ++i )
 	{
-		new (&dest[ i ]) T( src[ i ] );
+		new (&temp[i]) T( src[ i ] );
+	}
+
+	for( uint i = 0; i < count; ++i )
+	{
+		new (&dest[i]) T( temp[i] );
 	}
 }
 
@@ -27,7 +39,7 @@ void DestroyRange( T* src, uint count )
 {
 	for( uint i = 0; i < count; ++i )
 	{
-		src[ i ].~T();
+		src[i].~T();
 	}
 }
 
@@ -38,9 +50,19 @@ void MoveRange( const T* src, T* dest, uint count )
 	ASSERT( src != nullptr && dest != nullptr );
 	ASSERT( src != dest );
 
+	ASSERT( count <= MAX_COUNT );
+
+	static __declspec(thread) char buffer[sizeof( T ) * MAX_COUNT];
+	T* temp = (T*) buffer;
+
 	for( uint i = 0; i < count; ++i )
 	{
-		new (&dest[i]) T( std::move( src[i] ) );
-		src->~T();
+		new (&temp[i]) T( std::move( src[i] ) );
+		src[i].~T();
+	}
+
+	for( uint i = 0; i < count; ++i )
+	{
+		new (&dest[i]) T( std::move( temp[i] ) );
 	}
 }

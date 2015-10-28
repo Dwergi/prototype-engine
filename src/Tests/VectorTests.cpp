@@ -48,6 +48,51 @@ TEST_CASE( "[Vector] AddAll" )
 	REQUIRE( container[ 63 ] == 31 );
 }
 
+TEST_CASE( "[Vector] Insert" )
+{
+	dd::Vector<int> container;
+
+	// insert at start
+	for( int i = 0; i < 32; ++i )
+	{
+		container.Insert( i, 0 );
+	}
+	
+	for( int i = 0; i < 32; ++i )
+	{
+		REQUIRE( container[i] == 32 - i - 1 );
+	}
+
+	container.Clear();
+
+	// insert at end
+	for( int i = 0; i < 32; ++i )
+	{
+		container.Insert( i, i );
+	}
+	
+	for( int i = 0; i < 32; ++i )
+	{
+		REQUIRE( container[i] == i );
+	}
+
+	for( int i = 0; i < 32; ++i )
+	{
+		container.Insert( i, i * 2 );
+	}
+
+	int prev;
+	int prev_prev;
+	for( int i = 3; i < 64; i += 2 )
+	{
+		prev = container[i - 1];
+		prev_prev = container[i - 2];
+
+		REQUIRE( container[i] == prev );
+		REQUIRE( container[i] == prev_prev + 1 );
+	}
+}
+
 TEST_CASE( "[Vector] Remove" )
 {
 	dd::Vector<int> container;

@@ -5,6 +5,9 @@
 // August 6th 2015
 //
 
+#include "EntityHandle.h"
+#include "Vector.h"
+
 namespace dd
 {
 	template <typename T>
@@ -22,65 +25,67 @@ namespace dd
 	template <typename T>
 	void SortedVectorPool<T>::Clear()
 	{
-		m_components.swap( std::vector<std::pair<int, T>>() );
+		m_components.Clear();
 	}
 
 	template <typename T>
 	uint SortedVectorPool<T>::Size() const
 	{
-		return (uint) m_components.size();
+		return m_components.Size();
 	}
 
 	template <typename T>
 	T* SortedVectorPool<T>::Create( const EntityHandle& entity )
 	{
 		// use insertion with a binary search to make sure we keep the list in order
-		size_t min = 0;
-		size_t max = m_components.size();
+		int min = 0;
+		int max = (int) m_components.Size();
 
-		auto it = m_components.begin();
+		int current = 0;
+
 		while( max >= min )
 		{
-			size_t mid = (min + max) / 2;
+			current = (min + max) / 2;
 
-			it = m_components.begin();
-			it += mid;
-
-			if( it == m_components.end() )
+			if( current == m_components.Size() )
 				break;
 
-			if( it->first == entity.ID )
+			uint current_handle = m_components[current].Entity;
+
+			if( current_handle == entity.Handle )
 			{
 				// already exists
 				ASSERT( false );
 				return nullptr;
 			}
 
-			if( it->first < entity.ID )
+			if( current_handle < entity.Handle )
 			{
-				min = mid + 1;
+				min = current + 1;
 			}
-			else if( it->first >= entity.ID )
+			else if( current_handle >= entity.Handle )
 			{
-				max = mid - 1;
+				max = current - 1;
 			}
 		}
 
 		// undershot by 1 slot, it happens
-		if( it != m_components.begin() && it != m_components.end()
-			&& it->first < entity.ID )
-			++it;
+		if( current >= 0 && current < (int) m_components.Size() && m_components[current].Entity < entity.Handle )
+			++current;
 
-		auto inserted = m_components.insert( it, std::make_pair( entity.ID, T() ) );
+		SortedVectorPool<T>::EntityEntry new_entry;
+		new_entry.Entity = entity.Handle;
 
-		return &inserted->second;
+		m_components.Insert( std::move( new_entry ), current );
+
+		return &m_components[current].Component;
 	}
 
 	template <typename T>
 	T* SortedVectorPool<T>::Find( const EntityHandle& entity ) const
 	{
 		int min = 0;
-		int max = (int) m_components.size();
+		int max = (int) m_components.Size();
 
 		// empty vector
 		if( max == 0 )
@@ -89,18 +94,18 @@ namespace dd
 		while( max >= min )
 		{
 			int mid = (min + max) / 2;
-			auto& entry = m_components[mid];
+			EntityEntry& entry = m_components[mid];
 
-			if( entry.first == entity.ID )
+			if( entry.Entity == entity.Handle )
 			{
-				return const_cast<T*>( &entry.second );
+				return &entry.Component;
 			}
 
-			if( entry.first < entity.ID )
+			if( entry.Entity < entity.Handle )
 			{
 				min = mid + 1;
 			}
-			else if( entry.first >= entity.ID )
+			else if( entry.Entity >= entity.Handle )
 			{
 				max = mid - 1;
 			}
@@ -112,17 +117,37 @@ namespace dd
 	template <typename T>
 	void SortedVectorPool<T>::Remove( const EntityHandle& entity )
 	{
-		auto it = m_components.begin();
-		for( ; it != m_components.end(); ++it )
-		{
-			if( it->first == entity.ID )
-				break;
-		}
+		int min = 0;
+		int max = (int) m_components.Size();
 
-		if( it == m_components.end() )
+		// empty vector
+		if( max == 0 )
 			return;
 
-		m_components.erase( it );
+		int index = -1;
+
+		while( max >= min )
+		{
+			index = (min + max) / 2;
+			EntityEntry& entry = m_components[index];
+
+			if( entry.Entity == entity.Handle )
+			{
+				break;
+			}
+
+			if( entry.Entity < entity.Handle )
+			{
+				min = index + 1;
+			}
+			else if( entry.Entity >= entity.Handle )
+			{
+				max = index - 1;
+			}
+		}
+
+		if( index != -1 )
+			m_components.RemoveOrdered( index );
 	}
 
 	template <typename T>
@@ -133,27 +158,53 @@ namespace dd
 		return cmp != nullptr;
 	}
 
+	template<typename TIter, typename TValue>
+	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( TIter init )
+	{
+		m_current = init;
+	}
+
+	template<typename TIter, typename TValue>
+	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( const SortedVectorIterator<TIter, TValue>& other )
+	{
+		m_current = other.m_current;
+	}
+
+	template<typename TIter, typename TValue>
+	TValue& SortedVectorIterator<TIter, TValue>::operator*() const
+	{
+		return m_current->Component;
+	}
+
+	template<typename TIter, typename TValue>
+	bool SortedVectorIterator<TIter, TValue>::operator==( const SortedVectorIterator<TIter, TValue>& other )
+	{
+		return m_current == other.m_current;
+	}
+
+	template<typename TIter, typename TValue>
+	bool SortedVectorIterator<TIter, TValue>::operator!=( const SortedVectorIterator<TIter, TValue>& other )
+	{
+		return !operator==( other );
+	}
+
+	template<typename TIter, typename TValue>
+	SortedVectorIterator<TIter, TValue>& SortedVectorIterator<TIter, TValue>::operator++()
+	{
+		++m_current;
+
+		return *this;
+	}
+
 	template <typename T>
-	typename SortedVectorPool<T>::iterator SortedVectorPool<T>::begin()
+	typename SortedVectorPool<T>::iterator SortedVectorPool<T>::begin() const
 	{
 		return iterator( m_components.begin() );
 	}
 
 	template <typename T>
-	typename SortedVectorPool<T>::iterator SortedVectorPool<T>::end()
+	typename SortedVectorPool<T>::iterator SortedVectorPool<T>::end() const
 	{
 		return iterator( m_components.end() );
-	}
-
-	template <typename T>
-	typename SortedVectorPool<T>::const_iterator SortedVectorPool<T>::begin() const
-	{
-		return const_iterator( m_components.begin() );
-	}
-
-	template <typename T>
-	typename SortedVectorPool<T>::const_iterator SortedVectorPool<T>::end() const
-	{
-		return const_iterator( m_components.end() );
 	}
 }

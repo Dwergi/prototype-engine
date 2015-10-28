@@ -202,15 +202,46 @@ namespace dd
 	{
 		ASSERT( index <= m_size );
 
+		if( m_size == m_capacity )
+		{
+			Grow();
+		}
+
 		if( index == m_size )
 		{
 			Add( entry );
 		}
 		else
 		{
-			MoveRange( &m_data[index], &m_data[index] + 1, m_size - index );
+			MoveRange( &m_data[index], &m_data[index + 1], m_size - index );
 
-			new (&m_data[m_size]) T( entry );
+			new (&m_data[index]) T( entry );
+
+			++m_size;
+		}
+	}
+
+	template<typename T>
+	void Vector<T>::Insert( const T& entry, uint index )
+	{
+		ASSERT( index <= m_size );
+
+		if( m_size == m_capacity )
+		{
+			Grow();
+		}
+
+		if( index == m_size )
+		{
+			Add( entry );
+		}
+		else
+		{
+			MoveRange( &m_data[index], &m_data[index + 1], m_size - index );
+
+			new (&m_data[index]) T( entry );
+
+			++m_size;
 		}
 	}
 

@@ -18,14 +18,14 @@ TEST_CASE( "[Recorder] Recorder" )
 	int HISTORY_SIZE = 32;
 
 	int value = -1;
-	std::vector<int> values;
+	dd::Vector<int> values;
 	dd::Recorder<int> test( value, HISTORY_SIZE );
-	values.push_back( test );
+	values.Add( test );
 
 	for( int i = 0; i < ITERATION_COUNT; ++i )
 	{
 		test = i;
-		values.push_back( test );
+		values.Add( test );
 
 		REQUIRE( value == test );
 		REQUIRE( value == i );

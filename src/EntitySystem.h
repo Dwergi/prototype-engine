@@ -26,6 +26,8 @@ namespace dd
 		void DestroyAllEntities();
 		void ProcessCommands();
 
+		EntityHandle GetEntity( unsigned int index );
+
 	private:
 
 		friend class EntityHandle;
@@ -55,7 +57,7 @@ namespace dd
 			}
 
 			EntityHandle Entity;
-			int Flags;
+			short Flags;
 		};
 
 		enum class CommandType
@@ -79,9 +81,9 @@ namespace dd
 
 		bool m_initialized;
 
-		std::queue<int> m_free;
-		std::vector<EntityEntry> m_entities;
-		std::vector<EntityCommand> m_commands;
+		Vector<int> m_free;
+		Vector<EntityEntry> m_entities;
+		Vector<EntityCommand> m_commands;
 
 		int m_activeEntities;
 

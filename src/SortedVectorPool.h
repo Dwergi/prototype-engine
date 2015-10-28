@@ -8,7 +8,6 @@
 #pragma once
 
 #include "ComponentPoolBase.h"
-#include "ComponentPairIterator.h"
 
 //
 // A component pool for components that are rare(ish).
@@ -16,13 +15,36 @@
 //
 namespace dd
 {
+	template<typename TIter, typename TValue>
+	class SortedVectorIterator
+		: public std::iterator<std::forward_iterator_tag, TValue*>
+	{
+	private:
+		TIter m_current;
+		typedef SortedVectorIterator<TIter, TValue> ThisType;
+
+	public:
+		SortedVectorIterator( TIter init );
+		SortedVectorIterator( const ThisType& other );
+
+		TValue& operator*() const;
+		bool operator==( const ThisType& other );
+		bool operator!=( const ThisType& other );
+		ThisType& operator++();
+	};
+
 	template<typename T>
 	class SortedVectorPool
 		: public ComponentPool<T>
 	{
 	private:
-		typedef typename ComponentPairIterator<typename std::vector<std::pair<int, T>>::iterator, int, T> iterator;
-		typedef typename ComponentPairConstIterator<typename std::vector<std::pair<int, T>>::const_iterator, int, T> const_iterator;
+		struct EntityEntry
+		{
+			uint Entity;
+			T Component;
+		};
+
+		typedef typename SortedVectorIterator<typename Vector<EntityEntry>::iterator, T> iterator;
 
 	public:
 
@@ -57,14 +79,12 @@ namespace dd
 		// 
 		virtual bool Exists( const EntityHandle& entity ) const override;
 
-		iterator begin();
-		iterator end();
-		const_iterator begin() const;
-		const_iterator end() const;
+		iterator begin() const;
+		iterator end() const;
 
 	private:
 
-		std::vector<std::pair<int, T>> m_components;
+		Vector<EntityEntry> m_components;
 	};
 }
 

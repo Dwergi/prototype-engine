@@ -9,52 +9,54 @@
 
 namespace
 {
-	const int Invalid = -1;
-	const int Maximum = std::numeric_limits<int>::max();
+	const unsigned int Invalid = -1;
+	const unsigned int Maximum = ((unsigned int) -1) - 1;
 
-	const int DefaultEntityCount = 512;
-	const int DefaultCommandCount = 32;
+	const unsigned int DefaultEntityCount = 512;
+	const unsigned int DefaultCommandCount = 32;
 }
 
-dd::EntitySystem::EntitySystem()
+namespace dd
 {
-	m_initialized = true;
-}
-
-dd::EntitySystem::~EntitySystem()
-{
-	ProcessCommands();
-
-	m_commands.swap( std::vector<EntityCommand>() );
-
-	DestroyAllEntities();
-
-	m_entities.swap( std::vector<EntityEntry>() );
-
-	m_activeEntities = 0;
-
-	m_free.swap( std::queue<int>() );
-}
-
-void dd::EntitySystem::ProcessCommands()
-{
-	for( const EntityCommand& command : m_commands )
+	EntitySystem::EntitySystem()
 	{
-		switch( command.Type )
+		m_initialized = true;
+	}
+
+	EntitySystem::~EntitySystem()
+	{
+		ProcessCommands();
+
+		m_commands.Clear();
+
+		DestroyAllEntities();
+
+		m_entities.Clear();
+
+		m_activeEntities = 0;
+
+		m_free.Clear();
+	}
+
+	void EntitySystem::ProcessCommands()
+	{
+		for( const EntityCommand& command : m_commands )
 		{
-		case( CommandType::Create ):
+			switch( command.Type )
 			{
-				EntityEntry& entry = m_entities[ command.Entity.ID ];
+			case CommandType::Create:
+			{
+				EntityEntry& entry = m_entities[command.Entity.ID];
 
 				entry.Flags |= EntityState::Active;
 
 				++m_activeEntities;
 			}
-			break;
+									  break;
 
-		case( CommandType::Destroy ):
+			case CommandType::Destroy:
 			{
-				EntityEntry& entry = m_entities[ command.Entity.ID ];
+				EntityEntry& entry = m_entities[command.Entity.ID];
 
 				// ensure that this entity has actually lived a full, productive life
 				ASSERT( entry.Flags & EntityState::Valid );
@@ -65,84 +67,99 @@ void dd::EntitySystem::ProcessCommands()
 
 				entry.Entity.Version += 1;
 
-				m_free.push( entry.Entity.ID );
+				m_free.Add( entry.Entity.ID );
 
 				--m_activeEntities;
 			}
+			}
+		}
+
+		m_commands.Clear();
+	}
+
+	//
+	// Create an entity and return its handle.
+	// 
+	EntityHandle EntitySystem::CreateEntity()
+	{
+		if( m_free.Size() == 0 )
+		{
+			EntityHandle handle;
+			handle.ID = m_entities.Size();
+			handle.Version = 0;
+			handle.m_system = this;
+
+			EntityEntry entry( handle, EntityState::None );
+
+			m_entities.Add( entry );
+			m_free.Add( handle.ID );
+		}
+
+		EntityEntry& entry = m_entities[m_free[0]];
+		m_free.Remove( 0 );
+
+		entry.Flags |= EntityState::Valid;
+
+		EntityCommand command( entry.Entity, CommandType::Create );
+		m_commands.Add( command );
+
+		return entry.Entity;
+	}
+
+	//
+	// Get a handle to the entity at the given slot, or an invalid handle if it's not valid.
+	//
+	EntityHandle EntitySystem::GetEntity( unsigned int index )
+	{
+		if( m_entities[index].Flags & EntityState::Valid )
+			return m_entities[index].Entity;
+
+		return EntityHandle();
+	}
+
+	//
+	// Destroy an entity.
+	// 
+	void EntitySystem::DestroyEntity( const EntityHandle& handle )
+	{
+		if( !IsEntityValid( handle ) )
+			return;
+
+		EntityEntry& entry = m_entities[handle.ID];
+		entry.Flags |= EntityState::Destroyed;
+
+		EntityCommand command( entry.Entity, CommandType::Destroy );
+
+		m_commands.Add( command );
+	}
+
+	void EntitySystem::DestroyAllEntities()
+	{
+		for( EntityEntry& entry : m_entities )
+		{
+			DestroyEntity( entry.Entity );
 		}
 	}
 
-	m_commands.swap( std::vector<EntityCommand>() );
-}
-
-//
-// Create an entity and return its handle.
-// 
-dd::EntityHandle dd::EntitySystem::CreateEntity()
-{
-	if( m_free.empty() )
+	bool EntitySystem::IsEntityValid( const EntityHandle& handle )
 	{
-		EntityHandle handle( (int) m_entities.size(), 0, this );
+		if( handle.ID == EntityHandle::Invalid )
+			return false;
 
-		EntityEntry entry( handle, EntityState::None );
+		if( handle.ID > m_entities.Size() )
+			return false;
 
-		m_entities.push_back( entry );
-		m_free.push( handle.ID );
+		EntityEntry& entry = m_entities[handle.ID];
+
+		if( entry.Entity.Version != handle.Version )
+			return false;
+
+		if( !(entry.Flags & EntityState::Valid) )
+			return false;
+
+		if( entry.Flags & EntityState::Destroyed )
+			return false;
+
+		return true;
 	}
-
-	EntityEntry& entry = m_entities[ m_free.front() ];
-	m_free.pop();
-
-	entry.Flags |= EntityState::Valid;
-
-	EntityCommand command( entry.Entity, CommandType::Create );
-	m_commands.push_back( command );
-
-	return entry.Entity;
-}
-
-//
-// Destroy an entity.
-// 
-void dd::EntitySystem::DestroyEntity( const dd::EntityHandle& handle )
-{
-	if( !IsEntityValid( handle ) )
-		return;
-
-	EntityEntry& entry = m_entities[ handle.ID ];
-	entry.Flags |= EntityState::Destroyed;
-
-	EntityCommand command( entry.Entity, CommandType::Destroy );
-
-	m_commands.push_back( command );
-}
-
-void dd::EntitySystem::DestroyAllEntities()
-{
-	for( EntityEntry& entry : m_entities )
-	{
-		DestroyEntity( entry.Entity );
-	}
-}
-
-bool dd::EntitySystem::IsEntityValid( const dd::EntityHandle& handle )
-{
-	if( handle.ID == EntityHandle::Invalid )
-		return false;
-
-	if( handle.ID > (int) m_entities.size() )
-		return false;
-
-	EntityEntry& entry = m_entities[ handle.ID ];
-
-	if( entry.Entity.Version != handle.Version )
-		return false;
-
-	if( !(entry.Flags & EntityState::Valid) )
-		return false;
-
-	if( entry.Flags & EntityState::Destroyed )
-		return false;
-
-	return true;
 }

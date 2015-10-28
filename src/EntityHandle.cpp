@@ -13,24 +13,21 @@ namespace dd
 {
 	EntityHandle::EntityHandle() :
 		m_system( nullptr ),
-		ID( EntityHandle::Invalid ),
-		Version( EntityHandle::Invalid )
+		Handle( EntityHandle::Invalid )
 	{
 
 	}
 
-	EntityHandle::EntityHandle( int id, int version, EntitySystem* m_system ) :
+	EntityHandle::EntityHandle( uint handle, EntitySystem* m_system ) :
 		m_system( m_system ),
-		ID( id ),
-		Version( version )
+		Handle( handle )
 	{
 
 	}
 
 	EntityHandle::EntityHandle( const EntityHandle& other ) :
 		m_system( other.m_system ),
-		ID( other.ID ),
-		Version( other.Version )
+		Handle( other.Handle )
 	{
 
 	}
@@ -42,7 +39,7 @@ namespace dd
 
 	bool EntityHandle::operator==( const EntityHandle& other ) const
 	{
-		return ID == other.ID && Version == other.Version;
+		return Handle == other.Handle;
 	}
 
 	bool EntityHandle::operator!=( const EntityHandle& other ) const
@@ -53,8 +50,7 @@ namespace dd
 	EntityHandle& EntityHandle::operator=( const EntityHandle& other )
 	{
 		m_system = other.m_system;
-		ID = other.ID;
-		Version = other.Version;
+		Handle = other.Handle;
 
 		return *this;
 	}

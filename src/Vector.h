@@ -71,9 +71,10 @@ namespace dd
 
 		//
 		// Insert at the given index. 
-		// Index must be <= Size()
+		// Index must be <= Size() and >= 0
 		//
 		void Insert( const T&& value, uint index );
+		void Insert( const T& value, uint index );
 
 		//
 		// Add all the entries from the given vector to the end of this vector.
