@@ -221,7 +221,7 @@ int GameMain()
 	input.AddMouseCallback( &DebugUI::MouseButtonCallback );
 	input.AddCharCallback( &DebugUI::CharCallback );
 
-	JobSystem jobsystem( 2 );
+	JobSystem jobsystem( 2u );
 
 	Timer timer;
 	timer.Start();

@@ -48,23 +48,35 @@ namespace dd
 
 	}
 
-	JobSystem::JobSystem( int thread_count )
+	JobSystem::JobSystem( uint thread_count )
 	{
-		CreateWorkers( thread_count );
+		ASSERT( thread_count <= MAX_THREADS );
+
+		CreateWorkers( std::min( thread_count, MAX_THREADS ) );
 	}
 
 	JobSystem::~JobSystem()
 	{
+		{
+			std::lock_guard<std::mutex> lock( m_jobsMutex );
+			m_jobs.Clear();
+		}
 
+		for( uint i = 0; i < m_workers.Size(); ++i )
+		{
+			m_workers[i].Kill();
+
+			m_threads[i].join();
+		}
 	}
 
-	void JobSystem::CreateWorkers( int thread_count )
+	void JobSystem::CreateWorkers( uint thread_count )
 	{
-		for( int i = 0; i < thread_count; ++i )
+		for( uint i = 0; i < thread_count; ++i )
 		{
 			m_workers.Add( JobThread( *this ) );
 
-			m_threads.Add( std::thread( &JobThread::Run, m_workers[ i ] ) );
+			m_threads[i] = std::thread( &JobThread::Run, m_workers[i] );
 
 			char name[32] = "DD Jobs ";
 			char count[8];
@@ -81,14 +93,14 @@ namespace dd
 		ASSERT( fn.Signature()->GetRet() == nullptr );
 		ASSERT( fn.Signature()->ArgCount() == args.Arguments.Size() );
 
-		std::lock_guard<std::mutex> lock( m_mutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		m_jobs.Add( Job( fn, args ) );
 	}
 
 	bool JobSystem::GetJob( Function& out_task, FunctionArgs& out_args )
 	{
-		std::lock_guard<std::mutex> lock( m_mutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		if( m_jobs.Size() == 0 )
 			return false;

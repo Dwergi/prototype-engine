@@ -24,7 +24,7 @@ namespace dd
 	{
 	public:
 
-		JobSystem( int thread_count );
+		JobSystem( uint thread_count );
 		~JobSystem();
 
 		void Schedule( const Function& fn, const FunctionArgs& args );
@@ -33,6 +33,8 @@ namespace dd
 
 	private:
 
+		static const uint MAX_THREADS = 8;
+
 		struct Job
 		{
 			Job( const Function& fn, const FunctionArgs& args );
@@ -40,12 +42,12 @@ namespace dd
 			const FunctionArgs& Args;
 		};
 
-		Vector<std::thread> m_threads;
+		std::thread m_threads[MAX_THREADS];
 		Vector<JobThread> m_workers;
 		Vector<Job> m_jobs;
 
-		std::mutex m_mutex;
+		std::mutex m_jobsMutex;
 
-		void CreateWorkers( int thread_count );
+		void CreateWorkers( uint thread_count );
 	};
 }
