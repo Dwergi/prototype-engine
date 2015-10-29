@@ -351,6 +351,8 @@ namespace dd
 
 	void DebugUI::Update( float delta_t )
 	{
+		DD_PROFILE_START( DebugUI_Update );
+
 		if( !g_FontTexture )
 			DebugUI::CreateDeviceObjects();
 
@@ -374,5 +376,7 @@ namespace dd
 
 		// Start the frame
 		ImGui::NewFrame();
+
+		DD_PROFILE_END();
 	}
 }

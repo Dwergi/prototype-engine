@@ -46,6 +46,9 @@ namespace dd
 		void Remove( uint index );
 		void Remove( int index );
 
+		//
+		// Remove all instances that are equivalent to the given item from the container.
+		//
 		void RemoveItem( const T& item );
 
 		//
@@ -88,6 +91,11 @@ namespace dd
 		T& Allocate( T&& entry );
 
 		void Swap( Vector<T>& other );
+
+		//
+		// Reverse the order of the elements in the vector.
+		//
+		void Reverse();
 
 		int Find( const T& entry ) const;
 		bool Contains( const T& entry ) const;

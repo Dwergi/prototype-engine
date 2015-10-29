@@ -11,12 +11,13 @@
 #include <windows.h>
 #endif
 
-#include <utility>
-#include <iostream>
+// min & max, mostly
 #include <algorithm>
 
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+
+#include "Profiler.h"
 
 #include "DDAssert.h"
 #include "Typedefs.h"

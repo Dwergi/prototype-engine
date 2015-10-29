@@ -25,9 +25,6 @@
     <Filter Include="Systems">
       <UniqueIdentifier>{74210990-6148-4e02-995f-ab11859b19ef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics">
-      <UniqueIdentifier>{e0d133c6-bccb-4633-bf28-f4ea9348d5d6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Application">
       <UniqueIdentifier>{00f2688a-c546-4b01-8678-895e6ec79ab4}</UniqueIdentifier>
     </Filter>
@@ -40,14 +37,8 @@
     <Filter Include="Serialization">
       <UniqueIdentifier>{7eb4d0ac-91be-4912-8f53-b90ac3bc0db9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Base64">
-      <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DebugUI">
       <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer">
-      <UniqueIdentifier>{9b1b5c97-b823-4ea1-a5bb-de504eedf166}</UniqueIdentifier>
     </Filter>
     <Filter Include="Script\Add-Ons">
       <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
@@ -57,6 +48,39 @@
     </Filter>
     <Filter Include="Components\Pools\Test Components">
       <UniqueIdentifier>{fe77aabc-75a8-4829-a000-a8d493294d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{6f7b570c-e8a9-463e-a549-5bb17d2ab414}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Base64">
+      <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{9b1b5c97-b823-4ea1-a5bb-de504eedf166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\PCG">
+      <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\JSON">
+      <UniqueIdentifier>{ceaa887e-31b6-4693-8e62-b73768dce76e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\PP Assert">
+      <UniqueIdentifier>{16d20338-1fa4-4afd-8d42-1e4b198a3d3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\gl3w">
+      <UniqueIdentifier>{e87999f1-1019-463f-9d68-497df60b60de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Catch">
+      <UniqueIdentifier>{ceb3961e-5856-4686-b625-9db1fcc59eb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Remotery">
+      <UniqueIdentifier>{6478ffbb-0dc4-46f1-8153-9faffa4eab73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Jobs">
+      <UniqueIdentifier>{b44a65d4-1a70-45cc-b448-f311fd301d07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\GLM">
+      <UniqueIdentifier>{468c9f6f-eacc-4308-9c92-3a2397200665}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,9 +98,6 @@
     </ClInclude>
     <ClInclude Include="src\BoundingBox.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PP_Assert.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Recorder.h">
       <Filter>Properties</Filter>
@@ -199,16 +220,16 @@
       <Filter>Serialization</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\cdecode.h">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\cencode.h">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\decode.h">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\encode.h">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClInclude>
     <ClInclude Include="src\JSONSerializer.h">
       <Filter>Serialization</Filter>
@@ -232,10 +253,7 @@
       <Filter>DebugUI</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gl3w\include\GL\gl3w.h">
-      <Filter>Renderer</Filter>
+      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\CommandLine.h">
       <Filter>Application</Filter>
@@ -288,8 +306,45 @@
     <ClInclude Include="src\Script.h">
       <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="src\JobThread.h" />
-    <ClInclude Include="src\JobSystem.h" />
+    <ClInclude Include="include\pcg\pcg_extras.hpp">
+      <Filter>Includes\PCG</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcg\pcg_random.hpp">
+      <Filter>Includes\PCG</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcg\pcg_uint128.hpp">
+      <Filter>Includes\PCG</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json.h\json.h">
+      <Filter>Includes\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PP_Assert.h">
+      <Filter>Includes\PP Assert</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gl3w\include\GL\gl3w.h">
+      <Filter>Includes\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch\catch.hpp">
+      <Filter>Includes\Catch</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Remotery\lib\Remotery.h">
+      <Filter>Includes\Remotery</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JobSystem.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\JobThread.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Profiler.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\fwd.hpp">
+      <Filter>Includes\GLM</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\glm.hpp">
+      <Filter>Includes\GLM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -308,9 +363,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PP_Assert.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\PrecompiledHeader.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -393,10 +445,10 @@
       <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="include\base64\src\cdecode.c">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClCompile>
     <ClCompile Include="include\base64\src\cencode.c">
-      <Filter>Base64</Filter>
+      <Filter>Includes\Base64</Filter>
     </ClCompile>
     <ClCompile Include="src\JSONSerializer.cpp">
       <Filter>Serialization</Filter>
@@ -411,10 +463,7 @@
       <Filter>DebugUI</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="include\gl3w\src\gl3w.c">
-      <Filter>Renderer</Filter>
+      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\CommandLine.cpp">
       <Filter>Application</Filter>
@@ -470,8 +519,24 @@
     <ClCompile Include="src\Script.cpp">
       <Filter>Script</Filter>
     </ClCompile>
-    <ClCompile Include="src\JobThread.cpp" />
-    <ClCompile Include="src\JobSystem.cpp" />
+    <ClCompile Include="include\json.h\json.c">
+      <Filter>Includes\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PP_Assert.cpp">
+      <Filter>Includes\PP Assert</Filter>
+    </ClCompile>
+    <ClCompile Include="include\gl3w\src\gl3w.c">
+      <Filter>Includes\gl3w</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Remotery\lib\Remotery.c">
+      <Filter>Includes\Remotery</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JobSystem.cpp">
+      <Filter>Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JobThread.cpp">
+      <Filter>Jobs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

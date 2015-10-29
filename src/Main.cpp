@@ -34,6 +34,8 @@
 #include "DebugConsole.h"
 
 #include "imgui/imgui.h"
+
+#include "Remotery/lib/Remotery.h"
 //---------------------------------------------------------------------------
 
 using namespace dd;
@@ -65,7 +67,7 @@ DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 	return buffer;
 }
 
-float s_maxFPS = 100.0f;
+float s_maxFPS = 30.0f;
 
 bool s_drawFPS = true;
 
@@ -160,10 +162,17 @@ int TestMain( int argc, char* const argv[] )
 
 int GameMain()
 {
+	DD_PROFILE_INIT();
+	DD_PROFILE_THREAD_NAME( "Main" );
+
+	::ShowWindow( GetConsoleWindow(), SW_HIDE );
+
 	EntitySystem entitySystem;
 	g_services.Register( entitySystem );
 
 	RegisterGameTypes();
+
+	JobSystem jobsystem( 2u );
 
 	auto& transform_db = GetDoubleBuffer<TransformComponent>();
 	auto& swarm_db = GetDoubleBuffer<SwarmAgentComponent>();
@@ -206,87 +215,99 @@ int GameMain()
 	SwarmSystem swarm_system( swarm_db );
 	g_services.Register( swarm_system );
 
-	Window window( 1280, 960, "Neutrino" );
-
-	Input input( window );
-
-	bool opened;
-
-	DebugUI debugUI( window.GetInternalWindow() );
-
-	DebugConsole console;
-
-	input.AddKeyboardCallback( &DebugUI::KeyCallback );
-	input.AddScrollCallback( &DebugUI::ScrollCallback );
-	input.AddMouseCallback( &DebugUI::MouseButtonCallback );
-	input.AddCharCallback( &DebugUI::CharCallback );
-
-	JobSystem jobsystem( 2u );
-
-	Timer timer;
-	timer.Start();
-
-	float target_delta = 1.0f / s_maxFPS;
-	float last_frame = 0.0f;
-	float current_frame = -target_delta;
-	float delta_t = target_delta;
-
-	input.BindKey( '`', InputAction::CONSOLE );
-
-	while( !window.ShouldClose() )
 	{
-		target_delta = 1.0f / s_maxFPS;
-		last_frame = current_frame;
-		current_frame = timer.Time();
-		delta_t = current_frame - last_frame;
+		Window window( 1280, 960, "Neutrino" );
 
-		input.Update();
+		Input input( window );
 
-		MousePosition mouse_pos = input.GetMousePosition();
+		bool opened;
 
-		Array<InputEvent, 64> events;
-		input.GetKeyEvents( events );
+		DebugUI debugUI( window.GetInternalWindow() );
 
-		for( uint i = 0; i < events.Size(); ++i )
+		DebugConsole console;
+
+		input.AddKeyboardCallback( &DebugUI::KeyCallback );
+		input.AddScrollCallback( &DebugUI::ScrollCallback );
+		input.AddMouseCallback( &DebugUI::MouseButtonCallback );
+		input.AddCharCallback( &DebugUI::CharCallback );
+
+		Timer timer;
+		timer.Start();
+
+		float target_delta = 1.0f / s_maxFPS;
+		float last_frame = 0.0f;
+		float current_frame = -target_delta;
+		float delta_t = target_delta;
+
+		input.BindKey( '`', InputAction::CONSOLE );
+
+		while( !window.ShouldClose() )
 		{
-			if( events[i].Action == InputAction::CONSOLE && events[i].Type == InputType::RELEASED )
-				s_drawConsole = !s_drawConsole;
+			DD_PROFILE_START( Frame );
+
+			target_delta = 1.0f / s_maxFPS;
+			last_frame = current_frame;
+			current_frame = timer.Time();
+			delta_t = current_frame - last_frame;
+
+			input.Update();
+
+			MousePosition mouse_pos = input.GetMousePosition();
+
+			Array<InputEvent, 64> events;
+			input.GetKeyEvents( events );
+
+			for( uint i = 0; i < events.Size(); ++i )
+			{
+				if( events[i].Action == InputAction::CONSOLE && events[i].Type == InputType::RELEASED )
+					s_drawConsole = !s_drawConsole;
+			}
+
+			debugUI.SetMousePosition( input.GetMousePosition().X, input.GetMousePosition().Y );
+			debugUI.SetFocused( window.IsFocused() );
+			debugUI.SetDisplaySize( window.GetWidth(), window.GetHeight() );
+
+			debugUI.Update( delta_t );
+
+			FunctionArgs args;
+			args.Arguments.Add( Variable( delta_t ) );
+			args.Context = Variable( g_services.Get<SwarmSystem>() );
+
+			jobsystem.Schedule( FUNCTION( SwarmSystem::Update ), args );
+
+			ImGui::ShowTestWindow( &opened );
+
+			if( s_drawConsole )
+				console.Draw( "Console", s_drawConsole );
+
+			if( s_drawFPS )
+				DrawFPS( delta_t );
+
+			ImGui::Render();
+
+			window.Swap();
+
+			DD_PROFILE_START( Main_Sleep );
+
+			float now = timer.Time();
+			while( now - last_frame < target_delta )
+			{
+				::Sleep( 1 );
+
+				now = timer.Time();
+			}
+
+			DD_PROFILE_END();
+
+			DD_PROFILE_END();
+
+			DD_PROFILE_LOG( "End Frame" );
 		}
 
-		debugUI.SetMousePosition( input.GetMousePosition().X, input.GetMousePosition().Y );
-		debugUI.SetFocused( window.IsFocused() );
-		debugUI.SetDisplaySize( window.GetWidth(), window.GetHeight() );
-
-		debugUI.Update( delta_t );
-
-		FunctionArgs args;
-		args.Arguments.Add( Variable( delta_t ) );
-		args.Context = Variable( g_services.Get<SwarmSystem>() );
-
-		jobsystem.Schedule( FUNCTION( SwarmSystem::Update ), args );
-
-		ImGui::ShowTestWindow( &opened );
-
-		if( s_drawConsole )
-			console.Draw( "Console", s_drawConsole );
-
-		if( s_drawFPS )
-			DrawFPS( delta_t );
-
-		ImGui::Render();
-
-		window.Swap();
-
-		float now = timer.Time();
-		while( now - last_frame < target_delta )
-		{
-			::Sleep( 1 );
-
-			now = timer.Time();
-		}
+		window.Close();
 	}
 
-	window.Close();
+	DD_PROFILE_DEINIT();
 
 	ASSERT( false, "DONE!" );
 	return 0;

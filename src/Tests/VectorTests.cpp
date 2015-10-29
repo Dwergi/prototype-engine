@@ -255,3 +255,30 @@ TEST_CASE( "[Vector] Resize" )
 	REQUIRE( a.Size() == 128 );
 	REQUIRE( a.Capacity() == 128 );
 }
+
+TEST_CASE( "[Vector] Reverse" )
+{
+	dd::Vector<int> a;
+
+	for( int i = 0; i < 32; ++i )
+	{
+		a.Push( i );
+	}
+
+	a.Reverse();
+
+	for( int i = 31; i >= 0; --i )
+	{
+		REQUIRE( a[i] == i );
+	}
+
+	// odd-sized
+	a.Push( 32 );
+
+	a.Reverse();
+
+	for( int i = 0; i < 33; ++i )
+	{
+		REQUIRE( a[i] == i );
+	}
+}

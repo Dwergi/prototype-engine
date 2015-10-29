@@ -42,7 +42,7 @@ TEST_CASE( "Octree", "[octree]")
 
 	int added = 0;
 
-	dd::Random32 rngPosition( 0, 100 );
+	dd::Random32 rngPosition( 0, 100, 100 );
 
 	for( const dd::EntityHandle& handle : handles )
 	{
@@ -61,7 +61,7 @@ TEST_CASE( "Octree", "[octree]")
 
 	dd::Vector<dd::Octree::Entry> output( 50 );
 
-	dd::Random32 rngEntity( 0, EntityCount );
+	dd::Random32 rngEntity( 0, EntityCount, 100 );
 
 	for( int i = 0; i < 100; ++i )
 	{

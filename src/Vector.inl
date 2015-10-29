@@ -88,17 +88,23 @@ namespace dd
 	template<typename T>
 	void Vector<T>::RemoveItem( const T& item )
 	{
-		int index = -1;
+		Vector<uint> to_remove;
+
 		for( uint i = 0; i < m_size; ++i )
 		{
 			if( m_data[i] == item )
 			{
-				index = i;
-				break;
+				to_remove.Add( i );
 			}
 		}
 
-		Remove( index );
+		// delete in reverse order so our indices don't get fucked
+		to_remove.Reverse();
+
+		for( uint i : to_remove )
+		{
+			Remove( i );
+		}
 	}
 
 	template<typename T>
@@ -314,6 +320,15 @@ namespace dd
 		}
 
 		return -1;
+	}
+
+	template<typename T>
+	void Vector<T>::Reverse()
+	{
+		for( uint i = 0; i < m_size / 2; ++i )
+		{
+			std::swap( m_data[i], m_data[m_size - i - 1] );
+		}
 	}
 
 	template<typename T>

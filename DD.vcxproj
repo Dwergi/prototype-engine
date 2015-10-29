@@ -265,7 +265,15 @@
     <ClInclude Include="include\base64\include\cencode.h" />
     <ClInclude Include="include\base64\include\decode.h" />
     <ClInclude Include="include\base64\include\encode.h" />
+    <ClInclude Include="include\catch\catch.hpp" />
     <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
+    <ClInclude Include="include\glm\fwd.hpp" />
+    <ClInclude Include="include\glm\glm.hpp" />
+    <ClInclude Include="include\json.h\json.h" />
+    <ClInclude Include="include\pcg\pcg_extras.hpp" />
+    <ClInclude Include="include\pcg\pcg_random.hpp" />
+    <ClInclude Include="include\pcg\pcg_uint128.hpp" />
+    <ClInclude Include="include\Remotery\lib\Remotery.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
@@ -298,6 +306,7 @@
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PrecompiledHeader.h" />
+    <ClInclude Include="src\Profiler.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RefCounter.h" />
@@ -369,6 +378,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\json.h\json.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\Remotery\lib\Remotery.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
