@@ -19,6 +19,7 @@
 #include "DoubleBuffer.h"
 #include "EntitySystem.h"
 #include "Input.h"
+#include "JobSystem.h"
 #include "OctreeComponent.h"
 #include "PropertyList.h"
 #include "Random.h"
@@ -136,6 +137,8 @@ void RegisterGameTypes()
 	RegisterComponent<OctreeComponent>();
 	RegisterComponent<SwarmAgentComponent>();
 
+	REGISTER_TYPE( SwarmSystem );
+
 	RegisterGlobalScriptFunctions();
 }
 
@@ -170,7 +173,7 @@ int GameMain()
 	auto& swarm_pool = swarm_db.GetWrite();
 	auto& octree_pool = octree_db.GetWrite();
 
-	Random32 rngPos( 0, 100 );
+	Random32 rngPos( 0, 100, 50 );
 	Random32 rngVelocity( 0, 100 );
 
 	Octree octree;
@@ -201,6 +204,7 @@ int GameMain()
 	octree_db.Duplicate();
 
 	SwarmSystem swarm_system( swarm_db );
+	g_services.Register( swarm_system );
 
 	Window window( 1280, 960, "Neutrino" );
 
@@ -216,6 +220,8 @@ int GameMain()
 	input.AddScrollCallback( &DebugUI::ScrollCallback );
 	input.AddMouseCallback( &DebugUI::MouseButtonCallback );
 	input.AddCharCallback( &DebugUI::CharCallback );
+
+	JobSystem jobsystem( 2 );
 
 	Timer timer;
 	timer.Start();
@@ -243,12 +249,6 @@ int GameMain()
 
 		for( uint i = 0; i < events.Size(); ++i )
 		{
-			if( events[i].Type == InputType::PRESSED )
-				std::cout << "Pressed a key!" << std::endl;
-
-			if( events[i].Type == InputType::RELEASED )
-				std::cout << "Released a key!" << std::endl;
-
 			if( events[i].Action == InputAction::CONSOLE && events[i].Type == InputType::RELEASED )
 				s_drawConsole = !s_drawConsole;
 		}
@@ -258,6 +258,12 @@ int GameMain()
 		debugUI.SetDisplaySize( window.GetWidth(), window.GetHeight() );
 
 		debugUI.Update( delta_t );
+
+		FunctionArgs args;
+		args.Arguments.Add( Variable( delta_t ) );
+		args.Context = Variable( g_services.Get<SwarmSystem>() );
+
+		jobsystem.Schedule( FUNCTION( SwarmSystem::Update ), args );
 
 		ImGui::ShowTestWindow( &opened );
 

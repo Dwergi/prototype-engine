@@ -9,22 +9,25 @@
 
 #include "DoubleBuffer.h"
 
-dd::SwarmSystem::SwarmSystem( const dd::DoubleBuffer< dd::SwarmAgentComponent::Pool >& pool )
-	: m_pool( pool )
+namespace dd
 {
-
-}
-
-dd::SwarmSystem::~SwarmSystem()
-{
-
-}
-
-void dd::SwarmSystem::Update( float dt )
-{
-	auto& read = m_pool.GetRead();
-	for( const dd::SwarmAgentComponent& cmp : read )
+	SwarmSystem::SwarmSystem( const DoubleBuffer<SwarmAgentComponent::Pool>& pool )
+		: m_pool( pool )
 	{
 
+	}
+
+	SwarmSystem::~SwarmSystem()
+	{
+
+	}
+
+	void SwarmSystem::Update( float dt )
+	{
+		auto& read = m_pool.GetRead();
+		for( const SwarmAgentComponent& cmp : read )
+		{
+
+		}
 	}
 }

@@ -62,22 +62,22 @@ namespace dd
 
 	template <typename T>
 	Variable::Variable( const T& rhs )
-		: m_data( (T*) &rhs )
-		, m_typeInfo( GET_TYPE( T ) )
+		: m_data( (T*) &rhs ),
+		m_typeInfo( GET_TYPE( T ) )
 	{
 	}
 
 	template <typename T>
-	Variable::Variable( const T *rhs )
-		: m_data( (T*) rhs )
-		, m_typeInfo( GET_TYPE( T* )  )
+	Variable::Variable( const T* rhs )
+		: m_data( (T*) rhs ),
+		m_typeInfo( GET_TYPE( T* )  )
 	{
 	}
 
 	template <typename T>
 	Variable::Variable( T* rhs )
-		: m_data( rhs )
-		, m_typeInfo( GET_TYPE( T* )  )
+		: m_data( rhs ),
+		m_typeInfo( GET_TYPE( T* )  )
 	{
 	}
 

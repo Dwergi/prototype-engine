@@ -51,6 +51,11 @@ namespace dd
 		return m_context;
 	}
 
+	void Function::Bind( Variable& context )
+	{
+		m_context = context;
+	}
+
 	bool Function::IsMethod() const
 	{
 		return m_sig.GetContext() ? true : false;

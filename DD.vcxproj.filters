@@ -288,6 +288,8 @@
     <ClInclude Include="src\Script.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="src\JobThread.h" />
+    <ClInclude Include="src\JobSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -468,6 +470,8 @@
     <ClCompile Include="src\Script.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="src\JobThread.cpp" />
+    <ClCompile Include="src\JobSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

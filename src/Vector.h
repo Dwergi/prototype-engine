@@ -92,6 +92,8 @@ namespace dd
 		int Find( const T& entry ) const;
 		bool Contains( const T& entry ) const;
 
+		T* Data() const;
+
 		//
 		// Reserve at least capacity elements. 
 		// Does NOT change the size of the container.

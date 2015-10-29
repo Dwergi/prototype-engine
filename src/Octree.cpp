@@ -34,12 +34,6 @@ namespace dd
 
 	}
 
-	Octree::Entry::Entry( Octree::Entry&& other )
-		: ID( other.ID )
-	{
-		other.ID = -1;
-	}
-
 	Octree::Entry::Entry( const Octree::Entry& other )
 		: ID( other.ID )
 	{

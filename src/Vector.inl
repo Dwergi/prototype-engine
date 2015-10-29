@@ -57,6 +57,12 @@ namespace dd
 	}
 
 	template<typename T>
+	T* Vector<T>::Data() const
+	{
+		return m_data;
+	}
+
+	template<typename T>
 	void Vector<T>::Remove( uint index )
 	{
 		ASSERT( m_size > 0 );
@@ -167,7 +173,7 @@ namespace dd
 			Grow();
 		}
 
-		new (&m_data[m_size]) T( entry );
+		new (&m_data[m_size]) T( std::move( entry ) );
 
 		++m_size;
 	}

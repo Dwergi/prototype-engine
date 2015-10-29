@@ -14,13 +14,15 @@ namespace dd
 	class SwarmSystem
 	{
 	public:
-		SwarmSystem( const dd::DoubleBuffer< dd::SwarmAgentComponent::Pool >& pool );
+		SwarmSystem( const DoubleBuffer<SwarmAgentComponent::Pool>& pool );
 		~SwarmSystem();
 
 		void Update( float dt );
 
+		NO_MEMBERS( SwarmSystem )
+
 	private:
 
-		const dd::DoubleBuffer< dd::SwarmAgentComponent::Pool >& m_pool;
+		const DoubleBuffer<SwarmAgentComponent::Pool>& m_pool;
 	};
 }

@@ -7,7 +7,7 @@
 const int MAX_COUNT = 2048;
 
 template<typename T>
-void CopyRange( const T* src, T* dest, uint count )
+void CopyRange( T* src, T* dest, uint count )
 {
 	ASSERT( count <= MAX_COUNT );
 
@@ -16,12 +16,12 @@ void CopyRange( const T* src, T* dest, uint count )
 
 	for( uint i = 0; i < count; ++i )
 	{
-		new (&temp[i]) T( src[ i ] );
+		new (&temp[i]) T( std::move( src[i] ) );
 	}
 
 	for( uint i = 0; i < count; ++i )
 	{
-		new (&dest[i]) T( temp[i] );
+		new (&dest[i]) T( std::move( temp[i] ) );
 	}
 }
 
