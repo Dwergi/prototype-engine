@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>DD Header</Title>
+      <Author>Windows User</Author>
+      <Description>
+      </Description>
+      <HelpUrl>
+      </HelpUrl>
+      <Shortcut>ddheader</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>ClassName</ID>
+          <ToolTip>Class name</ToolTip>
+          <Default>ClassName</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>Date</ID>
+          <ToolTip>Date</ToolTip>
+          <Default>Date</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <Code Language="cpp" Delimiter="$"><![CDATA[//
+// $ClassName$.h - $end$
+// Copyright (C) Sebastian Nordgren 
+// $Date$
+//
+
+#pragma once
+
+namespace dd
+{
+	class $ClassName$
+	{
+	public:
+
+		$ClassName$();
+		~$ClassName$();
+	};
+}]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
