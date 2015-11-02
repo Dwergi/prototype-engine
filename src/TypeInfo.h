@@ -41,6 +41,9 @@ namespace dd
 		inline const String& Name() const { return m_name; }
 
 		inline bool IsPOD() const { return m_members.Size() == 0; }
+		inline bool IsRegistered() const { return m_size != 0; }
+
+		bool IsDerivedFrom( const TypeInfo* type ) const;
 
 		void* (*New)();
 		void (*Copy)( void* data, const void* src );
@@ -49,8 +52,6 @@ namespace dd
 		void (*PlacementNew)( void* data );
 		void (*PlacementDelete)( void* data );
 		void (*PlacementCopy)( void* data, const void* src );
-
-		inline bool IsRegistered() const { return m_size != 0; }
 
 		//
 		// Register a non-POD, non-container type (eg. a class).
@@ -65,6 +66,8 @@ namespace dd
 		void RegisterMethod( const Function& f, T fn, const char* name );
 
 		void RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset );
+
+		void RegisterParentType( const TypeInfo* typeInfo );
 
 		template <typename T>
 		void RegisterScriptObject( const char* name );
@@ -98,9 +101,11 @@ namespace dd
 	private:
 		uint m_size;
 		String32 m_name;
-		const TypeInfo* m_containedType;
 		bool m_scriptObject;
 
+		const TypeInfo* m_parentType;
+		const TypeInfo* m_containedType;
+		
 		Vector<Member> m_members;
 		Vector<Method> m_methods;
 

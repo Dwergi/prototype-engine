@@ -80,6 +80,21 @@ namespace dd
 		return *pType;
 	}
 
+	bool TypeInfo::IsDerivedFrom( const TypeInfo* type ) const
+	{
+		const TypeInfo* current = this;
+
+		while( current != nullptr )
+		{
+			if( current == type )
+				return true;
+
+			current = current->m_parentType;
+		}
+		
+		return false;
+	}
+
 	bool TypeInfo::HasCustomSerializers() const
 	{
 		return SerializeCustom != nullptr && DeserializeCustom != nullptr;
@@ -89,6 +104,11 @@ namespace dd
 	{
 		SerializeCustom = serializer;
 		DeserializeCustom = deserializer;
+	}
+
+	void TypeInfo::RegisterParentType( const TypeInfo* type )
+	{
+		m_parentType = type;
 	}
 
 	void TypeInfo::RegisterDefaultTypes()
@@ -116,17 +136,29 @@ namespace dd
 
 		REGISTER_TYPE( String );
 		SET_SERIALIZERS( String, Serialize::SerializeString, Serialize::DeserializeString );
+
 		REGISTER_TYPE( String8 );
+		SET_PARENT( String8, String );
 		SET_SERIALIZERS( String8, Serialize::SerializeString, Serialize::DeserializeString );
+
 		REGISTER_TYPE( String16 );
+		SET_PARENT( String16, String );
 		SET_SERIALIZERS( String16, Serialize::SerializeString, Serialize::DeserializeString );
+
 		REGISTER_TYPE( String32 );
+		SET_PARENT( String32, String );
 		SET_SERIALIZERS( String32, Serialize::SerializeString, Serialize::DeserializeString );
+		
 		REGISTER_TYPE( String64 );
+		SET_PARENT( String64, String );
 		SET_SERIALIZERS( String64, Serialize::SerializeString, Serialize::DeserializeString );
+		
 		REGISTER_TYPE( String128 );
+		SET_PARENT( String128, String );
 		SET_SERIALIZERS( String128, Serialize::SerializeString, Serialize::DeserializeString );
+
 		REGISTER_TYPE( String256 );
+		SET_PARENT( String256, String );
 		SET_SERIALIZERS( String256, Serialize::SerializeString, Serialize::DeserializeString );
 	}
 }

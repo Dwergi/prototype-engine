@@ -24,9 +24,9 @@ namespace dd
 		SwarmAgentComponent();
 		virtual ~SwarmAgentComponent();
 
-		BEGIN_MEMBERS( SwarmAgentComponent )
+		BEGIN_TYPE( SwarmAgentComponent )
 			MEMBER( ID );
 			MEMBER( Velocity );
-		END_MEMBERS
+		END_TYPE
 	};
 }

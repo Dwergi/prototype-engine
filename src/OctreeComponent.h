@@ -12,15 +12,17 @@
 
 namespace dd
 {
-	class OctreeComponent : public dd::Component
+	class OctreeComponent : public Component
 	{
 	public:
-		typedef dd::UnorderedMapPool<OctreeComponent> Pool;
+		typedef UnorderedMapPool<OctreeComponent> Pool;
 
 		Octree::Entry Entry;
 
 		OctreeComponent() {}
 
-		NO_MEMBERS( OctreeComponent )
+		BEGIN_TYPE( OctreeComponent )
+			PARENT( Component );
+		END_TYPE
 	};
 }

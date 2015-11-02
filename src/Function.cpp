@@ -37,7 +37,14 @@ namespace dd
 	Function::Function( const Function& rhs )
 		: m_sig( rhs.m_sig )
 		, m_callHelper( rhs.m_callHelper )
-		, m_context()
+		, m_context( rhs.m_context )
+	{
+	}
+
+	Function::Function( Function&& rhs )
+		: m_sig( rhs.m_sig )
+		, m_callHelper( rhs.m_callHelper )
+		, m_context( rhs.m_context )
 	{
 	}
 

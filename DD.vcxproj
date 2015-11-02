@@ -302,6 +302,9 @@
     <ClInclude Include="src\JobThread.h" />
     <ClInclude Include="src\JSONSerializer.h" />
     <ClInclude Include="src\Member.h" />
+    <ClInclude Include="src\Message.h" />
+    <ClInclude Include="src\MessageSystem.h" />
+    <ClInclude Include="src\MessageTypes.h" />
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
@@ -412,6 +415,7 @@
     <ClCompile Include="src\JSONSerializer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />
+    <ClCompile Include="src\MessageSystem.cpp" />
     <ClCompile Include="src\Octree.cpp" />
     <ClCompile Include="src\PP_Assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -441,6 +445,7 @@
     <ClCompile Include="src\Tests\CommandLineTests.cpp" />
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
+    <ClCompile Include="src\Tests\MessageSystemTests.cpp" />
     <ClCompile Include="src\Tests\OctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
     <ClCompile Include="src\Tests\RandomTests.cpp" />

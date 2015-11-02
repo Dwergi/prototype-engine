@@ -304,7 +304,8 @@ namespace dd
 		const FunctionSignature* Signature() const;
 
 		Function();
-		Function(const Function& rhs );
+		Function( const Function& rhs );
+		Function( Function&& rhs );
 		Function& operator=( const Function& rhs );
 
 		Variable& Context();

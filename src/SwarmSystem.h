@@ -19,7 +19,7 @@ namespace dd
 
 		void Update( float dt );
 
-		NO_MEMBERS( SwarmSystem )
+		BASIC_TYPE( SwarmSystem )
 
 	private:
 

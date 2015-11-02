@@ -97,6 +97,6 @@ namespace dd
 			MEMBER( Y );
 			MEMBER( Z );
 			MEMBER( W );
-		END_MEMBERS
+		END_TYPE
 	};
 }

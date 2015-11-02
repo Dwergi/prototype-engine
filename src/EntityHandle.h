@@ -40,7 +40,7 @@ namespace dd
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( Handle );
 			METHOD( IsValid );
-		END_MEMBERS
+		END_TYPE
 
 	private: 
 	

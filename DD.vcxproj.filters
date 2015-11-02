@@ -345,6 +345,15 @@
     <ClInclude Include="include\glm\glm.hpp">
       <Filter>Includes\GLM</Filter>
     </ClInclude>
+    <ClInclude Include="src\MessageSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Message.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MessageTypes.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -536,6 +545,12 @@
     </ClCompile>
     <ClCompile Include="src\JobThread.cpp">
       <Filter>Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\MessageSystemTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

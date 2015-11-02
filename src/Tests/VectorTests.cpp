@@ -267,13 +267,13 @@ TEST_CASE( "[Vector] Reverse" )
 
 	a.Reverse();
 
-	for( int i = 31; i >= 0; --i )
+	for( int i = 0; i < 32; ++i )
 	{
-		REQUIRE( a[i] == i );
+		REQUIRE( a[i] == (32 - i - 1) );
 	}
 
 	// odd-sized
-	a.Push( 32 );
+	a.Insert( 32, 0 );
 
 	a.Reverse();
 

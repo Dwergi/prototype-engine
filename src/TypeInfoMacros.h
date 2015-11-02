@@ -9,6 +9,8 @@
 
 #include "RemoveQualifiers.h"
 
+#define UNREFERENCED(P) (P)
+
 // Introspection macros
 #define REGISTER_TYPE( TypeName ) \
 	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
@@ -34,17 +36,23 @@
 #define GET_TYPE_STR( NameString ) \
 	dd::TypeInfo::GetType( NameString )
 
-#define BEGIN_MEMBERS( TypeName ) \
-	static void RegisterMembers() { TypeName instance; dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
+#define BEGIN_TYPE( TypeName ) \
+	static void RegisterMembers() { TypeName instance; UNREFERENCED( instance ); dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter<TypeName> m_refCount; \
-	BEGIN_MEMBERS( TypeName ) \
+	BEGIN_TYPE( TypeName ) \
 	typeInfo->RegisterScriptObject<TypeName>( #TypeName );
 
 #define BEGIN_SCRIPT_STRUCT( TypeName ) \
-	BEGIN_MEMBERS( TypeName ) \
+	BEGIN_TYPE( TypeName ) \
 	typeInfo->RegisterScriptStruct<TypeName>( #TypeName );
+
+#define SET_PARENT( TypeName, ParentType ) \
+	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType( GET_TYPE( ParentType ) )
+
+#define PARENT( ParentType ) \
+	typeInfo->RegisterParentType( GET_TYPE( ParentType ) )
 
 #define MEMBER( MemberName ) \
 	typeInfo->RegisterMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
@@ -52,9 +60,9 @@
 #define METHOD( MethodName ) \
 	typeInfo->RegisterMethod( FUNCTION( MethodName ), &MethodName, #MethodName )
 
-#define END_MEMBERS }
+#define END_TYPE }
 
-#define NO_MEMBERS( TypeName ) \
+#define BASIC_TYPE( TypeName ) \
 	static void RegisterMembers() {}
 
 #define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
