@@ -354,6 +354,15 @@
     <ClInclude Include="src\MessageTypes.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="src\Octree2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AABB.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundingVolumeHierarchy.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -550,6 +559,15 @@
       <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\MessageSystemTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AABB.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Octree2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\Octree2Tests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>

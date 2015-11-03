@@ -43,17 +43,17 @@ namespace dd
 		//
 		// Get the <count> nearest entries to the given handle.
 		// 
-		void GetKNearest( const Octree::Entry& entry, uint count, dd::Vector<Octree::Entry>& output );
+		void GetKNearest( const Octree::Entry& entry, uint count, Vector<Octree::Entry>& output );
 
 		//
 		// Get all the entries within <range> of the given handle.
 		//
-		void GetWithinRange( const Octree::Entry& entry, float range, dd::Vector<Octree::Entry>& output );
+		void GetWithinRange( const Octree::Entry& entry, float range, Vector<Octree::Entry>& output );
 
 		//
 		// Get all the entries within the given (axis-aligned) bounding box.
 		//
-		void GetWithinBounds( const BoundingBox& bounds, dd::Vector<Octree::Entry>& output );
+		void GetWithinBounds( const BoundingBox& bounds, Vector<Octree::Entry>& output );
 
 		// 
 		// Validate that the octree is well-formed.
@@ -63,7 +63,7 @@ namespace dd
 		//
 		// Get the position associated with the given entry.
 		//
-		const dd::Vector4& GetPosition( const Octree::Entry& entry ) const;
+		const Vector4& GetPosition( const Octree::Entry& entry ) const;
 	
 		//
 		// Gets the number of entries in the tree.
@@ -131,7 +131,7 @@ namespace dd
 			Vector4 Position;
 			float Size;
 			CellRef Children[ 8 ];
-			dd::Vector<Octree::Entry> Data;
+			Vector<Octree::Entry> Data;
 
 			Cell( const Vector4& pos, float size );
 			Cell( const Cell& other );
@@ -148,16 +148,16 @@ namespace dd
 		};
 
 		// Map of entry IDs to positions.
-		dd::DenseMap<Entry, Vector4> m_entries;
+		DenseMap<Entry, Vector4> m_entries;
 
 		// List of all existing cells.
-		dd::Vector<Octree::Cell> m_cells;
+		Vector<Octree::Cell> m_cells;
 
 		// The root cell.
 		CellRef m_root;
 	
 		// List of free cells.
-		dd::Vector<int> m_free;
+		Vector<int> m_free;
 
 		// The last created ID.
 		int m_lastID;

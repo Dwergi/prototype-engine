@@ -274,6 +274,8 @@
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
+    <ClInclude Include="src\AABB.h" />
+    <ClInclude Include="src\BoundingVolumeHierarchy.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
@@ -306,6 +308,7 @@
     <ClInclude Include="src\MessageSystem.h" />
     <ClInclude Include="src\MessageTypes.h" />
     <ClInclude Include="src\Octree.h" />
+    <ClInclude Include="src\Octree2.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PrecompiledHeader.h" />
@@ -392,6 +395,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <None Include="src\Array.inl" />
@@ -417,6 +421,7 @@
     <ClCompile Include="src\Member.cpp" />
     <ClCompile Include="src\MessageSystem.cpp" />
     <ClCompile Include="src\Octree.cpp" />
+    <ClCompile Include="src\Octree2.cpp" />
     <ClCompile Include="src\PP_Assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -446,6 +451,7 @@
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
     <ClCompile Include="src\Tests\MessageSystemTests.cpp" />
+    <ClCompile Include="src\Tests\Octree2Tests.cpp" />
     <ClCompile Include="src\Tests\OctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
     <ClCompile Include="src\Tests\RandomTests.cpp" />
