@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Component.h"
-#include "Octree.h"
+#include "AABBOctree.h"
 #include "UnorderedMapPool.h"
 
 namespace dd
@@ -17,12 +17,13 @@ namespace dd
 	public:
 		typedef UnorderedMapPool<OctreeComponent> Pool;
 
-		Octree::Entry Entry;
+		OctreeEntry Entry;
 
 		OctreeComponent() {}
 
 		BEGIN_TYPE( OctreeComponent )
 			PARENT( Component );
+			MEMBER( Entry );
 		END_TYPE
 	};
 }

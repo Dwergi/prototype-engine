@@ -17,7 +17,7 @@ Buffer<T>::Buffer( T* ptr, uint size )
 	: m_ptr( ptr ),
 	m_size( size )
 {
-
+	
 }
 
 template <typename T>
@@ -52,6 +52,8 @@ Buffer<T>& Buffer<T>::operator=( const Buffer<T>& other )
 template <typename T>
 void Buffer<T>::Set( T* ptr, uint size )
 {
+	ASSERT( m_ptr == nullptr, "Overwriting a Buffer pointer! Call Release first." );
+
 	m_ptr = ptr;
 	m_size = size;
 }
@@ -69,21 +71,22 @@ Buffer<T>::operator T*() const
 }
 
 template <typename T>
-T& Buffer<T>::operator []( uint index ) const
+T* Buffer<T>::Release()
+{
+	T* ptr = m_ptr;
+
+	m_ptr = nullptr;
+	m_size = 0;
+
+	return ptr;
+}
+
+template <typename T>
+T& Buffer<T>::operator[]( uint index ) const
 {
 	ASSERT( index < m_size );
 
 	return m_ptr[ index ];
-}
-
-template <typename T>
-T* Buffer<T>::Release()
-{
-	T* ptr = m_ptr;
-	m_size = 0;
-	m_ptr = nullptr;
-
-	return ptr;
 }
 
 template <typename T>

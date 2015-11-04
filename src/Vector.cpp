@@ -10,7 +10,7 @@
 namespace dd
 {
 
-	const float VectorBase::GrowthFactor = 2.0f;
+	const float VectorBase::GrowthFactor = 1.7f;
 	const uint VectorBase::GrowthFudge = 8;
 
 	VectorBase::VectorBase()

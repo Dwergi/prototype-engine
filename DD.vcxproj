@@ -307,8 +307,7 @@
     <ClInclude Include="src\Message.h" />
     <ClInclude Include="src\MessageSystem.h" />
     <ClInclude Include="src\MessageTypes.h" />
-    <ClInclude Include="src\Octree.h" />
-    <ClInclude Include="src\Octree2.h" />
+    <ClInclude Include="src\AABBOctree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\Plane.h" />
     <ClInclude Include="src\PP_Assert.h" />
@@ -421,8 +420,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />
     <ClCompile Include="src\MessageSystem.cpp" />
-    <ClCompile Include="src\Octree.cpp" />
-    <ClCompile Include="src\Octree2.cpp" />
+    <ClCompile Include="src\AABBOctree.cpp" />
     <ClCompile Include="src\Plane.cpp" />
     <ClCompile Include="src\PP_Assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -453,8 +451,7 @@
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
     <ClCompile Include="src\Tests\MessageSystemTests.cpp" />
-    <ClCompile Include="src\Tests\Octree2Tests.cpp" />
-    <ClCompile Include="src\Tests\OctreeTests.cpp" />
+    <ClCompile Include="src\Tests\AABBOctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
     <ClCompile Include="src\Tests\RandomTests.cpp" />
     <ClCompile Include="src\Tests\RecorderTests.cpp" />

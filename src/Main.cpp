@@ -15,6 +15,7 @@
 
 #endif
 
+#include "AABB.h"
 #include "DebugUI.h"
 #include "DoubleBuffer.h"
 #include "EntitySystem.h"
@@ -185,7 +186,7 @@ int GameMain()
 	Random32 rngPos( 0, 100, 50 );
 	Random32 rngVelocity( 0, 100 );
 
-	Octree octree;
+	AABBOctree octree;
 
 	// create a bunch of entities and components
 	for( int i = 0; i < 1000; ++i )
@@ -200,7 +201,9 @@ int GameMain()
 		swarm_cmp->Velocity = Vector4( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
 		transform_cmp->Position = Vector4( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
 
-		octree_cmp->Entry = octree.Add( transform_cmp->Position );
+		AABB aabb;
+		aabb.Expand( glm::vec3( transform_cmp->Position.X, transform_cmp->Position.Y, transform_cmp->Position.Z ) );
+		octree_cmp->Entry = octree.Add( aabb );
 	}
 
 	// copy them over

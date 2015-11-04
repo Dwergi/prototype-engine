@@ -4,15 +4,16 @@
 // September 3rd 2015
 //
 
-const int MAX_COUNT = 2048;
+// A temporary buffer for copying containers around.
+const int BUFFER_SIZE = 1 * 1024 * 1024;
+static __declspec(thread) char s_buffer[BUFFER_SIZE];
 
 template<typename T>
 void CopyRange( const T* src, T* dest, uint count )
 {
-	ASSERT( count <= MAX_COUNT );
+	ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
 
-	static __declspec(thread) char buffer[sizeof(T) * MAX_COUNT];
-	T* temp = (T*) buffer;
+	T* temp = reinterpret_cast<T*>(s_buffer);
 
 	for( uint i = 0; i < count; ++i )
 	{
@@ -30,7 +31,7 @@ void ConstructRange( T* src, uint count )
 {
 	for( uint i = 0; i < count; ++i )
 	{
-		new (&src[ i ]) T();
+		new (&src[i]) T();
 	}
 }
 
@@ -50,10 +51,9 @@ void MoveRange( const T* src, T* dest, uint count )
 	ASSERT( src != nullptr && dest != nullptr );
 	ASSERT( src != dest );
 
-	ASSERT( count <= MAX_COUNT );
+	ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
 
-	static __declspec(thread) char buffer[sizeof( T ) * MAX_COUNT];
-	T* temp = (T*) buffer;
+	T* temp = reinterpret_cast<T*>(s_buffer);
 
 	for( uint i = 0; i < count; ++i )
 	{

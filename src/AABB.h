@@ -25,6 +25,9 @@ namespace dd
 		void GetCorners( glm::vec3 (&corners)[8] ) const;
 		glm::vec3 Extents() const;
 
+		bool operator==( const AABB& other ) const;
+		bool operator!=( const AABB& other ) const;
+
 		glm::vec3 Min;
 		glm::vec3 Max;
 	};

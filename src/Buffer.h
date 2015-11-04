@@ -1,5 +1,6 @@
 //
-// Buffer.h - A wrapper around a buffer. Just holds a pointer and a size.
+// Buffer.h - A wrapper around a buffer. Just holds a pointer and a size. 
+// Is stupid and won't clean up for you.
 // Copyright (C) Sebastian Nordgren 
 // September 10th 2015
 //

@@ -1,5 +1,5 @@
 //
-// Octree2.h - A better octree implementation, hopefully?
+// AABBOctree.h - An octree for storing AABB's. Each AABB may be present in multiple nodes.
 // Copyright (C) Sebastian Nordgren 
 // November 2nd 2015
 //
@@ -15,11 +15,11 @@ namespace dd
 	// an octree entry is a handle that defines the entry, which is used to remove data from the tree
 	typedef int OctreeEntry;
 
-	class Octree2
+	class AABBOctree
 	{
 	public:
-		Octree2();
-		~Octree2();
+		AABBOctree();
+		~AABBOctree();
 
 		//
 		// Add an entry to the octree. Returns a handle for removing it in the future.
@@ -41,7 +41,7 @@ namespace dd
 		//
 		bool IsValid( OctreeEntry entry ) const;
 
-		uint GetAllContaining( const glm::vec3& pt, Vector<AABB>& outResults ) const;
+		uint GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
 
 		const AABB& GetBounds() const { return m_treeBounds; }
 		uint GetNodeCount() const { return m_nodes.Size(); }
@@ -71,12 +71,12 @@ namespace dd
 		NodeHandle GetRoot() const;
 
 		NodeHandle CreateNode();
-		void CreateChildrenFor( NodeHandle handle, const AABB& bounds );
-		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds );
-		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds );
+		void CreateChildrenFor( NodeHandle handle, const AABB& bounds, uint depth );
+		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds, uint depth );
+		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds, uint depth );
 		
 		void Rebuild();
 
-		void GetIntersecting( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<AABB>& outResults ) const;
+		void GetIntersecting( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
 	};
 }

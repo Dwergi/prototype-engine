@@ -75,4 +75,14 @@ namespace dd
 	{
 		return Max - Min;
 	}
+
+	bool AABB::operator==( const AABB& other ) const
+	{
+		return Min == other.Min && Max == other.Max;
+	}
+
+	bool AABB::operator!=( const AABB& other ) const
+	{
+		return !operator==( other );
+	}
 }

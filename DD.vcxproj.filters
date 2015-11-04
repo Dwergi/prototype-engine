@@ -111,9 +111,6 @@
     <ClInclude Include="src\PrecompiledHeader.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Octree.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\ScopedTimer.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -354,9 +351,6 @@
     <ClInclude Include="src\MessageTypes.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\Octree2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\AABB.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -364,6 +358,9 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AABBOctree.h">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
@@ -379,9 +376,6 @@
     </ClCompile>
     <ClCompile Include="src\Recorder.cpp">
       <Filter>Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Octree.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\PrecompiledHeader.cpp">
@@ -406,9 +400,6 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\RecorderTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\OctreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\ScopedTimer.cpp">
@@ -567,13 +558,13 @@
     <ClCompile Include="src\AABB.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Octree2.cpp">
+    <ClCompile Include="src\Plane.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\Octree2Tests.cpp">
+    <ClCompile Include="src\Tests\AABBOctreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plane.cpp">
+    <ClCompile Include="src\AABBOctree.cpp">
       <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>

@@ -28,6 +28,9 @@ namespace dd
 			char* buf = m_buffer.Release();
 			delete[] buf;
 		}
+
+		m_buffer.Release();
+		m_stack.Release();
 	}
 
 	const char* String::c_str() const
@@ -216,6 +219,7 @@ namespace dd
 			{
 				void* ptr = m_buffer.Release();
 				delete[] ptr;
+
 				m_buffer = m_stack;
 			}
 
