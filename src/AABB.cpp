@@ -70,4 +70,9 @@ namespace dd
 	{
 		return (Min + Max) * 0.5f;
 	}
+
+	glm::vec3 AABB::Extents() const
+	{
+		return Max - Min;
+	}
 }

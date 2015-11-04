@@ -310,6 +310,7 @@
     <ClInclude Include="src\Octree.h" />
     <ClInclude Include="src\Octree2.h" />
     <ClInclude Include="src\OctreeComponent.h" />
+    <ClInclude Include="src\Plane.h" />
     <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PrecompiledHeader.h" />
     <ClInclude Include="src\Profiler.h" />
@@ -422,6 +423,7 @@
     <ClCompile Include="src\MessageSystem.cpp" />
     <ClCompile Include="src\Octree.cpp" />
     <ClCompile Include="src\Octree2.cpp" />
+    <ClCompile Include="src\Plane.cpp" />
     <ClCompile Include="src\PP_Assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

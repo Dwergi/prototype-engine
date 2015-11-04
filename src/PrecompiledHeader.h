@@ -14,6 +14,8 @@
 // min & max, mostly
 #include <algorithm>
 
+#define GLM_SWIZZLE 1
+
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 

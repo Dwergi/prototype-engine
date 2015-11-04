@@ -31,6 +31,30 @@ TEST_CASE( "[Octree2] Add" )
 		REQUIRE( octree.GetBounds().Contains( new_entry ) );
 		REQUIRE( octree.GetEntryCount() == i + 1 );
 	}
+	
+	for( int i = 0; i < 128; ++i )
+	{
+		octree.Remove( OctreeEntry( i ) );
 
-	uint nodes = octree.GetNodeCount();
+		REQUIRE( octree.GetEntryCount() == 256 - (i + 1) );
+	}
+
+	for( int i = 0; i < 128; ++i )
+	{
+		AABB new_entry;
+		new_entry.Min = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
+		new_entry.Max = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
+		entries.Add( octree.Add( new_entry ) );
+
+		REQUIRE( octree.GetEntryCount() == 128 + i + 1 );
+	}
+
+	Vector<AABB> results;
+
+	for( uint i = 0; i < entries.Size(); ++i )
+	{
+		glm::vec3 pt( rng.Next(), rng.Next(), rng.Next() );
+
+		octree.GetAllContaining( pt, results );
+	}
 }

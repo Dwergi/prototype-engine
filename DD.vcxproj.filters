@@ -363,6 +363,9 @@
     <ClInclude Include="src\BoundingVolumeHierarchy.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -569,6 +572,9 @@
     </ClCompile>
     <ClCompile Include="src\Tests\Octree2Tests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plane.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
