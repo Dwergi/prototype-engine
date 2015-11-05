@@ -323,6 +323,7 @@
     <ClInclude Include="src\ScriptEngine.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\Serializers.h" />
+    <ClInclude Include="src\SharedString.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\Stream.h" />
@@ -442,6 +443,7 @@
     <ClCompile Include="src\Script.cpp" />
     <ClCompile Include="src\ScriptEngine.cpp" />
     <ClCompile Include="src\Serializers.cpp" />
+    <ClCompile Include="src\SharedString.cpp" />
     <ClCompile Include="src\Stream.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
     <ClCompile Include="src\SwarmAgentComponent.cpp" />

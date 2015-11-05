@@ -6,13 +6,9 @@
 
 #pragma once
 
-#include <string>
-
-typedef unsigned long long uint64;
-
 namespace dd
 {
-	uint64 HashBytes( const uint8* data, uint64 size );
+	uint64 HashBytes( const byte* data, uint64 size );
 
 	template< typename T >
 	inline uint64 Hash( const T& value )
@@ -20,8 +16,13 @@ namespace dd
 		return HashBytes( (const byte*)((const void*) &value), sizeof( T ) );
 	}
 
+	inline uint64 HashString( const char* data, uint64 size )
+	{
+		return HashBytes( (const byte*) data, size );
+	}
+
 	template<>
-	inline uint64 Hash( const dd::String32& value )
+	inline uint64 Hash( const dd::String& value )
 	{
 		return HashBytes( (const uint8*) value.c_str(), value.Length() );
 	}

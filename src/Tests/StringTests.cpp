@@ -7,6 +7,9 @@
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 
+#include "String_dd.h"
+#include "SharedString.h"
+
 TEST_CASE( "[String] Create" )
 {
 	dd::String32 str;
@@ -127,4 +130,99 @@ TEST_CASE( "[String] Shrink To Fit" )
 	
 	REQUIRE( start == "01234" );
 	REQUIRE( !start.IsOnHeap() );
+}
+
+TEST_CASE( "[SharedString] Create" )
+{
+	const char* test = "A test string.";
+
+	dd::SharedString str( test );
+}
+
+TEST_CASE( "[SharedString] Copy" )
+{
+	const char* test = "A test string.";
+
+	dd::SharedString str( test );
+
+	dd::SharedString str2( str );
+
+	REQUIRE( str.c_str() == str2.c_str() );
+
+	str.Clear();
+
+	REQUIRE( str2 == test );
+}
+
+TEST_CASE( "[SharedString] Mixed Scopes" )
+{
+	const char* test = "A test string.";
+
+	dd::SharedString str1( test );
+
+	{
+		dd::SharedString str2( test );
+
+		{
+			dd::SharedString str3( str2 );
+
+			REQUIRE( str3.c_str() == str1.c_str() );
+			REQUIRE( str3.c_str() == str2.c_str() );
+
+			dd::SharedString str4 = str1;
+			str3.Clear();
+
+			REQUIRE( str4.c_str() == str2.c_str() );
+		}
+
+		dd::SharedString str5 = str1;
+
+		REQUIRE( str2.c_str() == str1.c_str() );
+	}
+
+	REQUIRE( str1 == test );
+}
+
+TEST_CASE( "[SharedString] Usage Count" )
+{
+	const char* test = "A test string.";
+	const char* test2 = "TheSecondTestString";
+
+	dd::Vector<dd::SharedString> strings;
+
+	SECTION( "Assignment" )
+	{
+		for( int i = 0; i < 64; ++i )
+		{
+			dd::SharedString& str = strings.Allocate();
+			str = test;
+
+			REQUIRE( str.UseCount() == i + 1 );
+		}
+	}
+	
+	dd::Vector<dd::SharedString> other_strings;
+
+	SECTION( "Move Constructor" )
+	{
+		for( int i = 0; i < 64; ++i )
+		{
+			other_strings.Allocate( dd::SharedString( test2 ) );
+
+			REQUIRE( other_strings[i].UseCount() == i + 1 );
+		}
+
+		dd::Vector<dd::SharedString> third_strings;
+
+		SECTION( "Copy Constructor" )
+		{
+			for( int i = 0; i < 64; ++i )
+			{
+				dd::SharedString str( test2 );
+				third_strings.Add( str );
+
+				REQUIRE( str.UseCount() == 64 + i + 2 );
+			}
+		}
+	}
 }
