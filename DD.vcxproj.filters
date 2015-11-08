@@ -177,9 +177,6 @@
     <ClInclude Include="src\String_dd.h">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Containers.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Exception.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -285,9 +282,6 @@
     <ClInclude Include="src\UnorderedMapPool.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
-    <ClInclude Include="src\UnsortedVectorPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
     <ClInclude Include="src\ComponentPairIterator.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
@@ -354,9 +348,6 @@
     <ClInclude Include="src\AABB.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\BoundingVolumeHierarchy.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\Plane.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -365,6 +356,9 @@
     </ClInclude>
     <ClInclude Include="src\SharedString.h">
       <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DLL.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

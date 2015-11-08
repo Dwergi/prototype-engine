@@ -143,7 +143,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;DD_EXPORT</PreprocessorDefinitions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
@@ -186,7 +186,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
-      <PreprocessorDefinitions>_NDEBUG;_RELEASE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_NDEBUG;_RELEASE;DD_EXPORT</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -226,7 +226,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_TEST</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_TEST;DD_EXPORT</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\assimp\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
@@ -275,7 +275,6 @@
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
     <ClInclude Include="src\AABB.h" />
-    <ClInclude Include="src\BoundingVolumeHierarchy.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
@@ -285,9 +284,9 @@
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
-    <ClInclude Include="src\Containers.h" />
     <ClInclude Include="src\DebugConsole.h" />
     <ClInclude Include="src\DebugUI.h" />
+    <ClInclude Include="src\DLL.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\Function.h" />
@@ -338,7 +337,6 @@
     <ClInclude Include="src\TypeInfoHelpers.h" />
     <ClInclude Include="src\TypeInfoMacros.h" />
     <ClInclude Include="src\UnorderedMapPool.h" />
-    <ClInclude Include="src\UnsortedVectorPool.h" />
     <ClInclude Include="src\DenseVectorPool.h" />
     <ClInclude Include="src\EntityHandle.h" />
     <ClInclude Include="src\EntitySystem.h" />

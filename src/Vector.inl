@@ -4,6 +4,8 @@
 // August 6th 2015
 //
 
+#include "ContainerHelpers.h"
+
 namespace dd
 {
 	template<typename T>

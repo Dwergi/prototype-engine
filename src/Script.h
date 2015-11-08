@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "SharedString.h"
+
 namespace dd
 {
 	class Script
@@ -13,11 +15,12 @@ namespace dd
 	public:
 
 		Script();
+		Script( const Script& other );
 		Script( const char* script );
 		~Script();
 
 	private:
 
-		String256 m_text;
+		SharedString m_text;
 	};
 }

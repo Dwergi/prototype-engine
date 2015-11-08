@@ -41,10 +41,30 @@ namespace dd
 		//
 		bool IsValid( OctreeEntry entry ) const;
 
+		//
+		// Get all entries containing the given point. Returns the number of entries found for convenience.
+		//
 		uint GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
 
+		//
+		// Get all entries that intersect with the given bounds.
+		//
+		uint GetAllIntersecting( const AABB& bounds, Vector<OctreeEntry>& outResults ) const;
+
+		//
+		// Get the bounds of the tree.
+		//
 		const AABB& GetBounds() const { return m_treeBounds; }
+
+		// 
+		// Get the internal node count of the tree.
+		// Really just a diagnostic.
+		// 
 		uint GetNodeCount() const { return m_nodes.Size(); }
+
+		//
+		// Get the number of entries in this tree.
+		//
 		uint GetEntryCount() const { return m_entries.Size() - m_free.Size(); }
 
 	private:
@@ -54,7 +74,7 @@ namespace dd
 		struct Node
 		{
 			NodeHandle m_children;
-			Vector<OctreeEntry> m_entries;
+			Vector<OctreeEntry> m_data;
 
 			Node();
 		};
@@ -66,17 +86,19 @@ namespace dd
 
 		bool IsFull( NodeHandle node ) const;
 		bool HasChildren( NodeHandle handle ) const;
+		NodeHandle GetRoot() const;
 		NodeHandle GetChild( NodeHandle handle, uint index ) const;
 		Node* GetNodePtr( NodeHandle handle ) const;
-		NodeHandle GetRoot() const;
-
+		
 		NodeHandle CreateNode();
+		
 		void CreateChildrenFor( NodeHandle handle, const AABB& bounds, uint depth );
 		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds, uint depth );
 		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds, uint depth );
 		
 		void Rebuild();
 
-		void GetIntersecting( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
+		void GetContaining( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
+		void GetIntersecting( const AABB& bounds, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
 	};
 }

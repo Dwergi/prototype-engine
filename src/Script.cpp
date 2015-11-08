@@ -14,7 +14,14 @@ namespace dd
 
 	}
 
+	Script::Script( const Script& other )
+		: m_text( other.m_text )
+	{
+
+	}
+
 	Script::Script( const char* script )
+		: m_text( script )
 	{
 
 	}

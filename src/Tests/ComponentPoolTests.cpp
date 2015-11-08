@@ -4,7 +4,6 @@
 
 #include "ComponentPoolTestComponent.h"
 #include "SortedVectorPool.h"
-#include "UnsortedVectorPool.h"
 #include "UnorderedMapPool.h"
 #include "DenseVectorPool.h"
 
@@ -68,11 +67,6 @@ void TestPool()
 TEST_CASE( "Unordered Map Pool" )
 {
 	TestPool<dd::UnorderedMapPool<TestComponent>>();
-}
-
-TEST_CASE( "Unsorted Vector Pool" )
-{
-	TestPool<dd::UnsortedVectorPool<TestComponent>>();
 }
 
 TEST_CASE( "Dense Vector Pool" )
