@@ -101,7 +101,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 	}
 }
 
-TEST_CASE( "[AABBOctree] GetContaining" )
+TEST_CASE( "[AABBOctree] GetIntersecting" )
 {
 	std::swap( octree, AABBOctree() );
 

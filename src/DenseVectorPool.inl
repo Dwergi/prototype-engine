@@ -7,6 +7,29 @@
 namespace dd
 {
 	template <typename T>
+	bool DenseVectorPool<T>::IsValid( uint id ) const
+	{
+		char c = m_valid[id / (sizeof( char ) * 8)];
+
+		int index = id % (sizeof( char ) * 8);
+
+		return (c >> index) & 1;
+	}
+
+	template <typename T>
+	void DenseVectorPool<T>::SetValid( uint id, bool value )
+	{
+		char& c = m_valid[id / (sizeof( char ) * 8)];
+
+		int index = id % (sizeof( char ) * 8);
+
+		if( value )
+			c |= (1 << index);
+		else
+			c &= ~(1 << index);
+	}
+
+	template <typename T>
 	DenseVectorPool<T>::DenseVectorPool()
 	{
 
@@ -22,16 +45,16 @@ namespace dd
 	void DenseVectorPool<T>::Clear()
 	{
 		std::swap( m_components, Vector<T>() );
-		std::swap( m_valid, Vector<bool>() );
+		std::swap( m_valid, Vector<char>() );
 	}
 
 	template <typename T>
 	uint DenseVectorPool<T>::Size() const
 	{
 		uint count = 0;
-		for( bool valid : m_valid )
+		for( uint i = 0; i < m_components.Size(); ++i )
 		{
-			if( valid )
+			if( IsValid( i ) )
 				++count;
 		}
 
@@ -48,18 +71,19 @@ namespace dd
 			return nullptr;
 		}
 
-		if( entity.ID < 0 || entity.ID >= (int) m_components.Size() )
+		if( entity.ID >= (int) m_components.Size() )
 		{
 			m_components.Resize( entity.ID + 1 );
-			m_valid.Resize( entity.ID + 1 );
+
+			m_valid.Resize( (entity.ID / (sizeof( char ) * 8) ) + 1 );
 		}
 
-		m_valid[entity.ID] = true;
+		SetValid( entity.ID, true );
 
 		T* cmp = new (&m_components[entity.ID]) T();
 		return cmp;
 	}
-	
+
 	template <typename T>
 	T* DenseVectorPool<T>::Find( const EntityHandle& entity ) const
 	{
@@ -76,24 +100,24 @@ namespace dd
 	template <typename T>
 	void DenseVectorPool<T>::Remove( const EntityHandle& entity )
 	{
-		if( entity.ID < 0 || entity.ID >= (int) m_valid.Size() )
+		if( entity.ID >= (int) m_components.Size() )
 		{
 			ASSERT( false, "Entity ID outside of valid range!" );
 			return;
 		}
 
 		m_components[entity.ID].~T();
-		m_valid[entity.ID] = false;
+
+		SetValid( entity.ID, false );
 	}
 
 	template <typename T>
 	bool DenseVectorPool<T>::Exists( const EntityHandle& entity ) const
 	{
-		if( entity.ID < 0 || entity.ID >= (int) m_valid.Size() )
+		if( entity.ID >= (int) m_components.Size() )
 			return false;
 
-		bool isValid = m_valid[entity.ID];
-		return isValid;
+		return IsValid( entity.ID );
 	}
 
 	template <typename T>

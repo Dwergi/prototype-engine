@@ -593,9 +593,6 @@
     <None Include="src\SortedVectorPool.inl">
       <Filter>Components\Pools</Filter>
     </None>
-    <None Include="src\UnsortedVectorPool.inl">
-      <Filter>Components\Pools</Filter>
-    </None>
     <None Include="src\ScriptEngine.inl">
       <Filter>Script</Filter>
     </None>

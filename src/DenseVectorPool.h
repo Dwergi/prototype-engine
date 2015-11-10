@@ -65,7 +65,10 @@ namespace dd
 	private:
 
 		Vector<T> m_components;
-		Vector<bool> m_valid;
+		Vector<char> m_valid; // this is actually a bitmap
+
+		bool IsValid( uint id ) const;
+		void SetValid( uint id, bool value );
 	};
 }
 

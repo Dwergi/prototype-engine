@@ -475,7 +475,6 @@
     <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\UnorderedMapPool.inl" />
-    <None Include="src\UnsortedVectorPool.inl" />
     <None Include="src\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
