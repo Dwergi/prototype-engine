@@ -1,0 +1,63 @@
+Determining if the system is big endian passed with the following output:
+Change Dir: W:/testing/DD/include/magnum/corrade/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTC_74b93.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
+Microsoft (R) Build Engine version 14.0.23107.0
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 15/11/2015 15:54:02.
+Project "W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\cmTC_74b93.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_74b93.dir\Debug\".
+  Creating directory "W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_74b93.dir\Debug\cmTC_74b93.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_74b93.dir\Debug\cmTC_74b93.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_74b93.dir\Debug\\" /Fd"cmTC_74b93.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\TestEndianess.c
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.00.23026 for x64
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_74b93.dir\Debug\\" /Fd"cmTC_74b93.dir\Debug\vc140.pdb" /Gd /TC /errorReport:queue W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\TestEndianess.c
+  
+  TestEndianess.c
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:QUEUE /OUT:"W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\Debug\cmTC_74b93.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"W:/testing/DD/include/magnum/corrade/CMakeFiles/CMakeTmp/Debug/cmTC_74b93.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"W:/testing/DD/include/magnum/corrade/CMakeFiles/CMakeTmp/Debug/cmTC_74b93.lib" /MACHINE:X64  /machine:x64 /debug cmTC_74b93.dir\Debug\TestEndianess.obj
+  cmTC_74b93.vcxproj -> W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\Debug\cmTC_74b93.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_74b93.dir\Debug\cmTC_74b93.tlog\unsuccessfulbuild".
+  Touching "cmTC_74b93.dir\Debug\cmTC_74b93.tlog\cmTC_74b93.lastbuildstate".
+Done Building Project "W:\testing\DD\include\magnum\corrade\CMakeFiles\CMakeTmp\cmTC_74b93.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.67
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+

@@ -269,7 +269,6 @@
     <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
     <ClInclude Include="include\glm\fwd.hpp" />
     <ClInclude Include="include\glm\glm.hpp" />
-    <ClInclude Include="include\json.h\json.h" />
     <ClInclude Include="include\pcg\pcg_extras.hpp" />
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
@@ -336,7 +335,7 @@
     <ClInclude Include="src\TypeInfo.h" />
     <ClInclude Include="src\TypeInfoHelpers.h" />
     <ClInclude Include="src\TypeInfoMacros.h" />
-    <ClInclude Include="src\UnorderedMapPool.h" />
+    <ClInclude Include="src\DenseMapPool.h" />
     <ClInclude Include="src\DenseVectorPool.h" />
     <ClInclude Include="src\EntityHandle.h" />
     <ClInclude Include="src\EntitySystem.h" />
@@ -383,11 +382,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="include\json.h\json.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="include\Remotery\lib\Remotery.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -469,12 +463,13 @@
     <ClCompile Include="src\Vector.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <None Include="src\DenseMap.inl" />
     <None Include="src\DenseVectorPool.inl" />
     <None Include="src\Recorder.inl" />
     <None Include="src\ScriptEngine.inl" />
     <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
-    <None Include="src\UnorderedMapPool.inl" />
+    <None Include="src\DenseMapPool.inl" />
     <None Include="src\Vector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

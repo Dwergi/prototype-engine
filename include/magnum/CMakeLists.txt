@@ -1,0 +1,245 @@
+#
+#   This file is part of Magnum.
+#
+#   Copyright © 2010, 2011, 2012, 2013, 2014, 2015
+#             Vladimír Vondruš <mosra@centrum.cz>
+#
+#   Permission is hereby granted, free of charge, to any person obtaining a
+#   copy of this software and associated documentation files (the "Software"),
+#   to deal in the Software without restriction, including without limitation
+#   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#   and/or sell copies of the Software, and to permit persons to whom the
+#   Software is furnished to do so, subject to the following conditions:
+#
+#   The above copyright notice and this permission notice shall be included
+#   in all copies or substantial portions of the Software.
+#
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+#   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#   DEALINGS IN THE SOFTWARE.
+#
+
+cmake_minimum_required(VERSION 2.8.9)
+project(Magnum)
+
+# Find Corrade first so we can check on the target
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
+find_package(Corrade REQUIRED)
+
+include(CMakeDependentOption)
+
+# If targeting Android, NaCl, Emscripten or Windows RT, set explicit OpenGL ES
+# support
+if(NOT CORRADE_TARGET_ANDROID AND NOT CORRADE_TARGET_EMSCRIPTEN AND NOT CORRADE_TARGET_NACL AND NOT CORRADE_TARGET_WINDOWS_RT)
+    option(TARGET_GLES "Build for OpenGL ES / WebGL" OFF)
+else()
+    set(TARGET_GLES ON)
+endif()
+
+cmake_dependent_option(TARGET_GLES2 "Build for OpenGL ES 2 / WebGL 1.0" ON "TARGET_GLES" OFF)
+cmake_dependent_option(TARGET_DESKTOP_GLES "Build for OpenGL ES on desktop" OFF "TARGET_GLES" OFF)
+
+# Parts of the library
+option(WITH_AUDIO "Build Audio library" OFF)
+option(WITH_DEBUGTOOLS "Build DebugTools library" ON)
+cmake_dependent_option(WITH_MESHTOOLS "Build MeshTools library" ON "NOT WITH_DEBUGTOOLS;NOT WITH_OBJIMPORTER" ON)
+cmake_dependent_option(WITH_PRIMITIVES "Builf Primitives library" ON "NOT WITH_DEBUGTOOLS" ON)
+cmake_dependent_option(WITH_SCENEGRAPH "Build SceneGraph library" ON "NOT WITH_DEBUGTOOLS;NOT WITH_SHAPES" ON)
+cmake_dependent_option(WITH_SHADERS "Build Shaders library" ON "NOT WITH_DEBUGTOOLS" ON)
+cmake_dependent_option(WITH_SHAPES "Build Shapes library" ON "NOT WITH_DEBUGTOOLS" ON)
+option(WITH_TEXT "Build Text library" ON)
+cmake_dependent_option(WITH_TEXTURETOOLS "Build TextureTools library" ON "NOT WITH_TEXT;NOT WITH_DISTANCEFIELDCONVERTER" ON)
+
+# EGL context, available everywhere except on platforms which don't support extension loading
+if(NOT CORRADE_TARGET_EMSCRIPTEN AND NOT CORRADE_TARGET_NACL)
+    option(WITH_EGLCONTEXT "Build EglContext library" OFF)
+endif()
+
+# NaCl-specific application libraries
+if(CORRADE_TARGET_NACL)
+    option(WITH_NACLAPPLICATION "Build NaClApplication library" OFF)
+    cmake_dependent_option(WITH_WINDOWLESSNACLAPPLICATION "Build WindowlessNaClApplication library" OFF "NOT WITH_MAGNUMINFO" ON)
+
+# Android-specific application libraries
+elseif(CORRADE_TARGET_ANDROID)
+    option(WITH_ANDROIDAPPLICATION "Build AndroidApplication library" OFF)
+
+# OS X-specific application libraries
+elseif(CORRADE_TARGET_APPLE)
+    cmake_dependent_option(WITH_WINDOWLESSCGLAPPLICATION "Build WindowlessCglApplication library" OFF "NOT WITH_MAGNUMINFO;NOT WITH_FONTCONVERTER;NOT WITH_DISTANCEFIELDCONVERTER" ON)
+    option(WITH_CGLCONTEXT "Build CglContext library" OFF)
+
+# X11 + GLX/EGL-specific application libraries
+elseif(CORRADE_TARGET_UNIX)
+    option(WITH_GLXAPPLICATION "Build GlxApplication library" OFF)
+    cmake_dependent_option(WITH_WINDOWLESSGLXAPPLICATION "Build WindowlessGlxApplication library" OFF "NOT WITH_MAGNUMINFO;NOT WITH_FONTCONVERTER;NOT WITH_DISTANCEFIELDCONVERTER" ON)
+    option(WITH_XEGLAPPLICATION "Build XEglApplication library" OFF)
+    option(WITH_GLXCONTEXT "Build GlxContext library" OFF)
+
+# Windows-specific application libraries
+elseif(CORRADE_TARGET_WINDOWS)
+    if(NOT TARGET_GLES)
+        cmake_dependent_option(WITH_WINDOWLESSWGLAPPLICATION "Build WindowlessWglApplication library" OFF "NOT WITH_MAGNUMINFO;NOT WITH_FONTCONVERTER;NOT WITH_DISTANCEFIELDCONVERTER" ON)
+        option(WITH_WGLCONTEXT "Build WglContext library" OFF)
+    else()
+        cmake_dependent_option(WITH_WINDOWLESSWINDOWSEGLAPPLICATION "Build WindowlessWindowsEglApplication library" OFF "NOT WITH_MAGNUMINFO;NOT WITH_FONTCONVERTER;NOT WITH_DISTANCEFIELDCONVERTER" ON)
+    endif()
+endif()
+
+# Platform-independent (almost) application libraries
+if(NOT CORRADE_TARGET_NACL AND NOT CORRADE_TARGET_ANDROID)
+    cmake_dependent_option(WITH_GLUTAPPLICATION "Build GlutApplication library" OFF "NOT TARGET_GLES" OFF)
+    option(WITH_SDL2APPLICATION "Build Sdl2Application library" OFF)
+endif()
+
+# Magnum Info (currently only using GLX, CGL, WGL/EGL on Windows or on NaCl)
+if(CORRADE_TARGET_UNIX OR CORRADE_TARGET_NACL OR CORRADE_TARGET_WINDOWS)
+    option(WITH_MAGNUMINFO "Build magnum-info utility" OFF)
+endif()
+
+# Utilities (currently only using GLX, CGL or WGL)
+if(CORRADE_TARGET_UNIX OR CORRADE_TARGET_WINDOWS)
+    cmake_dependent_option(WITH_FONTCONVERTER "Build magnum-fontconverter utility" OFF "NOT TARGET_GLES" OFF)
+    cmake_dependent_option(WITH_DISTANCEFIELDCONVERTER "Build magnum-distancefieldconverter utility" OFF "NOT TARGET_GLES" OFF)
+endif()
+
+# Plugins
+cmake_dependent_option(WITH_MAGNUMFONT "Build MagnumFont plugin" OFF "WITH_TEXT" OFF)
+cmake_dependent_option(WITH_MAGNUMFONTCONVERTER "Build MagnumFontConverter plugin" OFF "NOT MAGNUM_TARGET_GLES;WITH_TEXT" OFF)
+option(WITH_OBJIMPORTER "Build ObjImporter plugin" OFF)
+cmake_dependent_option(WITH_TGAIMAGECONVERTER "Build TgaImageConverter plugin" OFF "NOT WITH_MAGNUMFONTCONVERTER" ON)
+cmake_dependent_option(WITH_TGAIMPORTER "Build TgaImporter plugin" OFF "NOT WITH_MAGNUMFONT" ON)
+cmake_dependent_option(WITH_WAVAUDIOIMPORTER "Build WavAudioImporter plugin" OFF "WITH_AUDIO" OFF)
+
+option(BUILD_DEPRECATED "Include deprecated API in the build" ON)
+if(BUILD_DEPRECATED)
+    set(MAGNUM_BUILD_DEPRECATED 1)
+endif()
+
+option(BUILD_STATIC "Build static libraries (default are shared)" OFF)
+option(BUILD_STATIC_PIC "Build static libraries and plugins with position-independent code" OFF)
+option(BUILD_PLUGINS_STATIC "Build static plugins (default are dynamic)" OFF)
+option(BUILD_TESTS "Build unit tests." OFF)
+cmake_dependent_option(BUILD_GL_TESTS "Build unit tests for OpenGL code." OFF "BUILD_TESTS" OFF)
+if(BUILD_TESTS)
+    enable_testing()
+endif()
+
+# Check compiler compatibility
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
+    message(FATAL_ERROR "Compatibility branch of Magnum is needed for use with GCC < 4.7. See the documentation for more information.")
+elseif(MSVC)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.0")
+        message(FATAL_ERROR "Compatibility branch of Magnum is needed for use with MSVC < 2015. See the documentation for more information.")
+    endif()
+endif()
+
+# If targeting NaCl, set explicit OpenGL ES 2.0 support. For Android and
+# Emscripten the decision between ES 2.0 / WebGL 1.0 and ES 3.0 / WebGL 2.0
+# must be done by the user.
+if(CORRADE_TARGET_NACL)
+    set(TARGET_GLES2 ON)
+endif()
+
+# NaCl newlib toolchain supports only static linking, dynamic linking is
+# meaningless on Emscripten and too inconvenient on Android
+if(CORRADE_TARGET_NACL_NEWLIB OR CORRADE_TARGET_EMSCRIPTEN OR CORRADE_TARGET_ANDROID)
+    set(BUILD_STATIC ON)
+    set(BUILD_PLUGINS_STATIC ON)
+endif()
+
+if(BUILD_STATIC)
+    set(MAGNUM_BUILD_STATIC 1)
+endif()
+
+# Check dependencies
+if(NOT TARGET_GLES OR TARGET_DESKTOP_GLES)
+    find_package(OpenGL REQUIRED)
+elseif(TARGET_GLES2)
+    find_package(OpenGLES2 REQUIRED)
+else()
+    find_package(OpenGLES3 REQUIRED)
+endif()
+
+# Configuration variables (saved later to configure.h)
+if(TARGET_GLES)
+    set(MAGNUM_TARGET_GLES 1)
+    if(TARGET_GLES2)
+        set(MAGNUM_TARGET_GLES2 1)
+    else()
+        set(MAGNUM_TARGET_GLES3 1)
+    endif()
+endif()
+if(CORRADE_TARGET_EMSCRIPTEN)
+    set(TARGET_WEBGL 1)
+    set(MAGNUM_TARGET_WEBGL 1)
+endif()
+if(TARGET_DESKTOP_GLES)
+    set(MAGNUM_TARGET_DESKTOP_GLES 1)
+endif()
+
+if(BUILD_GL_TESTS)
+    if(CORRADE_TARGET_APPLE)
+        set(WITH_WINDOWLESSCGLAPPLICATION ON)
+        set(GL_TEST_LIBRARIES Magnum MagnumWindowlessCglApplication)
+    elseif(CORRADE_TARGET_UNIX AND (NOT MAGNUM_TARGET_GLES OR MAGNUM_TARGET_DESKTOP_GLES))
+        set(WITH_WINDOWLESSGLXAPPLICATION ON)
+        set(GL_TEST_LIBRARIES Magnum MagnumWindowlessGlxApplication)
+    elseif(CORRADE_TARGET_WINDOWS)
+        if(NOT MAGNUM_TARGET_GLES OR MAGNUM_TARGET_DESKTOP_GLES)
+            set(WITH_WINDOWLESSWGLAPPLICATION ON)
+            set(GL_TEST_LIBRARIES Magnum MagnumWindowlessWglApplication)
+        else()
+            set(WITH_WINDOWLESSWINDOWSEGLAPPLICATION ON)
+            set(GL_TEST_LIBRARIES Magnum MagnumWindowlessWindowsEglApplication)
+        endif()
+    else()
+        message(FATAL_ERROR "Cannot run tests for OpenGL code on this platform. Set BUILD_GL_TESTS to OFF to skip building them.")
+    endif()
+endif()
+
+if(NOT BUILD_STATIC)
+    set(SHARED_OR_STATIC SHARED)
+else()
+    set(SHARED_OR_STATIC STATIC)
+endif()
+
+# Installation paths
+include(${CORRADE_LIB_SUFFIX_MODULE})
+set(MAGNUM_BINARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+set(MAGNUM_LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+set(MAGNUM_DATA_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/share/magnum)
+set(MAGNUM_CMAKE_MODULE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/share/cmake/Magnum)
+set(MAGNUM_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/Magnum)
+set(MAGNUM_EXTERNAL_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/MagnumExternal)
+set(MAGNUM_PLUGINS_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/MagnumPlugins)
+
+# Separate install dirs for debug and release plugins
+set(MAGNUM_PLUGINS_DEBUG_INSTALL_DIR ${MAGNUM_LIBRARY_INSTALL_DIR}/magnum-d)
+set(MAGNUM_PLUGINS_RELEASE_INSTALL_DIR ${MAGNUM_LIBRARY_INSTALL_DIR}/magnum)
+
+# Plugin installation dirs based on wheter we are in debug or release build,
+# needed by some command-line tools
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(MAGNUM_PLUGINS_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR})
+else()
+    set(MAGNUM_PLUGINS_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR})
+endif()
+
+set(MAGNUM_PLUGINS_FONT_DEBUG_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR}/fonts)
+set(MAGNUM_PLUGINS_FONT_RELEASE_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR}/fonts)
+set(MAGNUM_PLUGINS_FONTCONVERTER_DEBUG_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR}/fontconverters)
+set(MAGNUM_PLUGINS_FONTCONVERTER_RELEASE_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR}/fontconverters)
+set(MAGNUM_PLUGINS_IMAGECONVERTER_DEBUG_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR}/imageconverters)
+set(MAGNUM_PLUGINS_IMAGECONVERTER_RELEASE_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR}/imageconverters)
+set(MAGNUM_PLUGINS_IMPORTER_DEBUG_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR}/importers)
+set(MAGNUM_PLUGINS_IMPORTER_RELEASE_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR}/importers)
+set(MAGNUM_PLUGINS_AUDIOIMPORTER_DEBUG_INSTALL_DIR ${MAGNUM_PLUGINS_DEBUG_INSTALL_DIR}/audioimporters)
+set(MAGNUM_PLUGINS_AUDIOIMPORTER_RELEASE_INSTALL_DIR ${MAGNUM_PLUGINS_RELEASE_INSTALL_DIR}/audioimporters)
+
+add_subdirectory(modules)
+add_subdirectory(src)

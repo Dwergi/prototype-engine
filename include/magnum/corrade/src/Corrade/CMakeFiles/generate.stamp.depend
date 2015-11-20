@@ -1,0 +1,4 @@
+# CMake generation dependency list for this directory.
+W:/testing/DD/include/magnum/corrade/src/Corrade/CMakeLists.txt
+C:/Program Files (x86)/CMake/share/cmake-3.3/Modules/TestBigEndian.cmake
+W:/testing/DD/include/magnum/corrade/src/Corrade/configure.h.cmake

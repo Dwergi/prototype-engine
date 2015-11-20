@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\ConfigurationValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\MurmurHash2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Sha1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Arguments.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\AbstractHash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\ConfigurationGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\ConfigurationValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Directory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Endianness.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\MurmurHash2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Sha1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\TypeTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\VisibilityMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\visibility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6595738A-0677-42E2-873F-4F9C15E3E211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{D8B30417-D8D7-4DF1-BBC0-B0074ECC6AC2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

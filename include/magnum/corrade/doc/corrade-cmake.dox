@@ -1,0 +1,173 @@
+/*
+    This file is part of Corrade.
+
+    Copyright © 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015
+              Vladimír Vondruš <mosra@centrum.cz>
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+namespace Corrade {
+/** @page corrade-cmake Usage with CMake
+@brief Guide how to find and use Corrade with CMake build system
+
+Corrade uses CMake build system for both building and integration into your
+projects. The logic is in module `FindCorrade.cmake` distributed with the
+library in `modules/` directory, you are encouraged to copy it into your
+project and add path to the file to `CMAKE_MODULE_PATH`. Otherwise, if CMake
+won't be able to find this file in predefined locations, it will error out even
+if Corrade might be installed on the system.
+
+Note that the module file is updated as the library evolves, you are encouraged
+to update your copy from time to time to avoid strange building issues.
+
+If you installed the library to non-standard location (other than `/usr`, e.g.
+`/home/xyz/projects`), set `CMAKE_PREFIX_PATH` to that directory to help CMake
+find it.
+
+Basic usage is:
+
+    find_package(Corrade REQUIRED)
+
+This module tries to find Corrade library and then defines these variables:
+
+-   `CORRADE_FOUND` -- True if Corrade is found
+-   `CORRADE_INCLUDE_DIR` -- Root include dir
+-   `CORRADE_INTERCONNECT_LIBRARIES` -- @ref Interconnect library and dependent
+    libraries
+-   `CORRADE_UTILITY_LIBRARIES` -- @ref Utility library and dependent libraries
+-   `CORRADE_PLUGINMANAGER_LIBRARIES` -- @ref PluginManager library and
+    dependent libraries
+-   `CORRADE_TESTSUITE_LIBRARIES` -- @ref TestSuite library and dependent
+    libraries
+-   `CORRADE_RC_EXECUTABLE` -- Resource compiler executable
+-   `CORRADE_LIB_SUFFIX_MODULE` -- Path to `CorradeLibSuffix.cmake` module,
+    which tries to autodetect value of `LIB_SUFFIX` variable.
+
+The package is found if either debug or release version of each library is
+found. If both debug and release libraries are found, proper version is chosen
+based on actual build configuration of the project (i.e. `Debug` build is
+linked to debug libraries, `Release` build to release libraries).
+
+On multi-configuration build systems (such as Visual Studio or XCode) the
+preprocessor variable `CORRADE_IS_DEBUG_BUILD` is defined if given build
+configuration is `Debug` (not Corrade itself, but build configuration of the
+project using it). Useful e.g. for selecting proper plugin directory. On
+single-configuration build systems (such as Makefiles) this information is not
+needed and thus the variable is not defined in any case.
+
+Corrade configures the compiler to use C++11 standard (if it is not already
+configured to do so). Additionally you can use `CORRADE_CXX_FLAGS` to enable
+additional pedantic set of warnings and enable hidden visibility by default.
+
+Features of found Corrade library are exposed in these variables, they are
+also available as preprocessor variables if you include
+@ref Corrade/Corrade.h "Corrade/Corrade.h":
+
+-   `CORRADE_GCC47_COMPATIBILITY` -- Defined if compiled with compatibility
+    mode for GCC 4.7
+-   `CORRADE_MSVC2015_COMPATIBILITY` -- Defined if compiled with compatibility
+    mode for MSVC 2015
+-   `CORRADE_BUILD_DEPRECATED` -- Defined if compiled with deprecated APIs
+    included
+-   `CORRADE_BUILD_STATIC` -- Defined if compiled as static libraries. Default
+    are shared libraries.
+-   `CORRADE_TARGET_UNIX` -- Defined if compiled for some Unix flavor (Linux,
+    BSD, OS X)
+-   `CORRADE_TARGET_APPLE` -- Defined if compiled for OS X
+-   `CORRADE_TARGET_WINDOWS` -- Defined if compiled for Windows
+-   `CORRADE_TARGET_WINDOWS_RT` -- Defined if compiled for Windows RT
+-   `CORRADE_TARGET_NACL` -- Defined if compiled for Google Chrome Native
+    Client
+-   `CORRADE_TARGET_NACL_NEWLIB` -- Defined if compiled for Google Chrome
+    Native Client with `newlib` toolchain
+-   `CORRADE_TARGET_NACL_GLIBC` -- Defined if compiled for Google Chrome Native
+    Client with `glibc` toolchain
+-   `CORRADE_TARGET_EMSCRIPTEN` -- Defined if compiled for Emscripten
+-   `CORRADE_TARGET_ANDROID` -- Defined if compiled for Android
+
+Note that [each namespace](namespaces.html) contains more detailed guide how to
+use given library with CMake.
+
+Corrade provides these macros and functions:
+
+### Add unit test using Corrade's TestSuite
+@anchor corrade-cmake-add-test
+
+    corrade_add_test(test_name
+                     sources...
+                     [LIBRARIES libraries...])
+
+Test name is also executable name. You can also specify libraries to link with
+instead of using target_link_libraries(). `CORRADE_TESTSUITE_LIBRARIES` are
+linked automatically to each test. Note that the `enable_testing()` function
+must be called explicitly.
+
+### Compile data resources into application binary
+@anchor corrade-cmake-add-resource
+
+    corrade_add_resource(name resources.conf)
+
+Depends on corrade-rc, which is part of Corrade utilities. This command
+generates resource data using given configuration file in current build
+directory. Argument name is name under which the resources can be explicitly
+loaded. Variable `name` contains compiled resource filename, which is then
+used for compiling library / executable. Example usage:
+
+    corrade_add_resource(app_resources resources.conf)
+    add_executable(app source1 source2 ... ${app_resources})
+
+### Add dynamic plugin
+@anchor corrade-cmake-add-plugin
+
+    corrade_add_plugin(plugin_name debug_install_dir release_install_dir
+                       metadata_file sources...)
+
+The macro adds preprocessor directive `CORRADE_DYNAMIC_PLUGIN`. Additional
+libraries can be linked in via `target_link_libraries(plugin_name ...)`. If
+`debug_install_dir` is set to `CMAKE_CURRENT_BINARY_DIR` (e.g. for testing purposes),
+the files are copied directly, without the need to perform install step. Note
+that the files are actually put into configuration-based subdirectory, i.e.
+`${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}`. See documentation of
+`CMAKE_CFG_INTDIR` variable for more information.
+
+### Add static plugin
+@anchor corrade-cmake-add-static-plugin
+
+    corrade_add_static_plugin(plugin_name install_dir metadata_file
+                              sources...)
+
+The macro adds preprocessor directive `CORRADE_STATIC_PLUGIN`. Additional
+libraries can be linked in via `target_link_libraries(plugin_name ...)`. If
+`install_dir` is set to `CMAKE_CURRENT_BINARY_DIR` (e.g. for testing purposes),
+no installation rules are added.
+@attention Plugins built in debug configuration (e.g. with `CMAKE_BUILD_TYPE`
+    set to `Debug`) have `-d` suffix to make it possible to have both debug and
+    release plugins installed alongside each other.
+
+### Find corresponding DLLs for library files
+@anchor corrade-find-dlls-for-libs
+
+    corrade_find_dlls_for_libs(<VAR> libs...)
+
+Available only on Windows, for all `*.lib` files tries to find corresponding
+DLL file. Useful for bundling dependencies for e.g. WinRT packages.
+
+*/
+}

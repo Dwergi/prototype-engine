@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Arguments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\ConfigurationGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\Unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\Debug.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\Directory.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\Configuration.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\ConfigurationValue.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\MurmurHash2.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\Sha1.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\String.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="W:\testing\DD\include\magnum\corrade\src\Corrade\Utility\CorradeUtilityObjects.dir\$(Configuration)\utilities.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6595738A-0677-42E2-873F-4F9C15E3E211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Files">
+      <UniqueIdentifier>{6CA70607-2977-43D9-8C20-FD9736B83C02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{CB24BCFF-1727-44DF-BA78-7447C076E98F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

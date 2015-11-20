@@ -61,9 +61,6 @@
     <Filter Include="Includes\PCG">
       <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\JSON">
-      <UniqueIdentifier>{ceaa887e-31b6-4693-8e62-b73768dce76e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\PP Assert">
       <UniqueIdentifier>{16d20338-1fa4-4afd-8d42-1e4b198a3d3f}</UniqueIdentifier>
     </Filter>
@@ -279,9 +276,6 @@
     <ClInclude Include="src\SortedVectorPool.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
-    <ClInclude Include="src\UnorderedMapPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
     <ClInclude Include="src\ComponentPairIterator.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
@@ -305,9 +299,6 @@
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_uint128.hpp">
       <Filter>Includes\PCG</Filter>
-    </ClInclude>
-    <ClInclude Include="include\json.h\json.h">
-      <Filter>Includes\JSON</Filter>
     </ClInclude>
     <ClInclude Include="src\PP_Assert.h">
       <Filter>Includes\PP Assert</Filter>
@@ -359,6 +350,9 @@
     </ClInclude>
     <ClInclude Include="src\DLL.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DenseMapPool.h">
+      <Filter>Components\Pools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -528,9 +522,6 @@
     <ClCompile Include="src\Script.cpp">
       <Filter>Script</Filter>
     </ClCompile>
-    <ClCompile Include="include\json.h\json.c">
-      <Filter>Includes\JSON</Filter>
-    </ClCompile>
     <ClCompile Include="src\PP_Assert.cpp">
       <Filter>Includes\PP Assert</Filter>
     </ClCompile>
@@ -587,14 +578,17 @@
     <None Include="src\DenseVectorPool.inl">
       <Filter>Components\Pools</Filter>
     </None>
-    <None Include="src\UnorderedMapPool.inl">
-      <Filter>Components\Pools</Filter>
-    </None>
     <None Include="src\SortedVectorPool.inl">
       <Filter>Components\Pools</Filter>
     </None>
     <None Include="src\ScriptEngine.inl">
       <Filter>Script</Filter>
+    </None>
+    <None Include="src\DenseMap.inl">
+      <Filter>Containers</Filter>
+    </None>
+    <None Include="src\DenseMapPool.inl">
+      <Filter>Components\Pools</Filter>
     </None>
   </ItemGroup>
 </Project>

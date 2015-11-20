@@ -1,0 +1,204 @@
+/*
+    This file is part of Magnum.
+
+    Copyright © 2010, 2011, 2012, 2013, 2014, 2015
+              Vladimír Vondruš <mosra@centrum.cz>
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+namespace Magnum {
+/** @page types Type system
+@brief Type aliases, naming and compatibility with OpenGL and GLSL types.
+
+-   Previous page: @ref platform
+-   Next page: @ref matrix-vector
+
+The root @ref Magnum namespace defines a few aliases for essential types. See
+its documentation for more information about usage with CMake.
+
+@tableofcontents
+
+@section types-builtin Builtin types
+
+Magnum provides typedefs for builtin integral and floating-point arithmetic
+types to ensure portability (e.g. @ref Int is *always* 32bit), maintain
+consistency and reduce confusion (e.g. `std::int32_t`, `int` and `GLint` all
+refer to the same type).
+
+| Magnum type        | Size           | Equivalent GLSL type |
+| ------------------ | -------------- | -------------------- |
+| @ref UnsignedByte  | 8bit unsigned  |                      |
+| @ref Byte          | 8bit signed    |                      |
+| @ref UnsignedShort | 16bit unsigned |                      |
+| @ref Short         | 16bit signed   |                      |
+| @ref UnsignedInt   | 32bit unsigned | `uint`               |
+| @ref Int           | 32bit signed   | `int`                |
+| @ref UnsignedLong  | 64bit unsigned |                      |
+| @ref Long          | 64bit signed   |                      |
+| @ref Float         | 32bit          | `float`              |
+| @ref Double        | 64bit          | `double`             |
+
+Types not meant to be used in arithmetic (such as `bool` or `std::size_t`) or
+types which cannot be directly passed to GLSL shaders (such as `long double`)
+have no typedefs.
+
+Types from the above table are then used to define other types. All following
+types are aliases of corresponding types in @ref Math namespace. No suffix
+after type name means @ref Float underlying type, `ui` means @ref UnsignedInt
+underlying type, `i` is @ref Int underlying type and `d` is for @ref Double
+underlying type.
+
+@section types-matrix Matrix/vector types
+
+| Magnum vector type                             | Equivalent GLSL type      |
+| ---------------------------------------------- | ------------------------- |
+| @ref Vector2, @ref Vector3, @ref Vector4       | `vec2`, `vec3`, `vec4`    |
+| @ref Vector2ui, @ref Vector3ui, @ref Vector4ui | `uvec2`, `uvec3`, `uvec4` |
+| @ref Vector2i, @ref Vector3i, @ref Vector4i    | `ivec2`, `ivec3`, `ivec4` |
+| @ref Vector2d, @ref Vector3d, @ref Vector4d    | `dvec2`, `dvec3`, `dvec4` |
+
+| Magnum matrix type                                               | Equivalent GLSL type                 |
+| ---------------------------------------------------------------- | ------------------------------------ |
+| @ref Matrix2x2 or @ref Matrix2x2d                                | `mat2`/`mat2x2` or `dmat2`/`dmat2x2` |
+| @ref Matrix3 / @ref Matrix3x3 or @ref Matrix3d / @ref Matrix3x3d | `mat3`/`mat3x3` or `dmat3`/`dmat3x3` |
+| @ref Matrix4 / @ref Matrix4x4 or @ref Matrix4d / @ref Matrix4x4d | `mat4`/`mat4x4` or `dmat4`/`dmat4x4` |
+| @ref Matrix2x3 or @ref Matrix2x3d                                | `mat2x3` or `dmat2x3`                |
+| @ref Matrix3x2 or @ref Matrix3x2d                                | `mat3x2` or `dmat3x2`                |
+| @ref Matrix2x4 or @ref Matrix2x4d                                | `mat2x4` or `dmat2x4`                |
+| @ref Matrix4x2 or @ref Matrix4x2d                                | `mat4x2` or `dmat4x2`                |
+| @ref Matrix3x4 or @ref Matrix3x4d                                | `mat3x4` or `dmat3x4`                |
+| @ref Matrix4x3 or @ref Matrix4x3d                                | `mat4x3` or `dmat4x3`                |
+
+Any super- or sub-class of the same size and underlying type can be used
+equivalently (e.g. @ref Math::Vector or @ref Color3 instead of @ref Vector3).
+
+@section types-binary Binary representation
+
+Scalar types with GLSL equivalent are verified to be exactly the same as
+corresponding `GL*` types. Matrix and vector classes have the same binary
+representation as corresponding array of numeric values without any additional
+data or padding (e.g. `sizeof(Vector3i) == sizeof(Int[3])`), all matrices are
+stored in column-major order.
+
+This means that all scalar, matrix and vector types can be used directly for
+filling GPU buffers and textures without any need for data extraction or
+conversion. For convenience all vector and matrix classes provide
+@ref Math::RectangularMatrix::data() "data()" function, which returns pointer
+to the internal data array.
+
+@section types-special Special types
+
+Magnum has special type for strongly-typed representation of angles, namely
+the @ref Deg and @ref Rad classes (or @ref Degd and @ref Radd with @ref Double
+as underlying type). Their only purpose is to avoid common degree-vs-radian
+bugs (i.e. entering degree value where radians should be) and make the
+conversion between these two representations easier. They are just a tiny
+`inline` `constexpr` wrapper around the native type and they support all
+meaningful numeric operations, so using them won't have any performance or
+usability impact in practice.
+
+These classes are *not* implicitly constructible or convertible from/to
+@ref Float or @ref Double, you have to either construct/convert them explicitly
+or use custom `_degf`/`_deg` and `_radf`/`_rad` literals:
+@code
+//Deg a = 60.0f         // error, no implicit conversion from Float
+Deg a = 60.0_degf;      // okay
+
+Float b = 3.2831853f;
+auto tau = Rad{b} + 3.0_radf;
+Radd pi = 3.141592653589793_rad;
+
+//Double c = pi;        // error, no implicit conversion to Double
+auto c = Double{pi};    // okay
+@endcode
+
+They can be implicitly converted to each other, but conversion to different
+underlying type is *explicit* to avoid precision loss (or, on the other hand,
+unnecessarily high precision) during computations:
+@code
+Rad d = 60.0_degf;      // 1.0471976f
+auto e = Degd{pi};      // 180.0
+
+//Rad f = pi;           // error, no implicit conversion of underlying types
+auto f = Rad{pi};       // 3.141592654f
+@endcode
+
+These classes are used exclusively in all functions taking and returning angles
+-- trigonometry, angle computation, rotating transformation etc. Thanks to
+implicit conversion you can seamlessly use either radians or degrees without
+any need to care about what input the function expects:
+@code
+Float a = Math::sin(1.32457_radf);
+Complex b = Complex::rotation(60.0_degf);
+@endcode
+
+@section types-other Other types
+
+Other types, which don't have their GLSL equivalent, are:
+
+-   @ref Complex or @ref Complexd, @ref DualComplex or @ref DualComplexd
+-   @ref Quaternion or @ref Quaterniond, @ref DualQuaternion or
+    @ref DualQuaterniond
+-   @ref Range1D / @ref Range2D / @ref Range3D, @ref Range1Di / @ref Range2Di /
+    @ref Range3Di or @ref Range1Dd / @ref Range2Dd / @ref Range3Dd
+
+These types can be used in GLSL either by extracting values from their
+underlying structure or converting them to types supported by GLSL (e.g.
+quaternion to matrix).
+
+For your convenience, there is also alias for class with often used constants
+-- @ref Constants or @ref Constantsd.
+
+@section types-initialization Initialization
+
+Vectors, general matrices and range types are by default zero-initialized,
+transformation types (square matrices, (dual) complex numbers and quaternions)
+are set to identity transformation. It is possible to initialize the instances
+differently using so-called *tags* or use the *tag* to make the choice appear
+explicit:
+
+-   @ref Math::ZeroInit zero-initializes the contents (works for all types).
+-   @ref Math::IdentityInit initializes the contents to identity transformation
+    (works only for transformation types, where it is also the default).
+-   @ref Math::NoInit leaves the contents uninitialized (useful if you will
+    overwrite the contents anyway, works for all types).
+
+Example:
+@code
+// These are equivalent
+Vector3 a1;
+Vector3 a1{Math::ZeroInit};
+
+// These too
+Quaternion q;
+Quaternion q{Math::IdentityInit};
+
+// Avoid unnecessary initialization if is overwritten anyway
+Matrix4 projection{Math::NoInit};
+if(orthographic)
+    projection = Matrix4::orthographicProjection(...);
+else
+    projection = Matrix4::perspectiveProjection(...);
+@endcode
+
+-   Previous page: @ref platform
+-   Next page: @ref matrix-vector
+*/
+}

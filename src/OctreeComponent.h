@@ -8,14 +8,14 @@
 
 #include "Component.h"
 #include "AABBOctree.h"
-#include "UnorderedMapPool.h"
+#include "DenseMapPool.h"
 
 namespace dd
 {
 	class OctreeComponent : public Component
 	{
 	public:
-		typedef UnorderedMapPool<OctreeComponent> Pool;
+		typedef DenseMapPool<OctreeComponent> Pool;
 
 		OctreeEntry Entry;
 

@@ -7,19 +7,19 @@
 #pragma once
 
 #include "Component.h"
-#include "UnorderedMapPool.h"
+#include "DenseMapPool.h"
 #include "Vector4.h"
 
 namespace dd
 {
-	class SwarmAgentComponent : public dd::Component
+	class SwarmAgentComponent : public Component
 	{
 	public:
 
-		typedef dd::UnorderedMapPool<SwarmAgentComponent> Pool;
+		typedef DenseMapPool<SwarmAgentComponent> Pool;
 
 		unsigned int ID;
-		dd::Vector4 Velocity;
+		Vector4 Velocity;
 
 		SwarmAgentComponent();
 		virtual ~SwarmAgentComponent();

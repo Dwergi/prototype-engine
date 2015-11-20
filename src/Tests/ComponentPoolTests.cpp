@@ -4,7 +4,7 @@
 
 #include "ComponentPoolTestComponent.h"
 #include "SortedVectorPool.h"
-#include "UnorderedMapPool.h"
+#include "DenseMapPool.h"
 #include "DenseVectorPool.h"
 
 struct TestComponent
@@ -66,7 +66,7 @@ void TestPool()
 
 TEST_CASE( "Unordered Map Pool" )
 {
-	TestPool<dd::UnorderedMapPool<TestComponent>>();
+	TestPool<dd::DenseMapPool<TestComponent>>();
 }
 
 TEST_CASE( "Dense Vector Pool" )

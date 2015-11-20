@@ -1,0 +1,12 @@
+W:/testing/DD/include/magnum/corrade/src/Corrade/CMakeFiles/Corrade.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/PluginManager/CMakeFiles/CorradePluginManager.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/Interconnect/CMakeFiles/CorradeInterconnect.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/Containers/CMakeFiles/CorradeContainers.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/Utility/CMakeFiles/CorradeUtilityObjects.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/TestSuite/CMakeFiles/CorradeTestSuite.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/PluginManager/CMakeFiles/CorradePluginManagerObjects.dir
+W:/testing/DD/include/magnum/corrade/CMakeFiles/ALL_BUILD.dir
+W:/testing/DD/include/magnum/corrade/CMakeFiles/ZERO_CHECK.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/Utility/CMakeFiles/corrade-rc.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/Utility/CMakeFiles/CorradeUtility.dir
+W:/testing/DD/include/magnum/corrade/src/Corrade/TestSuite/Compare/CMakeFiles/CorradeTestSuiteCompare.dir
