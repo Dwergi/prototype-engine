@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <includedir>
+        <dir name="include/"/>
+        <dir name="src/"/>
+        <dir name="include/gl3w/include/"/>
+        <dir name="include/glfw/include/"/>
+        <dir name="include/assimp/include/"/>
+    </includedir>
+    <defines>
+        <define name="_NDEBUG"/>
+        <define name="_RELEASE"/>
+        <define name="DD_EXPORT"/>
+    </defines>
+    <paths>
+        <dir name="W:/testing/DD/src"/>
+    </paths>
+</project>

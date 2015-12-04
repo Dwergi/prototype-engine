@@ -478,8 +478,8 @@ namespace implementation {
   }; // AssertUsedWrapper<int, T>
 
   template<int level, typename T>
-  PPK_ASSERT_ALWAYS_INLINE AssertUsedWrapper<level, T>::AssertUsedWrapper(const T& t)
-    : t(t), used(false)
+  PPK_ASSERT_ALWAYS_INLINE explicit AssertUsedWrapper<level, T>::AssertUsedWrapper(const T& _t)
+    : t(_t), used(false)
   {}
 
   template<int level, typename T>

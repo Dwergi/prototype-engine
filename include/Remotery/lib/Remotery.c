@@ -246,7 +246,7 @@ static void rmtFree( void* ptr )
 static rmtU32 msTimer_Get()
 {
     #ifdef RMT_PLATFORM_WINDOWS
-        return (rmtU32)GetTickCount();
+        return (rmtU32)GetTickCount64();
     #else
         clock_t time = clock();
         rmtU32 msTime = (rmtU32) (time / (CLOCKS_PER_SEC / 1000));

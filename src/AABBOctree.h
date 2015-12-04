@@ -89,14 +89,14 @@ namespace dd
 		NodeHandle GetRoot() const;
 		NodeHandle GetChild( NodeHandle handle, uint index ) const;
 		Node* GetNodePtr( NodeHandle handle ) const;
-		
+
 		NodeHandle CreateNode();
+
+		void Rebuild();
 		
 		void CreateChildrenFor( NodeHandle handle, const AABB& bounds, uint depth );
 		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds, uint depth );
 		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds, uint depth );
-		
-		void Rebuild();
 
 		void GetContaining( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
 		void GetIntersecting( const AABB& bounds, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;

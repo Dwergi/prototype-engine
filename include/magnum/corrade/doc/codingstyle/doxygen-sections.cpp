@@ -1,6 +1,0 @@
-/**
-...
-@section ConfigurationValue-basic-usage Basic usage
-...
-*/
-class ConfigurationValue {

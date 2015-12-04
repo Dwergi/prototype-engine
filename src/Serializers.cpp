@@ -327,6 +327,7 @@ namespace dd
 			{
 				char out[5];
 				src.Read( out, 4 );
+				out[4] = '\0';
 
 				if( strcmp( out, "true" ) )
 				{

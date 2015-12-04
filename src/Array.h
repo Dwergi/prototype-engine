@@ -59,6 +59,8 @@ namespace dd
 	private:
 
 		T m_buffer[ MaxCapacity ];
+
+		static_assert( sizeof( T ) * MaxCapacity < 16 * 1024, "Used more than 16K of stack size!" );
 	};
 }
 

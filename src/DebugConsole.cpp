@@ -479,9 +479,11 @@ namespace dd
 				// A better implementation would preserve the data on the current input line along with cursor position.
 				if( prev_history_pos != m_historyPos )
 				{
-					snprintf( data->Buf, data->BufSize, "%s", (m_historyPos >= 0) ? m_history[m_historyPos].c_str() : "" );
-					data->BufDirty = true;
-					data->CursorPos = data->SelectionStart = data->SelectionEnd = (int) strlen( data->Buf );
+					if( snprintf( data->Buf, data->BufSize, "%s", (m_historyPos >= 0) ? m_history[m_historyPos].c_str() : "" ) == 0 )
+					{
+						data->BufDirty = true;
+						data->CursorPos = data->SelectionStart = data->SelectionEnd = (int) strlen( data->Buf );
+					}
 				}
 			}
 		}

@@ -74,8 +74,9 @@ TEST_CASE( "[MessageSystem]" )
 
 		REQUIRE( Received == &msg );
 
-		TestMessage* received = (TestMessage*) Received;
+		TestMessage* received = static_cast<TestMessage*>( Received );
 
+		REQUIRE( received != nullptr );
 		REQUIRE( received->Payload == 50 );
 	}
 

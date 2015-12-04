@@ -81,7 +81,9 @@ namespace dd
 			char name[32] = "DD Jobs ";
 			char count[8];
 			_itoa_s( i + 1, count, 10 );
-			strcat_s( name, count );
+			count[7] = '\0';
+
+			strcat_s( name, count );			
 
 			DWORD threadId = ::GetThreadId( static_cast<HANDLE>( m_threads[i].native_handle() ) );
 			SetThreadName( threadId, name );
