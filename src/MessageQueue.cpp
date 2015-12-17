@@ -1,28 +1,32 @@
 //
-// MessageSystem.cpp - A pub/sub style messaging system.
+// MessageQueue.cpp - A pub/sub style messaging system.
 // Messages are queued up sequentially and processed during Update.
 // Copyright (C) Sebastian Nordgren 
 // November 2nd 2015
 //
 
 #include "PrecompiledHeader.h"
-#include "MessageSystem.h"
+#include "MessageQueue.h"
+
+#include <thread>
 
 namespace dd
 {
-	MessageSystem::MessageSystem()
+	MessageQueue::MessageQueue()
 		: m_nextHandlerID( 0 )
 	{
 
 	}
 
-	MessageSystem::~MessageSystem()
+	MessageQueue::~MessageQueue()
 	{
 
 	}
 
-	MessageSubscription MessageSystem::Subscribe( uint message_type, Function handler )
+	MessageSubscription MessageQueue::Subscribe( uint message_type, Function handler )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		const FunctionSignature* sig = handler.Signature();
 		const TypeInfo* arg = sig->GetArg( 0 );
 
@@ -47,8 +51,10 @@ namespace dd
 		return new_token;
 	}
 
-	void MessageSystem::Unsubscribe( MessageSubscription token )
+	void MessageQueue::Unsubscribe( MessageSubscription token )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		m_handlers.Remove( token.Handler );
 
 		Vector<HandlerID>* subs = m_subscribers.Find( token.MessageID );
@@ -66,12 +72,14 @@ namespace dd
 		}
 	}
 
-	void MessageSystem::Send( Message* message )
+	void MessageQueue::Send( Message* message )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		m_pendingMessages.Add( message );
 	}
 
-	void MessageSystem::Dispatch( Message* message ) const
+	void MessageQueue::Dispatch( Message* message ) const
 	{
 		Vector<HandlerID>* subs = m_subscribers.Find( message->Type );
 
@@ -88,8 +96,10 @@ namespace dd
 		}
 	}
 
-	void MessageSystem::Update( float dt )
+	void MessageQueue::Update( float dt )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		for( Message* message : m_pendingMessages )
 		{
 			Dispatch( message );
@@ -98,7 +108,7 @@ namespace dd
 		m_pendingMessages.Clear();
 	}
 
-	uint MessageSystem::GetSubscriberCount( uint message_type ) const
+	uint MessageQueue::GetSubscriberCount( uint message_type ) const
 	{
 		Vector<HandlerID>* subs = m_subscribers.Find( message_type );
 
@@ -108,7 +118,7 @@ namespace dd
 		return subs->Size();
 	}
 
-	uint MessageSystem::GetTotalSubscriberCount() const
+	uint MessageQueue::GetTotalSubscriberCount() const
 	{
 		return m_handlers.Size();
 	}

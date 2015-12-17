@@ -1,5 +1,5 @@
 //
-// MessageSystem.h - A pub/sub style messaging system.
+// MessageQueue.h - A pub/sub style messaging system.
 // Copyright (C) Sebastian Nordgren 
 // November 2nd 2015
 //
@@ -10,11 +10,13 @@
 #include "MessageTypes.h"
 #include "ISystem.h"
 
+#include <mutex>
+
 namespace dd
 {
 	struct MessageSubscription;
 
-	class MessageSystem : public ISystem
+	class MessageQueue : public ISystem
 	{
 	private:
 		typedef uint HandlerID;
@@ -22,8 +24,8 @@ namespace dd
 
 	public:
 
-		MessageSystem();
-		~MessageSystem();
+		MessageQueue();
+		~MessageQueue();
 
 		//
 		// Subscribe to a given message with the given handler.
@@ -52,6 +54,8 @@ namespace dd
 
 	private:
 
+		std::mutex m_mutex;
+
 		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
 		DenseMap<HandlerID, Function> m_handlers;
 		Vector<Message*> m_pendingMessages;
@@ -64,10 +68,9 @@ namespace dd
 	struct MessageSubscription
 	{
 	private:
-
 		uint MessageID;
 		uint Handler;
 
-		friend class MessageSystem;
+		friend class MessageQueue;
 	};
 }

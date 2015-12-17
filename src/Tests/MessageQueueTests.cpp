@@ -1,5 +1,5 @@
 //
-// MessageSystemTests.cpp - Tests for MessageSystem.
+// MessageQueueTests.cpp - Tests for MessageQueue.
 // Copyright (C) Sebastian Nordgren 
 // November 2nd 2015
 //
@@ -8,7 +8,7 @@
 
 #include "catch/catch.hpp"
 
-#include "MessageSystem.h"
+#include "MessageQueue.h"
 
 bool called = false;
 
@@ -42,7 +42,7 @@ TEST_CASE( "[MessageSystem]" )
 {
 	REGISTER_TYPE( TestMessage );
 
-	dd::MessageSystem system;
+	dd::MessageQueue system;
 	dd::Function f = FUNCTION( TestFunction );
 	Received = nullptr;
 

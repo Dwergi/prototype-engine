@@ -327,9 +327,6 @@
     <ClInclude Include="include\glm\glm.hpp">
       <Filter>Includes\GLM</Filter>
     </ClInclude>
-    <ClInclude Include="src\MessageSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\Message.h">
       <Filter>Systems</Filter>
     </ClInclude>
@@ -356,6 +353,12 @@
     </ClInclude>
     <ClInclude Include="src\ISystem.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MessageQueue.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RingBuffer.h">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -540,12 +543,6 @@
     <ClCompile Include="src\JobThread.cpp">
       <Filter>Jobs</Filter>
     </ClCompile>
-    <ClCompile Include="src\MessageSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\MessageSystemTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\AABB.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -560,6 +557,15 @@
     </ClCompile>
     <ClCompile Include="src\SharedString.cpp">
       <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\MessageQueueTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageQueue.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RingBufferTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -592,6 +598,9 @@
     </None>
     <None Include="src\DenseMapPool.inl">
       <Filter>Components\Pools</Filter>
+    </None>
+    <None Include="src\RingBuffer.inl">
+      <Filter>Containers</Filter>
     </None>
   </ItemGroup>
 </Project>

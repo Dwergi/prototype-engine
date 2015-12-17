@@ -8,7 +8,7 @@
 const int BUFFER_SIZE = 1 * 1024 * 1024;
 static __declspec(thread) char s_buffer[BUFFER_SIZE];
 
-template<typename T>
+template <typename T>
 void CopyRange( const T* src, T* dest, uint count )
 {
 	ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
@@ -26,7 +26,7 @@ void CopyRange( const T* src, T* dest, uint count )
 	}
 }
 
-template<typename T>
+template <typename T>
 void ConstructRange( T* src, uint count )
 {
 	for( uint i = 0; i < count; ++i )
@@ -35,7 +35,7 @@ void ConstructRange( T* src, uint count )
 	}
 }
 
-template<typename T>
+template <typename T>
 void DestroyRange( T* src, uint count )
 {
 	for( uint i = 0; i < count; ++i )
@@ -44,7 +44,7 @@ void DestroyRange( T* src, uint count )
 	}
 }
 
-template<typename T>
+template <typename T>
 void MoveRange( const T* src, T* dest, uint count )
 {
 	ASSERT( count > 0 );

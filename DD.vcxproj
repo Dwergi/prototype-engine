@@ -306,7 +306,7 @@
     <ClInclude Include="src\JSONSerializer.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Message.h" />
-    <ClInclude Include="src\MessageSystem.h" />
+    <ClInclude Include="src\MessageQueue.h" />
     <ClInclude Include="src\MessageTypes.h" />
     <ClInclude Include="src\AABBOctree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
@@ -319,6 +319,7 @@
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
     <ClInclude Include="src\ScriptEngine.h" />
@@ -415,7 +416,7 @@
     <ClCompile Include="src\JSONSerializer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />
-    <ClCompile Include="src\MessageSystem.cpp" />
+    <ClCompile Include="src\MessageQueue.cpp" />
     <ClCompile Include="src\AABBOctree.cpp" />
     <ClCompile Include="src\Plane.cpp" />
     <ClCompile Include="src\PP_Assert.cpp">
@@ -434,6 +435,7 @@
     <ClCompile Include="src\PropertyList.cpp" />
     <ClCompile Include="src\Recorder.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\RingBufferTests.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />
     <ClCompile Include="src\ScriptEngine.cpp" />
@@ -447,7 +449,7 @@
     <ClCompile Include="src\Tests\CommandLineTests.cpp" />
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
-    <ClCompile Include="src\Tests\MessageSystemTests.cpp" />
+    <ClCompile Include="src\Tests\MessageQueueTests.cpp" />
     <ClCompile Include="src\Tests\AABBOctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />
     <ClCompile Include="src\Tests\RandomTests.cpp" />
@@ -469,6 +471,7 @@
     <None Include="src\DenseMap.inl" />
     <None Include="src\DenseVectorPool.inl" />
     <None Include="src\Recorder.inl" />
+    <None Include="src\RingBuffer.inl" />
     <None Include="src\ScriptEngine.inl" />
     <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
