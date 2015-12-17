@@ -1,5 +1,6 @@
 //
 // MessageSystem.cpp - A pub/sub style messaging system.
+// Messages are queued up sequentially and processed during Update.
 // Copyright (C) Sebastian Nordgren 
 // November 2nd 2015
 //
@@ -52,30 +53,49 @@ namespace dd
 
 		Vector<HandlerID>* subs = m_subscribers.Find( token.MessageID );
 
+		if( subs == nullptr )
+			return;
+
 		for( uint i = 0; i < subs->Size(); ++i )
 		{
 			if( (*subs)[i] == token.Handler )
 			{
 				subs->Remove( i );
+				break;
 			}
 		}
 	}
 
 	void MessageSystem::Send( Message* message )
 	{
+		m_pendingMessages.Add( message );
+	}
+
+	void MessageSystem::Dispatch( Message* message ) const
+	{
 		Vector<HandlerID>* subs = m_subscribers.Find( message->Type );
 
 		if( subs == nullptr )
 			return;
 
-		for( uint i = 0; i < subs->Size(); ++i )
+		for( HandlerID handler : *subs )
 		{
-			Function* fn = m_handlers.Find( (*subs)[i] );
+			Function* fn = m_handlers.Find( handler );
 			if( fn != nullptr )
 			{
 				(*fn)(message);
 			}
 		}
+	}
+
+	void MessageSystem::Update( float dt )
+	{
+		for( Message* message : m_pendingMessages )
+		{
+			Dispatch( message );
+		}
+
+		m_pendingMessages.Clear();
 	}
 
 	uint MessageSystem::GetSubscriberCount( uint message_type ) const

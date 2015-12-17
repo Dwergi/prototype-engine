@@ -299,6 +299,7 @@
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\ISystem.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\JobSystem.h" />
     <ClInclude Include="src\JobThread.h" />

@@ -354,6 +354,9 @@
     <ClInclude Include="src\DenseMapPool.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
+    <ClInclude Include="src\ISystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">

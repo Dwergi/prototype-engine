@@ -71,6 +71,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 
@@ -89,6 +90,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
+		system.Update( 0 );
 
 		REQUIRE( Received == nullptr );
 	}
@@ -107,6 +109,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == &msg );
@@ -117,6 +120,7 @@ TEST_CASE( "[MessageSystem]" )
 		Received2 = nullptr;
 
 		system.Send( &msg );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == nullptr );

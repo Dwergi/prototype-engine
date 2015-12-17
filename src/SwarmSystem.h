@@ -8,16 +8,17 @@
 
 #include "SwarmAgentComponent.h"
 #include "DoubleBuffer.h"
+#include "ISystem.h"
 
 namespace dd
 {
-	class SwarmSystem
+	class SwarmSystem : public ISystem
 	{
 	public:
 		SwarmSystem( const DoubleBuffer<SwarmAgentComponent::Pool>& pool );
 		~SwarmSystem();
 
-		void Update( float dt );
+		virtual void Update( float dt ) override;
 
 		BASIC_TYPE( SwarmSystem )
 

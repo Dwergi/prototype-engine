@@ -8,12 +8,13 @@
 
 #include "Message.h"
 #include "MessageTypes.h"
+#include "ISystem.h"
 
 namespace dd
 {
 	struct MessageSubscription;
 
-	class MessageSystem
+	class MessageSystem : public ISystem
 	{
 	private:
 		typedef uint HandlerID;
@@ -40,6 +41,11 @@ namespace dd
 		//
 		void Send( Message* message );
 
+		//
+		// Actually send messages in order of arrival.
+		//
+		virtual void Update( float dt ) override;
+
 		uint GetSubscriberCount( uint message_type ) const;
 
 		uint GetTotalSubscriberCount() const;
@@ -48,8 +54,11 @@ namespace dd
 
 		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
 		DenseMap<HandlerID, Function> m_handlers;
+		Vector<Message*> m_pendingMessages;
 
 		HandlerID m_nextHandlerID;
+
+		void Dispatch( Message* message ) const;
 	};
 
 	struct MessageSubscription
