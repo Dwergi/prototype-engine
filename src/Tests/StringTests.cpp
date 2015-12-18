@@ -26,15 +26,15 @@ TEST_CASE( "[String] Create" )
 
 	REQUIRE( str == str2 );
 
-	dd::String32 str3 = "Test";
+	dd::String32 str3( "Test" );
 
 	REQUIRE( str2 == str3 );
 }
 
 TEST_CASE( "[String] Assign" )
 {
-	dd::String32 str = "Test";
-	dd::String32 str2 = str;
+	dd::String32 str( "Test" );
+	dd::String32 str2( str );
 
 	REQUIRE( str == str2 );
 	REQUIRE( str2 == "Test" );
@@ -45,7 +45,7 @@ TEST_CASE( "[String] Out of Scope" )
 {
 	dd::String32 outer;
 	{
-		dd::String32 inner = "Test";
+		dd::String32 inner( "Test" );
 
 		outer = inner;
 	}

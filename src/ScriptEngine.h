@@ -30,22 +30,20 @@ namespace dd
 		// Register a script object that is passed by reference exclusively.
 		// 
 		template <typename ObjType>
-		void RegisterObject( const String& className );
+		void RegisterObject( const char* className );
 
 		//
 		// Register a script object that is passed by value.
 		//
 		template <typename ObjType>
-		void RegisterStruct( const String& className );
+		void RegisterStruct( const char* className );
 
-		void RegisterMember( const String& className, const Member& member );
+		void RegisterMember( const char* className, const Member& member );
 
 		template <typename FnType>
-		void RegisterGlobalFunction( const String& name, const Function& function, FnType ptr, const char* explicit_sig = nullptr );
+		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr, const char* explicit_sig = nullptr );
 
-		void RegisterGlobalVariable( const String& name, const Variable& var );
-
-		bool IsObjectRegistered( const String& className );
+		void RegisterGlobalVariable( const char* name, const Variable& var );
 
 		bool Evaluate( const String& script, String& output );
 
@@ -57,9 +55,9 @@ namespace dd
 		asIScriptEngine* m_engine;
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
-		static String64 GetWithoutNamespace( const String& className );
+		static String64 GetWithoutNamespace( const char* className );
 
-		static String256 GetFunctionSignatureString( const String& name, const Function& fn );
+		static String256 GetFunctionSignatureString( const char* name, const Function& fn );
 	};
 	//---------------------------------------------------------------------------
 

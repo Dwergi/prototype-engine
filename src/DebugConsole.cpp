@@ -77,7 +77,7 @@ namespace dd
 
 			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
 			if( func->GetName()[0] != '_' )
-				commands.Add( func->GetName() );
+				commands.Add( String64( func->GetName() ) );
 		}
 
 		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
@@ -85,7 +85,7 @@ namespace dd
 			const char* name;
 			int res = engine->GetGlobalPropertyByIndex( i, &name );
 			if( res >= 0 )
-				commands.Add( name );
+				commands.Add( String64( name ) );
 		}
 	}
 
@@ -97,16 +97,14 @@ namespace dd
 
 		// Register special function with overloads to catch any type.
 		// This is used by the exec command to output the resulting value from the statement.
-		String16 name( "_grab" );
-
-		engine->RegisterGlobalFunction( name, FUNCTION( grabBool ), &grabBool );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabInt ), &grabInt );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabUint ), &grabUint );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabFloat ), &grabFloat );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabDouble ), &grabDouble );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabEntityHandle ), &grabEntityHandle );
-		engine->RegisterGlobalFunction( name, FUNCTION( grabTransformComponent ), &grabTransformComponent );
-		engine->RegisterGlobalFunction( name, FUNCTION( grab ), &grab );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabBool ), &grabBool );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabInt ), &grabInt );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabUint ), &grabUint );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabFloat ), &grabFloat );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabDouble ), &grabDouble );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabEntityHandle ), &grabEntityHandle );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabTransformComponent ), &grabTransformComponent );
+		engine->RegisterGlobalFunction( "_grab", FUNCTION( grab ), &grab );
 		/*engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
 	}
 
@@ -117,11 +115,11 @@ namespace dd
 		m_inputBuf[0] = 0;
 		m_historyPos = -1;
 
-		m_commands.Add( "Help" );
-		m_commands.Add( "History" );
-		m_commands.Add( "Clear" );
-		m_commands.Add( "Functions" );
-		m_commands.Add( "Variables" );
+		m_commands.Add( String64( "Help" ) );
+		m_commands.Add( String64( "History" ) );
+		m_commands.Add( String64( "Clear" ) );
+		m_commands.Add( String64( "Functions" ) );
+		m_commands.Add( String64( "Variables" ) );
 
 		RegisterConsoleHelpers();
 		RegisterScriptCommands( m_commands );
@@ -152,7 +150,7 @@ namespace dd
 		buf[ArraySize - 1] = 0;
 		va_end( args );
 
-		m_items.Add( buf );
+		m_items.Add( String128( buf ) );
 
 		m_scrollToBottom = true;
 	}

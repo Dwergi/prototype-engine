@@ -58,12 +58,12 @@ namespace dd
 		m_engine = nullptr;
 	}
 
-	void ScriptEngine::RegisterMember( const String& className, const Member& member )
+	void ScriptEngine::RegisterMember( const char* className, const Member& member )
 	{
 		String64 objType( GetWithoutNamespace( className ) );
 
 		String128 signature;
-		signature += GetWithoutNamespace( member.Type()->Name() );
+		signature += GetWithoutNamespace( member.Type()->Name().c_str() );
 		signature += " ";
 		signature += member.Name();
 
@@ -91,13 +91,13 @@ namespace dd
 		return true;
 	}
 
-	String256 ScriptEngine::GetFunctionSignatureString( const String& name, const Function& fn )
+	String256 ScriptEngine::GetFunctionSignatureString( const char* name, const Function& fn )
 	{
 		const FunctionSignature* sig = fn.Signature();
 		String256 signature;
 
 		if( sig->GetRet() != nullptr )
-			signature += GetWithoutNamespace( sig->GetRet()->Name() );
+			signature += GetWithoutNamespace( sig->GetRet()->Name().c_str() );
 		else
 			signature += "void";
 
@@ -109,7 +109,7 @@ namespace dd
 		uint argCount = sig->ArgCount();
 		for( uint i = 0; i < argCount; ++i )
 		{
-			signature += GetWithoutNamespace( sig->GetArg( i )->Name() );
+			signature += GetWithoutNamespace( sig->GetArg( i )->Name().c_str() );
 
 			if( i < (argCount - 1) )
 				signature += ",";
@@ -120,8 +120,9 @@ namespace dd
 		return signature;
 	}
 
-	String64 ScriptEngine::GetWithoutNamespace( const String& typeName )
+	String64 ScriptEngine::GetWithoutNamespace( const char* type )
 	{
+		String64 typeName( type );
 		String64 result( typeName );
 
 		uint afterColon = 0;
@@ -154,10 +155,10 @@ namespace dd
 		return result;
 	}
 
-	void ScriptEngine::RegisterGlobalVariable( const String& name, const Variable& var )
+	void ScriptEngine::RegisterGlobalVariable( const char* name, const Variable& var )
 	{
 		String128 signature;
-		signature += GetWithoutNamespace( var.Type()->Name() );
+		signature += GetWithoutNamespace( var.Type()->Name().c_str() );
 		signature += " ";
 		signature += name;
 

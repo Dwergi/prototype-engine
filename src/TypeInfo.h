@@ -22,7 +22,7 @@ namespace dd
 
 	struct Method
 	{
-		String32 Name;
+		SharedString Name;
 		Function Function;
 	};
 
@@ -38,7 +38,7 @@ namespace dd
 		const Function* GetMethod( const char* methodName ) const;
 
 		inline uint Size() const { return m_size; }
-		inline const String& Name() const { return m_name; }
+		inline const SharedString& Name() const { return m_name; }
 
 		inline bool IsPOD() const { return m_members.Size() == 0; }
 		inline bool IsRegistered() const { return m_size != 0; }
@@ -70,10 +70,10 @@ namespace dd
 		void RegisterParentType( const TypeInfo* typeInfo );
 
 		template <typename T>
-		void RegisterScriptObject( const char* name );
+		void RegisterScriptObject();
 
 		template <typename T>
-		void RegisterScriptStruct( const char* name );
+		void RegisterScriptStruct();
 
 		//
 		// Register a POD type - these are the basic types like ints, floats and char*.
@@ -86,6 +86,7 @@ namespace dd
 		static const TypeInfo* GetType();
 		static const TypeInfo* GetType( const char* typeName );
 		static const TypeInfo* GetType( const String& typeName );
+		static const TypeInfo* GetType( const SharedString& typeName );
 
 		template <typename T>
 		static TypeInfo* AccessType();
@@ -100,7 +101,7 @@ namespace dd
 
 	private:
 		uint m_size;
-		String32 m_name;
+		SharedString m_name;
 		bool m_scriptObject;
 
 		const TypeInfo* m_parentType;
@@ -110,7 +111,7 @@ namespace dd
 		Vector<Method> m_methods;
 
 		static bool sm_defaultsRegistered;
-		static DenseMap<String32, TypeInfo*> sm_typeMap;
+		static DenseMap<SharedString, TypeInfo*> sm_typeMap;
 	};
 
 	#include "TypeInfo.inl"

@@ -50,6 +50,15 @@ Buffer<T>& Buffer<T>::operator=( const Buffer<T>& other )
 }
 
 template <typename T>
+Buffer<T>& Buffer<T>::operator=( Buffer<T>&& other )
+{
+	Set( other.m_ptr, other.m_size );
+	other.Release();
+
+	return *this;
+}
+
+template <typename T>
 void Buffer<T>::Set( T* ptr, uint size )
 {
 	ASSERT( m_ptr == nullptr, "Overwriting a Buffer pointer! Call Release first." );

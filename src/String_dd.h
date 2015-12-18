@@ -92,7 +92,7 @@ namespace dd
 			m_stackData[ 0 ] = '\0';
 		}
 
-		InplaceString( const char* other )
+		explicit InplaceString( const char* other )
 			: String( m_stackData, Size )
 		{
 			SetString( other, (uint) strlen( other ) );
@@ -136,6 +136,12 @@ namespace dd
 		InplaceString<Size>& operator=( const InplaceString<Size>& other )
 		{
 			SetString( other.c_str(), other.Length() );
+			return *this;
+		}
+
+		InplaceString<Size>& operator=( const char* other )
+		{
+			SetString( other, (uint) strlen( other ) );
 			return *this;
 		}
 

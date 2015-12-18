@@ -50,9 +50,39 @@ namespace dd
 	}
 
 	template <typename T>
+	DenseMapPool<T>::DenseMapPool( DenseMapPool<T>&& other )
+		: m_components( std::move( other.m_components ) )
+	{
+
+	}
+
+	template <typename T>
+	DenseMapPool<T>::DenseMapPool( const DenseMapPool<T>& other )
+		: m_components( other.m_components )
+	{
+
+	}
+
+	template <typename T>
 	DenseMapPool<T>::~DenseMapPool()
 	{
 		Clear();
+	}
+
+	template <typename T>
+	DenseMapPool<T>& DenseMapPool<T>::operator=( DenseMapPool<T>&& other )
+	{
+		m_components = std::move( other.m_components );
+
+		return *this;
+	}
+
+	template <typename T>
+	DenseMapPool<T>& DenseMapPool<T>::operator=( const DenseMapPool<T>& other )
+	{
+		m_components = other.m_components;
+
+		return *this;
 	}
 
 	template <typename T>

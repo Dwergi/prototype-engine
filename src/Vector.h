@@ -14,7 +14,7 @@ namespace dd
 	public:
 
 		Vector();
-		Vector( uint reserved_size );
+		explicit Vector( uint reserved_size );
 		Vector( const Vector& other );
 		Vector( Vector&& other );
 

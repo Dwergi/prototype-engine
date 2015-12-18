@@ -104,7 +104,7 @@ namespace dd
 
 			// composite object
 			ScopedJSONObject obj( *this );
-			AddString( "type", type->Name() );
+			AddString( "type", String64( type->Name().c_str() ) );
 
 			AddKey( String16( "members" ) );
 			m_stream.WriteByte( '\n' );
@@ -305,7 +305,7 @@ namespace dd
 					JSONDeserializer nested( pair.Value );
 					nested.Deserialize( strType );
 
-					ASSERT( strType == type->Name() );
+					ASSERT( strType == type->Name().c_str() );
 				}
 			}
 

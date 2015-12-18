@@ -38,7 +38,7 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 
 	SECTION( "String" )
 	{
-		String8 x = "test";
+		String8 x( "test" );
 		serializer.Serialize( x );
 
 		// strings should have extra quotes around them
@@ -47,11 +47,11 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 
 	SECTION( "Long String" )
 	{
-		String256 x = "testing the string serialization\ntesting the string serialization\n"
+		String256 x( "testing the string serialization\ntesting the string serialization\n"
 			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
 			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
 			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n"
-			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n";
+			"testing the string serialization\ntesting the string serialization\ntesting the string serialization\n" );
 
 		serializer.Serialize( x );
 		

@@ -23,6 +23,11 @@ namespace dd
 		Assign( str );
 	}
 
+	SharedString::SharedString( const String& str )
+	{
+		Assign( str.c_str() );
+	}
+
 	SharedString::SharedString( const SharedString& other )
 		: m_ptr( other.m_ptr ),
 		m_length( other.m_length ),

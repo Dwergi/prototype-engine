@@ -50,12 +50,55 @@ namespace dd
 
 	template<typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::DenseMap()
-		: m_entries( 0 ),
-		m_capacity( 0 ),
-		m_data( nullptr ),
-		m_hash( &Hash )
+		: m_hash( &Hash )
 	{
 		Resize( DefaultSize );
+	}
+
+	template<typename TKey, typename TValue>
+	DenseMap<TKey, TValue>::DenseMap( DenseMap&& other )
+		: m_data( std::move( other.m_data ) ),
+		m_hash( std::move( other.m_hash ) )
+	{
+
+	}
+
+	template<typename TKey, typename TValue>
+	DenseMap<TKey, TValue>::DenseMap( const DenseMap& other )
+		: m_hash( other.m_hash )
+	{
+		Resize( other.m_data.Size() );
+		Rehash( other.m_data );
+	}
+
+	template<typename TKey, typename TValue>
+	DenseMap<TKey, TValue>::~DenseMap()
+	{
+		Clear();
+
+		delete[] (char*) m_data.Release();
+	}
+
+	template<typename TKey, typename TValue>
+	DenseMap<TKey, TValue>& DenseMap<TKey, TValue>::operator=( DenseMap<TKey, TValue>&& other )
+	{
+		m_hash = other.m_hash;
+		m_data = std::move( other.m_data );
+		m_entries = other.m_entries;
+
+		return *this;
+	}
+
+	template<typename TKey, typename TValue>
+	DenseMap<TKey, TValue>& DenseMap<TKey, TValue>::operator=( const DenseMap<TKey, TValue>& other )
+	{
+		Clear();
+		Resize( other.m_data.Size() );
+
+		m_hash = other.m_hash;
+		Rehash( other.m_data );
+
+		return *this;
 	}
 
 	template<typename TKey, typename TValue>
@@ -67,9 +110,9 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Add( const TKey& key, const TValue& value )
 	{
-		ASSERT( m_capacity > 0 );
+		ASSERT( m_data.Size() > 0 );
 
-		if( m_entries == m_capacity )
+		if( m_entries == m_data.Size() )
 		{
 			Grow();
 		}
@@ -94,7 +137,7 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear()
 	{
-		for( uint i = 0; i < m_capacity; ++i )
+		for( uint i = 0; i < m_data.Size(); ++i )
 		{
 			if( !IsEmpty( m_data[i] ) )
 			{
@@ -138,7 +181,7 @@ namespace dd
 		{
 			// hard case - collision, so linearly search for the next free slot
 			Entry* current = &entry + 1;
-			Entry* last = &m_data[m_capacity - 1];
+			Entry* last = &m_data[m_data.Size() - 1];
 
 			while( current <= last )
 			{
@@ -164,26 +207,32 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Grow()
 	{
-		Resize( m_capacity * 2 );
+		Resize( m_data.Size() * 2 );
 	}
 
 	template<typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Resize( uint new_size )
+	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
 	{
-		Entry* new_data = new Entry[new_size];
-		memset( new_data, 0xFF, new_size * sizeof( Entry ) );
+		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
+		memset( new_data, 0xFF, new_capacity * sizeof( Entry ) );
 
-		Entry* old_data = m_data;
-		uint old_capacity = m_capacity;
+		Buffer<Entry> old_data( m_data );
+		m_data.Release();
+		m_data.Set( new_data, new_capacity );
 
-		m_capacity = new_size;
-		m_data = new_data;
-
-		if( old_data != nullptr )
+		if( old_data.Size() > 0 )
 		{
-			Rehash( old_data, old_capacity );
+			Rehash( old_data );
 
-			delete[] old_data;
+			for( uint i = 0; i < m_data.Size(); ++i )
+			{
+				if( !IsEmpty( m_data[i] ) )
+				{
+					Clear( m_data[i] );
+				}
+			}
+
+			delete[] (char*) old_data.Release();
 		}
 	}
 
@@ -210,11 +259,11 @@ namespace dd
 	}
 
 	template<typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Rehash( const typename DenseMap<TKey, TValue>::Entry* data, uint capacity )
+	void DenseMap<TKey, TValue>::Rehash( const Buffer<typename DenseMap<TKey, TValue>::Entry>& data )
 	{
 		m_entries = 0; // clear this here, because we're going to be re-inserting everything
 
-		for( uint i = 0; i < capacity; ++i )
+		for( uint i = 0; i < data.Size(); ++i )
 		{
 			if( !IsEmpty( data[i] ) )
 			{
@@ -247,7 +296,7 @@ namespace dd
 		{
 			// find a new slot by linearly searching for the next free one
 			Entry* current = &entry + 1;
-			Entry* last = &m_data[m_capacity - 1];
+			Entry* last = &m_data[m_data.Size() - 1];
 
 			while( current <= last )
 			{
@@ -280,7 +329,7 @@ namespace dd
 	{
 		uint64 hash = m_hash( key );
 
-		uint index = hash % m_capacity;
+		uint index = hash % m_data.Size();
 
 		if( pIndex != nullptr )
 		{

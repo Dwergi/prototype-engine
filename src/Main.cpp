@@ -120,12 +120,12 @@ void RegisterGlobalScriptFunctions()
 
 	ScriptEngine& engine = g_services.Get<ScriptEngine>();
 
-	engine.RegisterGlobalFunction( String16( "GetTransformComponent" ), FUNCTION( GetTransformComponent ), &GetTransformComponent );
-	engine.RegisterGlobalFunction( String16( "GetEntityHandle" ), FUNCTION( GetEntityHandle ), &GetEntityHandle );
-	engine.RegisterGlobalVariable( String16( "s_drawFPS" ), Variable( s_drawFPS ) );
-	engine.RegisterGlobalVariable( String16( "s_maxFPS" ), Variable( s_maxFPS ) );
-	engine.RegisterGlobalVariable( String16( "s_rollingAverageFPS" ), Variable( s_rollingAverageFPS ) );
-	engine.RegisterGlobalVariable( String16( "s_rollingAverageMultiplier" ), Variable( s_rollingAverageMultiplier ) );
+	engine.RegisterGlobalFunction( "GetTransformComponent", FUNCTION( GetTransformComponent ), &GetTransformComponent );
+	engine.RegisterGlobalFunction( "GetEntityHandle", FUNCTION( GetEntityHandle ), &GetEntityHandle );
+	engine.RegisterGlobalVariable( "s_drawFPS", Variable( s_drawFPS ) );
+	engine.RegisterGlobalVariable( "s_maxFPS", Variable( s_maxFPS ) );
+	engine.RegisterGlobalVariable( "s_rollingAverageFPS", Variable( s_rollingAverageFPS ) );
+	engine.RegisterGlobalVariable( "s_rollingAverageMultiplier", Variable( s_rollingAverageMultiplier ) );
 }
 
 void RegisterGameTypes()

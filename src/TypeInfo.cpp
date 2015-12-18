@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	DenseMap<String32,TypeInfo*> TypeInfo::sm_typeMap;
+	DenseMap<SharedString,TypeInfo*> TypeInfo::sm_typeMap;
 
 	bool TypeInfo::sm_defaultsRegistered = false;
 
@@ -37,7 +37,7 @@ namespace dd
 
 		if( m_scriptObject )
 		{
-			g_services.Get<ScriptEngine>().RegisterMember( m_name, member );
+			g_services.Get<ScriptEngine>().RegisterMember( m_name.c_str(), member );
 		}
 	}
 
@@ -65,10 +65,15 @@ namespace dd
 
 	const TypeInfo* TypeInfo::GetType( const char* typeName )
 	{
-		return GetType( String32( typeName ) );
+		return GetType( SharedString( typeName ) );
 	}
 
 	const TypeInfo* TypeInfo::GetType( const String& typeName )
+	{
+		return GetType( SharedString( typeName ) );
+	}
+
+	const TypeInfo* TypeInfo::GetType( const SharedString& typeName )
 	{
 		ASSERT( sm_typeMap.Contains( typeName ) );
 

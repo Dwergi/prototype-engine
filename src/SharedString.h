@@ -18,18 +18,20 @@ namespace dd
 	public:
 
 		SharedString();
-		SharedString( const char* str );
+		explicit SharedString( const char* str );
+		explicit SharedString( const String& str );
+
 		SharedString( const SharedString& other );
 		SharedString( SharedString&& other );
 		~SharedString();
+
+		SharedString& operator=( const SharedString& other );
+		SharedString& operator=( const char* other );
 
 		const char* c_str() const {	return m_ptr.get(); }
 
 		uint Length() const { return m_length; }
 		uint UseCount() const { return m_ptr.use_count() - 1; } // take one away for the detail of the internal map
-
-		SharedString& operator=( const SharedString& other );
-		SharedString& operator=( const char* other );
 
 		bool operator==( const SharedString& other ) const;
 		bool operator==( const char* other ) const;

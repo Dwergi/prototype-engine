@@ -13,23 +13,21 @@ T* Factory()
 }
 
 template <typename FnType>
-void dd::ScriptEngine::RegisterMethod( const char* name, const dd::Function& method, FnType fnPtr )
+void dd::ScriptEngine::RegisterMethod( const char* method_name, const Function& method, FnType fnPtr )
 {
 	class DummyClass {};
 	const int METHOD_SIZE = sizeof(void (DummyClass::*)());
 
-	String64 method_name( name );
-
 	String256 signature( GetFunctionSignatureString( method_name, method ) );
 
-	String64 className( GetWithoutNamespace( method.Signature()->GetContext()->Name() ) );
+	String64 className( GetWithoutNamespace( method.Signature()->GetContext()->Name().c_str() ) );
 
 	int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
 	ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
 }
 
 template <typename ObjType>
-void dd::ScriptEngine::RegisterObject( const String& className )
+void dd::ScriptEngine::RegisterObject( const char* className )
 {
 	String64 objType( GetWithoutNamespace( className ) );
 
@@ -68,12 +66,12 @@ void Destruct( T* memory )
 }
 
 template <typename ObjType>
-void dd::ScriptEngine::RegisterStruct( const String& className )
+void dd::ScriptEngine::RegisterStruct( const char* className )
 {
 	String64 objType( GetWithoutNamespace( className ) );
 
 	int res = m_engine->RegisterObjectType( objType.c_str(), sizeof( ObjType ), asOBJ_VALUE | asGetTypeTraits<ObjType>() );
-	ASSERT( res >= 0, "Failed to register struct '%s'!", className.c_str() );
+	ASSERT( res >= 0, "Failed to register struct '%s'!", className );
 
 	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_CONSTRUCT, "void Construct()", asFUNCTION( Construct<ObjType> ), asCALL_CDECL_OBJLAST );
 	ASSERT( res >= 0 );
@@ -100,7 +98,7 @@ void dd::ScriptEngine::RegisterStruct( const String& className )
 }
 
 template <typename FnType>
-void dd::ScriptEngine::RegisterGlobalFunction( const dd::String& name, const dd::Function& function, FnType ptr, const char* explicit_sig )
+void dd::ScriptEngine::RegisterGlobalFunction( const char* name, const Function& function, FnType ptr, const char* explicit_sig )
 {
 	String256 signature;
 

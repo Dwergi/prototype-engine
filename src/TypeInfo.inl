@@ -41,21 +41,21 @@ const TypeInfo* TypeInfo::RegisterType( const char* name )
 	typeInfo->SerializeCustom = nullptr;
 	typeInfo->DeserializeCustom = nullptr;
 
-	sm_typeMap.Add( name, typeInfo );
+	sm_typeMap.Add( SharedString( name ), typeInfo );
 
 	// register pointer and references as well
 	{
-		String64 ptrName = name;
+		String64 ptrName( name );
 		ptrName += "*";
 		TypeInfo* ptrInfo = const_cast<TypeInfo*>(GetType<T*>());
 		ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
-		sm_typeMap.Add( ptrName, ptrInfo );
+		sm_typeMap.Add( SharedString( ptrName ), ptrInfo );
 
-		String64 refName = name;
+		String64 refName( name );
 		refName += "&";
 		TypeInfo* refInfo = const_cast<TypeInfo*>(GetType<T&>());
 		refInfo->Init( refName.c_str(), sizeof( T& ) );
-		sm_typeMap.Add( refName, refInfo );
+		sm_typeMap.Add( SharedString( refName ), refInfo );
 	}
 
 	T::RegisterMembers();
@@ -85,7 +85,7 @@ const TypeInfo* TypeInfo::RegisterPOD( const char* name )
 	typeInfo->SerializeCustom = dd::Serialize::SerializePOD<T>;
 	typeInfo->DeserializeCustom = dd::Serialize::DeserializePOD<T>;
 
-	sm_typeMap.Add( name, typeInfo );
+	sm_typeMap.Add( SharedString( name ), typeInfo );
 
 	RegisterContainer<Vector<T>>( "Vector", typeInfo );
 
@@ -101,9 +101,9 @@ const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeIn
 	if( typeInfo->IsRegistered() )
 		return typeInfo;
 
-	String32 finalName( container );
+	String64 finalName( container );
 	finalName += "<";
-	finalName += containing->Name();
+	finalName += containing->Name().c_str();
 	finalName += ">";
 
 	typeInfo->Init( finalName.c_str(), sizeof( T ) );
@@ -121,7 +121,7 @@ const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeIn
 	typeInfo->SerializeCustom = dd::Serialize::SerializeContainer<T>;
 	typeInfo->DeserializeCustom = dd::Serialize::DeserializeContainer<T>;
 
-	sm_typeMap.Add( finalName, typeInfo );
+	sm_typeMap.Add( SharedString( finalName ), typeInfo );
 
 	return typeInfo;
 }
@@ -145,7 +145,7 @@ void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 }
 
 template <typename T>
-void TypeInfo::RegisterScriptObject( const char* name )
+void TypeInfo::RegisterScriptObject()
 {
 	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
 	ASSERT( script_engine != nullptr );
@@ -154,12 +154,12 @@ void TypeInfo::RegisterScriptObject( const char* name )
 	{
 		m_scriptObject = true;
 
-		script_engine->RegisterObject<T>( m_name );
+		script_engine->RegisterObject<T>( m_name.c_str() );
 	}
 }
 
 template <typename T>
-void TypeInfo::RegisterScriptStruct( const char* name )
+void TypeInfo::RegisterScriptStruct()
 {
 	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
 	ASSERT( script_engine != nullptr );
@@ -168,6 +168,6 @@ void TypeInfo::RegisterScriptStruct( const char* name )
 	{
 		m_scriptObject = true;
 
-		script_engine->RegisterStruct<T>( m_name );
+		script_engine->RegisterStruct<T>( m_name.c_str() );
 	}
 }

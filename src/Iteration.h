@@ -1,9 +1,9 @@
 #pragma once
 
 #define DEFINE_ITERATORS( Type, Buffer, Size ) \
-	typedef dd::Iterator<Type> iterator; \
-	dd::Iterator<Type> begin() const { return dd::Iterator<Type>( (Type*) Buffer ); } \
-	dd::Iterator<Type> end() const { return dd::Iterator<Type>( (Type*) Buffer + Size ); }	
+	typedef Iterator<Type> iterator; \
+	Iterator<Type> begin() const { return dd::Iterator<Type>( (Type*) Buffer ); } \
+	Iterator<Type> end() const { return dd::Iterator<Type>( (Type*) Buffer + Size ); }	
 
 namespace dd
 {

@@ -24,7 +24,7 @@ namespace dd
 	{
 	public:
 
-		JobSystem( uint thread_count );
+		explicit JobSystem( uint thread_count );
 		~JobSystem();
 
 		void Schedule( const Function& fn, const FunctionArgs& args );

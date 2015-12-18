@@ -26,7 +26,13 @@ namespace dd
 	public:
 
 		DenseMapPool();
+		DenseMapPool( DenseMapPool<T>&& other );
+		DenseMapPool( const DenseMapPool<T>& other );
 		~DenseMapPool();
+
+		DenseMapPool<T>& operator=( DenseMapPool<T>&& other );
+		DenseMapPool<T>& operator=( const DenseMapPool<T>& other );
+
 
 		//
 		// Clear this component pool.

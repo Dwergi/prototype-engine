@@ -24,6 +24,7 @@ namespace dd
 		T& operator[]( uint idx ) const;
 
 		Buffer<T>& operator=( const Buffer<T>& other );
+		Buffer<T>& operator=( Buffer<T>&& other );
 		void Set( T* ptr, uint size );
 
 		T* Get() const;

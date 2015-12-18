@@ -26,7 +26,9 @@
 #include "TypeInfoMacros.h"
 
 #include "Buffer.h"
+#include "DenseMap.h"
 #include "String_dd.h"
+#include "SharedString.h"
 #include "Array.h"
 #include "Vector.h"
 
@@ -37,7 +39,6 @@
 #include "Function.h"
 
 #include "AutoList.h"
-#include "DenseMap.h"
 
 #include "TypeInfoHelpers.h"
 #include "TypeInfo.h"

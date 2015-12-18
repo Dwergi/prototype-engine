@@ -28,6 +28,12 @@ namespace dd
 		};
 
 		DenseMap();
+		DenseMap( DenseMap<TKey, TValue>&& other );
+		DenseMap( const DenseMap<TKey, TValue>& other );
+		~DenseMap();
+
+		DenseMap<TKey, TValue>& operator=( DenseMap<TKey, TValue>&& other );
+		DenseMap<TKey, TValue>& operator=( const DenseMap<TKey, TValue>& other );
 
 		void SetHashFunction( void (*hash)( const TKey& ) );
 
@@ -45,15 +51,15 @@ namespace dd
 		inline uint Size() const { return m_entries; }
 
 		inline DenseMapIterator<TKey, TValue> begin() const { return DenseMapIterator<TKey, TValue>( m_data, *this ); }
-		inline DenseMapIterator<TKey, TValue> end() const { return DenseMapIterator<TKey, TValue>( m_data + m_capacity, *this ); }
+		inline DenseMapIterator<TKey, TValue> end() const { return DenseMapIterator<TKey, TValue>( m_data + m_data.Size(), *this ); }
 		
 	private:
 
 		friend class DenseMapIterator<TKey, TValue>;
 
-		uint m_entries;
-		uint m_capacity;
-		Entry* m_data;
+		uint m_entries { 0 };
+		Buffer<Entry> m_data;
+
 		uint64 (*m_hash)( const TKey& );
 
 		void Clear( Entry& entry ) const;
@@ -68,7 +74,7 @@ namespace dd
 
 		void Grow();
 		void Resize( uint new_size );
-		void Rehash( const Entry* data, uint capacity );		
+		void Rehash( const Buffer<Entry>& data );
 	};
 }
 

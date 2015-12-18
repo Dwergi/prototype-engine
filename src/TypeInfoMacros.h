@@ -42,11 +42,11 @@
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter<TypeName> m_refCount; \
 	BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptObject<TypeName>( #TypeName );
+	typeInfo->RegisterScriptObject<TypeName>();
 
 #define BEGIN_SCRIPT_STRUCT( TypeName ) \
 	BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptStruct<TypeName>( #TypeName );
+	typeInfo->RegisterScriptStruct<TypeName>();
 
 #define SET_PARENT( TypeName, ParentType ) \
 	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType( GET_TYPE( ParentType ) )
