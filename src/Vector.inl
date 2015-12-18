@@ -8,21 +8,30 @@
 
 namespace dd
 {
-	template<typename T>
+	template <typename T>
+	const float Vector<T>::GrowthFactor = 1.7f;
+
+	template <typename T>
+	const uint Vector<T>::GrowthFudge = 8;
+	
+	template <typename T>
+	const uint Vector<T>::DefaultSize = 8;
+
+	template <typename T>
 	Vector<T>::Vector()
 		: m_data( nullptr )
 	{
 		
 	}
 
-	template<typename T>
+	template <typename T>
 	Vector<T>::Vector( uint reserved )
 		: m_data( nullptr )
 	{
 		Reserve( reserved );
 	}
 
-	template<typename T>
+	template <typename T>
 	Vector<T>::Vector( const Vector<T>& other )
 		: m_data( nullptr )
 	{
@@ -31,7 +40,7 @@ namespace dd
 		m_size = other.m_size;
 	}
 
-	template<typename T>
+	template <typename T>
 	Vector<T>::Vector( Vector<T>&& other )
 	{
 		Swap( other );
@@ -41,7 +50,7 @@ namespace dd
 		other.m_capacity = 0;
 	}
 
-	template<typename T>
+	template <typename T>
 	Vector<T>& Vector<T>::operator=( const Vector& other )
 	{
 		Clear();
@@ -52,13 +61,25 @@ namespace dd
 		return *this;
 	}
 
-	template<typename T>
+	template <typename T>
+	uint Vector<T>::Size() const
+	{
+		return m_size;
+	}
+
+	template <typename T>
+	uint Vector<T>::Capacity() const
+	{
+		return m_capacity;
+	}
+
+	template <typename T>
 	T& Vector<T>::operator[]( uint index ) const
 	{
 		return GetEntry( index );
 	}
 
-	template<typename T>
+	template <typename T>
 	T* Vector<T>::Data() const
 	{
 		return m_data;
@@ -407,7 +428,7 @@ namespace dd
 		if( new_capacity > 0 )
 		{
 			new_data = reinterpret_cast<T*>(new char[new_capacity * sizeof( T )]);
-			memset( new_data, 0xffffffff, new_capacity * sizeof( T ) );
+			memset( new_data, 0xABAD1DEA, new_capacity * sizeof( T ) );
 		}
 
 		if( m_data != nullptr )

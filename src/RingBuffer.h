@@ -26,14 +26,15 @@ namespace dd
 		uint Capacity() const;
 
 	private:
-		const uint DefaultSize = 8;
+		const uint DefaultSize { 8 };
 
 		Buffer<T> m_storage;
-		int m_head;
-		int m_tail;
+		int m_head { 0 };
+		int m_tail { 0 };
+		int m_size { 0 };
 
 		void Grow();
-		void Allocate( uint size );
+		void Allocate( int size );
 	};
 }
 

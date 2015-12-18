@@ -9,18 +9,12 @@ namespace dd
 	template <typename T>
 	RingBuffer<T>::RingBuffer()
 	{
-		m_head = 0;
-		m_tail = 0;
-
 		Allocate( DefaultSize );
 	}
 
 	template <typename T>
 	RingBuffer<T>::RingBuffer( uint size )
 	{
-		m_head = 0;
-		m_tail = 0;
-
 		Allocate( size );
 	}
 
@@ -32,6 +26,7 @@ namespace dd
 
 		m_head = 0;
 		m_tail = 0;
+		m_size = 0;
 	}
 
 	template <typename T>
@@ -47,6 +42,7 @@ namespace dd
 		new (&m_storage[m_tail]) T( item );
 
 		m_tail = (m_tail + 1) % Capacity();
+		++m_size;
 	}
 
 	template <typename T>
@@ -62,16 +58,19 @@ namespace dd
 		new (&m_storage[m_tail]) T( std::move( item ) );
 
 		m_tail = (m_tail + 1) % Capacity();
+		++m_size;
 	}
 
 	template <typename T>
 	T RingBuffer<T>::Pop()
 	{
-		ASSERT( m_head != m_tail );
+		ASSERT( m_size != 0 );
 
 		uint old_head = m_head;
 
 		m_head = (m_head + 1) % Capacity();
+
+		--m_size;
 
 		return m_storage[old_head];
 	}
@@ -79,14 +78,7 @@ namespace dd
 	template <typename T>
 	uint RingBuffer<T>::Size() const
 	{
-		if( m_tail < m_head )
-		{
-			return (uint) ((m_storage.Size() - m_head) + m_tail);
-		}
-		else
-		{
-			return (uint) (m_tail - m_head);
-		}
+		return m_size;
 	}
 
 	template <typename T>
@@ -118,12 +110,14 @@ namespace dd
 		}
 
 		m_head = 0;
-		m_tail = old_size - 1;
+		m_tail = m_size;
 	}
 
 	template <typename T>
-	void RingBuffer<T>::Allocate( uint size )
+	void RingBuffer<T>::Allocate( int size )
 	{
+		ASSERT( size > 0 );
+
 		m_storage.Set( reinterpret_cast<T*>(new char[size * sizeof( T )]), size );
 		memset( m_storage.Get(), 0xABAD1DEA, size * sizeof( T ) );
 	}

@@ -64,7 +64,7 @@ namespace dd
 	protected:
 
 		Buffer<char> m_buffer;
-		uint m_length;
+		uint m_length { 0 };
 		Buffer<char> m_stack;
 		
 		void Resize( uint length );
@@ -73,6 +73,8 @@ namespace dd
 		bool Equals( const char* other, uint length, bool caseless ) const;
 
 		void NullTerminate();
+
+		static const float GrowthFactor;
 	};
 
 	//

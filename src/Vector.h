@@ -8,26 +8,8 @@
 
 namespace dd
 {
-	class VectorBase
-	{
-	public:
-		VectorBase();
-		uint Size() const;
-		uint Capacity() const;
-
-	protected:
-		uint m_capacity;
-		uint m_size;
-
-		static const uint DefaultSize = 8;
-
-		// growth factor and growth fudge defines 
-		static const float GrowthFactor;
-		static const uint GrowthFudge;
-	};
-
 	template< typename T >
-	class Vector : public VectorBase
+	class Vector
 	{
 	public:
 
@@ -38,6 +20,9 @@ namespace dd
 
 		Vector<T>& operator=( const Vector& other );
 		T& operator[]( uint index ) const;
+
+		uint Size() const;
+		uint Capacity() const;
 
 		//
 		// Remove from the given index in an unordered way. 
@@ -137,7 +122,13 @@ namespace dd
 
 		T& GetEntry( uint index ) const;
 
-		T* m_data;
+		uint m_capacity { 0 };
+		uint m_size { 0 };
+		T* m_data { nullptr };
+
+		static const float GrowthFactor;
+		static const uint GrowthFudge;
+		static const uint DefaultSize;
 	};
 }
 

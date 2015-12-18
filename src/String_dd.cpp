@@ -7,10 +7,10 @@
 #include "PrecompiledHeader.h"
 #include "String_dd.h"
 
-const float GrowthFactor = 2.0f;
-
 namespace dd
 {
+	const float String::GrowthFactor = 2.0f;
+
 	String::String( char* stackBuffer, uint stackCapacity )
 		: m_stack( stackBuffer, stackCapacity )
 	{

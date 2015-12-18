@@ -465,7 +465,6 @@
     <ClCompile Include="src\TypeInfo.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Variable.cpp" />
-    <ClCompile Include="src\Vector.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseMap.inl" />

@@ -441,9 +441,6 @@
     <ClCompile Include="src\FunctionPtr.cpp">
       <Filter>Types</Filter>
     </ClCompile>
-    <ClCompile Include="src\Vector.cpp">
-      <Filter>Containers</Filter>
-    </ClCompile>
     <ClCompile Include="src\Array.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
