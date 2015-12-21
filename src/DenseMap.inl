@@ -76,7 +76,7 @@ namespace dd
 	{
 		Clear();
 
-		delete[] (char*) m_data.Release();
+		delete[] (byte*) m_data.Release();
 	}
 
 	template<typename TKey, typename TValue>
@@ -224,15 +224,15 @@ namespace dd
 		{
 			Rehash( old_data );
 
-			for( uint i = 0; i < m_data.Size(); ++i )
+			for( uint i = 0; i < old_data.Size(); ++i )
 			{
-				if( !IsEmpty( m_data[i] ) )
+				if( !IsEmpty( old_data[i] ) )
 				{
-					Clear( m_data[i] );
+					Clear( old_data[i] );
 				}
 			}
 
-			delete[] (char*) old_data.Release();
+			delete[] (byte*) old_data.Release();
 		}
 	}
 
@@ -259,15 +259,15 @@ namespace dd
 	}
 
 	template<typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Rehash( const Buffer<typename DenseMap<TKey, TValue>::Entry>& data )
+	void DenseMap<TKey, TValue>::Rehash( const Buffer<typename DenseMap<TKey, TValue>::Entry>& from )
 	{
 		m_entries = 0; // clear this here, because we're going to be re-inserting everything
 
-		for( uint i = 0; i < data.Size(); ++i )
+		for( uint i = 0; i < from.Size(); ++i )
 		{
-			if( !IsEmpty( data[i] ) )
+			if( !IsEmpty( from[i] ) )
 			{
-				Insert( data[i].Key, data[i].Value );
+				Insert( from[i].Key, from[i].Value );
 			}
 		}
 	}
