@@ -104,13 +104,13 @@ namespace dd
 			SetString( other.c_str(), other.Length() );
 		}
 
-		InplaceString( const dd::InplaceString<Size>& other )
+		InplaceString( const InplaceString<Size>& other )
 			: String( m_stackData, Size )
 		{
 			SetString( other.c_str(), other.Length() );
 		}
 
-		InplaceString( dd::InplaceString<Size>&& other )
+		InplaceString( InplaceString<Size>&& other )
 			: String( m_stackData, Size )
 		{
 			if( other.m_buffer == other.m_stackData )

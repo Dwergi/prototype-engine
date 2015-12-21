@@ -16,7 +16,7 @@ namespace dd
 	{
 	public: 
 		template<typename T>
-		PropertyList( T& host )
+		explicit PropertyList( T& host )
 			: m_base( &host )
 		{
 			AddMembers( GET_TYPE( T ), &host );

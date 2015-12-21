@@ -12,7 +12,7 @@ namespace dd
 	{
 	public:
 		Iterator();
-		Iterator( T* data );
+		explicit Iterator( T* data );
 
 		T& operator*() const;
 		T* operator->() const;

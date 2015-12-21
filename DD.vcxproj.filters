@@ -55,9 +55,6 @@
     <Filter Include="Includes\Base64">
       <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{9b1b5c97-b823-4ea1-a5bb-de504eedf166}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\PCG">
       <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,9 @@
     </Filter>
     <Filter Include="Includes\GLM">
       <UniqueIdentifier>{468c9f6f-eacc-4308-9c92-3a2397200665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Messaging">
+      <UniqueIdentifier>{81c3db90-4cb0-48f4-b975-6bc058b48c4d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -243,9 +243,6 @@
     <ClInclude Include="src\DebugUI.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\CommandLine.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -327,12 +324,6 @@
     <ClInclude Include="include\glm\glm.hpp">
       <Filter>Includes\GLM</Filter>
     </ClInclude>
-    <ClInclude Include="src\Message.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MessageTypes.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\AABB.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -354,11 +345,17 @@
     <ClInclude Include="src\ISystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\MessageQueue.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\RingBuffer.h">
       <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MessageQueue.h">
+      <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Message.h">
+      <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MessageTypes.h">
+      <Filter>Messaging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -468,9 +465,6 @@
     <ClCompile Include="src\DebugUI.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\CommandLine.cpp">
       <Filter>Application</Filter>
     </ClCompile>
@@ -558,11 +552,11 @@
     <ClCompile Include="src\Tests\MessageQueueTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\MessageQueue.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\RingBufferTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageQueue.cpp">
+      <Filter>Messaging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

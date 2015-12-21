@@ -28,8 +28,8 @@ namespace dd
 
 	public:
 
-		Recorder( dd::Property* prop );
-		Recorder( T& value, int size = HISTORY_SIZE );
+		explicit Recorder( dd::Property* prop );
+		explicit Recorder( T& value, int size = HISTORY_SIZE );
 		
 		Recorder<T>& operator=( const T& newValue );
 
@@ -58,7 +58,7 @@ namespace dd
 
 	public:
 
-		FullRecorder( T& value, int history_size = Recorder<T>::HISTORY_SIZE );
+		explicit FullRecorder( T& value, int history_size = Recorder<T>::HISTORY_SIZE );
 
 		FullRecorder<T>& operator=( const T& newValue );
 

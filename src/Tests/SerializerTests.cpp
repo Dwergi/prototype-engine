@@ -221,7 +221,9 @@ TEST_CASE( "[Deserialization] POD types" )
 		char c[256];
 
 		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( &c[0] );
+
+		Variable v( c );
+		deserializer.Deserialize( v );
 
 		REQUIRE( strcmp( c, "125" ) == 0 );
 	}

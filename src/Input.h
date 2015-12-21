@@ -57,7 +57,7 @@ namespace dd
 		typedef void( *ScrollCallbackFunction )(GLFWwindow*, double, double);
 		typedef void( *CharacterCallbackFunction )(GLFWwindow*, unsigned int);
 
-		Input( const Window& window );
+		explicit Input( const Window& window );
 		~Input();
 
 		void Update();

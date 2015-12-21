@@ -1,7 +1,7 @@
 //
 // DoubleBuffer.h - DoubleBuffer wraps double buffering of any arbitrary type - just call Swap to switch the read and write buffers.
-// Does not perform any copying, so make sure that you update everything in the write buffer or they'll be out of sync, 
-// or call Duplicate to perform a copy.
+// By default does not perform any copying, so make sure that you update everything in the write buffer or they'll be out of sync.
+// Or call Duplicate to perform a copy.
 // Copyright (C) Sebastian Nordgren 
 // August 6th 2015
 //

@@ -318,7 +318,6 @@
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
-    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\Script.h" />
@@ -434,7 +433,6 @@
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
     <ClCompile Include="src\Recorder.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\RingBufferTests.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\Script.cpp" />

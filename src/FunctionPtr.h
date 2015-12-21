@@ -478,14 +478,14 @@ namespace dd
 	{
 	public:
 		template <typename FunctionPtrType>
-		FunctionPtr( FunctionPtrType ptr )
+		explicit FunctionPtr( FunctionPtrType ptr )
 			: m_sig( ptr )
 			, m_ptr( *((FnPtr*) &ptr) )
 			, m_call( CallHelper<FunctionPtrType> )
 		{
 		}
 
-		FunctionPtr( const dd::String32& functionName )
+		explicit FunctionPtr( const dd::String32& functionName )
 			: m_sig()
 			, m_call( CallHelper<const char* > )
 		{

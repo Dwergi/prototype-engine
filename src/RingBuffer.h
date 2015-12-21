@@ -14,7 +14,7 @@ namespace dd
 	public:
 
 		RingBuffer();
-		RingBuffer( uint size );
+		explicit RingBuffer( uint size );
 		~RingBuffer();
 
 		void Push( const T& item );

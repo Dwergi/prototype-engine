@@ -35,11 +35,11 @@ namespace dd
 		Variable( const TypeInfo* typeInfo, void* data );
 		Variable( const Variable& rhs );
 		template <typename T>
-		Variable( const T& rhs );
+		explicit Variable( const T& rhs );
 		template <typename T>
-		Variable( const T *rhs );
+		explicit Variable( const T *rhs );
 		template <typename T>
-		Variable( T* rhs );
+		explicit Variable( T* rhs );
 
 		void* Data() const;
 		const TypeInfo* Type() const;

@@ -43,8 +43,9 @@ namespace
 		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
 	}
 
-	void grabString( const dd::String& v )
+	void grabString( const dd::String& str )
 	{
+		dd::Variable v( str );
 		SerializeString( dd::Serialize::Mode::JSON, s_stream, v );
 	}
 
