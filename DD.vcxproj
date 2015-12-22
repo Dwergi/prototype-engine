@@ -447,6 +447,7 @@
     <ClCompile Include="src\Tests\CommandLineTests.cpp" />
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp" />
     <ClCompile Include="src\Tests\DenseMapTests.cpp" />
+    <ClCompile Include="src\Tests\DoubleBufferTests.cpp" />
     <ClCompile Include="src\Tests\MessageQueueTests.cpp" />
     <ClCompile Include="src\Tests\AABBOctreeTests.cpp" />
     <ClCompile Include="src\Tests\PropertyListTests.cpp" />

@@ -558,6 +558,9 @@
     <ClCompile Include="src\MessageQueue.cpp">
       <Filter>Messaging</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tests\DoubleBufferTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

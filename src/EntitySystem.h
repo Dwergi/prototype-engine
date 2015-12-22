@@ -24,7 +24,7 @@ namespace dd
 		void DestroyEntity( const EntityHandle& entity );
 
 		void DestroyAllEntities();
-		void ProcessCommands();
+		void Update( float dt );
 
 		EntityHandle GetEntity( unsigned int index );
 
@@ -33,7 +33,7 @@ namespace dd
 		friend class EntityHandle;
 
 		// Flags for the state of each entity entry.
-		enum EntityState
+		enum EntityState : short
 		{
 			// Newly created or freed.
 			None = 0,
@@ -50,7 +50,7 @@ namespace dd
 
 		struct EntityEntry
 		{
-			EntityEntry( const EntityHandle& handle, int flags ) : 
+			EntityEntry( const EntityHandle& handle, short flags ) : 
 				Entity( handle ),
 				Flags( flags )
 			{

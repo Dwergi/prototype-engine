@@ -25,20 +25,16 @@ namespace dd
 
 	EntitySystem::~EntitySystem()
 	{
-		ProcessCommands();
-
-		m_commands.Clear();
-
+		Update( 0.0f );
 		DestroyAllEntities();
 
 		m_entities.Clear();
-
 		m_activeEntities = 0;
 
 		m_free.Clear();
 	}
 
-	void EntitySystem::ProcessCommands()
+	void EntitySystem::Update( float dt )
 	{
 		for( const EntityCommand& command : m_commands )
 		{
