@@ -26,7 +26,7 @@ namespace dd
 	EntitySystem::~EntitySystem()
 	{
 		Update( 0.0f );
-		DestroyAllEntities();
+		DestroyAll();
 
 		m_entities.Clear();
 		m_activeEntities = 0;
@@ -76,7 +76,7 @@ namespace dd
 	//
 	// Create an entity and return its handle.
 	// 
-	EntityHandle EntitySystem::CreateEntity()
+	EntityHandle EntitySystem::Create()
 	{
 		if( m_free.Size() == 0 )
 		{
@@ -103,20 +103,9 @@ namespace dd
 	}
 
 	//
-	// Get a handle to the entity at the given slot, or an invalid handle if it's not valid.
-	//
-	EntityHandle EntitySystem::GetEntity( unsigned int index )
-	{
-		if( m_entities[index].Flags & EntityState::Valid )
-			return m_entities[index].Entity;
-
-		return EntityHandle();
-	}
-
-	//
 	// Destroy an entity.
 	// 
-	void EntitySystem::DestroyEntity( const EntityHandle& handle )
+	void EntitySystem::Destroy( const EntityHandle& handle )
 	{
 		if( !IsEntityValid( handle ) )
 			return;
@@ -129,11 +118,11 @@ namespace dd
 		m_commands.Add( command );
 	}
 
-	void EntitySystem::DestroyAllEntities()
+	void EntitySystem::DestroyAll()
 	{
 		for( EntityEntry& entry : m_entities )
 		{
-			DestroyEntity( entry.Entity );
+			Destroy( entry.Entity );
 		}
 	}
 

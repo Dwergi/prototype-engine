@@ -20,13 +20,11 @@ namespace dd
 		EntitySystem();
 		~EntitySystem();
 
-		EntityHandle CreateEntity();
-		void DestroyEntity( const EntityHandle& entity );
+		EntityHandle Create();
+		void Destroy( const EntityHandle& entity );
 
-		void DestroyAllEntities();
+		void DestroyAll();
 		void Update( float dt );
-
-		EntityHandle GetEntity( unsigned int index );
 
 	private:
 

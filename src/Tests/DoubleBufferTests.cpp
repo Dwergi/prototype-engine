@@ -77,7 +77,7 @@ public:
 TEST_CASE( "[DoubleBuffer] Components" )
 {
 	EntitySystem system;
-	EntityHandle handle = system.CreateEntity();
+	EntityHandle handle = system.Create();
 	
 	TestComponent::Pool pool;
 	pool.Create( handle );

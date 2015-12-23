@@ -107,11 +107,12 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 	return cmp;
 }
 
-EntityHandle GetEntityHandle( unsigned int id )
+EntityHandle GetEntityHandle( uint id )
 {
 	EntitySystem& system = g_services.Get<EntitySystem>();
 
-	return system.GetEntity( id );
+	EntityHandle handle( id, &system );
+	return handle;
 }
 
 void RegisterGlobalScriptFunctions()
@@ -191,7 +192,7 @@ int GameMain()
 	// create a bunch of entities and components
 	for( int i = 0; i < 1000; ++i )
 	{
-		EntityHandle entity = entitySystem.CreateEntity();
+		EntityHandle entity = entitySystem.Create();
 
 		SwarmAgentComponent* swarm_cmp = swarm_pool.Create( entity );
 		TransformComponent* transform_cmp = transform_pool.Create( entity );

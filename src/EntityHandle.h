@@ -20,8 +20,8 @@ namespace dd
 		{
 			struct
 			{
-				uint ID : 20;
-				uint Version : 12;
+				uint ID : 22;
+				uint Version : 10;
 			};
 
 			uint Handle;
