@@ -40,9 +40,6 @@
     <Filter Include="DebugUI">
       <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script\Add-Ons">
-      <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Components\Pools">
       <UniqueIdentifier>{8d309a51-ff54-4264-b346-5a708869a8b3}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,12 @@
     </Filter>
     <Filter Include="Messaging">
       <UniqueIdentifier>{81c3db90-4cb0-48f4-b975-6bc058b48c4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\AngelScript">
+      <UniqueIdentifier>{a9ec13a1-e651-4551-bc2c-adcd707e8c9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\AngelScript\Add-Ons">
+      <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -253,10 +256,10 @@
       <Filter>Script</Filter>
     </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.h">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
     <ClInclude Include="src\DebugConsole.h">
       <Filter>Application</Filter>
@@ -265,7 +268,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
     <ClInclude Include="src\ComponentPoolBase.h">
       <Filter>Components\Pools</Filter>
@@ -281,9 +284,6 @@
     </ClInclude>
     <ClInclude Include="src\ComponentPoolTestComponent.h">
       <Filter>Components\Pools\Test Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScriptEngine.h">
-      <Filter>Script</Filter>
     </ClInclude>
     <ClInclude Include="src\Script.h">
       <Filter>Script</Filter>
@@ -356,6 +356,12 @@
     </ClInclude>
     <ClInclude Include="src\MessageTypes.h">
       <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AngelScriptEngine.h">
+      <Filter>Script\AngelScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WrenEngine.h">
+      <Filter>Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -496,10 +502,10 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
     <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.cpp">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
     <ClCompile Include="src\Globals.cpp">
       <Filter>Core</Filter>
@@ -508,13 +514,10 @@
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
-      <Filter>Script\Add-Ons</Filter>
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScriptEngine.cpp">
-      <Filter>Script</Filter>
     </ClCompile>
     <ClCompile Include="src\Script.cpp">
       <Filter>Script</Filter>
@@ -561,6 +564,12 @@
     <ClCompile Include="src\Tests\DoubleBufferTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\AngelScriptEngine.cpp">
+      <Filter>Script\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WrenEngine.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -584,9 +593,6 @@
     <None Include="src\SortedVectorPool.inl">
       <Filter>Components\Pools</Filter>
     </None>
-    <None Include="src\ScriptEngine.inl">
-      <Filter>Script</Filter>
-    </None>
     <None Include="src\DenseMap.inl">
       <Filter>Containers</Filter>
     </None>
@@ -595,6 +601,9 @@
     </None>
     <None Include="src\RingBuffer.inl">
       <Filter>Containers</Filter>
+    </None>
+    <None Include="src\AngelScriptEngine.inl">
+      <Filter>Script\AngelScript</Filter>
     </None>
   </ItemGroup>
 </Project>

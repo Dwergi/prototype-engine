@@ -135,7 +135,7 @@ void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 	m.Name = name;
 	m.Function = f;
 
-	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+	AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
 
 	// don't register with script if this isn't a script object
 	if( m_scriptObject && script_engine != nullptr )
@@ -147,7 +147,7 @@ void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 template <typename T>
 void TypeInfo::RegisterScriptObject()
 {
-	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+	AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
 	ASSERT( script_engine != nullptr );
 
 	if( script_engine != nullptr )
@@ -161,7 +161,7 @@ void TypeInfo::RegisterScriptObject()
 template <typename T>
 void TypeInfo::RegisterScriptStruct()
 {
-	ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+	AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
 	ASSERT( script_engine != nullptr );
 
 	if( script_engine != nullptr )

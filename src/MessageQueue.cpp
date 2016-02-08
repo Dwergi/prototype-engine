@@ -13,7 +13,8 @@
 namespace dd
 {
 	MessageQueue::MessageQueue()
-		: m_nextHandlerID( 0 )
+		: m_nextHandlerID( 0 ),
+		m_pendingMessages( new Vector<Message*>, new Vector<Message*> )
 	{
 
 	}
@@ -76,7 +77,7 @@ namespace dd
 	{
 		std::lock_guard<std::mutex> lock( m_mutex );
 
-		m_pendingMessages.Add( message );
+		m_pendingMessages.GetWrite().Add( message );
 	}
 
 	void MessageQueue::Dispatch( Message* message ) const
@@ -98,14 +99,18 @@ namespace dd
 
 	void MessageQueue::Update( float dt )
 	{
-		std::lock_guard<std::mutex> lock( m_mutex );
+		{
+			std::lock_guard<std::mutex> lock( m_mutex );
 
-		for( Message* message : m_pendingMessages )
+			m_pendingMessages.Swap();
+		}
+
+		for( Message* message : m_pendingMessages.GetRead() )
 		{
 			Dispatch( message );
 		}
 
-		m_pendingMessages.Clear();
+		m_pendingMessages.GetWrite().Clear();
 	}
 
 	uint MessageQueue::GetSubscriberCount( uint message_type ) const
@@ -121,5 +126,10 @@ namespace dd
 	uint MessageQueue::GetTotalSubscriberCount() const
 	{
 		return m_handlers.Size();
+	}
+
+	uint MessageQueue::GetPendingMessageCount() const
+	{
+		return m_pendingMessages.GetWrite().Size();
 	}
 }

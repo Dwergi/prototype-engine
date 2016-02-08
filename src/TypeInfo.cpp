@@ -37,7 +37,7 @@ namespace dd
 
 		if( m_scriptObject )
 		{
-			g_services.Get<ScriptEngine>().RegisterMember( m_name.c_str(), member );
+			g_services.Get<AngelScriptEngine>().RegisterMember( m_name.c_str(), member );
 		}
 	}
 

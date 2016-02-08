@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "DoubleBuffer.h"
 #include "Message.h"
 #include "MessageTypes.h"
 #include "ISystem.h"
@@ -52,13 +53,15 @@ namespace dd
 
 		uint GetTotalSubscriberCount() const;
 
+		uint GetPendingMessageCount() const;
+
 	private:
 
 		std::mutex m_mutex;
 
 		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
 		DenseMap<HandlerID, Function> m_handlers;
-		Vector<Message*> m_pendingMessages;
+		DoubleBuffer<Vector<Message*>> m_pendingMessages;
 
 		HandlerID m_nextHandlerID;
 

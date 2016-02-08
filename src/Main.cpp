@@ -119,7 +119,7 @@ void RegisterGlobalScriptFunctions()
 {
 	REGISTER_TYPE( EntityHandle );
 
-	ScriptEngine& engine = g_services.Get<ScriptEngine>();
+	AngelScriptEngine& engine = g_services.Get<AngelScriptEngine>();
 
 	engine.RegisterGlobalFunction( "GetTransformComponent", FUNCTION( GetTransformComponent ), &GetTransformComponent );
 	engine.RegisterGlobalFunction( "GetEntityHandle", FUNCTION( GetEntityHandle ), &GetEntityHandle );
@@ -328,8 +328,8 @@ int main( int argc, char* const argv[] )
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
-	ScriptEngine scriptEngine;
-	g_services.Register( scriptEngine );
+	AngelScriptEngine AngelScriptEngine;
+	g_services.Register( AngelScriptEngine );
 
 	TypeInfo::RegisterDefaultTypes();
 

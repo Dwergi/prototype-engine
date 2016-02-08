@@ -71,7 +71,7 @@ namespace dd
 {
 	void RegisterScriptCommands( Vector<String64>& commands )
 	{
-		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
+		asIScriptEngine* engine = g_services.Get<AngelScriptEngine>().GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
 			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
@@ -92,7 +92,7 @@ namespace dd
 
 	void RegisterConsoleHelpers()
 	{
-		ScriptEngine* engine = dd::g_services.GetPtr<ScriptEngine>();
+		AngelScriptEngine* engine = dd::g_services.GetPtr<AngelScriptEngine>();
 		if( engine == nullptr )
 			return;
 
@@ -295,7 +295,7 @@ namespace dd
 
 	void DebugConsole::EvaluateScript( const String& script )
 	{
-		ScriptEngine* script_engine = g_services.GetPtr<ScriptEngine>();
+		AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
 		if( script_engine == nullptr )
 			return;
 
@@ -321,7 +321,7 @@ namespace dd
 	{
 		AddLog( "Functions:\n" );
 
-		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
+		asIScriptEngine* engine = g_services.Get<AngelScriptEngine>().GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
 			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
@@ -336,7 +336,7 @@ namespace dd
 	{
 		AddLog( "Variables:\n" );
 
-		asIScriptEngine* engine = g_services.Get<ScriptEngine>().GetInternalEngine();
+		asIScriptEngine* engine = g_services.Get<AngelScriptEngine>().GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
 		{
 			const char* name;
