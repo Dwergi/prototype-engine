@@ -29,12 +29,12 @@ namespace dd
 		const uint DefaultSize { 8 };
 
 		Buffer<T> m_storage;
-		int m_head { 0 };
-		int m_tail { 0 };
-		int m_size { 0 };
+		uint m_head { 0 };
+		uint m_tail { 0 };
+		uint m_size { 0 };
 
 		void Grow();
-		void Allocate( int size );
+		void Allocate( uint size );
 	};
 }
 

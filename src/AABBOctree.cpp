@@ -71,7 +71,7 @@ namespace dd
 		ASSERT( IsValid( entry ) );
 
 		m_free.Push( entry );
-		memset( &m_entries[entry], 0xffffffff, sizeof( AABB ) );
+		memset( &m_entries[entry], 0xFFFFFFFF, sizeof( AABB ) );
 
 		for( Node& node : m_nodes )
 		{

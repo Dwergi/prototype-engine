@@ -114,7 +114,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void RingBuffer<T>::Allocate( int size )
+	void RingBuffer<T>::Allocate( uint size )
 	{
 		ASSERT( size > 0 );
 

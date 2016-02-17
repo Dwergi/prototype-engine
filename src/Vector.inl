@@ -179,7 +179,7 @@ namespace dd
 	{
 		DestroyRange( m_data, m_size );
 
-		memset( m_data, 0xffffffff, sizeof( T ) * m_capacity );
+		memset( m_data, 0xFFFFFFFF, sizeof( T ) * m_capacity );
 
 		m_size = 0;
 	}
@@ -191,7 +191,7 @@ namespace dd
 
 		m_data[index].~T();
 
-		memset( &m_data[index], 0xffffffff, sizeof( T ) );
+		memset( &m_data[index], 0xFFFFFFFF, sizeof( T ) );
 	}
 
 	template<typename T>

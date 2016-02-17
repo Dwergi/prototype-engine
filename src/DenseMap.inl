@@ -214,7 +214,7 @@ namespace dd
 	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
 	{
 		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
-		memset( new_data, 0xFF, new_capacity * sizeof( Entry ) );
+		memset( new_data, 0xABAD1DEA, new_capacity * sizeof( Entry ) );
 
 		Buffer<Entry> old_data( m_data );
 		m_data.Release();
@@ -277,7 +277,7 @@ namespace dd
 	{
 		entry.~Entry();
 
-		memset( &entry, 0xFF, sizeof( Entry ) );
+		memset( &entry, 0xFFFFFFFF, sizeof( Entry ) );
 	}
 
 	template<typename TKey, typename TValue>

@@ -7,8 +7,63 @@
 #include "PrecompiledHeader.h"
 #include "WrenEngine.h"
 
+#include "wren/src/include/wren.h"
+
 namespace dd
 {
+	static Vector<WrenEngine*> m_activeEngines;
+
+	//
+	// Find the engine that owns the given VM.
+	//
+	WrenEngine* FindEngine( WrenVM* vm )
+	{
+		for( WrenEngine* engine : m_activeEngines )
+		{
+			if( engine->GetVM() == vm )
+				return engine;
+		}
+
+		return nullptr;
+	}
+
+	WrenForeignClassMethods BindForeignClassCallback( WrenVM* vm, const char* module, const char* className )
+	{
+		WrenForeignClassMethods ret;
+		ret.allocate = nullptr;
+		ret.allocate = nullptr;
+
+		WrenEngine* engine = FindEngine( vm );
+
+		if( engine == nullptr )
+			return ret;
+
+		// TODO
+		return ret;
+	}
+
+	WrenForeignMethodFn	BindForeignMethodCallback( WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature )
+	{
+		WrenEngine* engine = FindEngine( vm );
+
+		if( engine == nullptr )
+			return nullptr;
+
+		// TODO
+		return nullptr;
+	}
+
+	char* LoadModuleCallback( WrenVM* vm, const char* name )
+	{
+		WrenEngine* engine = FindEngine( vm );
+
+		if( engine == nullptr )
+			return nullptr;
+
+		// TODO
+		return nullptr;
+	}
+
 	WrenEngine::WrenEngine()
 	{
 		WrenConfiguration config;
@@ -29,60 +84,12 @@ namespace dd
 
 		wrenFreeVM( m_engine );
 	}
-
-	WrenEngine* WrenEngine::FindEngine( WrenVM* vm )
-	{
-		for( WrenEngine* engine : m_activeEngines )
-		{
-			if( engine->m_engine == vm )
-				return engine;
-		}
-
-		return nullptr;
-	}
-
+	
 	void WrenEngine::CallFunction( WrenVM* vm )
 	{
 		WrenEngine* engine = FindEngine( vm );
 
 		if( engine == nullptr )
 			return;
-	}
-
-	WrenForeignClassMethods WrenEngine::BindForeignClassCallback( WrenVM* vm, const char* module, const char* className )
-	{
-		WrenForeignClassMethods ret;
-		ret.allocate = nullptr;
-		ret.allocate = nullptr;
-
-		WrenEngine* engine = FindEngine( vm );
-
-		if( engine == nullptr )
-			return ret;
-		
-		// TODO
-		return ret;
-	}
-
-	WrenForeignMethodFn	WrenEngine::BindForeignMethodCallback( WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature )
-	{
-		WrenEngine* engine = FindEngine( vm );
-
-		if( engine == nullptr )
-			return nullptr;
-
-		// TODO
-		return nullptr;
-	}
-
-	char* WrenEngine::LoadModuleCallback( WrenVM* vm, const char* name )
-	{
-		WrenEngine* engine = FindEngine( vm );
-
-		if( engine == nullptr )
-			return nullptr;
-
-		// TODO
-		return nullptr;
 	}
 }

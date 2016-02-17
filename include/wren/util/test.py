@@ -362,6 +362,9 @@ def run_example(path):
   if "animals" in path: return
   if "guess_number" in path: return
 
+  # This one is annoyingly slow.
+  if "skynet" in path: return
+
   run_script(WREN_APP, path, "example")
 
 

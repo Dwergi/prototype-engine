@@ -352,6 +352,30 @@ struct sCompiler
   IntBuffer debugSourceLines;
 };
 
+// Describes where a variable is declared.
+typedef enum
+{
+  // A local variable in the current function.
+  SCOPE_LOCAL,
+  
+  // A local variable declared in an enclosing function.
+  SCOPE_UPVALUE,
+  
+  // A top-level module variable.
+  SCOPE_MODULE
+} Scope;
+
+// A reference to a variable and the scope where it is defined. This contains
+// enough information to emit correct code to load or store the variable.
+typedef struct
+{
+  // The stack slot, upvalue slot, or module symbol defining the variable.
+  int index;
+  
+  // Where the variable is declared.
+  Scope scope;
+} Variable;
+
 // The stack effect of each opcode. The index in the array is the opcode, and
 // the value is the stack effect of that instruction.
 static const int stackEffects[] = {
@@ -1212,7 +1236,7 @@ static int declareVariable(Compiler* compiler, Token* token)
     if (local->depth < compiler->scopeDepth) break;
 
     if (local->length == token->length &&
-        strncmp(local->name, token->start, token->length) == 0)
+        memcmp(local->name, token->start, token->length) == 0)
     {
       error(compiler, "Variable is already declared in this scope.");
       return i;
@@ -1310,7 +1334,7 @@ static int resolveLocal(Compiler* compiler, const char* name, int length)
   for (int i = compiler->numLocals - 1; i >= 0; i--)
   {
     if (compiler->locals[i].length == length &&
-        strncmp(name, compiler->locals[i].name, length) == 0)
+        memcmp(name, compiler->locals[i].name, length) == 0)
     {
       return i;
     }
@@ -1385,42 +1409,37 @@ static int findUpvalue(Compiler* compiler, const char* name, int length)
   return -1;
 }
 
-// Look up [name] in the current scope to see what name it is bound to. Returns
-// the index of the name either in local scope, or the enclosing function's
-// upvalue list. Does not search the module scope. Returns -1 if not found.
-//
-// Sets [loadInstruction] to the instruction needed to load the variable. Will
-// be [CODE_LOAD_LOCAL] or [CODE_LOAD_UPVALUE].
-static int resolveNonmodule(Compiler* compiler, const char* name, int length,
-                            Code* loadInstruction)
+// Look up [name] in the current scope to see what variable it refers to.
+// Returns the variable either in local scope, or the enclosing function's
+// upvalue list. Does not search the module scope. Returns a variable with
+// index -1 if not found.
+static Variable resolveNonmodule(Compiler* compiler,
+                                 const char* name, int length)
 {
-  // Look it up in the local scopes. Look in reverse order so that the most
-  // nested variable is found first and shadows outer ones.
-  *loadInstruction = CODE_LOAD_LOCAL;
-  int local = resolveLocal(compiler, name, length);
-  if (local != -1) return local;
+  // Look it up in the local scopes.
+  Variable variable;
+  variable.scope = SCOPE_LOCAL;
+  variable.index = resolveLocal(compiler, name, length);
+  if (variable.index != -1) return variable;
 
-  // If we got here, it's not a local, so lets see if we are closing over an
-  // outer local.
-  *loadInstruction = CODE_LOAD_UPVALUE;
-  return findUpvalue(compiler, name, length);
+  // Tt's not a local, so guess that it's an upvalue.
+  variable.scope = SCOPE_UPVALUE;
+  variable.index = findUpvalue(compiler, name, length);
+  return variable;
 }
 
-// Look up [name] in the current scope to see what name it is bound to. Returns
-// the index of the name either in module scope, local scope, or the enclosing
-// function's upvalue list. Returns -1 if not found.
-//
-// Sets [loadInstruction] to the instruction needed to load the variable. Will
-// be one of [CODE_LOAD_LOCAL], [CODE_LOAD_UPVALUE], or [CODE_LOAD_MODULE_VAR].
-static int resolveName(Compiler* compiler, const char* name, int length,
-                       Code* loadInstruction)
+// Look up [name] in the current scope to see what variable it refers to.
+// Returns the variable either in module scope, local scope, or the enclosing
+// function's upvalue list. Returns a variable with index -1 if not found.
+static Variable resolveName(Compiler* compiler, const char* name, int length)
 {
-  int nonmodule = resolveNonmodule(compiler, name, length, loadInstruction);
-  if (nonmodule != -1) return nonmodule;
+  Variable variable = resolveNonmodule(compiler, name, length);
+  if (variable.index != -1) return variable;
 
-  *loadInstruction = CODE_LOAD_MODULE_VAR;
-  return wrenSymbolTableFind(&compiler->parser->module->variableNames,
-                             name, length);
+  variable.scope = SCOPE_MODULE;
+  variable.index = wrenSymbolTableFind(&compiler->parser->module->variableNames,
+                                       name, length);
+  return variable;
 }
 
 static void loadLocal(Compiler* compiler, int slot)
@@ -1913,20 +1932,30 @@ static void namedCall(Compiler* compiler, bool allowAssignment,
   }
 }
 
+// Emits the code to load [variable] onto the stack.
+static void loadVariable(Compiler* compiler, Variable variable)
+{
+  switch (variable.scope)
+  {
+    case SCOPE_LOCAL:
+      loadLocal(compiler, variable.index);
+      break;
+    case SCOPE_UPVALUE:
+      emitByteArg(compiler, CODE_LOAD_UPVALUE, variable.index);
+      break;
+    case SCOPE_MODULE:
+      emitShortArg(compiler, CODE_LOAD_MODULE_VAR, variable.index);
+      break;
+    default:
+      UNREACHABLE();
+  }
+}
+
 // Loads the receiver of the currently enclosing method. Correctly handles
 // functions defined inside methods.
 static void loadThis(Compiler* compiler)
 {
-  Code loadInstruction;
-  int index = resolveNonmodule(compiler, "this", 4, &loadInstruction);
-  if (loadInstruction == CODE_LOAD_LOCAL)
-  {
-    loadLocal(compiler, index);
-  }
-  else
-  {
-    emitByteArg(compiler, loadInstruction, index);
-  }
+  loadVariable(compiler, resolveNonmodule(compiler, "this", 4));
 }
 
 // Pushes the value for a module-level variable implicitly imported from core.
@@ -2100,10 +2129,9 @@ static void field(Compiler* compiler, bool allowAssignment)
   }
 }
 
-// Compiles a read or assignment to a variable at [index] using
-// [loadInstruction].
-static void variable(Compiler* compiler, bool allowAssignment, int index,
-                     Code loadInstruction)
+// Compiles a read or assignment to [variable].
+static void bareName(Compiler* compiler, bool allowAssignment,
+                     Variable variable)
 {
   // If there's an "=" after a bare name, it's a variable assignment.
   if (match(compiler, TOKEN_EQ))
@@ -2114,69 +2142,55 @@ static void variable(Compiler* compiler, bool allowAssignment, int index,
     expression(compiler);
 
     // Emit the store instruction.
-    switch (loadInstruction)
+    switch (variable.scope)
     {
-      case CODE_LOAD_LOCAL:
-        emitByteArg(compiler, CODE_STORE_LOCAL, index);
+      case SCOPE_LOCAL:
+        emitByteArg(compiler, CODE_STORE_LOCAL, variable.index);
         break;
-      case CODE_LOAD_UPVALUE:
-        emitByteArg(compiler, CODE_STORE_UPVALUE, index);
+      case SCOPE_UPVALUE:
+        emitByteArg(compiler, CODE_STORE_UPVALUE, variable.index);
         break;
-      case CODE_LOAD_MODULE_VAR:
-        emitShortArg(compiler, CODE_STORE_MODULE_VAR, index);
+      case SCOPE_MODULE:
+        emitShortArg(compiler, CODE_STORE_MODULE_VAR, variable.index);
         break;
       default:
         UNREACHABLE();
     }
+    return;
   }
-  else if (loadInstruction == CODE_LOAD_MODULE_VAR)
-  {
-    emitShortArg(compiler, loadInstruction, index);
-  }
-  else if (loadInstruction == CODE_LOAD_LOCAL)
-  {
-    loadLocal(compiler, index);
-  }
-  else
-  {
-    emitByteArg(compiler, loadInstruction, index);
-  }
+
+  // Emit the load instruction.
+  loadVariable(compiler, variable);
 }
 
 static void staticField(Compiler* compiler, bool allowAssignment)
 {
-  Code loadInstruction = CODE_LOAD_LOCAL;
-  int index = 255;
-
   Compiler* classCompiler = getEnclosingClassCompiler(compiler);
   if (classCompiler == NULL)
   {
     error(compiler, "Cannot use a static field outside of a class definition.");
+    return;
   }
-  else
+
+  // Look up the name in the scope chain.
+  Token* token = &compiler->parser->previous;
+
+  // If this is the first time we've seen this static field, implicitly
+  // define it as a variable in the scope surrounding the class definition.
+  if (resolveLocal(classCompiler, token->start, token->length) == -1)
   {
-    // Look up the name in the scope chain.
-    Token* token = &compiler->parser->previous;
+    int symbol = declareVariable(classCompiler, NULL);
 
-    // If this is the first time we've seen this static field, implicitly
-    // define it as a variable in the scope surrounding the class definition.
-    if (resolveLocal(classCompiler, token->start, token->length) == -1)
-    {
-      int symbol = declareVariable(classCompiler, NULL);
-
-      // Implicitly initialize it to null.
-      emitOp(classCompiler, CODE_NULL);
-      defineVariable(classCompiler, symbol);
-    }
-
-    // It definitely exists now, so resolve it properly. This is different from
-    // the above resolveLocal() call because we may have already closed over it
-    // as an upvalue.
-    index = resolveName(compiler, token->start, token->length,
-                        &loadInstruction);
+    // Implicitly initialize it to null.
+    emitOp(classCompiler, CODE_NULL);
+    defineVariable(classCompiler, symbol);
   }
 
-  variable(compiler, allowAssignment, index, loadInstruction);
+  // It definitely exists now, so resolve it properly. This is different from
+  // the above resolveLocal() call because we may have already closed over it
+  // as an upvalue.
+  Variable variable = resolveName(compiler, token->start, token->length);
+  bareName(compiler, allowAssignment, variable);
 }
 
 // Returns `true` if [name] is a local variable name (starts with a lowercase
@@ -2192,12 +2206,10 @@ static void name(Compiler* compiler, bool allowAssignment)
   // Look for the name in the scope chain up to the nearest enclosing method.
   Token* token = &compiler->parser->previous;
 
-  Code loadInstruction;
-  int index = resolveNonmodule(compiler, token->start, token->length,
-                               &loadInstruction);
-  if (index != -1)
+  Variable variable = resolveNonmodule(compiler, token->start, token->length);
+  if (variable.index != -1)
   {
-    variable(compiler, allowAssignment, index, loadInstruction);
+    bareName(compiler, allowAssignment, variable);
     return;
   }
 
@@ -2219,9 +2231,10 @@ static void name(Compiler* compiler, bool allowAssignment)
   }
 
   // Otherwise, look for a module-level variable with the name.
-  int module = wrenSymbolTableFind(&compiler->parser->module->variableNames,
-                                   token->start, token->length);
-  if (module == -1)
+  variable.scope = SCOPE_MODULE;
+  variable.index = wrenSymbolTableFind(&compiler->parser->module->variableNames,
+                                       token->start, token->length);
+  if (variable.index == -1)
   {
     if (isLocalName(token->start))
     {
@@ -2231,16 +2244,17 @@ static void name(Compiler* compiler, bool allowAssignment)
 
     // If it's a nonlocal name, implicitly define a module-level variable in
     // the hopes that we get a real definition later.
-    module = wrenDeclareVariable(compiler->parser->vm, compiler->parser->module,
-                                 token->start, token->length);
+    variable.index = wrenDeclareVariable(compiler->parser->vm,
+                                         compiler->parser->module,
+                                         token->start, token->length);
 
-    if (module == -2)
+    if (variable.index == -2)
     {
       error(compiler, "Too many module variables defined.");
     }
   }
-
-  variable(compiler, allowAssignment, module, CODE_LOAD_MODULE_VAR);
+  
+  bareName(compiler, allowAssignment, variable);
 }
 
 static void null(Compiler* compiler, bool allowAssignment)
@@ -3096,26 +3110,16 @@ static void createConstructor(Compiler* compiler, Signature* signature,
 
 // Loads the enclosing class onto the stack and then binds the function already
 // on the stack as a method on that class.
-static void defineMethod(Compiler* compiler, int classSlot, bool isStatic,
-                         int methodSymbol)
+static void defineMethod(Compiler* compiler, Variable classVariable,
+                         bool isStatic, int methodSymbol)
 {
   // Load the class. We have to do this for each method because we can't
   // keep the class on top of the stack. If there are static fields, they
   // will be locals above the initial variable slot for the class on the
   // stack. To skip past those, we just load the class each time right before
   // defining a method.
-  if (compiler->scopeDepth == 0)
-  {
-    // The class is at the top level (scope depth is 0, not -1 to account for
-    // the static variable scope surrounding the class itself), so load it from
-    // there.
-    emitShortArg(compiler, CODE_LOAD_MODULE_VAR, classSlot);
-  }
-  else
-  {
-    loadLocal(compiler, classSlot);
-  }
-  
+  loadVariable(compiler, classVariable);
+
   // Define the method.
   Code instruction = isStatic ? CODE_METHOD_STATIC : CODE_METHOD_INSTANCE;
   emitShortArg(compiler, instruction, methodSymbol);
@@ -3125,7 +3129,7 @@ static void defineMethod(Compiler* compiler, int classSlot, bool isStatic,
 //
 // Returns `true` if it compiled successfully, or `false` if the method couldn't
 // be parsed.
-static bool method(Compiler* compiler, int classSlot)
+static bool method(Compiler* compiler, Variable classVariable)
 {
   // TODO: What about foreign constructors?
   bool isForeign = match(compiler, TOKEN_FOREIGN);
@@ -3180,7 +3184,7 @@ static bool method(Compiler* compiler, int classSlot)
   // Define the method. For a constructor, this defines the instance
   // initializer method.
   int methodSymbol = signatureSymbol(compiler, &signature);
-  defineMethod(compiler, classSlot, compiler->enclosingClass->inStatic,
+  defineMethod(compiler, classVariable, compiler->enclosingClass->inStatic,
                methodSymbol);
 
   if (signature.type == SIG_INITIALIZER)
@@ -3190,7 +3194,7 @@ static bool method(Compiler* compiler, int classSlot)
     int constructorSymbol = signatureSymbol(compiler, &signature);
     
     createConstructor(compiler, &signature, methodSymbol);
-    defineMethod(compiler, classSlot, true, constructorSymbol);
+    defineMethod(compiler, classVariable, true, constructorSymbol);
   }
 
   return true;
@@ -3201,8 +3205,10 @@ static bool method(Compiler* compiler, int classSlot)
 static void classDefinition(Compiler* compiler, bool isForeign)
 {
   // Create a variable to store the class in.
-  int slot = declareNamedVariable(compiler);
-
+  Variable classVariable;
+  classVariable.scope = compiler->scopeDepth == -1 ? SCOPE_MODULE : SCOPE_LOCAL;
+  classVariable.index = declareNamedVariable(compiler);
+  
   // Make a string constant for the name.
   emitConstant(compiler, wrenNewString(compiler->parser->vm,
       compiler->parser->previous.start, compiler->parser->previous.length));
@@ -3232,7 +3238,7 @@ static void classDefinition(Compiler* compiler, bool isForeign)
   }
 
   // Store it in its name.
-  defineVariable(compiler, slot);
+  defineVariable(compiler, classVariable.index);
 
   // Push a local variable scope. Static fields in a class body are hoisted out
   // into local variables declared in this scope. Methods that use them will
@@ -3247,7 +3253,6 @@ static void classDefinition(Compiler* compiler, bool isForeign)
   // bytecode will be adjusted by [wrenBindMethod] to take inherited fields
   // into account.
   wrenSymbolTableInit(&classCompiler.fields);
-
   compiler->enclosingClass = &classCompiler;
 
   // Compile the method definitions.
@@ -3256,7 +3261,7 @@ static void classDefinition(Compiler* compiler, bool isForeign)
 
   while (!match(compiler, TOKEN_RIGHT_BRACE))
   {
-    if (!method(compiler, slot)) break;
+    if (!method(compiler, classVariable)) break;
     
     // Don't require a newline after the last definition.
     if (match(compiler, TOKEN_RIGHT_BRACE)) break;
@@ -3272,9 +3277,7 @@ static void classDefinition(Compiler* compiler, bool isForeign)
   }
   
   wrenSymbolTableClear(compiler->parser->vm, &classCompiler.fields);
-
   compiler->enclosingClass = NULL;
-
   popScope(compiler);
 }
 

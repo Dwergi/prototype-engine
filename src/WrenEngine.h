@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "wren\src\include\wren.h"
+typedef struct WrenVM WrenVM;
 
 namespace dd
 {
@@ -47,21 +47,12 @@ namespace dd
 
 		bool Evaluate( const String& script, String& output );
 
-	private:
+		WrenVM* GetVM() const { return m_engine; }
 
-		static Vector<WrenEngine*> m_activeEngines;
+	private:
 
 		WrenVM* m_engine;
 
-		static WrenForeignClassMethods	BindForeignClassCallback( WrenVM* vm, const char* module, const char* className );
-		static WrenForeignMethodFn		BindForeignMethodCallback( WrenVM* vm, const char* module,	const char* className, bool isStatic, const char* signature );
-		static char*					LoadModuleCallback( WrenVM* vm, const char* name );
-
-		//
-		// Find the engine that owns the given VM.
-		//
-		static WrenEngine*				FindEngine( WrenVM* vm );
-
-		static void						CallFunction( WrenVM* vm );
+		static void	CallFunction( WrenVM* vm );
 	};
 }

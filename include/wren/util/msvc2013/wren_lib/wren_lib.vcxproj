@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -67,28 +67,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\..\..\src\include;$(ProjectDir)..\..\..\src\vm;$(ProjectDir)..\..\..\src\optional</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
     <TargetName>wren_static_d</TargetName>
-    <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\build\lib\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\..\..\src\include;$(ProjectDir)..\..\..\src\vm;$(ProjectDir)..\..\..\src\optional</IncludePath>
-    <TargetName>wren_static_d</TargetName>
-    <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\build\lib\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
+    <TargetName>wren_static_64_d</TargetName>
+    <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\..\..\src\optional;$(ProjectDir)..\..\..\src\vm;$(ProjectDir)..\..\..\src\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
     <TargetName>wren_static</TargetName>
-    <OutDir>$(SolutionDir)..\..\lib\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\..\build\lib\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\..\..\src\optional;$(ProjectDir)..\..\..\src\vm;$(ProjectDir)..\..\..\src\include</IncludePath>
-    <TargetName>wren_static</TargetName>
-    <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\build\lib\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
+    <TargetName>wren_static_64</TargetName>
+    <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,6 +96,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\src\include\;$(ProjectDir)..\..\..\src\vm\;$(ProjectDir)..\..\..\src\optional\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,6 +108,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\src\include\;$(ProjectDir)..\..\..\src\vm\;$(ProjectDir)..\..\..\src\optional\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -121,6 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\src\include\;$(ProjectDir)..\..\..\src\vm\;$(ProjectDir)..\..\..\src\optional\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -137,6 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\src\include\;$(ProjectDir)..\..\..\src\vm\;$(ProjectDir)..\..\..\src\optional\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
