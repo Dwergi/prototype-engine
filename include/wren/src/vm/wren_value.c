@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "wren.h"
+#include "../include/wren.h"
 #include "wren_value.h"
 #include "wren_vm.h"
 
@@ -733,7 +733,7 @@ Value wrenNumToString(WrenVM* vm, double value)
   // + 1 char for "\0"
   // = 24
   char buffer[24];
-  int length = sprintf(buffer, "%.14g", value);
+  int length = sprintf_s(buffer, 24, "%.14g", value);
   return wrenNewString(vm, buffer, length);
 }
 

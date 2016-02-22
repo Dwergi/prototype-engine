@@ -7,8 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "WrenEngine.h"
 
-#include "wren/src/include/wren.h"
-
 namespace dd
 {
 	static Vector<WrenEngine*> m_activeEngines;

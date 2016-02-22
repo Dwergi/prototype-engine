@@ -5,8 +5,8 @@
 #include <string.h>
 #include <time.h>
 
-#include "wren.h"
-#include "wren_vm.h"
+#include "../include/wren.h"
+#include "../vm/wren_vm.h"
 
 #include "wren_opt_random.wren.inc"
 

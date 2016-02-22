@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "wren.h"
+#include "../include/wren.h"
 #include "wren_common.h"
 #include "wren_compiler.h"
 #include "wren_core.h"
@@ -9,10 +9,10 @@
 #include "wren_vm.h"
 
 #if WREN_OPT_META
-  #include "wren_opt_meta.h"
+  #include "../optional/wren_opt_meta.h"
 #endif
 #if WREN_OPT_RANDOM
-  #include "wren_opt_random.h"
+  #include "../optional/wren_opt_random.h"
 #endif
 
 #if WREN_DEBUG_TRACE_MEMORY || WREN_DEBUG_TRACE_GC

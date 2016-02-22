@@ -6,7 +6,7 @@
 
 #pragma once
 
-typedef struct WrenVM WrenVM;
+#include "wren/src/include/wren.h"
 
 namespace dd
 {

@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "wren_vm.h"
+#include "../vm/wren_vm.h"
 #include "wren_opt_meta.wren.inc"
 
 void metaCompile(WrenVM* vm)
