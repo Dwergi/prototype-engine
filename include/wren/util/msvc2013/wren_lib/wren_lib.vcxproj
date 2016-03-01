@@ -140,8 +140,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\src\include\;$(ProjectDir)..\..\..\src\vm\;$(ProjectDir)..\..\..\src\optional\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -1,6 +1,11 @@
 #ifndef wren_h
 #define wren_h
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -66,7 +71,7 @@ typedef struct
   // [wrenAllocateForeign] exactly once.
   WrenForeignMethodFn allocate;
 
-  // The callback invoked when the garbage collector is about to collecto a
+  // The callback invoked when the garbage collector is about to collect a
   // foreign object's memory.
   //
   // This may be `NULL` if the foreign class does not need to finalize.
@@ -75,8 +80,9 @@ typedef struct
 
 // Returns a pair of pointers to the foreign methods used to allocate and
 // finalize the data for instances of [className] in [module].
-typedef WrenForeignClassMethods (*WrenBindForeignClassFn)(
-    WrenVM* vm, const char* module, const char* className);
+typedef WrenForeignClassMethods (*WrenBindForeignClassFn)(WrenVM* vm,
+                                                          const char* module,
+                                                          const char* className);
 
 typedef struct
 {
@@ -88,9 +94,9 @@ typedef struct
   // The callback Wren uses to load a module.
   //
   // Since Wren does not talk directly to the file system, it relies on the
-  // embedder to phyisically locate and read the source code for a module. The
+  // embedder to physically locate and read the source code for a module. The
   // first time an import appears, Wren will call this and pass in the name of
-  // the module being imported. The VM should return the soure code for that
+  // the module being imported. The VM should return the source code for that
   // module. Memory for the source should be allocated using [reallocateFn] and
   // Wren will take ownership over it.
   //
@@ -367,7 +373,10 @@ void wrenInsertInList(WrenVM* vm, int listSlot, int index, int elementSlot);
 
 // Looks up the top level variable with [name] in [module] and stores it in
 // [slot].
-void wrenGetVariable(WrenVM* vm, const char* module, const char* name,
-                     int slot);
+void wrenGetVariable(WrenVM* vm, const char* module, const char* name, int slot);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
