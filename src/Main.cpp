@@ -311,7 +311,7 @@ int GameMain()
 		window.Close();
 	}
 
-	DD_PROFILE_DEINIT();
+	DD_PROFILE_DEINIT(); 
 
 	ASSERT( false, "DONE!" );
 	return 0;

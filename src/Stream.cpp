@@ -106,7 +106,7 @@ namespace dd
 
 		va_list args;
 		va_start( args, format );
-		int read = vsscanf_s( src, format, args );
+		int read = vsscanf( src, format, args );
 		va_end( args );
 	}
 	//----------------------------------------------------------------------------
