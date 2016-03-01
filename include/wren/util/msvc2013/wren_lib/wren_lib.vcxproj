@@ -28,7 +28,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -68,27 +68,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
-    <TargetName>wren_static_d</TargetName>
+    <TargetName>wren32d</TargetName>
     <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
-    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
-    <TargetName>wren_static_64_d</TargetName>
+    <TargetName>wren64d</TargetName>
     <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
-    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
-    <TargetName>wren_static</TargetName>
+    <TargetName>wren32</TargetName>
     <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
-    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\..\src\include;$(SolutionDir)..\..\src\vm;$(SolutionDir)..\..\src\optional</IncludePath>
-    <TargetName>wren_static_64</TargetName>
+    <TargetName>wren64</TargetName>
     <OutDir>$(ProjectDir)..\..\..\lib\</OutDir>
-    <IntDir>$(ProjectDir)..\..\..\build\lib\</IntDir>
+    <IntDir>$(ProjectDir)..\..\..\build\lib\$(Platform)\$(Configuration)\</IntDir>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -131,6 +131,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

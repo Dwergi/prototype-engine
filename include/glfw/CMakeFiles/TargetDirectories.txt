@@ -1,0 +1,3 @@
+W:/testing/DD/include/glfw/CMakeFiles/ALL_BUILD.dir
+W:/testing/DD/include/glfw/CMakeFiles/ZERO_CHECK.dir
+W:/testing/DD/include/glfw/src/CMakeFiles/glfw.dir

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="W:\testing\DD\include\glfw\tests\monitors.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\testing\DD\include\glfw\deps\getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="W:\testing\DD\include\glfw\deps\getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="W:\testing\DD\include\glfw\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0632A188-D0B5-4BDF-8618-ABBF2B55D1EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{19F77181-5DC9-4E6C-913A-5BBC28D10507}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
