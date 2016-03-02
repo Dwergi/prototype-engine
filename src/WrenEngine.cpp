@@ -25,16 +25,38 @@ namespace dd
 		return nullptr;
 	}
 
+	//
+	// Callback from Wren when something like print() is called that should write to output.
+	//
+	void WriteCallback( WrenVM* vm, const char* msg )
+	{
+		WrenEngine* engine = FindEngine( vm );
+		if( engine == nullptr )
+			return;
+
+		engine->Write( msg );
+	}
+
 	WrenForeignClassMethods BindForeignClassCallback( WrenVM* vm, const char* module, const char* className )
 	{
 		WrenForeignClassMethods ret;
 		ret.allocate = nullptr;
-		ret.allocate = nullptr;
+		ret.finalize = nullptr;
 
 		WrenEngine* engine = FindEngine( vm );
-
 		if( engine == nullptr )
 			return ret;
+
+		String128 fullName( module );
+		fullName += "::";
+		fullName += className;
+
+		const TypeInfo* typeInfo = GET_TYPE_STR( fullName );
+		if( typeInfo == nullptr )
+			return ret;
+
+		void* newPtr = wrenSetSlotNewForeign( vm, 0, 0, typeInfo->Size() );
+		typeInfo->PlacementNew( newPtr );
 
 		// TODO
 		return ret;
@@ -70,6 +92,7 @@ namespace dd
 		config.loadModuleFn = &LoadModuleCallback;
 		config.bindForeignClassFn = &BindForeignClassCallback;
 		config.bindForeignMethodFn = &BindForeignMethodCallback;
+		config.writeFn = &WriteCallback;
 
 		m_engine = wrenNewVM( &config );
 
@@ -89,5 +112,25 @@ namespace dd
 
 		if( engine == nullptr )
 			return;
+	}
+
+	void WrenEngine::SetOutput( String* output )
+	{
+		if( output != nullptr )
+			m_output = new WriteStream( *output );
+		else
+			delete m_output;
+	}
+
+	void WrenEngine::Write( const char* message )
+	{
+		if( m_output == nullptr )
+		{
+			printf( "%s\n\n", message );
+		}
+		else
+		{
+			m_output->WriteFormat( "%s\n", message );
+		}
 	}
 }

@@ -10,6 +10,8 @@
 
 namespace dd
 {
+	class WriteStream;
+
 	class WrenEngine
 	{
 	public:
@@ -49,9 +51,13 @@ namespace dd
 
 		WrenVM* GetVM() const { return m_engine; }
 
+		void SetOutput( String* output );
+		void Write( const char* message );
+
 	private:
 
 		WrenVM* m_engine;
+		WriteStream* m_output;
 
 		static void	CallFunction( WrenVM* vm );
 	};
