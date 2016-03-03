@@ -6,24 +6,28 @@
 
 namespace dd
 {
-	template <typename T>
 	class RefCounter
 	{
 	public:
 
-		void Init( T* ptr )
+		void Init( void* ptr, const TypeInfo* type )
 		{
 			m_ptr = ptr;
+			m_type = type;
 			m_refCount = 1;
 		}
 
 		void Increment()
 		{
+			ASSERT( m_ptr != nullptr );
+
 			++m_refCount;
 		}
 
 		void Decrement()
 		{
+			ASSERT( m_ptr != nullptr );
+
 			--m_refCount;
 
 			if( m_refCount == 0 )
@@ -33,6 +37,7 @@ namespace dd
 	private:
 
 		int m_refCount;
-		T* m_ptr;
+		void* m_ptr;
+		const TypeInfo* m_type;
 	};
 }

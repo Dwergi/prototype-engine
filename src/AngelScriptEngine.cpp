@@ -7,8 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "AngelScriptEngine.h"
 
-#include "Script.h"
-
 #include "angelscript/add_on/scriptmath/scriptmath.h"
 #include "angelscript/add_on/scripthelper/scripthelper.h"
 

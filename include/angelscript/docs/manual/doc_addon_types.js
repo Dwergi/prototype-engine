@@ -10,7 +10,8 @@ var doc_addon_types =
     [ "Arrays", "doc_datatypes_arrays.html", [
       [ "Supporting array object and functions", "doc_datatypes_arrays.html#doc_datatypes_arrays_addon", [
         [ "Operators", "doc_datatypes_arrays.html#doc_datatypes_array_addon_ops", null ],
-        [ "Methods", "doc_datatypes_arrays.html#doc_datatypes_array_addon_mthd", null ]
+        [ "Methods", "doc_datatypes_arrays.html#doc_datatypes_array_addon_mthd", null ],
+        [ "Script example", "doc_datatypes_arrays.html#doc_datatypes_array_addon_example", null ]
       ] ]
     ] ],
     [ "dictionary", "doc_datatypes_dictionary.html", [

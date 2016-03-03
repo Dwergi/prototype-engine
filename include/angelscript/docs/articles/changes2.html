@@ -15,6 +15,87 @@ BODY { FONT-SIZE: 12px; FONT-FAMILY: Arial; }
 
 <h1>AngelScript Change Log</h1>
 
+<h2>Version 2.31.0 - 2016/02/26</h2>
+
+<ul>
+<li>Bug fixes
+<ul>
+<li>Compiler no longer crashes when assigning anonymous function to variable declared with auto type (Thanks glcolor)
+<li>Compiler will no longer match funcdefs for datatype if the namespace is not the correct one
+<li>Fixed bug with template value types and loading bytecode (Thanks glcolor)
+<li>Fixed bug with namespace and class member initialization (Thanks Solokiller)
+<li>Ternary condition can now return function pointers (Thanks Sir Ementaler)
+<li>Fixed problem with named args and registered behaviours (Thanks Solokiller)
+<li>Linux with PPC64 Little Endian is now working with AS_MAX_PORTABILITY (Thanks Rafael Fonseca)
+<li>Functions with generic calling conventions now catch application exceptions (Thanks Jason Goepel)
+<li>Fixed a bug in compiler with calling function with const reference and the function expected non-const reference (Thanks cvet)
+<li>Fixed compiler error in as_memory.cpp on OpenBSD (Thanks David Carlier)
+<li>Fixes for Big Endian CPUs (Thanks Rafael Fonseca)
+<li>Fixed crash on Linux 32bit when application threw C++ exception and library had been compiled with optimizations
+<li>Fixed bug in compiler when passing a handle from function argument to copy constructor (Thanks GGLucas)
+<li>Compiler properly resolves namespace when calling base classes method and the base class is declared in a different namespace (Thanks Ansjh)
+</ul>
+<li>Library interface
+<ul>
+<li>Added GetAuxiliary to asIScriptGeneric and asIScriptFunction for retrieving the auxiliary object registered with the function (Thanks cvet)
+<li>Added GetChildFuncdefCount and GetChildFuncdef to asIObjectType
+<li>Renamed GetFuncDefFromTypeId to GetFuncdefFromTypeId for consistency
+<li>It is now possible to register child funcdefs with RegisterFuncdef too
+<li>Renamed asIObjectType to asITypeInfo 
+<li>Renamed asCLEANOBJECTTYPEFUNC_t to asCLEANTYPEINFOFUNC_t
+<li>Implemented GetTypeInfoByDecl, GetTypeInfoByName, and GetTypeInfoById
+<li>Implemented SetTypeInfoUserDataCleanupCallback
+<li>Implemented asITypeInfo::GetEnumValueCount and GetEnumValueByIndex
+<li>Deprecated GetObjectTypeByName/Decl, GetEnumValueCount/ByIndex, GetObjectTypeById, SetObjectTypeUserDataCleanupCallback in engine
+<li>Deprecated GetObjectTypeByName/Decl, GetEnumValueCount/ByIndex in module
+<li>Deprecated asIObjectType
+<li>Changed GetEnumByIndex and GetTypedefByIndex to return an asITypeInfo and removed all the output parameters
+<li>Implemented GetTypedefTypeId in asITypeInfo
+<li>GetChildFuncdef now returns an asITypeInfo instead of asIScriptFunction
+<li>Added GetFuncdefSignature to asITypeInfo
+<li>Deprecated GetFuncdefFromTypeId
+<li>Implemented GetParentType in asITypeInfo to allow querying the parent type for child funcdefs
+</ul>
+<li>Library
+<ul>
+<li>The asCALL_GENERIC calling convention now also supports storing an auxiliary pointer during registration (Thanks cvet)
+<li>Improved parser error message when finding unexpected token to inform if the token is reserved or not (Thanks Solokiller)
+<li>Implemented asEP_ALLOW_UNICODE_IDENTIFIERS (Thanks Alexander Orefkov)
+<li>Added configuration in as_config.h to identify GNUC+Linux+PPC64 (Thanks Rafael Fonseca)
+<li>Access mask in the engine now defaults to all bits set to make sure built-in functions are available to all modules (Thanks Solokiller)
+<li>Included the asOBJ_FUNCDEF value to allow asITypeInfo to represent funcdefs too
+<li>asOBJ_SCRIPT_FUNCTION has been removed
+<li>RefCastObject can now be used for function pointers too
+<li>Refactored the code with regards to how types are stored, specifically funcdefs, resulting in more unified code and less memory use
+<li>Clang is now recognized in angelscript.h as supporting C++11 features (Thanks Derric McGarrah)
+</ul>
+<li>Script language
+<ul>
+<li>It is now possible to declare funcdefs as members of script classes
+<li>Partially specializing the scope as the enum type when referring to enums in namespaces is now possible (Thanks cvet)
+</ul>
+<li>Add-ons &amp; Samples
+<ul>
+<li>Fixed compiler error in scriptstdstring.h when using AS_USE_NAMESPACE (Thanks Sami Vuorela)
+<li>Fixed compiler error in aswrappedcall.h when using AS_USE_NAMESPACE
+<li>WriteConfigToStream and ConfigEngineFromStream is properly handling child funcdefs
+<li>Fixed problem in CScriptAny with constructing any object from primitive (Thanks gjl)
+<li>ScriptHandle and Dictionary no longer need special code for function pointers
+<li>Implemented CScriptDictionary::find for easier lookup of key/value pairs from application side
+<li>dictionary::delete now returns a bool to indicate if the delete was successful or not
+<li>Implemented CDateTime as a basic way of getting the time in scripts
+<li>The asrun sample exposes the CDateTime add-on to scripts
+<li>Implemented getInput in the asrun sample to allow it to get user input from standard input
+<li>CScriptAny released asITypeInfo that it didn't own when a null handle was stored in it (Thanks GGLucas)
+<li>CScriptBuilder incorrectly replaced /./ in include paths with nothing (Thanks Solokiller)
+</ul>
+<li>Project
+<ul>
+<li>Fixed cmake project files so library can be built as stand-alone without including the game sample (Thanks Wipe)
+<li>Corrected the name of the shared object filename in the gnuc makefile (Thanks hasufell)
+</ul>
+</ul>
+
 <h2>Version 2.30.2 - 2015/08/30</h2>
 
 <ul>

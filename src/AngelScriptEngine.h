@@ -8,7 +8,7 @@
 
 #include "RefCounter.h"
 
-#include "angelscript/include/angelscript.h"
+#include <angelscript.h>
 
 namespace dd
 {
@@ -19,9 +19,6 @@ namespace dd
 	public:
 		AngelScriptEngine();
 		~AngelScriptEngine();
-
-		Script& LoadScript( const char* script );
-		void UnloadScript( Script& script );
 
 		template <typename FnType>
 		void RegisterMethod( const char* name, const Function& method, FnType ptr );

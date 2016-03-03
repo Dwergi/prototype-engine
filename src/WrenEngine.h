@@ -29,13 +29,13 @@ namespace dd
 		// Register a script object that is passed by reference exclusively.
 		// 
 		template <typename ObjType>
-		void RegisterObject( const char* className );
+		void RegisterObject( const char* module, const char* className );
 
 		//
 		// Register a script object that is passed by value.
 		//
 		template <typename ObjType>
-		void RegisterStruct( const char* className );
+		void RegisterStruct( const char* module, const char* className );
 
 		// 
 		// Register a member for an object.

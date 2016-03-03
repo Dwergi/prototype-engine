@@ -43,5 +43,9 @@ var doc_addon_script =
       [ "Public C++ interface", "doc_addon_grid.html#doc_addon_grid_1", null ],
       [ "Public script interface", "doc_addon_grid.html#doc_addon_grid_2", null ],
       [ "Example usage in script", "doc_addon_grid.html#doc_addon_grid_3", null ]
+    ] ],
+    [ "datetime object", "doc_addon_datetime.html", [
+      [ "Public C++ interface", "doc_addon_datetime.html#doc_addon_array_1", null ],
+      [ "Public script interface", "doc_addon_datetime.html#doc_addon_array_2", null ]
     ] ]
 ];

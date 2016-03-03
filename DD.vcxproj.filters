@@ -79,8 +79,11 @@
     <Filter Include="Script\AngelScript">
       <UniqueIdentifier>{a9ec13a1-e651-4551-bc2c-adcd707e8c9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Script\Wren">
+      <UniqueIdentifier>{0d3f1fa4-bdc8-4de3-856e-0640f20631b1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Script\AngelScript\Add-Ons">
-      <UniqueIdentifier>{4da1e5b1-12a3-4213-add5-a2e84eeca9eb}</UniqueIdentifier>
+      <UniqueIdentifier>{b184cb4f-9bd7-4dbf-a594-7e9dfda46ced}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -255,20 +258,11 @@
     <ClInclude Include="src\RefCounter.h">
       <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
     <ClInclude Include="src\DebugConsole.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="src\Globals.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
     <ClInclude Include="src\ComponentPoolBase.h">
       <Filter>Components\Pools</Filter>
@@ -284,9 +278,6 @@
     </ClInclude>
     <ClInclude Include="src\ComponentPoolTestComponent.h">
       <Filter>Components\Pools\Test Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Script.h">
-      <Filter>Script</Filter>
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_extras.hpp">
       <Filter>Includes\PCG</Filter>
@@ -361,7 +352,13 @@
       <Filter>Script\AngelScript</Filter>
     </ClInclude>
     <ClInclude Include="src\WrenEngine.h">
-      <Filter>Script</Filter>
+      <Filter>Script\Wren</Filter>
+    </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -501,26 +498,14 @@
     <ClCompile Include="src\Tests\VectorTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmathcomplex.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
     <ClCompile Include="src\Globals.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\DebugConsole.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Script.cpp">
-      <Filter>Script</Filter>
     </ClCompile>
     <ClCompile Include="src\PP_Assert.cpp">
       <Filter>Includes\PP Assert</Filter>
@@ -568,7 +553,13 @@
       <Filter>Script\AngelScript</Filter>
     </ClCompile>
     <ClCompile Include="src\WrenEngine.cpp">
-      <Filter>Script</Filter>
+      <Filter>Script\Wren</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "include\imgui\imgui.vcxproj", "{60D06B70-22A9-41B4-A681-FEBED15B77CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "angelscript", "include\angelscript\projects\msvc2013\angelscript.vcxproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DD", "DD.vcxproj", "{FDC55983-C586-4390-908C-4B19AC8B90E0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{89CF2C43-749E-4EC4-A7C3-3F22FBA9B874} = {89CF2C43-749E-4EC4-A7C3-3F22FBA9B874}
@@ -15,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DD", "DD.vcxproj", "{FDC559
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wren_lib", "include\wren\util\msvc2013\wren_lib\wren_lib.vcxproj", "{89CF2C43-749E-4EC4-A7C3-3F22FBA9B874}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "angelscript", "include\angelscript\angelscript\projects\msvc2015\angelscript.vcxproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,18 +38,6 @@ Global
 		{60D06B70-22A9-41B4-A681-FEBED15B77CB}.Test|Win32.Build.0 = Debug|Win32
 		{60D06B70-22A9-41B4-A681-FEBED15B77CB}.Test|x64.ActiveCfg = Debug|x64
 		{60D06B70-22A9-41B4-A681-FEBED15B77CB}.Test|x64.Build.0 = Debug|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.Build.0 = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|x64.ActiveCfg = Debug|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|x64.Build.0 = Debug|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.ActiveCfg = Release|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.Build.0 = Release|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|x64.ActiveCfg = Release|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|x64.Build.0 = Release|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|Win32.ActiveCfg = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|Win32.Build.0 = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|x64.ActiveCfg = Debug|x64
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|x64.Build.0 = Debug|x64
 		{FDC55983-C586-4390-908C-4B19AC8B90E0}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FDC55983-C586-4390-908C-4B19AC8B90E0}.Debug|Win32.Build.0 = Debug|Win32
 		{FDC55983-C586-4390-908C-4B19AC8B90E0}.Debug|x64.ActiveCfg = Debug|x64
@@ -74,6 +62,18 @@ Global
 		{89CF2C43-749E-4EC4-A7C3-3F22FBA9B874}.Test|Win32.Build.0 = Debug|Win32
 		{89CF2C43-749E-4EC4-A7C3-3F22FBA9B874}.Test|x64.ActiveCfg = Debug|x64
 		{89CF2C43-749E-4EC4-A7C3-3F22FBA9B874}.Test|x64.Build.0 = Debug|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.Build.0 = Debug|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|x64.ActiveCfg = Debug|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|x64.Build.0 = Debug|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.ActiveCfg = Release|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.Build.0 = Release|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|x64.ActiveCfg = Release|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|x64.Build.0 = Release|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|Win32.ActiveCfg = Debug|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|Win32.Build.0 = Debug|Win32
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|x64.ActiveCfg = Debug|x64
+		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Test|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

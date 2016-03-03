@@ -8,7 +8,7 @@ template <typename T>
 T* Factory()
 {
 	T* ptr = new T();
-	ptr->m_refCount.Init( ptr );
+	ptr->m_refCount.Init( ptr, GET_TYPE( T ) );
 	return ptr;
 }
 
@@ -22,7 +22,7 @@ void dd::AngelScriptEngine::RegisterMethod( const char* method_name, const Funct
 
 	String64 className( GetWithoutNamespace( method.Signature()->GetContext()->Name().c_str() ) );
 
-	int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( method ), asCALL_THISCALL );
+	int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( fnPtr ), asCALL_THISCALL );
 	ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
 }
 
@@ -40,10 +40,10 @@ void dd::AngelScriptEngine::RegisterObject( const char* className )
 	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<ObjType> ), asCALL_CDECL );
 	ASSERT( res >= 0 );
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter<ObjType>, Increment ), asCALL_THISCALL );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter, Increment ), asCALL_THISCALL );
 	ASSERT( res >= 0 );
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_RELEASE, "void Decrement()", asMETHOD( RefCounter<ObjType>, Decrement ), asCALL_THISCALL );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_RELEASE, "void Decrement()", asMETHOD( RefCounter, Decrement ), asCALL_THISCALL );
 	ASSERT( res >= 0 );
 }
 

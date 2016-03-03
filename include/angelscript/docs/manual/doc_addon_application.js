@@ -9,7 +9,8 @@ var doc_addon_application =
       [ "Metadata in scripts", "doc_addon_build.html#doc_addon_build_metadata", null ]
     ] ],
     [ "Context manager", "doc_addon_ctxmgr.html", [
-      [ "Public C++ interface", "doc_addon_ctxmgr.html#doc_addon_ctxmgr_1", null ]
+      [ "Public C++ interface", "doc_addon_ctxmgr.html#doc_addon_ctxmgr_1", null ],
+      [ "Public script interface", "doc_addon_ctxmgr.html#doc_addon_ctxmgr_2", null ]
     ] ],
     [ "Debugger", "doc_addon_debugger.html", [
       [ "Public C++ interface", "doc_addon_debugger.html#doc_addon_ctxmgr_1", null ],

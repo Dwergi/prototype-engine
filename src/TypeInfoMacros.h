@@ -40,7 +40,7 @@
 	static void RegisterMembers() { TypeName instance; UNREFERENCED( instance ); dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
-	dd::RefCounter<TypeName> m_refCount; \
+	dd::RefCounter m_refCount; \
 	BEGIN_TYPE( TypeName ) \
 	typeInfo->RegisterScriptObject<TypeName>();
 

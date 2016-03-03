@@ -12,6 +12,7 @@ var classas_i_script_generic =
     [ "GetArgQWord", "classas_i_script_generic.html#a0fbd6ce45aebc29e29a64dac4affc111", null ],
     [ "GetArgTypeId", "classas_i_script_generic.html#a2bdce6872b371355665e932a962548cb", null ],
     [ "GetArgWord", "classas_i_script_generic.html#afdb602c3c2e285c5f34bc477ebbd1534", null ],
+    [ "GetAuxiliary", "classas_i_script_generic.html#adf0ec41b9df5c93d72a950c78f6fea8e", null ],
     [ "GetEngine", "classas_i_script_generic.html#a3f3b0838588e3afa7172f9bbb87f5445", null ],
     [ "GetFunction", "classas_i_script_generic.html#acf00e806a36e0b42686c0f8df25b0898", null ],
     [ "GetObject", "classas_i_script_generic.html#ab9e6627ec3920b1e1576d82586cac84d", null ],
