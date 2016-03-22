@@ -43,6 +43,8 @@ namespace dd
 		int Find( const char* other, uint offset = 0 ) const;
 		int Find( const String& other, uint offset = 0 ) const;
 
+		void ReplaceAll( char src, char target );
+
 		void Clear() { m_length = 0; }
 
 		const char& operator[]( uint index ) const { ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }

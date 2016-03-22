@@ -52,7 +52,7 @@ namespace dd
 		asIScriptEngine* m_engine;
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
-		static String64 GetWithoutNamespace( const char* className );
+		static String64 ReplacePointer( const char* typeName );
 
 		static String256 GetFunctionSignatureString( const char* name, const Function& fn );
 	};

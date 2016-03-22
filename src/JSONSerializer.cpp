@@ -1,3 +1,4 @@
+Copy
 //
 // JSONSerializer.h - Serialization! To JSON!
 // Copyright (C) Sebastian Nordgren 
@@ -104,7 +105,7 @@ namespace dd
 
 			// composite object
 			ScopedJSONObject obj( *this );
-			AddString( "type", String64( type->Name().c_str() ) );
+			AddString( "type", type->FullTypeName() );
 
 			AddKey( String16( "members" ) );
 			m_stream.WriteByte( '\n' );
@@ -301,11 +302,11 @@ namespace dd
 				ASSERT( pair.Key == "type" );
 
 				{
-					String64 strType;
+					String128 strType;
 					JSONDeserializer nested( pair.Value );
 					nested.Deserialize( strType );
 
-					ASSERT( strType == type->Name().c_str() );
+					ASSERT( strType == type->FullTypeName() );
 				}
 			}
 

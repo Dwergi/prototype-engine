@@ -49,6 +49,13 @@ namespace dd
 		Clear();
 	}
 
+	SharedString& SharedString::operator=( const String& other )
+	{
+		Clear();
+		Assign( other.c_str() );
+		return *this;
+	}
+
 	SharedString& SharedString::operator=( const SharedString& other )
 	{
 		m_ptr = other.m_ptr;
@@ -82,7 +89,6 @@ namespace dd
 		ASSERT( offset >= 0 && offset < m_length );
 
 		const char* res = strstr( m_ptr.get(), other );
-		
 		if( res == nullptr )
 			return -1;
 

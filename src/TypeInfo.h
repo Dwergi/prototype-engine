@@ -39,6 +39,8 @@ namespace dd
 
 		inline uint Size() const { return m_size; }
 		inline const SharedString& Name() const { return m_name; }
+		inline const SharedString& Namespace() const { return m_namespace; }
+		String128 FullTypeName() const;
 
 		inline bool IsPOD() const { return m_members.Size() == 0; }
 		inline bool IsRegistered() const { return m_size != 0; }
@@ -101,6 +103,7 @@ namespace dd
 
 	private:
 		uint m_size;
+		SharedString m_namespace;
 		SharedString m_name;
 		bool m_scriptObject;
 

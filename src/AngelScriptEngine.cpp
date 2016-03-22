@@ -58,10 +58,10 @@ namespace dd
 
 	void AngelScriptEngine::RegisterMember( const char* className, const Member& member )
 	{
-		String64 objType( GetWithoutNamespace( className ) );
+		String64 objType( ReplacePointer( className ) );
 
 		String128 signature;
-		signature += GetWithoutNamespace( member.Type()->Name().c_str() );
+		signature += ReplacePointer( member.Type()->Name().c_str() );
 		signature += " ";
 		signature += member.Name();
 
@@ -95,7 +95,7 @@ namespace dd
 		String256 signature;
 
 		if( sig->GetRet() != nullptr )
-			signature += GetWithoutNamespace( sig->GetRet()->Name().c_str() );
+			signature += ReplacePointer( sig->GetRet()->Name().c_str() );
 		else
 			signature += "void";
 
@@ -107,7 +107,7 @@ namespace dd
 		uint argCount = sig->ArgCount();
 		for( uint i = 0; i < argCount; ++i )
 		{
-			signature += GetWithoutNamespace( sig->GetArg( i )->Name().c_str() );
+			signature += ReplacePointer( sig->GetArg( i )->Name().c_str() );
 
 			if( i < (argCount - 1) )
 				signature += ",";
@@ -118,37 +118,10 @@ namespace dd
 		return signature;
 	}
 
-	String64 AngelScriptEngine::GetWithoutNamespace( const char* type )
+	String64 AngelScriptEngine::ReplacePointer( const char* type )
 	{
-		String64 typeName( type );
-		String64 result( typeName );
-
-		uint afterColon = 0;
-		while( true )
-		{
-			uint res = typeName.Find( "::", afterColon );
-			if( res == -1 )
-				break;
-
-			afterColon = res + 2;
-		}
-
-		if( afterColon > 0 )
-		{
-			result = typeName.c_str() + afterColon;
-			return result;
-		}
-
-		uint ptr = 0;
-		while( true )
-		{
-			ptr = result.Find( "*", ptr );
-			if( ptr == -1 )
-				break;
-
-			result[ptr] = '@';
-			++ptr;
-		}
+		String64 result( type );
+		result.ReplaceAll( '*', '@' );
 
 		return result;
 	}
@@ -156,7 +129,7 @@ namespace dd
 	void AngelScriptEngine::RegisterGlobalVariable( const char* name, const Variable& var )
 	{
 		String128 signature;
-		signature += GetWithoutNamespace( var.Type()->Name().c_str() );
+		signature += ReplacePointer( var.Type()->Name().c_str() );
 		signature += " ";
 		signature += name;
 

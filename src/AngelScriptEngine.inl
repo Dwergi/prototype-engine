@@ -20,7 +20,7 @@ void dd::AngelScriptEngine::RegisterMethod( const char* method_name, const Funct
 
 	String256 signature( GetFunctionSignatureString( method_name, method ) );
 
-	String64 className( GetWithoutNamespace( method.Signature()->GetContext()->Name().c_str() ) );
+	String64 className( ReplacePointer( method.Signature()->GetContext()->Name().c_str() ) );
 
 	int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<METHOD_SIZE>::Convert( fnPtr ), asCALL_THISCALL );
 	ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
@@ -29,7 +29,7 @@ void dd::AngelScriptEngine::RegisterMethod( const char* method_name, const Funct
 template <typename ObjType>
 void dd::AngelScriptEngine::RegisterObject( const char* className )
 {
-	String64 objType( GetWithoutNamespace( className ) );
+	String64 objType( ReplacePointer( className ) );
 
 	int res = m_engine->RegisterObjectType( objType.c_str(), 0, asOBJ_REF );
 	ASSERT( res >= 0 );
@@ -68,7 +68,7 @@ void Destruct( T* memory )
 template <typename ObjType>
 void dd::AngelScriptEngine::RegisterStruct( const char* className )
 {
-	String64 objType( GetWithoutNamespace( className ) );
+	String64 objType( ReplacePointer( className ) );
 
 	int res = m_engine->RegisterObjectType( objType.c_str(), sizeof( ObjType ), asOBJ_VALUE | asGetTypeTraits<ObjType>() );
 	ASSERT( res >= 0, "Failed to register struct '%s'!", className );

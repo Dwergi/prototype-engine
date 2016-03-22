@@ -48,7 +48,7 @@
 	BEGIN_TYPE( TypeName ) \
 	typeInfo->RegisterScriptStruct<TypeName>();
 
-#define SET_PARENT( TypeName, ParentType ) \
+#define REGISTER_PARENT( TypeName, ParentType ) \
 	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType( GET_TYPE( ParentType ) )
 
 #define PARENT( ParentType ) \
@@ -65,7 +65,7 @@
 #define BASIC_TYPE( TypeName ) \
 	static void RegisterMembers() {}
 
-#define SET_SERIALIZERS( TypeName, Serializer, Deserializer ) \
+#define REGISTER_SERIALIZERS( TypeName, Serializer, Deserializer ) \
 	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )
 
 #define FUNCTION( FN ) \

@@ -423,6 +423,7 @@
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\Tests\TypeInfoTests.cpp" />
     <ClCompile Include="src\WrenEngine.cpp" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
@@ -506,6 +507,9 @@
     <None Include="src\Vector.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="include\angelscript\angelscript\projects\msvc2015\angelscript.vcxproj">
+      <Project>{39e6af97-6ba3-4a72-8c61-bcebf214ebfd}</Project>
+    </ProjectReference>
     <ProjectReference Include="include\imgui\imgui.vcxproj">
       <Project>{60d06b70-22a9-41b4-a681-febed15b77cb}</Project>
     </ProjectReference>

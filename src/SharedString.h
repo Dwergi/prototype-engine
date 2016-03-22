@@ -25,6 +25,7 @@ namespace dd
 		SharedString( SharedString&& other );
 		~SharedString();
 
+		SharedString& operator=( const String& other );
 		SharedString& operator=( const SharedString& other );
 		SharedString& operator=( const char* other );
 

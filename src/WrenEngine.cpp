@@ -106,14 +106,6 @@ namespace dd
 		wrenFreeVM( m_engine );
 	}
 	
-	void WrenEngine::CallFunction( WrenVM* vm )
-	{
-		WrenEngine* engine = FindEngine( vm );
-
-		if( engine == nullptr )
-			return;
-	}
-
 	void WrenEngine::SetOutput( String* output )
 	{
 		if( output != nullptr )

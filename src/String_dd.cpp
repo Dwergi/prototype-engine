@@ -170,6 +170,17 @@ namespace dd
 		return location;
 	}
 
+	void String::ReplaceAll( char src, char target )
+	{
+		ASSERT( m_buffer != nullptr );
+
+		for( uint i = 0; i < m_length; ++i )
+		{
+			if( m_buffer[i] == src )
+				m_buffer[i] = target;
+		}
+	}
+
 	String& String::operator+=( char other )
 	{
 		Resize( m_length + 1 );

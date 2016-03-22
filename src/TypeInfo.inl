@@ -87,7 +87,7 @@ const TypeInfo* TypeInfo::RegisterPOD( const char* name )
 
 	sm_typeMap.Add( SharedString( name ), typeInfo );
 
-	RegisterContainer<Vector<T>>( "Vector", typeInfo );
+	RegisterContainer<Vector<T>>( "dd::Vector", typeInfo );
 
 	return typeInfo;
 }

@@ -58,7 +58,5 @@ namespace dd
 
 		WrenVM* m_engine;
 		WriteStream* m_output;
-
-		static void	CallFunction( WrenVM* vm );
 	};
 }
