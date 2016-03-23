@@ -24,6 +24,8 @@ Purpose       :
 
 #pragma once
 
+#include <functional>
+
 namespace dd
 {
 	// Get the type-safe argument at the given index in the given args array.
@@ -165,7 +167,7 @@ namespace dd
 		template<typename Context>
 		void Bind( Context& context )
 		{
-			m_context = context;
+			m_context = Variable( context );
 		}
 
 		void Bind( Variable& context );
@@ -341,6 +343,7 @@ namespace dd
 		};
 	}
 
+	// TODO: Investigate if we could implement this to actually return the return value instead of bind it to the variable.
 	// Call with return value
 	template <typename... Args>
 	void Function::operator()( Variable& ret, Args... args ) const
@@ -352,7 +355,7 @@ namespace dd
 		Variable argStack[ArgCount];
 		std::tuple<Args...> tuple = std::make_tuple( args... );
 
-		CreateVariables( argStack, tuple, std::make_index_sequence( ArgCount ) );
+		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
 
 		m_callHelper( &ret, m_context.Data(), argStack, ArgCount );
 	}
