@@ -52,7 +52,7 @@ namespace dd
 	template<typename T>
 	void Property::Get( T& out )
 	{
-		ASSERT( m_ptr != nullptr );
+		DD_ASSERT( m_ptr != nullptr );
 
 		out = *reinterpret_cast<const T*>( m_ptr );
 	}
@@ -60,7 +60,7 @@ namespace dd
 	template<typename T>
 	void Property::Set( const T& val )
 	{
-		ASSERT( m_ptr != nullptr );
+		DD_ASSERT( m_ptr != nullptr );
 
 		*reinterpret_cast<T*>( m_ptr ) = val;
 	}

@@ -110,7 +110,7 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Add( const TKey& key, const TValue& value )
 	{
-		ASSERT( m_data.Size() > 0 );
+		DD_ASSERT( m_data.Size() > 0 );
 
 		if( m_entries == m_data.Size() )
 		{
@@ -123,7 +123,7 @@ namespace dd
 	template<typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Remove( const TKey& key )
 	{
-		ASSERT( m_entries > 0 );
+		DD_ASSERT( m_entries > 0 );
 
 		Entry* entry = FindEntry( key );
 		if( entry == nullptr )

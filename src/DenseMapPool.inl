@@ -104,7 +104,7 @@ namespace dd
 		T* pCmp = Find( entity );
 		if( pCmp != nullptr )
 		{
-			ASSERT( false, "Component already allocated for given entity!" );
+			DD_ASSERT( false, "Component already allocated for given entity!" );
 			return nullptr;
 		}
 

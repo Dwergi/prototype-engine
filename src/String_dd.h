@@ -47,8 +47,8 @@ namespace dd
 
 		void Clear() { m_length = 0; }
 
-		const char& operator[]( uint index ) const { ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
-		char& operator[]( uint index ) { ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
+		const char& operator[]( uint index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
+		char& operator[]( uint index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
 		const char* c_str() const;
 
 		uint Length() const { return m_length; }
@@ -169,8 +169,8 @@ namespace dd
 	template<int Size>
 	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count )
 	{
-		ASSERT( start <= m_length );
-		ASSERT( count >= 0 );
+		DD_ASSERT( start <= m_length );
+		DD_ASSERT( count >= 0 );
 
 		count = std::min( m_length - start, count );
 

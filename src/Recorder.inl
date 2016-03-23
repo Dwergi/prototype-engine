@@ -31,7 +31,7 @@ namespace dd
 	template <typename T>
 	void Recorder<T>::Undo()
 	{
-		ASSERT( m_undo.Size() > 0 );
+		DD_ASSERT( m_undo.Size() > 0 );
 
 		*m_current = m_undo.Pop();
 	}
@@ -106,7 +106,7 @@ namespace dd
 	template <typename T>
 	void FullRecorder<T>::Redo()
 	{
-		ASSERT( m_redo.Size() > 0 );
+		DD_ASSERT( m_redo.Size() > 0 );
 
 		base::operator=( m_redo.Pop() );
 	}

@@ -64,7 +64,7 @@ namespace dd
 	template <typename T>
 	T RingBuffer<T>::Pop()
 	{
-		ASSERT( m_size != 0 );
+		DD_ASSERT( m_size != 0 );
 
 		uint old_head = m_head;
 
@@ -116,7 +116,7 @@ namespace dd
 	template <typename T>
 	void RingBuffer<T>::Allocate( uint size )
 	{
-		ASSERT( size > 0 );
+		DD_ASSERT( size > 0 );
 
 		m_storage.Set( reinterpret_cast<T*>(new char[size * sizeof( T )]), size );
 		memset( m_storage.Get(), 0xABAD1DEA, size * sizeof( T ) );

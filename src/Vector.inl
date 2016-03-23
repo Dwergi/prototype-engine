@@ -88,8 +88,8 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Remove( uint index )
 	{
-		ASSERT( m_size > 0 );
-		ASSERT( index < m_size );
+		DD_ASSERT( m_size > 0 );
+		DD_ASSERT( index < m_size );
 
 		--m_size;
 
@@ -133,8 +133,8 @@ namespace dd
 	template<typename T>
 	void Vector<T>::RemoveOrdered( uint index )
 	{
-		ASSERT( m_size > 0 );
-		ASSERT( index < m_size );
+		DD_ASSERT( m_size > 0 );
+		DD_ASSERT( index < m_size );
 
 		// destruct the entry
 		Zero( index );
@@ -150,7 +150,7 @@ namespace dd
 	template<typename T>
 	void Vector<T>::RemoveAll( const Vector<T>& to_remove )
 	{
-		ASSERT( m_size > 0 );
+		DD_ASSERT( m_size > 0 );
 
 		for( const T& entry : to_remove )
 		{
@@ -163,7 +163,7 @@ namespace dd
 	template<typename T>
 	T Vector<T>::Pop()
 	{
-		ASSERT( m_size > 0 );
+		DD_ASSERT( m_size > 0 );
 
 		--m_size;
 
@@ -187,7 +187,7 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Zero( uint index ) const
 	{
-		ASSERT( index < m_capacity );
+		DD_ASSERT( index < m_capacity );
 
 		m_data[index].~T();
 
@@ -235,7 +235,7 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Insert( const T&& entry, uint index )
 	{
-		ASSERT( index <= m_size );
+		DD_ASSERT( index <= m_size );
 
 		if( m_size == m_capacity )
 		{
@@ -259,7 +259,7 @@ namespace dd
 	template<typename T>
 	void Vector<T>::Insert( const T& entry, uint index )
 	{
-		ASSERT( index <= m_size );
+		DD_ASSERT( index <= m_size );
 
 		if( m_size == m_capacity )
 		{
@@ -446,7 +446,7 @@ namespace dd
 	template<typename T>
 	T& Vector<T>::GetEntry( uint index ) const
 	{
-		ASSERT( index < m_capacity );
+		DD_ASSERT( index < m_capacity );
 
 		return m_data[index];
 	}

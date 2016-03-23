@@ -84,9 +84,9 @@ namespace dd
 	
 	int SharedString::Find( const char* other, uint offset ) const
 	{
-		ASSERT( m_ptr.get() != nullptr );
-		ASSERT( other != nullptr );
-		ASSERT( offset >= 0 && offset < m_length );
+		DD_ASSERT( m_ptr.get() != nullptr );
+		DD_ASSERT( other != nullptr );
+		DD_ASSERT( offset >= 0 && offset < m_length );
 
 		const char* res = strstr( m_ptr.get(), other );
 		if( res == nullptr )
@@ -104,7 +104,7 @@ namespace dd
 
 	char SharedString::operator[]( uint index ) const
 	{
-		ASSERT( index >= 0 && index < m_length );
+		DD_ASSERT( index >= 0 && index < m_length );
 		return m_ptr.get()[index];
 	}
 

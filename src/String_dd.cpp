@@ -76,7 +76,7 @@ namespace dd
 
 	bool String::operator==( const char* other ) const
 	{
-		ASSERT( other != nullptr );
+		DD_ASSERT( other != nullptr );
 
 		size_t length = strlen( other );
 
@@ -97,7 +97,7 @@ namespace dd
 
 	String& String::operator=( const char* other )
 	{
-		ASSERT( other != nullptr );
+		DD_ASSERT( other != nullptr );
 
 		SetString( other, (uint) strlen( other ) );
 
@@ -136,8 +136,8 @@ namespace dd
 
 	int String::Find( const char* other, uint offset ) const
 	{
-		ASSERT( m_buffer != nullptr );
-		ASSERT( other != nullptr );
+		DD_ASSERT( m_buffer != nullptr );
+		DD_ASSERT( other != nullptr );
 
 		if( other == nullptr || offset >= m_length )
 			return -1;
@@ -154,8 +154,8 @@ namespace dd
 
 	int String::Find( const String& other, uint offset ) const
 	{
-		ASSERT( m_buffer != nullptr );
-		ASSERT( other.m_buffer != nullptr );
+		DD_ASSERT( m_buffer != nullptr );
+		DD_ASSERT( other.m_buffer != nullptr );
 
 		if( offset >= m_length )
 			return -1;
@@ -172,7 +172,7 @@ namespace dd
 
 	void String::ReplaceAll( char src, char target )
 	{
-		ASSERT( m_buffer != nullptr );
+		DD_ASSERT( m_buffer != nullptr );
 
 		for( uint i = 0; i < m_length; ++i )
 		{

@@ -11,7 +11,7 @@ namespace dd
 {
 	static String8 s_empty;
 
-	CommandLine::CommandLine( char* const argv[], int argc )
+	CommandLine::CommandLine( char const* argv[], int argc )
 	{
 		for( int i = 1; i < argc; ++i )
 		{

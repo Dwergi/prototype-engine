@@ -18,14 +18,14 @@ namespace dd
 
 	void Timer::Start()
 	{
-		ASSERT( m_start == 0 );
+		DD_ASSERT( m_start == 0 );
 
 		m_start = std::clock();
 	}
 
 	void Timer::Pause()
 	{
-		ASSERT( m_start > 0 );
+		DD_ASSERT( m_start > 0 );
 
 		std::time_t current = std::clock();
 		m_elapsed += current - m_start;
@@ -35,7 +35,7 @@ namespace dd
 
 	float Timer::Stop()
 	{
-		ASSERT( m_start > 0 );
+		DD_ASSERT( m_start > 0 );
 
 		Pause();
 		return Time();

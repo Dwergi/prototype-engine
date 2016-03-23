@@ -59,7 +59,7 @@ namespace dd
 
 	void TypeInfo::RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset )
 	{
-		ASSERT( typeInfo->IsRegistered() );
+		DD_ASSERT( typeInfo->IsRegistered() );
 
 		Member& member = m_members.Allocate();
 		member.m_name = name;
@@ -106,7 +106,7 @@ namespace dd
 
 	const TypeInfo* TypeInfo::GetType( const SharedString& typeName )
 	{
-		ASSERT( sm_typeMap.Contains( typeName ) );
+		DD_ASSERT( sm_typeMap.Contains( typeName ) );
 
 		TypeInfo** pType = sm_typeMap.Find( typeName );
 

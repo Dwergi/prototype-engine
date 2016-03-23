@@ -62,7 +62,7 @@ namespace dd
 			else
 			{
 				char c = src.PeekByte();
-				ASSERT( c == '"' );
+				DD_ASSERT( c == '"' );
 				src.Advance( 1 );
 
 				int iCount = 0;
@@ -73,7 +73,7 @@ namespace dd
 					++iCount;
 				}
 
-				ASSERT( iCount + 1 < TEMP_BUFFER_SIZE );
+				DD_ASSERT( iCount + 1 < TEMP_BUFFER_SIZE );
 				s_temp[iCount] = '\0';
 
 				str = s_temp;

@@ -25,7 +25,7 @@ namespace dd
 
 	ScopedJSONObject::~ScopedJSONObject()
 	{
-		ASSERT( m_host.m_indent > 0 );
+		DD_ASSERT( m_host.m_indent > 0 );
 
 		--m_host.m_indent;
 		Indent();
@@ -91,7 +91,7 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 		
-		ASSERT( type->IsRegistered() );
+		DD_ASSERT( type->IsRegistered() );
 		if( !type->IsRegistered() )
 			return false;
 
@@ -101,7 +101,7 @@ namespace dd
 		}
 		else
 		{
-			ASSERT( type->Members().Size() > 0 );
+			DD_ASSERT( type->Members().Size() > 0 );
 
 			// composite object
 			ScopedJSONObject obj( *this );
@@ -229,17 +229,17 @@ namespace dd
 
 		// expecting a name here
 		current = stream.ReadByte();
-		ASSERT( current == '"' );
+		DD_ASSERT( current == '"' );
 
 		ReadUntil( stream, '"', kvp.Key );
 
 		current = stream.ReadByte();
-		ASSERT( current == '"' );
+		DD_ASSERT( current == '"' );
 
 		SkipUntil( stream, ':' );
 
 		current = stream.ReadByte();
-		ASSERT( current == ':' );
+		DD_ASSERT( current == ':' );
 
 		SkipWhitespace( stream );
 			
@@ -257,7 +257,7 @@ namespace dd
 
 			current = stream.ReadByte();
 			kvp.Value += current;
-			ASSERT( current == '"' );
+			DD_ASSERT( current == '"' );
 		}
 		else if( current == '[' )
 		{
@@ -277,7 +277,7 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 		
-		ASSERT( type->IsRegistered() );
+		DD_ASSERT( type->IsRegistered() );
 		if( !type->IsRegistered() )
 			return false;
 
@@ -287,11 +287,11 @@ namespace dd
 		}
 		else
 		{
-			ASSERT( type->Members().Size() > 0 );
+			DD_ASSERT( type->Members().Size() > 0 );
 
 			// composite object
 			char c = m_stream.ReadByte();
-			ASSERT( c == '{' );
+			DD_ASSERT( c == '{' );
 
 			JSONKeyValuePair pair;
 
@@ -299,32 +299,32 @@ namespace dd
 			{			
 				ReadNextPair( m_stream, pair );
 
-				ASSERT( pair.Key == "type" );
+				DD_ASSERT( pair.Key == "type" );
 
 				{
 					String128 strType;
 					JSONDeserializer nested( pair.Value );
 					nested.Deserialize( strType );
 
-					ASSERT( strType == type->FullTypeName() );
+					DD_ASSERT( strType == type->FullTypeName() );
 				}
 			}
 
 			// has to have a "members" entry
 			{
-				ASSERT( m_stream.ReadByte() == ',' );
+				DD_ASSERT( m_stream.ReadByte() == ',' );
 
 				ReadNextPair( m_stream, pair );
 
-				ASSERT( pair.Key == "members" && pair.HasChildren );
-				ASSERT( m_stream.ReadByte() == '{' );
+				DD_ASSERT( pair.Key == "members" && pair.HasChildren );
+				DD_ASSERT( m_stream.ReadByte() == '{' );
 			}
 
 			for( Member& member : type->Members() )
 			{
 				ReadNextPair( m_stream, pair );
 
-				ASSERT( pair.Key == member.Name() );
+				DD_ASSERT( pair.Key == member.Name() );
 
 				Variable member_var( member.Type(), PointerAdd( var.Data(), member.Offset() ) );
 
@@ -348,7 +348,7 @@ namespace dd
 				}
 
 				char c = m_stream.ReadByte();
-				ASSERT( c == ',' || c == '}' );
+				DD_ASSERT( c == ',' || c == '}' );
 			}
 		}
 

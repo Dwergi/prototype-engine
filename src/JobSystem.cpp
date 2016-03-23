@@ -50,7 +50,7 @@ namespace dd
 
 	JobSystem::JobSystem( uint thread_count )
 	{
-		ASSERT( thread_count <= MAX_THREADS );
+		DD_ASSERT( thread_count <= MAX_THREADS );
 
 		CreateWorkers( std::min( thread_count, MAX_THREADS ) );
 	}
@@ -92,8 +92,8 @@ namespace dd
 
 	void JobSystem::Schedule( const Function& fn, const FunctionArgs& args )
 	{
-		ASSERT( fn.Signature()->GetRet() == nullptr );
-		ASSERT( fn.Signature()->ArgCount() == args.Arguments.Size() );
+		DD_ASSERT( fn.Signature()->GetRet() == nullptr );
+		DD_ASSERT( fn.Signature()->ArgCount() == args.Arguments.Size() );
 
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 

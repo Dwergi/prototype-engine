@@ -39,7 +39,7 @@ namespace dd
 		template<typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, Variable src )
 		{
-			ASSERT( "Should never hit this!");
+			DD_ASSERT( "Should never hit this!");
 		}
 
 		template<>
@@ -70,7 +70,7 @@ namespace dd
 		template<typename T>
 		void DeserializePOD( Mode mode, ReadStream& src, Variable dst )
 		{
-			ASSERT( "Should never hit this!");
+			DD_ASSERT( "Should never hit this!");
 		}
 
 		template<>

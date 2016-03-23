@@ -54,7 +54,7 @@ namespace dd
 	// Static functions without return value
 	inline void CallPtr( void (*ptr)(), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		ptr();
 	}
@@ -62,7 +62,7 @@ namespace dd
 	template <typename Arg1>
 	inline void CallPtr( void (*ptr)( Arg1 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		ptr(
 			args[0].GetValue<Arg1>()
@@ -72,7 +72,7 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	inline void CallPtr( void (*ptr)( Arg1, Arg2 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		ptr(
 			args[0].GetValue<Arg1>(),
@@ -83,7 +83,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	inline void CallPtr( void (*ptr)( Arg1, Arg2, Arg3 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		ptr(
 			args[0].GetValue<Arg1>(),
@@ -95,7 +95,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	inline void CallPtr( void (*ptr)( Arg1, Arg2, Arg3, Arg4 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		ptr(
 			args[0].GetValue<Arg1>(),
@@ -108,7 +108,7 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	inline void CallPtr( void (*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		ptr(
 			args[0].GetValue<Arg1>(),
@@ -123,7 +123,7 @@ namespace dd
 	template <typename R>
 	inline void CallPtr( R (*ptr)(), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		ret->GetValue<R>() = ptr();
 	}
@@ -131,7 +131,7 @@ namespace dd
 	template <typename R, typename Arg1>
 	inline void CallPtr( R (*ptr)( Arg1 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		ret->GetValue<R>() = ptr(
 			args[0].GetValue<Arg1>()
@@ -141,7 +141,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2>
 	inline void CallPtr( R (*ptr)( Arg1, Arg2 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		ret->GetValue<R>() = ptr(
 			args[0].GetValue<Arg1>(),
@@ -152,7 +152,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3>
 	inline void CallPtr( R (*ptr)( Arg1, Arg2, Arg3 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		ret->GetValue<R>() = ptr(
 			args[0].GetValue<Arg1>(),
@@ -164,7 +164,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	inline void CallPtr( R (*ptr)( Arg1, Arg2, Arg3, Arg4 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		ret->GetValue<R>() = ptr(
 			args[0].GetValue<Arg1>(),
@@ -177,7 +177,7 @@ namespace dd
 	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	inline void CallPtr( R (*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		ret->GetValue<R>() = ptr(
 			args[0].GetValue<Arg1>(),
@@ -192,7 +192,7 @@ namespace dd
 	template <typename C>
 	void CallPtr( void (C::*ptr)(), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		(((C *)context)->*ptr)();
 	}
@@ -200,7 +200,7 @@ namespace dd
 	template <typename C, typename Arg1>
 	void CallPtr( void (C::*ptr)( Arg1 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>()
@@ -210,7 +210,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -221,7 +221,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -233,7 +233,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3, Arg4 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -246,7 +246,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -261,7 +261,7 @@ namespace dd
 	template <typename C, typename R>
 	void CallPtr( R (C::*ptr)(), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)();
 	}
@@ -269,7 +269,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1>
 	void CallPtr( R (C::*ptr)( Arg1 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>()
@@ -279,7 +279,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -290,7 +290,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -302,7 +302,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3, Arg4 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -315,7 +315,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ), Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -330,7 +330,7 @@ namespace dd
 	template <typename C>
 	void CallPtr( void (C::*ptr)() const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		(((C *)context)->*ptr)();
 	}
@@ -338,7 +338,7 @@ namespace dd
 	template <typename C, typename Arg1>
 	void CallPtr( void (C::*ptr)( Arg1 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>()
@@ -348,7 +348,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -359,7 +359,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -371,7 +371,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3, Arg4 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -384,7 +384,7 @@ namespace dd
 	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallPtr( void (C::*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -399,7 +399,7 @@ namespace dd
 	template <typename C, typename R>
 	void CallPtr( R (C::*ptr)() const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)();
 	}
@@ -407,7 +407,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1>
 	void CallPtr( R (C::*ptr)( Arg1 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 1 );
+		DD_ASSERT( argCount == 1 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>()
@@ -417,7 +417,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 2 );
+		DD_ASSERT( argCount == 2 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -428,7 +428,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 3 );
+		DD_ASSERT( argCount == 3 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -440,7 +440,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3, Arg4 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 4 );
+		DD_ASSERT( argCount == 4 );
 
 		ret->GetValue<R>() = (((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -453,7 +453,7 @@ namespace dd
 	template <typename C, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void CallPtr( R (C::*ptr)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const, Variable* ret, void* context, Variable* args, unsigned argCount )
 	{
-		ASSERT( argCount == 5 );
+		DD_ASSERT( argCount == 5 );
 
 		(((C *)context)->*ptr)(
 			args[0].GetValue<Arg1>(),
@@ -489,7 +489,7 @@ namespace dd
 			: m_sig()
 			, m_call( CallHelper<const char* > )
 		{
-			ASSERT( functionName.Length() < sizeof( FnPtr ) - 1, "Function name %s too long to bind.", functionName );
+			DD_ASSERT( functionName.Length() < sizeof( FnPtr ) - 1, "Function name %s too long to bind.", functionName );
 
 			char* dest = (char*) &m_ptr;
 			memcpy( dest, functionName.c_str(), functionName.Length() );
@@ -557,8 +557,8 @@ namespace dd
 	template <typename Arg1>
 	void FunctionPtr::operator()( Arg1 arg1 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 1 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.ArgCount() == 1 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
 
 		Variable argStack[1];
 
@@ -570,9 +570,9 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	void FunctionPtr::operator()( Arg1 arg1, Arg2 arg2 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 2 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.ArgCount() == 2 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
 
 		Variable argStack[2];
 
@@ -585,10 +585,10 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	void FunctionPtr::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 3 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.ArgCount() == 3 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
 
 		Variable argStack[3];
 
@@ -602,11 +602,11 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void FunctionPtr::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 4 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		DD_ASSERT( m_sig.ArgCount() == 4 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
 
 		Variable argStack[4];
 
@@ -621,12 +621,12 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void FunctionPtr::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 5 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
-		ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
+		DD_ASSERT( m_sig.ArgCount() == 5 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		DD_ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
 
 		Variable argStack[5];
 
@@ -643,8 +643,8 @@ namespace dd
 	template <typename Arg1>
 	void FunctionPtr::operator()( Variable& ret, Arg1 arg1 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 1 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.ArgCount() == 1 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
 
 		Variable argStack[1];
 
@@ -656,9 +656,9 @@ namespace dd
 	template <typename Arg1, typename Arg2>
 	void FunctionPtr::operator()( Variable& ret, Arg1 arg1, Arg2 arg2 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 2 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.ArgCount() == 2 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
 
 		Variable argStack[2];
 
@@ -671,10 +671,10 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3>
 	void FunctionPtr::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 3 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.ArgCount() == 3 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
 
 		Variable argStack[3];
 
@@ -688,11 +688,11 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 	void FunctionPtr::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 4 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		DD_ASSERT( m_sig.ArgCount() == 4 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
 
 		Variable argStack[4];
 
@@ -707,12 +707,12 @@ namespace dd
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 	void FunctionPtr::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
 	{
-		ASSERT( m_sig.ArgCount() == 5 );
-		ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
-		ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
+		DD_ASSERT( m_sig.ArgCount() == 5 );
+		DD_ASSERT( m_sig.GetArg( 0 ) == SEL_TYPE( Arg1 ) );
+		DD_ASSERT( m_sig.GetArg( 1 ) == SEL_TYPE( Arg2 ) );
+		DD_ASSERT( m_sig.GetArg( 2 ) == SEL_TYPE( Arg3 ) );
+		DD_ASSERT( m_sig.GetArg( 3 ) == SEL_TYPE( Arg4 ) );
+		DD_ASSERT( m_sig.GetArg( 4 ) == SEL_TYPE( Arg5 ) );
 
 		Variable argStack[5];
 

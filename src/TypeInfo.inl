@@ -21,7 +21,7 @@ TypeInfo* TypeInfo::AccessType()
 template<typename T>
 const TypeInfo* TypeInfo::RegisterType( const char* name )
 {
-	ASSERT( sm_defaultsRegistered );
+	DD_ASSERT( sm_defaultsRegistered );
 
 	TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
 	if( typeInfo->IsRegistered() )
@@ -66,7 +66,7 @@ const TypeInfo* TypeInfo::RegisterType( const char* name )
 template <typename T>
 const TypeInfo* TypeInfo::RegisterPOD( const char* name )
 {
-	ASSERT( sm_defaultsRegistered );
+	DD_ASSERT( sm_defaultsRegistered );
 
 	TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
 	if( typeInfo->IsRegistered() )
@@ -95,7 +95,7 @@ const TypeInfo* TypeInfo::RegisterPOD( const char* name )
 template<typename T>
 const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeInfo* containing )
 {
-	ASSERT( sm_defaultsRegistered );
+	DD_ASSERT( sm_defaultsRegistered );
 
 	TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
 	if( typeInfo->IsRegistered() )
@@ -129,7 +129,7 @@ const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeIn
 template <typename FnType>
 void TypeInfo::RegisterMethod( const Function& f, FnType fn, const char* name )
 {
-	ASSERT( sm_defaultsRegistered );
+	DD_ASSERT( sm_defaultsRegistered );
 
 	Method& m = m_methods.Allocate();
 	m.Name = name;
@@ -148,7 +148,7 @@ template <typename T>
 void TypeInfo::RegisterScriptObject()
 {
 	AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
-	ASSERT( script_engine != nullptr );
+	DD_ASSERT( script_engine != nullptr );
 
 	if( script_engine != nullptr )
 	{
@@ -162,7 +162,7 @@ template <typename T>
 void TypeInfo::RegisterScriptStruct()
 {
 	AngelScriptEngine* script_engine = g_services.GetPtr<AngelScriptEngine>();
-	ASSERT( script_engine != nullptr );
+	DD_ASSERT( script_engine != nullptr );
 
 	if( script_engine != nullptr )
 	{

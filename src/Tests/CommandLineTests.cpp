@@ -11,7 +11,7 @@
 
 TEST_CASE( "[CommandLine] Single Arguments" )
 {
-	char* args[] = { "-crap", "-hello", "test", "-lol" };
+	char const* args[] = { "-crap", "-hello", "test", "-lol" };
 
 	dd::CommandLine cmdline( args, 4 );
 
@@ -29,7 +29,7 @@ TEST_CASE( "[CommandLine] Single Arguments" )
 
 TEST_CASE( "[CommandLine] Pairs" )
 {
-	char* args[] = { "program_name", "-noassert=true", "-test=false" };
+	char const* args[] = { "program_name", "-noassert=true", "-test=false" };
 
 	dd::CommandLine cmdline( args, 3 );
 

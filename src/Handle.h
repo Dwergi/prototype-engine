@@ -48,35 +48,35 @@ public:
 
 	TValue* operator->()
 	{
-		ASSERT( m_container != nullptr );
+		DD_ASSERT( m_container != nullptr );
 
 		return &(*m_container)[ m_key ];
 	}
 
 	TValue& operator*()
 	{
-		ASSERT( m_container != nullptr );
+		DD_ASSERT( m_container != nullptr );
 
 		return (*m_container)[ m_key ];
 	}
 
 	const TValue* operator->() const
 	{
-		ASSERT( m_container != nullptr );
+		DD_ASSERT( m_container != nullptr );
 
 		return &(*m_container)[ m_key ];
 	}
 
 	const TValue& operator*() const
 	{
-		ASSERT( m_container != nullptr );
+		DD_ASSERT( m_container != nullptr );
 
 		return (*m_container)[ m_key ];
 	}
 
 	bool operator==( const TThis& other ) const
 	{
-		ASSERT( m_container != nullptr );
+		DD_ASSERT( m_container != nullptr );
 
 		return m_key == other.m_key;
 	}

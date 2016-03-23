@@ -42,8 +42,8 @@ namespace dd
 
 		ComponentType* Get() const 
 		{
-			ASSERT( m_pool != nullptr );
-			ASSERT( IsValid(), "Handle not valid!" );
+			DD_ASSERT( m_pool != nullptr );
+			DD_ASSERT( IsValid(), "Handle not valid!" );
 
 			if( !IsValid() )
 				return nullptr;
@@ -58,21 +58,21 @@ namespace dd
 
 		ComponentType& operator*()
 		{
-			ASSERT( IsValid(), "Handle not valid!" );
+			DD_ASSERT( IsValid(), "Handle not valid!" );
 
 			return *m_pool->Find( m_entity );
 		}
 
 		ComponentType* operator->() const
 		{
-			ASSERT( IsValid(), "Handle not valid!" );
+			DD_ASSERT( IsValid(), "Handle not valid!" );
 
 			return m_pool->Find( m_entity );
 		}
 
 		ComponentType& operator*() const
 		{
-			ASSERT( IsValid(), "Handle not valid!" );
+			DD_ASSERT( IsValid(), "Handle not valid!" );
 
 			return *m_pool->Find( m_entity );
 		}

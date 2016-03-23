@@ -44,7 +44,7 @@ namespace dd
 	template<typename T>
 	ArrayBase<T>& ArrayBase<T>::operator=( const ArrayBase<T>& other )
 	{
-		ASSERT( other.Size() <= m_capacity );
+		DD_ASSERT( other.Size() <= m_capacity );
 
 		// clear, then push the entire other array
 		Clear();
@@ -56,7 +56,7 @@ namespace dd
 	template<typename T>
 	const T& ArrayBase<T>::operator[]( uint index ) const
 	{
-		ASSERT( index < m_size, "Indexing unallocated memory!" );
+		DD_ASSERT( index < m_size, "Indexing unallocated memory!" );
 
 		return m_data[index];
 	}
@@ -64,7 +64,7 @@ namespace dd
 	template<typename T>
 	void ArrayBase<T>::Push( const T& value )
 	{
-		ASSERT( m_size < m_capacity );
+		DD_ASSERT( m_size < m_capacity );
 
 		new (&m_data[m_size]) T( value );
 		++m_size;
@@ -73,7 +73,7 @@ namespace dd
 	template<typename T>
 	void ArrayBase<T>::PushAll( const ArrayBase<T>& other )
 	{
-		ASSERT( m_capacity - m_size >= other.Size() );
+		DD_ASSERT( m_capacity - m_size >= other.Size() );
 
 		for( uint i = 0; i < other.m_size; ++i )
 		{
@@ -84,7 +84,7 @@ namespace dd
 	template<typename T>
 	T ArrayBase<T>::Pop()
 	{
-		ASSERT( m_size > 0 );
+		DD_ASSERT( m_size > 0 );
 
 		--m_size;
 
@@ -94,7 +94,7 @@ namespace dd
 	template<typename T>
 	void ArrayBase<T>::Remove( uint index )
 	{
-		ASSERT( index < m_size );
+		DD_ASSERT( index < m_size );
 
 		m_data[index].~T();
 

@@ -148,12 +148,12 @@ void RegisterGameTypes()
 
 #ifdef _TEST
 
-int TestMain( int argc, char* const argv[] )
+int TestMain( int argc, char const* argv[] )
 {
 	int iError = tests::RunTests( argc, argv );
 
 	if( iError != 0 )
-		ASSERT( false, "Tests failed!" );
+		DD_ASSERT( false, "Tests failed!" );
 	else
 		printf( "Tests passed!" );
 
@@ -313,14 +313,14 @@ int GameMain()
 
 	DD_PROFILE_DEINIT(); 
 
-	ASSERT( false, "DONE!" );
+	DD_ASSERT( false, "DONE!" );
 	return 0;
 }
 
 //
 // ENTRY POINT
 //
-int main( int argc, char* const argv[] )
+int main( int argc, char const* argv[] )
 {
 	CommandLine cmdLine( argv, argc );
 	g_services.Register( cmdLine );
@@ -328,6 +328,7 @@ int main( int argc, char* const argv[] )
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
+	// TODO: this is bad, not compatible with Wren, and registered too early anyway
 	AngelScriptEngine AngelScriptEngine;
 	g_services.Register( AngelScriptEngine );
 

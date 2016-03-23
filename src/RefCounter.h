@@ -19,14 +19,14 @@ namespace dd
 
 		void Increment()
 		{
-			ASSERT( m_ptr != nullptr );
+			DD_ASSERT( m_ptr != nullptr );
 
 			++m_refCount;
 		}
 
 		void Decrement()
 		{
-			ASSERT( m_ptr != nullptr );
+			DD_ASSERT( m_ptr != nullptr );
 
 			--m_refCount;
 

@@ -9,7 +9,7 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch/catch.hpp"
 
-int tests::RunTests( int argc, char* const argv[] ) 
+int tests::RunTests( int argc, char const* argv[] )
 {
 	Catch::Session session;
 	return session.run( argc, argv );

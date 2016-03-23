@@ -75,7 +75,7 @@ namespace dd
 
 	void ReadStream::Read( String& dst )
 	{
-		ASSERT( Remaining() > 0 );
+		DD_ASSERT( Remaining() > 0 );
 
 		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
 		src += m_current;
@@ -88,8 +88,8 @@ namespace dd
 
 	void ReadStream::Read( void* dst, uint bytes )
 	{
-		ASSERT( dst != nullptr );
-		ASSERT( Remaining() >= bytes );
+		DD_ASSERT( dst != nullptr );
+		DD_ASSERT( Remaining() >= bytes );
 
 		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
 
@@ -147,7 +147,7 @@ namespace dd
 
 	void WriteStream::Write( const String& str )
 	{
-		ASSERT( Remaining() > 0 );
+		DD_ASSERT( Remaining() > 0 );
 
 		if( m_pDest != nullptr )
 		{
@@ -167,7 +167,7 @@ namespace dd
 
 	void WriteStream::Write( const void* src, uint bytes )
 	{
-		ASSERT( Remaining() >= bytes );
+		DD_ASSERT( Remaining() >= bytes );
 
 		if( m_pDest != nullptr )
 		{
@@ -191,7 +191,7 @@ namespace dd
 
 	void WriteStream::WriteFormat( const char* format, ... )
 	{
-		ASSERT( Remaining() > 0 );
+		DD_ASSERT( Remaining() > 0 );
 
 		void* dest = m_pDest != nullptr ? PointerAdd( m_pDest, m_current ) : s_temp;
 

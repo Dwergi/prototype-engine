@@ -55,7 +55,7 @@ namespace dd
 			if( current_handle == entity.Handle )
 			{
 				// already exists
-				ASSERT( false );
+				DD_ASSERT( false );
 				return nullptr;
 			}
 

@@ -17,7 +17,7 @@ namespace dd
 
 	Input::Input( const Window& window )
 	{
-		ASSERT( m_pInstance == nullptr );
+		DD_ASSERT( m_pInstance == nullptr );
 
 		m_pInstance = this;
 
@@ -35,7 +35,7 @@ namespace dd
 
 	Input::~Input()
 	{
-		ASSERT( m_pInstance == this );
+		DD_ASSERT( m_pInstance == this );
 
 		m_pInstance = nullptr;
 		glfwSetKeyCallback( m_glfwWindow, nullptr );

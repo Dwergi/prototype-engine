@@ -55,9 +55,9 @@ namespace dd
 				EntityEntry& entry = m_entities[command.Entity.ID];
 
 				// ensure that this entity has actually lived a full, productive life
-				ASSERT( entry.Flags & EntityState::Valid );
-				ASSERT( entry.Flags & EntityState::Active );
-				ASSERT( entry.Flags & EntityState::Destroyed );
+				DD_ASSERT( entry.Flags & EntityState::Valid );
+				DD_ASSERT( entry.Flags & EntityState::Active );
+				DD_ASSERT( entry.Flags & EntityState::Destroyed );
 
 				entry.Flags = EntityState::None;
 

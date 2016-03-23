@@ -82,8 +82,8 @@ namespace ArrayTests
 	{
 		dd::Array<Test::NestedStruct, 32> container;
 	
-		ASSERT( sizeof( Test::NestedStruct ) > sizeof( Test::SimpleStruct ) );
-		ASSERT( sizeof( dd::Array<Test::NestedStruct, 32> ) > sizeof( Test::NestedStruct ) * 32 );
+		DD_ASSERT( sizeof( Test::NestedStruct ) > sizeof( Test::SimpleStruct ) );
+		DD_ASSERT( sizeof( dd::Array<Test::NestedStruct, 32> ) > sizeof( Test::NestedStruct ) * 32 );
 
 		for( int i = 0; i < 32; ++i )
 		{

@@ -104,7 +104,7 @@ namespace dd
 	T& Variable::GetValue()
 	{
 		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
-		ASSERT( m_typeInfo->IsDerivedFrom( GET_TYPE( T ) ) );
+		DD_ASSERT( m_typeInfo->IsDerivedFrom( GET_TYPE( T ) ) );
 
 		return CastHelper<T>::Cast( m_data );
 	}
@@ -112,7 +112,7 @@ namespace dd
 	template <typename T>
 	const T& Variable::GetValue() const
 	{
-		ASSERT( m_typeInfo->IsDerivedFrom( GET_TYPE( T ) ) );
+		DD_ASSERT( m_typeInfo->IsDerivedFrom( GET_TYPE( T ) ) );
 
 		return CastHelper<T>::Cast( m_data );
 	}

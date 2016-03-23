@@ -31,8 +31,8 @@ namespace dd
 		const FunctionSignature* sig = handler.Signature();
 		const TypeInfo* arg = sig->GetArg( 0 );
 
-		ASSERT( sig->ArgCount() == 1 );
-		ASSERT( arg == GET_TYPE( Message* ) );
+		DD_ASSERT( sig->ArgCount() == 1 );
+		DD_ASSERT( arg == GET_TYPE( Message* ) );
 
 		MessageSubscription new_token;
 		new_token.Handler = m_nextHandlerID++;

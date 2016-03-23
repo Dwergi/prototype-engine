@@ -68,7 +68,7 @@ namespace dd
 	//
 	void AABBOctree::Remove( OctreeEntry entry )
 	{
-		ASSERT( IsValid( entry ) );
+		DD_ASSERT( IsValid( entry ) );
 
 		m_free.Push( entry );
 		memset( &m_entries[entry], 0xFF, sizeof( AABB ) );
@@ -186,7 +186,7 @@ namespace dd
 	//
 	AABBOctree::Node* AABBOctree::GetNodePtr( AABBOctree::NodeHandle handle ) const
 	{
-		ASSERT( handle >= 0 && handle < (int) m_nodes.Size() );
+		DD_ASSERT( handle >= 0 && handle < (int) m_nodes.Size() );
 
 		return &(m_nodes[handle]);
 	}
@@ -196,7 +196,7 @@ namespace dd
 	//
 	AABBOctree::NodeHandle AABBOctree::GetChild( AABBOctree::NodeHandle handle, uint index ) const
 	{
-		ASSERT( handle + index >= 0 && handle + index < m_nodes.Size() );
+		DD_ASSERT( handle + index >= 0 && handle + index < m_nodes.Size() );
 
 		return NodeHandle( GetNodePtr( handle )->m_children + index );
 	}
@@ -206,7 +206,7 @@ namespace dd
 	//
 	const AABB& AABBOctree::GetEntry( OctreeEntry entry ) const
 	{
-		ASSERT( entry >= 0 && entry < (int) m_entries.Size() );
+		DD_ASSERT( entry >= 0 && entry < (int) m_entries.Size() );
 
 		return m_entries[entry];
 	}
@@ -238,8 +238,8 @@ namespace dd
 	//
 	void AABBOctree::AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle parent_handle, const AABB& parent_bounds, uint depth )
 	{
-		ASSERT( HasChildren( parent_handle ) );
-		ASSERT( entry_bounds.Intersects( parent_bounds ) );
+		DD_ASSERT( HasChildren( parent_handle ) );
+		DD_ASSERT( entry_bounds.Intersects( parent_bounds ) );
 
 		for( uint i = 0; i < 8; ++i )
 		{
@@ -258,8 +258,8 @@ namespace dd
 	//
 	void AABBOctree::AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle node_handle, const AABB& node_bounds, uint depth )
 	{
-		ASSERT( depth <= MAX_DEPTH );
-		ASSERT( entry_bounds.Intersects( node_bounds ) );
+		DD_ASSERT( depth <= MAX_DEPTH );
+		DD_ASSERT( entry_bounds.Intersects( node_bounds ) );
 
 		if( !HasChildren( node_handle ) )
 		{

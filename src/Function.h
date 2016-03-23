@@ -43,7 +43,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R>
 	void Call( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		ret->GetValue<R>() = (*FunctionPtr)();
 	}
@@ -59,7 +59,7 @@ namespace dd
 	void Call( Variable* ret, void* context, Variable* args, uint argCount )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
-		ASSERT( argCount == ArgCount );
+		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallHelper<FunctionType, FunctionPtr, R, First, Args...>( ret, args, std::make_index_sequence<ArgCount>() );
 	}
@@ -69,7 +69,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr>
 	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 
 		(*FunctionPtr)();
 	}
@@ -85,7 +85,7 @@ namespace dd
 	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
-		ASSERT( argCount == ArgCount );
+		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallVoidHelper<FunctionType, FunctionPtr, First, Args...>( args, std::make_index_sequence<ArgCount>() );
 	}
@@ -95,7 +95,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
 	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)();
 	}
 
@@ -110,7 +110,7 @@ namespace dd
 	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
-		ASSERT( argCount == ArgCount );
+		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodHelper<FunctionType, FunctionPtr, R, C, First, Args...>( ret, (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
@@ -120,7 +120,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 0 );
+		DD_ASSERT( argCount == 0 );
 		(((C*) context)->*FunctionPtr)();
 	}
 
@@ -135,7 +135,7 @@ namespace dd
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
-		ASSERT( argCount == ArgCount );
+		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodVoidHelper<FunctionType, FunctionPtr, C, First, Args...>( (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
@@ -328,7 +328,7 @@ namespace dd
 	{
 		const TypeInfo* typeInfo = TypeInfo::GetType<std::tuple_element_t<Index, std::tuple<Args...>>>();
 
-		ASSERT( m_sig.GetArg( Index ) == typeInfo );
+		DD_ASSERT( m_sig.GetArg( Index ) == typeInfo );
 	}
 
 	template<typename... Args, std::size_t... Index>
@@ -347,7 +347,7 @@ namespace dd
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args);
 
-		ASSERT( m_sig.ArgCount() == ArgCount );
+		DD_ASSERT( m_sig.ArgCount() == ArgCount );
 		
 		Variable argStack[ArgCount];
 		std::tuple<Args...> tuple = std::make_tuple( args... );
@@ -363,7 +363,7 @@ namespace dd
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args);
 
-		ASSERT( m_sig.ArgCount() == ArgCount );
+		DD_ASSERT( m_sig.ArgCount() == ArgCount );
 
 		Variable argStack[ArgCount];
 		std::tuple<Args...> tuple = std::make_tuple( args... );

@@ -45,7 +45,7 @@ namespace dd
 		m_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 
 		int r = m_engine->SetMessageCallback( asMETHOD( dd::AngelScriptEngine, MessageCallback ), this, asCALL_THISCALL );
-		ASSERT( r >= 0 );
+		DD_ASSERT( r >= 0 );
 
 		RegisterScriptMath( m_engine );
 	}
@@ -66,7 +66,7 @@ namespace dd
 		signature += member.Name();
 
 		int res = m_engine->RegisterObjectProperty( objType.c_str(), signature.c_str(), (int) member.Offset() );
-		ASSERT( res >= 0 );
+		DD_ASSERT( res >= 0 );
 	}
 
 	bool AngelScriptEngine::Evaluate( const String& script, String& output )
@@ -134,6 +134,6 @@ namespace dd
 		signature += name;
 
 		int res = m_engine->RegisterGlobalProperty( signature.c_str(), var.Data() );
-		ASSERT( res >= 0 );
+		DD_ASSERT( res >= 0 );
 	}
 }

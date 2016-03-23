@@ -11,7 +11,7 @@ namespace dd
 	class CommandLine
 	{
 	public:
-		CommandLine( char* const argv[], int argc );
+		CommandLine( char const* argv[], int argc );
 
 		bool Exists( const char* key ) const;
 		const String& GetValue( const char* key ) const;

@@ -2,5 +2,5 @@
 
 namespace tests
 {
-	int RunTests( int argc, char* const argv[] );
+	int RunTests( int argc, char const* argv[] );
 }

@@ -11,7 +11,7 @@ static __declspec(thread) char s_buffer[BUFFER_SIZE];
 template <typename T>
 void CopyRange( const T* src, T* dest, uint count )
 {
-	ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
+	DD_ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
 
 	T* temp = reinterpret_cast<T*>(s_buffer);
 
@@ -47,11 +47,11 @@ void DestroyRange( T* src, uint count )
 template <typename T>
 void MoveRange( const T* src, T* dest, uint count )
 {
-	ASSERT( count > 0 );
-	ASSERT( src != nullptr && dest != nullptr );
-	ASSERT( src != dest );
+	DD_ASSERT( count > 0 );
+	DD_ASSERT( src != nullptr && dest != nullptr );
+	DD_ASSERT( src != dest );
 
-	ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
+	DD_ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
 
 	T* temp = reinterpret_cast<T*>(s_buffer);
 

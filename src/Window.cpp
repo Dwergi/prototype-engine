@@ -19,7 +19,7 @@ namespace dd
 		m_sizeX( resX ),
 		m_sizeY( resY )
 	{
-		ASSERT( m_pInstance == nullptr );
+		DD_ASSERT( m_pInstance == nullptr );
 		m_pInstance = this;
 
 		if( !glfwInit() )

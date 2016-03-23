@@ -18,7 +18,7 @@ namespace dd
 {
 	PropertyList::PropertyList( const PropertyList& other )
 	{
-		ASSERT( m_type == other.m_type );
+		DD_ASSERT( m_type == other.m_type );
 
 		m_base = other.m_base;
 		m_properties = other.m_properties;

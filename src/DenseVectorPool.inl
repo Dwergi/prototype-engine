@@ -67,7 +67,7 @@ namespace dd
 		// already allocated!
 		if( Exists( entity ) )
 		{
-			ASSERT( false, "Entity already exists!" );
+			DD_ASSERT( false, "Entity already exists!" );
 			return nullptr;
 		}
 
@@ -89,7 +89,7 @@ namespace dd
 	{
 		if( !Exists( entity ) )
 		{
-			ASSERT( false, "Entity does not exist!" );
+			DD_ASSERT( false, "Entity does not exist!" );
 			return nullptr;
 		}
 
@@ -102,7 +102,7 @@ namespace dd
 	{
 		if( entity.ID >= (int) m_components.Size() )
 		{
-			ASSERT( false, "Entity ID outside of valid range!" );
+			DD_ASSERT( false, "Entity ID outside of valid range!" );
 			return;
 		}
 

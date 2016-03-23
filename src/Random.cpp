@@ -19,7 +19,7 @@ namespace dd
 		m_max( max ),
 		m_rng( seed )
 	{
-		ASSERT( min < max );
+		DD_ASSERT( min < max );
 
 		if( seed == DEFAULT_SEED )
 		{
@@ -41,7 +41,7 @@ namespace dd
 		m_max( max ),
 		m_rng( seed )
 	{
-		ASSERT( min < max );
+		DD_ASSERT( min < max );
 
 		if( seed == DEFAULT_SEED )
 		{
@@ -63,7 +63,7 @@ namespace dd
 		m_max( max ),
 		m_rng( seed )
 	{
-		ASSERT( min < max );
+		DD_ASSERT( min < max );
 
 		if( seed == DEFAULT_SEED )
 		{
