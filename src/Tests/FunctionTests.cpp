@@ -1,7 +1,7 @@
 //
-// TypeInfoTests.h - Tests for TypeInfo.
+// FunctionTests.h - Tests for Function.
 // Copyright (C) Sebastian Nordgren 
-// March 23rd 2016
+// August 6th 2015
 //
 
 #include "PrecompiledHeader.h"

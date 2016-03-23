@@ -26,7 +26,20 @@ Purpose       :
 
 namespace dd
 {
+	// Get the type-safe argument at the given index in the given args array.
+	template <std::size_t Index, typename... Args>
+	struct GetArg
+	{
+		using Type = std::tuple_element_t<Index, std::tuple<Args...>>;
+
+		static Type get( Variable* args )
+		{
+			return args[Index].GetValue<Type>();
+		}
+	};
+
 	// Static functions with return value
+	// Specialized version for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename R>
 	void Call( Variable* ret, void* context, Variable* args, uint argCount )
 	{
@@ -35,67 +48,24 @@ namespace dd
 		ret->GetValue<R>() = (*FunctionPtr)();
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1>
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename... Args, std::size_t... Index>
+	void InternalCallHelper( Variable* ret, Variable* args, std::index_sequence<Index...> )
 	{
-		ASSERT( argCount == 1 );
-
-		ret->GetValue<R>() = (*FunctionPtr)(
-			args[0].GetValue<Arg1>()
-			);
+		ret->GetValue<R>() = (*FunctionPtr)(GetArg<Index, Args...>::get( args )...);
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2>
+	// General case of 1-N arguments.
+	template < typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args >
 	void Call( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 2 );
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		ASSERT( argCount == ArgCount );
 
-		ret->GetValue<R>() = (*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3>
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 3 );
-
-		ret->GetValue<R>() = (*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 4 );
-
-		ret->GetValue<R>() = (*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 5 );
-
-		ret->GetValue<R>() = (*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>(),
-			args[4].GetValue<Arg5>()
-			);
+		InternalCallHelper<FunctionType, FunctionPtr, R, First, Args...>( ret, args, std::make_index_sequence<ArgCount>() );
 	}
 
 	// Call static function without return value
+	// Specialized version for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr>
 	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
@@ -104,67 +74,24 @@ namespace dd
 		(*FunctionPtr)();
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	template <typename FunctionType, FunctionType FunctionPtr, typename... Args, std::size_t... Index>
+	void InternalCallVoidHelper( Variable* args, std::index_sequence<Index...> )
 	{
-		ASSERT( argCount == 1 );
-
-		(*FunctionPtr)(
-			args[0].GetValue<Arg1>()
-			);
+		(*FunctionPtr)(GetArg<Index, Args...>::get( args )...);
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2>
+	// General case of 1-N arguments.
+	template <typename FunctionType, FunctionType FunctionPtr, typename First, typename... Args>
 	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 2 );
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		ASSERT( argCount == ArgCount );
 
-		(*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>()
-			);
+		InternalCallVoidHelper<FunctionType, FunctionPtr, First, Args...>( args, std::make_index_sequence<ArgCount>() );
 	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 3 );
-
-		(*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 4 );
-
-		(*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 5 );
-
-		(*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>(),
-			args[4].GetValue<Arg5>()
-			);
-	}
-
+	
 	// Methods with return value
+	// Specialized for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
 	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
 	{
@@ -172,62 +99,24 @@ namespace dd
 		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)();
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args, std::size_t... Index>
+	void InternalCallMethodHelper( Variable* ret, C* context, Variable* args, std::index_sequence<Index...> )
 	{
-		ASSERT( argCount == 1 );
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>()
-			);
+		ret->GetValue<R>() = (context->*FunctionPtr)( GetArg<Index, Args...>::get( args )... );
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2>
+	// General case of 1-N arguments.
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename First, typename... Args>
 	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 2 );
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>()
-			);
-	}
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		ASSERT( argCount == ArgCount );
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 3 );
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 4 );
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 5 );
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>(),
-			args[4].GetValue<Arg5>()
-			);
+		InternalCallMethodHelper<FunctionType, FunctionPtr, R, C, First, Args...>( ret, (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
 
 	// Methods without return value
+	// Specialized for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename C>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
@@ -235,59 +124,20 @@ namespace dd
 		(((C*) context)->*FunctionPtr)();
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename... Args, std::size_t... Index>
+	void InternalCallMethodVoidHelper( C* context, Variable* args, std::index_sequence<Index...> )
 	{
-		ASSERT( argCount == 1 );
-		(((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>()
-			);
+		(context->*FunctionPtr)( GetArg<Index, Args...>::get( args )... );
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2>
+	// General case of 1-N arguments.
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename First, typename... Args>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		ASSERT( argCount == 2 );
-		(((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>()
-			);
-	}
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		ASSERT( argCount == ArgCount );
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 3 );
-		(((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 4 );
-		(((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>()
-			);
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
-	{
-		ASSERT( argCount == 5 );
-		(((C*) context)->*FunctionPtr)(
-			args[0].GetValue<Arg1>(),
-			args[1].GetValue<Arg2>(),
-			args[2].GetValue<Arg3>(),
-			args[3].GetValue<Arg4>(),
-			args[4].GetValue<Arg5>()
-			);
+		InternalCallMethodVoidHelper<FunctionType, FunctionPtr, C, First, Args...>( (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
 
 	struct FunctionArgs
@@ -320,977 +170,206 @@ namespace dd
 
 		void Bind( Variable& context );
 
-		// Static functions with return values
-		template <typename R>
-		Function(
-			R (*fn)(),
-			HelperType helper
-			);
-		template <typename R, typename Arg1>
-		Function(
-			R (*fn)( Arg1 ),
-			HelperType helper
-			);
-		template <typename R, typename Arg1, typename Arg2>
-		Function(
-			R (*fn)( Arg1, Arg2 ),
-			HelperType helper
-			);
-		template <typename R, typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			R (*fn)( Arg1, Arg2, Arg3 ),
-			HelperType helper
-			);
-		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			R (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			HelperType helper
-			);
-		template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			HelperType helper
-			);
-
 		// Static functions without return values
-		Function(
-			void (*fn)(),
-			HelperType helper
-			);
-		template <typename Arg1>
-		Function(
-			void (*fn)( Arg1 ),
-			HelperType helper
-			);
-		template <typename Arg1, typename Arg2>
-		Function(
-			void (*fn)( Arg1, Arg2 ),
-			HelperType helper
-			);
-		template <typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			void (*fn)( Arg1, Arg2, Arg3 ),
-			HelperType helper
-			);
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			void (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			HelperType helper
-			);
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			HelperType helper
-			);
+		template <typename... Args>
+		Function( void( *fn )(Args...), HelperType helper );
 
-		// Methods with return values, non-const
-		template <typename R, typename C>
-		Function(
-			R (C::*fn)(),
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1>
-		Function(
-			R (C::*fn)( Arg1 ),
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2>
-		Function(
-			R (C::*fn)( Arg1, Arg2 ),
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3 ),
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			HelperType helper
-			);
+		// Static functions with return values
+		template <typename R, typename... Args>
+		Function( R (*fn)(Args...), HelperType helper );
 
 		// Methods without return values, non-const
-		template <typename C>
-		Function(
-			void (C::*fn)(),
-			HelperType helper
-			);
-		template <typename C, typename Arg1>
-		Function(
-			void (C::*fn)( Arg1 ),
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2>
-		Function(
-			void (C::*fn)( Arg1, Arg2 ),
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3 ),
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-			HelperType helper
-			);
+		template <typename C, typename... Args>
+		Function( void (C::*fn)( Args... ), HelperType helper );
 
-		// Methods with return values, const
-		template <typename R, typename C>
-		Function(
-			R (C::*fn)() const,
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1>
-		Function(
-			R (C::*fn)( Arg1 ) const,
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2>
-		Function(
-			R (C::*fn)( Arg1, Arg2 ) const,
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3 ) const,
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-			HelperType helper
-			);
-		template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-			HelperType helper
-			);
+		// Methods with return values, non-const
+		template <typename R, typename C, typename... Args>
+		Function( R (C::*fn)( Args... ), HelperType helper );
 
 		// Methods without return values, const
-		template <typename C>
-		Function(
-			void (C::*fn)() const,
-			HelperType helper
-			);
-		template <typename C, typename Arg1>
-		Function(
-			void (C::*fn)( Arg1 ) const,
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2>
-		Function(
-			void (C::*fn)( Arg1, Arg2 ) const,
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3 ) const,
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-			HelperType helper
-			);
-		template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		Function(
-			void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-			HelperType helper
-			);
+		template <typename C, typename... Args>
+		Function( void (C::*fn)( Args... ) const, HelperType helper );
+
+		// Methods with return values, const
+		template <typename R, typename C, typename... Args>
+		Function( R (C::*fn)( Args... ) const, HelperType helper );
 
 		void operator()( Variable& ret, Variable* args, uint argCount ) const;
 		void operator()( Variable& ret, Variable* args, uint argCount );
 
-		void operator()( Variable& ret ) const;
-		template <typename Arg1>
-		void operator()( Variable& ret, Arg1 arg1 ) const;
-		template <typename Arg1, typename Arg2>
-		void operator()( Variable& ret, Arg1 arg1, Arg2 arg2 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3>
-		void operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		void operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		void operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const;
-
 		void operator()() const;
-		template <typename Arg1>
-		void operator()( Arg1 arg1 ) const;
-		template <typename Arg1, typename Arg2>
-		void operator()( Arg1 arg1, Arg2 arg2 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3>
-		void operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-		void operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const;
-		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-		void operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const;
+		void operator()( Variable& ret ) const;
+
+		template <typename... Args>
+		void operator()( Variable& ret, Args... args ) const;
+
+		template <typename... Args>
+		void operator()( Args... args ) const;
 
 	private:
 		Variable m_context;
 		FunctionSignature m_sig;
 		void (*m_callHelper)( Variable*, void*, Variable*, uint );
+
+		template <std::size_t Index, typename... Args>
+		void AssertType() const;
+
+		template <typename... Args, std::size_t... Index>
+		void CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence< Index... > ) const;
 	};
 
 	// Static functions with return value
-	template <typename R>
-	Function::Function(
-		R (*fn)(),
-		HelperType helper
-		)
+	template <typename R, typename... Args>
+	Function::Function( R (*fn)(Args...), HelperType helper )
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
-
-	template <typename R, typename Arg1>
-	Function::Function(
-		R (*fn)( Arg1 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename Arg1, typename Arg2>
-	Function::Function(
-		R (*fn)( Arg1, Arg2 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		R (*fn)( Arg1, Arg2, Arg3 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		R (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
+	
 	// Static functions without return value
-	template <typename Arg1>
-	Function::Function(
-		void (*fn)( Arg1 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename Arg1, typename Arg2>
-	Function::Function(
-		void (*fn)( Arg1, Arg2 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		void (*fn)( Arg1, Arg2, Arg3 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		void (*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		HelperType helper
-		)
+	template <typename... Args>
+	Function::Function( void (*fn)( Args... ), HelperType helper )
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
 
 	// Methods with return value, non-const
-	template <typename R, typename C>
-	Function::Function(
-		R (C::*fn)(),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1>
-	Function::Function(
-		R (C::*fn)( Arg1 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		HelperType helper
-		)
+	template <typename R, typename C, typename... Args>
+	Function::Function( R (C::*fn)( Args... ), HelperType helper )
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
 
 	// Methods without return value, non-const
-	template <typename C>
-	Function::Function(
-		void (C::*fn)(),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1>
-	Function::Function(
-		void (C::*fn)( Arg1 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ),
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ),
-		HelperType helper
-		)
+	template <typename C, typename... Args>
+	Function::Function( void (C::*fn)( Args... ), HelperType helper	)
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
 
 	// Methods with return value, const
-	template <typename R, typename C>
-	Function::Function(
-		R (C::*fn)() const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1>
-	Function::Function(
-		R (C::*fn)( Arg1 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-		HelperType helper
-		)
+	template <typename R, typename C, typename... Args>
+	Function::Function( R (C::*fn)( Args... ) const, HelperType helper )
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
 
 	// Methods without return value, const
-	template <typename C>
-	Function::Function(
-		void (C::*fn)() const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1>
-	Function::Function(
-		void (C::*fn)( Arg1 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const,
-		HelperType helper
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
-	template <typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function::Function(
-		void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const,
-		HelperType helper
-		)
+	template <typename C, typename... Args>
+	Function::Function(	void (C::*fn)( Args... ) const,	HelperType helper )
 		: m_sig( fn )
 		, m_callHelper( helper )
 	{
 	}
 
 	// Build static functions with return value
-	template <typename FunctionType, FunctionType FunctionPtr, typename R>
-	Function BuildFunction(R (*fn)() )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename... Args>
+	Function BuildFunction( R (*fn)( Args... ) )
 	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1>
-	Function BuildFunction(R (*fn)( Arg1 ) )
-	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R, Arg1> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2>
-	Function BuildFunction(R (*fn)( Arg1, Arg2 ) )
-	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(R (*fn)( Arg1, Arg2, Arg3 ) )
-	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(R (*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(R (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-	{
-		return Function(fn, &Call<FunctionType, FunctionPtr, R, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		auto helper = &Call<FunctionType, FunctionPtr, R, Args...>;
+		return Function( fn, helper );
 	}
 
 	// Build static functions without return value
-	template <typename FunctionType, FunctionType FunctionPtr>
-	Function BuildFunction(void (*fn)() )
+	template <typename FunctionType, FunctionType FunctionPtr, typename... Args>
+	Function BuildFunction( void (*fn)( Args... ) )
 	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1>
-	Function BuildFunction(void (*fn)( Arg1 ) )
-	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr, Arg1> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2>
-	Function BuildFunction(void (*fn)( Arg1, Arg2 ) )
-	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(void (*fn)( Arg1, Arg2, Arg3 ) )
-	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(void (*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(void (*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-	{
-		return Function(fn, &CallVoid<FunctionType, FunctionPtr, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		auto helper = &CallVoid<FunctionType, FunctionPtr, Args...>;
+		return Function( fn, helper );
 	}
 
 	// Build methods with return value, non-const
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
-	Function BuildFunction(R (C::*fn)() )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args>
+	Function BuildFunction( R (C::*fn)( Args... ) )
 	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1>
-	Function BuildFunction(R (C::*fn)( Arg1 ) )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2 ) )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3 ) )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, Args...>;
+		return Function( fn, helper );
 	}
 
 	// Build methods with return value, const
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
-	Function BuildFunction(R (C::*fn)() const )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args>
+	Function BuildFunction( R (C::*fn)( Args... ) const )
 	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1>
-	Function BuildFunction(R (C::*fn)( Arg1 ) const )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2 ) const )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3 ) const )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(R (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
-	{
-		return Function(fn, &CallMethod<FunctionType, FunctionPtr, R, C, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, Args...>;
+		return Function( fn, helper );
 	}
 
 	// Build methods without return value, non-const
-	template <typename FunctionType, FunctionType FunctionPtr, typename C>
-	Function BuildFunction(void (C::*fn)() )
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename... Args>
+	Function BuildFunction( void (C::*fn)( Args... ) )
 	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1>
-	Function BuildFunction(void (C::*fn)( Arg1 ) )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2 ) )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3 ) )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, Args...>;
+		return Function( fn, helper );
 	}
 
 	// Build methods without return value, const
-	template <typename FunctionType, FunctionType FunctionPtr, typename C>
-	Function BuildFunction(void (C::*fn)() const )
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename... Args>
+	Function BuildFunction( void (C::*fn)( Args... ) const )
 	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C> );
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, Args...>;
+		return Function( fn, helper );
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1>
-	Function BuildFunction(void (C::*fn)( Arg1 ) const )
+	// Helper to use list initialization to evaluate side-effects with variadic templates.
+	// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
+	struct ExpandType
 	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1> );
+		template< typename... Ts >
+		ExpandType( Ts&&... ) {}
+	};
+
+	// Creates an assert that the type at Index in the pack Args is of the same type as the signature.
+	template <std::size_t Index, typename... Args>
+	void Function::AssertType() const
+	{
+		const TypeInfo* typeInfo = TypeInfo::GetType<std::tuple_element_t<Index, std::tuple<Args...>>>();
+
+		ASSERT( m_sig.GetArg( Index ) == typeInfo );
 	}
 
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2 ) const )
+	template<typename... Args, std::size_t... Index>
+	void Function::CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const
 	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3 ) const )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3, Arg4 ) const )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3, Arg4> );
-	}
-
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	Function BuildFunction(void (C::*fn)( Arg1, Arg2, Arg3, Arg4, Arg5 ) const )
-	{
-		return Function(fn, &CallMethodVoid<FunctionType, FunctionPtr, C, Arg1, Arg2, Arg3, Arg4, Arg5> );
+		// Expand the side effects using template fuckery.
+		ExpandType
+		{
+			0, (argStack[Index] = Variable( std::get<Index>( tuple ) ), AssertType<Index, Args...>(), 0)...
+		};
 	}
 
 	// Call with return value
-	template <typename Arg1>
-	void Function::operator()( Variable& ret, Arg1 arg1 ) const
+	template <typename... Args>
+	void Function::operator()( Variable& ret, Args... args ) const
 	{
-		ASSERT( m_sig.ArgCount() == 1 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
+		constexpr const std::size_t ArgCount = sizeof...(Args);
 
-		Variable argStack[1];
+		ASSERT( m_sig.ArgCount() == ArgCount );
+		
+		Variable argStack[ArgCount];
+		std::tuple<Args...> tuple = std::make_tuple( args... );
 
-		new (argStack) Variable( arg1 );
+		CreateVariables( argStack, tuple, std::make_index_sequence( ArgCount ) );
 
-		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2>
-	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 2 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-
-		Variable argStack[2];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-
-		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3>
-	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 3 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-
-		Variable argStack[3];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-
-		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 4 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == GET_TYPE( Arg4 ) );
-
-		Variable argStack[4];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-		new (argStack + 3) Variable( arg4 );
-
-		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void Function::operator()( Variable& ret, Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 5 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == GET_TYPE( Arg4 ) );
-		ASSERT( m_sig.GetArg( 4 ) == GET_TYPE( Arg5 ) );
-
-		Variable argStack[5];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-		new (argStack + 3) Variable( arg4 );
-		new (argStack + 4) Variable( arg5 );
-
-		m_callHelper( &ret, m_context.Data(), argStack, m_sig.ArgCount() );
+		m_callHelper( &ret, m_context.Data(), argStack, ArgCount );
 	}
 
 	// Call without return value
-	template <typename Arg1>
-	void Function::operator()( Arg1 arg1 ) const
+	template <typename... Args>
+	void Function::operator()( Args... args ) const
 	{
-		ASSERT( m_sig.ArgCount() == 1 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
+		constexpr const std::size_t ArgCount = sizeof...(Args);
 
-		Variable argStack[1];
+		ASSERT( m_sig.ArgCount() == ArgCount );
 
-		new (argStack) Variable( arg1 );
+		Variable argStack[ArgCount];
+		std::tuple<Args...> tuple = std::make_tuple( args... );
 
-		m_callHelper( nullptr, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
+		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
 
-	template <typename Arg1, typename Arg2>
-	void Function::operator()( Arg1 arg1, Arg2 arg2 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 2 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-
-		Variable argStack[2];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-
-		m_callHelper( nullptr, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3>
-	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 3 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-
-		Variable argStack[3];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-
-		m_callHelper( nullptr, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 4 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == GET_TYPE( Arg4 ) );
-
-		Variable argStack[4];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-		new (argStack + 3) Variable( arg4 );
-
-		m_callHelper( nullptr, m_context.Data(), argStack, m_sig.ArgCount() );
-	}
-
-	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-	void Function::operator()( Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5 ) const
-	{
-		ASSERT( m_sig.ArgCount() == 5 );
-		ASSERT( m_sig.GetArg( 0 ) == GET_TYPE( Arg1 ) );
-		ASSERT( m_sig.GetArg( 1 ) == GET_TYPE( Arg2 ) );
-		ASSERT( m_sig.GetArg( 2 ) == GET_TYPE( Arg3 ) );
-		ASSERT( m_sig.GetArg( 3 ) == GET_TYPE( Arg4 ) );
-		ASSERT( m_sig.GetArg( 4 ) == GET_TYPE( Arg5 ) );
-
-		Variable argStack[5];
-
-		new (argStack)     Variable( arg1 );
-		new (argStack + 1) Variable( arg2 );
-		new (argStack + 2) Variable( arg3 );
-		new (argStack + 3) Variable( arg4 );
-		new (argStack + 4) Variable( arg5 );
-
-		m_callHelper( nullptr, m_context.Data(), argStack, m_sig.ArgCount() );
+		m_callHelper( nullptr, m_context.Data(), argStack, ArgCount );
 	}
 }

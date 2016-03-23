@@ -8,7 +8,7 @@
 #include "TestTypes.h"
 
 
-void Test::SimpleStruct::Double()
+void Test::SimpleStruct::Double() const
 {
 
 }

@@ -15,7 +15,7 @@ namespace Test
 		float Flt;
 		dd::Vector<int> Vec;
 
-		void Double();
+		void Double() const;
 		int Multiply( int x );
 
 		bool operator==( const SimpleStruct& other ) const;

@@ -76,15 +76,6 @@ namespace dd
 		return *this;
 	}
 
-	Function::Function( 
-		void (*fn)(),
-		void (*helper)( Variable* , void* , Variable* , uint )
-		)
-		: m_sig( fn )
-		, m_callHelper( helper )
-	{
-	}
-
 	void Function::operator()( Variable& ret ) const
 	{
 		m_callHelper( &ret, m_context.Data(), NULL, 0 );
