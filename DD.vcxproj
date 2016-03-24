@@ -506,6 +506,7 @@
     <None Include="src\TypeInfo.inl" />
     <None Include="src\DenseMapPool.inl" />
     <None Include="src\Vector.inl" />
+    <None Include="src\WrenEngine.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="include\angelscript\angelscript\projects\msvc2015\angelscript.vcxproj">

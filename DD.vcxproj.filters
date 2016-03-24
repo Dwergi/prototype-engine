@@ -602,5 +602,8 @@
     <None Include="src\AngelScriptEngine.inl">
       <Filter>Script\AngelScript</Filter>
     </None>
+    <None Include="src\WrenEngine.inl">
+      <Filter>Script\Wren</Filter>
+    </None>
   </ItemGroup>
 </Project>

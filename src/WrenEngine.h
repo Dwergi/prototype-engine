@@ -27,23 +27,21 @@ namespace dd
 
 		// 
 		// Register a script object that is passed by reference exclusively.
+		// @byValue - Whether this object can be passed by value or not.
 		// 
 		template <typename ObjType>
-		void RegisterObject( const char* module, const char* className );
-
-		//
-		// Register a script object that is passed by value.
-		//
-		template <typename ObjType>
-		void RegisterStruct( const char* module, const char* className );
+		void RegisterObject( bool byValue );
 
 		// 
-		// Register a member for an object.
+		// Register a script-accessible member for an object.
 		//
-		void RegisterMember( const char* className, const Member& member );
+		void RegisterMember( const Member& member );
 
+		//
+		// Register a 
+		//
 		template <typename FnType>
-		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr, const char* explicit_sig = nullptr );
+		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr );
 
 		void RegisterGlobalVariable( const char* name, const Variable& var );
 
@@ -60,3 +58,5 @@ namespace dd
 		WriteStream* m_output;
 	};
 }
+
+#include "WrenEngine.inl"

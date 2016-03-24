@@ -15,14 +15,31 @@ namespace dd
 	public:
 		Member();
 
+		//
+		// The containing type.
+		//
+		const TypeInfo* Parent() const;
+
+		//
+		// The type of this member.
+		//
 		const TypeInfo* Type() const;
+
+		//
+		// The byte offset of this member relative to its parent class.
+		//
 		uint Offset() const;
+
+		//
+		// The name of this member.
+		//
 		const String32& Name() const;
 
 	private:
 		String32 m_name;
 		uint m_offset;
 		const TypeInfo* m_typeInfo;
+		const TypeInfo* m_parent;
 		
 		friend class TypeInfo;
 	};

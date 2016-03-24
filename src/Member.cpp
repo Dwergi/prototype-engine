@@ -30,4 +30,9 @@ namespace dd
 	{
 		return m_name;
 	}
+
+	const TypeInfo* Member::Parent() const
+	{
+		return m_parent;
+	}
 }

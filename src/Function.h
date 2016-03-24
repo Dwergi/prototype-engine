@@ -60,7 +60,7 @@ namespace dd
 	template < typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args >
 	void Call( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
 		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallHelper<FunctionType, FunctionPtr, R, First, Args...>( ret, args, std::make_index_sequence<ArgCount>() );
@@ -86,7 +86,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename First, typename... Args>
 	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
 		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallVoidHelper<FunctionType, FunctionPtr, First, Args...>( args, std::make_index_sequence<ArgCount>() );
@@ -111,7 +111,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename First, typename... Args>
 	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
 		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodHelper<FunctionType, FunctionPtr, R, C, First, Args...>( ret, (C*) context, args, std::make_index_sequence<ArgCount>() );
@@ -136,7 +136,7 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename First, typename... Args>
 	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
 	{
-		constexpr const std::size_t ArgCount = sizeof...(Args) + 1;
+		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
 		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodVoidHelper<FunctionType, FunctionPtr, C, First, Args...>( (C*) context, args, std::make_index_sequence<ArgCount>() );
@@ -333,7 +333,7 @@ namespace dd
 		DD_ASSERT( m_sig.GetArg( Index ) == typeInfo );
 	}
 
-	template<typename... Args, std::size_t... Index>
+	template <typename... Args, std::size_t... Index>
 	void Function::CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const
 	{
 		// Expand the side effects using template fuckery.
@@ -343,7 +343,6 @@ namespace dd
 		};
 	}
 
-	// TODO: Investigate if we could implement this to actually return the return value instead of bind it to the variable.
 	// Call with return value
 	template <typename... Args>
 	void Function::operator()( Variable& ret, Args... args ) const
@@ -358,6 +357,8 @@ namespace dd
 		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
 
 		m_callHelper( &ret, m_context.Data(), argStack, ArgCount );
+
+		DD_ASSERT( ret.Type() == m_sig.GetRet() );
 	}
 
 	// Call without return value

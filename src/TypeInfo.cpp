@@ -65,6 +65,7 @@ namespace dd
 		member.m_name = name;
 		member.m_offset = offset;
 		member.m_typeInfo = typeInfo;
+		member.m_parent = this;
 
 		if( m_scriptObject )
 		{

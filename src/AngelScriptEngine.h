@@ -38,7 +38,7 @@ namespace dd
 		void RegisterMember( const char* className, const Member& member );
 
 		template <typename FnType>
-		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr, const char* explicit_sig = nullptr );
+		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr );
 
 		void RegisterGlobalVariable( const char* name, const Variable& var );
 

@@ -98,14 +98,9 @@ void dd::AngelScriptEngine::RegisterStruct( const char* className )
 }
 
 template <typename FnType>
-void dd::AngelScriptEngine::RegisterGlobalFunction( const char* name, const Function& function, FnType ptr, const char* explicit_sig )
+void dd::AngelScriptEngine::RegisterGlobalFunction( const char* name, const Function& function, FnType ptr )
 {
-	String256 signature;
-
-	if( explicit_sig != nullptr )
-		signature = explicit_sig;
-	else 
-		signature = GetFunctionSignatureString( name, function );
+	String256 signature = GetFunctionSignatureString( name, function );
 
 	int res = m_engine->RegisterGlobalFunction( signature.c_str(), asFUNCTION( ptr ), asCALL_CDECL );
 	DD_ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
