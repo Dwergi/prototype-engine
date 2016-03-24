@@ -86,6 +86,9 @@ namespace dd
 
 	WrenEngine::WrenEngine()
 	{
+		WrenClass& global = m_classes.Allocate();
+		global.Name = "dd";
+
 		WrenConfiguration config;
 		wrenInitConfiguration( &config );
 
@@ -124,5 +127,25 @@ namespace dd
 		{
 			m_output->WriteFormat( "%s\n", message );
 		}
+	}
+
+	void WrenEngine::RegisterMember( const Member& member )
+	{
+		WrenClass* classReg = FindClass( member.Parent()->Name().c_str() );
+		
+		DD_ASSERT( classReg == nullptr, "Class has not been registered yet!" );
+
+		classReg->Members.Add( member );
+	}
+
+	WrenClass* WrenEngine::FindClass( const char* name ) const
+	{
+		for( WrenClass& entry : m_classes )
+		{
+			if( entry.Name == name )
+				return &entry;
+		}
+
+		return nullptr;
 	}
 }

@@ -12,6 +12,26 @@ namespace dd
 {
 	class WriteStream;
 
+	struct WrenFunction
+	{
+		SharedString Name;
+		Function Function;
+	};
+
+	struct WrenClass
+	{
+		SharedString Name;
+		const TypeInfo* Type;
+		Vector<WrenFunction> Functions;
+		Vector<Member> Members;
+	};
+
+	struct WrenVariable
+	{
+		SharedString Name;
+		Variable Variable;
+	};
+
 	class WrenEngine
 	{
 	public:
@@ -19,18 +39,12 @@ namespace dd
 		WrenEngine();
 		~WrenEngine();
 
-		//
-		// Register a method to an object.
-		//
-		template <typename FnType>
-		void RegisterMethod( const char* name, const Function& method, FnType ptr );
-
 		// 
 		// Register a script object that is passed by reference exclusively.
 		// @byValue - Whether this object can be passed by value or not.
 		// 
 		template <typename ObjType>
-		void RegisterObject( bool byValue );
+		void RegisterObjectType( bool byValue );
 
 		// 
 		// Register a script-accessible member for an object.
@@ -38,11 +52,17 @@ namespace dd
 		void RegisterMember( const Member& member );
 
 		//
-		// Register a 
+		// Register a function to be callable from script.
+		// It doesn't matter if it's a method or a global function, 
+		// the Function object includes the required info to register either.
 		//
 		template <typename FnType>
-		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr );
+		void RegisterFunction( const char* name, const Function& function, FnType ptr );
 
+		//
+		// Register an instance of a global variable to be script-accessible. 
+		// This means that 
+		//
 		void RegisterGlobalVariable( const char* name, const Variable& var );
 
 		bool Evaluate( const String& script, String& output );
@@ -56,6 +76,11 @@ namespace dd
 
 		WrenVM* m_engine;
 		WriteStream* m_output;
+
+		Vector<WrenClass> m_classes;
+		Vector<WrenVariable> m_variables;
+
+		WrenClass* FindClass( const char* name ) const;
 	};
 }
 
