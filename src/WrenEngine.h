@@ -24,6 +24,7 @@ namespace dd
 		const TypeInfo* Type;
 		Vector<WrenFunction> Functions;
 		Vector<Member> Members;
+		WrenForeignClassMethods ForeignMethods;
 	};
 
 	struct WrenVariable
@@ -43,7 +44,7 @@ namespace dd
 		// Register a script object that is passed by reference exclusively.
 		// @byValue - Whether this object can be passed by value or not.
 		// 
-		template <typename ObjType>
+		template <typename ObjType, typename... CtorArgs>
 		void RegisterObjectType( bool byValue );
 
 		// 
@@ -65,20 +66,34 @@ namespace dd
 		//
 		void RegisterGlobalVariable( const char* name, const Variable& var );
 
+		//
+		// Evaluate a script snippet, and place the output into the output string.
+		// Essentially a REPL interface.
+		// Returns true if the snippet executed without errors.
+		//
 		bool Evaluate( const String& script, String& output );
-
-		WrenVM* GetVM() const { return m_engine; }
-
-		void SetOutput( String* output );
-		void Write( const char* message );
 
 	private:
 
-		WrenVM* m_engine;
+		WrenVM* m_vm;
 		WriteStream* m_output;
 
 		Vector<WrenClass> m_classes;
 		Vector<WrenVariable> m_variables;
+
+		// Internal helper for finding the engine that is registered with the given VM.
+		static WrenEngine* FindEngine( WrenVM* vm );
+
+		// Friend functions for Wren internals.
+		friend WrenForeignClassMethods BindForeignClassCallback( WrenVM* vm, const char* module, const char* className );
+		friend WrenForeignMethodFn BindForeignMethodCallback( WrenVM*, const char*, const char*, bool, const char* );
+		friend char* LoadModuleCallback( WrenVM*, const char* );
+		friend void WriteCallback( WrenVM* vm, const char* msg );
+
+		void SetOutput( String* output );
+		void Write( const char* message );
+
+		char* LoadModule( const char* name ) const;
 
 		WrenClass* FindClass( const char* name ) const;
 	};

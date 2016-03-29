@@ -16,7 +16,12 @@ namespace std
 namespace dd
 {
 	class Function;
-	struct FunctionArgs;
+	
+	struct FunctionArgs
+	{
+		Vector<Variable> Arguments;
+		Variable Context;
+	};
 
 	class JobThread;
 

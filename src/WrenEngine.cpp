@@ -14,11 +14,11 @@ namespace dd
 	//
 	// Find the engine that owns the given VM.
 	//
-	WrenEngine* FindEngine( WrenVM* vm )
+	WrenEngine* WrenEngine::FindEngine( WrenVM* vm )
 	{
 		for( WrenEngine* engine : m_activeEngines )
 		{
-			if( engine->GetVM() == vm )
+			if( engine->m_vm == vm )
 				return engine;
 		}
 
@@ -30,7 +30,7 @@ namespace dd
 	//
 	void WriteCallback( WrenVM* vm, const char* msg )
 	{
-		WrenEngine* engine = FindEngine( vm );
+		WrenEngine* engine = WrenEngine::FindEngine( vm );
 		if( engine == nullptr )
 			return;
 
@@ -43,7 +43,7 @@ namespace dd
 		ret.allocate = nullptr;
 		ret.finalize = nullptr;
 
-		WrenEngine* engine = FindEngine( vm );
+		WrenEngine* engine = WrenEngine::FindEngine( vm );
 		if( engine == nullptr )
 			return ret;
 
@@ -55,8 +55,7 @@ namespace dd
 		if( typeInfo == nullptr )
 			return ret;
 
-		void* newPtr = wrenSetSlotNewForeign( vm, 0, 0, typeInfo->Size() );
-		typeInfo->PlacementNew( newPtr );
+		//ret.finalize =
 
 		// TODO
 		return ret;
@@ -64,7 +63,7 @@ namespace dd
 
 	WrenForeignMethodFn	BindForeignMethodCallback( WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature )
 	{
-		WrenEngine* engine = FindEngine( vm );
+		WrenEngine* engine = WrenEngine::FindEngine( vm );
 
 		if( engine == nullptr )
 			return nullptr;
@@ -75,13 +74,12 @@ namespace dd
 
 	char* LoadModuleCallback( WrenVM* vm, const char* name )
 	{
-		WrenEngine* engine = FindEngine( vm );
+		WrenEngine* engine = WrenEngine::FindEngine( vm );
 
 		if( engine == nullptr )
 			return nullptr;
 
-		// TODO
-		return nullptr;
+		return engine->LoadModule( name );
 	}
 
 	WrenEngine::WrenEngine()
@@ -97,7 +95,7 @@ namespace dd
 		config.bindForeignMethodFn = &BindForeignMethodCallback;
 		config.writeFn = &WriteCallback;
 
-		m_engine = wrenNewVM( &config );
+		m_vm = wrenNewVM( &config );
 
 		m_activeEngines.Add( this );
 	}
@@ -106,7 +104,7 @@ namespace dd
 	{
 		m_activeEngines.RemoveItem( this );
 
-		wrenFreeVM( m_engine );
+		wrenFreeVM( m_vm );
 	}
 	
 	void WrenEngine::SetOutput( String* output )
@@ -147,5 +145,24 @@ namespace dd
 		}
 
 		return nullptr;
+	}
+
+	bool WrenEngine::Evaluate( const String& script, String& output )
+	{
+		SetOutput( &output );
+
+		return true;
+	}
+
+	char* WrenEngine::LoadModule( const char* name ) const
+	{
+		return nullptr;
+	}
+
+	void WrenEngine::RegisterGlobalVariable( const char* name, const Variable& var )
+	{
+		WrenVariable& regVar = m_variables.Allocate();
+		regVar.Name = name;
+		regVar.Variable = var;
 	}
 }

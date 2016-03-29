@@ -11,6 +11,14 @@
 
 namespace dd
 {
+	// Helper to use list initialization to evaluate side-effects with variadic templates.
+	// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
+	struct ExpandType
+	{
+		template< typename... Ts >
+		ExpandType( Ts&&... ) {}
+	};
+
 	// Get the type-safe argument at the given index in the given args array.
 	template <std::size_t Index, typename... Args>
 	struct GetArg
@@ -26,10 +34,8 @@ namespace dd
 	// Static functions with return value
 	// Specialized version for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename R>
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
+	void Call( Variable* ret, void* context, Variable* args )
 	{
-		DD_ASSERT( argCount == 0 );
-
 		ret->GetValue<R>() = (*FunctionPtr)();
 	}
 
@@ -41,10 +47,9 @@ namespace dd
 
 	// General case of 1-N arguments.
 	template < typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args >
-	void Call( Variable* ret, void* context, Variable* args, uint argCount )
+	void Call( Variable* ret, void* context, Variable* args )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
-		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallHelper<FunctionType, FunctionPtr, R, First, Args...>( ret, args, std::make_index_sequence<ArgCount>() );
 	}
@@ -52,10 +57,8 @@ namespace dd
 	// Call static function without return value
 	// Specialized version for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallVoid( Variable* ret, void* context, Variable* args )
 	{
-		DD_ASSERT( argCount == 0 );
-
 		(*FunctionPtr)();
 	}
 
@@ -67,10 +70,9 @@ namespace dd
 
 	// General case of 1-N arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename First, typename... Args>
-	void CallVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallVoid( Variable* ret, void* context, Variable* args )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
-		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallVoidHelper<FunctionType, FunctionPtr, First, Args...>( args, std::make_index_sequence<ArgCount>() );
 	}
@@ -78,9 +80,8 @@ namespace dd
 	// Methods with return value
 	// Specialized for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallMethod( Variable* ret, void* context, Variable* args )
 	{
-		DD_ASSERT( argCount == 0 );
 		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)();
 	}
 
@@ -92,10 +93,9 @@ namespace dd
 
 	// General case of 1-N arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename First, typename... Args>
-	void CallMethod( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallMethod( Variable* ret, void* context, Variable* args )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
-		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodHelper<FunctionType, FunctionPtr, R, C, First, Args...>( ret, (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
@@ -103,9 +103,8 @@ namespace dd
 	// Methods without return value
 	// Specialized for no arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename C>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallMethodVoid( Variable* ret, void* context, Variable* args )
 	{
-		DD_ASSERT( argCount == 0 );
 		(((C*) context)->*FunctionPtr)();
 	}
 
@@ -117,23 +116,16 @@ namespace dd
 
 	// General case of 1-N arguments.
 	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename First, typename... Args>
-	void CallMethodVoid( Variable* ret, void* context, Variable* args, uint argCount )
+	void CallMethodVoid( Variable* ret, void* context, Variable* args )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
-		DD_ASSERT( argCount == ArgCount );
 
 		InternalCallMethodVoidHelper<FunctionType, FunctionPtr, C, First, Args...>( (C*) context, args, std::make_index_sequence<ArgCount>() );
 	}
 
-	struct FunctionArgs
-	{
-		Vector<Variable> Arguments;
-		Variable Context;
-	};
-
 	class Function
 	{
-		typedef void (*HelperType)(Variable*, void*, Variable*, unsigned);
+		typedef void (*HelperType)( Variable*, void*, Variable* );
 
 	public:
 		const FunctionSignature* Signature() const;
@@ -147,7 +139,7 @@ namespace dd
 		const Variable& Context() const;
 		bool IsMethod() const;
 
-		template<typename Context>
+		template <typename Context>
 		void Bind( Context& context )
 		{
 			m_context = Variable( context );
@@ -180,7 +172,6 @@ namespace dd
 		Function( R (C::*fn)( Args... ) const, HelperType helper );
 
 		void operator()( Variable& ret, Variable* args, uint argCount ) const;
-		void operator()( Variable& ret, Variable* args, uint argCount );
 
 		void operator()() const;
 		void operator()( Variable& ret ) const;
@@ -194,7 +185,7 @@ namespace dd
 	private:
 		Variable m_context;
 		FunctionSignature m_sig;
-		void (*m_callHelper)( Variable*, void*, Variable*, uint );
+		HelperType m_callHelper;
 
 		template <std::size_t Index, typename... Args>
 		void AssertType() const;
@@ -299,14 +290,6 @@ namespace dd
 		return Function( fn, helper );
 	}
 
-	// Helper to use list initialization to evaluate side-effects with variadic templates.
-	// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
-	struct ExpandType
-	{
-		template< typename... Ts >
-		ExpandType( Ts&&... ) {}
-	};
-
 	// Creates an assert that the type at Index in the pack Args is of the same type as the signature.
 	template <std::size_t Index, typename... Args>
 	void Function::AssertType() const
@@ -339,7 +322,7 @@ namespace dd
 
 		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
 
-		m_callHelper( &ret, m_context.Data(), argStack, ArgCount );
+		m_callHelper( &ret, m_context.Data(), argStack );
 
 		DD_ASSERT( ret.Type() == m_sig.GetRet() );
 	}
@@ -357,6 +340,6 @@ namespace dd
 
 		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
 
-		m_callHelper( nullptr, m_context.Data(), argStack, ArgCount );
+		m_callHelper( nullptr, m_context.Data(), argStack );
 	}
 }

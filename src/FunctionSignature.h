@@ -21,6 +21,23 @@ namespace dd
 		const TypeInfo* m_context;
 		uint m_argCount;
 
+		// Helper to use list initialization to evaluate side-effects with variadic templates.
+		// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
+		struct ExpandType
+		{
+			template< typename... Ts >
+			ExpandType( Ts&&... ) {}
+		};
+
+		template <typename... Args, std::size_t... Index>
+		void CreateArgs( const TypeInfo** argStack, std::index_sequence<Index...> ) const
+		{
+			ExpandType
+			{
+				0, (argStack[Index] = dd::TypeInfo::GetType<std::tuple_element_t<Index, std::tuple<Args...>>>(), 0)...
+			};
+		}
+
 	public:
 		uint ArgCount() const;
 		const TypeInfo* GetRet() const;
@@ -41,23 +58,7 @@ namespace dd
 		{
 		}
 
-		// Helper to use list initialization to evaluate side-effects with variadic templates.
-		// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
-		struct ExpandType
-		{
-			template< typename... Ts >
-			ExpandType( Ts&&... ) {}
-		};
-
-		template <typename... Args, std::size_t... Index>
-		void CreateArgs( const TypeInfo** argStack, std::index_sequence<Index...> ) const
-		{
-			ExpandType
-			{
-				0, (argStack[Index] = dd::TypeInfo::GetType<std::tuple_element_t<Index, std::tuple<Args...>>>(), 0)...
-			};
-		}
-
+		// Overload to deal with not being able to allocate a zero size array.
 		template <typename R, typename... Args>
 		FunctionSignature( R (*fn)( Args... ) )
 			: m_ret( GET_TYPE( R ) )
