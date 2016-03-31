@@ -34,7 +34,7 @@ namespace dd
 		{
 			ExpandType
 			{
-				0, (argStack[Index] = dd::TypeInfo::GetType<std::tuple_element_t<Index, std::tuple<Args...>>>(), 0)...
+				0, (argStack[Index] = dd::TypeInfo::GetType<Args>(), 0)...
 			};
 		}
 

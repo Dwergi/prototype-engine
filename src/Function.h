@@ -243,50 +243,92 @@ namespace dd
 	}
 
 	// Build static functions with return value
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename... Args>
-	Function BuildFunction( R (*fn)( Args... ) )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R>
+	Function BuildFunction( R (*fn)() )
 	{
-		auto helper = &Call<FunctionType, FunctionPtr, R, Args...>;
+		auto helper = &Call<FunctionType, FunctionPtr, R>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args>
+	Function BuildFunction( R (*fn)( First, Args... ) )
+	{
+		auto helper = &Call<FunctionType, FunctionPtr, R, First, Args...>;
 		return Function( fn, helper );
 	}
 
 	// Build static functions without return value
-	template <typename FunctionType, FunctionType FunctionPtr, typename... Args>
-	Function BuildFunction( void (*fn)( Args... ) )
+	template <typename FunctionType, FunctionType FunctionPtr>
+	Function BuildFunction( void (*fn)() )
 	{
-		auto helper = &CallVoid<FunctionType, FunctionPtr, Args...>;
+		auto helper = &CallVoid<FunctionType, FunctionPtr>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename First, typename... Args>
+	Function BuildFunction( void (*fn)( First, Args... ) )
+	{
+		auto helper = &CallVoid<FunctionType, FunctionPtr, First, Args...>;
 		return Function( fn, helper );
 	}
 
 	// Build methods with return value, non-const
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args>
-	Function BuildFunction( R (C::*fn)( Args... ) )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
+	Function BuildFunction( R (C::*fn)() )
 	{
-		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, Args...>;
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename First, typename... Args>
+	Function BuildFunction( R (C::*fn)( First, Args... ) )
+	{
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, First, Args...>;
 		return Function( fn, helper );
 	}
 
 	// Build methods with return value, const
-	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args>
-	Function BuildFunction( R (C::*fn)( Args... ) const )
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
+	Function BuildFunction( R (C::*fn)() const )
 	{
-		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, Args...>;
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename First, typename... Args>
+	Function BuildFunction( R (C::*fn)( First, Args... ) const )
+	{
+		auto helper = &CallMethod<FunctionType, FunctionPtr, R, C, First, Args...>;
 		return Function( fn, helper );
 	}
 
 	// Build methods without return value, non-const
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename... Args>
-	Function BuildFunction( void (C::*fn)( Args... ) )
+	template <typename FunctionType, FunctionType FunctionPtr, typename C>
+	Function BuildFunction( void (C::*fn)() )
 	{
-		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, Args...>;
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename First, typename... Args>
+	Function BuildFunction( void (C::*fn)( First, Args... ) )
+	{
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, First, Args...>;
 		return Function( fn, helper );
 	}
 
 	// Build methods without return value, const
-	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename... Args>
-	Function BuildFunction( void (C::*fn)( Args... ) const )
+	template <typename FunctionType, FunctionType FunctionPtr, typename C>
+	Function BuildFunction( void (C::*fn)() const )
 	{
-		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, Args...>;
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C>;
+		return Function( fn, helper );
+	}
+
+	template <typename FunctionType, FunctionType FunctionPtr, typename C, typename First, typename... Args>
+	Function BuildFunction( void (C::*fn)( First, Args... ) const )
+	{
+		auto helper = &CallMethodVoid<FunctionType, FunctionPtr, C, First, Args...>;
 		return Function( fn, helper );
 	}
 

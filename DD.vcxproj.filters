@@ -192,9 +192,6 @@
     <ClInclude Include="src\Variable.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="src\FunctionPtr.h">
-      <Filter>Types</Filter>
-    </ClInclude>
     <ClInclude Include="src\FunctionSignature.h">
       <Filter>Types</Filter>
     </ClInclude>
@@ -360,6 +357,12 @@
     <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
       <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
+    <ClInclude Include="src\WrenArgument.h">
+      <Filter>Script\Wren</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WrenForeignFunction.h">
+      <Filter>Script\Wren</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -436,9 +439,6 @@
       <Filter>Types</Filter>
     </ClCompile>
     <ClCompile Include="src\Variable.cpp">
-      <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FunctionPtr.cpp">
       <Filter>Types</Filter>
     </ClCompile>
     <ClCompile Include="src\Array.cpp">
@@ -565,6 +565,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\tests\FunctionTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\WrenTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>

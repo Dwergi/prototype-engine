@@ -321,7 +321,6 @@
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\Function.h" />
-    <ClInclude Include="src\FunctionPtr.h" />
     <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Handle.h" />
@@ -381,7 +380,9 @@
     <ClInclude Include="src\Vector4.h" />
     <ClInclude Include="src\ComponentPairIterator.h" />
     <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\WrenArgument.h" />
     <ClInclude Include="src\WrenEngine.h" />
+    <ClInclude Include="src\WrenForeignFunction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
@@ -425,6 +426,7 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
     <ClCompile Include="src\Tests\TypeInfoTests.cpp" />
+    <ClCompile Include="src\Tests\WrenTests.cpp" />
     <ClCompile Include="src\WrenEngine.cpp" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
@@ -437,7 +439,6 @@
     <ClCompile Include="src\EntitySystem.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\Function.cpp" />
-    <ClCompile Include="src\FunctionPtr.cpp" />
     <ClCompile Include="src\FunctionSignature.cpp" />
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\Hash.cpp" />

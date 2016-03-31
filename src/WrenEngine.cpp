@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "WrenEngine.h"
 
+#include <cstdio>
+
 namespace dd
 {
 	static Vector<WrenEngine*> m_activeEngines;
@@ -37,28 +39,19 @@ namespace dd
 		engine->Write( msg );
 	}
 
-	WrenForeignClassMethods BindForeignClassCallback( WrenVM* vm, const char* module, const char* className )
+	WrenForeignClassMethods BindForeignClassCallback( WrenVM* vm, const char* module, const char* name )
 	{
-		WrenForeignClassMethods ret;
-		ret.allocate = nullptr;
-		ret.finalize = nullptr;
+		WrenForeignClassMethods ret { nullptr, nullptr };
 
 		WrenEngine* engine = WrenEngine::FindEngine( vm );
 		if( engine == nullptr )
 			return ret;
 
-		String128 fullName( module );
-		fullName += "::";
-		fullName += className;
-
-		const TypeInfo* typeInfo = GET_TYPE_STR( fullName );
-		if( typeInfo == nullptr )
+		WrenEngine::WrenClass* classReg = engine->FindClass( module, name );
+		if( classReg == nullptr )
 			return ret;
 
-		//ret.finalize =
-
-		// TODO
-		return ret;
+		return classReg->ForeignMethods;
 	}
 
 	WrenForeignMethodFn	BindForeignMethodCallback( WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature )
@@ -68,25 +61,84 @@ namespace dd
 		if( engine == nullptr )
 			return nullptr;
 
-		// TODO
-		return nullptr;
+		WrenEngine::WrenClass* classReg = engine->FindClass( module, className );
+
+		if( classReg == nullptr )
+			return nullptr;
+
+		WrenEngine::WrenFunction* funcReg = classReg->FindFunction( signature );
+
+		if( funcReg == nullptr )
+			return nullptr;
+
+		return funcReg->Function;
 	}
 
-	char* LoadModuleCallback( WrenVM* vm, const char* name )
+	char* LoadModuleCallback( WrenVM* vm, const char* module )
 	{
 		WrenEngine* engine = WrenEngine::FindEngine( vm );
 
 		if( engine == nullptr )
 			return nullptr;
 
-		return engine->LoadModule( name );
+		String256 source( engine->LoadModule( module ) );
+
+		// reallocate so that Wren can take ownership of the string
+		char* memory = (char*) std::realloc( NULL, source.Length() + 1 );
+		std::memcpy( memory, source.c_str(), source.Length() + 1 );
+		memory[source.Length()] = '\0';
+
+		return memory;
+	}
+
+	WrenMethod::WrenMethod( WrenMethod&& other )
+	{
+		std::swap( m_vm, other.m_vm );
+		std::swap( m_arity, other.m_arity );
+		std::swap( m_method, other.m_method );
+		std::swap( m_variable, other.m_variable );
+	}
+
+	WrenMethod& WrenMethod::operator=( WrenMethod&& other )
+	{
+		std::swap( m_vm, other.m_vm );
+		std::swap( m_arity, other.m_arity );
+		std::swap( m_method, other.m_method );
+		std::swap( m_variable, other.m_variable );
+
+		return *this;
+	}
+
+	WrenMethod::WrenMethod( WrenVM* vm, WrenValue* variable, WrenValue* method, uint arity )
+	{
+		m_vm = vm;
+		m_variable = variable;
+		m_method = method;
+		m_arity = arity;
+	}
+
+	WrenMethod::~WrenMethod()
+	{
+		wrenReleaseValue( m_vm, m_method );
+		wrenReleaseValue( m_vm, m_variable );
+
+		m_vm = nullptr;
+		m_method = nullptr;
+		m_variable = nullptr;
+	}
+
+	WrenEngine::WrenFunction* WrenEngine::WrenClass::FindFunction( const char* name )
+	{
+		for( WrenFunction& fn : Functions )
+		{
+			if( fn.Name == name )
+				return &fn;
+		}
+		return nullptr;
 	}
 
 	WrenEngine::WrenEngine()
 	{
-		WrenClass& global = m_classes.Allocate();
-		global.Name = "dd";
-
 		WrenConfiguration config;
 		wrenInitConfiguration( &config );
 
@@ -97,7 +149,25 @@ namespace dd
 
 		m_vm = wrenNewVM( &config );
 
+		RegisterGlobalContext();
+
 		m_activeEngines.Add( this );
+	}
+
+	WrenEngine::WrenEngine( WrenEngine&& other )
+	{
+		std::swap( m_vm, other.m_vm );
+		std::swap( m_output, other.m_output );
+		std::swap( m_classes, other.m_classes );
+	}
+
+	WrenEngine& WrenEngine::operator=( WrenEngine&& other )
+	{
+		std::swap( m_vm, other.m_vm );
+		std::swap( m_output, other.m_output );
+		std::swap( m_classes, other.m_classes );
+
+		return *this;
 	}
 
 	WrenEngine::~WrenEngine()
@@ -106,7 +176,15 @@ namespace dd
 
 		wrenFreeVM( m_vm );
 	}
-	
+
+	void WrenEngine::RegisterGlobalContext()
+	{
+		WrenClass& classReg = m_classes.Allocate();
+		classReg.Module = "dd";
+		classReg.Name = "global";
+		classReg.Type = nullptr;
+	}
+		
 	void WrenEngine::SetOutput( String* output )
 	{
 		if( output != nullptr )
@@ -127,42 +205,91 @@ namespace dd
 		}
 	}
 
-	void WrenEngine::RegisterMember( const Member& member )
-	{
-		WrenClass* classReg = FindClass( member.Parent()->Name().c_str() );
-		
-		DD_ASSERT( classReg == nullptr, "Class has not been registered yet!" );
-
-		classReg->Members.Add( member );
-	}
-
-	WrenClass* WrenEngine::FindClass( const char* name ) const
+	WrenEngine::WrenClass* WrenEngine::FindClass( const char* module, const char* name ) const
 	{
 		for( WrenClass& entry : m_classes )
 		{
-			if( entry.Name == name )
+			if( entry.Module == module && entry.Name == name )
 				return &entry;
 		}
 
 		return nullptr;
 	}
 
-	bool WrenEngine::Evaluate( const String& script, String& output )
+	bool WrenEngine::RunString( const char* script, String& output )
 	{
 		SetOutput( &output );
+
+		WrenInterpretResult result = wrenInterpret( m_vm, script );
+		
+		switch( result )
+		{
+		case WREN_RESULT_COMPILE_ERROR:
+			m_output->WriteFormat( "\nCOMPILE ERROR!" );
+			return false;
+
+		case WREN_RESULT_RUNTIME_ERROR:
+			m_output->WriteFormat( "\nRUNTIME ERROR!" );
+			return false;
+
+		case WREN_RESULT_SUCCESS:
+			break;
+		}
 
 		return true;
 	}
 
-	char* WrenEngine::LoadModule( const char* name ) const
+	bool WrenEngine::RunModule( const char* module, String& output )
 	{
-		return nullptr;
+		char* script = LoadModuleCallback( m_vm, module );
+		
+		bool res = RunString( script, output );
+
+		return res;
 	}
 
-	void WrenEngine::RegisterGlobalVariable( const char* name, const Variable& var )
+	WrenMethod WrenEngine::GetMethod( const String& module, const String& variable, const String& method, uint arity )
 	{
-		WrenVariable& regVar = m_variables.Allocate();
-		regVar.Name = name;
-		regVar.Variable = var;
+		wrenEnsureSlots( m_vm, 1 );
+		wrenGetVariable( m_vm, module.c_str(), variable.c_str(), 0 );
+
+		String128 fullSig( method );
+		fullSig += "(";
+
+		for( uint i = 0; i < arity; ++i )
+		{
+			if( i > 0 )
+				fullSig += ",";
+			fullSig += "_";
+		}
+
+		WrenValue* wrenVar = wrenGetSlotValue( m_vm, 0 );
+		WrenValue* wrenMethod = wrenMakeCallHandle( m_vm, fullSig.c_str() );
+
+		return WrenMethod( m_vm, wrenVar, wrenMethod, arity );
+	}
+
+	String256 WrenEngine::LoadModule( const char* module ) const
+	{
+		const char* path = "w:\\testing\\dd\\data\\wren\\";
+		String128 filename( path );
+		filename += module;
+		filename += ".wren";
+
+		std::FILE* file;
+		fopen_s( &file, filename.c_str(), "rb" );
+
+		if( file == nullptr )
+			return String256();
+
+		char buffer[256];
+		String256 source;
+
+		while( std::fgets( buffer, 256, file ) != nullptr )
+		{
+			source += buffer;
+		}
+
+		return source;
 	}
 }

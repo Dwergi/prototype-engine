@@ -26,13 +26,13 @@ namespace dd
 		// 
 		// Register a script object that is passed by reference exclusively.
 		// 
-		template <typename ObjType>
+		template <typename T>
 		void RegisterObject( const char* className );
 
 		//
 		// Register a script object that is passed by value.
 		//
-		template <typename ObjType>
+		template <typename T>
 		void RegisterStruct( const char* className );
 
 		void RegisterMember( const char* className, const Member& member );
@@ -40,7 +40,8 @@ namespace dd
 		template <typename FnType>
 		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr );
 
-		void RegisterGlobalVariable( const char* name, const Variable& var );
+		template <typename T, T& Variable>
+		void RegisterGlobalVariable( const char* name );
 
 		bool Evaluate( const String& script, String& output );
 

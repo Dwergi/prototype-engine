@@ -68,14 +68,21 @@ DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
 	return buffer;
 }
 
-float s_maxFPS = 30.0f;
-
+extern bool s_drawFPS;
 bool s_drawFPS = true;
 
-Vector<EntityHandle> s_entitites;
+extern float s_maxFPS;
+float s_maxFPS = 30.0f;
 
+extern float s_rollingAverageFPS;
 float s_rollingAverageFPS = s_maxFPS;
+
+extern float s_rollingAverageMultiplier;
 float s_rollingAverageMultiplier = 0.8f;
+
+#define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
+
+Vector<EntityHandle> s_entitites;
 
 void DrawFPS( float delta_t )
 {
@@ -123,10 +130,11 @@ void RegisterGlobalScriptFunctions()
 
 	engine.RegisterGlobalFunction( "GetTransformComponent", FUNCTION( GetTransformComponent ), &GetTransformComponent );
 	engine.RegisterGlobalFunction( "GetEntityHandle", FUNCTION( GetEntityHandle ), &GetEntityHandle );
-	engine.RegisterGlobalVariable( "s_drawFPS", Variable( s_drawFPS ) );
-	engine.RegisterGlobalVariable( "s_maxFPS", Variable( s_maxFPS ) );
-	engine.RegisterGlobalVariable( "s_rollingAverageFPS", Variable( s_rollingAverageFPS ) );
-	engine.RegisterGlobalVariable( "s_rollingAverageMultiplier", Variable( s_rollingAverageMultiplier ) );
+
+	REGISTER_GLOBAL_VARIABLE( engine, s_drawFPS );
+	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
+	REGISTER_GLOBAL_VARIABLE( engine, s_rollingAverageFPS );
+	REGISTER_GLOBAL_VARIABLE( engine, s_rollingAverageMultiplier );
 }
 
 void RegisterGameTypes()

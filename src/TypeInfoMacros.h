@@ -37,7 +37,10 @@
 	dd::TypeInfo::GetType( NameString )
 
 #define BEGIN_TYPE( TypeName ) \
-	static void RegisterMembers() { TypeName instance; UNREFERENCED( instance ); dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
+	static void RegisterMembers() { \
+				TypeName instance; \
+				UNREFERENCED( instance ); \
+				dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter m_refCount; \
@@ -67,6 +70,10 @@
 
 #define REGISTER_SERIALIZERS( TypeName, Serializer, Deserializer ) \
 	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )
+
+// Use this to create a function object to a template function with a comma in the type parameters, eg. add<int, float>
+// Required because it doesn't end up matching the signature of FUNCTION otherwise.
+#define TEMPLATE_FUNCTION( ... ) FUNCTION( __VA_ARGS__ )
 
 #define FUNCTION( FN ) \
 	dd::BuildFunction<decltype( &FN ), &FN>( &FN )

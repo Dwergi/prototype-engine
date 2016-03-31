@@ -26,7 +26,7 @@ void dd::AngelScriptEngine::RegisterMethod( const char* method_name, const Funct
 	DD_ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );
 }
 
-template <typename ObjType>
+template <typename T>
 void dd::AngelScriptEngine::RegisterObject( const char* className )
 {
 	String64 objType( ReplacePointer( className ) );
@@ -37,7 +37,7 @@ void dd::AngelScriptEngine::RegisterObject( const char* className )
 	String32 strSig = objType;
 	strSig += "@ Factory()";
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<ObjType> ), asCALL_CDECL );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<T> ), asCALL_CDECL );
 	DD_ASSERT( res >= 0 );
 
 	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter, Increment ), asCALL_THISCALL );
@@ -65,15 +65,15 @@ void Destruct( T* memory )
 	memory->~T();
 }
 
-template <typename ObjType>
+template <typename T>
 void dd::AngelScriptEngine::RegisterStruct( const char* className )
 {
 	String64 objType( ReplacePointer( className ) );
 
-	int res = m_engine->RegisterObjectType( objType.c_str(), sizeof( ObjType ), asOBJ_VALUE | asGetTypeTraits<ObjType>() );
+	int res = m_engine->RegisterObjectType( objType.c_str(), sizeof( T ), asOBJ_VALUE | asGetTypeTraits<T>() );
 	DD_ASSERT( res >= 0, "Failed to register struct '%s'!", className );
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_CONSTRUCT, "void Construct()", asFUNCTION( Construct<ObjType> ), asCALL_CDECL_OBJLAST );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_CONSTRUCT, "void Construct()", asFUNCTION( Construct<T> ), asCALL_CDECL_OBJLAST );
 	DD_ASSERT( res >= 0 );
 
 	String128 copyConstructSig;
@@ -81,10 +81,10 @@ void dd::AngelScriptEngine::RegisterStruct( const char* className )
 	copyConstructSig += objType.c_str();
 	copyConstructSig += "& in)";
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_CONSTRUCT, copyConstructSig.c_str(), asFUNCTION( CopyConstruct<ObjType> ), asCALL_CDECL_OBJLAST );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_CONSTRUCT, copyConstructSig.c_str(), asFUNCTION( CopyConstruct<T> ), asCALL_CDECL_OBJLAST );
 	DD_ASSERT( res >= 0 );
 
-	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_DESTRUCT, "void Destruct()", asFUNCTION( Destruct<ObjType> ), asCALL_CDECL_OBJLAST );
+	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_DESTRUCT, "void Destruct()", asFUNCTION( Destruct<T> ), asCALL_CDECL_OBJLAST );
 	DD_ASSERT( res >= 0 );
 
 	String128 opAssignSig;
@@ -93,7 +93,7 @@ void dd::AngelScriptEngine::RegisterStruct( const char* className )
 	opAssignSig += objType.c_str();
 	opAssignSig += "& in)";
 
-	res = m_engine->RegisterObjectMethod( objType.c_str(), opAssignSig.c_str(), asMETHODPR( ObjType, operator=, (const ObjType&), ObjType& ), asCALL_THISCALL ); 
+	res = m_engine->RegisterObjectMethod( objType.c_str(), opAssignSig.c_str(), asMETHODPR( T, operator=, (const T&), T& ), asCALL_THISCALL ); 
 	DD_ASSERT( res >= 0 );
 }
 
@@ -104,4 +104,19 @@ void dd::AngelScriptEngine::RegisterGlobalFunction( const char* name, const Func
 
 	int res = m_engine->RegisterGlobalFunction( signature.c_str(), asFUNCTION( ptr ), asCALL_CDECL );
 	DD_ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
+}
+
+template <typename T, T& Variable>
+void AngelScriptEngine::RegisterGlobalVariable( const char* name )
+{
+	const TypeInfo* typeInfo = GET_TYPE( T );
+	DD_ASSERT( typeInfo != nullptr );
+
+	String128 signature;
+	signature += ReplacePointer( typeInfo->Name().c_str() );
+	signature += " ";
+	signature += name;
+
+	int res = m_engine->RegisterGlobalProperty( signature.c_str(), &Variable );
+	DD_ASSERT( res >= 0 );
 }

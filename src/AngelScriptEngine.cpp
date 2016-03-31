@@ -125,15 +125,4 @@ namespace dd
 
 		return result;
 	}
-
-	void AngelScriptEngine::RegisterGlobalVariable( const char* name, const Variable& var )
-	{
-		String128 signature;
-		signature += ReplacePointer( var.Type()->Name().c_str() );
-		signature += " ";
-		signature += name;
-
-		int res = m_engine->RegisterGlobalProperty( signature.c_str(), var.Data() );
-		DD_ASSERT( res >= 0 );
-	}
 }
