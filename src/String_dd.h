@@ -121,6 +121,8 @@ namespace dd
 			}
 			else
 			{
+				m_buffer.Release();
+
 				m_buffer = other.m_buffer;
 				other.m_buffer.Release();
 

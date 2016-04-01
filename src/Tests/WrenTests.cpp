@@ -21,17 +21,20 @@ struct WrenTest
 	void TestFunction()
 	{
 		Integer = 1;
+		FunctionCalled = true;
 	}
 
 	int TestFunctionRet()
 	{
 		Boolean = true;
+		FunctionRetCalled = true;
 		return 1;
 	}
 
 	void TestFunctionArg( int a, int b )
 	{
 		Integer = a + b;
+		FunctionArgCalled = true;
 	}
 
 	int TestGetInt() const
@@ -39,9 +42,17 @@ struct WrenTest
 		return Integer;
 	}
 
+	static bool FunctionCalled;
+	static bool FunctionRetCalled;
+	static bool FunctionArgCalled;
+
 	BEGIN_TYPE( WrenTest )
 	END_TYPE
 };
+
+bool WrenTest::FunctionCalled = false;
+bool WrenTest::FunctionRetCalled = false;
+bool WrenTest::FunctionArgCalled = false;
 
 int FreeFunction()
 {
@@ -115,6 +126,61 @@ TEST_CASE( "[Wren] Call Wren Method" )
 
 	REQUIRE( res == true );
 
-	dd::WrenMethod method = engine.GetMethod( dd::String16( "test" ), dd::String16( "test_var" ), dd::String16( "simple" ), 0 );
-	method();
+	output.Clear();
+
+	dd::WrenMethod simple = engine.GetMethod( "test", "test_var", "simple", 0 );
+	simple();
+
+	REQUIRE( output.Length() > 0 );
+
+	output.Clear();
+
+	dd::WrenMethod with_arg = engine.GetMethod( "test", "test_var", "with_arg", 1 );
+	with_arg( 5 );
+
+	REQUIRE( output.Find( "5" ) != -1 );
+
+	output.Clear();
+
+	dd::WrenMethod multiple_args = engine.GetMethod( "test", "test_var", "multiple_args", 2 );
+	multiple_args( 5, "b" );
+
+	REQUIRE( output.Find( "5" ) != -1 );
+	REQUIRE( output.Find( "b" ) != -1 );
+
+	output.Clear();
+
+	dd::WrenMethod with_return = engine.GetMethod( "test", "test_var", "with_return", 0 );
+	with_return();
+
+	REQUIRE( output.Find( "5" ) != -1 );
+}
+
+TEST_CASE( "[Wren] Call From Wren" )
+{
+	dd::WrenEngine engine;
+
+	engine.RegisterType<WrenTest, int, bool>( false );
+	engine.RegisterMember<WrenTest, int, &WrenTest::Integer>( "Integer" );
+	engine.RegisterMember<WrenTest, bool, &WrenTest::Boolean>( "Boolean" );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction", FUNCTION( WrenTest::TestFunction ) );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg", FUNCTION( WrenTest::TestFunctionArg ) );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet", FUNCTION( WrenTest::TestFunctionRet ) );
+	engine.RegisterFunction<decltype(&WrenTest::TestGetInt), &WrenTest::TestGetInt>( "TestGetInt", FUNCTION( WrenTest::TestGetInt ) );
+
+	dd::String256 output;
+	bool res = engine.RunModule( "test_foreign", output );
+
+	REQUIRE( res == true );
+
+	WrenTest::FunctionCalled = false;
+	WrenTest::FunctionRetCalled = false;
+	WrenTest::FunctionArgCalled = false;
+
+	dd::WrenMethod start_test = engine.GetMethod( "test_foreign", "test_var", "call_cpp", 0 );
+	start_test();
+
+	REQUIRE( WrenTest::FunctionCalled );
+	REQUIRE( WrenTest::FunctionRetCalled );
+	REQUIRE( WrenTest::FunctionArgCalled );
 }

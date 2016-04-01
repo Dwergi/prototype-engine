@@ -100,7 +100,7 @@ namespace dd
 		//
 		// Bind a Wren method from the given module, called on the given variable with the given name and arity.
 		//
-		WrenMethod GetMethod( const String& module, const String& variable, const String& method, uint arity );
+		WrenMethod GetMethod( const char* module, const char* variable, const char* method, uint arity );
 
 	private:
 

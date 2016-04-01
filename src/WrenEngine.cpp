@@ -9,6 +9,8 @@
 
 #include <cstdio>
 
+#include "wren/src/vm/wren_vm.h"
+
 namespace dd
 {
 	static Vector<WrenEngine*> m_activeEngines;
@@ -197,11 +199,11 @@ namespace dd
 	{
 		if( m_output == nullptr )
 		{
-			printf( "%s\n\n", message );
+			printf( "%s", message );
 		}
 		else
 		{
-			m_output->WriteFormat( "%s\n", message );
+			m_output->WriteFormat( "%s", message );
 		}
 	}
 
@@ -209,7 +211,7 @@ namespace dd
 	{
 		for( WrenClass& entry : m_classes )
 		{
-			if( entry.Module == module && entry.Name == name )
+			if( entry.Name == name )
 				return &entry;
 		}
 
@@ -243,15 +245,31 @@ namespace dd
 	{
 		char* script = LoadModuleCallback( m_vm, module );
 		
-		bool res = RunString( script, output );
+		SetOutput( &output );
 
-		return res;
+		WrenInterpretResult result = wrenInterpretInModule( m_vm, module, script );
+
+		switch( result )
+		{
+		case WREN_RESULT_COMPILE_ERROR:
+			m_output->WriteFormat( "\nCOMPILE ERROR!" );
+			return false;
+
+		case WREN_RESULT_RUNTIME_ERROR:
+			m_output->WriteFormat( "\nRUNTIME ERROR!" );
+			return false;
+
+		case WREN_RESULT_SUCCESS:
+			break;
+		}
+
+		return true;
 	}
 
-	WrenMethod WrenEngine::GetMethod( const String& module, const String& variable, const String& method, uint arity )
+	WrenMethod WrenEngine::GetMethod( const char* module, const char* variable, const char* method, uint arity )
 	{
 		wrenEnsureSlots( m_vm, 1 );
-		wrenGetVariable( m_vm, module.c_str(), variable.c_str(), 0 );
+		wrenGetVariable( m_vm, module, variable, 0 );
 
 		String128 fullSig( method );
 		fullSig += "(";
@@ -262,6 +280,8 @@ namespace dd
 				fullSig += ",";
 			fullSig += "_";
 		}
+
+		fullSig += ")";
 
 		WrenValue* wrenVar = wrenGetSlotValue( m_vm, 0 );
 		WrenValue* wrenMethod = wrenMakeCallHandle( m_vm, fullSig.c_str() );
@@ -289,6 +309,8 @@ namespace dd
 		{
 			source += buffer;
 		}
+
+		fclose( file );
 
 		return source;
 	}

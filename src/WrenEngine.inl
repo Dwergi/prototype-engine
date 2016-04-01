@@ -71,7 +71,7 @@ namespace dd
 		classReg.ForeignMethods.finalize = &WrenInternal::finalize<T>;
 	}
 
-	template <typename FnType, FnType FunctionPtr >
+	template <typename FnType, FnType FunctionPtr>
 	void WrenEngine::RegisterFunction( const char* name, const Function& function )
 	{
 		WrenClass* pClass { nullptr };
@@ -87,8 +87,21 @@ namespace dd
 
 		DD_ASSERT( pClass != nullptr );
 
+		uint arity = function.Signature()->ArgCount();
+		String128 fullSig( name );
+		fullSig += "(";
+
+		for( uint i = 0; i < arity; ++i )
+		{
+			if( i > 0 )
+				fullSig += ",";
+			fullSig += "_";
+		}
+
+		fullSig += ")";
+
 		WrenFunction& fnReg = pClass->Functions.Allocate();
-		fnReg.Name = name;
+		fnReg.Name = fullSig;
 		fnReg.Function = &WrenInternal::WrenForeignFunction<FnType, FunctionPtr>::call;
 	}
 
@@ -140,7 +153,7 @@ namespace dd
 		ExpandType
 		{
 			0,
-			(WrenArgument<std::tuple_element_t<Index, std::tuple<Args...>>>::set( vm, Index + 1, std::get<Index>( args ) ),
+			(WrenInternal::WrenArgument<std::tuple_element_t<Index, std::tuple<Args...>>>::set( vm, Index + 1, std::get<Index>( args ) ),
 			0)...
 		};
 	}
