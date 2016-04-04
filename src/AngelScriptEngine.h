@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "RefCounter.h"
-
 #include <angelscript.h>
 
 namespace dd
@@ -19,6 +17,10 @@ namespace dd
 	public:
 		AngelScriptEngine();
 		~AngelScriptEngine();
+
+		// disable copying
+		AngelScriptEngine( const AngelScriptEngine& ) = delete;
+		AngelScriptEngine& operator=( const AngelScriptEngine& ) = delete;
 
 		template <typename FnType>
 		void RegisterMethod( const char* name, const Function& method, FnType ptr );
@@ -46,6 +48,8 @@ namespace dd
 		bool Evaluate( const String& script, String& output );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
+
+		BASIC_TYPE( AngelScriptEngine )
 
 	private:
 

@@ -21,12 +21,12 @@ namespace Test
 		bool operator==( const SimpleStruct& other ) const;
 
 		BEGIN_TYPE( SimpleStruct )
-			MEMBER( Int );
-			MEMBER( Str );
-			MEMBER( Flt );
-			MEMBER( Vec );
-			METHOD( Double );
-			METHOD( Multiply );
+			MEMBER( SimpleStruct, Int );
+			MEMBER( SimpleStruct, Str );
+			MEMBER( SimpleStruct, Flt );
+			MEMBER( SimpleStruct, Vec );
+			METHOD( SimpleStruct, Double );
+			METHOD( SimpleStruct, Multiply );
 		END_TYPE
 	};
 
@@ -36,8 +36,8 @@ namespace Test
 		int SecondInt;
 
 		BEGIN_TYPE( NestedStruct )
-			MEMBER( Nested );
-			MEMBER( SecondInt );
+			MEMBER( NestedStruct, Nested );
+			MEMBER( NestedStruct, SecondInt );
 		END_TYPE
 	};
 }

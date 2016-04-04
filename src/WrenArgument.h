@@ -17,6 +17,11 @@ namespace dd
 			{
 				return *static_cast<T*>(wrenGetSlotForeign( vm, slot ));
 			}
+
+			static void set( WrenVM* vm, int slot, T val )
+			{
+				
+			}
 		};
 
 		template <typename T>
@@ -25,6 +30,11 @@ namespace dd
 			static T& get( WrenVM* vm, int slot )
 			{
 				return *static_cast<T*>(wrenGetSlotForeign( vm, slot ));
+			}
+
+			static void set( WrenVM* vm, int slot, T& val )
+			{
+
 			}
 		};
 
@@ -35,6 +45,11 @@ namespace dd
 			{
 				return *static_cast<const T*>(wrenGetSlotForeign( vm, slot ));
 			}
+
+			static void set( WrenVM* vm, int slot, const T& val )
+			{
+
+			}
 		};
 
 		template <typename T>
@@ -44,6 +59,11 @@ namespace dd
 			{
 				return static_cast<T*>(wrenGetSlotForeign( vm, slot ));
 			}
+
+			static void set( WrenVM* vm, int slot, T* val )
+			{
+
+			}
 		};
 
 		template <typename T>
@@ -52,6 +72,11 @@ namespace dd
 			static const T* get( WrenVM* vm, int slot )
 			{
 				return static_cast<const T*>(wrenGetSlotForeign( vm, slot ));
+			}
+
+			static void set( WrenVM* vm, int slot, const T* val )
+			{
+
 			}
 		};
 

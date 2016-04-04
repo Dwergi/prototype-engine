@@ -60,7 +60,7 @@ namespace dd
 		// @byValue - Whether this object can be passed by value or not.
 		// 
 		template <typename T, typename... CtorArgs>
-		void RegisterType( bool byValue );
+		void RegisterType();
 
 		// 
 		// Register a script-accessible member for an object.
@@ -74,7 +74,7 @@ namespace dd
 		// the Function object includes the required info to register either.
 		//
 		template <typename FnType, FnType FunctionPtr>
-		void RegisterFunction( const char* name, const Function& function );
+		void RegisterFunction( const char* name );
 
 		//
 		// Register a global variable to be script-accessible.
@@ -101,6 +101,8 @@ namespace dd
 		// Bind a Wren method from the given module, called on the given variable with the given name and arity.
 		//
 		WrenMethod GetMethod( const char* module, const char* variable, const char* method, uint arity );
+
+		BASIC_TYPE( WrenEngine )
 
 	private:
 

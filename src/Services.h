@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include <typeinfo>
-#include <typeindex>
-
 namespace dd
 {
 	class Services
@@ -39,16 +36,25 @@ namespace dd
 	};
 
 	template <typename T>
-	void dd::Services::Register( T& service )
+	void Services::Register( T& service )
 	{
 		const char* key = GetKey<T>();
+		DD_ASSERT( key != nullptr );
+
+		if( key == nullptr )
+			return;
+
 		m_services.Add( key, &service );
 	}
 
 	template <typename T>
-	T* dd::Services::GetPtr() const
+	T* Services::GetPtr() const
 	{
 		const char* key = GetKey<T>();
+
+		if( key == nullptr )
+			return nullptr;
+
 		void** ptr = m_services.Find( key );
 
 		if( ptr == nullptr )
@@ -58,7 +64,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T& dd::Services::Get() const
+	T& Services::Get() const
 	{
 		T* ptr = GetPtr<T>();
 
@@ -70,13 +76,17 @@ namespace dd
 	}
 
 	template <typename T>
-	const char* dd::Services::GetKey() const
+	const char* Services::GetKey() const
 	{
-		return std::type_index( typeid(RemovePtr< RemoveQualifiers<T>::type >::type) ).name();
+		const TypeInfo* typeInfo = GET_TYPE( dd::RemovePtr<T>::type );
+
+		DD_ASSERT( typeInfo != nullptr );
+
+		return typeInfo->Name().c_str();
 	}
 
 	template <typename T>
-	bool dd::Services::Exists() const
+	bool Services::Exists() const
 	{
 		return GetPtr<T>() != nullptr;
 	}

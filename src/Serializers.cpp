@@ -18,7 +18,7 @@ namespace dd
 	const int TEMP_BUFFER_SIZE = 2048;
 	__declspec(thread) static char s_temp[ TEMP_BUFFER_SIZE ];
 
-	void* PointerAdd( void* base, uint offset )
+	void* PointerAdd( void* base, uint64 offset )
 	{
 		return (void*) ((size_t) base + offset);
 	}

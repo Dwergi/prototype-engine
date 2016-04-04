@@ -10,6 +10,8 @@
 #include "EntityHandle.h"
 #include "TransformComponent.h"
 
+#include "AngelScriptEngine.h"
+
 #include "imgui/imgui.h"
 
 // script helpers

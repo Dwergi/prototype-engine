@@ -113,39 +113,6 @@ namespace dd
 	{
 	}
 
-	template <typename T>
-	struct HasDefaultCtor
-	{
-		template <typename U>
-		static int SFINAE( decltype( U() )* );
-		template <typename U>
-		static uint8 SFINAE( ... );
-
-		static const bool value = sizeof( SFINAE<T>( nullptr ) ) == sizeof( int );
-	};
-
-	template <typename T>
-	struct HasCopyCtor
-	{
-		static T MakeT();
-
-		template <typename U>
-		static int SFINAE( decltype( U( MakeT() ) )* );
-		template <typename U>
-		static uint8 SFINAE( ... );
-
-		static const bool value = sizeof( SFINAE<T>( nullptr ) ) == sizeof( int );
-	};
-
-	template <bool B, typename T = void>
-	struct disable_if {
-		typedef T type;
-	};
-
-	template <typename T>
-	struct disable_if<true,T> {
-	};
-
 	template <bool, class T, T v>
 	struct SetFunc
 	{

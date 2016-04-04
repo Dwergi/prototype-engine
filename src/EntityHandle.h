@@ -38,8 +38,8 @@ namespace dd
 		bool operator!=( const EntityHandle& other ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
-			MEMBER( Handle );
-			METHOD( IsValid );
+			MEMBER( EntityHandle, Handle );
+			METHOD( EntityHandle, IsValid );
 		END_TYPE
 
 	private: 

@@ -73,7 +73,7 @@ TEST_CASE( "[Wren] Register Class" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>( false );
+	engine.RegisterType<WrenTest, int, bool>();
 }
 
 TEST_CASE( "[Wren] Register Member" )
@@ -82,7 +82,7 @@ TEST_CASE( "[Wren] Register Member" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>( false );
+	engine.RegisterType<WrenTest, int, bool>();
 	engine.RegisterMember<WrenTest, int, &WrenTest::Integer>( "Integer" );
 	engine.RegisterMember<WrenTest, bool, &WrenTest::Boolean>( "Boolean" );
 }
@@ -91,8 +91,8 @@ TEST_CASE( "[Wren] Register Free Function" )
 {
 	dd::WrenEngine engine;
 
-	engine.RegisterFunction<decltype(&FreeFunction), &FreeFunction>( "FreeFunction", FUNCTION( FreeFunction ) );
-	engine.RegisterFunction<decltype(&FreeFunctionWithArg), &FreeFunctionWithArg>( "FreeFunctionWithArg", FUNCTION( FreeFunctionWithArg ) );
+	engine.RegisterFunction<decltype(&FreeFunction), &FreeFunction>( "FreeFunction" );
+	engine.RegisterFunction<decltype(&FreeFunctionWithArg), &FreeFunctionWithArg>( "FreeFunctionWithArg" );
 }
 
 TEST_CASE( "[Wren] Register Method" )
@@ -101,11 +101,11 @@ TEST_CASE( "[Wren] Register Method" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>( false );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction", FUNCTION( WrenTest::TestFunction ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg", FUNCTION( WrenTest::TestFunctionArg ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet", FUNCTION( WrenTest::TestFunctionRet ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestGetInt), &WrenTest::TestGetInt>( "TestGetInt", FUNCTION( WrenTest::TestGetInt ) );
+	engine.RegisterType<WrenTest, int, bool>();
+	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction" );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg" );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet" );
+	engine.RegisterFunction<decltype(&WrenTest::TestGetInt), &WrenTest::TestGetInt>( "TestGetInt" );
 }
 
 TEST_CASE( "[Wren] Register Global Var" )
@@ -160,13 +160,13 @@ TEST_CASE( "[Wren] Call From Wren" )
 {
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>( false );
+	engine.RegisterType<WrenTest, int, bool>();
 	engine.RegisterMember<WrenTest, int, &WrenTest::Integer>( "Integer" );
 	engine.RegisterMember<WrenTest, bool, &WrenTest::Boolean>( "Boolean" );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction", FUNCTION( WrenTest::TestFunction ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg", FUNCTION( WrenTest::TestFunctionArg ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet", FUNCTION( WrenTest::TestFunctionRet ) );
-	engine.RegisterFunction<decltype(&WrenTest::TestGetInt), &WrenTest::TestGetInt>( "TestGetInt", FUNCTION( WrenTest::TestGetInt ) );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction" );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg" );
+	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet" );
+	engine.RegisterFunction<decltype(&WrenTest::TestGetInt), &WrenTest::TestGetInt>( "TestGetInt" );
 
 	dd::String256 output;
 	bool res = engine.RunModule( "test_foreign", output );

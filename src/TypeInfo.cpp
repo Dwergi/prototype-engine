@@ -57,22 +57,6 @@ namespace dd
 		m_containedType = nullptr;
 	}
 
-	void TypeInfo::RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset )
-	{
-		DD_ASSERT( typeInfo->IsRegistered() );
-
-		Member& member = m_members.Allocate();
-		member.m_name = name;
-		member.m_offset = offset;
-		member.m_typeInfo = typeInfo;
-		member.m_parent = this;
-
-		if( m_scriptObject )
-		{
-			g_services.Get<AngelScriptEngine>().RegisterMember( m_name.c_str(), member );
-		}
-	}
-
 	const Member* TypeInfo::GetMember( const char* memberName ) const
 	{
 		for( const Member& member : m_members )

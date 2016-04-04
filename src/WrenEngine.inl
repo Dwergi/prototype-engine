@@ -57,7 +57,7 @@ namespace dd
 	}
 
 	template <typename T, typename... CtorArgs>
-	void WrenEngine::RegisterType( bool byValue )
+	void WrenEngine::RegisterType()
 	{
 		const TypeInfo* typeInfo = GET_TYPE( T );
 		
@@ -72,22 +72,24 @@ namespace dd
 	}
 
 	template <typename FnType, FnType FunctionPtr>
-	void WrenEngine::RegisterFunction( const char* name, const Function& function )
+	void WrenEngine::RegisterFunction( const char* name )
 	{
 		WrenClass* pClass { nullptr };
 
-		if( function.Signature()->GetContext() == nullptr )
+		FunctionSignature sig( FunctionPtr );
+
+		if( sig.GetContext() == nullptr )
 		{
 			pClass = FindClass( "dd", "global" );
 		}
 		else
 		{
-			pClass = FindClass( function.Signature()->GetContext()->Namespace().c_str(), function.Signature()->GetContext()->Name().c_str() );
+			pClass = FindClass( sig.GetContext()->Namespace().c_str(), sig.GetContext()->Name().c_str() );
 		}
 
 		DD_ASSERT( pClass != nullptr );
 
-		uint arity = function.Signature()->ArgCount();
+		uint arity = sig.ArgCount();
 		String128 fullSig( name );
 		fullSig += "(";
 

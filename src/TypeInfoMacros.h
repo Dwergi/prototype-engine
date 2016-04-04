@@ -38,9 +38,7 @@
 
 #define BEGIN_TYPE( TypeName ) \
 	static void RegisterMembers() { \
-				TypeName instance; \
-				UNREFERENCED( instance ); \
-				dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
+	dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter m_refCount; \
@@ -57,11 +55,11 @@
 #define PARENT( ParentType ) \
 	typeInfo->RegisterParentType( GET_TYPE( ParentType ) )
 
-#define MEMBER( MemberName ) \
-	typeInfo->RegisterMember( GET_TYPE_OF( instance.MemberName ), #MemberName, (uint) (reinterpret_cast<uint64>(&instance.MemberName) - reinterpret_cast<uint64>(&instance)) )
+#define MEMBER( TypeName, MemberName ) \
+	typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName )
 
-#define METHOD( MethodName ) \
-	typeInfo->RegisterMethod( FUNCTION( MethodName ), &MethodName, #MethodName )
+#define METHOD( TypeName, MethodName ) \
+	typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
 
 #define END_TYPE }
 

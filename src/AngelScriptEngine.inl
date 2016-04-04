@@ -34,7 +34,7 @@ void dd::AngelScriptEngine::RegisterObject( const char* className )
 	int res = m_engine->RegisterObjectType( objType.c_str(), 0, asOBJ_REF );
 	DD_ASSERT( res >= 0 );
 
-	String32 strSig = objType;
+	String32 strSig( objType );
 	strSig += "@ Factory()";
 
 	res = m_engine->RegisterObjectBehaviour( objType.c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( Factory<T> ), asCALL_CDECL );

@@ -16,6 +16,8 @@ namespace dd
 		bool Exists( const char* key ) const;
 		const String& GetValue( const char* key ) const;
 
+		BASIC_TYPE( CommandLine )
+
 	private:
 
 		struct ArgumentPair
@@ -25,5 +27,8 @@ namespace dd
 		};
 
 		Vector<ArgumentPair> m_args;
+
+		// only used for constructing the type info
+		CommandLine() {}
 	};
 }

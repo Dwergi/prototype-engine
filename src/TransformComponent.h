@@ -32,8 +32,8 @@ namespace dd
 
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			PARENT( Component );
-			MEMBER( Position );
-			METHOD( SetPosition );
+			MEMBER( TransformComponent, Position );
+			METHOD( TransformComponent, SetPosition );
 		END_TYPE
 	};
 }

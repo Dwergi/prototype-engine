@@ -64,10 +64,11 @@ namespace dd
 		template <typename T>
 		static const TypeInfo* RegisterContainer( const char* container, const TypeInfo* containing );
 
-		template <typename T>
-		void RegisterMethod( const Function& f, T fn, const char* name );
+		template <typename FnType, FnType Fn>
+		void RegisterMethod( const char* name );
 
-		void RegisterMember( const TypeInfo* typeInfo, const char* name, uint offset );
+		template <typename TClass, typename TProp, TProp TClass::* Member>
+		void RegisterMember( const char* name );
 
 		void RegisterParentType( const TypeInfo* typeInfo );
 
@@ -115,7 +116,10 @@ namespace dd
 
 		static bool sm_defaultsRegistered;
 		static DenseMap<SharedString, TypeInfo*> sm_typeMap;
-	};
 
-	#include "TypeInfo.inl"
-};
+		template <typename T>
+		void RegisterFunctions();
+	};
+}
+
+#include "TypeInfo.inl"

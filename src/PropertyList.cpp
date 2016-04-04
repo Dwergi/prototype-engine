@@ -8,7 +8,7 @@
 
 namespace 
 {
-	void* AddPointer( void* base, uint offset )
+	void* AddPointer( void* base, uint64 offset )
 	{
 		return (void*) (((byte*) base) + offset);
 	}

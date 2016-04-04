@@ -23,7 +23,7 @@ namespace dd
 
 		BEGIN_TYPE( OctreeComponent )
 			PARENT( Component );
-			MEMBER( Entry );
+			MEMBER( OctreeComponent, Entry );
 		END_TYPE
 	};
 }

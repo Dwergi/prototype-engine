@@ -126,10 +126,10 @@ void RegisterGlobalScriptFunctions()
 {
 	REGISTER_TYPE( EntityHandle );
 
-	AngelScriptEngine& engine = g_services.Get<AngelScriptEngine>();
+	ScriptEngine& engine = g_services.Get<ScriptEngine>();
 
-	engine.RegisterGlobalFunction( "GetTransformComponent", FUNCTION( GetTransformComponent ), &GetTransformComponent );
-	engine.RegisterGlobalFunction( "GetEntityHandle", FUNCTION( GetEntityHandle ), &GetEntityHandle );
+	engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
+	engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
 
 	REGISTER_GLOBAL_VARIABLE( engine, s_drawFPS );
 	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
@@ -330,17 +330,20 @@ int GameMain()
 //
 int main( int argc, char const* argv[] )
 {
-	CommandLine cmdLine( argv, argc );
-	g_services.Register( cmdLine );
+	TypeInfo::RegisterDefaultTypes();
 
+	CommandLine cmdLine( argv, argc );
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
-	// TODO: this is bad, not compatible with Wren, and registered too early anyway
-	AngelScriptEngine AngelScriptEngine;
-	g_services.Register( AngelScriptEngine );
+	REGISTER_TYPE( CommandLine );
+	g_services.Register( cmdLine );
 
-	TypeInfo::RegisterDefaultTypes();
+	// TODO: this is bad, not compatible with Wren, and registered too early anyway
+	REGISTER_TYPE( ScriptEngine );
+
+	ScriptEngine scriptEngine;
+	g_services.Register( scriptEngine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );

@@ -8,8 +8,8 @@
 
 namespace dd
 {
-	const void* PointerAdd( const void* base, uint offset );
-	void* PointerAdd( void* base, uint offset );
+	const void* PointerAdd( const void* base, uint64 offset );
+	void* PointerAdd( void* base, uint64 offset );
 
 	namespace Serialize
 	{

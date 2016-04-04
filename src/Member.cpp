@@ -21,7 +21,7 @@ namespace dd
 		return m_typeInfo;
 	}
 
-	uint Member::Offset() const
+	uint64 Member::Offset() const
 	{
 		return m_offset;
 	}

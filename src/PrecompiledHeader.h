@@ -46,5 +46,22 @@
 #include "Globals.h"
 
 #include "Serialization.h"
+#include "RefCounter.h"
+
+#ifdef USE_ANGELSCRIPT
 
 #include "AngelScriptEngine.h"
+namespace dd
+{
+	typedef AngelScriptEngine ScriptEngine;
+}
+
+#else
+
+#include "WrenEngine.h"
+namespace dd
+{
+	typedef WrenEngine ScriptEngine;
+}
+	
+#endif 
