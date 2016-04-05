@@ -40,6 +40,7 @@ void TestFunction2( dd::Message* msg )
 
 TEST_CASE( "[MessageSystem]" )
 {
+	REGISTER_TYPE( dd::Message );
 	REGISTER_TYPE( TestMessage );
 
 	dd::MessageQueue system;

@@ -10,7 +10,11 @@
 
 namespace dd
 {
-	class Script;
+	namespace ASInternal
+	{
+		template <typename T, bool>
+		struct RegisterTypeForwarder;
+	}
 
 	class AngelScriptEngine
 	{
@@ -22,25 +26,17 @@ namespace dd
 		AngelScriptEngine( const AngelScriptEngine& ) = delete;
 		AngelScriptEngine& operator=( const AngelScriptEngine& ) = delete;
 
-		template <typename FnType>
-		void RegisterMethod( const char* name, const Function& method, FnType ptr );
-
 		// 
-		// Register a script object that is passed by reference exclusively.
+		// Register a type with the script system.
 		// 
-		template <typename T>
-		void RegisterObject( const char* className );
+		template <typename T, bool byValue>
+		void RegisterType();
 
-		//
-		// Register a script object that is passed by value.
-		//
-		template <typename T>
-		void RegisterStruct( const char* className );
+		template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
+		void RegisterMember( const char* name );
 
-		void RegisterMember( const char* className, const Member& member );
-
-		template <typename FnType>
-		void RegisterGlobalFunction( const char* name, const Function& function, FnType ptr );
+		template <typename FnType, FnType Fn>
+		void RegisterFunction( const char* name );
 
 		template <typename T, T& Variable>
 		void RegisterGlobalVariable( const char* name );
@@ -53,15 +49,28 @@ namespace dd
 
 	private:
 
-		Vector<Script> m_vecScripts;
+		template <typename T, bool>
+		friend struct ASInternal::RegisterTypeForwarder;
+
 		asIScriptEngine* m_engine;
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
 		static String64 ReplacePointer( const char* typeName );
 
 		static String256 GetFunctionSignatureString( const char* name, const Function& fn );
-	};
-	//---------------------------------------------------------------------------
 
-	#include "AngelScriptEngine.inl"
+		template <typename FnType, FnType FnPtr>
+		void RegisterMethod( const char* name, const Function& method );
+
+		template <typename FnType, FnType FnPtr>
+		void RegisterGlobalFunction( const char* name, const Function& method );
+
+		template <typename T>
+		void RegisterObject();
+
+		template <typename T>
+		void RegisterStruct();
+	};
 }
+
+#include "AngelScriptEngine.inl"

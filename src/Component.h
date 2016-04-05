@@ -15,5 +15,7 @@ namespace dd
 
 	public:
 		virtual ~Component() {}
+
+		BASIC_TYPE( Component )
 	};
 }

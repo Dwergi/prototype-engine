@@ -70,13 +70,11 @@ namespace dd
 		template <typename TClass, typename TProp, TProp TClass::* Member>
 		void RegisterMember( const char* name );
 
-		void RegisterParentType( const TypeInfo* typeInfo );
-
 		template <typename T>
-		void RegisterScriptObject();
+		void RegisterParentType();
 
-		template <typename T>
-		void RegisterScriptStruct();
+		template <typename T, bool byValue>
+		void RegisterScriptType();
 
 		//
 		// Register a POD type - these are the basic types like ints, floats and char*.

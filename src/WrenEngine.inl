@@ -56,7 +56,7 @@ namespace dd
 		}
 	}
 
-	template <typename T, typename... CtorArgs>
+	template <typename T, bool byValue, typename... CtorArgs>
 	void WrenEngine::RegisterType()
 	{
 		const TypeInfo* typeInfo = GET_TYPE( T );

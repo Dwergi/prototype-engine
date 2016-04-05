@@ -131,6 +131,15 @@ namespace dd
 		return typeInfo;
 	}
 
+	template <typename T>
+	void TypeInfo::RegisterParentType()
+	{
+		const TypeInfo* parent = GET_TYPE( T );
+		DD_ASSERT( parent->IsRegistered() );
+
+		m_parentType = parent;
+	}
+
 	template <typename FnType, FnType Fn>
 	void TypeInfo::RegisterMethod( const char* name )
 	{
@@ -173,8 +182,8 @@ namespace dd
 		}
 	}
 
-	template <typename T>
-	void TypeInfo::RegisterScriptObject()
+	template <typename T, bool byValue>
+	void TypeInfo::RegisterScriptType()
 	{
 		ScriptEngine* scriptEngine = g_services.GetPtr<ScriptEngine>();
 		DD_ASSERT( scriptEngine != nullptr );
@@ -183,21 +192,7 @@ namespace dd
 		{
 			m_scriptObject = true;
 
-			scriptEngine->RegisterType<T>();
-		}
-	}
-
-	template <typename T>
-	void TypeInfo::RegisterScriptStruct()
-	{
-		ScriptEngine* scriptEngine = g_services.GetPtr<ScriptEngine>();
-		DD_ASSERT( scriptEngine != nullptr );
-
-		if( scriptEngine != nullptr )
-		{
-			m_scriptObject = true;
-
-			scriptEngine->RegisterType<T>();
+			scriptEngine->RegisterType<T, byValue>();
 		}
 	}
 }

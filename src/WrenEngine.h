@@ -59,7 +59,7 @@ namespace dd
 		// Register a script object that is passed by reference exclusively.
 		// @byValue - Whether this object can be passed by value or not.
 		// 
-		template <typename T, typename... CtorArgs>
+		template <typename T, bool byValue, typename... CtorArgs>
 		void RegisterType();
 
 		// 

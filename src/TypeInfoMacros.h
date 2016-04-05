@@ -43,17 +43,17 @@
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter m_refCount; \
 	BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptObject<TypeName>();
+	typeInfo->RegisterScriptType<TypeName, false>();
 
 #define BEGIN_SCRIPT_STRUCT( TypeName ) \
 	BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptStruct<TypeName>();
+	typeInfo->RegisterScriptType<TypeName, true>();
 
 #define REGISTER_PARENT( TypeName, ParentType ) \
-	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType( GET_TYPE( ParentType ) )
+	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
 
 #define PARENT( ParentType ) \
-	typeInfo->RegisterParentType( GET_TYPE( ParentType ) )
+	typeInfo->RegisterParentType<ParentType>()
 
 #define MEMBER( TypeName, MemberName ) \
 	typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName )

@@ -11,5 +11,7 @@ namespace dd
 	struct Message
 	{
 		uint Type;
+
+		BASIC_TYPE( Message )
 	};
 }

@@ -137,11 +137,6 @@ namespace dd
 		DeserializeCustom = deserializer;
 	}
 
-	void TypeInfo::RegisterParentType( const TypeInfo* type )
-	{
-		m_parentType = type;
-	}
-
 	void TypeInfo::RegisterDefaultTypes()
 	{
 		sm_defaultsRegistered = true;

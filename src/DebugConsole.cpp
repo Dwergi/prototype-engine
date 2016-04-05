@@ -100,14 +100,14 @@ namespace dd
 
 		// Register special function with overloads to catch any type.
 		// This is used by the exec command to output the resulting value from the statement.
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabBool ), &grabBool );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabInt ), &grabInt );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabUint ), &grabUint );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabFloat ), &grabFloat );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabDouble ), &grabDouble );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabEntityHandle ), &grabEntityHandle );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grabTransformComponent ), &grabTransformComponent );
-		engine->RegisterGlobalFunction( "_grab", FUNCTION( grab ), &grab );
+		engine->RegisterFunction<decltype(&grabBool), &grabBool>( "_grab" );
+		engine->RegisterFunction<decltype(&grabInt), &grabInt>( "_grab" );
+		engine->RegisterFunction<decltype(&grabUint), &grabUint>( "_grab" );
+		engine->RegisterFunction<decltype(&grabFloat), &grabFloat>( "_grab" );
+		engine->RegisterFunction<decltype(&grabDouble), &grabDouble>( "_grab" );
+		engine->RegisterFunction<decltype(&grabEntityHandle), &grabEntityHandle>( "_grab" );
+		engine->RegisterFunction<decltype(&grabTransformComponent), &grabTransformComponent>( "_grab" );
+		engine->RegisterFunction<decltype(&grab), &grab>( "_grab" );
 		/*engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
 	}
 

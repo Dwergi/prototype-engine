@@ -56,19 +56,6 @@ namespace dd
 		m_engine = nullptr;
 	}
 
-	void AngelScriptEngine::RegisterMember( const char* className, const Member& member )
-	{
-		String64 objType( ReplacePointer( className ) );
-
-		String128 signature;
-		signature += ReplacePointer( member.Type()->Name().c_str() );
-		signature += " ";
-		signature += member.Name();
-
-		int res = m_engine->RegisterObjectProperty( objType.c_str(), signature.c_str(), (int) member.Offset() );
-		DD_ASSERT( res >= 0 );
-	}
-
 	bool AngelScriptEngine::Evaluate( const String& script, String& output )
 	{
 		SetOutput( &output );

@@ -81,6 +81,7 @@ TEST_CASE( "[property] Integer properties" )
 
 TEST_CASE( "[property] Recorder" )
 {
+	REGISTER_TYPE( dd::Component );
 	REGISTER_TYPE( dd::Vector4 );
 	REGISTER_TYPE( dd::TransformComponent );
 

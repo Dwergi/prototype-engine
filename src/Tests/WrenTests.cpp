@@ -73,7 +73,7 @@ TEST_CASE( "[Wren] Register Class" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>();
+	engine.RegisterType<WrenTest, false, int, bool>();
 }
 
 TEST_CASE( "[Wren] Register Member" )
@@ -82,7 +82,7 @@ TEST_CASE( "[Wren] Register Member" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>();
+	engine.RegisterType<WrenTest, false, int, bool>();
 	engine.RegisterMember<WrenTest, int, &WrenTest::Integer>( "Integer" );
 	engine.RegisterMember<WrenTest, bool, &WrenTest::Boolean>( "Boolean" );
 }
@@ -101,7 +101,7 @@ TEST_CASE( "[Wren] Register Method" )
 
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>();
+	engine.RegisterType<WrenTest, false, int, bool>();
 	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction" );
 	engine.RegisterFunction<decltype(&WrenTest::TestFunctionArg), &WrenTest::TestFunctionArg>( "TestFunctionArg" );
 	engine.RegisterFunction<decltype(&WrenTest::TestFunctionRet), &WrenTest::TestFunctionRet>( "TestFunctionRet" );
@@ -160,7 +160,7 @@ TEST_CASE( "[Wren] Call From Wren" )
 {
 	dd::WrenEngine engine;
 
-	engine.RegisterType<WrenTest, int, bool>();
+	engine.RegisterType<WrenTest, false, int, bool>();
 	engine.RegisterMember<WrenTest, int, &WrenTest::Integer>( "Integer" );
 	engine.RegisterMember<WrenTest, bool, &WrenTest::Boolean>( "Boolean" );
 	engine.RegisterFunction<decltype(&WrenTest::TestFunction), &WrenTest::TestFunction>( "TestFunction" );

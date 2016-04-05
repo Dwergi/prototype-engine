@@ -48,20 +48,17 @@
 #include "Serialization.h"
 #include "RefCounter.h"
 
+//#define USE_ANGELSCRIPT
 #ifdef USE_ANGELSCRIPT
-
 #include "AngelScriptEngine.h"
 namespace dd
 {
 	typedef AngelScriptEngine ScriptEngine;
 }
-
 #else
-
 #include "WrenEngine.h"
 namespace dd
 {
 	typedef WrenEngine ScriptEngine;
 }
-	
 #endif 
