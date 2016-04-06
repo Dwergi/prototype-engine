@@ -6,16 +6,19 @@
 
 #pragma once
 
+#include "JobSystem.h"
+
 namespace dd
 {
-	class JobSystem;
-
 	class JobThread
 	{
 	public:
 
+		JobThread( JobThread&& other );
 		JobThread( JobSystem& m_owner );
 		~JobThread();
+
+		JobThread( const JobThread& ) = delete;
 
 		void Kill();
 
@@ -23,10 +26,13 @@ namespace dd
 
 		bool m_killed;
 		JobSystem& m_owner;
+		Vector<JobHandle> m_pendingJobs;
 
 		void Run();
-		void Execute( const Function& fn ) const;
+		void ProcessJob();
 
+		void WaitForCategory( const char* category, uint timeout_ms );
+		
 		friend class JobSystem;
 	};
 }

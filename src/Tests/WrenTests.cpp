@@ -1,3 +1,9 @@
+//
+// WrenTests.cpp - Tests for the Wren bindings.
+// Copyright (C) Sebastian Nordgren 
+// April 4th 2016
+//
+
 #include "PrecompiledHeader.h"
 #include "catch/catch.hpp"
 

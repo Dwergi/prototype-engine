@@ -425,6 +425,7 @@
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
+    <ClCompile Include="src\Tests\JobSystemTests.cpp" />
     <ClCompile Include="src\Tests\TypeInfoTests.cpp" />
     <ClCompile Include="src\Tests\WrenTests.cpp" />
     <ClCompile Include="src\WrenEngine.cpp" />

@@ -150,12 +150,12 @@ namespace dd
 	}
 
 	template <typename... Args, std::size_t... Index>
-	void WrenMethodCallHelper( WrenVM* vm, std::tuple< Args... > args, std::index_sequence<Index...> )
+	void WrenMethodCallHelper( WrenVM* vm, std::tuple<Args...> args, std::index_sequence<Index...> )
 	{
 		ExpandType
 		{
-			0,
-			(WrenInternal::WrenArgument<std::tuple_element_t<Index, std::tuple<Args...>>>::set( vm, Index + 1, std::get<Index>( args ) ),
+			0, (
+				WrenInternal::WrenArgument<std::tuple_element_t<Index, std::tuple<Args...>>>::set( vm, Index + 1, std::get<Index>( args ) ),
 			0)...
 		};
 	}

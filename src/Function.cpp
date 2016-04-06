@@ -48,7 +48,7 @@ namespace dd
 
 	bool Function::IsMethod() const
 	{
-		return m_sig.GetContext() ? true : false;
+		return m_sig.GetContext() != nullptr;
 	}
 
 	Function& Function::operator=( const Function& rhs )

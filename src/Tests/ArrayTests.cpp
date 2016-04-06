@@ -23,30 +23,6 @@ namespace ArrayTests
 		REQUIRE( container[ 0 ] == 123 );
 	}
 
-	TEST_CASE( "[Array] PushAll" )
-	{
-		dd::Array<int, 64> container;
-		dd::Array<int, 32> other;
-
-		for( int i = 0; i < 32; ++i )
-		{
-			other.Push( i );
-		}
-
-		REQUIRE( other.Size() == 32 );
-
-		container.PushAll( other );
-
-		REQUIRE( container.Size() == 32 );
-		REQUIRE( container[ 0 ] == 0 );
-		REQUIRE( container[ 31 ] == 31 );
-
-		container.PushAll( other );
-
-		REQUIRE( container.Size() == 64 );
-		REQUIRE( container[ 63 ] == 31 );
-	}
-
 	TEST_CASE( "[Array] Pop" )
 	{
 		dd::Array<int, 32> container;
@@ -75,7 +51,6 @@ namespace ArrayTests
 		}
 
 		REQUIRE( container.IndexOf( 15 ) == 15 );
-		REQUIRE( container.Contains( 15 ) );
 	}
 
 	TEST_CASE( "[Array] Struct" )

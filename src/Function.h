@@ -13,11 +13,7 @@ namespace dd
 {
 	// Helper to use list initialization to evaluate side-effects with variadic templates.
 	// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
-	struct ExpandType
-	{
-		template< typename... Ts >
-		ExpandType( Ts&&... ) {}
-	};
+	using ExpandType = int[];
 
 	// Get the type-safe argument at the given index in the given args array.
 	template <std::size_t Index, typename... Args>

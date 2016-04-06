@@ -21,7 +21,7 @@ namespace dd
 		void Push( const T& value );
 		void PushAll( const ArrayBase<T>& other );
 
-		void Remove( uint index );
+		void RemoveAt( uint index );
 		void Remove( const T& value );
 
 		T Pop();
@@ -29,7 +29,10 @@ namespace dd
 
 		const T& operator[]( uint index ) const;
 		bool Contains( const T& val );
-		int IndexOf( const T& val );		
+		int IndexOf( const T& val );
+
+		T* Data() { return m_data; }
+		void SetSize( uint size ) { m_size = size; }
 
 		DEFINE_ITERATORS( T, m_data, m_size );
 

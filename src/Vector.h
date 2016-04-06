@@ -43,6 +43,10 @@ namespace dd
 		void RemoveOrdered( uint index );
 		void RemoveAll( const Vector<T>& to_remove );
 		void Clear();
+
+		//
+		// Remove and return the last entry.
+		//
 		T Pop();
 
 		//
@@ -52,6 +56,10 @@ namespace dd
 		//
 		void Zero( uint index ) const;
 
+		//
+		// Add the given value.
+		// Push and Add are identical.
+		//
 		void Add( T&& value );
 		void Add( const T& value );
 		void Push( T&& value );

@@ -17,6 +17,8 @@ namespace dd
 		: ArrayBase( m_buffer, MaxCapacity )
 	{
 		CopyRange( other.m_buffer, m_buffer, other.m_size );
+
+		m_size = other.m_size;
 	}
 
 	template<typename T, uint MaxCapacity>
@@ -92,7 +94,7 @@ namespace dd
 	}
 
 	template<typename T>
-	void ArrayBase<T>::Remove( uint index )
+	void ArrayBase<T>::RemoveAt( uint index )
 	{
 		DD_ASSERT( index < m_size );
 

@@ -23,11 +23,7 @@ namespace dd
 
 		// Helper to use list initialization to evaluate side-effects with variadic templates.
 		// See: http://stackoverflow.com/questions/17339789/how-to-call-a-function-on-all-variadic-template-args
-		struct ExpandType
-		{
-			template< typename... Ts >
-			ExpandType( Ts&&... ) {}
-		};
+		using ExpandType = int[];
 
 		template <typename... Args, std::size_t... Index>
 		void CreateArgs( const TypeInfo** argStack, std::index_sequence<Index...> ) const

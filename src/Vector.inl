@@ -85,7 +85,7 @@ namespace dd
 		return m_data;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Remove( uint index )
 	{
 		DD_ASSERT( m_size > 0 );
@@ -99,7 +99,7 @@ namespace dd
 		Zero( m_size );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Remove( int index )
 	{
 		if( index < 0 )
@@ -108,7 +108,7 @@ namespace dd
 		Remove( (uint) index );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::RemoveItem( const T& item )
 	{
 		Vector<uint> to_remove;
@@ -130,7 +130,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::RemoveOrdered( uint index )
 	{
 		DD_ASSERT( m_size > 0 );
@@ -147,7 +147,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::RemoveAll( const Vector<T>& to_remove )
 	{
 		DD_ASSERT( m_size > 0 );
@@ -160,7 +160,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	T Vector<T>::Pop()
 	{
 		DD_ASSERT( m_size > 0 );
@@ -174,7 +174,7 @@ namespace dd
 		return entry;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Clear()
 	{
 		DestroyRange( m_data, m_size );
@@ -184,7 +184,7 @@ namespace dd
 		m_size = 0;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Zero( uint index ) const
 	{
 		DD_ASSERT( index < m_capacity );
@@ -194,7 +194,7 @@ namespace dd
 		memset( &m_data[index], 0xFF, sizeof( T ) );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Add( T&& entry )
 	{
 		if( m_size == m_capacity )
@@ -207,7 +207,7 @@ namespace dd
 		++m_size;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Add( const T& entry )
 	{
 		if( m_size == m_capacity )
@@ -220,19 +220,19 @@ namespace dd
 		++m_size;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Push( T&& entry )
 	{
 		Add( std::move( entry ) );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Push( const T& entry )
 	{
 		Add( entry );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Insert( const T&& entry, uint index )
 	{
 		DD_ASSERT( index <= m_size );
@@ -256,7 +256,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Insert( const T& entry, uint index )
 	{
 		DD_ASSERT( index <= m_size );
@@ -280,7 +280,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::AddAll( const Vector<T>& other )
 	{
 		uint new_size = Size() + other.Size();
@@ -295,7 +295,7 @@ namespace dd
 		m_size += other.Size();
 	}
 
-	template<typename T>
+	template <typename T>
 	T& Vector<T>::Allocate()
 	{
 		if( m_size == m_capacity )
@@ -310,7 +310,7 @@ namespace dd
 		return *ptr;
 	}
 
-	template<typename T>
+	template <typename T>
 	T& Vector<T>::Allocate( T&& to_add )
 	{
 		if( m_size == m_capacity )
@@ -325,7 +325,7 @@ namespace dd
 		return *ptr;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Swap( Vector<T>& other )
 	{
 		std::swap( m_data, other.m_data );
@@ -333,7 +333,7 @@ namespace dd
 		std::swap( m_capacity, other.m_capacity );
 	}
 
-	template<typename T>
+	template <typename T>
 	int Vector<T>::Find( const T& entry ) const
 	{
 		for( uint i = 0; i < m_size; ++i )
@@ -345,7 +345,7 @@ namespace dd
 		return -1;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Reverse()
 	{
 		for( uint i = 0; i < m_size / 2; ++i )
@@ -354,13 +354,13 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	bool Vector<T>::Contains( const T& entry ) const
 	{
 		return Find( entry ) != -1;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Resize( uint size )
 	{
 		if( size == m_capacity )
@@ -383,7 +383,7 @@ namespace dd
 		m_size = size;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Reserve( uint capacity )
 	{
 		if( capacity <= m_capacity )
@@ -392,20 +392,20 @@ namespace dd
 		Reallocate( capacity );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::ShrinkToFit()
 	{
 		Reallocate( m_size );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Grow()
 	{
 		// an unparametrized grow just grows by the default growth factor
 		Reallocate( ((uint) (m_capacity * GrowthFactor)) + GrowthFudge );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Grow( uint target )
 	{
 		if( target <= m_capacity )
@@ -420,7 +420,7 @@ namespace dd
 		Reallocate( new_capacity );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Vector<T>::Reallocate( uint new_capacity )
 	{
 		T* new_data = nullptr;
@@ -443,7 +443,7 @@ namespace dd
 		m_capacity = new_capacity;
 	}
 
-	template<typename T>
+	template <typename T>
 	T& Vector<T>::GetEntry( uint index ) const
 	{
 		DD_ASSERT( index < m_capacity );
@@ -451,7 +451,7 @@ namespace dd
 		return m_data[index];
 	}
 
-	template<typename T>
+	template <typename T>
 	bool Vector<T>::operator==( const Vector<T>& other ) const
 	{
 		if( m_size != other.m_size )
