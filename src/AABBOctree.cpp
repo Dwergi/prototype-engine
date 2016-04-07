@@ -31,6 +31,16 @@ namespace dd
 	}
 
 	//
+	// Add a point to the tree.
+	//
+	OctreeEntry AABBOctree::Add( const glm::vec3& pt )
+	{
+		AABB bb;
+		bb.Expand( pt );
+		return Add( bb );
+	}
+
+	//
 	// Add an entry with the given bounds to the tree.
 	//
 	OctreeEntry AABBOctree::Add( const AABB& bounds )

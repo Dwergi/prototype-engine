@@ -15,8 +15,8 @@ namespace dd
 	class SwarmSystem : public ISystem
 	{
 	public:
-		explicit SwarmSystem( const DoubleBuffer<SwarmAgentComponent::Pool>& pool );
-		~SwarmSystem();
+		SwarmSystem();
+		virtual ~SwarmSystem();
 
 		virtual void Update( float dt ) override;
 
@@ -24,6 +24,6 @@ namespace dd
 
 	private:
 
-		const DoubleBuffer<SwarmAgentComponent::Pool>& m_pool;
+		
 	};
 }

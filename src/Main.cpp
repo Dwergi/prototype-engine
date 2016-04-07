@@ -41,33 +41,6 @@
 
 using namespace dd;
 
-template<typename T>
-void RegisterComponent()
-{
-	DoubleBuffer<typename T::Pool>* double_buffer = new DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
-	g_services.Register( *double_buffer );
-}
-
-template<typename T>
-typename T::Pool* GetWritePool()
-{
-	return g_services.Get<DoubleBuffer<typename T::Pool>>().GetWrite();
-}
-
-template<typename T>
-typename T::Pool* GetReadPool()
-{
-	return g_services.Get<DoubleBuffer<typename T::Pool>>().GetRead();
-}
-
-template<typename T>
-DoubleBuffer<typename T::Pool>& GetDoubleBuffer()
-{
-	DoubleBuffer<typename T::Pool>& buffer = g_services.Get<DoubleBuffer<typename T::Pool>>();
-
-	return buffer;
-}
-
 extern bool s_drawFPS;
 bool s_drawFPS = true;
 
@@ -107,7 +80,7 @@ bool s_drawConsole = true;
 
 TransformComponent* GetTransformComponent( EntityHandle entity )
 {
-	auto& transform_pool = GetDoubleBuffer<TransformComponent>().GetRead();
+	auto& transform_pool = Services::GetReadPool<TransformComponent>();
 	
 	TransformComponent* cmp = transform_pool.Find( entity );
 
@@ -116,7 +89,7 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 
 EntityHandle GetEntityHandle( uint id )
 {
-	EntitySystem& system = g_services.Get<EntitySystem>();
+	EntitySystem& system = Services::Get<EntitySystem>();
 
 	EntityHandle handle( id, &system );
 	return handle;
@@ -126,7 +99,7 @@ void RegisterGlobalScriptFunctions()
 {
 	REGISTER_TYPE( EntityHandle );
 
-	ScriptEngine& engine = g_services.Get<ScriptEngine>();
+	ScriptEngine& engine = Services::Get<ScriptEngine>();
 
 	engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
 	engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
@@ -145,9 +118,9 @@ void RegisterGameTypes()
 	REGISTER_TYPE( OctreeComponent );
 	REGISTER_TYPE( SwarmAgentComponent );
 
-	RegisterComponent<TransformComponent>();
-	RegisterComponent<OctreeComponent>();
-	RegisterComponent<SwarmAgentComponent>();
+	Services::RegisterComponent<TransformComponent>();
+	Services::RegisterComponent<OctreeComponent>();
+	Services::RegisterComponent<SwarmAgentComponent>();
 
 	REGISTER_TYPE( SwarmSystem );
 
@@ -178,15 +151,15 @@ int GameMain()
 	::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 	EntitySystem entitySystem;
-	g_services.Register( entitySystem );
+	Services::Register( entitySystem );
 
 	RegisterGameTypes();
 
 	JobSystem jobsystem( 2u );
 
-	auto& transform_db = GetDoubleBuffer<TransformComponent>();
-	auto& swarm_db = GetDoubleBuffer<SwarmAgentComponent>();
-	auto& octree_db = GetDoubleBuffer<OctreeComponent>();
+	auto& transform_db = Services::GetDoubleBuffer<TransformComponent>();
+	auto& swarm_db = Services::GetDoubleBuffer<SwarmAgentComponent>();
+	auto& octree_db = Services::GetDoubleBuffer<OctreeComponent>();
 
 	auto& transform_pool = transform_db.GetWrite();
 	auto& swarm_pool = swarm_db.GetWrite();
@@ -224,8 +197,8 @@ int GameMain()
 	swarm_db.Duplicate();
 	octree_db.Duplicate();
 
-	SwarmSystem swarm_system( swarm_db );
-	g_services.Register( swarm_system );
+	SwarmSystem swarm_system;
+	Services::Register( swarm_system );
 
 	{
 		Window window( 1280, 960, "Neutrino" );
@@ -281,7 +254,7 @@ int GameMain()
 
 			debugUI.Update( delta_t );
 
-			jobsystem.Schedule( std::bind( &SwarmSystem::Update, g_services.GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
+			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
 
 			ImGui::ShowTestWindow( &opened );
 
@@ -326,6 +299,8 @@ int GameMain()
 //
 int main( int argc, char const* argv[] )
 {
+	Services::Initialize();
+
 	TypeInfo::RegisterDefaultTypes();
 
 	CommandLine cmdLine( argv, argc );
@@ -333,13 +308,13 @@ int main( int argc, char const* argv[] )
 		pempek::assert::implementation::ignoreAllAsserts( true );
 
 	REGISTER_TYPE( CommandLine );
-	g_services.Register( cmdLine );
+	Services::Register( cmdLine );
 
 	// TODO: this is bad, not compatible with Wren, and registered too early anyway
 	REGISTER_TYPE( ScriptEngine );
 
 	ScriptEngine scriptEngine;
-	g_services.Register( scriptEngine );
+	Services::Register( scriptEngine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );

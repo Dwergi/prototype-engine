@@ -8,5 +8,4 @@
 
 namespace dd
 {
-	extern Services g_services;
 }

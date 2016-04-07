@@ -22,6 +22,11 @@ namespace dd
 		~AABBOctree();
 
 		//
+		// Add a point to the tree.
+		//
+		OctreeEntry Add( const glm::vec3& pt );
+
+		//
 		// Add an entry to the octree. Returns a handle for removing it in the future.
 		//
 		OctreeEntry Add( const AABB& bounds );

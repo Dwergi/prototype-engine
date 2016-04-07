@@ -6,88 +6,53 @@
 
 #pragma once
 
+#include "DoubleBuffer.h"
+
 namespace dd
 {
 	class Services
 	{
 	public:
 
-		Services() {}
-		~Services() {}
+		~Services();
+
+		static void Initialize();
 
 		template<typename T>
-		void Register( T& service );
+		static void Register( T& service );
 
 		template<typename T>
-		bool Exists() const;
+		static bool Exists();
 
 		template<typename T>
-		T* GetPtr() const;
+		static T* GetPtr();
 
 		template<typename T>
-		T& Get() const;
+		static T& Get();
+
+		template<typename T>
+		static void RegisterComponent();
+
+		template<typename T>
+		static typename T::Pool& GetWritePool();
+
+		template<typename T>
+		static const typename T::Pool& GetReadPool();
+
+		template<typename T>
+		static DoubleBuffer<typename T::Pool>& GetDoubleBuffer();
 
 	private:
 
+		static Services* m_instance;
+
 		DenseMap<const char*, void*> m_services;
 
+		Services();
+
 		template<typename T>
-		const char* GetKey() const;
+		static const char* GetKey();
 	};
-
-	template <typename T>
-	void Services::Register( T& service )
-	{
-		const char* key = GetKey<T>();
-		DD_ASSERT( key != nullptr );
-
-		if( key == nullptr )
-			return;
-
-		m_services.Add( key, &service );
-	}
-
-	template <typename T>
-	T* Services::GetPtr() const
-	{
-		const char* key = GetKey<T>();
-
-		if( key == nullptr )
-			return nullptr;
-
-		void** ptr = m_services.Find( key );
-
-		if( ptr == nullptr )
-			return nullptr;
-
-		return reinterpret_cast<T*>(*ptr);
-	}
-
-	template <typename T>
-	T& Services::Get() const
-	{
-		T* ptr = GetPtr<T>();
-
-		// just crash
-		if( ptr == nullptr )
-			(*(int*) nullptr) = 0;
-
-		return *ptr;
-	}
-
-	template <typename T>
-	const char* Services::GetKey() const
-	{
-		const TypeInfo* typeInfo = GET_TYPE( dd::RemovePtr<T>::type );
-
-		DD_ASSERT( typeInfo != nullptr );
-
-		return typeInfo->Name().c_str();
-	}
-
-	template <typename T>
-	bool Services::Exists() const
-	{
-		return GetPtr<T>() != nullptr;
-	}
 }
+
+#include "Services.inl"

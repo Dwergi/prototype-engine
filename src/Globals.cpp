@@ -9,5 +9,4 @@
 
 namespace dd
 {
-	Services g_services;
 }

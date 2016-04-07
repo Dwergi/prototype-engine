@@ -340,6 +340,7 @@
     <ClInclude Include="src\AABBOctree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\Plane.h" />
+    <ClInclude Include="src\PlayerComponent.h" />
     <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PrecompiledHeader.h" />
     <ClInclude Include="src\Profiler.h" />
@@ -424,6 +425,7 @@
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
     <ClCompile Include="src\Tests\JobSystemTests.cpp" />
     <ClCompile Include="src\Tests\TypeInfoTests.cpp" />
@@ -504,6 +506,7 @@
     <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
     <None Include="src\AngelScriptEngine.inl" />
+    <None Include="src\Services.inl" />
     <None Include="src\SortedVectorPool.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\DenseMapPool.inl" />

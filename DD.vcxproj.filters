@@ -363,6 +363,9 @@
     <ClInclude Include="src\WrenForeignFunction.h">
       <Filter>Script\Wren</Filter>
     </ClInclude>
+    <ClInclude Include="src\PlayerComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -573,6 +576,9 @@
     <ClCompile Include="src\Tests\JobSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\Services.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -610,6 +616,9 @@
     </None>
     <None Include="src\WrenEngine.inl">
       <Filter>Script\Wren</Filter>
+    </None>
+    <None Include="src\Services.inl">
+      <Filter>Core</Filter>
     </None>
   </ItemGroup>
 </Project>

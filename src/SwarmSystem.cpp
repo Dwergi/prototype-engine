@@ -8,11 +8,11 @@
 #include "SwarmSystem.h"
 
 #include "DoubleBuffer.h"
+#include "TransformComponent.h"
 
 namespace dd
 {
-	SwarmSystem::SwarmSystem( const DoubleBuffer<SwarmAgentComponent::Pool>& pool )
-		: m_pool( pool )
+	SwarmSystem::SwarmSystem()
 	{
 
 	}
@@ -24,8 +24,9 @@ namespace dd
 
 	void SwarmSystem::Update( float dt )
 	{
-		auto& read = m_pool.GetRead();
-		for( const SwarmAgentComponent& cmp : read )
+		const TransformComponent::Pool& transform_read = Services::GetReadPool<TransformComponent>();
+		const SwarmAgentComponent::Pool& swarm_read = Services::GetReadPool<SwarmAgentComponent>();
+		for( const SwarmAgentComponent& cmp : swarm_read )
 		{
 
 		}
