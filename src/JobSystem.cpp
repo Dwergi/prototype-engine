@@ -1,7 +1,7 @@
 //
 // JobSystem.cpp - A manager for creating job threads which will process tasks in parallel over a number of threads.
 // Copyright (C) Sebastian Nordgren 
-// Date
+// 7th April 2016
 //
 
 #include "PrecompiledHeader.h"
@@ -42,35 +42,21 @@ void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName )
 
 namespace dd
 {
-	JobSystem::Job::Job()
-	{
-
-	}
-
 	JobSystem::Job::Job( const Job& other )
 		: Func( other.Func ),
-		Args( other.Args ),
 		Category( other.Category ),
 		WaitingOn( other.WaitingOn ),
-		Status( other.Status )
+		Status( other.Status ),
+		ID( other.ID )
 	{
 
 	}
 
-	JobSystem::Job::Job( Function&& fn, FunctionArgs&& args, const char* category )
+	JobSystem::Job::Job( const std::function<void()>& fn, const char* category, uint id )
 		: Func( fn ),
-		Args( args ),
 		Category( category ),
-		Status( JobStatus::Pending )
-	{
-
-	}
-
-	JobSystem::Job::Job( const Function& fn, const FunctionArgs& args, const char* category )
-		: Func( fn ),
-		Args( args ),
-		Category( category ),
-		Status( JobStatus::Pending )
+		Status( JobStatus::Pending ),
+		ID( id )
 	{
 
 	}
@@ -85,7 +71,7 @@ namespace dd
 	JobSystem::~JobSystem()
 	{
 		{
-			std::lock_guard<std::mutex> lock( m_jobsMutex );
+			std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 			m_jobs.Clear();
 		}
 
@@ -119,68 +105,47 @@ namespace dd
 
 	void JobSystem::Schedule( const Function& fn, const char* category )
 	{
-		DD_ASSERT( fn.Signature()->GetRet() == nullptr );
 		DD_ASSERT( fn.Signature()->ArgCount() == 0 );
+		DD_ASSERT( !fn.IsMethod() || fn.Context().IsValid() ); // must be free or already be bound
 
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
+		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 
-		m_jobs.Add( Job( fn, FunctionArgs(), category ) );
+		m_jobs.Add( Job( [fn]() { fn(); }, category, m_jobID++ ) );
 	}
 
-	void JobSystem::Schedule( Function&& fn, const char* category )
+	void JobSystem::Schedule( const std::function<void ()>& fn, const char* category )
 	{
-		DD_ASSERT( fn.Signature()->GetRet() == nullptr );
-		DD_ASSERT( fn.Signature()->ArgCount() == 0 );
+		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-
-		m_jobs.Add( Job( fn, FunctionArgs(), category ) );
-	}
-
-	void JobSystem::Schedule( const Function& fn, const FunctionArgs& args, const char* category )
-	{
-		DD_ASSERT( fn.Signature()->GetRet() == nullptr );
-		DD_ASSERT( fn.Signature()->ArgCount() == args.ArgCount() );
-
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-
-		m_jobs.Add( Job( fn, args, category ) );
-	}
-
-	void JobSystem::Schedule( Function&& fn, FunctionArgs&& args, const char* category )
-	{
-		DD_ASSERT( fn.Signature()->GetRet() == nullptr );
-		DD_ASSERT( fn.Signature()->ArgCount() == args.ArgCount() );
-
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-
-		m_jobs.Add( Job( std::move( fn ), std::move( args ), category ) );
+		m_jobs.Add( Job( fn, category, m_jobID++ ) );
 	}
 
 	bool JobSystem::HasPendingJobs( const char* category )
 	{
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
+		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 
 		for( Job& job : m_jobs )
 		{
-			if( job.Status != JobStatus::Done )
-			{
-				if( job.Category == category )
-					return true;
-			}
+			if( job.Category == category )
+				return true;
 		}
 
 		return false;
 	}
 
-	void JobSystem::ClearDoneJobs()
+	void JobSystem::UpdateJobs()
 	{
-		std::remove_if( m_jobs.begin(), m_jobs.end(), []( const JobSystem::Job& j )->bool { return j.Status == JobStatus::Done; } );
-	}
+		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 
-	void JobSystem::UpdateWaitingJobs()
-	{
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
+		// clear finished jobs
+		for( int i = 0; i < (int) m_jobs.Size(); ++i )
+		{
+			if( m_jobs[i].Status == JobStatus::Done )
+			{
+				m_jobs.Remove( i );
+				--i;
+			}
+		}
 
 		DenseMap<String128, int> categories;
 
@@ -214,14 +179,14 @@ namespace dd
 
 	JobHandle::JobHandle()
 		: m_system( nullptr ),
-		m_hash( 0 )
+		m_id( 0 )
 	{
 
 	}
 
 	JobHandle::JobHandle( JobSystem& system, JobSystem::Job& job )
 		: m_system( &system ),
-		m_hash( dd::Hash( job ) )
+		m_id( job.ID )
 	{
 
 	}
@@ -230,11 +195,11 @@ namespace dd
 	{
 		DD_ASSERT( m_system != nullptr, "Invalid handle used!" );
 
-		std::lock_guard<std::mutex> lock( m_system->m_jobsMutex );
+		std::lock_guard<std::recursive_mutex> lock( m_system->m_jobsMutex );
 
 		for( JobSystem::Job& job : m_system->m_jobs )
 		{
-			if( dd::Hash( job ) == m_hash )
+			if( job.ID == m_id )
 				return &job;
 		}
 
@@ -243,12 +208,12 @@ namespace dd
 
 	bool JobSystem::GetPendingJob( JobHandle& out_handle )
 	{
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
+		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
 		
 		if( m_jobs.Size() == 0 )
 			return false;
 
-		ClearDoneJobs();
+		UpdateJobs();
 
 		for( Job& job : m_jobs )
 		{
@@ -296,7 +261,7 @@ namespace dd
 			if( !HasPendingJobs( category ) )
 				return;
 
-			UpdateWaitingJobs();
+			UpdateJobs();
 			
 			::Sleep( 0 );
 		} 

@@ -281,11 +281,7 @@ int GameMain()
 
 			debugUI.Update( delta_t );
 
-			FunctionArgs args = FunctionArgs::CreateMethod( g_services.Get<SwarmSystem>(), delta_t );
-			args.AddArgument( Variable( delta_t ) );
-			args.Context = Variable( g_services.Get<SwarmSystem>() );
-
-			jobsystem.Schedule( FUNCTION( SwarmSystem::Update ), args, "SwarmSystem" );
+			jobsystem.Schedule( std::bind( &SwarmSystem::Update, g_services.GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
 
 			ImGui::ShowTestWindow( &opened );
 

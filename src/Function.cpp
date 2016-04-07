@@ -1,5 +1,5 @@
 //
-// FunctionSignature.h - A way to extract TypeInfo objects from function pointers.
+// Function.cpp - A wrapper around a function pointer.
 // Copyright (C) Sebastian Nordgren
 // Original version by Randy Gaul (RandyGaul.net)
 // March 24th 2016

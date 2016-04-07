@@ -8,6 +8,7 @@
 #include "catch/catch.hpp"
 
 #include "JobSystem.h"
+#include "Timer.h"
 
 static bool FreeExecuted;
 static int FreeResult;
@@ -83,27 +84,14 @@ TEST_CASE( "[JobSystem]" )
 
 	SECTION( "Void Free Function" )
 	{
-		SECTION( "- Copy No Args" )
-		{
-			dd::Function fn = FUNCTION( FreeFunctionVoid );
-			system.Schedule( fn, "Test" );
-		}
-
-		SECTION( "- Move No Args" )
+		SECTION( "- Function" )
 		{
 			system.Schedule( FUNCTION( FreeFunctionVoid ), "Test" );
 		}
 
-		SECTION( "- Copy Args" )
+		SECTION( "- std::function" )
 		{
-			dd::Function fn = FUNCTION( FreeFunctionVoid );
-			dd::FunctionArgs args;
-			system.Schedule( fn, args, "Test" );
-		}
-
-		SECTION( "- Move Args" )
-		{
-			system.Schedule( FUNCTION( FreeFunctionVoid ), dd::FunctionArgs {}, "Test" );
+			system.Schedule( &FreeFunctionVoid, "Test" );
 		}
 
 		system.WaitForCategory( "Test" );
@@ -115,23 +103,7 @@ TEST_CASE( "[JobSystem]" )
 	{
 		FreeResult = 0;
 
-		SECTION( "- Explicit FunctionArgs" )
-		{
-			dd::FunctionArgs args;
-			args.AddArgument( dd::Variable( 1 ) );
-			args.AddArgument( dd::Variable( 2 ) );
-			system.Schedule( FUNCTION( FreeFunctionWithArgs ), args, "Test" );
-		}
-
-		SECTION( "- FunctionArgs::Create" )
-		{
-			system.Schedule( FUNCTION( FreeFunctionWithArgs ), dd::FunctionArgs::Create( 1, 2 ), "Test" );
-		}
-
-		SECTION( "- Different Args" )
-		{
-			system.Schedule( FUNCTION( FreeFunctionWithDifferentArgs ), dd::FunctionArgs::Create( -7, (char) 10 ), "Test" );
-		}
+		system.Schedule( std::bind( &FreeFunctionWithDifferentArgs, -7, (char) 10 ), "Test" );
 		
 		system.WaitForCategory( "Test" );
 
@@ -146,16 +118,16 @@ TEST_CASE( "[JobSystem]" )
 
 		SECTION( "Void" )
 		{
-			SECTION( "- Explicit FunctionArgs" )
+			SECTION( "- Function" )
 			{
-				dd::FunctionArgs args;
-				args.Context = dd::Variable( test_struct );
-				system.Schedule( FUNCTION( TestStruct::TestFunctionVoid ), args, "Test" );
+				dd::Function fn = FUNCTION( TestStruct::TestFunctionVoid );
+				fn.Bind( test_struct );
+				system.Schedule( fn, "Test" );
 			}
 
-			SECTION( "- FunctionArgs::Create" )
+			SECTION( "- std::function" )
 			{
-				system.Schedule( FUNCTION( TestStruct::TestFunctionVoid ), dd::FunctionArgs::CreateMethod( &test_struct ), "Test" );
+				system.Schedule( std::bind( &TestStruct::TestFunctionVoid, &test_struct ), "Test" );
 			}
 
 			system.WaitForCategory( "Test" );
@@ -167,19 +139,7 @@ TEST_CASE( "[JobSystem]" )
 		{
 			test_struct.Result = 0;
 
-			SECTION( "- Explicit FunctionArgs" )
-			{
-				dd::FunctionArgs args;
-				args.Context = dd::Variable( test_struct );
-				args.AddArgument( dd::Variable( 1 ) );
-				args.AddArgument( dd::Variable( 2 ) );
-				system.Schedule( FUNCTION( TestStruct::TestFunctionArgs ), args, "Test" );
-			}
-
-			SECTION( "- FunctionArgs::Create" )
-			{
-				system.Schedule( FUNCTION( TestStruct::TestFunctionArgs ), dd::FunctionArgs::CreateMethod( &test_struct, 1, 2 ), "Test" );
-			}
+			system.Schedule( std::bind( &TestStruct::TestFunctionArgs, &test_struct, 1, 2 ), "Test" );
 
 			system.WaitForCategory( "Test" );
 
@@ -197,7 +157,12 @@ TEST_CASE( "[JobSystem]" )
 		FinishedWaitingA = false;
 		CalledB = false;
 
-		system.Schedule( FUNCTION( TestWaitA ), dd::FunctionArgs::Create( &system ), "A" );
+		system.Schedule( std::bind( &TestWaitA, &system ), "A" );
+
+		// this should only take some arbitrarily short amount of time, let's say 0.1 seconds
+		dd::Timer t;
+		t.Start();
+		while( !ScheduledB && t.Time() < 0.1f ) { ::Sleep( 5 ); }
 
 		REQUIRE( ScheduledB );
 		REQUIRE( CalledB );

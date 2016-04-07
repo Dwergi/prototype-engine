@@ -47,13 +47,7 @@ namespace dd
 			JobSystem::Job* job = handle.GetJob();
 			job->Status = JobSystem::JobStatus::Running;
 
-			Variable ret;
-			Function func( job->Func );
-
-			func.Bind( job->Args.Context );
-
-			Vector<Variable> vars = job->Args.GetArguments();
-			func( ret, vars.Data(), job->Args.ArgCount() );
+			job->Func();
 
 			job->Status = JobSystem::JobStatus::Done;
 
@@ -85,7 +79,7 @@ namespace dd
 
 		do
 		{
-			m_owner.UpdateWaitingJobs();
+			m_owner.UpdateJobs();
 
 			if( current.GetJob()->Status == JobSystem::JobStatus::DoneWaiting )
 				return;
