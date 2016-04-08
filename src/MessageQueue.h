@@ -57,7 +57,7 @@ namespace dd
 
 	private:
 
-		std::recursive_mutex m_mutex;
+		std::mutex m_mutex;
 
 		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
 		DenseMap<HandlerID, Function> m_handlers;

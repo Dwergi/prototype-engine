@@ -158,37 +158,37 @@ namespace dd
 		return cmp != nullptr;
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( TIter init )
 	{
 		m_current = init;
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( const SortedVectorIterator<TIter, TValue>& other )
 	{
 		m_current = other.m_current;
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	TValue& SortedVectorIterator<TIter, TValue>::operator*() const
 	{
 		return m_current->Component;
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	bool SortedVectorIterator<TIter, TValue>::operator==( const SortedVectorIterator<TIter, TValue>& other )
 	{
 		return m_current == other.m_current;
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	bool SortedVectorIterator<TIter, TValue>::operator!=( const SortedVectorIterator<TIter, TValue>& other )
 	{
 		return !operator==( other );
 	}
 
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	SortedVectorIterator<TIter, TValue>& SortedVectorIterator<TIter, TValue>::operator++()
 	{
 		++m_current;

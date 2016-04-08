@@ -107,7 +107,7 @@ namespace dd
 		fnReg.Function = &WrenInternal::WrenForeignFunction<FnType, FunctionPtr>::call;
 	}
 
-	template <typename ObjType, typename PropType, PropType ObjType::* Member >
+	template <typename ObjType, typename PropType, PropType ObjType::* Member>
 	void WrenEngine::RegisterMember( const char* name )
 	{
 		const TypeInfo* typeInfo = GET_TYPE( ObjType );

@@ -10,7 +10,7 @@ namespace dd
 {
 	uint64 HashBytes( const byte* data, uint64 size );
 
-	template< typename T >
+	template <typename T>
 	inline uint64 Hash( const T& value )
 	{
 		return HashBytes( (const byte*)((const void*) &value), sizeof( T ) );
@@ -21,7 +21,7 @@ namespace dd
 		return HashBytes( (const byte*) data, size );
 	}
 
-	template<>
+	template <>
 	inline uint64 Hash( const dd::String& value )
 	{
 		return HashBytes( (const uint8*) value.c_str(), value.Length() );

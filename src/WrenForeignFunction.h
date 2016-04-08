@@ -108,7 +108,7 @@ namespace dd
 		struct WrenForeignFunction;
 
 		// free function
-		template <typename R, typename... Args, R (*fn)(Args...) >
+		template <typename R, typename... Args, R (*fn)(Args...)>
 		struct WrenForeignFunction<R( *)(Args...), fn>
 		{
 			static void call( WrenVM* vm )

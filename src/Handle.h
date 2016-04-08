@@ -4,7 +4,7 @@
 // A handle for an entry in a container. 
 // Uses the [] operator to access it each time. 
 //
-template<typename TValue, typename TKey, typename TContainer>
+template <typename TValue, typename TKey, typename TContainer>
 class Handle
 {
 private:

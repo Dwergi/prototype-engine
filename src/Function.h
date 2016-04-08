@@ -42,7 +42,7 @@ namespace dd
 	}
 
 	// General case of 1-N arguments.
-	template < typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args >
+	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename First, typename... Args>
 	void Call( Variable* ret, void* context, Variable* args )
 	{
 		constexpr const std::size_t ArgCount = sizeof...(Args) + 1; // +1 because of First
@@ -187,7 +187,7 @@ namespace dd
 		void AssertType() const;
 
 		template <typename... Args, std::size_t... Index>
-		void CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence< Index... > ) const;
+		void CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const;
 	};
 
 	// Static functions with return value

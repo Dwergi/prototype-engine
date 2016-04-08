@@ -9,6 +9,7 @@
 #include "Component.h"
 #include "DenseMapPool.h"
 #include "Vector4.h"
+#include "AABBOctree.h"
 
 namespace dd
 {
@@ -20,14 +21,16 @@ namespace dd
 
 		unsigned int ID;
 		Vector4 Velocity;
+		OctreeEntry OctreeHandle;
 
 		SwarmAgentComponent();
 		virtual ~SwarmAgentComponent();
 
-		BEGIN_TYPE( SwarmAgentComponent )
+		BEGIN_SCRIPT_OBJECT( SwarmAgentComponent )
 			PARENT( Component );
 			MEMBER( SwarmAgentComponent, ID );
 			MEMBER( SwarmAgentComponent, Velocity );
+			MEMBER( SwarmAgentComponent, OctreeHandle );
 		END_TYPE
 	};
 }

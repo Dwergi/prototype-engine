@@ -15,7 +15,7 @@
 //
 namespace dd
 {
-	template<typename TIter, typename TValue>
+	template <typename TIter, typename TValue>
 	class SortedVectorIterator
 		: public std::iterator<std::forward_iterator_tag, TValue*>
 	{
@@ -33,7 +33,7 @@ namespace dd
 		ThisType& operator++();
 	};
 
-	template<typename T>
+	template <typename T>
 	class SortedVectorPool
 		: public ComponentPool<T>
 	{

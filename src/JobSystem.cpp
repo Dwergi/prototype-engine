@@ -71,7 +71,7 @@ namespace dd
 	JobSystem::~JobSystem()
 	{
 		{
-			std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+			std::lock_guard<std::mutex> lock( m_jobsMutex );
 			m_jobs.Clear();
 		}
 
@@ -108,21 +108,21 @@ namespace dd
 		DD_ASSERT( fn.Signature()->ArgCount() == 0 );
 		DD_ASSERT( !fn.IsMethod() || fn.Context().IsValid() ); // must be free or already be bound
 
-		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		m_jobs.Add( Job( [fn]() { fn(); }, category, m_jobID++ ) );
 	}
 
 	void JobSystem::Schedule( const std::function<void ()>& fn, const char* category )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		m_jobs.Add( Job( fn, category, m_jobID++ ) );
 	}
 
 	bool JobSystem::HasPendingJobs( const char* category )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		for( Job& job : m_jobs )
 		{
@@ -135,7 +135,7 @@ namespace dd
 
 	void JobSystem::UpdateJobs()
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		// clear finished jobs
 		for( int i = 0; i < (int) m_jobs.Size(); ++i )
@@ -148,6 +148,7 @@ namespace dd
 		}
 
 		DenseMap<String128, int> categories;
+		categories.Reserve( m_jobs.Size() );
 
 		// hash all the categories and keep track of them
 		for( Job& job : m_jobs )
@@ -195,7 +196,7 @@ namespace dd
 	{
 		DD_ASSERT( m_system != nullptr, "Invalid handle used!" );
 
-		std::lock_guard<std::recursive_mutex> lock( m_system->m_jobsMutex );
+		std::lock_guard<std::mutex> lock( m_system->m_jobsMutex );
 
 		for( JobSystem::Job& job : m_system->m_jobs )
 		{
@@ -208,12 +209,12 @@ namespace dd
 
 	bool JobSystem::GetPendingJob( JobHandle& out_handle )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_jobsMutex );
+		UpdateJobs();
+
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
 		
 		if( m_jobs.Size() == 0 )
-			return false;
-
-		UpdateJobs();
+			return false;	
 
 		for( Job& job : m_jobs )
 		{

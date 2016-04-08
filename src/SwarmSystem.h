@@ -9,6 +9,7 @@
 #include "SwarmAgentComponent.h"
 #include "DoubleBuffer.h"
 #include "ISystem.h"
+#include "AABBOctree.h"
 
 namespace dd
 {
@@ -24,6 +25,6 @@ namespace dd
 
 	private:
 
-		
+		DoubleBuffer<AABBOctree> m_agentsTree;
 	};
 }

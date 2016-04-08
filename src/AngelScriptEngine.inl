@@ -16,19 +16,19 @@ namespace dd
 			return ptr;
 		}
 
-		template<typename T>
+		template <typename T>
 		void Construct( T* memory )
 		{
 			new (memory) T();
 		}
 
-		template<typename T>
+		template <typename T>
 		void CopyConstruct( const T& other, T* self )
 		{
 			new (self) T( other );
 		}
 
-		template<typename T>
+		template <typename T>
 		void Destruct( T* memory )
 		{
 			memory->~T();

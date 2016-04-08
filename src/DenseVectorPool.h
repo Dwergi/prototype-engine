@@ -14,7 +14,7 @@ namespace dd
 	// A dense component pool is one for which the component is assumed to exist for all entities (eg. transform).
 	// Uses much more space than a sparse component pool for large numbers of entities.
 	//
-	template<typename T>
+	template <typename T>
 	class DenseVectorPool 
 		: public ComponentPool<T>
 	{

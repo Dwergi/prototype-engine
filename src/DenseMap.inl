@@ -9,7 +9,7 @@ namespace dd
 	//
 	// Iterator
 	//
-	template< typename TKey, typename TValue >
+	template <typename TKey, typename TValue>
 	class DenseMapIterator
 	{
 	private:
@@ -48,14 +48,14 @@ namespace dd
 		}
 	};
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::DenseMap()
 		: m_hash( &Hash )
 	{
 		Resize( DefaultSize );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::DenseMap( DenseMap&& other )
 		: m_data( std::move( other.m_data ) ),
 		m_hash( std::move( other.m_hash ) )
@@ -63,7 +63,7 @@ namespace dd
 
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::DenseMap( const DenseMap& other )
 		: m_hash( other.m_hash )
 	{
@@ -71,7 +71,7 @@ namespace dd
 		Rehash( other.m_data );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::~DenseMap()
 	{
 		Clear();
@@ -79,7 +79,7 @@ namespace dd
 		delete[] (byte*) m_data.Release();
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>& DenseMap<TKey, TValue>::operator=( DenseMap<TKey, TValue>&& other )
 	{
 		m_hash = other.m_hash;
@@ -89,7 +89,7 @@ namespace dd
 		return *this;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>& DenseMap<TKey, TValue>::operator=( const DenseMap<TKey, TValue>& other )
 	{
 		Clear();
@@ -101,13 +101,13 @@ namespace dd
 		return *this;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::SetHashFunction( void( *hash )(const TKey&) )
 	{
 		m_hash = hash;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Add( const TKey& key, const TValue& value )
 	{
 		DD_ASSERT( m_data.Size() > 0 );
@@ -120,7 +120,7 @@ namespace dd
 		Insert( key, value );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Remove( const TKey& key )
 	{
 		DD_ASSERT( m_entries > 0 );
@@ -134,7 +134,7 @@ namespace dd
 		--m_entries;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear()
 	{
 		for( uint i = 0; i < m_data.Size(); ++i )
@@ -148,13 +148,13 @@ namespace dd
 		m_entries = 0;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	bool DenseMap<TKey, TValue>::Contains( const TKey& key ) const
 	{
 		return Find( key ) != nullptr;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	TValue* DenseMap<TKey, TValue>::Find( const TKey& key ) const
 	{
 		Entry* entry = FindEntry( key );
@@ -166,7 +166,7 @@ namespace dd
 		return &entry->Value;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
 	{
 		uint index = 0;
@@ -198,19 +198,25 @@ namespace dd
 		return nullptr;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	TValue& DenseMap<TKey, TValue>::operator[]( const TKey& key ) const
 	{
 		return *Find( key );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Grow()
 	{
 		Resize( m_data.Size() * 2 );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
+	void DenseMap<TKey, TValue>::Reserve( uint size )
+	{
+		Resize( size );
+	}
+
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
 	{
 		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
@@ -236,13 +242,13 @@ namespace dd
 		}
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	bool DenseMap<TKey, TValue>::IsMatch( const typename DenseMap<TKey, TValue>::Entry& entry, const TKey& key ) const
 	{
 		return !IsEmpty( entry ) && entry.Key == key;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	bool DenseMap<TKey, TValue>::IsEmpty( const typename DenseMap<TKey, TValue>::Entry& entry ) const
 	{
 		const byte* bytes = reinterpret_cast<const byte*>(&entry.Key);
@@ -258,7 +264,7 @@ namespace dd
 		return true;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Rehash( const Buffer<typename DenseMap<TKey, TValue>::Entry>& from )
 	{
 		m_entries = 0; // clear this here, because we're going to be re-inserting everything
@@ -272,7 +278,7 @@ namespace dd
 		}
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear( typename DenseMap<TKey, TValue>::Entry& entry ) const
 	{
 		entry.~Entry();
@@ -280,7 +286,7 @@ namespace dd
 		memset( &entry, 0xFF, sizeof( Entry ) );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Insert( const TKey& key, const TValue& value )
 	{
 		uint index;
@@ -315,7 +321,7 @@ namespace dd
 		Insert( key, value );
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::CreateEntry( Entry* ptr, const TKey& key, const TValue& value )
 	{
 		new (&ptr->Key) TKey( key );
@@ -324,7 +330,7 @@ namespace dd
 		++m_entries;
 	}
 
-	template<typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	typename DenseMap<TKey, TValue>::Entry& DenseMap<TKey, TValue>::GetEntry( const TKey& key, uint* pIndex ) const
 	{
 		uint64 hash = m_hash( key );

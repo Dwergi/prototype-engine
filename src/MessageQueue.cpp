@@ -26,7 +26,7 @@ namespace dd
 
 	MessageSubscription MessageQueue::Subscribe( uint message_type, Function handler )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+		std::lock_guard<std::mutex> lock( m_mutex );
 
 		const FunctionSignature* sig = handler.Signature();
 		const TypeInfo* arg = sig->GetArg( 0 );
@@ -54,7 +54,7 @@ namespace dd
 
 	void MessageQueue::Unsubscribe( MessageSubscription token )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+		std::lock_guard<std::mutex> lock( m_mutex );
 
 		m_handlers.Remove( token.Handler );
 
@@ -75,7 +75,7 @@ namespace dd
 
 	void MessageQueue::Send( Message* message )
 	{
-		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+		std::lock_guard<std::mutex> lock( m_mutex );
 
 		m_pendingMessages.GetWrite().Add( message );
 	}
@@ -100,7 +100,7 @@ namespace dd
 	void MessageQueue::Update( float dt )
 	{
 		{
-			std::lock_guard<std::recursive_mutex> lock( m_mutex );
+			std::lock_guard<std::mutex> lock( m_mutex );
 
 			m_pendingMessages.Swap();
 		}

@@ -24,81 +24,81 @@ namespace dd
 		void SerializeString( Mode mode, WriteStream& dst, Variable src );
 		void DeserializeString( Mode mode, ReadStream& src, Variable dst );
 
-		template<typename T>
+		template <typename T>
 		void CopyPOD( T value, Stream& out )
 		{
 			memcpy( out, &value, sizeof( T ) );
 		}
 
-		template<typename T>
+		template <typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, const T& src )
 		{
 			SerializePOD<RemoveQualifiers<T>::type>( mode, dst, Variable( src ) );
 		}
 
-		template<typename T>
+		template <typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, Variable src )
 		{
 			DD_ASSERT( "Should never hit this!");
 		}
 
-		template<>
+		template <>
 		void SerializePOD<int>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<char>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<int16>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<int64>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<uint>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<byte>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<uint16>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<uint64>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<float>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<double>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<char*>( Mode mode, WriteStream& dst, Variable src );
-		template<>
+		template <>
 		void SerializePOD<bool>( Mode mode, WriteStream& dst, Variable src );
 
-		template<typename T>
+		template <typename T>
 		void DeserializePOD( Mode mode, ReadStream& src, Variable dst )
 		{
 			DD_ASSERT( "Should never hit this!");
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<int>( Mode mode, ReadStream& dst, Variable src );
-		template<>
+		template <>
 		void DeserializePOD<char>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<int16>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<int64>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<uint>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<byte>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<uint16>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<uint64>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<float>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst );
-		template<>
+		template <>
 		void DeserializePOD<bool>( Mode mode, ReadStream& src, Variable dst );
 
-		template<typename T>
+		template <typename T>
 		void SerializeContainer( Mode mode, WriteStream& dst, Variable src )
 		{
 			T& container = src.GetValue<T>();
@@ -124,7 +124,7 @@ namespace dd
 			}
 		}
 
-		template<typename T>
+		template <typename T>
 		void DeserializeContainer( Mode mode, ReadStream& src, Variable dst )
 		{
 

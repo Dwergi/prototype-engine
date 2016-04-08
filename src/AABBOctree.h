@@ -22,6 +22,11 @@ namespace dd
 		~AABBOctree();
 
 		//
+		// Reset the tree to its initial state.
+		//
+		void Clear();
+
+		//
 		// Add a point to the tree.
 		//
 		OctreeEntry Add( const glm::vec3& pt );

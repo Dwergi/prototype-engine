@@ -18,28 +18,28 @@ namespace dd
 
 		static void Initialize();
 
-		template<typename T>
+		template <typename T>
 		static void Register( T& service );
 
-		template<typename T>
+		template <typename T>
 		static bool Exists();
 
-		template<typename T>
+		template <typename T>
 		static T* GetPtr();
 
-		template<typename T>
+		template <typename T>
 		static T& Get();
 
-		template<typename T>
+		template <typename T>
 		static void RegisterComponent();
 
-		template<typename T>
+		template <typename T>
 		static typename T::Pool& GetWritePool();
 
-		template<typename T>
+		template <typename T>
 		static const typename T::Pool& GetReadPool();
 
-		template<typename T>
+		template <typename T>
 		static DoubleBuffer<typename T::Pool>& GetDoubleBuffer();
 
 	private:
@@ -50,7 +50,7 @@ namespace dd
 
 		Services();
 
-		template<typename T>
+		template <typename T>
 		static const char* GetKey();
 	};
 }

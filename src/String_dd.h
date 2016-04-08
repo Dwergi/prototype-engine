@@ -82,7 +82,7 @@ namespace dd
 	//
 	// An in-place implementation of string which always allocates a fixed size buffer. 
 	//
-	template< int Size = 32 >
+	template <int Size = 32>
 	class InplaceString
 		: public String
 	{
@@ -168,7 +168,7 @@ namespace dd
 	typedef InplaceString<128> String128;
 	typedef InplaceString<256> String256;
 
-	template<int Size>
+	template <int Size>
 	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count )
 	{
 		DD_ASSERT( start <= m_length );

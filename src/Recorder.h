@@ -15,7 +15,7 @@ namespace dd
 	};
 	//---------------------------------------------------------------------------
 
-	template< typename T >
+	template <typename T>
 	class Recorder
 		: public RecorderBase
 	{
@@ -47,7 +47,7 @@ namespace dd
 	};
 	//---------------------------------------------------------------------------
 
-	template< typename T >
+	template <typename T>
 	class FullRecorder
 		: public Recorder<T> 
 	{

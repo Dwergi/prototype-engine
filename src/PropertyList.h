@@ -15,7 +15,7 @@ namespace dd
 	class PropertyList
 	{
 	public: 
-		template<typename T>
+		template <typename T>
 		explicit PropertyList( T& host )
 			: m_base( &host )
 		{

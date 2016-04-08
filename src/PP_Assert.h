@@ -235,7 +235,7 @@ namespace implementation {
   {
   }; // StaticAssertion<true>
 
-  template<int i>
+  template <int i>
   struct StaticAssertionTest
   {
   }; // StaticAssertionTest<int>
@@ -351,7 +351,7 @@ namespace implementation {
 
 #if !defined(PPK_ASSERT_DISABLE_EXCEPTIONS)
 
-  template<typename E>
+  template <typename E>
   inline void throwException(const E& e)
   {
     throw e;
@@ -422,7 +422,7 @@ namespace implementation {
 
 #if defined(PPK_ASSERT_CXX11)
 
-  template<int level, typename T>
+  template <int level, typename T>
   class AssertUsedWrapper
   {
     public:
@@ -439,19 +439,19 @@ namespace implementation {
 
   }; // AssertUsedWrapper<int, T>
 
-  template<int level, typename T>
+  template <int level, typename T>
   inline AssertUsedWrapper<level, T>::AssertUsedWrapper(T&& t)
     : t(std::forward<T>(t)), used(false)
   {}
 
-  template<int level, typename T>
+  template <int level, typename T>
   inline AssertUsedWrapper<level, T>::operator T()
   {
     used = true;
     return std::move(t);
   }
 
-  template<int level, typename T>
+  template <int level, typename T>
   inline AssertUsedWrapper<level, T>::~AssertUsedWrapper() PPK_ASSERT_EXCEPTION_NO_THROW
   {
     PPK_ASSERT_3(level, used, "unused value");
@@ -459,7 +459,7 @@ namespace implementation {
 
 #else
 
-  template<int level, typename T>
+  template <int level, typename T>
   class AssertUsedWrapper
   {
     public:
@@ -477,24 +477,24 @@ namespace implementation {
 
   }; // AssertUsedWrapper<int, T>
 
-  template<int level, typename T>
+  template <int level, typename T>
   PPK_ASSERT_ALWAYS_INLINE explicit AssertUsedWrapper<level, T>::AssertUsedWrapper(const T& _t)
     : t(_t), used(false)
   {}
 
-  template<int level, typename T>
+  template <int level, typename T>
   PPK_ASSERT_ALWAYS_INLINE AssertUsedWrapper<level, T>::AssertUsedWrapper(const AssertUsedWrapper& rhs)
     : t(rhs.t), used(rhs.used)
   {}
 
   // /!\ GCC is not so happy if we inline that destructor
-  template<int level, typename T>
+  template <int level, typename T>
   AssertUsedWrapper<level, T>::~AssertUsedWrapper() PPK_ASSERT_EXCEPTION_NO_THROW
   {
     PPK_ASSERT_3(level, used, "unused value");
   }
 
-  template<int level, typename T>
+  template <int level, typename T>
   PPK_ASSERT_ALWAYS_INLINE AssertUsedWrapper<level, T>::operator T() const
   {
     used = true;

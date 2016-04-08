@@ -6,7 +6,7 @@
 
 #pragma once
 
-template<typename TIter, typename TKey, typename TValue>
+template <typename TIter, typename TKey, typename TValue>
 class ComponentPairIterator
 	: public std::iterator<std::forward_iterator_tag, TValue*>
 {
@@ -51,7 +51,7 @@ public:
 	}
 };
 
-template<typename TIter, typename TKey, typename TValue>
+template <typename TIter, typename TKey, typename TValue>
 class ComponentPairConstIterator
 	: public std::iterator<std::forward_iterator_tag, TValue*>
 {

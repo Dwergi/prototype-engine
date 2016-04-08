@@ -86,7 +86,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<int>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -99,7 +99,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<char>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -112,7 +112,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<int16>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -125,7 +125,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<int64>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -138,7 +138,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<uint>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -151,7 +151,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<byte>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -164,7 +164,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<uint16>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -177,7 +177,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<uint64>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -190,7 +190,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<float>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -203,7 +203,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<double>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -216,7 +216,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<bool>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -230,7 +230,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void SerializePOD<char*>( Mode mode, WriteStream& dst, Variable src )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -256,67 +256,67 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<int>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<int>( mode, src, dst, "%d" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<char>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<char>( mode, src, dst, "%c" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<int16>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<int16>( mode, src, dst, "%hd" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<int64>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<int64>( mode, src, dst, "%lld" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<uint>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<uint>( mode, src, dst, "%u" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<byte>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<byte>( mode, src, dst, "%hhu" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<uint16>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<uint16>( mode, src, dst, "%hu" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<uint64>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<uint64>( mode, src, dst, "%llu" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<float>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<float>( mode, src, dst, "%f" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<double>( Mode mode, ReadStream& src, Variable dst )
 		{
 			DeserializePODInternal<double>( mode, src, dst, "%lf" );
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<bool>( Mode mode, ReadStream& src, Variable dst )
 		{
 			if( mode == Serialize::Mode::BINARY )
@@ -344,7 +344,7 @@ namespace dd
 			}
 		}
 
-		template<>
+		template <>
 		void DeserializePOD<char*>( Mode mode, ReadStream& src, Variable dst )
 		{
 			String64 out;

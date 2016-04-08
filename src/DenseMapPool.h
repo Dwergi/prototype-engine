@@ -16,10 +16,10 @@
 //
 namespace dd
 {
-	template<typename T>
+	template <typename T>
 	class DenseMapPoolIterator;
 
-	template<typename T>
+	template <typename T>
 	class DenseMapPool
 		: public ComponentPool<T>
 	{

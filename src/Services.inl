@@ -62,26 +62,26 @@ namespace dd
 		return GetPtr<T>() != nullptr;
 	}
 
-	template<typename T>
+	template <typename T>
 	void Services::RegisterComponent()
 	{
 		DoubleBuffer<typename T::Pool>* double_buffer = new DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
 		Services::Register( *double_buffer );
 	}
 
-	template<typename T>
+	template <typename T>
 	typename T::Pool& Services::GetWritePool()
 	{
 		return Services::Get<DoubleBuffer<typename T::Pool>>().GetWrite();
 	}
 
-	template<typename T>
+	template <typename T>
 	typename const T::Pool& Services::GetReadPool()
 	{
 		return Services::Get<DoubleBuffer<typename T::Pool>>().GetRead();
 	}
 
-	template<typename T>
+	template <typename T>
 	DoubleBuffer<typename T::Pool>& Services::GetDoubleBuffer()
 	{
 		DoubleBuffer<typename T::Pool>& buffer = Services::Get<DoubleBuffer<typename T::Pool>>();

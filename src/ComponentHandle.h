@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	template<typename T>
+	template <typename T>
 	class ComponentPool;
 
 	//
@@ -18,7 +18,7 @@ namespace dd
 	// It's not the most efficient way to access a component repeatedly in a short span,
 	// but it is more tolerant to components ceasing to exist.
 	//
-	template< typename ComponentType >
+	template <typename ComponentType>
 	class ComponentHandle
 	{
 	public:

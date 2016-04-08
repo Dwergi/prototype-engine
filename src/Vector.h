@@ -8,7 +8,7 @@
 
 namespace dd
 {
-	template< typename T >
+	template <typename T>
 	class Vector
 	{
 	public:

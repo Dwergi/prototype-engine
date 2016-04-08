@@ -11,10 +11,10 @@
 
 namespace dd
 {
-	template<typename T>
+	template <typename T>
 	class Recorder;
 
-	template<typename T>
+	template <typename T>
 	class FullRecorder;
 
 	class Property
@@ -28,9 +28,9 @@ namespace dd
 		~Property();
 
 		// Get or set the member this property wraps
-		template<typename T>
+		template <typename T>
 		void Get( T& ret );
-		template<typename T>
+		template <typename T>
 		void Set( const T& val );
 
 		const String& Name() { return m_member->Name(); }
@@ -42,14 +42,14 @@ namespace dd
 
 		void* GetPtr() const { return m_ptr; }
 
-		template<typename T>
+		template <typename T>
 		friend class Recorder;
 
-		template<typename T>
+		template <typename T>
 		friend class FullRecorder;
 	};
 
-	template<typename T>
+	template <typename T>
 	void Property::Get( T& out )
 	{
 		DD_ASSERT( m_ptr != nullptr );
@@ -57,7 +57,7 @@ namespace dd
 		out = *reinterpret_cast<const T*>( m_ptr );
 	}
 
-	template<typename T>
+	template <typename T>
 	void Property::Set( const T& val )
 	{
 		DD_ASSERT( m_ptr != nullptr );

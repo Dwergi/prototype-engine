@@ -80,7 +80,7 @@ namespace dd
 		// Register a POD type - these are the basic types like ints, floats and char*.
 		// If it can be printed with a printf format string, it's POD.
 		//
-		template<typename T>
+		template <typename T>
 		static const TypeInfo* RegisterPOD( const char* name );
 
 		template <typename T>

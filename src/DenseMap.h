@@ -11,10 +11,10 @@
 
 namespace dd
 {
-	template< typename TKey, typename TValue>
+	template <typename TKey, typename TValue>
 	class DenseMapIterator;
 
-	template< typename TKey, typename TValue >
+	template <typename TKey, typename TValue>
 	class DenseMap
 	{
 		static const uint DefaultSize = 16;
@@ -34,6 +34,8 @@ namespace dd
 
 		DenseMap<TKey, TValue>& operator=( DenseMap<TKey, TValue>&& other );
 		DenseMap<TKey, TValue>& operator=( const DenseMap<TKey, TValue>& other );
+
+		void Reserve( uint size );
 
 		void SetHashFunction( void (*hash)( const TKey& ) );
 

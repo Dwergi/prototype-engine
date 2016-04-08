@@ -31,6 +31,17 @@ namespace dd
 	}
 
 	//
+	// Reset the tree to its initial state.
+	//
+	void AABBOctree::Clear()
+	{
+		m_nodes.Clear();
+		m_entries.Clear();
+		m_free.Clear();
+		m_treeBounds = AABB {};
+	}
+
+	//
 	// Add a point to the tree.
 	//
 	OctreeEntry AABBOctree::Add( const glm::vec3& pt )

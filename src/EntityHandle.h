@@ -56,7 +56,7 @@ namespace dd
 // hash for STL containers
 namespace std
 {
-	template<>
+	template <>
 	struct hash<dd::EntityHandle>
 	{
 		std::size_t operator()( const dd::EntityHandle& entity ) const

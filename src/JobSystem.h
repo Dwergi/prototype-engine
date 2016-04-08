@@ -77,7 +77,7 @@ namespace dd
 		Vector<Job> m_jobs;
 		uint m_jobID;
 
-		std::recursive_mutex m_jobsMutex;
+		std::mutex m_jobsMutex;
 
 		void CreateWorkers( uint thread_count );
 

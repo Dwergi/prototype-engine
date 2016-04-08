@@ -6,13 +6,13 @@
 
 namespace dd
 {
-	template<typename T, uint MaxCapacity>
+	template <typename T, uint MaxCapacity>
 	Array<T, MaxCapacity>::Array()
 		: ArrayBase( m_buffer, MaxCapacity )
 	{
 	}
 
-	template<typename T, uint MaxCapacity>
+	template <typename T, uint MaxCapacity>
 	Array<T, MaxCapacity>::Array( const Array<T, MaxCapacity>& other )
 		: ArrayBase( m_buffer, MaxCapacity )
 	{
@@ -21,7 +21,7 @@ namespace dd
 		m_size = other.m_size;
 	}
 
-	template<typename T, uint MaxCapacity>
+	template <typename T, uint MaxCapacity>
 	Array<T, MaxCapacity>::~Array()
 	{
 
@@ -35,7 +35,7 @@ namespace dd
 		m_size = 0;
 	}
 
-	template<typename T>
+	template <typename T>
 	ArrayBase<T>::ArrayBase( T* buffer, uint capacity )
 		: m_data( buffer ),
 		m_capacity( capacity ),
@@ -43,7 +43,7 @@ namespace dd
 	{
 	}
 
-	template<typename T>
+	template <typename T>
 	ArrayBase<T>& ArrayBase<T>::operator=( const ArrayBase<T>& other )
 	{
 		DD_ASSERT( other.Size() <= m_capacity );
@@ -55,7 +55,7 @@ namespace dd
 		return *this;
 	}
 
-	template<typename T>
+	template <typename T>
 	const T& ArrayBase<T>::operator[]( uint index ) const
 	{
 		DD_ASSERT( index < m_size, "Indexing unallocated memory!" );
@@ -63,7 +63,7 @@ namespace dd
 		return m_data[index];
 	}
 
-	template<typename T>
+	template <typename T>
 	void ArrayBase<T>::Push( const T& value )
 	{
 		DD_ASSERT( m_size < m_capacity );
@@ -72,7 +72,7 @@ namespace dd
 		++m_size;
 	}
 
-	template<typename T>
+	template <typename T>
 	void ArrayBase<T>::PushAll( const ArrayBase<T>& other )
 	{
 		DD_ASSERT( m_capacity - m_size >= other.Size() );
@@ -83,7 +83,7 @@ namespace dd
 		}
 	}
 
-	template<typename T>
+	template <typename T>
 	T ArrayBase<T>::Pop()
 	{
 		DD_ASSERT( m_size > 0 );
@@ -93,7 +93,7 @@ namespace dd
 		return m_data[m_size];
 	}
 
-	template<typename T>
+	template <typename T>
 	void ArrayBase<T>::RemoveAt( uint index )
 	{
 		DD_ASSERT( index < m_size );
@@ -103,7 +103,7 @@ namespace dd
 		MoveRange( &m_data[index] + 1, m_data[index], (m_size - index) - 1 );
 	}
 
-	template<typename T>
+	template <typename T>
 	void ArrayBase<T>::Remove( const T& value )
 	{
 		int index = IndexOf( value );
@@ -113,7 +113,7 @@ namespace dd
 		Remove( (uint) index );
 	}
 
-	template<typename T>
+	template <typename T>
 	void ArrayBase<T>::Clear()
 	{
 		for( uint i = 0; i < m_size; ++i )
@@ -123,13 +123,13 @@ namespace dd
 		m_size = 0;
 	}
 
-	template<typename T>
+	template <typename T>
 	bool ArrayBase<T>::Contains( const T& val )
 	{
 		return IndexOf( val ) != -1;
 	}
 
-	template<typename T>
+	template <typename T>
 	int ArrayBase<T>::IndexOf( const T& val )
 	{
 		for( uint i = 0; i < m_size; ++i )

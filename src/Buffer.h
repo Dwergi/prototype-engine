@@ -9,7 +9,7 @@
 
 namespace dd
 {
-	template<typename T>
+	template <typename T>
 	class Buffer
 	{
 	public:

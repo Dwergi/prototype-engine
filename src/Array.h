@@ -8,7 +8,7 @@
 
 namespace dd
 {
-	template< typename T >
+	template <typename T>
 	class ArrayBase
 	{
 	public:
@@ -48,7 +48,7 @@ namespace dd
 	//
 	// Array is, as the name implies, a static array that is allocated on the stack. Useful for temporary passing around of values. 
 	//
-	template< typename T, uint MaxCapacity >
+	template <typename T, uint MaxCapacity>
 	class Array 
 		: public ArrayBase<T>
 	{

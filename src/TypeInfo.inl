@@ -7,7 +7,7 @@
 
 namespace dd
 {
-	template<typename T>
+	template <typename T>
 	const TypeInfo* TypeInfo::GetType()
 	{
 		static TypeInfo instance;
@@ -104,7 +104,7 @@ namespace dd
 		return typeInfo;
 	}
 
-	template<typename T>
+	template <typename T>
 	const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeInfo* containing )
 	{
 		DD_ASSERT( sm_defaultsRegistered );
