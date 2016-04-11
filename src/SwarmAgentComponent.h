@@ -19,18 +19,16 @@ namespace dd
 
 		typedef DenseMapPool<SwarmAgentComponent> Pool;
 
-		unsigned int ID;
-		Vector4 Velocity;
+		glm::vec3 Velocity;
 		OctreeEntry OctreeHandle;
 
 		SwarmAgentComponent();
 		virtual ~SwarmAgentComponent();
 
 		BEGIN_SCRIPT_OBJECT( SwarmAgentComponent )
-			PARENT( Component );
-			MEMBER( SwarmAgentComponent, ID );
-			MEMBER( SwarmAgentComponent, Velocity );
-			MEMBER( SwarmAgentComponent, OctreeHandle );
+			PARENT( Component )
+			MEMBER( SwarmAgentComponent, Velocity )
+			MEMBER( SwarmAgentComponent, OctreeHandle )
 		END_TYPE
 	};
 }

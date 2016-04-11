@@ -67,7 +67,7 @@ namespace dd
 		template <typename FnType, FnType Fn>
 		void RegisterMethod( const char* name );
 
-		template <typename TClass, typename TProp, TProp TClass::* Member>
+		template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
 		void RegisterMember( const char* name );
 
 		template <typename T>

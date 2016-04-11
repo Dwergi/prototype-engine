@@ -9,31 +9,17 @@ namespace dd
 	class TransformComponent : public Component
 	{
 	public:
-		Vector4 Position;
+		glm::vec3 Position;
 
 		typedef DenseVectorPool<TransformComponent> Pool;
 
 		TransformComponent()
-			: Position( 0, 0, 0, 0 )
 		{ 
 		}
-
-		void Update( int iMultiplier )
-		{
-			Position += 0.001f;
-			Position *= (float) iMultiplier;
-		}
-
-		void SetPosition( float x, float y )
-		{
-			Position.X = x;
-			Position.Y = y;
-		}
-
+		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
-			PARENT( Component );
-			MEMBER( TransformComponent, Position );
-			METHOD( TransformComponent, SetPosition );
+			PARENT( Component )
+			MEMBER( TransformComponent, Position )
 		END_TYPE
 	};
 }

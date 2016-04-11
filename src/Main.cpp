@@ -112,8 +112,14 @@ void RegisterGlobalScriptFunctions()
 
 void RegisterGameTypes()
 {
-	REGISTER_TYPE( Vector4 );
+	REGISTER_POD( glm::vec3 );
+	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
+	REGISTER_TYPE( EntityHandle );
+	REGISTER_TYPE( Component );
 	REGISTER_TYPE( TransformComponent );
 	REGISTER_TYPE( OctreeComponent );
 	REGISTER_TYPE( SwarmAgentComponent );
@@ -179,12 +185,11 @@ int GameMain()
 		TransformComponent* transform_cmp = transform_pool.Create( entity );
 		OctreeComponent* octree_cmp = octree_pool.Create( entity );
 
-		swarm_cmp->ID = i;
-		swarm_cmp->Velocity = Vector4( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
-		transform_cmp->Position = Vector4( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
+		swarm_cmp->Velocity = glm::vec3( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
+		transform_cmp->Position = glm::vec3( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
 
 		AABB aabb;
-		aabb.Expand( glm::vec3( transform_cmp->Position.X, transform_cmp->Position.Y, transform_cmp->Position.Z ) );
+		aabb.Expand( glm::vec3( transform_cmp->Position.x, transform_cmp->Position.y, transform_cmp->Position.z ) );
 		octree_cmp->Entry = octree.Add( aabb );
 	}
 
@@ -315,6 +320,8 @@ int main( int argc, char const* argv[] )
 
 	ScriptEngine scriptEngine;
 	Services::Register( scriptEngine );
+
+	RegisterGameTypes();
 
 #ifdef _TEST
 	return TestMain( argc, argv );

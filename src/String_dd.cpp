@@ -118,22 +118,6 @@ namespace dd
 		return *this;
 	}
 
-	String& String::Prepend( const String& other )
-	{
-		Resize( m_length + other.m_length );
-
-		// shift everything currently in the buffer over by the other's length
-		memcpy( m_buffer + other.m_length, m_buffer, m_length );
-		
-		// copy from other string into the start of the buffer
-		memcpy( m_buffer, other.m_buffer, other.m_length );
-
-		m_length += other.m_length;
-		NullTerminate();
-
-		return *this;
-	}
-
 	int String::Find( const char* other, uint offset ) const
 	{
 		DD_ASSERT( m_buffer != nullptr );

@@ -108,9 +108,8 @@ namespace dd
 	}
 
 	template <typename ObjType, typename PropType, PropType ObjType::* Member>
-	void WrenEngine::RegisterMember( const char* name )
+	void WrenEngine::RegisterMember( const char* name, const TypeInfo* typeInfo )
 	{
-		const TypeInfo* typeInfo = GET_TYPE( ObjType );
 		WrenClass* classReg = FindClass( typeInfo->Namespace().c_str(), typeInfo->Name().c_str() );
 
 		DD_ASSERT( classReg != nullptr, "Class has not been registered yet!" );

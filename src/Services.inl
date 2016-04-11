@@ -65,6 +65,9 @@ namespace dd
 	template <typename T>
 	void Services::RegisterComponent()
 	{
+		REGISTER_TYPE( T::Pool );
+		REGISTER_TYPE( DoubleBuffer<typename T::Pool> );
+
 		DoubleBuffer<typename T::Pool>* double_buffer = new DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
 		Services::Register( *double_buffer );
 	}

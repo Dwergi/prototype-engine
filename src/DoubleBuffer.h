@@ -48,6 +48,8 @@ namespace dd
 			return *m_write;
 		}
 
+		BASIC_TYPE( DoubleBuffer<T> )
+
 	private:
 
 		T* m_write;

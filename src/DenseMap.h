@@ -68,7 +68,7 @@ namespace dd
 		void Insert( const TKey& key, const TValue& value );
 
 		Entry* FindEntry( const TKey& key ) const;
-		Entry& GetEntry( const TKey& key, uint* pIndex = nullptr ) const;
+		Entry& GetEntry( const TKey& key ) const;
 		void CreateEntry( Entry* ptr, const TKey& key, const TValue& value );
 
 		bool IsMatch( const Entry& entry, const TKey& key ) const;

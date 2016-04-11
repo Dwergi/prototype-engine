@@ -68,6 +68,8 @@ namespace dd
 		DenseMapPoolIterator<T> begin() const;
 		DenseMapPoolIterator<T> end() const;
 
+		BASIC_TYPE( DenseMapPool<T> )
+
 	private:
 
 		DenseMap<int, T> m_components;

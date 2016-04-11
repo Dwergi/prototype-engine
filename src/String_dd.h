@@ -10,6 +10,8 @@
 
 namespace dd
 {
+	class TypeInfo;
+
 	class String
 	{
 	private:
@@ -31,8 +33,6 @@ namespace dd
 		String& operator+=( const String& other );
 		String& operator+=( const char* other );
 		String& operator+=( char other );
-
-		String& Prepend( const String& other );
 
 		bool operator==( const char* other ) const;
 		bool operator==( const String& other ) const;
@@ -59,9 +59,9 @@ namespace dd
 		bool StartsWith( const char* other ) const;
 		bool StartsWith( const String& other ) const;
 
-		static void RegisterMembers() { }
+		BASIC_TYPE( String )
 
-		DEFINE_ITERATORS( const char, m_buffer, m_length );
+		DEFINE_ITERATORS( const char, m_buffer, m_length )
 
 	protected:
 

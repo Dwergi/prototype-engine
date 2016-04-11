@@ -37,8 +37,7 @@
 	dd::TypeInfo::GetType( NameString )
 
 #define BEGIN_TYPE( TypeName ) \
-	static void RegisterMembers() { \
-	dd::TypeInfo* typeInfo = (dd::TypeInfo*) GET_TYPE( TypeName );
+	static void RegisterMembers( dd::TypeInfo* typeInfo ) { \
 
 #define BEGIN_SCRIPT_OBJECT( TypeName ) \
 	dd::RefCounter m_refCount; \
@@ -53,18 +52,18 @@
 	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
 
 #define PARENT( ParentType ) \
-	typeInfo->RegisterParentType<ParentType>()
+	typeInfo->RegisterParentType<ParentType>();
 
 #define MEMBER( TypeName, MemberName ) \
-	typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName )
+	typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName );
 
 #define METHOD( TypeName, MethodName ) \
-	typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
+	typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName );
 
 #define END_TYPE }
 
 #define BASIC_TYPE( TypeName ) \
-	static void RegisterMembers() {}
+	static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
 
 #define REGISTER_SERIALIZERS( TypeName, Serializer, Deserializer ) \
 	const_cast<dd::TypeInfo*>( GET_TYPE( TypeName ) )->SetCustomSerializers( Serializer, Deserializer )

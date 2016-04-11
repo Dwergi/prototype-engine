@@ -8,38 +8,39 @@
 #include "EntityHandle.h"
 
 #include "EntitySystem.h"
+#include "Services.h"
 
 namespace dd
 {
 	EntityHandle::EntityHandle() :
-		m_system( nullptr ),
-		Handle( EntityHandle::Invalid )
+		Handle( EntityHandle::Invalid ),
+		m_system( nullptr )
 	{
 
 	}
 
-	EntityHandle::EntityHandle( uint handle, EntitySystem* m_system ) :
-		m_system( m_system ),
-		Handle( handle )
+	EntityHandle::EntityHandle( uint handle, EntitySystem* system ) :
+		Handle( handle ),
+		m_system( system )
 	{
 
 	}
 
 	EntityHandle::EntityHandle( const EntityHandle& other ) :
-		m_system( other.m_system ),
-		Handle( other.Handle )
+		Handle( other.Handle ),
+		m_system( other.m_system )
 	{
 
 	}
 
 	bool EntityHandle::IsValid() const
 	{
-		return m_system->IsEntityValid( *this );
+		return m_system != nullptr && m_system->IsEntityValid( *this );
 	}
 
 	bool EntityHandle::operator==( const EntityHandle& other ) const
 	{
-		return Handle == other.Handle;
+		return m_system == other.m_system && Handle == other.Handle;
 	}
 
 	bool EntityHandle::operator!=( const EntityHandle& other ) const
@@ -49,8 +50,8 @@ namespace dd
 
 	EntityHandle& EntityHandle::operator=( const EntityHandle& other )
 	{
-		m_system = other.m_system;
 		Handle = other.Handle;
+		m_system = other.m_system;
 
 		return *this;
 	}

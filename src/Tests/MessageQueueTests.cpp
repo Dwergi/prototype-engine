@@ -20,7 +20,7 @@ struct TestMessage : public dd::Message
 	uint Payload;
 
 	BEGIN_TYPE( TestMessage )
-		PARENT( dd::Message );
+		PARENT( dd::Message )
 	END_TYPE
 };
 

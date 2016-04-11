@@ -9,6 +9,19 @@
 
 #include "TestTypes.h"
 
+namespace Test
+{
+	struct DerivedStruct : public SimpleStruct
+	{
+		uint DerivedThing;
+
+		BEGIN_TYPE( DerivedStruct )
+			PARENT( SimpleStruct )
+			MEMBER( DerivedStruct, DerivedThing )
+		END_TYPE
+	};
+}
+
 TEST_CASE( "[TypeInfo] Find" )
 {
 	REGISTER_TYPE( Test::SimpleStruct );
@@ -41,4 +54,20 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 	REQUIRE( typeAlias->Namespace() == "Test" );
 	REQUIRE( typeAlias->Name() == "SimpleStruct" );
+}
+
+TEST_CASE( "[TypeInfo] Derived" )
+{
+	REGISTER_TYPE( Test::SimpleStruct );
+	REGISTER_TYPE( Test::DerivedStruct );
+
+	const dd::TypeInfo* type = GET_TYPE( Test::DerivedStruct );
+	REQUIRE( type != nullptr );
+
+	REQUIRE( type->Namespace() == "Test" );
+	REQUIRE( type->Name() == "DerivedStruct" );
+
+	REQUIRE( type->GetMember( "Int" ) != nullptr );
+	REQUIRE( type->GetMethod( "Multiply" ) != nullptr );
+	REQUIRE( type->GetMember( "DerivedThing" ) != nullptr );
 }

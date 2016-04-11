@@ -34,7 +34,7 @@ namespace dd
 		T* Data() { return m_data; }
 		void SetSize( uint size ) { m_size = size; }
 
-		DEFINE_ITERATORS( T, m_data, m_size );
+		DEFINE_ITERATORS( T, m_data, m_size )
 
 	protected:
 

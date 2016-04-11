@@ -62,6 +62,8 @@ namespace dd
 		Iterator<T> begin() const;
 		Iterator<T> end() const;
 
+		BASIC_TYPE( DenseVectorPool<T> )
+
 	private:
 
 		Vector<T> m_components;

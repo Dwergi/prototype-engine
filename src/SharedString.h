@@ -44,9 +44,9 @@ namespace dd
 
 		void Clear();
 
-		static void RegisterMembers() { }
+		BASIC_TYPE( SharedString )
 		
-		DEFINE_ITERATORS( const char, *m_ptr, m_length );
+		DEFINE_ITERATORS( const char, *m_ptr, m_length )
 
 	private:
 

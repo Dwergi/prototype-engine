@@ -21,7 +21,7 @@ namespace dd
 		virtual ~PlayerComponent() {}
 
 		BEGIN_TYPE( PlayerComponent )
-			PARENT( Component );
+			PARENT( Component )
 		END_TYPE
 	};
 }

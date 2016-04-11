@@ -66,7 +66,7 @@ namespace dd
 		// Register a script-accessible member for an object.
 		//
 		template <typename ObjType, typename PropType, typename PropType ObjType::* Member>
-		void RegisterMember( const char* name );
+		void RegisterMember( const char* name, const TypeInfo* typeInfo );
 
 		//
 		// Register a function to be callable from script.

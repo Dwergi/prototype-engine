@@ -82,6 +82,8 @@ namespace dd
 		iterator begin() const;
 		iterator end() const;
 
+		BASIC_TYPE( SortedVectorPool<T> )
+
 	private:
 
 		Vector<EntityEntry> m_components;

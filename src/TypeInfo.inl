@@ -59,18 +59,18 @@ namespace dd
 		{
 			String64 ptrName( name );
 			ptrName += "*";
-			TypeInfo* ptrInfo = const_cast<TypeInfo*>(GetType<T*>());
+			TypeInfo* ptrInfo = AccessType<T*>();
 			ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
 			sm_typeMap.Add( SharedString( ptrName ), ptrInfo );
 
 			String64 refName( name );
 			refName += "&";
-			TypeInfo* refInfo = const_cast<TypeInfo*>(GetType<T&>());
+			TypeInfo* refInfo = AccessType<T&>();
 			refInfo->Init( refName.c_str(), sizeof( T& ) );
 			sm_typeMap.Add( SharedString( refName ), refInfo );
 		}
 
-		T::RegisterMembers();
+		T::RegisterMembers( typeInfo );
 
 		return typeInfo;
 	}
@@ -138,6 +138,8 @@ namespace dd
 		DD_ASSERT( parent->IsRegistered() );
 
 		m_parentType = parent;
+
+		T::RegisterMembers( this );
 	}
 
 	template <typename FnType, FnType Fn>
@@ -178,7 +180,7 @@ namespace dd
 
 		if( m_scriptObject && scriptEngine != nullptr )
 		{
-			scriptEngine->RegisterMember<TClass, TProp, MemberPtr>( name );
+			scriptEngine->RegisterMember<TClass, TProp, MemberPtr>( name, this );
 		}
 	}
 

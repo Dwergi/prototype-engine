@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "EntityHandle.h"
+
 namespace dd
 {
 	class Component
@@ -16,6 +18,10 @@ namespace dd
 	public:
 		virtual ~Component() {}
 
-		BASIC_TYPE( Component )
+		EntityHandle Entity;
+
+		BEGIN_TYPE( Component )
+			MEMBER( Component, Entity )
+		END_TYPE
 	};
 }

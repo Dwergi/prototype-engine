@@ -22,8 +22,8 @@ namespace dd
 		OctreeComponent() {}
 
 		BEGIN_TYPE( OctreeComponent )
-			PARENT( Component );
-			MEMBER( OctreeComponent, Entry );
+			PARENT( Component )
+			MEMBER( OctreeComponent, Entry )
 		END_TYPE
 	};
 }

@@ -38,8 +38,8 @@ namespace dd
 		bool operator!=( const EntityHandle& other ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
-			MEMBER( EntityHandle, Handle );
-			METHOD( EntityHandle, IsValid );
+			MEMBER( EntityHandle, Handle )
+			METHOD( EntityHandle, IsValid )
 		END_TYPE
 
 	private: 
@@ -47,9 +47,8 @@ namespace dd
 		friend class EntitySystem;
 		friend std::hash<EntityHandle>;
 
-		static const int Invalid = -1;
-
 		EntitySystem* m_system;
+		static const int Invalid = -1;
 	};
 }
 

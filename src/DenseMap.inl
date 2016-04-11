@@ -170,7 +170,7 @@ namespace dd
 	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
 	{
 		uint index = 0;
-		Entry& entry = GetEntry( key, &index );
+		Entry& entry = GetEntry( key );
 
 		if( IsMatch( entry, key ) )
 		{
@@ -289,8 +289,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Insert( const TKey& key, const TValue& value )
 	{
-		uint index;
-		Entry& entry = GetEntry( key, &index );
+		Entry& entry = GetEntry( key );
 
 		if( IsEmpty( entry ) )
 		{
@@ -331,17 +330,12 @@ namespace dd
 	}
 
 	template <typename TKey, typename TValue>
-	typename DenseMap<TKey, TValue>::Entry& DenseMap<TKey, TValue>::GetEntry( const TKey& key, uint* pIndex ) const
+	typename DenseMap<TKey, TValue>::Entry& DenseMap<TKey, TValue>::GetEntry( const TKey& key ) const
 	{
 		uint64 hash = m_hash( key );
 
 		uint index = hash % m_data.Size();
-
-		if( pIndex != nullptr )
-		{
-			*pIndex = index;
-		}
-
+		
 		return m_data[index];
 	}
 }

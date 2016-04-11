@@ -25,12 +25,6 @@ namespace dd
 		void DeserializeString( Mode mode, ReadStream& src, Variable dst );
 
 		template <typename T>
-		void CopyPOD( T value, Stream& out )
-		{
-			memcpy( out, &value, sizeof( T ) );
-		}
-
-		template <typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, const T& src )
 		{
 			SerializePOD<RemoveQualifiers<T>::type>( mode, dst, Variable( src ) );
@@ -39,7 +33,7 @@ namespace dd
 		template <typename T>
 		void SerializePOD( Mode mode, WriteStream& dst, Variable src )
 		{
-			DD_ASSERT( "Should never hit this!");
+			DD_ASSERT( "POD type serializers not registered!");
 		}
 
 		template <>
@@ -70,7 +64,7 @@ namespace dd
 		template <typename T>
 		void DeserializePOD( Mode mode, ReadStream& src, Variable dst )
 		{
-			DD_ASSERT( "Should never hit this!");
+			DD_ASSERT( "POD type serializers not registered!");
 		}
 
 		template <>
