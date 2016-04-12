@@ -15,14 +15,16 @@
 
 #endif
 
-#include "AABB.h"
+#include "Camera.h"
 #include "DebugUI.h"
 #include "DoubleBuffer.h"
 #include "EntitySystem.h"
+#include "FreeCameraController.h"
 #include "Input.h"
+#include "InputBindings.h"
 #include "JobSystem.h"
+#include "Message.h"
 #include "OctreeComponent.h"
-#include "PropertyList.h"
 #include "Random.h"
 #include "Recorder.h"
 #include "ScopedTimer.h"
@@ -45,17 +47,20 @@ extern bool s_drawFPS;
 bool s_drawFPS = true;
 
 extern float s_maxFPS;
-float s_maxFPS = 30.0f;
+float s_maxFPS = 60.0f;
 
 extern float s_rollingAverageFPS;
 float s_rollingAverageFPS = s_maxFPS;
 
 extern float s_rollingAverageMultiplier;
-float s_rollingAverageMultiplier = 0.8f;
+float s_rollingAverageMultiplier = 0.9f;
+
+bool s_drawConsole = true;
+
+Window* s_window = nullptr;
+Input* s_input = nullptr;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
-
-Vector<EntityHandle> s_entitites;
 
 void DrawFPS( float delta_t )
 {
@@ -76,8 +81,6 @@ void DrawFPS( float delta_t )
 	ImGui::End();
 }
 
-bool s_drawConsole = true;
-
 TransformComponent* GetTransformComponent( EntityHandle entity )
 {
 	auto& transform_pool = Services::GetReadPool<TransformComponent>();
@@ -97,8 +100,6 @@ EntityHandle GetEntityHandle( uint id )
 
 void RegisterGlobalScriptFunctions()
 {
-	REGISTER_TYPE( EntityHandle );
-
 	ScriptEngine& engine = Services::Get<ScriptEngine>();
 
 	engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
@@ -120,6 +121,9 @@ void RegisterGameTypes()
 
 	REGISTER_TYPE( EntityHandle );
 	REGISTER_TYPE( Component );
+	REGISTER_TYPE( Message );
+	REGISTER_TYPE( JobSystem );
+
 	REGISTER_TYPE( TransformComponent );
 	REGISTER_TYPE( OctreeComponent );
 	REGISTER_TYPE( SwarmAgentComponent );
@@ -131,6 +135,28 @@ void RegisterGameTypes()
 	REGISTER_TYPE( SwarmSystem );
 
 	RegisterGlobalScriptFunctions();
+}
+
+void ToggleConsole( InputAction action, InputType type )
+{
+	if( action == InputAction::CONSOLE && type == InputType::RELEASED )
+	{
+		s_drawConsole = !s_drawConsole;
+
+		s_input->CaptureMouse( !s_drawConsole );
+	}
+}
+
+void BindKeys( Input& input )
+{
+	input.BindKey( '`', InputAction::CONSOLE );
+	input.BindKey( 'W', InputAction::FORWARD );
+	input.BindKey( 'S', InputAction::BACKWARD );
+	input.BindKey( 'A', InputAction::LEFT );
+	input.BindKey( 'D', InputAction::RIGHT );
+	input.BindKey( ' ', InputAction::UP );
+	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
+	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 }
 
 #ifdef _TEST
@@ -154,12 +180,11 @@ int GameMain()
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
-	::ShowWindow( GetConsoleWindow(), SW_HIDE );
+	//::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 	EntitySystem entitySystem;
+	REGISTER_TYPE( EntitySystem );
 	Services::Register( entitySystem );
-
-	RegisterGameTypes();
 
 	JobSystem jobsystem( 2u );
 
@@ -167,59 +192,17 @@ int GameMain()
 	auto& swarm_db = Services::GetDoubleBuffer<SwarmAgentComponent>();
 	auto& octree_db = Services::GetDoubleBuffer<OctreeComponent>();
 
-	auto& transform_pool = transform_db.GetWrite();
-	auto& swarm_pool = swarm_db.GetWrite();
-	auto& octree_pool = octree_db.GetWrite();
-
-	Random32 rngPos( 0, 100, 50 );
-	Random32 rngVelocity( 0, 100 );
-
-	AABBOctree octree;
-
-	// create a bunch of entities and components
-	for( int i = 0; i < 1000; ++i )
-	{
-		EntityHandle entity = entitySystem.Create();
-
-		SwarmAgentComponent* swarm_cmp = swarm_pool.Create( entity );
-		TransformComponent* transform_cmp = transform_pool.Create( entity );
-		OctreeComponent* octree_cmp = octree_pool.Create( entity );
-
-		swarm_cmp->Velocity = glm::vec3( rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100, rngVelocity.Next() / (float) 100 );
-		transform_cmp->Position = glm::vec3( (float) rngPos.Next(), (float) rngPos.Next(), (float) rngPos.Next() );
-
-		AABB aabb;
-		aabb.Expand( glm::vec3( transform_cmp->Position.x, transform_cmp->Position.y, transform_cmp->Position.z ) );
-		octree_cmp->Entry = octree.Add( aabb );
-	}
-
-	// copy them over
-	transform_db.Swap();
-	swarm_db.Swap();
-	octree_db.Swap();
-
-	transform_db.Duplicate();
-	swarm_db.Duplicate();
-	octree_db.Duplicate();
-
 	SwarmSystem swarm_system;
 	Services::Register( swarm_system );
 
 	{
-		Window window( 1280, 960, "Neutrino" );
+		s_window = new Window( 1280, 960, "Neutrino" );
+		s_input = new Input( *s_window );
 
-		Input input( window );
-
-		bool opened;
-
-		DebugUI debugUI( window.GetInternalWindow() );
+		DebugUI debugUI( s_window->GetInternalWindow(), *s_input );
 
 		DebugConsole console;
-
-		input.AddKeyboardCallback( &DebugUI::KeyCallback );
-		input.AddScrollCallback( &DebugUI::ScrollCallback );
-		input.AddMouseCallback( &DebugUI::MouseButtonCallback );
-		input.AddCharCallback( &DebugUI::CharCallback );
+		bool opened;
 
 		Timer timer;
 		timer.Start();
@@ -229,9 +212,24 @@ int GameMain()
 		float current_frame = -target_delta;
 		float delta_t = target_delta;
 
-		input.BindKey( '`', InputAction::CONSOLE );
+		BindKeys( *s_input );
 
-		while( !window.ShouldClose() )
+		Camera camera;
+		FreeCameraController free_cam( camera );
+
+		InputBindings bindings;
+		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
+
+		auto handle_input = std::bind( &FreeCameraController::HandleInput, std::ref( free_cam ), std::placeholders::_1, std::placeholders::_2 );
+		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
+		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
+		bindings.RegisterHandler( InputAction::LEFT, handle_input );
+		bindings.RegisterHandler( InputAction::RIGHT, handle_input );
+		bindings.RegisterHandler( InputAction::UP, handle_input );
+		bindings.RegisterHandler( InputAction::DOWN, handle_input );
+		bindings.RegisterHandler( InputAction::BOOST, handle_input );
+
+		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_START( Frame );
 
@@ -240,22 +238,21 @@ int GameMain()
 			current_frame = timer.Time();
 			delta_t = current_frame - last_frame;
 
-			input.Update();
+			s_input->Update();
 
-			MousePosition mouse_pos = input.GetMousePosition();
-
+			// update input
 			Array<InputEvent, 64> events;
-			input.GetKeyEvents( events );
+			s_input->GetKeyEvents( events );
+			bindings.Dispatch( events );
 
-			for( uint i = 0; i < events.Size(); ++i )
-			{
-				if( events[i].Action == InputAction::CONSOLE && events[i].Type == InputType::RELEASED )
-					s_drawConsole = !s_drawConsole;
-			}
+			MousePosition mouse_pos = s_input->GetMousePosition();
 
-			debugUI.SetMousePosition( input.GetMousePosition().X, input.GetMousePosition().Y );
-			debugUI.SetFocused( window.IsFocused() );
-			debugUI.SetDisplaySize( window.GetWidth(), window.GetHeight() );
+			free_cam.UpdateMouse( mouse_pos );
+			free_cam.Update( delta_t );
+
+			debugUI.SetMousePosition( s_input->GetMousePosition().X, s_input->GetMousePosition().Y );
+			debugUI.SetFocused( s_window->IsFocused() );
+			debugUI.SetDisplaySize( s_window->GetWidth(), s_window->GetHeight() );
 
 			debugUI.Update( delta_t );
 
@@ -271,14 +268,14 @@ int GameMain()
 
 			ImGui::Render();
 
-			window.Swap();
+			s_window->Swap();
 
 			DD_PROFILE_START( Main_Sleep );
 
 			float now = timer.Time();
 			while( now - last_frame < target_delta )
 			{
-				::Sleep( 1 );
+				::Sleep( 0 );
 
 				now = timer.Time();
 			}
@@ -290,7 +287,7 @@ int GameMain()
 			DD_PROFILE_LOG( "End Frame" );
 		}
 
-		window.Close();
+		s_window->Close();
 	}
 
 	DD_PROFILE_DEINIT(); 

@@ -35,7 +35,7 @@ namespace dd
 
 		return clamped;
 	}
-
+	
 	Random32::Random32( uint min, uint max, uint seed )
 		: m_min( min ),
 		m_max( max ),
@@ -78,5 +78,27 @@ namespace dd
 		int clamped = m_min + out % (m_max - m_min);
 
 		return clamped;
+	}
+
+	RandomFloat::RandomFloat( float min, float max, uint seed ) :
+		m_min( min ),
+		m_max( max ),
+		m_rng( seed )
+	{
+		DD_ASSERT( min < max );
+		
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
+
+	float RandomFloat::Next()
+	{
+		uint val = m_rng();
+
+		float rem = m_min + (val / static_cast<float>(UINT_MAX / (m_max - m_min)));
+
+		return rem;
 	}
 }

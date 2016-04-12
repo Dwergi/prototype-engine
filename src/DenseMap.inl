@@ -49,23 +49,23 @@ namespace dd
 	};
 
 	template <typename TKey, typename TValue>
-	DenseMap<TKey, TValue>::DenseMap()
-		: m_hash( &Hash )
+	DenseMap<TKey, TValue>::DenseMap() :
+		m_hash( &Hash )
 	{
 		Resize( DefaultSize );
 	}
 
 	template <typename TKey, typename TValue>
-	DenseMap<TKey, TValue>::DenseMap( DenseMap&& other )
-		: m_data( std::move( other.m_data ) ),
+	DenseMap<TKey, TValue>::DenseMap( DenseMap&& other ) :
+		m_data( std::move( other.m_data ) ),
 		m_hash( std::move( other.m_hash ) )
 	{
 
 	}
 
 	template <typename TKey, typename TValue>
-	DenseMap<TKey, TValue>::DenseMap( const DenseMap& other )
-		: m_hash( other.m_hash )
+	DenseMap<TKey, TValue>::DenseMap( const DenseMap& other ) :
+		m_hash( other.m_hash )
 	{
 		Resize( other.m_data.Size() );
 		Rehash( other.m_data );

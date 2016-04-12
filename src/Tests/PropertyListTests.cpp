@@ -81,11 +81,6 @@ TEST_CASE( "[property] Integer properties" )
 
 TEST_CASE( "[property] Recorder" )
 {
-	REGISTER_TYPE( dd::EntityHandle );
-	REGISTER_TYPE( dd::Component );
-	REGISTER_TYPE( dd::Vector4 );
-	REGISTER_TYPE( dd::TransformComponent );
-
 	dd::TransformComponent cmp;
 	cmp.Position.x = 500;
 

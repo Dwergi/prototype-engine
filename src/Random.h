@@ -63,4 +63,22 @@ namespace dd
 		int m_min;
 		int m_max;
 	};
+
+	class RandomFloat
+	{
+	public:
+
+		static const uint DEFAULT_SEED = -1;
+
+		RandomFloat( float min, float max, uint seed = DEFAULT_SEED );
+
+		float Next();
+
+	private:
+
+		pcg32_fast m_rng;
+
+		float m_min;
+		float m_max;
+	};
 }

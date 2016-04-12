@@ -306,6 +306,7 @@
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
     <ClInclude Include="src\AABB.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
@@ -320,6 +321,7 @@
     <ClInclude Include="src\DLL.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
+    <ClInclude Include="src\FreeCameraController.h" />
     <ClInclude Include="src\Function.h" />
     <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\Globals.h" />
@@ -333,6 +335,7 @@
     <ClInclude Include="src\JobSystem.h" />
     <ClInclude Include="src\JobThread.h" />
     <ClInclude Include="src\JSONSerializer.h" />
+    <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Message.h" />
     <ClInclude Include="src\MessageQueue.h" />
@@ -425,6 +428,9 @@
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\FreeCameraController.cpp" />
+    <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
     <ClCompile Include="src\Tests\JobSystemTests.cpp" />

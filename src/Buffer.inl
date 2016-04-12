@@ -5,29 +5,33 @@
 //
 
 template <typename T>
-Buffer<T>::Buffer()
-	: m_ptr( nullptr ),
+Buffer<T>::Buffer() :
+	m_ptr( nullptr ),
 	m_size( 0 )
 {
 
 }
 
 template <typename T>
-Buffer<T>::Buffer( T* ptr, uint size )
-	: m_ptr( ptr ),
+Buffer<T>::Buffer( T* ptr, uint size ) :
+	m_ptr( ptr ),
 	m_size( size )
 {
 	
 }
 
 template <typename T>
-Buffer<T>::Buffer( const Buffer<T>& other )
+Buffer<T>::Buffer( const Buffer<T>& other ) :
+	m_ptr( nullptr ),
+	m_size( 0 )
 {
 	Set( other.m_ptr, other.m_size );
 }
 
 template <typename T>
-Buffer<T>::Buffer( Buffer<T>&& other )
+Buffer<T>::Buffer( Buffer<T>&& other ) :
+	m_ptr( nullptr ),
+	m_size( 0 )
 {
 	Set( other.m_ptr, other.m_size );
 

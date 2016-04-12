@@ -26,6 +26,8 @@ namespace dd
 		void DestroyAll();
 		void Update( float dt );
 
+		BASIC_TYPE( EntitySystem )
+
 	private:
 
 		friend class EntityHandle;

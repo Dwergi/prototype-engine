@@ -18,20 +18,6 @@ namespace dd
 {
 	class Window;
 
-	class InputBindings
-	{
-	public:
-
-		void Register( int key, InputAction action );
-
-		InputAction GetAction( int key ) const;
-		
-	private:
-
-		DenseMap<int, InputAction> m_bindings;
-	};
-	//===================================================================================
-
 	struct MousePosition
 	{
 		float DeltaX;
@@ -52,6 +38,15 @@ namespace dd
 	{
 	public:
 
+		// special keys that can't be typed as characters
+		// these map to GLFW_KEY values
+		enum class Key : int
+		{
+			LSHIFT = 340,
+			LCTRL = 341,
+			LALT = 342
+		};
+
 		typedef void( *KeyboardCallbackFunction )(GLFWwindow*, int, int, int, int);
 		typedef void( *MouseButtonCallbackFunction )(GLFWwindow*, int, int, int);
 		typedef void( *ScrollCallbackFunction )(GLFWwindow*, double, double);
@@ -62,10 +57,18 @@ namespace dd
 
 		void Update();
 		MousePosition GetMousePosition() const;
-		void GetKeyEvents( Array<InputEvent, 64>& out ) const;
+
+		void CaptureMouse( bool capture );
+
+		// get all key events received in the last update
+		// returns true if the output array successfully contained all of them
+		// otherwise fills the array with Capacity() events and returns false
+		bool GetKeyEvents( ArrayBase<InputEvent>& out ) const;
 
 		void BindKey( char c, InputAction action );
+		void BindKey( Key k, InputAction action );
 
+		// these shouldn't be used by default, mainly used by imgui
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );
 		void AddMouseCallback( MouseButtonCallbackFunction cb );
 		void AddScrollCallback( ScrollCallbackFunction cb );
@@ -89,7 +92,7 @@ namespace dd
 		Vector<ScrollCallbackFunction> m_scrollCallbacks;
 		Vector<CharacterCallbackFunction> m_charCallbacks;
 
-		InputBindings m_bindings;
+		DenseMap<int, InputAction> m_bindings;
 
 		static Input* m_pInstance;
 		static void KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods );

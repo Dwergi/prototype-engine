@@ -73,22 +73,27 @@ namespace dd
 {
 	void RegisterScriptCommands( Vector<String64>& commands )
 	{
-		asIScriptEngine* engine = Services::Get<AngelScriptEngine>().GetInternalEngine();
-		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
+		AngelScriptEngine* wrapper = Services::GetPtr<AngelScriptEngine>();
+		if( wrapper != nullptr )
 		{
-			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
+			asIScriptEngine* engine = wrapper->GetInternalEngine();
 
-			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
-			if( func->GetName()[0] != '_' )
-				commands.Add( String64( func->GetName() ) );
-		}
+			for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
+			{
+				asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
 
-		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
-		{
-			const char* name;
-			int res = engine->GetGlobalPropertyByIndex( i, &name );
-			if( res >= 0 )
-				commands.Add( String64( name ) );
+				// Skip the functions that start with _ as these are not meant to be called explicitly by the user
+				if( func->GetName()[0] != '_' )
+					commands.Add( String64( func->GetName() ) );
+			}
+
+			for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
+			{
+				const char* name;
+				int res = engine->GetGlobalPropertyByIndex( i, &name );
+				if( res >= 0 )
+					commands.Add( String64( name ) );
+			}
 		}
 	}
 

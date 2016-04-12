@@ -49,7 +49,7 @@ namespace dd
 	template <typename T>
 	const char* Services::GetKey()
 	{
-		const TypeInfo* typeInfo = GET_TYPE( dd::RemovePtr<T>::type );
+		const TypeInfo* typeInfo = GET_TYPE( T );
 
 		DD_ASSERT( typeInfo != nullptr );
 

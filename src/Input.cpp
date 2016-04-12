@@ -26,11 +26,6 @@ namespace dd
 		glfwSetMouseButtonCallback( m_glfwWindow, &MouseButtonCallback );
 		glfwSetScrollCallback( m_glfwWindow, &ScrollCallback );
 		glfwSetCharCallback( m_glfwWindow, &CharCallback );
-
-		m_bindings.Register( GLFW_KEY_W, InputAction::FORWARD );
-		m_bindings.Register( GLFW_KEY_S, InputAction::BACKWARD );
-		m_bindings.Register( GLFW_KEY_A, InputAction::LEFT );
-		m_bindings.Register( GLFW_KEY_D, InputAction::RIGHT );
 	}
 
 	Input::~Input()
@@ -41,10 +36,71 @@ namespace dd
 		glfwSetKeyCallback( m_glfwWindow, nullptr );
 	}
 
+	void Input::BindKey( char c, InputAction action )
+	{
+		m_bindings.Add( (int) c, action );
+	}
+
+	void Input::BindKey( Key k, InputAction action )
+	{
+		m_bindings.Add( (int) k, action );
+	}
+
+	void Input::Update()
+	{
+		double newX, newY;
+
+		glfwGetCursorPos( m_glfwWindow, &newX, &newY );
+
+		m_currentMousePosition.DeltaX = (float) (m_currentMousePosition.X - newX);
+		m_currentMousePosition.DeltaY = (float) (m_currentMousePosition.Y - newY);
+		m_currentMousePosition.X = (float) newX;
+		m_currentMousePosition.Y = (float) newY;
+
+		m_currentEvents.Swap( m_pendingEvents );
+		m_pendingEvents.Clear();
+	}
+
+	bool Input::GetKeyEvents( ArrayBase<InputEvent>& events ) const
+	{
+		events.Clear();
+
+		for( uint i = 0; i < m_currentEvents.Size(); ++i )
+		{
+			if( events.Size() == events.Capacity() )
+				return false;
+
+			events.Push( m_currentEvents[i] );
+		}
+
+		return true;
+	}
+
+	InputType Input::GetEventType( int action )
+	{
+		if( action == GLFW_PRESS )
+			return InputType::PRESSED;
+
+		if( action == GLFW_RELEASE )
+			return InputType::RELEASED;
+
+		return InputType::NONE;
+	}
+
+	MousePosition Input::GetMousePosition() const
+	{
+		return m_currentMousePosition;
+	}
+
+	void Input::CaptureMouse( bool capture )
+	{
+		glfwSetInputMode( m_glfwWindow, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL );
+	}
+
 	void Input::KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
 	{
 		InputType event_type = GetEventType( action );
-		InputAction event_action = m_pInstance->m_bindings.GetAction( key );
+		InputAction event_action = m_pInstance->m_bindings.Contains( key ) ? m_pInstance->m_bindings[key] : InputAction::NONE;
 
 		if( event_type != InputType::NONE && event_action != InputAction::NONE )
 		{
@@ -64,7 +120,7 @@ namespace dd
 	{
 		for( GLFWmousebuttonfun fn : m_pInstance->m_mouseButtonCallbacks )
 		{
-			(*fn)( window, button, action, mods );
+			(*fn)(window, button, action, mods);
 		}
 	}
 
@@ -72,7 +128,7 @@ namespace dd
 	{
 		for( GLFWscrollfun fn : m_pInstance->m_scrollCallbacks )
 		{
-			(*fn)( window, xoffset, yoffset );
+			(*fn)(window, xoffset, yoffset);
 		}
 	}
 
@@ -80,104 +136,47 @@ namespace dd
 	{
 		for( GLFWcharfun fn : m_pInstance->m_charCallbacks )
 		{
-			(*fn)( window, c );
+			(*fn)(window, c);
 		}
 	}
 
-	void Input::AddKeyboardCallback( GLFWkeyfun cb )
+	void Input::AddKeyboardCallback( KeyboardCallbackFunction cb )
 	{
 		m_keyboardCallbacks.Add( cb );
 	}
 
-	void Input::AddMouseCallback( GLFWmousebuttonfun cb )
+	void Input::AddMouseCallback( MouseButtonCallbackFunction cb )
 	{
 		m_mouseButtonCallbacks.Add( cb );
 	}
 
-	void Input::AddScrollCallback( GLFWscrollfun cb )
+	void Input::AddScrollCallback( ScrollCallbackFunction cb )
 	{
 		m_scrollCallbacks.Add( cb );
 	}
 
-	void Input::AddCharCallback( GLFWcharfun cb )
+	void Input::AddCharCallback( CharacterCallbackFunction cb )
 	{
 		m_charCallbacks.Add( cb );
 	}
 
-	void Input::RemoveKeyboardCallback( GLFWkeyfun cb )
+	void Input::RemoveKeyboardCallback( KeyboardCallbackFunction cb )
 	{
 		m_keyboardCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveMouseCallback( GLFWmousebuttonfun cb )
+	void Input::RemoveMouseCallback( MouseButtonCallbackFunction cb )
 	{
 		m_mouseButtonCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveScrollCallback( GLFWscrollfun cb )
+	void Input::RemoveScrollCallback( ScrollCallbackFunction cb )
 	{
 		m_scrollCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveCharCallback( GLFWcharfun cb )
+	void Input::RemoveCharCallback( CharacterCallbackFunction cb )
 	{
 		m_charCallbacks.RemoveItem( cb );
-	}
-
-	void Input::BindKey( char c, InputAction action )
-	{
-		m_bindings.Register( (int) c, action );
-	}
-
-	void Input::Update()
-	{
-		double newX, newY;
-
-		glfwGetCursorPos( m_glfwWindow, &newX, &newY );
-
-		m_currentMousePosition.DeltaX = (float) (m_currentMousePosition.X - newX);
-		m_currentMousePosition.DeltaY = (float) (m_currentMousePosition.Y - newY);
-		m_currentMousePosition.X = (float) newX;
-		m_currentMousePosition.Y = (float) newY;
-
-		m_currentEvents.Swap( m_pendingEvents );
-		m_pendingEvents.Clear();
-	}
-
-	void Input::GetKeyEvents( Array<InputEvent, 64>& events ) const
-	{
-		for( uint i = 0; i < m_currentEvents.Size(); ++i )
-		{
-			events.Push( m_currentEvents[i] );
-		}
-	}
-
-	InputType Input::GetEventType( int action )
-	{
-		if( action == GLFW_PRESS )
-			return InputType::PRESSED;
-
-		if( action == GLFW_RELEASE )
-			return InputType::RELEASED;
-
-		return InputType::NONE;
-	}
-
-	MousePosition Input::GetMousePosition() const
-	{
-		return m_currentMousePosition;
-	}
-
-	void InputBindings::Register( int key, InputAction action )
-	{
-		m_bindings.Add( key, action );
-	}
-
-	InputAction InputBindings::GetAction( int key ) const
-	{
-		if( !m_bindings.Contains( key ) )
-			return InputAction::NONE;
-
-		return m_bindings[key];
 	}
 }

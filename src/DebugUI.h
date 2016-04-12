@@ -11,10 +11,12 @@ struct ImDrawData;
 
 namespace dd
 {
+	class Input;
+
 	class DebugUI
 	{
 	public:
-		DebugUI( GLFWwindow* window );
+		DebugUI( GLFWwindow* window, Input& input );
 		~DebugUI();
 
 		void Update( float delta_t );

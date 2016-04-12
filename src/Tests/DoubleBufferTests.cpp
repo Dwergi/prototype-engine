@@ -72,12 +72,18 @@ public:
 	int A;
 
 	typedef DenseVectorPool<TestComponent> Pool;
+
+	BEGIN_TYPE( TestComponent )
+		MEMBER( TestComponent, A )
+	END_TYPE
 };
 
 TEST_CASE( "[DoubleBuffer] Components" )
 {
 	EntitySystem system;
 	EntityHandle handle = system.Create();
+
+	REGISTER_TYPE( TestComponent );
 	
 	TestComponent::Pool pool;
 	pool.Create( handle );
