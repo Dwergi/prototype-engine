@@ -381,6 +381,15 @@
     <ClInclude Include="src\InputBindings.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderProgram.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -602,6 +611,15 @@
     </ClCompile>
     <ClCompile Include="src\FreeCameraController.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderProgram.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

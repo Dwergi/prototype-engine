@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
 #include "Iteration.h"
 
@@ -54,6 +55,7 @@ namespace dd
 		uint m_length;
 		uint64 m_hash;
 
+		static std::mutex s_mutex;
 		static DenseMap<uint64, std::shared_ptr<const char>> s_instances;
 
 		void Assign( const char* str );

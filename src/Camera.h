@@ -10,11 +10,13 @@
 
 namespace dd
 {
+	class Window;
+
 	class Camera
 	{
 	public:
 
-		Camera();
+		Camera( Window& window );
 
 		glm::vec3 GetPosition() const;
 		void SetPosition( const glm::vec3& pos );
@@ -33,7 +35,7 @@ namespace dd
 
 		glm::mat4 GetProjection();
 		
-		BEGIN_SCRIPT_OBJECT( Camera )
+		BEGIN_TYPE( Camera )
 			/*METHOD( Camera, GetPosition )
 			METHOD( Camera, SetPosition )
 			METHOD( Camera, GetTransform )

@@ -9,7 +9,7 @@
 
 // GL3W/GLFW
 #include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -20,9 +20,10 @@
 #include "imgui/imgui.h"
 
 #include "Input.h"
+#include "Window.h"
 
 // Data
-static GLFWwindow*  g_Window = NULL;
+static GLFWwindow*  s_window = NULL;
 static double       g_Time = 0.0f;
 static bool         g_MousePressed[3] = { false, false, false };
 static float        g_MouseWheel = 0.0f;
@@ -124,12 +125,12 @@ namespace dd
 
 	static const char* GetClipboardText()
 	{
-		return glfwGetClipboardString( g_Window );
+		return glfwGetClipboardString( s_window );
 	}
 
 	static void SetClipboardText( const char* text )
 	{
-		glfwSetClipboardString( g_Window, text );
+		glfwSetClipboardString( s_window, text );
 	}
 
 	void DebugUI::MouseButtonCallback( GLFWwindow*, int button, int action, int /*mods*/ )
@@ -265,14 +266,17 @@ namespace dd
 		return true;
 	}
 
-	DebugUI::DebugUI( GLFWwindow* window, Input& input )
+	DebugUI::DebugUI( Window& window, Input& input )
 	{
-		input.AddKeyboardCallback( &DebugUI::KeyCallback );
-		input.AddScrollCallback( &DebugUI::ScrollCallback );
-		input.AddMouseCallback( &DebugUI::MouseButtonCallback );
-		input.AddCharCallback( &DebugUI::CharCallback );
+		m_input = &input;
+		m_window = &window;
 
-		g_Window = window;
+		m_input->AddKeyboardCallback( &DebugUI::KeyCallback );
+		m_input->AddScrollCallback( &DebugUI::ScrollCallback );
+		m_input->AddMouseCallback( &DebugUI::MouseButtonCallback );
+		m_input->AddCharCallback( &DebugUI::CharCallback );
+
+		s_window = window.GetInternalWindow();
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                         // Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
@@ -300,7 +304,7 @@ namespace dd
 		io.GetClipboardTextFn = GetClipboardText;
 
 #ifdef _WIN32
-		io.ImeWindowHandle = glfwGetWin32Window( g_Window );
+		io.ImeWindowHandle = glfwGetWin32Window( s_window );
 #endif
 	}
 
@@ -365,13 +369,17 @@ namespace dd
 
 		ImGuiIO& io = ImGui::GetIO();
 
+		SetMousePosition( m_input->GetMousePosition().X, m_input->GetMousePosition().Y );
+		SetFocused( m_window->IsFocused() );
+		SetDisplaySize( m_window->GetWidth(), m_window->GetHeight() );
+
 		// Setup time step
 		io.DeltaTime = g_Time > 0.0 ? (float) delta_t : (float) (1.0f / 60.0f);
 		g_Time += delta_t;
 
 		for( int i = 0; i < 3; i++ )
 		{
-			io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton( g_Window, i ) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+			io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton( s_window, i ) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
 			g_MousePressed[i] = false;
 		}
 

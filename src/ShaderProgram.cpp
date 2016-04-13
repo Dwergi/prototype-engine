@@ -9,35 +9,49 @@
 
 #include "Shader.h"
 
+#include "GL/gl3w.h"
+
 namespace dd
 {
 	ShaderProgram::ShaderProgram( const String& name )
-		: m_name( name )
+		: m_name( name ),
+		m_refCount( nullptr ),
+		m_valid( true )
 	{
 		m_id = glCreateProgram();
 
-		ASSERT_ERROR( m_id != 0, "glCreateProgram failed!" );
-	}
+		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "glCreateProgram failed!" );
 
-	ShaderProgram::ShaderProgram( ShaderProgram&& other )
-		: m_id( other.m_id )
-	{
-		other.m_id = OpenGL::InvalidID;
-	}
+		m_valid = m_id != OpenGL::InvalidID;
 	
-	ShaderProgram::ShaderProgram( const ShaderProgram& other )
-		: m_id( other.m_id )
-	{
+		m_refCount = new std::atomic<int>( 1 );
+	}
 
+	ShaderProgram::ShaderProgram( const ShaderProgram& other ) :
+		m_id( other.m_id ),
+		m_name( other.m_name ),
+		m_refCount( other.m_refCount ),
+		m_valid( other.m_valid )
+	{
+		Retain();
 	}
 
 	ShaderProgram::~ShaderProgram()
 	{
-		Invalidate();
+		Release();
 	}
 
 	ShaderProgram& ShaderProgram::operator=( const ShaderProgram& other )
 	{
+		Release();
+
+		m_id = other.m_id;
+		m_name = other.m_name;
+		m_valid = other.m_valid;
+		m_refCount = other.m_refCount;
+
+		Retain();
+
 		return *this;
 	}
 
@@ -62,71 +76,100 @@ namespace dd
 			msg += strInfoLog;
 			delete[] strInfoLog;
 
-			glDeleteProgram( m_id );
-			m_id = OpenGL::InvalidID;
+			m_valid = false;
 		}
 
 		return msg;
 	}
 
-	void ShaderProgram::Invalidate()
+	bool ShaderProgram::InUse() const
 	{
-		if( m_id != OpenGL::InvalidID )
-		{
-			glDeleteProgram( m_id );
-			m_id = OpenGL::InvalidID;
-		}
+		GLint currentProgram = 0;
+		glGetIntegerv( GL_CURRENT_PROGRAM, &currentProgram );
+
+		return currentProgram == (GLint) m_id;
 	}
 
-	ShaderProgram ShaderProgram::Create( const String& name, const Vector<Shader*>& shaders )
+	void ShaderProgram::Use( bool use ) const
 	{
-		ASSERT_ERROR( shaders.Size() == 0, "Failed to provide any shaders to ShaderProgram!" );
+		DD_ASSERT( !InUse() == use, "Trying to change use state to program's current state!" );
 
+		glUseProgram( use ? m_id : 0 );
+	}
+
+	ShaderProgram ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
+	{
 		ShaderProgram program( name );
 
-		for( Shader* shader : shaders )
-		{
-			ASSERT_ERROR( shader != nullptr, "Null shader given to program!" );
-			ASSERT_ERROR( shader->IsValid(), "Invalid shader given to program!" );
+		if( shaders.Size() == 0 )
+			program.m_valid = false;
 
-			glAttachShader( program.m_id, shader->m_id );
+		DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
+
+		for( Shader& shader : shaders )
+		{
+			DD_ASSERT_ERROR( shader.IsValid(), "Invalid shader given to program!" );
+
+			glAttachShader( program.m_id, shader.m_id );
 		}
 
 		String256 msg = program.Link();
 
 		if( !msg.IsEmpty() )
 		{
-			ASSERT_ERROR( false, "Linking program failed!" );
-			program.Invalidate();
+			DD_ASSERT_ERROR( false, "Linking program failed!" );
+			
+			program.m_valid = false;
 		}
 
-		for( Shader* shader : shaders )
+		for( Shader& shader : shaders )
 		{
-			glDetachShader( program.m_id, shader->m_id );
+			glDetachShader( program.m_id, shader.m_id );
 		}
 
 		return program;
 	}
 
-	int ShaderProgram::GetAttribute( const String& name ) const
+	int ShaderProgram::GetAttribute( const char* name ) const
 	{
-		ASSERT( !name.IsEmpty(), "Empty attribute name given!" );
+		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
-		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name.c_str() );
-
-		ASSERT( attrib != -1, "Program attribute not found: %s", name.c_str() );
+		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name );
 
 		return (int) attrib;
 	}
 
-	int ShaderProgram::GetUniform( const String& name ) const
+	int ShaderProgram::GetUniform( const char* name ) const
 	{
-		ASSERT( !name.IsEmpty(), "Empty uniform name given!" );
+		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
-		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name.c_str() );
-
-		ASSERT( uniform != -1, "Program uniform not found: %s", name.c_str() );
+		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name );
 
 		return (int) uniform;
+	}
+
+	void ShaderProgram::Retain()
+	{
+		DD_ASSERT( m_refCount != nullptr );
+
+		++*m_refCount;
+	}
+
+	void ShaderProgram::Release()
+	{
+		DD_ASSERT( m_refCount != nullptr );
+
+		if( --*m_refCount == 0 )
+		{
+			if( m_id != OpenGL::InvalidID )
+			{
+				glDeleteProgram( m_id );
+			}
+
+			delete m_refCount;
+			m_refCount = nullptr;
+		}
 	}
 }

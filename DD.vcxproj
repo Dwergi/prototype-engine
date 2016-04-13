@@ -337,6 +337,7 @@
     <ClInclude Include="src\JSONSerializer.h" />
     <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\Member.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Message.h" />
     <ClInclude Include="src\MessageQueue.h" />
     <ClInclude Include="src\MessageTypes.h" />
@@ -356,6 +357,8 @@
     <ClInclude Include="src\AngelScriptEngine.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\Serializers.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\SharedString.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
@@ -431,7 +434,10 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Services.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
     <ClCompile Include="src\Tests\JobSystemTests.cpp" />
     <ClCompile Include="src\Tests\TypeInfoTests.cpp" />

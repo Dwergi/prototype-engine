@@ -117,6 +117,9 @@ namespace dd
 		glClearColor( 1, 1, 1, 1 );
 		glClear( GL_COLOR_BUFFER_BIT );
 
+		glClearColor( 0, 0, 0, 0 );
+		glClear( GL_DEPTH_BUFFER_BIT );
+
 		glfwPollEvents();
 
 		m_focused = glfwGetWindowAttrib( m_glfwWindow, GLFW_FOCUSED ) != 0;

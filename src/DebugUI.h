@@ -12,11 +12,12 @@ struct ImDrawData;
 namespace dd
 {
 	class Input;
+	class Window;
 
 	class DebugUI
 	{
 	public:
-		DebugUI( GLFWwindow* window, Input& input );
+		DebugUI( Window& window, Input& input );
 		~DebugUI();
 
 		void Update( float delta_t );
@@ -40,5 +41,7 @@ namespace dd
 		void CreateFontsTexture();
 
 		bool m_focused;
+		Input* m_input;
+		Window* m_window;
 	};
 }

@@ -23,11 +23,14 @@
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
+#include "Mesh.h"
 #include "Message.h"
 #include "OctreeComponent.h"
 #include "Random.h"
 #include "Recorder.h"
 #include "ScopedTimer.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "Timer.h"
@@ -39,6 +42,10 @@
 #include "imgui/imgui.h"
 
 #include "Remotery/lib/Remotery.h"
+
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "GL/gl3w.h"
 //---------------------------------------------------------------------------
 
 using namespace dd;
@@ -55,7 +62,9 @@ float s_rollingAverageFPS = s_maxFPS;
 extern float s_rollingAverageMultiplier;
 float s_rollingAverageMultiplier = 0.9f;
 
-bool s_drawConsole = true;
+bool s_drawConsole = false;
+
+bool s_drawCameraDebug = true;
 
 Window* s_window = nullptr;
 Input* s_input = nullptr;
@@ -71,7 +80,7 @@ void DrawFPS( float delta_t )
 	}
 
 	ImGui::SetNextWindowPos( ImVec2( 2, 2 ) );
-	if( !ImGui::Begin( "", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
+	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
 	{
 		ImGui::End();
 		return;
@@ -159,6 +168,24 @@ void BindKeys( Input& input )
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 }
 
+ShaderProgram CreateShaders()
+{
+	Vector<Shader> shaders;
+
+	Shader vert = Shader::Create( String8( "vertex" ), String8( "" ), Shader::Type::Vertex );
+	DD_ASSERT( vert.IsValid() );
+	shaders.Add( vert );
+
+	Shader pixel = Shader::Create( String8( "pixel" ), String8( "" ), Shader::Type::Pixel );
+	DD_ASSERT( pixel.IsValid() );
+	shaders.Add( pixel );
+
+	ShaderProgram program = ShaderProgram::Create( String8( "default" ), shaders );
+	DD_ASSERT( program.IsValid() );
+
+	return program;
+}
+
 #ifdef _TEST
 
 int TestMain( int argc, char const* argv[] )
@@ -198,11 +225,12 @@ int GameMain()
 	{
 		s_window = new Window( 1280, 960, "Neutrino" );
 		s_input = new Input( *s_window );
+		s_input->CaptureMouse( !s_drawConsole );
 
-		DebugUI debugUI( s_window->GetInternalWindow(), *s_input );
+		DebugUI debugUI( *s_window, *s_input );
 
 		DebugConsole console;
-		bool opened;
+		//bool opened;
 
 		Timer timer;
 		timer.Start();
@@ -214,8 +242,16 @@ int GameMain()
 
 		BindKeys( *s_input );
 
-		Camera camera;
+		Camera camera( *s_window );
 		FreeCameraController free_cam( camera );
+
+		// TODO: This should be in some renderer type of class.
+		glEnable( GL_DEPTH_TEST );
+
+		ShaderProgram shader = CreateShaders();
+
+		Mesh mesh;
+		mesh.Create( shader );
 
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
@@ -247,18 +283,20 @@ int GameMain()
 
 			MousePosition mouse_pos = s_input->GetMousePosition();
 
+			debugUI.Update( delta_t );
+
 			free_cam.UpdateMouse( mouse_pos );
 			free_cam.Update( delta_t );
 
-			debugUI.SetMousePosition( s_input->GetMousePosition().X, s_input->GetMousePosition().Y );
-			debugUI.SetFocused( s_window->IsFocused() );
-			debugUI.SetDisplaySize( s_window->GetWidth(), s_window->GetHeight() );
-
-			debugUI.Update( delta_t );
+			if( s_drawCameraDebug )
+				free_cam.DrawCameraDebug();
 
 			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
 
-			ImGui::ShowTestWindow( &opened );
+			//camera.SetTransform( glm::lookAt( glm::vec3( 10, 2, 10 ), glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) ) ); // TEST: Just setting to a known sane value
+			mesh.Render( camera );
+
+			//ImGui::ShowTestWindow( &opened );
 
 			if( s_drawConsole )
 				console.Draw( "Console", s_drawConsole );

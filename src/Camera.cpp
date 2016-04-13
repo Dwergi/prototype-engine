@@ -7,17 +7,18 @@
 #include "PrecompiledHeader.h"
 #include "Camera.h"
 
+#include "Window.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace dd
 {
-	Camera::Camera() :
-		m_vfov( (float) M_PI_2 ), // 90 degrees in radians
+	Camera::Camera( Window& window ) :
 		m_far( 1000.f ),
-		m_near( 0.001f ),
-		m_aspectRatio( 16.f / 9.f )
+		m_near( 0.1f )
 	{
-		
+		m_aspectRatio = (float) window.GetWidth() / (float) window.GetHeight();
+		m_vfov = glm::radians( 45.f );
 	}
 
 	glm::vec3 Camera::GetPosition() const

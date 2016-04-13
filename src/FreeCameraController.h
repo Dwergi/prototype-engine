@@ -26,6 +26,8 @@ namespace dd
 		void HandleInput( InputAction action, InputType type );
 		void Update( float dt );
 
+		void DrawCameraDebug() const;
+
 	private:
 
 		Camera& m_camera;
@@ -33,8 +35,8 @@ namespace dd
 		float m_pitch;
 		glm::vec2 m_mouseDelta;
 		glm::vec3 m_position;
-		glm::vec3 m_up;
-		
+		glm::vec3 m_direction;
+
 		DenseMap<InputAction, bool> m_inputs;
 	};
 }

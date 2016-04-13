@@ -10,6 +10,7 @@
 namespace dd
 {
 	DenseMap<uint64, std::shared_ptr<const char>> SharedString::s_instances;
+	std::mutex SharedString::s_mutex;
 
 	SharedString::SharedString()
 		: m_length( 0 ),
@@ -116,6 +117,8 @@ namespace dd
 		if( m_hash == 0 )
 			return;
 
+		std::lock_guard<std::mutex> lock( s_mutex );
+
 		std::shared_ptr<const char>& instance = s_instances[m_hash];
 		if( instance.unique() )
 		{
@@ -130,6 +133,8 @@ namespace dd
 	{
 		m_length = (uint) strlen( str );
 		m_hash = HashString( str, m_length );
+
+		std::lock_guard<std::mutex> lock( s_mutex );
 
 		std::shared_ptr<const char>* existing = s_instances.Find( m_hash );
 		if( existing != nullptr )
