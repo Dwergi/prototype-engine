@@ -14,16 +14,20 @@ namespace dd
 {
 	JobThread::JobThread( JobThread&& other )
 		: m_killed( other.m_killed ),
-		m_owner( std::move( other.m_owner ) )
+		m_owner( std::move( other.m_owner ) ),
+		m_name( other.m_name )
 	{
+		DD_PROFILE_THREAD_NAME( m_name.c_str() );
+
 		std::swap( m_pendingJobs, other.m_pendingJobs );
 	}
 
-	JobThread::JobThread( JobSystem& owner )
+	JobThread::JobThread( JobSystem& owner, const char* name )
 		: m_killed( false ),
-		m_owner( owner )
+		m_owner( owner ),
+		m_name( name )
 	{
-		
+		DD_PROFILE_THREAD_NAME( m_name.c_str() );
 	}
 
 	JobThread::~JobThread()

@@ -15,7 +15,7 @@ namespace dd
 	public:
 
 		JobThread( JobThread&& other );
-		JobThread( JobSystem& m_owner );
+		JobThread( JobSystem& owner, const char* name );
 		~JobThread();
 
 		JobThread( const JobThread& ) = delete;
@@ -25,6 +25,7 @@ namespace dd
 	private:
 
 		bool m_killed;
+		String128 m_name;
 		JobSystem& m_owner;
 		Vector<JobHandle> m_pendingJobs;
 

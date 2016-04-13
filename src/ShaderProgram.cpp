@@ -57,6 +57,8 @@ namespace dd
 
 	String256 ShaderProgram::Link()
 	{
+		DD_PROFILE_START( ShaderProgram_Link );
+
 		glLinkProgram( m_id );
 
 		String256 msg;
@@ -79,6 +81,8 @@ namespace dd
 			m_valid = false;
 		}
 
+		DD_PROFILE_END();
+
 		return msg;
 	}
 
@@ -99,6 +103,8 @@ namespace dd
 
 	ShaderProgram ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
 	{
+		DD_PROFILE_START( ShaderProgram_Create );
+
 		ShaderProgram program( name );
 
 		if( shaders.Size() == 0 )
@@ -126,6 +132,8 @@ namespace dd
 		{
 			glDetachShader( program.m_id, shader.m_id );
 		}
+
+		DD_PROFILE_END();
 
 		return program;
 	}

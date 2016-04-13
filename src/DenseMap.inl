@@ -169,6 +169,8 @@ namespace dd
 	template <typename TKey, typename TValue>
 	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
 	{
+		DD_PROFILE_SCOPED( DenseMap_FindEntry );
+
 		uint index = 0;
 		Entry& entry = GetEntry( key );
 
@@ -219,8 +221,13 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
 	{
+		DD_PROFILE_START( DenseMap_Resize );
+
 		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
-		memset( new_data, 0xFF, new_capacity * sizeof( Entry ) );
+		for( uint i = 0; i < new_capacity; ++i )
+		{
+			new_data[i].Used = false;
+		}
 
 		Buffer<Entry> old_data( m_data );
 		m_data.Release();
@@ -240,6 +247,8 @@ namespace dd
 
 			delete[] (byte*) old_data.Release();
 		}
+
+		DD_PROFILE_END();
 	}
 
 	template <typename TKey, typename TValue>
@@ -251,17 +260,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	bool DenseMap<TKey, TValue>::IsEmpty( const typename DenseMap<TKey, TValue>::Entry& entry ) const
 	{
-		const byte* bytes = reinterpret_cast<const byte*>(&entry.Key);
-		uint length = sizeof( TKey );
-
-		// check if all bytes of key are 0xFF
-		for( uint i = 0; i < length; ++i )
-		{
-			if( bytes[i] != 0xFF )
-				return false;
-		}
-
-		return true;
+		return !entry.Used;
 	}
 
 	template <typename TKey, typename TValue>
@@ -281,9 +280,8 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear( typename DenseMap<TKey, TValue>::Entry& entry ) const
 	{
+		entry.Used = false;
 		entry.~Entry();
-
-		memset( &entry, 0xFF, sizeof( Entry ) );
 	}
 
 	template <typename TKey, typename TValue>
@@ -323,6 +321,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::CreateEntry( Entry* ptr, const TKey& key, const TValue& value )
 	{
+		ptr->Used = true;
 		new (&ptr->Key) TKey( key );
 		new (&ptr->Value) TValue( value );
 

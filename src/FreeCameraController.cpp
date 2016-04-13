@@ -27,8 +27,8 @@ namespace dd
 	const float MovementSpeed = 10.0f;
 	const float BoostMultiplier = 5.0f;
 
-	// mouse sensitivity - 1920 pixels turns 180 degrees
-	const float TurnSpeed = 180.f / 1920.f;
+	// mouse sensitivity - 1920 * 1.5 pixels turns 180 degrees
+	const float TurnSpeed = 180.f / (1920.f * 1.5f);
 
 	FreeCameraController::FreeCameraController( Camera& camera ) :
 		m_camera( camera ),
@@ -92,23 +92,23 @@ namespace dd
 
 	void FreeCameraController::Update( float dt )
 	{
-		DD_PROFILE_START( FreeCameraController_Update );
+		DD_PROFILE_SCOPED( FreeCameraController_Update );
 
 		// rotate around up axis, ie. Y
 		m_yaw += m_mouseDelta.x * TurnSpeed;
-		m_pitch += m_mouseDelta.y * TurnSpeed * m_camera.GetAspectRatio();
+		m_pitch += m_mouseDelta.y * TurnSpeed;
 
 		// wrap the x direction
 		m_yaw = wrap( m_yaw, 0, 360 );
+
+		// clamp the y direction
+		m_pitch = glm::clamp( m_pitch, -89.f, 89.f );
 
 		glm::vec3 direction( std::cos( glm::radians( m_pitch ) ) * std::sin( glm::radians( m_yaw ) ),
 							 std::sin( glm::radians( m_pitch ) ),
 							 std::cos( glm::radians( m_pitch ) ) * std::cos( glm::radians( m_yaw ) ) );
 
 		direction = glm::normalize( direction );
-
-		// clamp the y direction
-		m_pitch = glm::clamp( m_pitch, -89.f, 89.f );
 
 		glm::vec3 up = glm::vec3( 0, 1, 0 );
 
@@ -152,8 +152,6 @@ namespace dd
 
 		glm::mat4 lookAt = glm::lookAt( m_position, m_position + m_direction, up );
 		m_camera.SetTransform( lookAt );
-
-		DD_PROFILE_END();
 	}
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )

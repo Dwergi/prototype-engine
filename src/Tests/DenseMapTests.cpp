@@ -96,3 +96,20 @@ TEST_CASE( "[DenseMap] Remove" )
 
 	REQUIRE( map.Size() == 0 );
 }
+
+TEST_CASE( "[DenseMap] Resize" )
+{
+	dd::DenseMap<int, int> map;
+
+	for( int i = 0; i < 128; ++i )
+	{
+		map.Add( i, i * 10 );
+	}
+
+	REQUIRE( map.Size() == 128 );
+
+	for( int i = 0; i < 128; ++i )
+	{
+		REQUIRE( map[i] == i * 10 );
+	}
+}

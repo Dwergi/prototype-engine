@@ -80,6 +80,8 @@ namespace dd
 
 	void Mesh::Create( ShaderProgram& program )
 	{
+		DD_PROFILE_START( Mesh_Create );
+
 		m_shader = &program;
 
 		glGenBuffers( 1, &m_vbo );
@@ -108,10 +110,14 @@ namespace dd
 		}
 
 		glBindVertexArray( 0 );
+
+		DD_PROFILE_END();
 	}
 
 	void Mesh::Render( Camera& camera )
 	{
+		DD_PROFILE_START( Mesh_Render );
+
 		DD_ASSERT( m_shader != nullptr );
 
 		m_shader->Use( true );
@@ -133,5 +139,7 @@ namespace dd
 		glBindVertexArray( 0 );
 
 		m_shader->Use( false );
+
+		DD_PROFILE_END();
 	}
 }

@@ -104,6 +104,8 @@ namespace dd
 
 	String256 Shader::Compile( const String& source )
 	{
+		DD_PROFILE_SCOPED( Shader_Compile );
+
 		String256 msg;
 
 		const char* src = source.c_str();
@@ -133,6 +135,8 @@ namespace dd
 
 	Shader Shader::Create( const String& name, const String& path, Shader::Type type )
 	{
+		DD_PROFILE_SCOPED( Shader_Create );
+
 		String256 source;
 
 		// TODO: Load source from file.
@@ -153,7 +157,6 @@ namespace dd
 		}
 
 		String256 message = shader.Compile( source );
-
 		if( !message.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed!" );

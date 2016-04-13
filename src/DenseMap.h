@@ -23,6 +23,7 @@ namespace dd
 
 		struct Entry
 		{
+			bool Used;
 			TKey Key;
 			TValue Value;
 		};

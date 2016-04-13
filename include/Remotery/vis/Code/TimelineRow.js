@@ -58,7 +58,7 @@ TimelineRow = (function()
 		DOM.Event.AddHandler(this.DecNode, "mouseup", ExpandButtonUp);
 		DOM.Event.AddHandler(this.DecNode, "mouseleave", ExpandButtonUp);
 
-		// Pressing +/- increases/decreases depth
+		// Pressing +/i increases/decreases depth
 		DOM.Event.AddHandler(this.IncNode, "click", Bind(IncDepth, this));
 		DOM.Event.AddHandler(this.DecNode, "click", Bind(DecDepth, this));
 

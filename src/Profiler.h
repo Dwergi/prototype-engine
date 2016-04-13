@@ -8,9 +8,6 @@
 
 #include "Remotery/lib/Remotery.h"
 
-#define RMT_ENABLED
-#define RMT_USE_OPENGL
-
 #define DD_PROFILE_INIT() \
 	Remotery* profiler; rmt_CreateGlobalInstance( &profiler )
 
@@ -18,13 +15,13 @@
 	rmt_SetCurrentThreadName( Name )
 
 #define DD_PROFILE_START( Name ) \
-	rmt_BeginCPUSample( Name )
+	rmt_BeginCPUSample( Name, 0 )
 
 #define DD_PROFILE_END() \
 	rmt_EndCPUSample()
 
 #define DD_PROFILE_SCOPED( Name ) \
-	rmt_ScopedCPUSample( Name )
+	rmt_ScopedCPUSample( Name, 0 )
 
 #define DD_PROFILE_DEINIT() \
 	rmt_DestroyGlobalInstance( profiler )
@@ -45,7 +42,7 @@
 	rmt_ScopedOpenGLSample( Name )
 
 #define DD_PROFILE_OGL_INIT() \
-	rmt_BindOpenGL()
+	_rmt_BindOpenGL()
 
 #define DD_PROFILE_OGL_DEINIT() \
 	rmt_UnbindOpenGL()

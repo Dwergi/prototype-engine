@@ -87,16 +87,16 @@ namespace dd
 	{
 		for( uint i = 0; i < thread_count; ++i )
 		{
-			m_workers.Add( new JobThread( *this ) );
-
-			m_threads[i] = std::thread( &JobThread::Run, m_workers[i] );
-
 			char name[32] = "DD Jobs ";
 			char count[8];
 			_itoa_s( i + 1, count, 10 );
 			count[7] = '\0';
 
 			strcat_s( name, count );
+
+			m_workers.Add( new JobThread( *this, name ) );
+
+			m_threads[i] = std::thread( &JobThread::Run, m_workers[i] );
 
 			DWORD threadId = ::GetThreadId( static_cast<HANDLE>( m_threads[i].native_handle() ) );
 			SetThreadName( threadId, name );
@@ -135,6 +135,8 @@ namespace dd
 
 	void JobSystem::UpdateJobs()
 	{
+		DD_PROFILE_START( JobSystem_UpdateJobs );
+
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		// clear finished jobs
@@ -176,6 +178,8 @@ namespace dd
 				}
 			}
 		}
+
+		DD_PROFILE_END();
 	}
 
 	JobHandle::JobHandle()
