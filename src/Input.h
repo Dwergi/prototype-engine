@@ -24,9 +24,10 @@ namespace dd
 		float DeltaY;
 		float X;
 		float Y;
-	};
-	//===================================================================================
 
+		MousePosition() : DeltaX( 0 ), DeltaY( 0 ), X( 0 ), Y( 0 ) {}
+	};
+	
 	struct InputEvent
 	{
 		InputAction Action;
@@ -55,8 +56,9 @@ namespace dd
 		explicit Input( const Window& window );
 		~Input();
 
-		void Update();
+		void Update( float delta_t );
 		MousePosition GetMousePosition() const;
+		MousePosition GetScrollPosition() const;
 
 		void CaptureMouse( bool capture );
 
@@ -82,7 +84,10 @@ namespace dd
 	private:
 
 		GLFWwindow* m_glfwWindow;
-		MousePosition m_currentMousePosition;
+		MousePosition m_mousePosition;
+		MousePosition m_scrollPosition;
+
+		MousePosition m_tempScrollPosition;
 
 		Vector<InputEvent> m_pendingEvents;
 		Vector<InputEvent> m_currentEvents;

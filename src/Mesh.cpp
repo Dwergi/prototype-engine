@@ -8,14 +8,14 @@
 #include "Mesh.h"
 
 #include "Camera.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 
 #include "GL/gl3w.h"
 
-#include "glm/gtc/type_ptr.hpp"
-
 namespace dd
 {
-	GLfloat s_unitCube[] = 
+	float s_unitCube[] = 
 	{
 		//  X     Y     Z       U     V          Normal
 		// bottom
@@ -67,18 +67,11 @@ namespace dd
 		1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   1.0f, 0.0f, 0.0f
 	};
 
-	Mesh::Mesh()
-	{
-
-	}
-
-	Mesh::~Mesh()
-	{
-		glDeleteBuffers( 1, &m_vbo );
-		glDeleteVertexArrays( 1, &m_vao );
-	}
-
-	void Mesh::Create( ShaderProgram& program )
+	Mesh::Mesh( ShaderProgram& program ) :
+		m_refCount( nullptr ),
+		m_vao( OpenGL::InvalidID ),
+		m_vbo( OpenGL::InvalidID ),
+		m_shader( nullptr )
 	{
 		DD_PROFILE_START( Mesh_Create );
 
@@ -92,26 +85,41 @@ namespace dd
 		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
 		glBufferData( GL_ARRAY_BUFFER, sizeof( s_unitCube ), s_unitCube, GL_STATIC_DRAW );
 
-		glVertexAttribPointer( program.GetAttribute( "position" ), 3, GL_FLOAT, GL_FALSE, 8 * sizeof( GLfloat ), NULL );
-		glEnableVertexAttribArray( program.GetAttribute( "position" ) );
-
-		int uv = program.GetAttribute( "uv" );
-		if( uv != -1 )
-		{
-			glVertexAttribPointer( uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof( GLfloat ), NULL );
-			glEnableVertexAttribArray( uv );
-		}
-
-		int normals = program.GetAttribute( "normal" );
-		if( normals != -1 )
-		{
-			glVertexAttribPointer( normals, 3, GL_FLOAT, GL_TRUE, 8 * sizeof( GLfloat ), NULL );
-			glEnableVertexAttribArray( normals );
-		}
+		m_shader->BindAttributeFloat( "position", 3, 8 * sizeof( float ), false );
+		m_shader->BindAttributeFloat( "uv", 2, 8 * sizeof( float ), false );
+		m_shader->BindAttributeFloat( "normal", 3, 8 * sizeof( float ), true );
 
 		glBindVertexArray( 0 );
 
+		m_refCount = new std::atomic<int>( 1 );
+
 		DD_PROFILE_END();
+	}
+
+	Mesh::Mesh( const Mesh& other ) :
+		m_refCount( other.m_refCount ),
+		m_vao( other.m_vao ),
+		m_vbo( other.m_vbo )
+	{
+		Retain();
+	}
+
+	Mesh::~Mesh()
+	{
+		Release();
+	}
+
+	Mesh& Mesh::operator=( const Mesh& other )
+	{
+		Release();
+
+		m_refCount = other.m_refCount;
+		m_vao = other.m_vao;
+		m_vbo = other.m_vbo;
+
+		Retain();
+
+		return *this;
 	}
 
 	void Mesh::Render( Camera& camera )
@@ -125,14 +133,12 @@ namespace dd
 		glBindVertexArray( m_vao );
 
 		glm::mat4 model;
-
 		glm::mat4 view = camera.GetTransform();
-
 		glm::mat4 projection = camera.GetProjection();
 
 		glm::mat4 mvp = projection * view * model;
 
-		glUniformMatrix4fv( m_shader->GetUniform( "mvp" ), 1, false, glm::value_ptr( mvp ) );
+		m_shader->SetUniform( "mvp", mvp );
 
 		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
 
@@ -141,5 +147,28 @@ namespace dd
 		m_shader->Use( false );
 
 		DD_PROFILE_END();
+	}
+
+	void Mesh::Retain()
+	{ 
+		DD_ASSERT( m_refCount != nullptr );
+
+		++*m_refCount;
+	}
+
+	void Mesh::Release()
+	{
+		DD_ASSERT( m_refCount != nullptr );
+
+		if( --*m_refCount <= 0 )
+		{
+			glDeleteBuffers( 1, &m_vbo );
+			glDeleteVertexArrays( 1, &m_vao );
+
+			delete m_refCount;
+
+			m_vbo = OpenGL::InvalidID;
+			m_vao = OpenGL::InvalidID;
+		}
 	}
 }

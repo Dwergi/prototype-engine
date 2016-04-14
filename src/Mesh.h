@@ -6,31 +6,41 @@
 
 #pragma once
 
-#include "ShaderProgram.h"
+#include <atomic>
 
 namespace dd
 {
 	class Camera;
+	class ShaderProgram;
 
+	//
+	// A ref-counted mesh asset.
+	//
 	class Mesh
 	{
 	public:
 
-		Mesh();
+		Mesh( ShaderProgram& program );
+		Mesh( const Mesh& other );
 		~Mesh();
 
-		void Create( ShaderProgram& program );
-
+		//
+		// Render this mesh in the given camera viewport.
+		//
 		void Render( Camera& camera );
+
+		Mesh& operator=( const Mesh& other );
 
 	private:
 		
-		Vector<glm::vec3> m_vertices;
-		Vector<uint> m_indices;
-
 		uint m_vbo;
 		uint m_vao;
 
 		ShaderProgram* m_shader;
+
+		std::atomic<int>* m_refCount;
+
+		void Retain();
+		void Release();
 	};
 }

@@ -16,6 +16,7 @@ namespace dd
 	{
 	public:
 
+		Camera();
 		Camera( Window& window );
 
 		glm::vec3 GetPosition() const;
@@ -33,10 +34,13 @@ namespace dd
 		float GetAspectRatio() const;
 		void SetAspectRatio( int w, int h );
 
+		float GetVerticalFOV() const;
+		void SetVerticalFOV( float vfov );
+
 		glm::mat4 GetProjection();
 		
-		BEGIN_TYPE( Camera )
-			/*METHOD( Camera, GetPosition )
+		BEGIN_SCRIPT_OBJECT( Camera )
+			METHOD( Camera, GetPosition )
 			METHOD( Camera, SetPosition )
 			METHOD( Camera, GetTransform )
 			METHOD( Camera, SetTransform )
@@ -46,7 +50,9 @@ namespace dd
 			METHOD( Camera, SetFar )
 			METHOD( Camera, GetAspectRatio )
 			METHOD( Camera, SetAspectRatio )
-			METHOD( Camera, GetProjection )*/
+			METHOD( Camera, GetProjection )
+			METHOD( Camera, GetVerticalFOV )
+			METHOD( Camera, SetVerticalFOV )
 		END_TYPE
 
 	private:

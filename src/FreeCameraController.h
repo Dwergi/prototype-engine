@@ -22,9 +22,11 @@ namespace dd
 		FreeCameraController( const FreeCameraController& ) = delete;
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
-		void UpdateMouse( const MousePosition& pos );
-		void HandleInput( InputAction action, InputType type );
 		void Update( float dt );
+
+		void UpdateMouse( const MousePosition& pos );
+		void UpdateScroll( const MousePosition& pos );
+		void HandleInput( InputAction action, InputType type );
 
 		void DrawCameraDebug() const;
 

@@ -352,6 +352,7 @@
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\AngelScriptEngine.h" />
@@ -435,6 +436,7 @@
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />

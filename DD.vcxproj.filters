@@ -390,6 +390,9 @@
     <ClInclude Include="src\ShaderProgram.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -619,6 +622,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderProgram.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

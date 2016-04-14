@@ -26,9 +26,10 @@ namespace dd
 	// camera movement speed in meters per second
 	const float MovementSpeed = 10.0f;
 	const float BoostMultiplier = 5.0f;
+	const float ZoomSpeed = 0.1f;
 
-	// mouse sensitivity - 1920 * 1.5 pixels turns 180 degrees
-	const float TurnSpeed = 180.f / (1920.f * 1.5f);
+	// mouse sensitivity - 3840 pixels turns 180 degrees
+	const float TurnSpeed = 180.f / 3840.f;
 
 	FreeCameraController::FreeCameraController( Camera& camera ) :
 		m_camera( camera ),
@@ -87,6 +88,7 @@ namespace dd
 		ImGui::Text( "Pitch: %.1f", m_pitch );
 		ImGui::Text( "Position: %.1f, %.1f, %.1f", m_position.x, m_position.y, m_position.z );
 		ImGui::Text( "Direction: %.1f, %.1f, %.1f", m_direction.x, m_direction.y, m_direction.z );
+		ImGui::Text( "VFOV: %.1f", glm::degrees( m_camera.GetVerticalFOV() ) * 2.f );
 		ImGui::End();
 	}
 
@@ -158,5 +160,19 @@ namespace dd
 	{
 		m_mouseDelta.x = pos.DeltaX;
 		m_mouseDelta.y = pos.DeltaY;
+	}
+
+	void FreeCameraController::UpdateScroll( const MousePosition& pos )
+	{
+		float vfov = m_camera.GetVerticalFOV();
+		
+		float degs = glm::degrees( vfov );
+
+		degs *= std::powf( 2.f, -pos.DeltaY * ZoomSpeed );
+
+		//degs += ZoomSpeed * -pos.DeltaY;
+		degs = glm::clamp( degs, 5.f, 89.f );
+
+		m_camera.SetVerticalFOV( glm::radians( degs ) );
 	}
 }

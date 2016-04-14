@@ -102,6 +102,24 @@ namespace dd
 	};
 
 	template <typename T>
+	struct CastHelper<const T*>
+	{
+		static const T*& Cast( void*& data )
+		{
+			return (const T*&) data;
+		}
+	};
+
+	template <typename T>
+	struct CastHelper<const T&>
+	{
+		static const T& Cast( void*& data )
+		{
+			return *(const T*&) data;
+		}
+	};
+
+	template <typename T>
 	T& Variable::GetValue()
 	{
 		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component

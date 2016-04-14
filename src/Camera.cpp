@@ -13,6 +13,14 @@
 
 namespace dd
 {
+	Camera::Camera()
+	{
+		m_far = 0.f;
+		m_near = 0.f;
+		m_aspectRatio = 0.f;
+		m_vfov = 0.f;
+	}
+
 	Camera::Camera( Window& window ) :
 		m_far( 1000.f ),
 		m_near( 0.1f )
@@ -59,6 +67,16 @@ namespace dd
 	void Camera::SetFar( float dist_far )
 	{
 		m_far = dist_far;
+	}
+
+	float Camera::GetVerticalFOV() const
+	{
+		return m_vfov;
+	}
+
+	void Camera::SetVerticalFOV( float vfov )
+	{
+		m_vfov = vfov;
 	}
 
 	float Camera::GetAspectRatio() const

@@ -12,6 +12,10 @@ namespace dd
 {
 	class Shader;
 
+	typedef int GLint;
+	typedef GLint ShaderLocation;
+	const ShaderLocation InvalidLocation = -1;
+
 	class ShaderProgram
 	{
 	public:
@@ -28,8 +32,14 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
-		int GetAttribute( const char* name ) const;
-		int GetUniform( const char* name ) const;
+		ShaderLocation GetAttribute( const char* name ) const;
+		ShaderLocation GetUniform( const char* name ) const;
+
+		bool BindAttributeFloat( const char* name, uint count, uint stride, bool normalized );
+
+		void SetUniform( const char* name, const glm::mat4& matrix ) const;
+		void SetUniform( const char* name, const glm::vec3& vec ) const;
+		void SetUniform( const char* name, float f ) const;
 
 	private:
 

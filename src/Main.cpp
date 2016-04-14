@@ -23,14 +23,12 @@
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
-#include "Mesh.h"
 #include "Message.h"
 #include "OctreeComponent.h"
 #include "Random.h"
 #include "Recorder.h"
+#include "Renderer.h"
 #include "ScopedTimer.h"
-#include "Shader.h"
-#include "ShaderProgram.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "Timer.h"
@@ -128,6 +126,15 @@ void RegisterGameTypes()
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
+	REGISTER_POD( glm::vec4 );
+	TypeInfo* vec4Type = TypeInfo::AccessType<glm::vec4>();
+	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
+	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
+	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
+	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "w" );
+
+	REGISTER_POD( glm::mat4 );
+
 	REGISTER_TYPE( EntityHandle );
 	REGISTER_TYPE( Component );
 	REGISTER_TYPE( Message );
@@ -166,24 +173,6 @@ void BindKeys( Input& input )
 	input.BindKey( ' ', InputAction::UP );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
-}
-
-ShaderProgram CreateShaders()
-{
-	Vector<Shader> shaders;
-
-	Shader vert = Shader::Create( String8( "vertex" ), String8( "" ), Shader::Type::Vertex );
-	DD_ASSERT( vert.IsValid() );
-	shaders.Add( vert );
-
-	Shader pixel = Shader::Create( String8( "pixel" ), String8( "" ), Shader::Type::Pixel );
-	DD_ASSERT( pixel.IsValid() );
-	shaders.Add( pixel );
-
-	ShaderProgram program = ShaderProgram::Create( String8( "default" ), shaders );
-	DD_ASSERT( program.IsValid() );
-
-	return program;
 }
 
 #ifdef _TEST
@@ -242,16 +231,10 @@ int GameMain()
 
 		BindKeys( *s_input );
 
-		Camera camera( *s_window );
-		FreeCameraController free_cam( camera );
-
-		// TODO: This should be in some renderer type of class.
-		glEnable( GL_DEPTH_TEST );
-
-		ShaderProgram shader = CreateShaders();
-
-		Mesh mesh;
-		mesh.Create( shader );
+		Renderer renderer( *s_window );
+		renderer.Init();
+		
+		FreeCameraController free_cam( renderer.GetCamera() );
 
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
@@ -274,18 +257,17 @@ int GameMain()
 			current_frame = timer.Time();
 			delta_t = current_frame - last_frame;
 
-			s_input->Update();
+			s_input->Update( delta_t );
 
 			// update input
 			Array<InputEvent, 64> events;
 			s_input->GetKeyEvents( events );
 			bindings.Dispatch( events );
 
-			MousePosition mouse_pos = s_input->GetMousePosition();
-
 			debugUI.Update( delta_t );
 
-			free_cam.UpdateMouse( mouse_pos );
+			free_cam.UpdateMouse( s_input->GetMousePosition() );
+			free_cam.UpdateScroll( s_input->GetScrollPosition() );
 			free_cam.Update( delta_t );
 
 			if( s_drawCameraDebug )
@@ -293,10 +275,7 @@ int GameMain()
 
 			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
 
-			//camera.SetTransform( glm::lookAt( glm::vec3( 10, 2, 10 ), glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) ) ); // TEST: Just setting to a known sane value
-			mesh.Render( camera );
-
-			//ImGui::ShowTestWindow( &opened );
+			renderer.Render( delta_t );
 
 			if( s_drawConsole )
 				console.Draw( "Console", s_drawConsole );
