@@ -15,23 +15,8 @@
 //
 namespace dd
 {
-	template <typename TIter, typename TValue>
-	class SortedVectorIterator
-		: public std::iterator<std::forward_iterator_tag, TValue*>
-	{
-	private:
-		TIter m_current;
-		typedef SortedVectorIterator<TIter, TValue> ThisType;
-
-	public:
-		SortedVectorIterator( TIter init );
-		SortedVectorIterator( const ThisType& other );
-
-		TValue& operator*() const;
-		bool operator==( const ThisType& other );
-		bool operator!=( const ThisType& other );
-		ThisType& operator++();
-	};
+	template <typename T>
+	class SortedVectorPoolIterator;
 
 	template <typename T>
 	class SortedVectorPool
@@ -44,9 +29,9 @@ namespace dd
 			T Component;
 		};
 
-		typedef typename SortedVectorIterator<typename Vector<EntityEntry>::iterator, T> iterator;
-
 	public:
+
+		typedef typename SortedVectorPoolIterator<T> iterator;
 
 		SortedVectorPool();
 		~SortedVectorPool();
@@ -87,6 +72,9 @@ namespace dd
 	private:
 
 		Vector<EntityEntry> m_components;
+
+		template <typename T>
+		friend class SortedVectorPoolIterator;
 	};
 }
 

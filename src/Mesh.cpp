@@ -13,6 +13,8 @@
 
 #include "GL/gl3w.h"
 
+#include "glm/gtx/transform.hpp"
+
 namespace dd
 {
 	float s_unitCube[] = 
@@ -67,15 +69,14 @@ namespace dd
 		1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   1.0f, 0.0f, 0.0f
 	};
 
-	Mesh::Mesh( ShaderProgram& program ) :
+	Mesh::Mesh( const char* name, ShaderProgram& program ) :
 		m_refCount( nullptr ),
 		m_vao( OpenGL::InvalidID ),
 		m_vbo( OpenGL::InvalidID ),
-		m_shader( nullptr )
+		m_shader( &program ),
+		m_name( name )
 	{
 		DD_PROFILE_START( Mesh_Create );
-
-		m_shader = &program;
 
 		glGenBuffers( 1, &m_vbo );
 		glGenVertexArrays( 1, &m_vao );
@@ -85,6 +86,7 @@ namespace dd
 		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
 		glBufferData( GL_ARRAY_BUFFER, sizeof( s_unitCube ), s_unitCube, GL_STATIC_DRAW );
 
+		// TODO: Don't do this.
 		m_shader->BindAttributeFloat( "position", 3, 8 * sizeof( float ), false );
 		m_shader->BindAttributeFloat( "uv", 2, 8 * sizeof( float ), false );
 		m_shader->BindAttributeFloat( "normal", 3, 8 * sizeof( float ), true );
@@ -99,7 +101,9 @@ namespace dd
 	Mesh::Mesh( const Mesh& other ) :
 		m_refCount( other.m_refCount ),
 		m_vao( other.m_vao ),
-		m_vbo( other.m_vbo )
+		m_vbo( other.m_vbo ),
+		m_name( other.m_name ),
+		m_shader( other.m_shader )
 	{
 		Retain();
 	}
@@ -116,23 +120,26 @@ namespace dd
 		m_refCount = other.m_refCount;
 		m_vao = other.m_vao;
 		m_vbo = other.m_vbo;
+		m_name = other.m_name;
+		m_shader = other.m_shader;
 
 		Retain();
 
 		return *this;
 	}
 
-	void Mesh::Render( Camera& camera )
+	void Mesh::Render( const Camera& camera, const glm::vec3& position )
 	{
 		DD_PROFILE_START( Mesh_Render );
 
 		DD_ASSERT( m_shader != nullptr );
+		DD_ASSERT( m_shader->IsValid() );
 
 		m_shader->Use( true );
 
 		glBindVertexArray( m_vao );
 
-		glm::mat4 model;
+		glm::mat4 model = glm::translate( position );
 		glm::mat4 view = camera.GetTransform();
 		glm::mat4 projection = camera.GetProjection();
 
@@ -170,5 +177,15 @@ namespace dd
 			m_vbo = OpenGL::InvalidID;
 			m_vao = OpenGL::InvalidID;
 		}
+	}
+
+	void Mesh::AddRef()
+	{
+		Retain();
+	}
+
+	void Mesh::RemoveRef()
+	{
+		Release();
 	}
 }

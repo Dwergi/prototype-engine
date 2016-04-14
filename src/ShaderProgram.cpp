@@ -17,8 +17,7 @@ namespace dd
 {
 	ShaderProgram::ShaderProgram( const String& name )
 		: m_name( name ),
-		m_refCount( nullptr ),
-		m_valid( true )
+		m_refCount( nullptr )
 	{
 		m_id = glCreateProgram();
 
@@ -79,8 +78,10 @@ namespace dd
 
 			msg += strInfoLog;
 			delete[] strInfoLog;
-
-			m_valid = false;
+		}
+		else
+		{
+			m_valid = true;
 		}
 
 		DD_PROFILE_END();

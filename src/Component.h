@@ -14,6 +14,7 @@ namespace dd
 	{
 	protected:
 		Component() {}
+		Component( const Component& other ) : Entity( other.Entity ) {}
 
 	public:
 		virtual ~Component() {}

@@ -14,13 +14,9 @@ struct TestComponent
 };
 
 template <typename PoolType>
-void TestPool()
+void CreateEntities( dd::Vector<dd::EntityHandle>& handles, PoolType& pool, int count )
 {
-	PoolType pool;
-
-	dd::Vector<dd::EntityHandle> handles;
-
-	for( int i = 0; i < 10; ++i )
+	for( int i = 0; i < count; ++i )
 	{
 		dd::EntityHandle handle;
 		memset( &handle, 0, sizeof( dd::EntityHandle ) );
@@ -33,6 +29,16 @@ void TestPool()
 
 		cmp->ID = i;
 	}
+}
+
+template <typename PoolType>
+void TestPool()
+{
+	PoolType pool;
+
+	dd::Vector<dd::EntityHandle> handles;
+
+	CreateEntities( handles, pool, 10 );
 
 	REQUIRE( pool.Size() == 10 );
 
@@ -62,16 +68,27 @@ void TestPool()
 	}
 
 	REQUIRE( pool.Empty() );
-}
 
-TEST_CASE( "Unordered Map Pool" )
-{
-	TestPool<dd::DenseMapPool<TestComponent>>();
+	CreateEntities( handles, pool, 10 );
+
+	pool.Remove( handles[5] );
+
+	REQUIRE( !pool.Exists( handles[5] ) );
+
+	for( TestComponent& cmp : pool )
+	{
+		REQUIRE( cmp.Entity != handles[5] );
+	}
 }
 
 TEST_CASE( "Dense Vector Pool" )
 {
 	TestPool<dd::DenseVectorPool<TestComponent>>();
+}
+
+TEST_CASE( "Unordered Map Pool" )
+{
+	TestPool<dd::DenseMapPool<TestComponent>>();
 }
 
 TEST_CASE( "Sorted Vector Pool" )

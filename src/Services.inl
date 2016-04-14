@@ -9,10 +9,10 @@ namespace dd
 	template <typename T>
 	void Services::Register( T& service )
 	{
-		const char* key = GetKey<T>();
-		DD_ASSERT( key != nullptr );
+		uint64 key = GetKey<T>();
+		DD_ASSERT( key != 0 );
 
-		if( key == nullptr )
+		if( key == 0 )
 			return;
 
 		m_instance->m_services.Add( key, &service );
@@ -21,9 +21,9 @@ namespace dd
 	template <typename T>
 	T* Services::GetPtr()
 	{
-		const char* key = GetKey<T>();
+		uint64 key = GetKey<T>();
 
-		if( key == nullptr )
+		if( key == 0 )
 			return nullptr;
 
 		void** ptr = m_instance->m_services.Find( key );
@@ -47,13 +47,14 @@ namespace dd
 	}
 
 	template <typename T>
-	const char* Services::GetKey()
+	uint64 Services::GetKey()
 	{
 		const TypeInfo* typeInfo = GET_TYPE( T );
 
-		DD_ASSERT( typeInfo != nullptr );
+		if( !typeInfo->IsRegistered() )
+			return 0;
 
-		return typeInfo->Name().c_str();
+		return reinterpret_cast<uint64>(typeInfo);
 	}
 
 	template <typename T>
@@ -65,8 +66,16 @@ namespace dd
 	template <typename T>
 	void Services::RegisterComponent()
 	{
-		REGISTER_TYPE( T::Pool );
-		REGISTER_TYPE( DoubleBuffer<typename T::Pool> );
+		const TypeInfo* typeInfo = GET_TYPE( T );
+		String128 typeName( typeInfo->Name().c_str() );
+		typeName += "Pool";
+
+		TypeInfo::RegisterType<T::Pool>( typeName.c_str() );
+
+		String128 doubleBufferName( "dd::DoubleBuffer<" );
+		doubleBufferName += typeName;
+		doubleBufferName += ">";
+		TypeInfo::RegisterType<DoubleBuffer<typename T::Pool>>( doubleBufferName.c_str() );
 
 		DoubleBuffer<typename T::Pool>* double_buffer = new DoubleBuffer<typename T::Pool>( new typename T::Pool(), new typename T::Pool() );
 		Services::Register( *double_buffer );

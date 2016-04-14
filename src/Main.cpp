@@ -23,6 +23,7 @@
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
+#include "MeshComponent.h"
 #include "Message.h"
 #include "OctreeComponent.h"
 #include "Random.h"
@@ -64,8 +65,8 @@ bool s_drawConsole = false;
 
 bool s_drawCameraDebug = true;
 
-Window* s_window = nullptr;
-Input* s_input = nullptr;
+std::unique_ptr<Window> s_window;
+std::unique_ptr<Input> s_input;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -143,10 +144,12 @@ void RegisterGameTypes()
 	REGISTER_TYPE( TransformComponent );
 	REGISTER_TYPE( OctreeComponent );
 	REGISTER_TYPE( SwarmAgentComponent );
+	REGISTER_TYPE( MeshComponent );
 
 	Services::RegisterComponent<TransformComponent>();
 	Services::RegisterComponent<OctreeComponent>();
 	Services::RegisterComponent<SwarmAgentComponent>();
+	Services::RegisterComponent<MeshComponent>();
 
 	REGISTER_TYPE( SwarmSystem );
 
@@ -175,6 +178,58 @@ void BindKeys( Input& input )
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 }
 
+class FrameTimer
+{
+public:
+
+	FrameTimer()
+	{
+		m_targetDelta = 1.0f / s_maxFPS;
+		m_lastFrame = 0.0f;
+		m_currentFrame = -m_targetDelta;
+		m_delta = m_targetDelta;
+
+		m_timer.Start();
+	}
+
+	void Update()
+	{
+		m_targetDelta = 1.0f / s_maxFPS;
+		m_lastFrame = m_currentFrame;
+		m_currentFrame = m_timer.Time();
+		m_delta = m_currentFrame - m_lastFrame;
+	}
+
+	float Delta() const
+	{
+		return m_delta;
+	}
+
+	void DelayFrame()
+	{
+		DD_PROFILE_START( FrameTimer_DelayFrame );
+
+		float now = m_timer.Time();
+		while( now - m_lastFrame < m_targetDelta )
+		{
+			::Sleep( 0 );
+
+			now = m_timer.Time();
+		}
+
+		DD_PROFILE_END();
+	}
+
+private:
+
+	Timer m_timer;
+	float m_targetDelta;
+	float m_lastFrame;
+	float m_currentFrame;
+	float m_delta;
+
+};
+
 #ifdef _TEST
 
 int TestMain( int argc, char const* argv[] )
@@ -198,64 +253,42 @@ int GameMain()
 
 	//::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
-	EntitySystem entitySystem;
-	REGISTER_TYPE( EntitySystem );
-	Services::Register( entitySystem );
-
-	JobSystem jobsystem( 2u );
-
-	auto& transform_db = Services::GetDoubleBuffer<TransformComponent>();
-	auto& swarm_db = Services::GetDoubleBuffer<SwarmAgentComponent>();
-	auto& octree_db = Services::GetDoubleBuffer<OctreeComponent>();
-
-	SwarmSystem swarm_system;
-	Services::Register( swarm_system );
-
 	{
-		s_window = new Window( 1280, 960, "Neutrino" );
-		s_input = new Input( *s_window );
+		JobSystem jobsystem( 2u );
+
+		EntitySystem entitySystem;
+		REGISTER_TYPE( EntitySystem );
+		Services::Register( entitySystem );
+
+		SwarmSystem swarm_system;
+		Services::Register( swarm_system );
+
+		s_window.reset( new Window( 1280, 960, "Neutrino" ) );
+		s_input.reset( new Input( *s_window ) );
 		s_input->CaptureMouse( !s_drawConsole );
 
 		DebugUI debugUI( *s_window, *s_input );
 
 		DebugConsole console;
-		//bool opened;
-
-		Timer timer;
-		timer.Start();
-
-		float target_delta = 1.0f / s_maxFPS;
-		float last_frame = 0.0f;
-		float current_frame = -target_delta;
-		float delta_t = target_delta;
 
 		BindKeys( *s_input );
 
-		Renderer renderer( *s_window );
-		renderer.Init();
+		Renderer renderer;
+		renderer.Init( *s_window );
 		
-		FreeCameraController free_cam( renderer.GetCamera() );
-
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
 
-		auto handle_input = std::bind( &FreeCameraController::HandleInput, std::ref( free_cam ), std::placeholders::_1, std::placeholders::_2 );
-		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
-		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
-		bindings.RegisterHandler( InputAction::LEFT, handle_input );
-		bindings.RegisterHandler( InputAction::RIGHT, handle_input );
-		bindings.RegisterHandler( InputAction::UP, handle_input );
-		bindings.RegisterHandler( InputAction::DOWN, handle_input );
-		bindings.RegisterHandler( InputAction::BOOST, handle_input );
+		FreeCameraController free_cam( renderer.GetCamera() );
+		free_cam.BindActions( bindings );
+
+		FrameTimer frameTimer;
 
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_START( Frame );
 
-			target_delta = 1.0f / s_maxFPS;
-			last_frame = current_frame;
-			current_frame = timer.Time();
-			delta_t = current_frame - last_frame;
+			float delta_t = frameTimer.Delta();
 
 			s_input->Update( delta_t );
 
@@ -287,17 +320,7 @@ int GameMain()
 
 			s_window->Swap();
 
-			DD_PROFILE_START( Main_Sleep );
-
-			float now = timer.Time();
-			while( now - last_frame < target_delta )
-			{
-				::Sleep( 0 );
-
-				now = timer.Time();
-			}
-
-			DD_PROFILE_END();
+			frameTimer.DelayFrame();
 
 			DD_PROFILE_END();
 
@@ -305,6 +328,9 @@ int GameMain()
 		}
 
 		s_window->Close();
+
+		s_input.reset();
+		s_window.reset();
 	}
 
 	DD_PROFILE_DEINIT(); 

@@ -10,6 +10,14 @@ namespace dd
 	{
 	public:
 
+		RefCounter() :
+			m_refCount( 0 ),
+			m_ptr( nullptr ),
+			m_type( nullptr )
+		{
+
+		}
+
 		void Init( void* ptr, const TypeInfo* type )
 		{
 			m_ptr = ptr;

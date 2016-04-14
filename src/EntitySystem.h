@@ -26,6 +26,20 @@ namespace dd
 		void DestroyAll();
 		void Update( float dt );
 
+		//
+		// Create an entity with the given component types.
+		//
+		template <typename... Components>
+		EntityHandle CreateEntity()
+		{
+			EntityHandle handle = Services::Get<EntitySystem>().Create();
+
+			CreateComponents<Components...>( handle, std::make_index_sequence<sizeof...(Components)>() );
+
+			return handle;
+		}
+
+
 		BASIC_TYPE( EntitySystem )
 
 	private:
@@ -86,6 +100,24 @@ namespace dd
 		Vector<EntityCommand> m_commands;
 
 		int m_activeEntities;
+
+		template <typename... Components, std::size_t... Index>
+		void CreateComponents( EntityHandle handle, std::index_sequence<Index...> )
+		{
+			ExpandType
+			{
+				0, (CreateComponent<Components, Index>( handle ), 0)...
+			};
+		}
+
+		//
+		// Create a component of the specified type for the given entity.
+		//
+		template <typename Component, std::size_t Index>
+		void CreateComponent( EntityHandle handle )
+		{
+			Services::GetWritePool<Component>().Create( handle );
+		}
 
 		bool IsEntityValid( const EntityHandle& entity );
 	};

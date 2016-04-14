@@ -16,10 +16,14 @@ namespace dd
 	public:
 
 		DenseMapPoolIterator( DenseMapIterator<int, T>& it )
-			: Iter( it ) {}
+			: Iter( it )
+		{
+		}
 
 		DenseMapPoolIterator( const DenseMapPoolIterator<T>& other )
-			: Iter( other.Iter ) {}
+			: Iter( other.Iter ) 
+		{
+		}
 
 		const T& operator*() const
 		{
@@ -109,7 +113,12 @@ namespace dd
 		}
 
 		m_components.Add( entity.ID, T() );
-		return &m_components[ entity.ID ];
+		T* cmp = &m_components[ entity.ID ];
+
+		Component* baseptr = static_cast<Component*>(cmp);
+		baseptr->Entity = entity;
+
+		return cmp;
 	}
 
 	template <typename T>

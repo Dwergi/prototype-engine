@@ -89,7 +89,7 @@ namespace dd
 		m_aspectRatio = float( w ) / float( h );
 	}
 
-	glm::mat4 Camera::GetProjection()
+	glm::mat4 Camera::GetProjection() const
 	{
 		return glm::perspective( m_vfov, m_aspectRatio, m_near, m_far );
 	}

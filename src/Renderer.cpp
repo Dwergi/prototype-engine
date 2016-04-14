@@ -2,16 +2,21 @@
 #include "Renderer.h"
 
 #include "Camera.h"
+#include "EntitySystem.h"
 #include "Mesh.h"
+#include "MeshComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
+#include "TransformComponent.h"
 #include "Window.h"
 
 #include "GL/gl3w.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+
 namespace dd
 {
-	Renderer::Renderer( Window& window )
+	Renderer::Renderer()
 	{
 
 	}
@@ -21,6 +26,7 @@ namespace dd
 
 	}
 
+	// TODO: Don't do this.
 	ShaderProgram CreateShaders()
 	{
 		Vector<Shader> shaders;
@@ -39,27 +45,52 @@ namespace dd
 		return program;
 	}
 
-	void Renderer::Init()
+	void Renderer::Init( Window& window )
 	{
-		m_camera = new Camera( *m_window );
+		m_camera = new Camera( window );
+		m_camera->SetTransform( glm::lookAt( glm::vec3( 10, 0, 10 ), glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) ) );
 
-		// TODO: This should be in some renderer type of class.
 		glEnable( GL_DEPTH_TEST );
 		glEnable( GL_CULL_FACE );
 		glFrontFace( GL_CCW );
 		glCullFace( GL_BACK );
 
-		ShaderProgram shader = CreateShaders();
+		m_shaders.Add( new ShaderProgram( CreateShaders() ) );
+		ShaderProgram* shader = m_shaders[0];
 
-		m_shaders.Add( new ShaderProgram( shader ) );
-		m_meshes.Add( new Mesh( shader ) );
+		Mesh* mesh = new Mesh( "cube", *shader );
+		m_meshes.Add( mesh );
+
+		EntityHandle handle = Services::Get<EntitySystem>().CreateEntity<TransformComponent, MeshComponent>();
+		
+		TransformComponent* transform_cmp = Services::GetWritePool<TransformComponent>().Find( handle );
+		transform_cmp->Position = glm::vec3( 0, 0, 0 );
+
+		MeshComponent* mesh_cmp = Services::GetWritePool<MeshComponent>().Find( handle );
+		mesh_cmp->SetMesh( mesh );
+
+		// TODO: Does not belong here.
+		Services::GetDoubleBuffer<TransformComponent>().Swap();
+		Services::GetDoubleBuffer<MeshComponent>().Swap();
+		Services::GetDoubleBuffer<TransformComponent>().Duplicate();
+		Services::GetDoubleBuffer<MeshComponent>().Duplicate();
 	}
 
 	void Renderer::Render( float delta_t )
 	{
-		for( Mesh* mesh : m_meshes )
+		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
+		const TransformComponent::Pool& transforms = Services::GetReadPool<TransformComponent>();
+
+		for( MeshComponent& mesh_cmp : meshes )
 		{
-			mesh->Render( *m_camera );
+			if( mesh_cmp.GetMesh() != nullptr )
+			{
+				TransformComponent* transform_cmp = transforms.Find( mesh_cmp.Entity );
+				if( transform_cmp != nullptr )
+				{
+					mesh_cmp.GetMesh()->Render( *m_camera, transform_cmp->Position );
+				}
+			}
 		}
 	}
 

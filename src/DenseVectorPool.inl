@@ -7,6 +7,56 @@
 namespace dd
 {
 	template <typename T>
+	class DenseVectorPoolIterator
+	{
+	private:
+
+		uint Index;
+		const DenseVectorPool<T>& Pool;
+
+	public:
+
+		DenseVectorPoolIterator( uint index, const DenseVectorPool<T>& pool )
+			: Index( index ),
+			Pool( pool )
+		{
+		}
+
+		DenseVectorPoolIterator( const DenseVectorPoolIterator<T>& other ) :
+			Index( other.Index ),
+			Pool( other.Pool )
+		{
+		}
+
+		const T& operator*() const
+		{
+			return Pool.m_components[Index];
+		}
+
+		T& operator*()
+		{
+			return Pool.m_components[Index];
+		}
+
+		DenseVectorPoolIterator<T> operator++()
+		{
+			++Index;
+			for( ; Index < Pool.m_components.Size(); ++Index )
+			{
+				if( Pool.IsValid( Index ) )
+					return *this;
+			}
+			
+			return *this;
+		}
+
+		bool operator!=( const DenseVectorPoolIterator<T>& other ) const
+		{
+			return &Pool != &other.Pool || Index != other.Index;
+		}
+	};
+
+	template <typename T>
 	bool DenseVectorPool<T>::IsValid( uint id ) const
 	{
 		char c = m_valid[id / (sizeof( char ) * 8)];
@@ -81,6 +131,10 @@ namespace dd
 		SetValid( entity.ID, true );
 
 		T* cmp = new (&m_components[entity.ID]) T();
+
+		Component* baseptr = static_cast<Component*>(cmp);
+		baseptr->Entity = entity;
+
 		return cmp;
 	}
 
@@ -121,14 +175,20 @@ namespace dd
 	}
 
 	template <typename T>
-	Iterator<T> DenseVectorPool<T>::begin() const
+	DenseVectorPoolIterator<T> DenseVectorPool<T>::begin() const
 	{
-		return m_components.begin();
+		for( uint i = 0; i < m_components.Size(); ++i )
+		{
+			if( IsValid( i ) )
+				return DenseVectorPoolIterator<T>( i, *this );
+		}
+
+		return end();
 	}
 
 	template <typename T>
-	Iterator<T> DenseVectorPool<T>::end() const
+	DenseVectorPoolIterator<T> DenseVectorPool<T>::end() const
 	{
-		return m_components.end();
+		return DenseVectorPoolIterator<T>( m_components.Size(), *this );
 	}
 }

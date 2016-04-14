@@ -20,16 +20,19 @@ namespace dd
 	{
 	public:
 
-		Mesh( ShaderProgram& program );
+		Mesh( const char* name, ShaderProgram& program );
 		Mesh( const Mesh& other );
 		~Mesh();
 
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( Camera& camera );
+		void Render( const Camera& camera, const glm::vec3& position );
 
 		Mesh& operator=( const Mesh& other );
+
+		void AddRef();
+		void RemoveRef();
 
 	private:
 		
@@ -39,6 +42,8 @@ namespace dd
 		ShaderProgram* m_shader;
 
 		std::atomic<int>* m_refCount;
+
+		String128 m_name;
 
 		void Retain();
 		void Release();

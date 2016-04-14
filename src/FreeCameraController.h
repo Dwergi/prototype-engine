@@ -11,6 +11,8 @@
 
 namespace dd
 {
+	class InputBindings;
+
 	class FreeCameraController
 	{
 	public:
@@ -27,6 +29,8 @@ namespace dd
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
 		void HandleInput( InputAction action, InputType type );
+
+		void BindActions( InputBindings& bindings );
 
 		void DrawCameraDebug() const;
 

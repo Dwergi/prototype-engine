@@ -53,7 +53,7 @@ namespace dd
 
 		inline uint Size() const { return m_entries; }
 
-		inline DenseMapIterator<TKey, TValue> begin() const { return DenseMapIterator<TKey, TValue>( m_data, *this ); }
+		DenseMapIterator<TKey, TValue> begin() const;
 		inline DenseMapIterator<TKey, TValue> end() const { return DenseMapIterator<TKey, TValue>( m_data + m_data.Size(), *this ); }
 		
 	private:

@@ -10,6 +10,9 @@
 
 namespace dd
 {
+	template <typename T>
+	class DenseVectorPoolIterator;
+
 	//
 	// A dense component pool is one for which the component is assumed to exist for all entities (eg. transform).
 	// Uses much more space than a sparse component pool for large numbers of entities.
@@ -21,6 +24,8 @@ namespace dd
 		static_assert(std::is_base_of<Component, T>::value, "Not derived from Component.");
 
 	public:
+		typedef DenseVectorPoolIterator<T> iterator;
+
 		DenseVectorPool();
 		~DenseVectorPool();
 
@@ -56,15 +61,15 @@ namespace dd
 		// 
 		virtual bool Exists( const EntityHandle& entity ) const override;
 
-		//
-		// Support for iteration over the pool.
-		//
-		Iterator<T> begin() const;
-		Iterator<T> end() const;
+		iterator begin() const;
+		iterator end() const;
 
 		BASIC_TYPE( DenseVectorPool<T> )
 
 	private:
+
+		template <typename T>
+		friend class DenseVectorPoolIterator;
 
 		Vector<T> m_components;
 		Vector<char> m_valid; // this is actually a bitmap

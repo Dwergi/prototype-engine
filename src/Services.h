@@ -46,12 +46,12 @@ namespace dd
 
 		static Services* m_instance;
 
-		DenseMap<const char*, void*> m_services;
+		DenseMap<uint64, void*> m_services;
 
 		Services();
 
 		template <typename T>
-		static const char* GetKey();
+		static uint64 GetKey();
 	};
 }
 

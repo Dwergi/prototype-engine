@@ -17,10 +17,10 @@ namespace dd
 	{
 	public:
 
-		Renderer( Window& window );
+		Renderer();
 		~Renderer();
 
-		void Init();
+		void Init( Window& window );
 
 		//
 		// Render a full frame.

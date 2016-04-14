@@ -25,6 +25,8 @@ namespace dd
 	{
 	public:
 
+		typedef DenseMapPoolIterator<T> iterator;
+
 		DenseMapPool();
 		DenseMapPool( DenseMapPool<T>&& other );
 		DenseMapPool( const DenseMapPool<T>& other );
@@ -65,8 +67,8 @@ namespace dd
 		// 
 		bool Exists( const EntityHandle& entity ) const override;
 
-		DenseMapPoolIterator<T> begin() const;
-		DenseMapPoolIterator<T> end() const;
+		iterator begin() const;
+		iterator end() const;
 
 		BASIC_TYPE( DenseMapPool<T> )
 

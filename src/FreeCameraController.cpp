@@ -7,6 +7,9 @@
 #include "PrecompiledHeader.h"
 #include "FreeCameraController.h"
 
+#include "InputAction.h"
+#include "InputBindings.h"
+
 #include "glm/gtx/transform.hpp"
 
 #include "imgui/imgui.h"
@@ -52,12 +55,23 @@ namespace dd
 		m_camera( other.m_camera ),
 		m_inputs( std::move( other.m_inputs ) )
 	{
-
 	}
 
 	FreeCameraController::~FreeCameraController()
 	{
 
+	}
+
+	void FreeCameraController::BindActions( InputBindings& bindings )
+	{
+		auto handle_input = std::bind( &FreeCameraController::HandleInput, std::ref( *this ), std::placeholders::_1, std::placeholders::_2 );
+		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
+		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
+		bindings.RegisterHandler( InputAction::LEFT, handle_input );
+		bindings.RegisterHandler( InputAction::RIGHT, handle_input );
+		bindings.RegisterHandler( InputAction::UP, handle_input );
+		bindings.RegisterHandler( InputAction::DOWN, handle_input );
+		bindings.RegisterHandler( InputAction::BOOST, handle_input );
 	}
 
 	void FreeCameraController::HandleInput( InputAction action, InputType type )

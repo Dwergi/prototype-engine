@@ -13,9 +13,8 @@ namespace dd
 
 		typedef DenseVectorPool<TransformComponent> Pool;
 
-		TransformComponent()
-		{ 
-		}
+		TransformComponent() { }
+		TransformComponent( const TransformComponent& other ) : Component( other ), Position( other.Position ) {}
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			PARENT( Component )

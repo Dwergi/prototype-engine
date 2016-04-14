@@ -37,7 +37,7 @@ namespace dd
 		float GetVerticalFOV() const;
 		void SetVerticalFOV( float vfov );
 
-		glm::mat4 GetProjection();
+		glm::mat4 GetProjection() const;
 		
 		BEGIN_SCRIPT_OBJECT( Camera )
 			METHOD( Camera, GetPosition )

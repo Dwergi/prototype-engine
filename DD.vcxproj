@@ -338,6 +338,7 @@
     <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\MeshComponent.h" />
     <ClInclude Include="src\Message.h" />
     <ClInclude Include="src\MessageQueue.h" />
     <ClInclude Include="src\MessageTypes.h" />
@@ -436,6 +437,7 @@
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />

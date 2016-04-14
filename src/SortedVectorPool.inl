@@ -11,6 +11,48 @@
 namespace dd
 {
 	template <typename T>
+	class SortedVectorPoolIterator
+	{
+	private:
+
+		typename Vector<typename SortedVectorPool<T>::EntityEntry>::iterator Iter;
+
+	public:
+
+		SortedVectorPoolIterator( typename Vector<typename SortedVectorPool<T>::EntityEntry>::iterator& it ) :
+			Iter( it )
+		{
+		}
+
+		SortedVectorPoolIterator( const SortedVectorPoolIterator<T>& other ) :
+			Iter( other.Iter )
+		{
+		}
+
+		const T& operator*() const
+		{
+			return Iter->Component;
+		}
+
+		T& operator*()
+		{
+			return Iter->Component;
+		}
+
+		SortedVectorPoolIterator<T> operator++()
+		{
+			++Iter;
+
+			return *this;
+		}
+
+		bool operator!=( const SortedVectorPoolIterator<T>& other ) const
+		{
+			return Iter != other.Iter;
+		}
+	};
+
+	template <typename T>
 	SortedVectorPool<T>::SortedVectorPool()
 	{
 
@@ -78,7 +120,12 @@ namespace dd
 
 		m_components.Insert( std::move( new_entry ), current );
 
-		return &m_components[current].Component;
+		T* cmp = &m_components[current].Component;
+
+		Component* baseptr = static_cast<Component*>(cmp);
+		baseptr->Entity = entity;
+
+		return cmp;
 	}
 
 	template <typename T>
@@ -156,44 +203,6 @@ namespace dd
 		T* cmp = Find( entity );
 
 		return cmp != nullptr;
-	}
-
-	template <typename TIter, typename TValue>
-	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( TIter init )
-	{
-		m_current = init;
-	}
-
-	template <typename TIter, typename TValue>
-	SortedVectorIterator<TIter, TValue>::SortedVectorIterator( const SortedVectorIterator<TIter, TValue>& other )
-	{
-		m_current = other.m_current;
-	}
-
-	template <typename TIter, typename TValue>
-	TValue& SortedVectorIterator<TIter, TValue>::operator*() const
-	{
-		return m_current->Component;
-	}
-
-	template <typename TIter, typename TValue>
-	bool SortedVectorIterator<TIter, TValue>::operator==( const SortedVectorIterator<TIter, TValue>& other )
-	{
-		return m_current == other.m_current;
-	}
-
-	template <typename TIter, typename TValue>
-	bool SortedVectorIterator<TIter, TValue>::operator!=( const SortedVectorIterator<TIter, TValue>& other )
-	{
-		return !operator==( other );
-	}
-
-	template <typename TIter, typename TValue>
-	SortedVectorIterator<TIter, TValue>& SortedVectorIterator<TIter, TValue>::operator++()
-	{
-		++m_current;
-
-		return *this;
 	}
 
 	template <typename T>

@@ -22,11 +22,16 @@ namespace dd
 		const TMapEntry* Pointer;
 
 		DenseMapIterator()
-			: Pointer( nullptr ), Map( nullptr ) {}
+			: Pointer( nullptr ), Map( nullptr )
+		{
+		}
 
 		DenseMapIterator( const TMapEntry* ptr, const TMap& map )
 			: Pointer( ptr ), 
-			Map( &map ) {}
+			Map( &map )
+		{
+
+		}
 
 		inline TMapEntry& operator*() { return const_cast<TMapEntry&>( *Pointer ); }
 		inline const TMapEntry& operator*() const { return *Pointer; }
@@ -336,5 +341,17 @@ namespace dd
 		uint index = hash % m_data.Size();
 		
 		return m_data[index];
+	}
+
+	template <typename TKey, typename TValue>
+	DenseMapIterator<TKey, TValue> DenseMap<TKey, TValue>::begin() const
+	{
+		for( uint i = 0; i < m_data.Size(); ++i )
+		{
+			if( !IsEmpty( m_data[i] ) )
+				return DenseMapIterator<TKey, TValue>( &m_data[i], *this );
+		}
+
+		return end();
 	}
 }
