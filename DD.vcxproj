@@ -322,6 +322,7 @@
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\FreeCameraController.h" />
+    <ClInclude Include="src\Frustum.h" />
     <ClInclude Include="src\Function.h" />
     <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\Globals.h" />
@@ -435,6 +436,7 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
+    <ClCompile Include="src\Frustum.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />

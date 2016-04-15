@@ -12,7 +12,10 @@ namespace dd
 	{
 	public:
 
+		Plane();
 		Plane( const glm::vec3& point, const glm::vec3& normal );
+		Plane( float a, float b, float c, float d );
+		Plane( const glm::vec3& pt1, const glm::vec3& pt2, const glm::vec3& pt3 );
 		Plane( const Plane& other );
 		~Plane();
 		
@@ -23,7 +26,6 @@ namespace dd
 
 	private:
 
-		// x, y and z are the normal of the plane, w is the negative distance along the normal to the origin
 		glm::vec4 m_plane;
 	};
 }

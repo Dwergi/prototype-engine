@@ -29,6 +29,8 @@ namespace dd
 		//
 		void Render( float delta_t );
 
+		void DrawDebugUI() const;
+
 		//
 		// Retrieve the active camera.
 		//
@@ -40,5 +42,7 @@ namespace dd
 		Camera* m_camera;
 		Vector<MeshHandle> m_meshes;
 		Vector<ShaderHandle> m_shaders;
+
+		int m_meshCount;
 	};
 }

@@ -1,8 +1,10 @@
 #include "PrecompiledHeader.h"
 #include "Renderer.h"
 
+#include "AABB.h"
 #include "Camera.h"
 #include "EntitySystem.h"
+#include "Frustum.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "Shader.h"
@@ -14,9 +16,14 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+
 namespace dd
 {
-	Renderer::Renderer()
+	Renderer::Renderer() :
+		m_meshCount( 0 ),
+		m_camera( nullptr ),
+		m_window( nullptr )
 	{
 
 	}
@@ -40,9 +47,22 @@ namespace dd
 		shaders.Add( pixel );
 
 		ShaderHandle handle = ShaderProgram::Create( String8( "default" ), shaders );
-		DD_ASSERT( handle.IsValid() );
-
 		return handle;
+	}
+
+	void Renderer::DrawDebugUI() const
+	{
+		bool open = true;
+		if( !ImGui::Begin( "Renderer", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
+		{
+			ImGui::End();
+			return;
+		}
+
+		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, 2 ) );
+
+		ImGui::Text( "Meshes: %d", m_meshCount );
+		ImGui::End();
 	}
 
 	void Renderer::Init( Window& window )
@@ -78,6 +98,8 @@ namespace dd
 
 	void Renderer::Render( float delta_t )
 	{
+		Frustum frustum( *m_camera );
+
 		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
 		const TransformComponent::Pool& transforms = Services::GetReadPool<TransformComponent>();
 

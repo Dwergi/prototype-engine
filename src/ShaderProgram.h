@@ -23,6 +23,7 @@ namespace dd
 
 		static ShaderHandle Create( const String& name, const Vector<Shader>& shaders );
 		static ShaderProgram* Get( ShaderHandle handle );
+		static void Destroy( ShaderHandle handle );
 
 		ShaderProgram( const ShaderProgram& other );
 		~ShaderProgram();
@@ -47,6 +48,7 @@ namespace dd
 
 	private:
 
+		static std::mutex m_instanceMutex;
 		static DenseMap<uint64, ShaderProgram> m_instances;
 
 		static ShaderProgram CreateInstance( const String& name, const Vector<Shader>& shaders );
@@ -65,26 +67,18 @@ namespace dd
 		void Release();
 	};
 
+	//
+	// A very simple handle to be used to reference a single global instance of a shader in a semi-safe way.
+	// Use ShaderProgram::Create to get a handle to a shader.
+	//
 	struct ShaderHandle
 	{
 	public:
-
 		ShaderHandle() : m_hash( 0 ) {}
-
-		ShaderProgram* Get()
-		{
-			return ShaderProgram::Get( *this );
-		}
-
-		bool IsValid() const
-		{
-			return m_hash != 0;
-		}
+		ShaderProgram* Get() { return ShaderProgram::Get( *this ); }
 
 	private:
-
 		friend class ShaderProgram;
-
 		uint64 m_hash;
 	};
 }

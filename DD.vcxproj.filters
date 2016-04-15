@@ -396,6 +396,9 @@
     <ClInclude Include="src\MeshComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\Frustum.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -632,6 +635,9 @@
     </ClCompile>
     <ClCompile Include="src\MeshComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Frustum.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

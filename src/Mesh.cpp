@@ -17,6 +17,7 @@
 
 namespace dd
 {
+	std::mutex Mesh::m_instanceMutex;
 	DenseMap<uint64, Mesh> Mesh::m_instances;
 
 	float s_unitCube[] = 
@@ -73,6 +74,8 @@ namespace dd
 
 	Mesh* Mesh::Get( MeshHandle handle )
 	{
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
+
 		return m_instances.Find( handle.m_hash );
 	}
 
@@ -83,6 +86,8 @@ namespace dd
 
 		uint64 hash = dd::Hash( name );
 		hash ^= dd::Hash( program.Name() );
+
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
 		Mesh* mesh = m_instances.Find( hash );
 		if( mesh == nullptr )
@@ -96,29 +101,37 @@ namespace dd
 		return handle;
 	}
 
+	void Mesh::Destroy( MeshHandle handle )
+	{
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
+
+		m_instances.Remove( handle.m_hash );
+	}
+
 	Mesh::Mesh( const char* name, ShaderProgram& program ) :
 		m_refCount( nullptr ),
 		m_vao( OpenGL::InvalidID ),
 		m_vbo( OpenGL::InvalidID ),
 		m_shader( &program ),
-		m_name( name )
+		m_name( name ),
+		m_stride( 0 )
 	{
 		DD_PROFILE_START( Mesh_Create );
 
 		glGenBuffers( 1, &m_vbo );
 		glGenVertexArrays( 1, &m_vao );
 
-		glBindVertexArray( m_vao );
+		// TODO: load this from assimp or something
+		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
+		BindAttribute( "position", MeshAttribute::Position, 3, false );
+		BindAttribute( "uv", MeshAttribute::UV, 2, false );
+		BindAttribute( "normal", MeshAttribute::Normal, 3, true );
 
-		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( s_unitCube ), s_unitCube, GL_STATIC_DRAW );
-
-		// TODO: Don't do this.
-		m_shader->BindAttributeFloat( "position", 3, 8 * sizeof( float ), false );
-		m_shader->BindAttributeFloat( "uv", 2, 8 * sizeof( float ), false );
-		m_shader->BindAttributeFloat( "normal", 3, 8 * sizeof( float ), true );
-
-		glBindVertexArray( 0 );
+		// TODO: Create an AABB constructor that takes min and max.
+		AABB bounds;
+		bounds.Expand( glm::vec3( -1, -1, -1 ) );
+		bounds.Expand( glm::vec3( 1, 1, 1 ) );
+		SetBounds( bounds );
 
 		m_refCount = new std::atomic<int>( 1 );
 
@@ -153,6 +166,41 @@ namespace dd
 		Retain();
 
 		return *this;
+	}
+
+	void Mesh::SetData( float* data, uint count, uint stride )
+	{
+		m_data.Set( data, count );
+		m_stride = stride;
+
+		glBindVertexArray( m_vao );
+
+		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
+		glBufferData( GL_ARRAY_BUFFER, count, data, GL_STATIC_DRAW );
+
+		glBindVertexArray( 0 );
+	}
+
+	void Mesh::BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized )
+	{
+		DD_ASSERT( m_data.Get() != nullptr );
+		DD_ASSERT( m_stride > 0 );
+
+		glBindVertexArray( m_vao );
+
+		m_shader->BindAttributeFloat( shaderAttribute, count, m_stride * sizeof( float ), normalized );
+
+		glBindVertexArray( 0 );
+	}
+
+	const AABB& Mesh::Bounds() const
+	{
+		return m_bounds;
+	}
+
+	void Mesh::SetBounds( const AABB& bounds )
+	{
+		m_bounds = bounds;
 	}
 
 	void Mesh::Render( const Camera& camera, const glm::vec3& position )
@@ -204,15 +252,5 @@ namespace dd
 			m_vbo = OpenGL::InvalidID;
 			m_vao = OpenGL::InvalidID;
 		}
-	}
-
-	void Mesh::AddRef()
-	{
-		Retain();
-	}
-
-	void Mesh::RemoveRef()
-	{
-		Release();
 	}
 }

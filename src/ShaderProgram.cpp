@@ -15,7 +15,50 @@
 
 namespace dd
 {
+	std::mutex ShaderProgram::m_instanceMutex;
 	DenseMap<uint64, ShaderProgram> ShaderProgram::m_instances;
+
+	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
+	{
+		DD_PROFILE_START( ShaderProgram_Create );
+
+		uint64 hash = dd::Hash( name );
+
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
+
+		ShaderProgram* instance = m_instances.Find( hash );
+		if( instance == nullptr )
+		{
+			ShaderProgram program = CreateInstance( name, shaders );
+			if( program.IsValid() )
+			{
+				m_instances.Add( hash, program );
+			}
+			else
+			{
+				hash = 0;
+			}
+		}
+
+		ShaderHandle handle;
+		handle.m_hash = hash;
+
+		DD_PROFILE_END();
+
+		return handle;
+	}
+
+	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
+	{
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
+		return m_instances.Find( handle.m_hash );
+	}
+
+	void ShaderProgram::Destroy( ShaderHandle handle )
+	{
+		std::lock_guard<std::mutex> lock( m_instanceMutex );
+		return m_instances.Remove( handle.m_hash );
+	}
 
 	ShaderProgram::ShaderProgram( const String& name )
 		: m_name( name ),
@@ -56,6 +99,39 @@ namespace dd
 		Retain();
 
 		return *this;
+	}
+
+	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader>& shaders )
+	{
+		ShaderProgram program( name );
+
+		if( shaders.Size() == 0 )
+			program.m_valid = false;
+
+		DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
+
+		for( Shader& shader : shaders )
+		{
+			DD_ASSERT_ERROR( shader.IsValid(), "Invalid shader given to program!" );
+
+			glAttachShader( program.m_id, shader.m_id );
+		}
+
+		String256 msg = program.Link();
+
+		if( !msg.IsEmpty() )
+		{
+			DD_ASSERT_ERROR( false, "Linking program failed!" );
+
+			program.m_valid = false;
+		}
+
+		for( Shader& shader : shaders )
+		{
+			glDetachShader( program.m_id, shader.m_id );
+		}
+
+		return program;
 	}
 
 	String256 ShaderProgram::Link()
@@ -104,74 +180,6 @@ namespace dd
 		DD_ASSERT( !InUse() == use, "Trying to change use state to program's current state!" );
 
 		glUseProgram( use ? m_id : 0 );
-	}
-
-	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader>& shaders )
-	{
-		ShaderProgram program( name );
-
-		if( shaders.Size() == 0 )
-			program.m_valid = false;
-
-		DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
-
-		for( Shader& shader : shaders )
-		{
-			DD_ASSERT_ERROR( shader.IsValid(), "Invalid shader given to program!" );
-
-			glAttachShader( program.m_id, shader.m_id );
-		}
-
-		String256 msg = program.Link();
-
-		if( !msg.IsEmpty() )
-		{
-			DD_ASSERT_ERROR( false, "Linking program failed!" );
-
-			program.m_valid = false;
-		}
-
-		for( Shader& shader : shaders )
-		{
-			glDetachShader( program.m_id, shader.m_id );
-		}
-
-		return program;
-	}
-
-	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
-	{
-		DD_PROFILE_START( ShaderProgram_Create );
-
-		uint64 hash = dd::Hash( name );
-		ShaderProgram* instance = m_instances.Find( hash );
-
-		if( instance == nullptr )
-		{
-			ShaderProgram program = CreateInstance( name, shaders );
-			if( program.IsValid() )
-			{
-				m_instances.Add( hash, program );
-			}
-			else
-			{
-				hash = 0;
-			}
-		}
-
-		ShaderHandle handle;
-		handle.m_hash = hash;
-
-		DD_PROFILE_END();
-
-		return handle;
-	}
-
-	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
-	{
-		ShaderProgram* program = m_instances.Find( handle.m_hash );
-
-		return program;
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const

@@ -6,14 +6,25 @@
 
 #pragma once
 
+#include "AABB.h"
+
 #include <atomic>
+#include <memory>
 
 namespace dd
 {
 	class Camera;
 	class ShaderProgram;
 
-	struct MeshHandle;	 
+	struct MeshHandle;
+
+	enum class MeshAttribute
+	{
+		Position,
+		Normal,
+		UV,
+		Other
+	};
 
 	//
 	// A ref-counted mesh asset.
@@ -22,30 +33,53 @@ namespace dd
 	{
 	public:
 
+		//
+		// Create (or retrieve) a handle to a mesh with the given name using the given shader.
+		//
 		static MeshHandle Create( const char* name, ShaderProgram& program );
+
+		//
+		// Get the mesh instance associated with the given handle.
+		// Returns null if the handle does not reference a mesh that still exists.
+		//
 		static Mesh* Get( MeshHandle handle );
 
-		Mesh( const Mesh& other );
-		~Mesh();
+		//
+		// Destroy the mesh associated with the given handle. All handles will become invalidated.
+		//
+		static void Destroy( MeshHandle handle );
 
 		//
 		// Render this mesh in the given camera viewport.
 		//
 		void Render( const Camera& camera, const glm::vec3& position );
 
-		Mesh& operator=( const Mesh& other );
+		//
+		// Retrieve the axis-aligned bounds of this mesh.
+		//
+		const AABB& Bounds() const;
+		void SetBounds( const AABB& bounds );
 
-		void AddRef();
-		void RemoveRef();
+		void SetData( float* data, uint count, uint stride );
+		void BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized );
+
+
+		Mesh& operator=( const Mesh& other );
+		Mesh( const Mesh& other );
+		~Mesh();
 
 	private:
 
+		static std::mutex m_instanceMutex;
 		static DenseMap<uint64, Mesh> m_instances;
 		
 		uint m_vbo;
 		uint m_vao;
 		String128 m_name;
 		ShaderProgram* m_shader;
+		AABB m_bounds;
+		Buffer<float> m_data;
+		uint m_stride;
 
 		std::atomic<int>* m_refCount;
 		void Retain();
@@ -54,26 +88,18 @@ namespace dd
 		Mesh( const char* name, ShaderProgram& program );
 	};
 
+	//
+	// A very simple handle to be used to reference a single global instance of a mesh in a semi-safe way.
+	// Use Mesh::Create to get a handle to a given mesh.
+	//
 	struct MeshHandle
 	{
 	public:
-	
 		MeshHandle() : m_hash( 0 ) {}
-
-		Mesh* Get()
-		{
-			return Mesh::Get( *this );
-		}
-
-		bool IsValid() const
-		{
-			return m_hash != 0;
-		}
-
+		Mesh* Get() { return Mesh::Get( *this ); }
+		
 	private:
-
 		friend class Mesh;
-
 		uint64 m_hash;
 	};
 }
