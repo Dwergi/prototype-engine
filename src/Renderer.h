@@ -6,11 +6,12 @@
 
 #pragma once
 
+#include "Mesh.h"
+#include "ShaderProgram.h"
+
 namespace dd
 {
 	class Camera;
-	class ShaderProgram;
-	class Mesh;
 	class Window;
 
 	class Renderer
@@ -37,7 +38,7 @@ namespace dd
 
 		Window* m_window;
 		Camera* m_camera;
-		Vector<Mesh*> m_meshes;
-		Vector<ShaderProgram*> m_shaders;
+		Vector<MeshHandle> m_meshes;
+		Vector<ShaderHandle> m_shaders;
 	};
 }

@@ -16,6 +16,12 @@ namespace dd
 		return HashBytes( (const byte*)((const void*) &value), sizeof( T ) );
 	}
 
+	template <>
+	inline uint64 Hash( const uint64& value )
+	{
+		return value;
+	}
+
 	inline uint64 HashString( const char* data, uint64 size )
 	{
 		return HashBytes( (const byte*) data, size );

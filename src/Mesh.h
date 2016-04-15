@@ -13,6 +13,8 @@ namespace dd
 	class Camera;
 	class ShaderProgram;
 
+	struct MeshHandle;	 
+
 	//
 	// A ref-counted mesh asset.
 	//
@@ -20,7 +22,9 @@ namespace dd
 	{
 	public:
 
-		Mesh( const char* name, ShaderProgram& program );
+		static MeshHandle Create( const char* name, ShaderProgram& program );
+		static Mesh* Get( MeshHandle handle );
+
 		Mesh( const Mesh& other );
 		~Mesh();
 
@@ -35,17 +39,41 @@ namespace dd
 		void RemoveRef();
 
 	private:
+
+		static DenseMap<uint64, Mesh> m_instances;
 		
 		uint m_vbo;
 		uint m_vao;
-
+		String128 m_name;
 		ShaderProgram* m_shader;
 
 		std::atomic<int>* m_refCount;
-
-		String128 m_name;
-
 		void Retain();
 		void Release();
+
+		Mesh( const char* name, ShaderProgram& program );
+	};
+
+	struct MeshHandle
+	{
+	public:
+	
+		MeshHandle() : m_hash( 0 ) {}
+
+		Mesh* Get()
+		{
+			return Mesh::Get( *this );
+		}
+
+		bool IsValid() const
+		{
+			return m_hash != 0;
+		}
+
+	private:
+
+		friend class Mesh;
+
+		uint64 m_hash;
 	};
 }

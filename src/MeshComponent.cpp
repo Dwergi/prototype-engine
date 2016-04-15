@@ -11,48 +11,31 @@
 
 namespace dd
 {
-	MeshComponent::MeshComponent() :
-		m_mesh( nullptr )
+	MeshComponent::MeshComponent()
 	{
 
 	}
 	
-	MeshComponent::MeshComponent( Mesh& mesh ) :
-		m_mesh( &mesh )
+	MeshComponent::MeshComponent( MeshHandle mesh ) :
+		m_mesh( mesh )
 	{
-		m_mesh->AddRef();
+
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
 		Component( other ),
 		m_mesh( other.m_mesh )
 	{
-		if( m_mesh != nullptr )
-		{
-			m_mesh->AddRef();
-		}
+
 	}
 
 	MeshComponent::~MeshComponent()
 	{
-		if( m_mesh != nullptr )
-		{
-			m_mesh->RemoveRef();
-		}
+
 	}
 
-	void MeshComponent::SetMesh( Mesh* mesh )
+	void MeshComponent::SetMesh( MeshHandle mesh )
 	{
-		if( m_mesh != nullptr )
-		{
-			m_mesh->RemoveRef();
-		}
-
 		m_mesh = mesh;
-
-		if( m_mesh != nullptr )
-		{
-			m_mesh->AddRef();
-		}
 	}
 }

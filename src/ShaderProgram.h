@@ -11,6 +11,7 @@
 namespace dd
 {
 	class Shader;
+	struct ShaderHandle;
 
 	typedef int GLint;
 	typedef GLint ShaderLocation;
@@ -20,12 +21,15 @@ namespace dd
 	{
 	public:
 
-		static ShaderProgram Create( const String& name, const Vector<Shader>& shaders );
+		static ShaderHandle Create( const String& name, const Vector<Shader>& shaders );
+		static ShaderProgram* Get( ShaderHandle handle );
 
 		ShaderProgram( const ShaderProgram& other );
 		~ShaderProgram();
 
 		ShaderProgram& operator=( const ShaderProgram& other );
+
+		const String& Name() const { return m_name; }
 
 		void Use( bool use ) const;
 		bool InUse() const;
@@ -43,6 +47,10 @@ namespace dd
 
 	private:
 
+		static DenseMap<uint64, ShaderProgram> m_instances;
+
+		static ShaderProgram CreateInstance( const String& name, const Vector<Shader>& shaders );
+
 		uint m_id;
 		String64 m_name;
 		bool m_valid;
@@ -55,5 +63,28 @@ namespace dd
 
 		void Retain();
 		void Release();
+	};
+
+	struct ShaderHandle
+	{
+	public:
+
+		ShaderHandle() : m_hash( 0 ) {}
+
+		ShaderProgram* Get()
+		{
+			return ShaderProgram::Get( *this );
+		}
+
+		bool IsValid() const
+		{
+			return m_hash != 0;
+		}
+
+	private:
+
+		friend class ShaderProgram;
+
+		uint64 m_hash;
 	};
 }

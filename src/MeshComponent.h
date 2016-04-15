@@ -8,11 +8,10 @@
 
 #include "Component.h"
 #include "DenseMapPool.h"
+#include "Mesh.h"
 
 namespace dd
 {
-	class Mesh;
-
 	class MeshComponent : public Component
 	{
 	public: 
@@ -20,16 +19,16 @@ namespace dd
 		typedef DenseMapPool<MeshComponent> Pool;
 
 		MeshComponent();
-		MeshComponent( Mesh& mesh );
+		MeshComponent( MeshHandle mesh );
 		MeshComponent( const MeshComponent& other );
 		~MeshComponent();
 
-		void SetMesh( Mesh* mesh );
-		Mesh* GetMesh() const { return m_mesh; }
+		void SetMesh( MeshHandle mesh );
+		MeshHandle GetMesh() const { return m_mesh; }
 
 		BASIC_TYPE( MeshComponent )
 
 	private:
-		Mesh* m_mesh;
+		MeshHandle m_mesh;
 	};
 }

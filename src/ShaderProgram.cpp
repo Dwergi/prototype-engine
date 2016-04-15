@@ -15,6 +15,8 @@
 
 namespace dd
 {
+	DenseMap<uint64, ShaderProgram> ShaderProgram::m_instances;
+
 	ShaderProgram::ShaderProgram( const String& name )
 		: m_name( name ),
 		m_refCount( nullptr )
@@ -104,10 +106,8 @@ namespace dd
 		glUseProgram( use ? m_id : 0 );
 	}
 
-	ShaderProgram ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
+	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader>& shaders )
 	{
-		DD_PROFILE_START( ShaderProgram_Create );
-
 		ShaderProgram program( name );
 
 		if( shaders.Size() == 0 )
@@ -127,7 +127,7 @@ namespace dd
 		if( !msg.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed!" );
-			
+
 			program.m_valid = false;
 		}
 
@@ -136,7 +136,40 @@ namespace dd
 			glDetachShader( program.m_id, shader.m_id );
 		}
 
+		return program;
+	}
+
+	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
+	{
+		DD_PROFILE_START( ShaderProgram_Create );
+
+		uint64 hash = dd::Hash( name );
+		ShaderProgram* instance = m_instances.Find( hash );
+
+		if( instance == nullptr )
+		{
+			ShaderProgram program = CreateInstance( name, shaders );
+			if( program.IsValid() )
+			{
+				m_instances.Add( hash, program );
+			}
+			else
+			{
+				hash = 0;
+			}
+		}
+
+		ShaderHandle handle;
+		handle.m_hash = hash;
+
 		DD_PROFILE_END();
+
+		return handle;
+	}
+
+	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
+	{
+		ShaderProgram* program = m_instances.Find( handle.m_hash );
 
 		return program;
 	}

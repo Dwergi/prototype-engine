@@ -27,7 +27,7 @@ namespace dd
 	}
 
 	// TODO: Don't do this.
-	ShaderProgram CreateShaders()
+	ShaderHandle CreateShaders()
 	{
 		Vector<Shader> shaders;
 
@@ -39,10 +39,10 @@ namespace dd
 		DD_ASSERT( pixel.IsValid() );
 		shaders.Add( pixel );
 
-		ShaderProgram program = ShaderProgram::Create( String8( "default" ), shaders );
-		DD_ASSERT( program.IsValid() );
+		ShaderHandle handle = ShaderProgram::Create( String8( "default" ), shaders );
+		DD_ASSERT( handle.IsValid() );
 
-		return program;
+		return handle;
 	}
 
 	void Renderer::Init( Window& window )
@@ -55,10 +55,10 @@ namespace dd
 		glFrontFace( GL_CCW );
 		glCullFace( GL_BACK );
 
-		m_shaders.Add( new ShaderProgram( CreateShaders() ) );
-		ShaderProgram* shader = m_shaders[0];
+		m_shaders.Add( CreateShaders() );
+		ShaderProgram* shader = m_shaders[0].Get();
 
-		Mesh* mesh = new Mesh( "cube", *shader );
+		MeshHandle mesh = Mesh::Create( "cube", *shader );
 		m_meshes.Add( mesh );
 
 		EntityHandle handle = Services::Get<EntitySystem>().CreateEntity<TransformComponent, MeshComponent>();
@@ -83,12 +83,13 @@ namespace dd
 
 		for( MeshComponent& mesh_cmp : meshes )
 		{
-			if( mesh_cmp.GetMesh() != nullptr )
+			Mesh* mesh = mesh_cmp.GetMesh().Get();
+			if( mesh != nullptr )
 			{
 				TransformComponent* transform_cmp = transforms.Find( mesh_cmp.Entity );
 				if( transform_cmp != nullptr )
 				{
-					mesh_cmp.GetMesh()->Render( *m_camera, transform_cmp->Position );
+					mesh->Render( *m_camera, transform_cmp->Position );
 				}
 			}
 		}
