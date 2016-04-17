@@ -8,7 +8,7 @@
 
 #include "Plane.h"
 
-namespace dd
+namespace dd 
 {
 	struct AABB;
 	class Camera;
