@@ -31,22 +31,27 @@ namespace dd
 
 	glm::vec3 Camera::GetPosition() const
 	{
-		return m_transform[3].xyz();
-	}
-
-	glm::mat4 Camera::GetTransform() const
-	{
-		return m_transform;
+		return m_position;
 	}
 
 	void Camera::SetPosition( const glm::vec3& pos )
 	{
-		m_transform[3] = glm::vec4( pos, 0 );
+		m_position = pos;
+	}
+
+	glm::vec3 Camera::GetDirection() const
+	{
+		return m_direction;
 	}
 	
-	void Camera::SetTransform( const glm::mat4& transform )
+	void Camera::SetDirection( const glm::vec3& dir )
 	{
-		m_transform = transform;
+		m_direction = glm::normalize( dir );
+	}
+
+	glm::mat4 Camera::GetCameraMatrix() const
+	{
+		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
 	}
 
 	float Camera::GetNear() const

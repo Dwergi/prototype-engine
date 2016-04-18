@@ -143,7 +143,9 @@ namespace dd
 		m_vao( other.m_vao ),
 		m_vbo( other.m_vbo ),
 		m_name( other.m_name ),
-		m_shader( other.m_shader )
+		m_shader( other.m_shader ),
+		m_bounds( other.m_bounds ),
+		m_colour( other.m_colour )
 	{
 		Retain();
 	}
@@ -203,7 +205,7 @@ namespace dd
 		m_bounds = bounds;
 	}
 
-	void Mesh::Render( const Camera& camera, const glm::vec3& position )
+	void Mesh::Render( const Camera& camera, const glm::mat4& transform )
 	{
 		DD_PROFILE_START( Mesh_Render );
 
@@ -214,13 +216,14 @@ namespace dd
 
 		glBindVertexArray( m_vao );
 
-		glm::mat4 model = glm::translate( position );
-		glm::mat4 view = camera.GetTransform();
+		glm::mat4 model = transform;
+		glm::mat4 view = camera.GetCameraMatrix();
 		glm::mat4 projection = camera.GetProjection();
 
 		glm::mat4 mvp = projection * view * model;
 
 		m_shader->SetUniform( "mvp", mvp );
+		m_shader->SetUniform( "colour_multiplier", m_colour );
 
 		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
 
@@ -242,6 +245,8 @@ namespace dd
 	{
 		DD_ASSERT( m_refCount != nullptr );
 
+		float* data = m_data.Release();
+
 		if( --*m_refCount <= 0 )
 		{
 			glDeleteBuffers( 1, &m_vbo );
@@ -251,6 +256,9 @@ namespace dd
 
 			m_vbo = OpenGL::InvalidID;
 			m_vao = OpenGL::InvalidID;
+
+			if( data != nullptr )
+				delete data;
 		}
 	}
 }

@@ -14,6 +14,7 @@
 
 #include "GL/gl3w.h"
 
+#include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "imgui/imgui.h"
@@ -68,12 +69,20 @@ namespace dd
 	void Renderer::Init( Window& window )
 	{
 		m_camera = new Camera( window );
-		m_camera->SetTransform( glm::lookAt( glm::vec3( 10, 0, 10 ), glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) ) );
+		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
+		m_camera->SetDirection( glm::vec3( -1, 0, -1 ) );
 
+		// depth test
 		glEnable( GL_DEPTH_TEST );
+		
+		// backface culling
 		glEnable( GL_CULL_FACE );
 		glFrontFace( GL_CCW );
 		glCullFace( GL_BACK );
+
+		// alpha blending
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		m_shaders.Add( CreateShaders() );
 		ShaderProgram* shader = m_shaders[0].Get();
@@ -96,6 +105,41 @@ namespace dd
 		Services::GetDoubleBuffer<MeshComponent>().Duplicate();
 	}
 
+	void RenderAxes( Camera& camera, ShaderProgram& program )
+	{
+		// Render axes
+		{
+			MeshHandle x_axis = Mesh::Create( "x_axis", program );
+			Mesh* x_mesh = x_axis.Get();
+
+			x_mesh->SetColourMultiplier( glm::vec4( 1, 0, 0, 1 ) );
+
+			glm::mat4 x_transform = glm::scale( glm::vec3( 100, 0.05f, 0.05f ) );
+			x_mesh->Render( camera, x_transform );
+		}
+
+		{
+			MeshHandle y_axis = Mesh::Create( "y_axis", program );
+			Mesh* y_mesh = y_axis.Get();
+
+			y_mesh->SetColourMultiplier( glm::vec4( 0, 1, 0, 1 ) );
+
+			glm::mat4 y_transform = glm::scale( glm::vec3( 0.05f, 100, 0.05f ) );
+			y_mesh->Render( camera, y_transform );
+		}
+
+		{
+			MeshHandle z_axis = Mesh::Create( "z_axis", program );
+			Mesh* z_mesh = z_axis.Get();
+
+			z_mesh->SetColourMultiplier( glm::vec4( 0, 0, 1, 1 ) );
+
+			glm::mat4 z_transform = glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) );
+			z_mesh->Render( camera, z_transform );
+		}
+
+	}
+
 	void Renderer::Render( float delta_t )
 	{
 		Frustum frustum( *m_camera );
@@ -111,10 +155,28 @@ namespace dd
 				TransformComponent* transform_cmp = transforms.Find( mesh_cmp.Entity );
 				if( transform_cmp != nullptr )
 				{
-					mesh->Render( *m_camera, transform_cmp->Position );
+					glm::vec4 multiplier( 0, 1, 0, 1 );
+					if( !frustum.Intersects( mesh->Bounds() ) )
+						multiplier = glm::vec4( 1, 0, 0, 1 );
+
+					mesh->SetColourMultiplier( multiplier );
+					mesh->Render( *m_camera, glm::translate( transform_cmp->Position ) );
+
+					++m_meshCount;
 				}
 			}
 		}
+
+		RenderAxes( *m_camera, *m_shaders[0].Get() );
+
+		// Render frustum
+		MeshHandle test_h = Mesh::Create( "test", *m_shaders[0].Get() );
+		Mesh* test_mesh = test_h.Get();
+
+		test_mesh->SetColourMultiplier( glm::vec4( 1, 1, 0, 1.0f ) );
+
+		glm::mat4 test_transform = glm::translate( glm::vec3( 5, 5, 5 ) );
+		test_mesh->Render( *m_camera, test_transform );
 	}
 
 	Camera& Renderer::GetCamera() const

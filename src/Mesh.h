@@ -52,7 +52,7 @@ namespace dd
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( const Camera& camera, const glm::vec3& position );
+		void Render( const Camera& camera, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
@@ -63,6 +63,7 @@ namespace dd
 		void SetData( float* data, uint count, uint stride );
 		void BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized );
 
+		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
 		Mesh& operator=( const Mesh& other );
 		Mesh( const Mesh& other );
@@ -80,6 +81,7 @@ namespace dd
 		AABB m_bounds;
 		Buffer<float> m_data;
 		uint m_stride;
+		glm::vec4 m_colour;
 
 		std::atomic<int>* m_refCount;
 		void Retain();

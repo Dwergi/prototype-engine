@@ -16,6 +16,12 @@ namespace dd
 
 	}
 
+	Plane::Plane( const glm::vec4& params )
+		: Plane( params.x, params.y, params.z, params.w )
+	{
+
+	}
+
 	Plane::Plane( float a, float b, float c, float d )
 	{
 		glm::vec3 normal( a, b, c );

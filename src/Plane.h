@@ -13,6 +13,7 @@ namespace dd
 	public:
 
 		Plane();
+		Plane( const glm::vec4& params );
 		Plane( const glm::vec3& point, const glm::vec3& normal );
 		Plane( float a, float b, float c, float d );
 		Plane( const glm::vec3& pt1, const glm::vec3& pt2, const glm::vec3& pt3 );

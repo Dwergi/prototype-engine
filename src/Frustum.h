@@ -13,13 +13,6 @@ namespace dd
 	struct AABB;
 	class Camera;
 
-	enum class FrustumState
-	{
-		Outside,
-		Intersects,
-		Inside
-	};
-
 	class Frustum
 	{
 	public:
@@ -32,7 +25,7 @@ namespace dd
 		//
 		// Check if the frustum intersects with the given bounds.
 		//
-		FrustumState Intersects( const AABB& bounds ) const;
+		bool Intersects( const AABB& bounds ) const;
 
 	private:
 

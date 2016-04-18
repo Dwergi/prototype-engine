@@ -245,6 +245,20 @@ namespace dd
 		}
 	}
 
+	void ShaderProgram::SetUniform( const char* name, const glm::vec4& vec ) const
+	{
+		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name );
+
+		DD_ASSERT( uniform != -1 );
+		if( uniform != -1 )
+		{
+			glUniform4fv( uniform, 1, glm::value_ptr( vec ) );
+		}
+	}
+
 	void ShaderProgram::SetUniform( const char* name, const glm::mat4& mat ) const
 	{
 		DD_ASSERT( m_valid, "Program is invalid!" );

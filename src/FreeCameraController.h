@@ -40,8 +40,6 @@ namespace dd
 		float m_yaw;
 		float m_pitch;
 		glm::vec2 m_mouseDelta;
-		glm::vec3 m_position;
-		glm::vec3 m_direction;
 
 		DenseMap<InputAction, bool> m_inputs;
 	};

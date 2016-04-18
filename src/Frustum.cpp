@@ -18,7 +18,7 @@ namespace dd
 {
 	Frustum::Frustum( Camera& camera )
 	{
-		const float vfov = camera.GetVerticalFOV();
+		/*const float vfov = camera.GetVerticalFOV();
 		const float si = std::sinf( vfov );
 		const float co = std::cosf( vfov );
 		const float aspect = camera.GetAspectRatio();
@@ -28,12 +28,19 @@ namespace dd
 		m_planes[2] = Plane( co,	0.0f,	si * aspect,	0.0f );
 		m_planes[3] = Plane( -co,	0.0f,	si * aspect,	0.0f );
 		m_planes[4] = Plane( 0.0f,	0.0f,	1.0f,			camera.GetFar() );
-		m_planes[5] = Plane( 0.0f,	0.0f,	-1.0f,			-camera.GetNear() );
+		m_planes[5] = Plane( 0.0f,	0.0f,	-1.0f,			-camera.GetNear() );*/
 
-		m_invTransform = glm::inverse( camera.GetTransform() );
+		glm::mat4 mvp = camera.GetCameraMatrix() * camera.GetProjection();
+
+		m_planes[0] = Plane(  mvp[0] + mvp[3] );
+		m_planes[1] = Plane( -mvp[0] + mvp[3] );
+		m_planes[2] = Plane(  mvp[1] + mvp[3] );
+		m_planes[3] = Plane( -mvp[1] + mvp[3] );
+		m_planes[4] = Plane(  mvp[2] + mvp[3] );
+		m_planes[5] = Plane( -mvp[2] + mvp[3] );
 	}
 
-	FrustumState Frustum::Intersects( const AABB& bounds ) const
+	bool Frustum::Intersects( const AABB& bounds ) const
 	{
 		glm::vec3 corners[8];
 		bounds.GetCorners( corners );
@@ -45,30 +52,20 @@ namespace dd
 			int inCount = 8;
 			bool inside = true;
 
-			for( const glm::vec3& corner : corners ) 
-			{
-				glm::vec4 transformed( corner, 1.0f );
-				transformed = transformed * m_invTransform;
+			glm::vec4 pvertex = glm::vec4(
+				plane.Normal().x > 0 ? bounds.Max.x : bounds.Min.x,
+				plane.Normal().y > 0 ? bounds.Max.y : bounds.Min.y,
+				plane.Normal().z > 0 ? bounds.Max.z : bounds.Min.z,
+				1.0f
+				);
 
-				if( plane.DistanceTo( transformed.xyz() ) < 0 )
-				{
-					inside = false;
-					--inCount;
-				}
-			}
+			pvertex = pvertex * m_invTransform;
 
-			// were all the points outside of plane p?
-			if( inCount == 0 )
-				return FrustumState::Outside;
-
-			totalIn += inside ? 1 : 0;
+			if( plane.DistanceTo( pvertex.xyz() ) < 0 )
+				return false;
 		}
 
-		// so if totalIn is 6, then all are inside the view
-		if( totalIn == 6 )
-			return FrustumState::Inside;
-
 		// we must be partly in then otherwise
-		return FrustumState::Intersects;
+		return true;
 	}
 }

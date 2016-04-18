@@ -40,7 +40,6 @@ namespace dd
 		m_pitch( 0.0f )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
-		m_position = glm::vec3( 5, 0, 0 );
 
 		m_inputs.Add( InputAction::FORWARD, false );
 		m_inputs.Add( InputAction::BACKWARD, false );
@@ -98,10 +97,13 @@ namespace dd
 
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, 2 ) );
 
+		glm::vec3 position = m_camera.GetPosition();
+		glm::vec3 direction = m_camera.GetDirection();
+
 		ImGui::Text( "Yaw: %.1f", m_yaw );
 		ImGui::Text( "Pitch: %.1f", m_pitch );
-		ImGui::Text( "Position: %.1f, %.1f, %.1f", m_position.x, m_position.y, m_position.z );
-		ImGui::Text( "Direction: %.1f, %.1f, %.1f", m_direction.x, m_direction.y, m_direction.z );
+		ImGui::Text( "Position: %.1f, %.1f, %.1f", position.x, position.y, position.z );
+		ImGui::Text( "Direction: %.1f, %.1f, %.1f", direction.x, direction.y, direction.z );
 		ImGui::Text( "VFOV: %.1f", glm::degrees( m_camera.GetVerticalFOV() ) * 2.f );
 		ImGui::End();
 	}
@@ -129,8 +131,6 @@ namespace dd
 		glm::vec3 up = glm::vec3( 0, 1, 0 );
 
 		glm::vec3 right = glm::normalize( glm::cross( direction.xyz(), up ) );
-
-		m_direction = direction;
 
 		glm::vec3 movement( 0, 0, 0 );
 
@@ -163,11 +163,12 @@ namespace dd
 			// scale with time and speed
 			glm::vec3 scaled = movement * MovementSpeed * dt;
 			
-			m_position += scaled;
+			glm::vec3 position = m_camera.GetPosition();
+			position += scaled;
+			m_camera.SetPosition( position );
 		}
 
-		glm::mat4 lookAt = glm::lookAt( m_position, m_position + m_direction, up );
-		m_camera.SetTransform( lookAt );
+		m_camera.SetDirection( direction );
 	}
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )

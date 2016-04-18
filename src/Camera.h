@@ -22,8 +22,10 @@ namespace dd
 		glm::vec3 GetPosition() const;
 		void SetPosition( const glm::vec3& pos );
 
-		glm::mat4 GetTransform() const;
-		void SetTransform( const glm::mat4& transform );
+		glm::vec3 GetDirection() const;
+		void SetDirection( const glm::vec3& dir );
+
+		glm::mat4 GetCameraMatrix() const;
 
 		float GetNear() const;
 		void SetNear( float dist_near );
@@ -42,8 +44,8 @@ namespace dd
 		BEGIN_SCRIPT_OBJECT( Camera )
 			METHOD( Camera, GetPosition )
 			METHOD( Camera, SetPosition )
-			METHOD( Camera, GetTransform )
-			METHOD( Camera, SetTransform )
+			METHOD( Camera, GetDirection )
+			METHOD( Camera, SetDirection )
 			METHOD( Camera, GetNear )
 			METHOD( Camera, SetNear )
 			METHOD( Camera, GetFar )
@@ -57,7 +59,8 @@ namespace dd
 
 	private:
 
-		glm::mat4 m_transform;
+		glm::vec3 m_direction;
+		glm::vec3 m_position;
 		float m_vfov;
 		float m_near;
 		float m_far;
