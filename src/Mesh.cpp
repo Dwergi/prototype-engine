@@ -110,7 +110,6 @@ namespace dd
 
 	Mesh::Mesh( const char* name, ShaderProgram& program ) :
 		m_refCount( nullptr ),
-		m_vao( OpenGL::InvalidID ),
 		m_vbo( OpenGL::InvalidID ),
 		m_shader( &program ),
 		m_name( name ),
@@ -118,8 +117,9 @@ namespace dd
 	{
 		DD_PROFILE_START( Mesh_Create );
 
+		m_vao.Create();
+
 		glGenBuffers( 1, &m_vbo );
-		glGenVertexArrays( 1, &m_vao );
 
 		// TODO: load this from assimp or something
 		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
@@ -175,12 +175,12 @@ namespace dd
 		m_data.Set( data, count );
 		m_stride = stride;
 
-		glBindVertexArray( m_vao );
+		m_vao.Bind();
 
 		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
 		glBufferData( GL_ARRAY_BUFFER, count, data, GL_STATIC_DRAW );
 
-		glBindVertexArray( 0 );
+		m_vao.Unbind();
 	}
 
 	void Mesh::BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized )
@@ -188,11 +188,11 @@ namespace dd
 		DD_ASSERT( m_data.Get() != nullptr );
 		DD_ASSERT( m_stride > 0 );
 
-		glBindVertexArray( m_vao );
+		m_vao.Bind();
 
 		m_shader->BindAttributeFloat( shaderAttribute, count, m_stride * sizeof( float ), normalized );
 
-		glBindVertexArray( 0 );
+		m_vao.Unbind();
 	}
 
 	const AABB& Mesh::Bounds() const
@@ -214,7 +214,7 @@ namespace dd
 
 		m_shader->Use( true );
 
-		glBindVertexArray( m_vao );
+		m_vao.Bind();
 
 		glm::mat4 model = transform;
 		glm::mat4 view = camera.GetCameraMatrix();
@@ -227,7 +227,7 @@ namespace dd
 
 		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
 
-		glBindVertexArray( 0 );
+		m_vao.Unbind();
 
 		m_shader->Use( false );
 
@@ -250,12 +250,12 @@ namespace dd
 		if( --*m_refCount <= 0 )
 		{
 			glDeleteBuffers( 1, &m_vbo );
-			glDeleteVertexArrays( 1, &m_vao );
+			
+			m_vao.Destroy();
 
 			delete m_refCount;
 
 			m_vbo = OpenGL::InvalidID;
-			m_vao = OpenGL::InvalidID;
 
 			if( data != nullptr )
 				delete data;

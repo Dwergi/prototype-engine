@@ -7,11 +7,14 @@
 #pragma once
 
 #include "Plane.h"
+#include "VAO.h"
+#include "VBO.h"
 
 namespace dd 
 {
 	struct AABB;
 	class Camera;
+	class ShaderProgram;
 
 	class Frustum
 	{
@@ -27,9 +30,17 @@ namespace dd
 		//
 		bool Intersects( const AABB& bounds ) const;
 
+		void Render( Camera& camera, ShaderProgram& shader );
+
 	private:
 
+		glm::vec3 m_corners[8];
 		Plane m_planes[6];
 		glm::mat4 m_invTransform;
+		VAO m_vao;
+		VBO m_indices;
+		VBO m_vertices;
+
+		void SetCorners( Camera& camera );
 	};
 }

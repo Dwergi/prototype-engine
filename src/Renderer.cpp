@@ -35,7 +35,7 @@ namespace dd
 	}
 
 	// TODO: Don't do this.
-	ShaderHandle CreateShaders()
+	ShaderHandle CreateShaders( const char* name )
 	{
 		Vector<Shader> shaders;
 
@@ -47,7 +47,7 @@ namespace dd
 		DD_ASSERT( pixel.IsValid() );
 		shaders.Add( pixel );
 
-		ShaderHandle handle = ShaderProgram::Create( String8( "default" ), shaders );
+		ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
 		return handle;
 	}
 
@@ -84,14 +84,16 @@ namespace dd
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		m_shaders.Add( CreateShaders() );
-		ShaderProgram* shader = m_shaders[0].Get();
+		m_shaders.Add( CreateShaders( "mesh" ) );
+		m_defaultShader = m_shaders[0].Get();
 
-		CreateMeshEntity( "cube", *shader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
+		m_shaders.Add( CreateShaders( "frustum" ) );
 
-		CreateMeshEntity( "x_axis", *shader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-		CreateMeshEntity( "y_axis", *shader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-		CreateMeshEntity( "z_axis", *shader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+		CreateMeshEntity( "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
+
+		CreateMeshEntity( "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		CreateMeshEntity( "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		CreateMeshEntity( "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 
 		// TODO: Does not belong here.
 		Services::GetDoubleBuffer<TransformComponent>().Swap();
@@ -117,7 +119,17 @@ namespace dd
 	void Renderer::Render( float delta_t )
 	{
 		m_meshCount = 0;
-		Frustum frustum( *m_camera );
+
+		Camera cam;
+		cam.SetPosition( glm::vec3( 0, 0, 0 ) );
+		cam.SetDirection( m_camera->GetDirection() );
+		cam.SetVerticalFOV( m_camera->GetVerticalFOV() );
+		cam.SetAspectRatio( 16, 9 );
+		cam.SetNear( 0.1f );
+		cam.SetFar( 5.0f );
+
+		Frustum frustum( cam );
+		frustum.Render( *m_camera, *m_shaders[1].Get() );
 
 		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
 		const TransformComponent::Pool& transforms = Services::GetReadPool<TransformComponent>();
@@ -137,15 +149,6 @@ namespace dd
 				}
 			}
 		}
-
-		// Render frustum
-		MeshHandle test_h = Mesh::Create( "test", *m_shaders[0].Get() );
-		Mesh* test_mesh = test_h.Get();
-
-		test_mesh->SetColourMultiplier( glm::vec4( 1, 1, 0, 1.0f ) );
-
-		glm::mat4 test_transform = glm::translate( glm::vec3( 5, 5, 5 ) );
-		test_mesh->Render( *m_camera, test_transform );
 	}
 
 	Camera& Renderer::GetCamera() const

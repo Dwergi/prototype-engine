@@ -66,13 +66,8 @@ namespace dd
 		return m_plane.xyz();
 	}
 
-	glm::vec3 Plane::Origin() const
-	{
-		return m_plane.xyz() - m_plane.w;
-	}
-
 	float Plane::DistanceTo( const glm::vec3& point ) const
 	{
-		return float( m_plane.x * point.x + m_plane.y * point.y + m_plane.z * point.z + m_plane.w );
+		return glm::dot( m_plane.xyz(), point ) + m_plane.w;
 	}
 }

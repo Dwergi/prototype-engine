@@ -7,6 +7,7 @@
 #pragma once
 
 #include "AABB.h"
+#include "VAO.h"
 
 #include <atomic>
 #include <memory>
@@ -75,7 +76,7 @@ namespace dd
 		static DenseMap<uint64, Mesh> m_instances;
 		
 		uint m_vbo;
-		uint m_vao;
+		VAO m_vao;
 		String128 m_name;
 		ShaderProgram* m_shader;
 		AABB m_bounds;

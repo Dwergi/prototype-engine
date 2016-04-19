@@ -12,6 +12,7 @@
 namespace dd
 {
 	class Camera;
+	class ShaderProgram;
 	class Window;
 
 	class Renderer
@@ -40,6 +41,7 @@ namespace dd
 
 		Window* m_window;
 		Camera* m_camera;
+		ShaderProgram* m_defaultShader;
 		Vector<ShaderHandle> m_shaders;
 
 		int m_meshCount;

@@ -399,6 +399,15 @@
     <ClInclude Include="src\Frustum.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\VAO.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLError.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VBO.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -637,6 +646,21 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Frustum.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlaneTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrustumTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VAO.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLError.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VBO.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
