@@ -140,6 +140,7 @@ void RegisterGameTypes()
 	REGISTER_TYPE( Component );
 	REGISTER_TYPE( Message );
 	REGISTER_TYPE( JobSystem );
+	REGISTER_TYPE( MeshHandle );
 
 	REGISTER_TYPE( TransformComponent );
 	REGISTER_TYPE( OctreeComponent );
@@ -309,6 +310,7 @@ int GameMain()
 			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
 
 			renderer.Render( delta_t );
+			renderer.DrawDebugUI();
 
 			if( s_drawConsole )
 				console.Draw( "Console", s_drawConsole );

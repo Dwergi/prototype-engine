@@ -17,14 +17,18 @@ namespace dd
 	}
 	
 	MeshComponent::MeshComponent( MeshHandle mesh ) :
-		m_mesh( mesh )
+		Mesh( mesh ),
+		Hidden( false ),
+		Colour( glm::vec4( 1, 1, 1, 1 ) )
 	{
 
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
 		Component( other ),
-		m_mesh( other.m_mesh )
+		Mesh( other.Mesh ),
+		Hidden( false ),
+		Colour( other.Colour )
 	{
 
 	}
@@ -32,10 +36,5 @@ namespace dd
 	MeshComponent::~MeshComponent()
 	{
 
-	}
-
-	void MeshComponent::SetMesh( MeshHandle mesh )
-	{
-		m_mesh = mesh;
 	}
 }

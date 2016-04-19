@@ -40,9 +40,10 @@ namespace dd
 
 		Window* m_window;
 		Camera* m_camera;
-		Vector<MeshHandle> m_meshes;
 		Vector<ShaderHandle> m_shaders;
 
 		int m_meshCount;
+
+		void CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4 colour, const glm::mat4& transform );
 	};
 }

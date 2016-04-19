@@ -23,12 +23,14 @@ namespace dd
 		MeshComponent( const MeshComponent& other );
 		~MeshComponent();
 
-		void SetMesh( MeshHandle mesh );
-		MeshHandle GetMesh() const { return m_mesh; }
+		MeshHandle Mesh;
+		bool Hidden;
+		glm::vec4 Colour;
 
-		BASIC_TYPE( MeshComponent )
-
-	private:
-		MeshHandle m_mesh;
+		BEGIN_TYPE( MeshComponent )
+			MEMBER( MeshComponent, Mesh )
+			MEMBER( MeshComponent, Hidden )
+			MEMBER( MeshComponent, Colour )
+		END_TYPE
 	};
 }

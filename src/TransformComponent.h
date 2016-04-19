@@ -9,16 +9,18 @@ namespace dd
 	class TransformComponent : public Component
 	{
 	public:
-		glm::vec3 Position;
+		glm::mat4 Transform;
 
 		typedef DenseVectorPool<TransformComponent> Pool;
 
 		TransformComponent() { }
-		TransformComponent( const TransformComponent& other ) : Component( other ), Position( other.Position ) {}
+		TransformComponent( const TransformComponent& other ) : Component( other ), Transform( other.Transform ) {}
+
+		glm::vec3 GetPosition() const { return Transform[3].xyz(); }
+		void SetPosition( const glm::vec3& pos ) { Transform[3].xyz = pos; }
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			PARENT( Component )
-			MEMBER( TransformComponent, Position )
 		END_TYPE
 	};
 }

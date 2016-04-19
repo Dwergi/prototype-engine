@@ -78,24 +78,3 @@ TEST_CASE( "[property] Integer properties" )
 		}
 	}
 }
-
-TEST_CASE( "[property] Recorder" )
-{
-	dd::TransformComponent cmp;
-	cmp.Position.x = 500;
-
-	dd::PropertyList transform_list( cmp );
-	dd::Recorder<float> x_recorder( transform_list.Find( "x" ) );
-
-	float value = 0;
-
-	value = x_recorder;
-	REQUIRE( value == 500.f );
-
-	x_recorder = 200.f;
-	value = x_recorder;
-	REQUIRE( value == 200.f );
-
-	x_recorder.Undo();
-	REQUIRE( x_recorder == 500.f );
-}

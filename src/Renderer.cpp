@@ -60,7 +60,7 @@ namespace dd
 			return;
 		}
 
-		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, 2 ) );
+		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowSize().y - 2 ) );
 
 		ImGui::Text( "Meshes: %d", m_meshCount );
 		ImGui::End();
@@ -87,16 +87,11 @@ namespace dd
 		m_shaders.Add( CreateShaders() );
 		ShaderProgram* shader = m_shaders[0].Get();
 
-		MeshHandle mesh = Mesh::Create( "cube", *shader );
-		m_meshes.Add( mesh );
+		CreateMeshEntity( "cube", *shader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
 
-		EntityHandle handle = Services::Get<EntitySystem>().CreateEntity<TransformComponent, MeshComponent>();
-		
-		TransformComponent* transform_cmp = Services::GetWritePool<TransformComponent>().Find( handle );
-		transform_cmp->Position = glm::vec3( 0, 0, 0 );
-
-		MeshComponent* mesh_cmp = Services::GetWritePool<MeshComponent>().Find( handle );
-		mesh_cmp->SetMesh( mesh );
+		CreateMeshEntity( "x_axis", *shader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		CreateMeshEntity( "y_axis", *shader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		CreateMeshEntity( "z_axis", *shader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 
 		// TODO: Does not belong here.
 		Services::GetDoubleBuffer<TransformComponent>().Swap();
@@ -105,43 +100,23 @@ namespace dd
 		Services::GetDoubleBuffer<MeshComponent>().Duplicate();
 	}
 
-	void RenderAxes( Camera& camera, ShaderProgram& program )
+	void Renderer::CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4 colour, const glm::mat4& transform )
 	{
-		// Render axes
-		{
-			MeshHandle x_axis = Mesh::Create( "x_axis", program );
-			Mesh* x_mesh = x_axis.Get();
+		MeshHandle mesh_h = Mesh::Create( meshName, shader );
 
-			x_mesh->SetColourMultiplier( glm::vec4( 1, 0, 0, 1 ) );
+		EntityHandle handle = Services::Get<EntitySystem>().CreateEntity<TransformComponent, MeshComponent>();
 
-			glm::mat4 x_transform = glm::scale( glm::vec3( 100, 0.05f, 0.05f ) );
-			x_mesh->Render( camera, x_transform );
-		}
+		TransformComponent* transform_cmp = Services::GetWritePool<TransformComponent>().Find( handle );
+		transform_cmp->Transform = transform;
 
-		{
-			MeshHandle y_axis = Mesh::Create( "y_axis", program );
-			Mesh* y_mesh = y_axis.Get();
-
-			y_mesh->SetColourMultiplier( glm::vec4( 0, 1, 0, 1 ) );
-
-			glm::mat4 y_transform = glm::scale( glm::vec3( 0.05f, 100, 0.05f ) );
-			y_mesh->Render( camera, y_transform );
-		}
-
-		{
-			MeshHandle z_axis = Mesh::Create( "z_axis", program );
-			Mesh* z_mesh = z_axis.Get();
-
-			z_mesh->SetColourMultiplier( glm::vec4( 0, 0, 1, 1 ) );
-
-			glm::mat4 z_transform = glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) );
-			z_mesh->Render( camera, z_transform );
-		}
-
+		MeshComponent* mesh_cmp = Services::GetWritePool<MeshComponent>().Find( handle );
+		mesh_cmp->Mesh = mesh_h;
+		mesh_cmp->Colour = colour;
 	}
 
 	void Renderer::Render( float delta_t )
 	{
+		m_meshCount = 0;
 		Frustum frustum( *m_camera );
 
 		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
@@ -149,25 +124,19 @@ namespace dd
 
 		for( MeshComponent& mesh_cmp : meshes )
 		{
-			Mesh* mesh = mesh_cmp.GetMesh().Get();
+			Mesh* mesh = mesh_cmp.Mesh.Get();
 			if( mesh != nullptr )
 			{
 				TransformComponent* transform_cmp = transforms.Find( mesh_cmp.Entity );
 				if( transform_cmp != nullptr )
 				{
-					glm::vec4 multiplier( 0, 1, 0, 1 );
-					if( !frustum.Intersects( mesh->Bounds() ) )
-						multiplier = glm::vec4( 1, 0, 0, 1 );
-
-					mesh->SetColourMultiplier( multiplier );
-					mesh->Render( *m_camera, glm::translate( transform_cmp->Position ) );
+					mesh->SetColourMultiplier( mesh_cmp.Colour	);
+					mesh->Render( *m_camera, transform_cmp->Transform );
 
 					++m_meshCount;
 				}
 			}
 		}
-
-		RenderAxes( *m_camera, *m_shaders[0].Get() );
 
 		// Render frustum
 		MeshHandle test_h = Mesh::Create( "test", *m_shaders[0].Get() );
