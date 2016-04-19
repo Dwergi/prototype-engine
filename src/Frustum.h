@@ -30,6 +30,7 @@ namespace dd
 		//
 		bool Intersects( const AABB& bounds ) const;
 
+		void CreateRenderResources();
 		void Render( Camera& camera, ShaderProgram& shader );
 
 	private:

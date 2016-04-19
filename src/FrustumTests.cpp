@@ -1,5 +1,5 @@
 //
-// PlaneTests.cpp - Tests for Frustum.
+// FrustumTests.cpp - Tests for Frustum.
 // Copyright (C) Sebastian Nordgren 
 // April 19th 2016
 //

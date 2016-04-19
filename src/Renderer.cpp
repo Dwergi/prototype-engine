@@ -9,6 +9,7 @@
 #include "MeshComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
+#include "TerrainChunk.h"
 #include "TransformComponent.h"
 #include "Window.h"
 
@@ -66,6 +67,8 @@ namespace dd
 		ImGui::End();
 	}
 
+	TerrainChunk* chunk;
+
 	void Renderer::Init( Window& window )
 	{
 		m_camera = new Camera( window );
@@ -88,12 +91,23 @@ namespace dd
 		m_defaultShader = m_shaders[0].Get();
 
 		m_shaders.Add( CreateShaders( "frustum" ) );
+		m_shaders.Add( CreateShaders( "terrain" ) );
 
 		CreateMeshEntity( "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
 
 		CreateMeshEntity( "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 		CreateMeshEntity( "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
 		CreateMeshEntity( "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+
+		ChunkKey key;
+		key.LOD = 0;
+		key.Size = 16;
+		key.X = 0;
+		key.Y = 0;
+
+		chunk = new TerrainChunk( key );
+		chunk->Generate();
+		chunk->CreateRenderResources();
 
 		// TODO: Does not belong here.
 		Services::GetDoubleBuffer<TransformComponent>().Swap();
@@ -128,7 +142,10 @@ namespace dd
 		cam.SetNear( 0.1f );
 		cam.SetFar( 5.0f );
 
+		chunk->Render( *m_camera, *m_shaders[2].Get() );
+
 		Frustum frustum( cam );
+		frustum.CreateRenderResources();
 		frustum.Render( *m_camera, *m_shaders[1].Get() );
 
 		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();

@@ -161,7 +161,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimpd.lib;imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
@@ -277,7 +277,7 @@
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
-      <AdditionalDependencies>assimpd.lib;imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
@@ -305,6 +305,7 @@
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
+    <ClInclude Include="include\stb\stb_image_write.h" />
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CommandLine.h" />
@@ -370,6 +371,8 @@
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
+    <ClInclude Include="src\TerrainChunk.h" />
+    <ClInclude Include="src\TerrainSystem.h" />
     <ClInclude Include="src\Tests.h" />
     <ClInclude Include="src\Tests\TestTypes.h" />
     <ClInclude Include="src\Timer.h" />
@@ -434,6 +437,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="include\stb\stb_image_write.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
@@ -450,6 +457,9 @@
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\TerrainChunk.cpp" />
+    <ClCompile Include="src\TerrainChunkTests.cpp" />
+    <ClCompile Include="src\TerrainSystem.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp" />
     <ClCompile Include="src\Tests\JobSystemTests.cpp" />
     <ClCompile Include="src\Tests\TypeInfoTests.cpp" />

@@ -81,10 +81,13 @@ namespace dd
 		m_planes[5] = Plane( -mvp[2] + mvp[3] );
 
 		SetCorners( camera );
+	}
 
+	void Frustum::CreateRenderResources()
+	{
 		m_vao.Create();
 		m_vao.Bind();
-	
+
 		m_vertices.Create( GL_ARRAY_BUFFER );
 		m_vertices.Bind();
 		m_vertices.SetData( m_corners, sizeof( m_corners ) );

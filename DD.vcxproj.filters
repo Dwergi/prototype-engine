@@ -91,6 +91,9 @@
     <Filter Include="Input">
       <UniqueIdentifier>{26287e03-283d-43d3-9a8c-3965659777b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Includes\stb">
+      <UniqueIdentifier>{a6d272e9-35c9-466a-9682-69fa40ba0a3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -408,6 +411,15 @@
     <ClInclude Include="src\VBO.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\TerrainSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainChunk.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb\stb_image_write.h">
+      <Filter>Includes\stb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -662,6 +674,18 @@
     </ClCompile>
     <ClCompile Include="src\VBO.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainChunk.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainChunkTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="include\stb\stb_image_write.cpp">
+      <Filter>Includes\stb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
