@@ -49,11 +49,11 @@ namespace dd
 
 			// we have a job, let's do it!
 			JobSystem::Job* job = handle.GetJob();
-			job->Status = JobSystem::JobStatus::Running;
+			handle.SetStatus( JobSystem::JobStatus::Running );
 
 			job->Func();
 
-			job->Status = JobSystem::JobStatus::Done;
+			handle.SetStatus( JobSystem::JobStatus::Done );
 
 			m_pendingJobs.Pop();
 		}

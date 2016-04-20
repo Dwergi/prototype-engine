@@ -211,6 +211,19 @@ namespace dd
 		return nullptr;
 	}
 
+	void JobHandle::SetStatus( JobSystem::JobStatus status ) const
+	{
+		DD_ASSERT( m_system != nullptr, "Invalid handle used!" );
+
+		std::lock_guard<std::mutex> lock( m_system->m_jobsMutex );
+
+		for( JobSystem::Job& job : m_system->m_jobs )
+		{
+			if( job.ID == m_id )
+				job.Status = status;
+		}
+	}
+
 	bool JobSystem::GetPendingJob( JobHandle& out_handle )
 	{
 		UpdateJobs();
@@ -268,7 +281,7 @@ namespace dd
 
 			UpdateJobs();
 			
-			::Sleep( 0 );
+			::Sleep( 1 );
 		} 
 		while( timeout_ms == 0 || timer.Time() < timeout_ms );
 	}

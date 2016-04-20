@@ -14,7 +14,6 @@ TEST_CASE( "[TerrainChunk] Generate" )
 	dd::ChunkKey key;
 	key.X = 0;
 	key.Y = 0;
-	key.LOD = 4;
 	key.Size = 16;
 
 	dd::TerrainChunk chunk( key );

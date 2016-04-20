@@ -9,7 +9,7 @@
 #include "MeshComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
-#include "TerrainChunk.h"
+#include "TerrainSystem.h"
 #include "TransformComponent.h"
 #include "Window.h"
 
@@ -25,7 +25,9 @@ namespace dd
 	Renderer::Renderer() :
 		m_meshCount( 0 ),
 		m_camera( nullptr ),
-		m_window( nullptr )
+		m_window( nullptr ),
+		m_terrain( nullptr ),
+		m_defaultShader( nullptr )
 	{
 
 	}
@@ -69,7 +71,7 @@ namespace dd
 
 	TerrainChunk* chunk;
 
-	void Renderer::Init( Window& window )
+	void Renderer::Initialize( Window& window )
 	{
 		m_camera = new Camera( window );
 		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
@@ -99,16 +101,6 @@ namespace dd
 		CreateMeshEntity( "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
 		CreateMeshEntity( "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 
-		ChunkKey key;
-		key.LOD = 0;
-		key.Size = 16;
-		key.X = 0;
-		key.Y = 0;
-
-		chunk = new TerrainChunk( key );
-		chunk->Generate();
-		chunk->CreateRenderResources();
-
 		// TODO: Does not belong here.
 		Services::GetDoubleBuffer<TransformComponent>().Swap();
 		Services::GetDoubleBuffer<MeshComponent>().Swap();
@@ -134,7 +126,7 @@ namespace dd
 	{
 		m_meshCount = 0;
 
-		Camera cam;
+		/*Camera cam;
 		cam.SetPosition( glm::vec3( 0, 0, 0 ) );
 		cam.SetDirection( m_camera->GetDirection() );
 		cam.SetVerticalFOV( m_camera->GetVerticalFOV() );
@@ -142,11 +134,12 @@ namespace dd
 		cam.SetNear( 0.1f );
 		cam.SetFar( 5.0f );
 
-		chunk->Render( *m_camera, *m_shaders[2].Get() );
-
 		Frustum frustum( cam );
 		frustum.CreateRenderResources();
-		frustum.Render( *m_camera, *m_shaders[1].Get() );
+		frustum.Render( *m_camera, *m_shaders[1].Get() );*/
+
+		if( m_terrain != nullptr )
+			m_terrain->Render( *m_camera, *m_shaders[2].Get() );	
 
 		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
 		const TransformComponent::Pool& transforms = Services::GetReadPool<TransformComponent>();

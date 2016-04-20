@@ -99,6 +99,7 @@ namespace dd
 		JobHandle( JobSystem& system, JobSystem::Job& job );
 
 		JobSystem::Job* GetJob() const;
+		void SetStatus( JobSystem::JobStatus status ) const;
 		
 	private:
 		JobSystem* m_system;

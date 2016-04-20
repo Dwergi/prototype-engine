@@ -122,7 +122,7 @@ TEST_CASE( "[Wren] Register Global Var" )
 
 	engine.RegisterGlobalVariable<decltype( s_counter ), s_counter>( "Counter" );
 }
-/*
+
 TEST_CASE( "[Wren] Call Wren Method" )
 {
 	dd::WrenEngine engine;
@@ -189,4 +189,4 @@ TEST_CASE( "[Wren] Call From Wren" )
 	REQUIRE( WrenTest::FunctionCalled );
 	REQUIRE( WrenTest::FunctionRetCalled );
 	REQUIRE( WrenTest::FunctionArgCalled );
-}*/
+}

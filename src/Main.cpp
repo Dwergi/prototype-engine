@@ -32,6 +32,7 @@
 #include "ScopedTimer.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
+#include "TerrainSystem.h"
 #include "Timer.h"
 #include "TransformComponent.h"
 #include "Window.h"
@@ -256,6 +257,7 @@ int GameMain()
 
 	{
 		JobSystem jobsystem( 2u );
+		Services::Register( jobsystem );
 
 		EntitySystem entitySystem;
 		REGISTER_TYPE( EntitySystem );
@@ -275,7 +277,13 @@ int GameMain()
 		BindKeys( *s_input );
 
 		Renderer renderer;
-		renderer.Init( *s_window );
+		renderer.Initialize( *s_window );
+
+		TerrainSystem terrain( renderer.GetCamera() );
+		terrain.Initialize();
+		terrain.SaveChunkImages();
+
+		renderer.SetTerrainSystem( terrain );
 		
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
@@ -307,7 +315,9 @@ int GameMain()
 			if( s_drawCameraDebug )
 				free_cam.DrawCameraDebug();
 
-			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "SwarmSystem" );
+			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "System" );
+
+			terrain.Update( delta_t );
 
 			renderer.Render( delta_t );
 			renderer.DrawDebugUI();

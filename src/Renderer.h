@@ -13,6 +13,7 @@ namespace dd
 {
 	class Camera;
 	class ShaderProgram;
+	class TerrainSystem;
 	class Window;
 
 	class Renderer
@@ -22,7 +23,7 @@ namespace dd
 		Renderer();
 		~Renderer();
 
-		void Init( Window& window );
+		void Initialize( Window& window );
 
 		//
 		// Render a full frame.
@@ -37,11 +38,14 @@ namespace dd
 		//
 		Camera& GetCamera() const;
 
+		void SetTerrainSystem( TerrainSystem& terrain ) { m_terrain = &terrain; }
+
 	private:
 
 		Window* m_window;
 		Camera* m_camera;
 		ShaderProgram* m_defaultShader;
+		TerrainSystem* m_terrain;
 		Vector<ShaderHandle> m_shaders;
 
 		int m_meshCount;
