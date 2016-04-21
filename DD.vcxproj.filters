@@ -420,6 +420,9 @@
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
     </ClInclude>
+    <ClInclude Include="src\TerrainChunkKey.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -687,6 +690,9 @@
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
     </ClCompile>
+    <ClCompile Include="src\TerrainChunkKey.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -727,6 +733,9 @@
     </None>
     <None Include="src\Services.inl">
       <Filter>Core</Filter>
+    </None>
+    <None Include="src\TerrainChunk.inl">
+      <Filter>Systems</Filter>
     </None>
   </ItemGroup>
 </Project>

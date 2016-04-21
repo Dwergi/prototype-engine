@@ -18,8 +18,6 @@ namespace dd
 		m_name( other.m_name )
 	{
 		DD_PROFILE_THREAD_NAME( m_name.c_str() );
-
-		std::swap( m_pendingJobs, other.m_pendingJobs );
 	}
 
 	JobThread::JobThread( JobSystem& owner, const char* name )
@@ -42,20 +40,11 @@ namespace dd
 
 	void JobThread::ProcessJob()
 	{
-		JobHandle handle;
-		if( m_owner.GetPendingJob( handle ) )
+		JobSystem::Job* job;
+		if( m_owner.GetPendingJob( job ) )
 		{
-			m_pendingJobs.Add( handle );
-
-			// we have a job, let's do it!
-			JobSystem::Job* job = handle.GetJob();
-			handle.SetStatus( JobSystem::JobStatus::Running );
-
 			job->Func();
-
-			handle.SetStatus( JobSystem::JobStatus::Done );
-
-			m_pendingJobs.Pop();
+			m_owner.MarkDone( *job );
 		}
 	}
 
@@ -68,30 +57,5 @@ namespace dd
 			// let someone else have a go at the CPU
 			::Sleep( 0 );
 		}
-	}
-
-	void JobThread::WaitForCategory( const char* category, uint timeout_ms )
-	{
-		Timer timer;
-		timer.Start();
-		
-		DD_ASSERT( m_pendingJobs.Size() > 0 );
-
-		JobHandle current = m_pendingJobs[m_pendingJobs.Size() - 1];
-		current.GetJob()->Status = JobSystem::JobStatus::Waiting;
-		current.GetJob()->WaitingOn = String128( category );
-
-		do
-		{
-			m_owner.UpdateJobs();
-
-			if( current.GetJob()->Status == JobSystem::JobStatus::DoneWaiting )
-				return;
-
-			// find more work to process in the meantime
-			ProcessJob();
-
-			::Sleep( 0 );
-		} while( timeout_ms == 0 || timer.Time() < timeout_ms );
 	}
 }

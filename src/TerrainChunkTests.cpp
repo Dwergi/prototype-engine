@@ -8,10 +8,11 @@
 #include "catch/catch.hpp"
 
 #include "TerrainChunk.h"
+#include "TerrainChunkKey.h"
 
 TEST_CASE( "[TerrainChunk] Generate" )
 {
-	dd::ChunkKey key;
+	dd::TerrainChunkKey key;
 	key.X = 0;
 	key.Y = 0;
 	key.Size = 16;

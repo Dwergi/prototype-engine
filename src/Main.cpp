@@ -281,7 +281,6 @@ int GameMain()
 
 		TerrainSystem terrain( renderer.GetCamera() );
 		terrain.Initialize();
-		terrain.SaveChunkImages();
 
 		renderer.SetTerrainSystem( terrain );
 		
@@ -318,6 +317,8 @@ int GameMain()
 			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "System" );
 
 			terrain.Update( delta_t );
+
+			jobsystem.WaitForCategory( "System" );
 
 			renderer.Render( delta_t );
 			renderer.DrawDebugUI();

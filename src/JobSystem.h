@@ -42,16 +42,14 @@ namespace dd
 	private:
 
 		static const uint MAX_THREADS = 8;
+		static const uint JOB_QUEUE_SIZE = 1024;
 
 		enum class JobStatus
 		{
 			Pending,
 			Assigned,
-			Running,
-			Waiting,
-			DoneWaiting,
 			Done,
-			Invalid
+			Free
 		};
 
 		//
@@ -61,48 +59,30 @@ namespace dd
 		{
 			Job( const Job& other );
 			Job( const std::function<void()>& fn, const char* category, uint id );
+			~Job();
 
-			std::function<void()> Func;
-			String128 Category;
-			String128 WaitingOn;
 			JobStatus Status;
+			String128 Category;
 			uint ID;
+			std::function<void()> Func;
 		};
 
 		friend class JobThread;
-		friend class JobHandle;
 
 		std::thread m_threads[MAX_THREADS];
 		Vector<JobThread*> m_workers;
 		Vector<Job> m_jobs;
-		uint m_jobID;
+		Vector<int> m_pendingJobs;
 
 		std::mutex m_jobsMutex;
 
 		void CreateWorkers( uint thread_count );
-
-		bool GetPendingJob( JobHandle& out_job );
-
 		JobThread* FindCurrentWorker() const;
 
 		bool HasPendingJobs( const char* category );
-		void UpdateJobs();
-	};
 
-	//
-	// A handle to refer to a single pending job.
-	//
-	class JobHandle
-	{
-	public:
-		JobHandle();
-		JobHandle( JobSystem& system, JobSystem::Job& job );
-
-		JobSystem::Job* GetJob() const;
-		void SetStatus( JobSystem::JobStatus status ) const;
-		
-	private:
-		JobSystem* m_system;
-		uint m_id;
+		// JobThread interface
+		bool GetPendingJob( Job*& out_job );
+		void MarkDone( const Job& job );
 	};
 }
