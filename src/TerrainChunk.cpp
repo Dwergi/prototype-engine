@@ -50,12 +50,8 @@ namespace dd
 		m_vao.Create();
 		m_vao.Bind();
 
-		/*s_indices.Create();
-		s_indices.Bind();*/
-
-		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER );
-		m_vboIndex.Bind();
-		m_vboIndex.SetData( &s_indices.Indices[0], sizeof( s_indices.Indices[0] ) * s_indices.Count );
+		s_indices.Create();
+		s_indices.Bind();
 
 		m_vboVertex.Create( GL_ARRAY_BUFFER );
 		m_vboVertex.Bind();
@@ -65,6 +61,8 @@ namespace dd
 		m_shader->BindAttributeFloat( "position", 3, 3 * sizeof( GLfloat ), false );
 
 		m_vao.Unbind();
+
+		CheckGLError();
 	}
 
 	float TerrainChunk::GetHeight( float x, float y )
@@ -128,18 +126,12 @@ namespace dd
 
 		m_vao.Bind();
 
-		CheckGLError();
-		
 		m_shader->Use( true );
-
-		CheckGLError();
 
 		glm::mat4 model = glm::translate( glm::vec3( m_key.X, 0, m_key.Y ) );
 
 		glm::mat4 mvp = camera.GetProjection() * camera.GetCameraMatrix() * model;
 		m_shader->SetUniform( "mvp", mvp );
-
-		CheckGLError();
 
 		float clr = m_key.Size / 128.f;
 		glm::vec4 colour( clr, clr, clr, 1.0 );
@@ -147,11 +139,11 @@ namespace dd
 
 		glDrawElements( GL_TRIANGLES, s_indices.Count, GL_UNSIGNED_SHORT, 0 );
 
-		CheckGLError();
-
 		m_shader->Use( false );
 
 		m_vao.Unbind();
+
+		CheckGLError();
 	}
 
 	void TerrainChunk::Write( const char* filename )

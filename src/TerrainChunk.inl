@@ -55,9 +55,9 @@ namespace dd
 			return;
 
 		m_created = true;
-		/*m_vbo.Create( 0x8893 );
+		m_vbo.Create( 0x8893 );
 		m_vbo.Bind();
-		m_vbo.SetData( &Indices[0], sizeof( Indices[0] ) * Count );*/
+		m_vbo.SetData( &Indices[0], sizeof( Indices[0] ) * Count );
 	}
 
 	template <int Width, int Height>

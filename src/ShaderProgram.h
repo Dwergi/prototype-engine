@@ -32,7 +32,7 @@ namespace dd
 
 		const String& Name() const { return m_name; }
 
-		void Use( bool use ) const;
+		void Use( bool use );
 		bool InUse() const;
 
 		bool IsValid() const { return m_valid; }
@@ -57,6 +57,7 @@ namespace dd
 		uint m_id;
 		String64 m_name;
 		bool m_valid;
+		bool m_inUse;
 
 		std::atomic<int>* m_refCount;
 

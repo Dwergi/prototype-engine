@@ -230,7 +230,7 @@ namespace dd
 			if( !HasPendingJobs( category ) )
 				return;
 			
-			::Sleep( 1 );
+			::Sleep( 0 );
 		} 
 		while( timeout_ms == 0 || timer.Time() < timeout_ms );
 	}

@@ -62,7 +62,6 @@ namespace dd
 
 		VAO m_vao;
 		VBO m_vboVertex;
-		VBO m_vboIndex;
 		ShaderProgram* m_shader;
 
 		TerrainChunkKey m_key;

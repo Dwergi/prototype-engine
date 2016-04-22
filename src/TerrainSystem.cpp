@@ -211,7 +211,7 @@ namespace dd
 	void TerrainSystem::Update( float delta_t )
 	{
 		glm::vec3 cam_pos = m_camera.GetPosition();
-		glm::vec2 chunk_origin = glm::vec2( (uint) (cam_pos.x / m_chunkSize) * m_chunkSize, (uint) (cam_pos.z / m_chunkSize) * m_chunkSize );
+		glm::vec2 chunk_origin = glm::vec2( (int) (cam_pos.x / m_chunkSize) * (int) m_chunkSize, (int) (cam_pos.z / m_chunkSize) * (int) m_chunkSize );
 
 		// generate chunk keys
 		Vector<Vector<TerrainChunkKey>> chunks;
