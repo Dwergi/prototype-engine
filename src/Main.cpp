@@ -56,6 +56,10 @@ bool s_drawFPS = true;
 extern float s_maxFPS;
 float s_maxFPS = 60.0f;
 
+const int SLIDING_WINDOW_SIZE = 60;
+float s_frameTimes[SLIDING_WINDOW_SIZE];
+int s_currentFrame = 0;
+
 bool s_drawConsole = false;
 
 bool s_drawCameraDebug = true;
@@ -74,9 +78,24 @@ void DrawFPS( float delta_t )
 		return;
 	}
 
+	s_frameTimes[s_currentFrame] = delta_t;
+	++s_currentFrame;
+
+	if( s_currentFrame >= SLIDING_WINDOW_SIZE )
+		s_currentFrame = 0;
+
 	float ms = delta_t * 1000.f;
 
+	float total_time = 0;
+	for( float f : s_frameTimes )
+	{
+		total_time += f;
+	}
+
+	float sliding_delta = (total_time / SLIDING_WINDOW_SIZE) * 1000.f;
+
 	ImGui::Text( "Frame time: %.1f", ms );
+	ImGui::Text( "Sliding: %.1f", sliding_delta );
 	ImGui::End();
 }
 
@@ -178,6 +197,12 @@ public:
 		m_lastFrameTime = 0.0f;
 		m_currentFrameTime = -m_targetDelta;
 		m_delta = m_targetDelta;
+
+		// fill history with standard deltas
+		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
+		{
+			s_frameTimes[i] = m_targetDelta;
+		}
 
 		m_timer.Start();
 	}
