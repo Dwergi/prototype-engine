@@ -98,7 +98,7 @@ namespace dd
 		typeInfo->DeserializeCustom = dd::Serialize::DeserializePOD<T>;
 
 		sm_typeMap.Add( SharedString( name ), typeInfo );
-
+		
 		RegisterContainer<Vector<T>>( "dd::Vector", typeInfo );
 
 		return typeInfo;

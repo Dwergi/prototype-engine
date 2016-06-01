@@ -423,6 +423,9 @@
     <ClInclude Include="src\TerrainChunkKey.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -692,6 +695,12 @@
     </ClCompile>
     <ClCompile Include="src\TerrainChunkKey.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AngelScriptTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

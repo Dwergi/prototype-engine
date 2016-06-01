@@ -9,6 +9,9 @@
 
 #include "angelscript/add_on/scriptmath/scriptmath.h"
 #include "angelscript/add_on/scripthelper/scripthelper.h"
+#include "angelscript/add_on/scriptbuilder/scriptbuilder.h"
+
+#include <direct.h>
 
 namespace dd
 {
@@ -110,6 +113,92 @@ namespace dd
 		String64 result( type );
 		result.ReplaceAll( '*', '@' );
 
+		return result;
+	}
+
+	String256 LoadScript( const char* module )
+	{
+		const char* path = "\\data\\as\\";
+
+		char current[256];
+		_getcwd( current, 256 );
+
+		String256 filename( current );
+		filename += path;
+		filename += module;
+		filename += ".as";
+
+		std::FILE* file;
+		fopen_s( &file, filename.c_str(), "rb" );
+
+		if( file == nullptr )
+			return String256();
+
+		char buffer[2048];
+		String256 source;
+
+		while( std::fgets( buffer, 2048, file ) != nullptr )
+		{
+			source += buffer;
+		}
+
+		fclose( file );
+
+		return source;
+	}
+
+	bool AngelScriptEngine::LoadFile( const char* module, String& output )
+	{
+		dd::String256 strSource( LoadScript( module ) );
+
+		SetOutput( &output );
+
+		CScriptBuilder builder;
+		int r = builder.StartNewModule( m_engine, module );
+
+		if( r >= 0 )
+		{
+			r = builder.AddSectionFromMemory( module, strSource.c_str(), strSource.Length() );
+			if( r >= 0 )
+			{
+				r = builder.BuildModule();
+			}
+		}
+
+		SetOutput( nullptr );
+
+		return r >= 0;
+	}
+
+	bool AngelScriptEngine::RunFunction( const char* module, const String& functionSig, String& output )
+	{
+		SetOutput( &output );
+
+		bool result = false;
+
+		asIScriptModule* mod = m_engine->GetModule( module );
+		if( module != nullptr )
+		{
+			asIScriptFunction* func = mod->GetFunctionByDecl( functionSig.c_str() );
+			if( func != nullptr )
+			{
+				asIScriptContext* context = m_engine->CreateContext();
+				if( context != nullptr )
+				{
+					context->Prepare( func );
+
+					int r = context->Execute();
+					if( r == asEXECUTION_FINISHED )
+					{
+						result = true;
+					}
+
+					context->Release();
+				}
+			}
+		}
+
+		SetOutput( nullptr );
 		return result;
 	}
 }

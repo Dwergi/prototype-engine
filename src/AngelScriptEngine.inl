@@ -117,9 +117,8 @@ namespace dd
 	}
 
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
-	void AngelScriptEngine::RegisterMember( const char* name )
+	void AngelScriptEngine::RegisterMember( const char* name, const TypeInfo* classType )
 	{
-		const TypeInfo* classType = GET_TYPE( TClass );
 		const TypeInfo* propType = GET_TYPE( TProp );
 
 		String128 signature;
@@ -153,7 +152,9 @@ namespace dd
 	{
 		String256 signature = GetFunctionSignatureString( name, function );
 
-		int res = m_engine->RegisterGlobalFunction( signature.c_str(), asSMethodPtr<sizeof(FnType)>::Convert( FnPtr ), asCALL_CDECL );
+		asSFuncPtr ptr = asSMethodPtr<sizeof( FnType )>::Convert( FnPtr );
+		ptr.flag = 2; // global calling convention, because fuck you AngelScript
+		int res = m_engine->RegisterGlobalFunction( signature.c_str(), ptr, asCALL_CDECL );
 		DD_ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
 	}
 

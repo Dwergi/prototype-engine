@@ -33,7 +33,7 @@ namespace dd
 		void RegisterType();
 
 		template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
-		void RegisterMember( const char* name );
+		void RegisterMember( const char* name, const TypeInfo* classType );
 
 		template <typename FnType, FnType Fn>
 		void RegisterFunction( const char* name );
@@ -42,6 +42,9 @@ namespace dd
 		void RegisterGlobalVariable( const char* name );
 
 		bool Evaluate( const String& script, String& output );
+
+		bool LoadFile( const char* module, String& output );
+		bool RunFunction( const char* module, const String& functionSig, String& output );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 

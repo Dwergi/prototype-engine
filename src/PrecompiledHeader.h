@@ -55,7 +55,7 @@ namespace dd
 	const double M_1_PI = 0.318309886183790671538;
 }
 
-//#define USE_ANGELSCRIPT
+#define USE_ANGELSCRIPT
 #ifdef USE_ANGELSCRIPT
 #include "AngelScriptEngine.h"
 namespace dd

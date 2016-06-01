@@ -60,18 +60,24 @@ bool WrenTest::FunctionCalled = false;
 bool WrenTest::FunctionRetCalled = false;
 bool WrenTest::FunctionArgCalled = false;
 
-int FreeFunction()
+namespace Test
 {
-	return 5;
-}
+	namespace Wren
+	{
+		int FreeFunction()
+		{
+			return 5;
+		}
 
-int FreeFunctionWithArg( int a )
-{
-	return a * 5;
-}
+		int FreeFunctionWithArg( int a )
+		{
+			return a * 5;
+		}
 
-extern uint s_counter;
-uint s_counter = 0;
+		extern uint s_counter;
+		uint s_counter = 0;
+	}
+}
 
 TEST_CASE( "[Wren] Register Class" )
 {
@@ -97,8 +103,8 @@ TEST_CASE( "[Wren] Register Free Function" )
 {
 	dd::WrenEngine engine;
 
-	engine.RegisterFunction<decltype(&FreeFunction), &FreeFunction>( "FreeFunction" );
-	engine.RegisterFunction<decltype(&FreeFunctionWithArg), &FreeFunctionWithArg>( "FreeFunctionWithArg" );
+	engine.RegisterFunction<decltype(&Test::Wren::FreeFunction), &Test::Wren::FreeFunction>( "FreeFunction" );
+	engine.RegisterFunction<decltype(&Test::Wren::FreeFunctionWithArg), &Test::Wren::FreeFunctionWithArg>( "FreeFunctionWithArg" );
 }
 
 TEST_CASE( "[Wren] Register Method" )
@@ -116,11 +122,9 @@ TEST_CASE( "[Wren] Register Method" )
 
 TEST_CASE( "[Wren] Register Global Var" )
 {
-	REGISTER_TYPE( WrenTest );
-
 	dd::WrenEngine engine;
 
-	engine.RegisterGlobalVariable<decltype( s_counter ), s_counter>( "Counter" );
+	engine.RegisterGlobalVariable<decltype(Test::Wren::s_counter ), Test::Wren::s_counter>( "Counter" );
 }
 
 TEST_CASE( "[Wren] Call Wren Method" )

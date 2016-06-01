@@ -131,12 +131,14 @@ void RegisterGameTypes()
 {
 	REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
+	vec3Type->RegisterScriptType<glm::vec3, true>();
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
 	REGISTER_POD( glm::vec4 );
 	TypeInfo* vec4Type = TypeInfo::AccessType<glm::vec4>();
+	vec4Type->RegisterScriptType<glm::vec4, true>();
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
