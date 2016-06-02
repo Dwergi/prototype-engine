@@ -45,6 +45,9 @@ namespace dd
 	template <int Width, int Height>
 	TerrainChunk::IndexBuffer<Width, Height>::~IndexBuffer()
 	{
+		if( !m_created )
+			return;
+
 		m_vbo.Destroy();
 	}
 

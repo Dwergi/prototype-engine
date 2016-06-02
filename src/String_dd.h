@@ -100,6 +100,12 @@ namespace dd
 			SetString( other, (uint) strlen( other ) );
 		}
 
+		InplaceString( const char* other, uint length )
+			: String( m_stackData, Size )
+		{
+			SetString( other, length );
+		}
+
 		InplaceString( const String& other )
 			: String( m_stackData, Size )
 		{
@@ -154,7 +160,7 @@ namespace dd
 
 		}
 
-		InplaceString<Size> Substring( uint start, uint count = -1 );
+		InplaceString<Size> Substring( uint start, uint count = -1 ) const;
 		
 	private:
 
@@ -169,7 +175,7 @@ namespace dd
 	typedef InplaceString<256> String256;
 
 	template <int Size>
-	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count )
+	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count ) const
 	{
 		DD_ASSERT( start <= m_length );
 		DD_ASSERT( count >= 0 );

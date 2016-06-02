@@ -308,6 +308,7 @@
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
     <ClInclude Include="include\stb\stb_image_write.h" />
     <ClInclude Include="src\AABB.h" />
+    <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -369,6 +370,7 @@
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\Stream.h" />
+    <ClInclude Include="src\StringBinding.h" />
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
@@ -466,6 +468,7 @@
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\StringBinding.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
     <ClCompile Include="src\TerrainChunkKey.cpp" />
     <ClCompile Include="src\TerrainChunkTests.cpp" />

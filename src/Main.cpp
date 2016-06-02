@@ -30,6 +30,7 @@
 #include "Recorder.h"
 #include "Renderer.h"
 #include "ScopedTimer.h"
+#include "StringBinding.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "TerrainSystem.h"
@@ -129,6 +130,10 @@ void RegisterGlobalScriptFunctions()
 
 void RegisterGameTypes()
 {
+#ifdef USE_ANGELSCRIPT
+	dd::RegisterString( Services::Get<AngelScriptEngine>() );
+#endif
+
 	REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
 	vec3Type->RegisterScriptType<glm::vec3, true>();

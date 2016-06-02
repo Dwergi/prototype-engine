@@ -15,14 +15,64 @@
 
 namespace dd
 {
-	WriteStream* s_output = nullptr;
 
-	void SetOutput( String* output )
+	AngelScriptFunction::~AngelScriptFunction()
+	{
+		Invalidate();
+	}
+
+	AngelScriptFunction::AngelScriptFunction( AngelScriptFunction&& other )
+	{
+		m_context = nullptr;
+
+		std::swap( m_context, other.m_context );
+		std::swap( m_function, other.m_function );
+	}
+
+	AngelScriptFunction& AngelScriptFunction::operator=( AngelScriptFunction&& other )
+	{
+		std::swap( m_context, other.m_context );
+		std::swap( m_function, other.m_function );
+		std::swap( m_engine, other.m_engine );
+
+		return *this;
+	}
+
+	AngelScriptFunction::AngelScriptFunction( AngelScriptEngine* engine, asIScriptFunction* fn )
+	{
+		m_function = fn;
+		m_engine = engine;
+		m_context = nullptr;
+	}
+
+	bool AngelScriptFunction::Valid() const
+	{
+		return m_engine != nullptr && m_function != nullptr;
+	}
+
+	void AngelScriptFunction::Invalidate()
+	{
+		ReleaseContext();
+
+		m_engine = nullptr;
+		m_function = nullptr;
+	}
+
+	void AngelScriptFunction::ReleaseContext()
+	{
+		if( m_context != nullptr )
+		{
+			m_context->Release();
+			m_context = nullptr;
+		}
+	}
+
+	void AngelScriptEngine::SetOutput( String* output )
 	{
 		if( output != nullptr )
-			s_output = new WriteStream( *output );
+			m_output = new WriteStream( *output );
 		else
-			delete s_output;
+			delete m_output;
 	}
 
 	void AngelScriptEngine::MessageCallback( const asSMessageInfo* msg, void* param )
@@ -33,13 +83,13 @@ namespace dd
 		else if( msg->type == asMSGTYPE_INFORMATION ) 
 			type = "INFO";
 
-		if( s_output == nullptr )
+		if( m_output == nullptr )
 		{
 			printf( "%s (%d, %d): %s - %s\n\n", msg->section, msg->row, msg->col, type, msg->message );
 		}
 		else
 		{
-			s_output->WriteFormat( "%s (%d, %d): %s - %s\n", msg->section, msg->row, msg->col, type, msg->message );
+			m_output->WriteFormat( "%s (%d, %d): %s - %s\n", msg->section, msg->row, msg->col, type, msg->message );
 		}
 	}
 
@@ -170,35 +220,18 @@ namespace dd
 		return r >= 0;
 	}
 
-	bool AngelScriptEngine::RunFunction( const char* module, const String& functionSig, String& output )
+	AngelScriptFunction* AngelScriptEngine::GetFunction( const char* module, const char* functionSig )
 	{
-		SetOutput( &output );
-
-		bool result = false;
-
 		asIScriptModule* mod = m_engine->GetModule( module );
 		if( module != nullptr )
 		{
-			asIScriptFunction* func = mod->GetFunctionByDecl( functionSig.c_str() );
+			asIScriptFunction* func = mod->GetFunctionByDecl( functionSig );
 			if( func != nullptr )
 			{
-				asIScriptContext* context = m_engine->CreateContext();
-				if( context != nullptr )
-				{
-					context->Prepare( func );
-
-					int r = context->Execute();
-					if( r == asEXECUTION_FINISHED )
-					{
-						result = true;
-					}
-
-					context->Release();
-				}
+				return new AngelScriptFunction( this, func );
 			}
 		}
 
-		SetOutput( nullptr );
-		return result;
+		return nullptr;
 	}
 }

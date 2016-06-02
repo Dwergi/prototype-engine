@@ -36,11 +36,11 @@ namespace dd
 
 	TerrainChunk::~TerrainChunk()
 	{
-		if( m_created )
-		{
-			m_vboVertex.Destroy();
-			m_vao.Destroy();
-		}
+		if( !m_created )
+			return;
+
+		m_vboVertex.Destroy();
+		m_vao.Destroy();
 	}
 
 	void TerrainChunk::CreateRenderResources( ShaderProgram& shader )

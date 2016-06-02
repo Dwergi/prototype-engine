@@ -123,14 +123,102 @@ TEST_CASE( "[AngelScript] Evaluate String" )
 	REQUIRE( success == true );
 }
 
-TEST_CASE( "[AngelScript] Call Method" )
+TEST_CASE( "[AngelScript] Call Function" )
 {
-	dd::AngelScriptEngine engine;
+	// our test script uses other types registered elsewhere
+	dd::AngelScriptEngine& engine = dd::Services::Get<dd::AngelScriptEngine>();
 
 	dd::String256 output;
 	bool success = engine.LoadFile( "test", output );
 	REQUIRE( success == true );
 
-	success = engine.RunFunction( "test", dd::String128( "void test()" ), output );
+	dd::AngelScriptFunction* fn = engine.GetFunction( "test", "void test()" );
+	REQUIRE( fn != nullptr );
+
+	success = (*fn)();
 	REQUIRE( success == true );
+
+	delete fn;
+}
+
+TEST_CASE( "[AngelScript] Return Values" )
+{
+	dd::AngelScriptEngine engine;
+	dd::String256 output;
+	bool success = engine.LoadFile( "test_returns", output );
+	REQUIRE( success == true );
+
+	int iRet = 0;
+	dd::AngelScriptFunction* iFn = engine.GetFunction( "test_returns", "int test_returns_int()" );
+	REQUIRE( iFn != nullptr );
+
+	success = (*iFn)();
+	REQUIRE( success == true );
+
+	iFn->Returned( iRet );
+	REQUIRE( iRet == 5 );
+
+	delete iFn;
+
+	float fRet = 0;
+	dd::AngelScriptFunction* fFn = engine.GetFunction( "test_returns", "float test_returns_float()" );
+	REQUIRE( fFn != nullptr );
+
+	success = (*fFn)();
+	REQUIRE( success == true );
+
+	fFn->Returned( fRet );
+	REQUIRE( fRet == 5.0f );
+
+	delete fFn;
+
+	double dRet = 0;
+	dd::AngelScriptFunction* dFn = engine.GetFunction( "test_returns", "double test_returns_double()" );
+	REQUIRE( dFn != nullptr );
+
+	success = (*dFn)();
+	REQUIRE( success == true );
+
+	dFn->Returned( dRet );
+	REQUIRE( dRet == 5 );
+
+	delete dFn;
+}
+
+TEST_CASE( "[AngelScript] Args" )
+{
+	dd::AngelScriptEngine engine;
+	dd::String256 output;
+	bool success = engine.LoadFile( "test_args", output );
+	REQUIRE( success == true );
+
+	int iRet = 0;
+	int iA = 1;
+	int iB = 2;
+
+	dd::AngelScriptFunction* iFn = engine.GetFunction( "test_args", "int test_args( int x, int y )" );
+	REQUIRE( iFn != nullptr );
+
+	success = (*iFn)(iA, iB);
+	REQUIRE( success == true );
+
+	iFn->Returned( iRet );
+	REQUIRE( iRet == 3 );
+
+	delete iFn;
+
+	float fRet = 0;
+	float fA = 2.0f;
+	float fB = 3.0f;
+
+	dd::AngelScriptFunction* fFn = engine.GetFunction( "test_args", "float test_args( float x, float y )" );
+	REQUIRE( fFn != nullptr );
+
+	success = (*fFn)(fA, fB);
+	REQUIRE( success == true );
+
+	fFn->Returned( fRet );
+	REQUIRE( fRet == 5.0f );
+
+	delete fFn;
 }

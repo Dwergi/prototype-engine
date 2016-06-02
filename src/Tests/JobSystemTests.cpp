@@ -71,8 +71,6 @@ void TestWaitA( dd::JobSystem* system )
 
 	ScheduledB = true;
 
-	system->WaitForCategory( "B" );
-
 	FinishedWaitingA = true;
 }
 

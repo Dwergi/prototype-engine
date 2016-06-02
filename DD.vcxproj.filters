@@ -426,6 +426,12 @@
     <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h">
       <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
+    <ClInclude Include="src\StringBinding.h">
+      <Filter>Script\AngelScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ASInternal.h">
+      <Filter>Script\AngelScript</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -701,6 +707,9 @@
     </ClCompile>
     <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
       <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringBinding.cpp">
+      <Filter>Script\AngelScript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
