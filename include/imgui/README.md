@@ -39,7 +39,7 @@ Demo
 ----
 
 You should be able to build the examples from sources (tested on Windows/Mac/Linux). If you don't, let me know! If you want to have a quick look at the features of ImGui, you can download Windows binaries of the demo app here.
-- [imgui-demo-binaries-20151226.zip](http://www.miracleworld.net/imgui/binaries/imgui-demo-binaries-20151226.zip) (Windows binaries, ImGui 1.47 2015/12/26, 4 executables, 515 KB)
+- [imgui-demo-binaries-20160410.zip](http://www.miracleworld.net/imgui/binaries/imgui-demo-binaries-20160410.zip) (Windows binaries, ImGui 1.48+ 2016/04/10, 4 executables, 534 KB)
 
 
 Gallery
@@ -95,12 +95,15 @@ Frequently Asked Question (FAQ)
 The library started its life and is best known as "ImGui" only due to the fact that I didn't give it a proper name when I released it. However, the term IMGUI (immediate-mode graphical user interface) was coined before and is being used in variety of other situations. It seemed confusing and unfair to hog the name. To reduce the ambiguity without affecting existing codebases, I have decided on an alternate, longer name "dear imgui" that people can use to refer to this specific library in ambiguous situations.
 
 <b>How do I update to a newer version of ImGui?</b>
-<br><b>Can I have multiple widgets with the same label? Can I have widget without a label? (Yes)</b>
+<br><b>What is ImTextureID and how do I display an image?</b>
 <br><b>I integrated ImGui in my engine and the text or lines are blurry..</b>
 <br><b>I integrated ImGui in my engine and some elements are disappearing when I move windows around..</b>
+<br><b>How can I have multiple widgets with the same label? Can I have widget without a label? (Yes). A primer on the purpose of labels/IDs.</b>
+<br><b>How can I tell when ImGui wants my mouse/keyboard inputs and when I can pass them to my application?</b>
 <br><b>How can I load a different font than the default?</b>
 <br><b>How can I load multiple fonts?</b>
 <br><b>How can I display and input non-latin characters such as Chinese, Japanese, Korean, Cyrillic?</b>
+<br><b>How can I use the drawing facilities without an ImGui window? (using ImDrawList API)</b>
 
 See the FAQ in imgui.cpp for answers.
 
@@ -116,7 +119,7 @@ ImGui is very programmer centric and the immediate-mode GUI paradigm might requi
 
 <b>Is ImGui fast?</b>
 
-Probably fast enough for most uses. Down to the fundation of its visual design, ImGui is engineered to be fairly performant both in term of CPU and GPU usage. Running elaborate code and creating elaborate UI will of course have a cost but ImGui aims to minimize it.
+Probably fast enough for most uses. Down to the foundation of its visual design, ImGui is engineered to be fairly performant both in term of CPU and GPU usage. Running elaborate code and creating elaborate UI will of course have a cost but ImGui aims to minimize it.
 
 Mileage may vary but the following screenshot can give you a rough idea of the cost of running and rendering UI code (In the case of a trivial demo application like this one, your driver/os setup are likely to be the bottleneck. Testing performance as part of a real application is recommended).
 

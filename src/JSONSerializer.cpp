@@ -1,4 +1,3 @@
-Copy
 //
 // JSONSerializer.h - Serialization! To JSON!
 // Copyright (C) Sebastian Nordgren 

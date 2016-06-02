@@ -22,7 +22,7 @@ namespace dd
 		template <>
 		struct ReturnValue<int>
 		{
-			static int Get( asIScriptContext* context, int& ret )
+			static void Get( asIScriptContext* context, int& ret )
 			{
 				ret = context->GetReturnDWord();
 			}
@@ -31,7 +31,7 @@ namespace dd
 		template <>
 		struct ReturnValue<char>
 		{
-			static int Get( asIScriptContext* context, char& ret )
+			static void Get( asIScriptContext* context, char& ret )
 			{
 				ret = context->GetReturnByte();
 			}
@@ -40,7 +40,7 @@ namespace dd
 		template <>
 		struct ReturnValue<byte>
 		{
-			static int Get( asIScriptContext* context, byte& ret )
+			static void Get( asIScriptContext* context, byte& ret )
 			{
 				ret = (byte) context->GetReturnByte();
 			}
@@ -49,7 +49,7 @@ namespace dd
 		template <>
 		struct ReturnValue<float>
 		{
-			static int Get( asIScriptContext* context, float& ret )
+			static void Get( asIScriptContext* context, float& ret )
 			{
 				ret = (float) context->GetReturnFloat();
 			}
@@ -58,7 +58,7 @@ namespace dd
 		template <>
 		struct ReturnValue<double>
 		{
-			static int Get( asIScriptContext* context, double& ret )
+			static void Get( asIScriptContext* context, double& ret )
 			{
 				ret = (double) context->GetReturnDouble();
 			}
@@ -67,7 +67,7 @@ namespace dd
 		template <>
 		struct ReturnValue<int16>
 		{
-			static int Get( asIScriptContext* context, int16& ret )
+			static void Get( asIScriptContext* context, int16& ret )
 			{
 				ret = (int16) context->GetReturnWord();
 			}
@@ -76,7 +76,7 @@ namespace dd
 		template <>
 		struct ReturnValue<uint16>
 		{
-			static int Get( asIScriptContext* context, uint16& ret )
+			static void Get( asIScriptContext* context, uint16& ret )
 			{
 				ret = (uint16) context->GetReturnWord();
 			}
@@ -85,7 +85,7 @@ namespace dd
 		template <>
 		struct ReturnValue<int64>
 		{
-			static int Get( asIScriptContext* context, int64& ret )
+			static void Get( asIScriptContext* context, int64& ret )
 			{
 				ret = (int64) context->GetReturnWord();
 			}
@@ -94,7 +94,7 @@ namespace dd
 		template <>
 		struct ReturnValue<uint64>
 		{
-			static int Get( asIScriptContext* context, uint64& ret )
+			static void Get( asIScriptContext* context, uint64& ret )
 			{
 				ret = (uint64) context->GetReturnWord();
 			}

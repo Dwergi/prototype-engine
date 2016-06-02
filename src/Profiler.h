@@ -6,6 +6,7 @@
 
 #pragma once
 
+#define RMT_ENABLED 1
 #include "Remotery/lib/Remotery.h"
 
 #define DD_PROFILE_INIT() \
@@ -28,9 +29,6 @@
 
 #define DD_PROFILE_LOG( LogText ) \
 	rmt_LogText( LogText )
-
-#define DD_PROFILE_BIND_OPENGL() \
-	rmt_BindOpenGL()
 
 #define DD_PROFILE_OGL_START( Name ) \
 	rmt_BeginOpenGLSample( Name )

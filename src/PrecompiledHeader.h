@@ -19,6 +19,8 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
+#include "Memory.h"
+
 #include "Profiler.h"
 
 #include "DDAssert.h"
