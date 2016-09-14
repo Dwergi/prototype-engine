@@ -94,6 +94,12 @@
     <Filter Include="Includes\stb">
       <UniqueIdentifier>{a6d272e9-35c9-466a-9682-69fa40ba0a3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{96ea3d00-f897-4b95-be6c-dcf3fa40176c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\json">
+      <UniqueIdentifier>{17c7afe7-f18e-4af3-89cc-93ce1bbe7a38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -435,6 +441,12 @@
     <ClInclude Include="src\Memory.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Socket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\json.hpp">
+      <Filter>Includes\json</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -713,6 +725,9 @@
     </ClCompile>
     <ClCompile Include="src\StringBinding.cpp">
       <Filter>Script\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Socket.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

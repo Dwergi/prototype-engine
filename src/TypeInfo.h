@@ -83,6 +83,9 @@ namespace dd
 		template <typename T>
 		static const TypeInfo* RegisterPOD( const char* name );
 
+		//
+		// TypeInfo accessors. 
+		//
 		template <typename T>
 		static const TypeInfo* GetType();
 		static const TypeInfo* GetType( const char* typeName );

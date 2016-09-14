@@ -30,7 +30,6 @@
     <ProjectGuid>{FDC55983-C586-4390-908C-4B19AC8B90E0}</ProjectGuid>
     <RootNamespace>ComponentSystem</RootNamespace>
     <ProjectName>DD</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -117,6 +116,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -129,16 +129,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>_UNICODE;_DEBUG;GLFW_DLL;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;_DEBUG;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;wren32d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;wren32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x86\glfw3.dll $(OutDir)</Command>
@@ -148,12 +149,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>_UNICODE;_DEBUG;GLFW_DLL;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;_DEBUG;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
@@ -161,10 +162,11 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x64\glfw3.dll $(OutDir)</Command>
@@ -177,9 +179,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PreprocessorDefinitions>_NDEBUG;_RELEASE;_UNICODE;GLFW_DLL;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_NDEBUG;_RELEASE;_UNICODE;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -187,9 +189,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>imgui32.lib;angelscript32.lib;wren32.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\assimp\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui32.lib;angelscript32.lib;wren32.lib;sfml-network-s.lib;sfml-audio-s.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Release</AdditionalLibraryDirectories>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x86\glfw3.dll $(OutDir)</Command>
@@ -200,14 +203,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
-      <PreprocessorDefinitions>_NDEBUG;_RELEASE;_UNICODE;GLFW_DLL;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_NDEBUG;_RELEASE;_UNICODE;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -216,10 +219,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\assimp\lib\Release;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\wren\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>imgui64.lib;angelscript64.lib;wren64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui64.lib;angelscript64.lib;wren64.lib;sfml-network-s64.lib;sfml-audio-s64.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x64\glfw3.dll $(OutDir)</Command>
@@ -232,8 +236,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_TEST;_UNICODE;_DEBUG;GLFW_DLL;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TEST;_UNICODE;_DEBUG;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -245,11 +249,11 @@
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
-      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;wren32d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;wren32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x86;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x86\glfw3.dll $(OutDir)</Command>
@@ -262,8 +266,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_TEST;_UNICODE;_DEBUG;GLFW_DLL;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TEST;_UNICODE;_DEBUG;GLFW_DLL;USE_ANGELSCRIPT;SFML_STATIC;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -281,10 +285,11 @@
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
-      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;wren64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;opengl32.lib;glfw3dll.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib\x64;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(SolutionDir)include\glfw\lib\x64\glfw3.dll $(OutDir)</Command>
@@ -306,6 +311,7 @@
     <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
     <ClInclude Include="include\glm\fwd.hpp" />
     <ClInclude Include="include\glm\glm.hpp" />
+    <ClInclude Include="include\json\json.hpp" />
     <ClInclude Include="include\pcg\pcg_extras.hpp" />
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
@@ -372,6 +378,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\SharedString.h" />
+    <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\Stream.h" />
@@ -491,6 +498,7 @@
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\StringBinding.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
     <ClCompile Include="src\TerrainChunkKey.cpp" />
@@ -596,6 +604,12 @@
     </ProjectReference>
     <ProjectReference Include="include\imgui\imgui.vcxproj">
       <Project>{60d06b70-22a9-41b4-a681-febed15b77cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="include\sfml\sfml-audio.vcxproj">
+      <Project>{c2ed5540-0601-382b-92b4-4e4f19f10b7b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="include\sfml\sfml-network.vcxproj">
+      <Project>{7d6e565f-5f2d-32b4-b071-769d6b2fb6b7}</Project>
     </ProjectReference>
     <ProjectReference Include="include\wren\util\msvc2013\wren_lib\wren_lib.vcxproj">
       <Project>{89cf2c43-749e-4ec4-a7c3-3f22fba9b874}</Project>

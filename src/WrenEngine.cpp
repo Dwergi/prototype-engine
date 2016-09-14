@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "WrenEngine.h"
 
+#ifdef USE_WREN
+
 #include <cstdio>
 #include <direct.h>
 
@@ -321,3 +323,5 @@ namespace dd
 		return source;
 	}
 }
+
+#endif

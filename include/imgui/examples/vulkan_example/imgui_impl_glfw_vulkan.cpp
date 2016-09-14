@@ -315,10 +315,10 @@ void ImGui_ImplGlfwVulkan_RenderDrawLists(ImDrawData* draw_data)
         for (int n = 0; n < draw_data->CmdListsCount; n++)
         {
             const ImDrawList* cmd_list = draw_data->CmdLists[n];
-            memcpy(vtx_dst, &cmd_list->VtxBuffer[0], cmd_list->VtxBuffer.size() * sizeof(ImDrawVert));
-            memcpy(idx_dst, &cmd_list->IdxBuffer[0], cmd_list->IdxBuffer.size() * sizeof(ImDrawIdx));
-            vtx_dst += cmd_list->VtxBuffer.size();
-            idx_dst += cmd_list->IdxBuffer.size();
+            memcpy(vtx_dst, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
+            memcpy(idx_dst, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
+            vtx_dst += cmd_list->VtxBuffer.Size;
+            idx_dst += cmd_list->IdxBuffer.Size;
         }
         VkMappedMemoryRange range[2] = {};
         range[0].sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -378,7 +378,7 @@ void ImGui_ImplGlfwVulkan_RenderDrawLists(ImDrawData* draw_data)
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
         const ImDrawList* cmd_list = draw_data->CmdLists[n];
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.size(); cmd_i++)
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
             const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
             if (pcmd->UserCallback)
@@ -388,16 +388,16 @@ void ImGui_ImplGlfwVulkan_RenderDrawLists(ImDrawData* draw_data)
             else
             {
                 VkRect2D scissor;
-                scissor.offset.x = static_cast<int32_t>(pcmd->ClipRect.x);
-                scissor.offset.y = static_cast<int32_t>(pcmd->ClipRect.y);
-                scissor.extent.width = static_cast<uint32_t>(pcmd->ClipRect.z - pcmd->ClipRect.x);
-                scissor.extent.height = static_cast<uint32_t>(pcmd->ClipRect.w - pcmd->ClipRect.y + 1); // TODO: + 1??????
+                scissor.offset.x = (int32_t)(pcmd->ClipRect.x);
+                scissor.offset.y = (int32_t)(pcmd->ClipRect.y);
+                scissor.extent.width = (uint32_t)(pcmd->ClipRect.z - pcmd->ClipRect.x);
+                scissor.extent.height = (uint32_t)(pcmd->ClipRect.w - pcmd->ClipRect.y + 1); // TODO: + 1??????
                 vkCmdSetScissor(g_CommandBuffer, 0, 1, &scissor);
                 vkCmdDrawIndexed(g_CommandBuffer, pcmd->ElemCount, 1, idx_offset, vtx_offset, 0);
             }
             idx_offset += pcmd->ElemCount;
         }
-        vtx_offset += cmd_list->VtxBuffer.size();
+        vtx_offset += cmd_list->VtxBuffer.Size;
     }
 }
 
@@ -661,19 +661,16 @@ bool ImGui_ImplGlfwVulkan_CreateDeviceObjects()
 
     if (!g_PipelineLayout)
     {
-        VkPushConstantRange push_constants[2] = {};
+        VkPushConstantRange push_constants[1] = {};
         push_constants[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
         push_constants[0].offset = sizeof(float) * 0;
-        push_constants[0].size = sizeof(float) * 2;
-        push_constants[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        push_constants[1].offset = sizeof(float) * 2;
-        push_constants[1].size = sizeof(float) * 2;
+        push_constants[0].size = sizeof(float) * 4;
         VkDescriptorSetLayout set_layout[1] = {g_DescriptorSetLayout};
         VkPipelineLayoutCreateInfo layout_info = {};
         layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         layout_info.setLayoutCount = 1;
         layout_info.pSetLayouts = set_layout;
-        layout_info.pushConstantRangeCount = 2;
+        layout_info.pushConstantRangeCount = 1;
         layout_info.pPushConstantRanges = push_constants;
         err = vkCreatePipelineLayout(g_Device, &layout_info, g_Allocator, &g_PipelineLayout);
         ImGui_ImplGlfwVulkan_VkResult(err);
@@ -728,6 +725,7 @@ bool ImGui_ImplGlfwVulkan_CreateDeviceObjects()
     raster_info.polygonMode = VK_POLYGON_MODE_FILL;
     raster_info.cullMode = VK_CULL_MODE_NONE;
     raster_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    raster_info.lineWidth = 1.0f;
 
     VkPipelineMultisampleStateCreateInfo ms_info = {};
     ms_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -743,6 +741,9 @@ bool ImGui_ImplGlfwVulkan_CreateDeviceObjects()
     color_attachment[0].alphaBlendOp = VK_BLEND_OP_ADD;
     color_attachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
+    VkPipelineDepthStencilStateCreateInfo depth_info = {};
+    depth_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+
     VkPipelineColorBlendStateCreateInfo blend_info = {};
     blend_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     blend_info.attachmentCount = 1;
@@ -750,6 +751,7 @@ bool ImGui_ImplGlfwVulkan_CreateDeviceObjects()
 
     VkDynamicState dynamic_states[2] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
     VkPipelineDynamicStateCreateInfo dynamic_state = {};
+    dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamic_state.dynamicStateCount = 2;
     dynamic_state.pDynamicStates = dynamic_states;
 
@@ -763,6 +765,7 @@ bool ImGui_ImplGlfwVulkan_CreateDeviceObjects()
     info.pViewportState = &viewport_info;
     info.pRasterizationState = &raster_info;
     info.pMultisampleState = &ms_info;
+    info.pDepthStencilState = &depth_info;
     info.pColorBlendState = &blend_info;
     info.pDynamicState = &dynamic_state;
     info.layout = g_PipelineLayout;

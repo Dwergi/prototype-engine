@@ -154,6 +154,7 @@ TEST_CASE( "[JobSystem]" )
 		ScheduledB = false;
 		FinishedWaitingA = false;
 		CalledB = false;
+		ExitedB = false;
 
 		system.Schedule( std::bind( &TestWaitA, &system ), "A" );
 

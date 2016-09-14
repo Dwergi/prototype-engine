@@ -442,6 +442,19 @@ void ImGui::ShowTestWindow(bool* p_open)
                 ImGui::Selectable("Hello.h", &selected[2]);   ImGui::SameLine(300); ImGui::Text(" 2,345 bytes");
                 ImGui::TreePop();
             }
+            if (ImGui::TreeNode("In columns"))
+            {
+                ImGui::Columns(3, NULL, false);
+                static bool selected[16] = { 0 };
+                for (int i = 0; i < 16; i++)
+                {
+                    char label[32]; sprintf(label, "Item %d", i);
+                    if (ImGui::Selectable(label, &selected[i])) {}
+                    ImGui::NextColumn();
+                }
+                ImGui::Columns(1);
+                ImGui::TreePop();
+            }
             if (ImGui::TreeNode("Grid"))
             {
                 static bool selected[16] = { true, false, false, false, false, true, false, false, false, false, true, false, false, false, false, true };
@@ -883,7 +896,7 @@ void ImGui::ShowTestWindow(bool* p_open)
 
         if (ImGui::TreeNode("Basic Horizontal Layout"))
         {
-            ImGui::TextWrapped("(Use ImGui::SameLine() to keep adding items to the right of the preceeding item)");
+            ImGui::TextWrapped("(Use ImGui::SameLine() to keep adding items to the right of the preceding item)");
 
             // Text
             ImGui::Text("Two items: Hello"); ImGui::SameLine();
@@ -1007,24 +1020,24 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImGui::Text("Hello\nWorld"); ImGui::SameLine();
             ImGui::Text("One\nTwo\nThree");
 
-            ImGui::Button("HOP"); ImGui::SameLine();
+            ImGui::Button("HOP##1"); ImGui::SameLine();
             ImGui::Text("Banana"); ImGui::SameLine();
             ImGui::Text("Hello\nWorld"); ImGui::SameLine();
             ImGui::Text("Banana");
 
-            ImGui::Button("HOP"); ImGui::SameLine();
+            ImGui::Button("HOP##2"); ImGui::SameLine();
             ImGui::Text("Hello\nWorld"); ImGui::SameLine();
             ImGui::Text("Banana");
 
-            ImGui::Button("TEST"); ImGui::SameLine();
+            ImGui::Button("TEST##1"); ImGui::SameLine();
             ImGui::Text("TEST"); ImGui::SameLine();
-            ImGui::SmallButton("TEST");
+            ImGui::SmallButton("TEST##2");
 
             ImGui::AlignFirstTextHeightToWidgets(); // If your line starts with text, call this to align it to upcoming widgets.
             ImGui::Text("Text aligned to Widget"); ImGui::SameLine();
-            ImGui::Button("Widget"); ImGui::SameLine();
+            ImGui::Button("Widget##1"); ImGui::SameLine();
             ImGui::Text("Widget"); ImGui::SameLine();
-            ImGui::SmallButton("Widget");
+            ImGui::SmallButton("Widget##2");
 
             // Tree
             const float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
@@ -1312,7 +1325,22 @@ void ImGui::ShowTestWindow(bool* p_open)
         // Basic columns
         if (ImGui::TreeNode("Basic"))
         {
-            ImGui::Columns(4, "mycolumns");
+            ImGui::Text("Without border:");
+            ImGui::Columns(3, "mycolumns3", false);  // 3-ways, no border
+            ImGui::Separator();
+            for (int n = 0; n < 14; n++)
+            {
+                char label[32];
+                sprintf(label, "Item %d", n);
+                if (ImGui::Selectable(label)) {}
+                //if (ImGui::Button(label, ImVec2(-1,0))) {}
+                ImGui::NextColumn();
+            }
+            ImGui::Columns(1);
+            ImGui::Separator();
+
+            ImGui::Text("With border:");
+            ImGui::Columns(4, "mycolumns"); // 4-ways, with border
             ImGui::Separator();
             ImGui::Text("ID"); ImGui::NextColumn();
             ImGui::Text("Name"); ImGui::NextColumn();
@@ -1642,7 +1670,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
             }
             ImGui::LogFinish();
         }
-        ImGui::SameLine(); ImGui::PushItemWidth(120); ImGui::Combo("##output_type", &output_dest, "To Clipboard\0To TTY"); ImGui::PopItemWidth();
+        ImGui::SameLine(); ImGui::PushItemWidth(120); ImGui::Combo("##output_type", &output_dest, "To Clipboard\0To TTY\0"); ImGui::PopItemWidth();
         ImGui::SameLine(); ImGui::Checkbox("Only Modified Fields", &output_only_modified);
 
         static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;

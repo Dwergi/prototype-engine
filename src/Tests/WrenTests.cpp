@@ -9,6 +9,8 @@
 
 #include "WrenEngine.h"
 
+#ifdef USE_WREN
+
 struct WrenTest
 {
 	int Integer;
@@ -194,3 +196,5 @@ TEST_CASE( "[Wren] Call From Wren" )
 	REQUIRE( WrenTest::FunctionRetCalled );
 	REQUIRE( WrenTest::FunctionArgCalled );
 }
+
+#endif

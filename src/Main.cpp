@@ -47,6 +47,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "GL/gl3w.h"
+
+#include "SFML/Network/UdpSocket.hpp"
 //---------------------------------------------------------------------------
 
 using namespace dd;
