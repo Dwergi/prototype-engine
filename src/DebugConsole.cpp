@@ -10,6 +10,8 @@
 #include "EntityHandle.h"
 #include "TransformComponent.h"
 
+#include "JsonSerializer.h"
+
 #include "AngelScriptEngine.h"
 
 #include "imgui/imgui.h"
@@ -22,33 +24,32 @@ namespace
 
 	void grabInt( int v )
 	{
-		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.WriteFormat( "%d", v );
 	}
 
 	void grabUint( uint v )
 	{
-		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.WriteFormat( "%u", v );
 	}
 
 	void grabBool( bool v )
 	{
-		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.Write( v ? "true" : "false" );
 	}
 
 	void grabFloat( float v )
 	{
-		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.WriteFormat( "%f", v );
 	}
 
 	void grabDouble( double v )
 	{
-		SerializePOD( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.WriteFormat( "%lf", v );
 	}
 
 	void grabString( const dd::String& str )
 	{
-		dd::Variable v( str );
-		SerializeString( dd::Serialize::Mode::JSON, s_stream, v );
+		s_stream.Write( str );
 	}
 
 	void grabEntityHandle( dd::EntityHandle handle )

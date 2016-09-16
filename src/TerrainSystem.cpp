@@ -11,6 +11,8 @@
 #include "JobSystem.h"
 #include "TerrainChunk.h"
 
+#include "Stream.h"
+
 namespace dd
 {
 	TerrainSystem::TerrainSystem( Camera& camera ) :

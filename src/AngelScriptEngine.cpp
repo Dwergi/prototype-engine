@@ -13,6 +13,8 @@
 
 #include <direct.h>
 
+#include "Stream.h"
+
 namespace dd
 {
 

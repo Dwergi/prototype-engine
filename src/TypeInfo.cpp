@@ -46,7 +46,7 @@ namespace dd
 	{
 	}
 
-	void TypeInfo::Init( const char* name, unsigned size )
+	void TypeInfo::Init( const char* name, uint size )
 	{
 		String128 typeName, nameSpace;
 		FindNamespace( name, nameSpace, typeName );
@@ -126,17 +126,6 @@ namespace dd
 		return fullName;
 	}
 
-	bool TypeInfo::HasCustomSerializers() const
-	{
-		return SerializeCustom != nullptr && DeserializeCustom != nullptr;
-	}
-
-	void TypeInfo::SetCustomSerializers( SerializeFn serializer, DeserializeFn deserializer )
-	{
-		SerializeCustom = serializer;
-		DeserializeCustom = deserializer;
-	}
-
 	void TypeInfo::RegisterDefaultTypes()
 	{
 		sm_defaultsRegistered = true;
@@ -161,30 +150,23 @@ namespace dd
 		REGISTER_POD( bool );
 
 		REGISTER_TYPE( dd::String );
-		REGISTER_SERIALIZERS( dd::String, Serialize::SerializeString, Serialize::DeserializeString );
 
 		REGISTER_TYPE( dd::String8 );
 		REGISTER_PARENT( dd::String8, dd::String );
-		REGISTER_SERIALIZERS( dd::String8, Serialize::SerializeString, Serialize::DeserializeString );
 
 		REGISTER_TYPE( dd::String16 );
 		REGISTER_PARENT( dd::String16, dd::String );
-		REGISTER_SERIALIZERS( dd::String16, Serialize::SerializeString, Serialize::DeserializeString );
 
 		REGISTER_TYPE( dd::String32 );
 		REGISTER_PARENT( dd::String32, dd::String );
-		REGISTER_SERIALIZERS( dd::String32, Serialize::SerializeString, Serialize::DeserializeString );
 		
 		REGISTER_TYPE( dd::String64 );
 		REGISTER_PARENT( dd::String64, dd::String );
-		REGISTER_SERIALIZERS( dd::String64, Serialize::SerializeString, Serialize::DeserializeString );
 		
 		REGISTER_TYPE( dd::String128 );
 		REGISTER_PARENT( dd::String128, dd::String );
-		REGISTER_SERIALIZERS( dd::String128, Serialize::SerializeString, Serialize::DeserializeString );
 
 		REGISTER_TYPE( dd::String256 );
 		REGISTER_PARENT( dd::String256, dd::String );
-		REGISTER_SERIALIZERS( dd::String256, Serialize::SerializeString, Serialize::DeserializeString );
 	}
 }

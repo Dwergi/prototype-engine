@@ -130,4 +130,22 @@ namespace dd
 			return nullptr;
 		};
 	};
+
+	template <typename T>
+	inline void* ElementAt( void* container, uint index )
+	{
+		return &(*(T*) container)[index];
+	}
+
+	template <typename T>
+	inline uint ContainerSize( void* container )
+	{
+		return ((T*) container)->Size();
+	}
+
+	template <typename TContainer, typename TItem>
+	inline void InsertElement( void* container, uint index, void* elem )
+	{
+		return ((TContainer*) container)->Insert( *(TItem*) elem, index );
+	}
 }

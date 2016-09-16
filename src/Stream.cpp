@@ -83,7 +83,7 @@ namespace dd
 		// we're essentially relying on null-termination here
 		dst = src; 
 
-		Advance( dst.Length() );
+		Advance( dst.Length() + 1 );
 	}
 
 	void ReadStream::Read( void* dst, uint bytes )
@@ -92,22 +92,11 @@ namespace dd
 		DD_ASSERT( Remaining() >= bytes );
 
 		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
-
 		src += m_current;
 
 		memcpy( dst, src, bytes );
 
 		Advance( bytes );
-	}
-
-	void ReadStream::ReadFormat( const char* format, ... )
-	{
-		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
-
-		va_list args;
-		va_start( args, format );
-		int read = vsscanf( src, format, args );
-		va_end( args );
 	}
 	//----------------------------------------------------------------------------
 
@@ -140,14 +129,26 @@ namespace dd
 		m_current = 0;
 	}
 
-	void WriteStream::WriteByte( char c )
+	void WriteStream::WriteByte( byte c )
 	{
-		Write( &c, 1 );
+		DD_ASSERT( Remaining() > 0 );
+
+		if( m_pDest != nullptr )
+		{
+			void* dest = PointerAdd( m_pDest, m_current );
+			*(byte*) dest = c;
+		}
+		else
+		{
+			*m_strDest += c;
+		}
+
+		Advance( 1 );
 	}
 
 	void WriteStream::Write( const String& str )
 	{
-		DD_ASSERT( Remaining() > 0 );
+		DD_ASSERT( Remaining() >= str.Length() );
 
 		if( m_pDest != nullptr )
 		{
@@ -163,6 +164,16 @@ namespace dd
 		}
 
 		Advance( str.Length() + 1 );
+	}
+
+	void WriteStream::Write( const char* str )
+	{
+		Write( str, (uint) strlen( str ) );
+
+		if( m_pDest != nullptr )
+		{
+			WriteByte( 0 );
+		}
 	}
 
 	void WriteStream::Write( const void* src, uint bytes )

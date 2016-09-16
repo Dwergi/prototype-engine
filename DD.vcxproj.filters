@@ -97,8 +97,8 @@
     <Filter Include="Networking">
       <UniqueIdentifier>{96ea3d00-f897-4b95-be6c-dcf3fa40176c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\json">
-      <UniqueIdentifier>{17c7afe7-f18e-4af3-89cc-93ce1bbe7a38}</UniqueIdentifier>
+    <Filter Include="Includes\ArduinoJSON">
+      <UniqueIdentifier>{42f68baa-971f-4e9d-9926-980613074687}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -218,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="src\TypeInfoHelpers.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Serializers.h">
-      <Filter>Serialization</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\cdecode.h">
       <Filter>Includes\Base64</Filter>
@@ -444,8 +441,11 @@
     <ClInclude Include="src\Socket.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="include\json\json.hpp">
-      <Filter>Includes\json</Filter>
+    <ClInclude Include="src\BinarySerializer.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\arduinojson\ArduinoJson.h">
+      <Filter>Includes\ArduinoJSON</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -527,9 +527,6 @@
     </ClCompile>
     <ClCompile Include="src\FunctionSignature.cpp">
       <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Serializers.cpp">
-      <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="include\base64\src\cdecode.c">
       <Filter>Includes\Base64</Filter>
@@ -728,6 +725,12 @@
     </ClCompile>
     <ClCompile Include="src\Socket.cpp">
       <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BinarySerializer.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

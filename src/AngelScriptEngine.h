@@ -10,6 +10,8 @@
 
 namespace dd
 {
+	class WriteStream;
+	
 	namespace ASInternal
 	{
 		template <typename T, bool>
