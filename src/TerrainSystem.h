@@ -12,6 +12,8 @@ namespace dd
 	class ShaderProgram;
 	class TerrainChunk;
 
+	struct TerrainChunkKey;
+
 	class TerrainSystem
 	{
 	public:
@@ -20,6 +22,7 @@ namespace dd
 		static const uint LODLevels = 4;
 		static const uint LowDetailChunksPerDim = 4; // 4 per dimension
 		static const uint ChunksToSplit = 4; // chunks to split at each LOD level
+		static const uint MaxInactiveChunks = 8;
 
 		TerrainSystem( Camera& camera );
 		~TerrainSystem();
@@ -36,10 +39,17 @@ namespace dd
 
 		void SaveChunkImages() const;
 
+		void WaitForGeneration() const;
+
 	private:
 
 		uint m_chunkSize;
 		Camera& m_camera;
-		Vector<TerrainChunk*> m_chunks;
+		DenseMap<TerrainChunkKey, TerrainChunk*> m_activeChunks;
+		DenseMap<TerrainChunkKey, TerrainChunk*> m_inactiveChunks;
+
+		void GenerateTerrain( const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
+		void GenerateChunk( const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
+		void PurgeInactiveChunks();
 	};
 }

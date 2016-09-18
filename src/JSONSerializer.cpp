@@ -1,4 +1,3 @@
-Copy
 //
 // JSONSerializer.h - Serialization! To JSON!
 // Copyright (C) Sebastian Nordgren 
@@ -8,85 +7,166 @@ Copy
 #include "PrecompiledHeader.h"
 #include "JSONSerializer.h"
 
+#include "arduinojson/ArduinoJson.h"
+
 namespace dd
 {
-	ScopedJSONObject::ScopedJSONObject( JSONSerializer& serializer )
-		: m_host( serializer )
+	class JSONPrint 
+		: public ArduinoJson::Print
 	{
-		m_previous = m_host.m_currentObject;
-		m_host.m_currentObject = this;
+	public:
+		JSONPrint( WriteStream& stream )
+			: m_stream( stream ) {}
 
-		Indent();
+		virtual size_t write( uint8_t c ) override
+		{
+			m_stream.WriteByte( c );
+			return 1;
+		}
 
-		m_host.m_stream.Write( "{\n", 2 );
+	private:
+		WriteStream& m_stream;
+	};
 
-		++m_host.m_indent;
+#define POD( T ) \
+	if( type == GET_TYPE( T ) ) \
+		return JsonVariant( var.GetValue<T>() );
+
+	JsonVariant GetPODVariant( Variable var, JsonBuffer& buffer )
+	{
+		const TypeInfo* type = var.Type();
+		DD_ASSERT( type->IsRegistered() );
+
+		POD( bool );
+		POD( int );
+		POD( int8 );
+		POD( int16 );
+		POD( int32 );
+		POD( int64 );
+		POD( uint );
+		POD( uint8 );
+		POD( uint16 );
+		POD( uint32 );
+		POD( uint64 );
+		POD( float );
+		POD( double );
+
+		return JsonVariant();
 	}
 
-	ScopedJSONObject::~ScopedJSONObject()
-	{
-		DD_ASSERT( m_host.m_indent > 0 );
-
-		--m_host.m_indent;
-		Indent();
-
-		m_host.m_stream.WriteByte( '}' );
-
-		m_host.m_currentObject = m_previous;
-	}
-
-	void ScopedJSONObject::Indent() const
-	{
-		for( uint i = 0; i < m_host.m_indent; ++i ) 
-			m_host.m_stream.Write( "\t", 1 );
-	}
-	//===================================================================================
+#undef POD
 
 	JSONSerializer::JSONSerializer( WriteStream& stream )
-		: m_currentObject( nullptr ),
-		m_stream( stream ),
-		m_indent( 0 )
+		: m_stream( stream )
 	{
-
-	}
-
-	JSONSerializer::JSONSerializer( String& buffer )
-		: m_currentObject( nullptr ),
-		m_stream( buffer ),
-		m_indent( 0 )
-	{
-		
 	}
 
 	JSONSerializer::~JSONSerializer()
 	{
-
 	}
 
-	void JSONSerializer::Indent()
+	JsonVariant GetVariant( Variable var, JsonBuffer& buffer );
+
+	JsonVariant GetArrayVariant( Variable var, JsonBuffer& buffer )
 	{
-		if( m_currentObject != nullptr )
-			m_currentObject->Indent();
+		const TypeInfo* type = var.Type();
+		DD_ASSERT( type->IsRegistered() );
+
+		JsonArray& arr = buffer.createArray();
+
+		uint size = type->ContainerSize( var.Data() );
+		for( uint i = 0; i < size; ++i )
+		{
+			void* elem = type->ElementAt( var.Data(), i );
+
+			Variable elem_var( type->ContainedType(), elem );
+
+			arr.add( GetVariant( elem_var, buffer ) );
+		}
+
+		return JsonVariant( arr );
 	}
 
-	void JSONSerializer::AddKey( const String& key )
+	JsonVariant GetObjectVariant( Variable var, JsonBuffer& buffer )
 	{
-		Indent();
-		Serialize( key );
-		m_stream.Write( " : ", 3 );
+		const TypeInfo* type = var.Type();
+		DD_ASSERT( type->IsRegistered() );
+
+		JsonObject& root = buffer.createObject();
+
+		root["type"] = buffer.strdup( type->FullTypeName().c_str() );
+		JsonObject& members = root.createNestedObject( "members" );
+
+		for( const Member& member : type->Members() )
+		{
+			Variable member_var( var, member );
+			members[member.Name().c_str()] = GetVariant( member_var, buffer );
+		}
+
+		return JsonVariant( root );
 	}
 
-	void JSONSerializer::AddString( const char* key, const String& value, bool last )
+	//
+	// Central decision making for what type we're actually serializing.
+	// Can be used recursively to fill out arrays and objects, which is nice.
+	//
+	JsonVariant GetVariant( Variable var, JsonBuffer& buffer )
 	{
-		AddKey( String16( key ) );
-		Serialize( value );
+		const TypeInfo* type = var.Type();
+		DD_ASSERT( type->IsRegistered() );
 
-		if( !last )
-			m_stream.WriteByte( ',' );
+		if( type->IsPOD() )
+		{
+			return GetPODVariant( var, buffer );
+		}
+		else if( type->IsContainer() )
+		{
+			return GetArrayVariant( var, buffer );
+		}
+		else if( type->IsDerivedFrom( GET_TYPE( String ) ) )
+		{
+			return JsonVariant( buffer.strdup( var.GetValue<String>().c_str() ) );
+		}
+		else if( type == GET_TYPE( SharedString ) )
+		{
+			return JsonVariant( buffer.strdup( var.GetValue<SharedString>().c_str() ) );
+		}
+		else if( type->Members().Size() > 0 )
+		{
+			return GetObjectVariant( var, buffer );
+		}
 
-		m_stream.WriteByte( '\n' );
+		return JsonVariant();
 	}
 
+	bool JSONSerializer::Serialize( Variable var )
+	{
+		DynamicJsonBuffer buffer;
+		JsonVariant root = GetVariant( var, buffer );
+
+		JSONPrint printer( m_stream );
+		root.prettyPrintTo( printer );
+
+		return root.success();
+	}
+
+	JSONDeserializer::JSONDeserializer( ReadStream& stream )
+		: m_stream( stream )
+	{
+
+	}
+
+	JSONDeserializer::~JSONDeserializer()
+	{
+
+	}
+
+	bool JSONDeserializer::Deserialize( Variable var )
+	{
+		return true;
+	}
+	//===================================================================================
+	/*
 	bool JSONSerializer::Serialize( Variable var )
 	{
 		const TypeInfo* type = var.Type();
@@ -119,12 +199,10 @@ namespace dd
 				{
 					AddKey( member.Name() );
 
-					void* data = PointerAdd( var.Data(), member.Offset() );
-
 					if( !member.Type()->IsPOD() )
 						m_stream.WriteByte( '\n' );
 
-					if( !Serialize( Variable( member.Type(), data ) ) )
+					if( !Serialize( Variable( var, member ) ) )
 						return false;
 
 					if( index < (member_count - 1) )
@@ -326,7 +404,7 @@ namespace dd
 
 				DD_ASSERT( pair.Key == member.Name() );
 
-				Variable member_var( member.Type(), PointerAdd( var.Data(), member.Offset() ) );
+				Variable member_var( var, member );
 
 				if( pair.HasChildren )
 				{
@@ -353,5 +431,5 @@ namespace dd
 		}
 
 		return true;
-	}
+	}*/
 }

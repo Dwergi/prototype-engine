@@ -30,6 +30,7 @@
 #include "Recorder.h"
 #include "Renderer.h"
 #include "ScopedTimer.h"
+#include "StringBinding.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "TerrainSystem.h"
@@ -46,6 +47,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "GL/gl3w.h"
+
+#include "SFML/Network/UdpSocket.hpp"
 //---------------------------------------------------------------------------
 
 using namespace dd;
@@ -56,11 +59,9 @@ bool s_drawFPS = true;
 extern float s_maxFPS;
 float s_maxFPS = 60.0f;
 
-extern float s_rollingAverageFPS;
-float s_rollingAverageFPS = s_maxFPS;
-
-extern float s_rollingAverageMultiplier;
-float s_rollingAverageMultiplier = 0.9f;
+const int SLIDING_WINDOW_SIZE = 60;
+float s_frameTimes[SLIDING_WINDOW_SIZE];
+int s_currentFrame = 0;
 
 bool s_drawConsole = false;
 
@@ -73,12 +74,6 @@ std::unique_ptr<Input> s_input;
 
 void DrawFPS( float delta_t )
 {
-	if( delta_t > 0 )
-	{
-		s_rollingAverageFPS *= s_rollingAverageMultiplier;
-		s_rollingAverageFPS += (1.0f / delta_t) * (1.0f - s_rollingAverageMultiplier);
-	}
-
 	ImGui::SetNextWindowPos( ImVec2( 2, 2 ) );
 	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
 	{
@@ -86,7 +81,24 @@ void DrawFPS( float delta_t )
 		return;
 	}
 
-	ImGui::Text( "FPS: %.1f", s_rollingAverageFPS );
+	s_frameTimes[s_currentFrame] = delta_t;
+	++s_currentFrame;
+
+	if( s_currentFrame >= SLIDING_WINDOW_SIZE )
+		s_currentFrame = 0;
+
+	float ms = delta_t * 1000.f;
+
+	float total_time = 0;
+	for( float f : s_frameTimes )
+	{
+		total_time += f;
+	}
+
+	float sliding_delta = (total_time / SLIDING_WINDOW_SIZE) * 1000.f;
+
+	ImGui::Text( "Frame time: %.1f", ms );
+	ImGui::Text( "Sliding: %.1f", sliding_delta );
 	ImGui::End();
 }
 
@@ -116,20 +128,24 @@ void RegisterGlobalScriptFunctions()
 
 	REGISTER_GLOBAL_VARIABLE( engine, s_drawFPS );
 	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
-	REGISTER_GLOBAL_VARIABLE( engine, s_rollingAverageFPS );
-	REGISTER_GLOBAL_VARIABLE( engine, s_rollingAverageMultiplier );
 }
 
 void RegisterGameTypes()
 {
+#ifdef USE_ANGELSCRIPT
+	dd::RegisterString( Services::Get<AngelScriptEngine>() );
+#endif
+
 	REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
+	vec3Type->RegisterScriptType<glm::vec3, true>();
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
 	REGISTER_POD( glm::vec4 );
 	TypeInfo* vec4Type = TypeInfo::AccessType<glm::vec4>();
+	vec4Type->RegisterScriptType<glm::vec4, true>();
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
@@ -187,9 +203,15 @@ public:
 	FrameTimer()
 	{
 		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrame = 0.0f;
-		m_currentFrame = -m_targetDelta;
+		m_lastFrameTime = 0.0f;
+		m_currentFrameTime = -m_targetDelta;
 		m_delta = m_targetDelta;
+
+		// fill history with standard deltas
+		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
+		{
+			s_frameTimes[i] = m_targetDelta;
+		}
 
 		m_timer.Start();
 	}
@@ -197,9 +219,9 @@ public:
 	void Update()
 	{
 		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrame = m_currentFrame;
-		m_currentFrame = m_timer.Time();
-		m_delta = m_currentFrame - m_lastFrame;
+		m_lastFrameTime = m_currentFrameTime;
+		m_currentFrameTime = m_timer.Time();
+		m_delta = m_currentFrameTime - m_lastFrameTime;
 	}
 
 	float Delta() const
@@ -212,7 +234,7 @@ public:
 		DD_PROFILE_START( FrameTimer_DelayFrame );
 
 		float now = m_timer.Time();
-		while( now - m_lastFrame < m_targetDelta )
+		while( now - m_lastFrameTime < m_targetDelta )
 		{
 			::Sleep( 0 );
 
@@ -226,8 +248,8 @@ private:
 
 	Timer m_timer;
 	float m_targetDelta;
-	float m_lastFrame;
-	float m_currentFrame;
+	float m_lastFrameTime;
+	float m_currentFrameTime;
 	float m_delta;
 
 };
@@ -266,7 +288,7 @@ int GameMain()
 		SwarmSystem swarm_system;
 		Services::Register( swarm_system );
 
-		s_window.reset( new Window( 1280, 960, "Neutrino" ) );
+		s_window.reset( new Window( 1280, 720, "DD" ) );
 		s_input.reset( new Input( *s_window ) );
 		s_input->CaptureMouse( !s_drawConsole );
 
@@ -281,7 +303,6 @@ int GameMain()
 
 		TerrainSystem terrain( renderer.GetCamera() );
 		terrain.Initialize();
-		terrain.SaveChunkImages();
 
 		renderer.SetTerrainSystem( terrain );
 		
@@ -297,6 +318,7 @@ int GameMain()
 		{
 			DD_PROFILE_START( Frame );
 
+			frameTimer.Update();
 			float delta_t = frameTimer.Delta();
 
 			s_input->Update( delta_t );
@@ -318,6 +340,8 @@ int GameMain()
 			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "System" );
 
 			terrain.Update( delta_t );
+
+			jobsystem.WaitForCategory( "System" );
 
 			renderer.Render( delta_t );
 			renderer.DrawDebugUI();

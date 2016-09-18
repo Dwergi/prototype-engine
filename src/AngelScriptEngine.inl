@@ -4,6 +4,8 @@
 // August 6th 2015
 //
 
+#include "ASInternal.h"
+
 namespace dd
 {
 	namespace ASInternal
@@ -51,6 +53,49 @@ namespace dd
 				ptr->RegisterStruct<T>();
 			}
 		};
+
+		template <typename... Args, std::size_t... Index>
+		void MethodCallHelper( asIScriptContext* context, std::tuple<Args...> args, std::index_sequence<Index...> )
+		{
+			ExpandType
+			{
+				0, (
+					ASInternal::ASArgument<std::tuple_element_t<Index, std::tuple<Args...>>>::set( context, Index, std::get<Index>( args ) ),
+				0)...
+			};
+		}
+	}
+
+	template <typename... Args>
+	bool AngelScriptFunction::operator()( Args... args )
+	{
+		constexpr const std::size_t ArgCount = sizeof...(Args);
+		DD_ASSERT( ArgCount == m_function->GetParamCount() );
+
+		ReleaseContext();
+
+		m_context = m_engine->GetInternalEngine()->CreateContext();
+		m_context->Prepare( m_function );
+
+		ASInternal::MethodCallHelper( m_context, std::make_tuple( args... ), std::make_index_sequence<ArgCount>() );
+
+		int r = m_context->Execute();
+		if( r != asEXECUTION_FINISHED )
+		{
+			ReleaseContext();
+			return false;
+		}
+
+		return true;
+	}
+
+	template <typename T>
+	void AngelScriptFunction::Returned( T& ret ) const
+	{
+		if( m_context != nullptr )
+		{
+			ASInternal::ReturnValue<T>::Get( m_context, ret );
+		}
 	}
 
 	template <typename T, bool byValue>
@@ -117,9 +162,8 @@ namespace dd
 	}
 
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
-	void AngelScriptEngine::RegisterMember( const char* name )
+	void AngelScriptEngine::RegisterMember( const char* name, const TypeInfo* classType )
 	{
-		const TypeInfo* classType = GET_TYPE( TClass );
 		const TypeInfo* propType = GET_TYPE( TProp );
 
 		String128 signature;
@@ -153,7 +197,9 @@ namespace dd
 	{
 		String256 signature = GetFunctionSignatureString( name, function );
 
-		int res = m_engine->RegisterGlobalFunction( signature.c_str(), asSMethodPtr<sizeof(FnType)>::Convert( FnPtr ), asCALL_CDECL );
+		asSFuncPtr ptr = asSMethodPtr<sizeof( FnType )>::Convert( FnPtr );
+		ptr.flag = 2; // global calling convention, because fuck you AngelScript
+		int res = m_engine->RegisterGlobalFunction( signature.c_str(), ptr, asCALL_CDECL );
 		DD_ASSERT( res >= 0, "Failed to register global function \'%s\'!", signature.c_str() );
 	}
 

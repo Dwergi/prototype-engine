@@ -62,7 +62,8 @@ namespace dd
 
 	ShaderProgram::ShaderProgram( const String& name )
 		: m_name( name ),
-		m_refCount( nullptr )
+		m_refCount( nullptr ),
+		m_inUse( false )
 	{
 		m_id = glCreateProgram();
 
@@ -77,7 +78,8 @@ namespace dd
 		m_id( other.m_id ),
 		m_name( other.m_name ),
 		m_refCount( other.m_refCount ),
-		m_valid( other.m_valid )
+		m_valid( other.m_valid ),
+		m_inUse( other.m_inUse )
 	{
 		Retain();
 	}
@@ -95,6 +97,7 @@ namespace dd
 		m_name = other.m_name;
 		m_valid = other.m_valid;
 		m_refCount = other.m_refCount;
+		m_inUse = other.m_inUse;
 
 		Retain();
 
@@ -169,17 +172,16 @@ namespace dd
 
 	bool ShaderProgram::InUse() const
 	{
-		GLint currentProgram = 0;
-		glGetIntegerv( GL_CURRENT_PROGRAM, &currentProgram );
-
-		return currentProgram == (GLint) m_id;
+		return m_inUse;
 	}
 
-	void ShaderProgram::Use( bool use ) const
+	void ShaderProgram::Use( bool use )
 	{
-		DD_ASSERT( !InUse() == use, "Trying to change use state to program's current state!" );
+		DD_ASSERT( !m_inUse == use, "Trying to change use state to program's current state!" );
 
 		glUseProgram( use ? m_id : 0 );
+
+		m_inUse = use;
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const

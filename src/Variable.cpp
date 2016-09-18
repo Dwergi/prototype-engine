@@ -39,6 +39,12 @@ namespace dd
 	{
 	}
 
+	Variable::Variable( Variable var, const Member& member )
+	{
+		m_data = PointerAdd( var.Data(), member.Offset() );
+		m_typeInfo = member.Type();
+	}
+
 	Variable::Variable( const Variable& rhs )
 	{
 		m_data = rhs.m_data;

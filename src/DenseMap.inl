@@ -115,8 +115,6 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Add( const TKey& key, const TValue& value )
 	{
-		DD_ASSERT( m_data.Size() > 0 );
-
 		if( m_entries == m_data.Size() )
 		{
 			Grow();
@@ -128,8 +126,6 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Remove( const TKey& key )
 	{
-		DD_ASSERT( m_entries > 0 );
-
 		Entry* entry = FindEntry( key );
 		if( entry == nullptr )
 			throw dd::Exception( "Key not found!" );
@@ -214,7 +210,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Grow()
 	{
-		Resize( m_data.Size() * 2 );
+		Resize( std::max( DefaultSize, m_data.Size() * 2 ) );
 	}
 
 	template <typename TKey, typename TValue>

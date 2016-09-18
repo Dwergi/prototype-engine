@@ -45,7 +45,6 @@ namespace dd
 	JobSystem::Job::Job( const Job& other )
 		: Func( other.Func ),
 		Category( other.Category ),
-		WaitingOn( other.WaitingOn ),
 		Status( other.Status ),
 		ID( other.ID )
 	{
@@ -61,8 +60,16 @@ namespace dd
 
 	}
 
+	JobSystem::Job::~Job()
+	{
+		ID = 0;
+		Status = JobStatus::Free;
+	}
+
 	JobSystem::JobSystem( uint thread_count )
 	{
+		m_jobs.Reserve( JOB_QUEUE_SIZE );
+
 		DD_ASSERT( thread_count <= MAX_THREADS );
 
 		CreateWorkers( std::min( thread_count, MAX_THREADS ) );
@@ -100,6 +107,8 @@ namespace dd
 
 			DWORD threadId = ::GetThreadId( static_cast<HANDLE>( m_threads[i].native_handle() ) );
 			SetThreadName( threadId, name );
+
+			SetThreadName( ::GetCurrentThreadId(), "Main" );
 		}
 	}
 
@@ -110,140 +119,87 @@ namespace dd
 
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
-		m_jobs.Add( Job( [fn]() { fn(); }, category, m_jobID++ ) );
+		// find a free slot
+		for( uint i = 0; i < m_jobs.Size(); ++i )
+		{
+			if( m_jobs[i].Status == JobStatus::Free )
+			{
+				new (&m_jobs[i]) Job( [fn]() { fn(); }, category, i );
+				m_pendingJobs.Add( i );
+				return;
+			}
+		}
+
+		DD_ASSERT( m_jobs.Size() < m_jobs.Capacity(), "JobSystem out of space, allocate more!" );
+
+		// add if we won't cause a reallocate
+		if( m_jobs.Size() < m_jobs.Capacity() )
+		{
+			int id = m_jobs.Size();
+			m_jobs.Add( Job( [fn]() { fn(); }, category, id ) );
+			m_pendingJobs.Add( id );
+		}
 	}
 
 	void JobSystem::Schedule( const std::function<void ()>& fn, const char* category )
 	{
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
-		m_jobs.Add( Job( fn, category, m_jobID++ ) );
+		// find a free slot
+		for( uint i = 0; i < m_jobs.Size(); ++i )
+		{
+			if( m_jobs[i].Status == JobStatus::Free )
+			{
+				new (&m_jobs[i]) Job( fn, category, i );
+				m_pendingJobs.Add( i );
+				return;
+			}
+		}
+
+		DD_ASSERT( m_jobs.Size() < m_jobs.Capacity(), "JobSystem out of space, allocate more!" );
+
+		// add if we won't cause a reallocate
+		if( m_jobs.Size() < m_jobs.Capacity() )
+		{
+			int id = m_jobs.Size();
+			m_jobs.Add( Job( fn, category, id ) );
+			m_pendingJobs.Add( id );
+		}
 	}
 
 	bool JobSystem::HasPendingJobs( const char* category )
 	{
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
-		for( Job& job : m_jobs )
+		for( int job : m_pendingJobs )
 		{
-			if( job.Category == category )
+			if( m_jobs[job].Category == category )
 				return true;
 		}
 
 		return false;
 	}
 
-	void JobSystem::UpdateJobs()
+	void JobSystem::MarkDone( const Job& job )
 	{
-		DD_PROFILE_START( JobSystem_UpdateJobs );
-
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-
-		// clear finished jobs
-		for( int i = 0; i < (int) m_jobs.Size(); ++i )
-		{
-			if( m_jobs[i].Status == JobStatus::Done )
-			{
-				m_jobs.Remove( i );
-				--i;
-			}
-		}
-
-		DenseMap<String128, int> categories;
-		categories.Reserve( m_jobs.Size() );
-
-		// hash all the categories and keep track of them
-		for( Job& job : m_jobs )
-		{
-			int* count = categories.Find( job.Category );
-			if( count == nullptr )
-			{
-				categories.Add( job.Category, 1 );
-			}
-			else
-			{
-				++(*count);
-			}
-		}
-
-		// if the category a job is waiting on isn't in the above list, bump the status of the job
-		for( Job& job : m_jobs )
-		{
-			if( job.Status == JobStatus::Waiting )
-			{
-				int* count = categories.Find( job.WaitingOn );
-				if( count == nullptr )
-				{
-					job.Status = JobStatus::DoneWaiting;
-				}
-			}
-		}
-
-		DD_PROFILE_END();
+		int id = job.ID;
+		m_jobs[id].~Job();
+		m_jobs[id].Status = JobStatus::Free;
 	}
 
-	JobHandle::JobHandle()
-		: m_system( nullptr ),
-		m_id( 0 )
+	bool JobSystem::GetPendingJob( Job*& out_job )
 	{
-
-	}
-
-	JobHandle::JobHandle( JobSystem& system, JobSystem::Job& job )
-		: m_system( &system ),
-		m_id( job.ID )
-	{
-
-	}
-	
-	JobSystem::Job* JobHandle::GetJob() const
-	{
-		DD_ASSERT( m_system != nullptr, "Invalid handle used!" );
-
-		std::lock_guard<std::mutex> lock( m_system->m_jobsMutex );
-
-		for( JobSystem::Job& job : m_system->m_jobs )
-		{
-			if( job.ID == m_id )
-				return &job;
-		}
-
-		return nullptr;
-	}
-
-	void JobHandle::SetStatus( JobSystem::JobStatus status ) const
-	{
-		DD_ASSERT( m_system != nullptr, "Invalid handle used!" );
-
-		std::lock_guard<std::mutex> lock( m_system->m_jobsMutex );
-
-		for( JobSystem::Job& job : m_system->m_jobs )
-		{
-			if( job.ID == m_id )
-				job.Status = status;
-		}
-	}
-
-	bool JobSystem::GetPendingJob( JobHandle& out_handle )
-	{
-		UpdateJobs();
+		out_job = nullptr;
 
 		std::lock_guard<std::mutex> lock( m_jobsMutex );
 		
-		if( m_jobs.Size() == 0 )
+		if( m_pendingJobs.Size() == 0 )
 			return false;	
 
-		for( Job& job : m_jobs )
-		{
-			if( job.Status == JobStatus::Pending )
-			{
-				job.Status = JobStatus::Assigned;
-				out_handle = JobHandle( *this, job );
-				return true;
-			}
-		}
+		out_job = &m_jobs[m_pendingJobs[0]];
+		m_pendingJobs.RemoveOrdered( 0 );
 
-		return false;
+		return true;
 	}
 
 	JobThread* JobSystem::FindCurrentWorker() const
@@ -267,21 +223,14 @@ namespace dd
 		timer.Start();
 
 		JobThread* thread = FindCurrentWorker();
-		if( thread != nullptr )
-		{
-			// delegate to thread if coming from inside another job
-			thread->WaitForCategory( category, timeout_ms );
-			return;
-		}
-
+		DD_ASSERT_ERROR( thread == nullptr, "Cannot wait for categories inside jobs!" );
+		
 		do
 		{
 			if( !HasPendingJobs( category ) )
 				return;
-
-			UpdateJobs();
 			
-			::Sleep( 1 );
+			::Sleep( 0 );
 		} 
 		while( timeout_ms == 0 || timer.Time() < timeout_ms );
 	}

@@ -22,101 +22,50 @@
 
 namespace dd
 {
-	template <>
-	uint64 Hash( const ChunkKey& key )
-	{
-		// Hash the bottom 28 bytes of the X and Y coordinates, and the inverse of the bottom 8 bytes of the size
-		// This should mean that in most cases chunks are ordered by X, then Y, then inverse size
-		return (key.X << 36) + (key.Y << 8) + ~(key.Size & 0xff);
-	}
-
-	bool operator<( const ChunkKey& a, const ChunkKey& b )
-	{
-		return Hash( a ) < Hash( b );
-	}
-
 	float TerrainChunk::HeightRange = 8.f;
-	VBO TerrainChunk::m_vboIndex;
-	std::mutex TerrainChunk::m_indexMutex;
 
-	const uint s_indexCount = (TerrainChunk::VerticesPerDim - 1) * (TerrainChunk::VerticesPerDim - 1) * 6;
-	unsigned short* s_indexData = nullptr;
+	TerrainChunk::IndexBuffer<TerrainChunk::VerticesPerDim, TerrainChunk::VerticesPerDim> TerrainChunk::s_indices;
 
-	void CreateIndices( unsigned short* indices, uint width, uint height )
-	{
-		unsigned int index = 0;
-
-		for( unsigned short y = 0; y < height - 1; ++y )
-		{
-			for( unsigned short x = 0; x < width; ++x )
-			{
-				bool first = x == 0;
-				bool last = x == (width - 1);
-
-				unsigned short next_row = (y + 1) * width + x;
-
-				if( !last )
-				{
-					indices[index]		= y * width + x;
-					indices[index + 1]	= next_row;
-					indices[index + 2]	= y * width + x + 1;
-
-					index += 3;
-				}
-
-				if( !first )
-				{
-					indices[index]		= y * width + x;
-					indices[index + 1]	= next_row - 1;
-					indices[index + 2]	= next_row;
-
-					index += 3;
-				}
-			}
-		}
-	}
-
-	TerrainChunk::TerrainChunk( const ChunkKey& key ) :
-		m_key( key )
+	TerrainChunk::TerrainChunk( const TerrainChunkKey& key ) :
+		m_key( key ),
+		m_generated( false ),
+		m_created( false )
 	{
 
 	}
 
 	TerrainChunk::~TerrainChunk()
 	{
+		if( !m_created )
+			return;
 
+		m_vboVertex.Destroy();
+		m_vao.Destroy();
 	}
 
 	void TerrainChunk::CreateRenderResources( ShaderProgram& shader )
 	{
-		if( !m_generated )
+		if( !m_generated ||	m_created )
 			return;
 
-		if( m_vao.IsValid() )
-			return;
+		m_created = true;
 
 		m_vao.Create();
 		m_vao.Bind();
 
-		std::lock_guard<std::mutex> lock( m_indexMutex );
-
-		if( s_indexData == nullptr )
-		{
-			s_indexData = new unsigned short[s_indexCount];
-			CreateIndices( s_indexData, VerticesPerDim, VerticesPerDim );
-
-			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER );
-			m_vboIndex.Bind();
-			m_vboIndex.SetData( s_indexData, sizeof( unsigned short ) * s_indexCount );
-		}
-
-		m_vboIndex.Bind();
+		s_indices.Create();
+		s_indices.Bind();
 
 		m_vboVertex.Create( GL_ARRAY_BUFFER );
 		m_vboVertex.Bind();
-		m_vboVertex.SetData( m_vertices, sizeof( glm::vec3 ) * VerticesPerDim * VerticesPerDim );
+		m_vboVertex.SetData( &m_vertices[0], sizeof( m_vertices[0] ) * VerticesPerDim * VerticesPerDim );
 
 		m_shader = &shader;
+		m_shader->BindAttributeFloat( "position", 3, 3 * sizeof( GLfloat ), false );
+
+		m_vao.Unbind();
+
+		CheckGLError();
 	}
 
 	float TerrainChunk::GetHeight( float x, float y )
@@ -148,6 +97,11 @@ namespace dd
 
 	void TerrainChunk::Generate()
 	{
+		if( m_generated )
+			return;
+
+		m_generated = true;
+
 		float offset = (float) m_key.Size / (VerticesPerDim - 1);
 		float height_range = HeightRange / 2; // noise returns between -1 and 1
 
@@ -166,23 +120,15 @@ namespace dd
 				m_vertices[y * VerticesPerDim + x].z = y * offset;
 			}
 		}
-		
-		m_generated = true;
 	}
 
 	void TerrainChunk::Render( Camera& camera )
 	{
-		if( !m_generated )
-			return;
-
-		if( !m_vao.IsValid() )
+		if( !m_generated || !m_created )
 			return;
 
 		m_vao.Bind();
-		m_vboVertex.Bind();
-		m_vboIndex.Bind();
-		
-		m_shader->BindAttributeFloat( "position", 3, 3 * sizeof( GLfloat ), false );
+
 		m_shader->Use( true );
 
 		glm::mat4 model = glm::translate( glm::vec3( m_key.X, 0, m_key.Y ) );
@@ -194,11 +140,13 @@ namespace dd
 		glm::vec4 colour( clr, clr, clr, 1.0 );
 		m_shader->SetUniform( "colour_multiplier", colour );
 
-		glDrawElements( GL_TRIANGLES, s_indexCount, GL_UNSIGNED_SHORT, 0 );
+		glDrawElements( GL_TRIANGLES, s_indices.Count, GL_UNSIGNED_SHORT, 0 );
 
 		m_shader->Use( false );
 
 		m_vao.Unbind();
+
+		CheckGLError();
 	}
 
 	void TerrainChunk::Write( const char* filename )

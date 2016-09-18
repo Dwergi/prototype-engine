@@ -18,6 +18,8 @@ namespace dd
 
 		glm::vec3 GetPosition() const { return Transform[3].xyz(); }
 		void SetPosition( const glm::vec3& pos ) { Transform[3].xyz = pos; }
+
+		ALIGNED_ALLOCATORS( 16 )
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			PARENT( Component )

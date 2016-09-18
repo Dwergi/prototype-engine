@@ -47,11 +47,11 @@ struct TestStruct
 	}
 };
 
-static bool ScheduledB = false;
-static bool FinishedWaitingA = false;
-static bool ContinueWaiting = true;
-static bool CalledB = false;
-static bool ExitedB = false;
+static volatile bool ScheduledB = false;
+static volatile bool FinishedWaitingA = false;
+static volatile bool ContinueWaiting = true;
+static volatile bool CalledB = false;
+static volatile bool ExitedB = false;
 
 void TestWaitB()
 {
@@ -70,8 +70,6 @@ void TestWaitA( dd::JobSystem* system )
 	system->Schedule( FUNCTION( TestWaitB ), "B" );
 
 	ScheduledB = true;
-
-	system->WaitForCategory( "B" );
 
 	FinishedWaitingA = true;
 }
@@ -156,6 +154,7 @@ TEST_CASE( "[JobSystem]" )
 		ScheduledB = false;
 		FinishedWaitingA = false;
 		CalledB = false;
+		ExitedB = false;
 
 		system.Schedule( std::bind( &TestWaitA, &system ), "A" );
 
@@ -171,8 +170,9 @@ TEST_CASE( "[JobSystem]" )
 		ContinueWaiting = false;
 
 		system.WaitForCategory( "A" );
-
-		REQUIRE( ExitedB );
 		REQUIRE( FinishedWaitingA );
+
+		system.WaitForCategory( "B" );
+		REQUIRE( ExitedB );
 	}
 }

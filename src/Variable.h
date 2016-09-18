@@ -27,12 +27,14 @@ Purpose       :
 namespace dd
 {
 	class TypeInfo;
+	class Member;
 
 	class Variable
 	{
 	public:
 		Variable();
 		Variable( const TypeInfo* typeInfo, void* data );
+		Variable( Variable var, const Member& member );
 		Variable( const Variable& rhs );
 
 		template <typename T>

@@ -1695,7 +1695,7 @@ static void TCPSocket_Destructor(TCPSocket* tcp_socket)
 }
 
 
-static rmtError TCPSocket_RunServer(TCPSocket* tcp_socket, rmtU16 port)
+static rmtError TCPSocket_RunServer(TCPSocket* tcp_socket, rmtU16 port, rmtBool limit_connections_to_localhost)
 {
     SOCKET s = INVALID_SOCKET;
     struct sockaddr_in sin;
@@ -1713,7 +1713,7 @@ static rmtError TCPSocket_RunServer(TCPSocket* tcp_socket, rmtU16 port)
 
     // Bind the socket to the incoming port
     sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_addr.s_addr = htonl(limit_connections_to_localhost ? INADDR_LOOPBACK : INADDR_ANY);
     sin.sin_port = htons(port);
     if (bind(s, (struct sockaddr*)&sin, sizeof(sin)) == SOCKET_ERROR)
         return RMT_ERROR_SOCKET_BIND_FAIL;
@@ -1830,6 +1830,18 @@ static rmtError TCPSocket_AcceptConnection(TCPSocket* tcp_socket, TCPSocket** cl
     if (s == SOCKET_ERROR)
         return RMT_ERROR_SOCKET_ACCEPT_FAIL;
 
+#ifdef SO_NOSIGPIPE
+    // On POSIX systems, send() may send a SIGPIPE signal when writing to an
+    // already closed connection. By setting this option, we prevent the
+    // signal from being emitted and send will instead return an error and set
+    // errno to EPIPE.
+    //
+    // This is supported on BSD platforms and not on Linux.
+    {
+        int flag = 1;
+        setsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(flag));
+    }
+#endif
     // Create a client socket for the new connection
     assert(client_socket != NULL);
     New_0(TCPSocket, *client_socket);
@@ -1885,7 +1897,14 @@ static rmtError TCPSocket_Send(TCPSocket* tcp_socket, const void* data, rmtU32 l
     while (cur_data < end_data)
     {
         // Attempt to send the remaining chunk of data
-        int bytes_sent = (int)send(tcp_socket->socket, cur_data, (int)(end_data - cur_data), 0);
+        int bytes_sent;
+        int send_flags = 0;
+#ifdef MSG_NOSIGNAL
+        // On Linux this prevents send from emitting a SIGPIPE signal
+        // Equivalent on BSD to the SO_NOSIGPIPE option.
+        send_flags = MSG_NOSIGNAL;
+#endif
+        bytes_sent = (int)send(tcp_socket->socket, cur_data, (int)(end_data - cur_data), send_flags);
 
         if (bytes_sent == SOCKET_ERROR || bytes_sent == 0)
         {
@@ -2570,12 +2589,12 @@ static void WebSocket_Destructor(WebSocket* web_socket)
 }
 
 
-static rmtError WebSocket_RunServer(WebSocket* web_socket, rmtU32 port, enum WebSocketMode mode)
+static rmtError WebSocket_RunServer(WebSocket* web_socket, rmtU16 port, rmtBool limit_connections_to_localhost, enum WebSocketMode mode)
 {
     // Create the server's listening socket
     assert(web_socket != NULL);
     web_socket->mode = mode;
-    return TCPSocket_RunServer(web_socket->tcp_socket, (rmtU16)port);
+    return TCPSocket_RunServer(web_socket->tcp_socket, port, limit_connections_to_localhost);
 }
 
 
@@ -3030,31 +3049,33 @@ typedef struct
     rmtU32 last_ping_time;
 
     rmtU16 port;
+    rmtBool limit_connections_to_localhost;
 } Server;
 
 
-static rmtError Server_CreateListenSocket(Server* server, rmtU16 port)
+static rmtError Server_CreateListenSocket(Server* server, rmtU16 port, rmtBool limit_connections_to_localhost)
 {
     rmtError error = RMT_ERROR_NONE;
 
     New_1(WebSocket, server->listen_socket, NULL);
     if (error == RMT_ERROR_NONE)
-        error = WebSocket_RunServer(server->listen_socket, port, WEBSOCKET_TEXT);
+        error = WebSocket_RunServer(server->listen_socket, port, limit_connections_to_localhost, WEBSOCKET_TEXT);
 
     return error;
 }
 
 
-static rmtError Server_Constructor(Server* server, rmtU16 port)
+static rmtError Server_Constructor(Server* server, rmtU16 port, rmtBool limit_connections_to_localhost)
 {
     assert(server != NULL);
     server->listen_socket = NULL;
     server->client_socket = NULL;
     server->last_ping_time = 0;
     server->port = port;
+    server->limit_connections_to_localhost = limit_connections_to_localhost;
 
     // Create the listening WebSocket
-    return Server_CreateListenSocket(server, port);
+    return Server_CreateListenSocket(server, port, limit_connections_to_localhost);
 }
 
 
@@ -3150,7 +3171,7 @@ static void Server_Update(Server* server)
 
     // Recreate the listening socket if it's been destroyed earlier
     if (server->listen_socket == NULL)
-        Server_CreateListenSocket(server, server->port);
+        Server_CreateListenSocket(server, server->port, server->limit_connections_to_localhost);
 
     if (server->listen_socket != NULL && server->client_socket == NULL)
     {
@@ -4171,7 +4192,7 @@ static rmtError Remotery_Constructor(Remotery* rmt)
         return error;
 
     // Create the server
-    New_1( Server, rmt->server, g_Settings.port );
+    New_2(Server, rmt->server, g_Settings.port, g_Settings.limit_connections_to_localhost);
     if (error != RMT_ERROR_NONE)
         return error;
 
@@ -4231,11 +4252,11 @@ static void Remotery_Destructor(Remotery* rmt)
     // Join the remotery thread before clearing the global object as the thread is profiling itself
     Delete(Thread, rmt->thread);
 
-    // Ensure this is the module that created it
-    assert(g_RemoteryCreated == RMT_TRUE);
-    assert(g_Remotery == rmt);
-    g_Remotery = NULL;
-    g_RemoteryCreated = RMT_FALSE;
+    if (g_RemoteryCreated)
+    {
+      g_Remotery = NULL;
+      g_RemoteryCreated = RMT_FALSE;
+    }
 
     #if RMT_USE_D3D11
         Delete(D3D11, rmt->d3d11);
@@ -4357,6 +4378,7 @@ RMT_API rmtSettings* _rmt_Settings(void)
     if( g_SettingsInitialized == RMT_FALSE )
     {
         g_Settings.port = 0x4597;
+        g_Settings.limit_connections_to_localhost = RMT_FALSE;
         g_Settings.msSleepBetweenServerUpdates = 10;
         g_Settings.messageQueueSizeInBytes = 64 * 1024;
         g_Settings.maxNbMessagesPerUpdate = 100;
@@ -4390,6 +4412,9 @@ RMT_API rmtError _rmt_CreateGlobalInstance(Remotery** remotery)
 
 RMT_API void _rmt_DestroyGlobalInstance(Remotery* remotery)
 {
+    // Ensure this is the module that created it
+    assert(g_RemoteryCreated == RMT_TRUE);
+    assert(g_Remotery == remotery);
     Delete(Remotery, remotery);
 }
 

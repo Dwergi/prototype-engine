@@ -19,6 +19,8 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
+#include "Memory.h"
+
 #include "Profiler.h"
 
 #include "DDAssert.h"
@@ -45,7 +47,7 @@
 #include "Services.h"
 #include "Globals.h"
 
-#include "Serialization.h"
+//#include "Serialization.h"
 #include "RefCounter.h"
 
 namespace dd
@@ -53,16 +55,18 @@ namespace dd
 	const double M_PI = 3.14159265358979323846;
 	const double M_PI_2 = 1.57079632679489661923;
 	const double M_1_PI = 0.318309886183790671538;
+
+	void* PointerAdd( void* base, uint64 offset );
+	const void* PointerAdd( const void* base, uint64 offset );
 }
 
-//#define USE_ANGELSCRIPT
 #ifdef USE_ANGELSCRIPT
 #include "AngelScriptEngine.h"
 namespace dd
 {
 	typedef AngelScriptEngine ScriptEngine;
 }
-#else
+#elif USE_WREN
 #include "WrenEngine.h"
 namespace dd
 {

@@ -108,7 +108,7 @@ namespace dd
 		Services::GetDoubleBuffer<MeshComponent>().Duplicate();
 	}
 
-	void Renderer::CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4 colour, const glm::mat4& transform )
+	void Renderer::CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform )
 	{
 		MeshHandle mesh_h = Mesh::Create( meshName, shader );
 

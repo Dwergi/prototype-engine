@@ -23,12 +23,14 @@ namespace dd
 		uint m_capacity;
 		uint m_current;
 	};
+	//===================================================================================
 
 	class ReadStream
 		: public Stream
 	{
 	public:
 
+		// TODO: Write a separate string stream...
 		ReadStream( const String& in );
 		ReadStream( const void* in, uint capacity );
 		ReadStream( const ReadStream& other );
@@ -37,32 +39,58 @@ namespace dd
 		char ReadByte();
 		void Read( String& dst );
 		void Read( void* dst, uint bytes );
-		void ReadFormat( const char* format, ... );
+
+		template <typename T>
+		T ReadPOD()
+		{
+			DD_ASSERT( Remaining() > sizeof( T ) );
+			DD_ASSERT( m_pSource != nullptr, "You can't read POD using this method to string streams!" );
+
+			const void* src = PointerAdd( m_pSource, m_current );
+			Advance( sizeof( T ) );
+
+			return *(const T*) src;
+		}
 
 	private:
 		const String* m_strSource;
 		const void* m_pSource;
 	};
+	//===================================================================================
 
 	class WriteStream
 		: public Stream
 	{
 	public:
 
+		// TODO: Write a separate string stream...
 		WriteStream( String& out );
 		WriteStream( void* out, uint capacity );
 		WriteStream( const WriteStream& other );
 
 		void Reset();
 
-		void WriteByte( char c );
+		void WriteByte( byte c );
 		void Write( const String& str );
+		void Write( const char* str );
 		void Write( const void* src, uint bytes );
 		void WriteFormat( const char* format, ... );
+
+		template <typename T>
+		void WritePOD( const T& val )
+		{
+			DD_ASSERT( Remaining() > sizeof( T ) );
+			DD_ASSERT( m_pDest != nullptr, "You can't write POD using this method to string streams!" );
+
+			void* dest = PointerAdd( m_pDest, m_current );
+			*(T*) dest = val;
+			Advance( sizeof( T ) );
+		}
 
 	private:
 
 		String* m_strDest;
 		void* m_pDest;
 	};
+	//===================================================================================
 }

@@ -9,17 +9,6 @@
 
 namespace dd
 {
-	namespace Serialize
-	{
-		enum class Mode : uint;
-	}
-
-	class WriteStream;
-	class ReadStream;
-
-	typedef void (*SerializeFn)( Serialize::Mode mode, WriteStream& dst, Variable src );
-	typedef void (*DeserializeFn)( Serialize::Mode mode, ReadStream& src, Variable dst );
-
 	struct Method
 	{
 		SharedString Name;
@@ -42,11 +31,14 @@ namespace dd
 		inline const SharedString& Namespace() const { return m_namespace; }
 		String128 FullTypeName() const;
 
-		inline bool IsPOD() const { return m_members.Size() == 0; }
+		inline bool IsPOD() const { return m_members.Size() == 0 && !IsContainer() && m_parentType == nullptr; }
 		inline bool IsRegistered() const { return m_size != 0; }
 
 		bool IsDerivedFrom( const TypeInfo* type ) const;
 
+		//
+		// Creation and deletion through a TypeInfo object.
+		//
 		void* (*New)();
 		void (*Copy)( void* data, const void* src );
 		void (*Delete)( void* data );
@@ -56,12 +48,22 @@ namespace dd
 		void (*PlacementCopy)( void* data, const void* src );
 
 		//
+		// Container type accessors.
+		//
+		inline bool IsContainer() const { return m_containedType != nullptr; }
+		inline const TypeInfo* ContainedType() const { return m_containedType; }
+
+		void (*InsertElement)(void* container, uint index, void* item);
+		void* (*ElementAt)(void* container, uint index);
+		uint (*ContainerSize)(void* container);
+
+		//
 		// Register a non-POD, non-container type (eg. a class).
 		//
 		template <typename T>
 		static const TypeInfo* RegisterType( const char* name );
 
-		template <typename T>
+		template <typename TContainer, typename TItem>
 		static const TypeInfo* RegisterContainer( const char* container, const TypeInfo* containing );
 
 		template <typename FnType, FnType Fn>
@@ -83,6 +85,9 @@ namespace dd
 		template <typename T>
 		static const TypeInfo* RegisterPOD( const char* name );
 
+		//
+		// TypeInfo accessors. 
+		//
 		template <typename T>
 		static const TypeInfo* GetType();
 		static const TypeInfo* GetType( const char* typeName );
@@ -91,12 +96,6 @@ namespace dd
 
 		template <typename T>
 		static TypeInfo* AccessType();
-
-		bool HasCustomSerializers() const;
-		void SetCustomSerializers( SerializeFn serializer, DeserializeFn deserializer );
-
-		SerializeFn SerializeCustom;
-		DeserializeFn DeserializeCustom;
 
 		static void RegisterDefaultTypes();
 

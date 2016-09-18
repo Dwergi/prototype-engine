@@ -50,6 +50,6 @@ namespace dd
 
 		int m_meshCount;
 
-		void CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4 colour, const glm::mat4& transform );
+		void CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
 	};
 }

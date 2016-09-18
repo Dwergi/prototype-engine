@@ -50,9 +50,6 @@ namespace dd
 
 		typeInfo->RegisterFunctions<T>();
 
-		typeInfo->SerializeCustom = nullptr;
-		typeInfo->DeserializeCustom = nullptr;
-
 		sm_typeMap.Add( SharedString( name ), typeInfo );
 
 		// register pointer and references as well
@@ -94,22 +91,19 @@ namespace dd
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
 
-		typeInfo->SerializeCustom = dd::Serialize::SerializePOD<T>;
-		typeInfo->DeserializeCustom = dd::Serialize::DeserializePOD<T>;
-
 		sm_typeMap.Add( SharedString( name ), typeInfo );
-
-		RegisterContainer<Vector<T>>( "dd::Vector", typeInfo );
+		
+		RegisterContainer<Vector<T>, T>( "dd::Vector", typeInfo );
 
 		return typeInfo;
 	}
 
-	template <typename T>
+	template <typename TContainer, typename TItem>
 	const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeInfo* containing )
 	{
 		DD_ASSERT( sm_defaultsRegistered );
 
-		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
+		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<TContainer>());
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
@@ -118,13 +112,14 @@ namespace dd
 		finalName += containing->Name().c_str();
 		finalName += ">";
 
-		typeInfo->Init( finalName.c_str(), sizeof( T ) );
+		typeInfo->Init( finalName.c_str(), sizeof( TContainer ) );
 		typeInfo->m_containedType = containing;
 
-		typeInfo->RegisterFunctions<T>();
+		typeInfo->RegisterFunctions<TContainer>();
 
-		typeInfo->SerializeCustom = dd::Serialize::SerializeContainer<T>;
-		typeInfo->DeserializeCustom = dd::Serialize::DeserializeContainer<T>;
+		typeInfo->ContainerSize = dd::ContainerSize<TContainer>;
+		typeInfo->ElementAt = dd::ElementAt<TContainer>;
+		typeInfo->InsertElement = dd::InsertElement<TContainer, TItem>;
 
 		sm_typeMap.Add( SharedString( finalName ), typeInfo );
 

@@ -7,7 +7,10 @@
 #include "PrecompiledHeader.h"
 #include "WrenEngine.h"
 
+#ifdef USE_WREN
+
 #include <cstdio>
+#include <direct.h>
 
 #include "wren/src/vm/wren_vm.h"
 
@@ -291,8 +294,13 @@ namespace dd
 
 	String256 WrenEngine::LoadModule( const char* module ) const
 	{
-		const char* path = "w:\\testing\\dd\\data\\wren\\";
-		String128 filename( path );
+		const char* path = "\\data\\wren\\";
+
+		char current[256];
+		_getcwd( current, 256 );
+
+		String256 filename( current );
+		filename += path;
 		filename += module;
 		filename += ".wren";
 
@@ -315,3 +323,5 @@ namespace dd
 		return source;
 	}
 }
+
+#endif

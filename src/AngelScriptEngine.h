@@ -10,11 +10,53 @@
 
 namespace dd
 {
+	class WriteStream;
+	
 	namespace ASInternal
 	{
 		template <typename T, bool>
 		struct RegisterTypeForwarder;
 	}
+
+	//
+	// A wrapper around a Wren method that is callable from C++.
+	//
+	class AngelScriptFunction
+	{
+	public:
+
+		AngelScriptFunction() = delete;
+		~AngelScriptFunction();
+
+		AngelScriptFunction( AngelScriptFunction&& );
+		AngelScriptFunction( const AngelScriptFunction& ) = delete;
+
+		AngelScriptFunction& operator=( AngelScriptFunction&& );
+		AngelScriptFunction& operator=( const AngelScriptFunction& ) = delete;
+
+		bool Valid() const;
+		void Invalidate();
+
+		template <typename... Args>
+		bool operator()( Args... );
+
+		template <typename T>
+		void Returned( T& ret ) const;
+
+	private:
+		friend class AngelScriptEngine;
+
+		AngelScriptFunction( AngelScriptEngine*, asIScriptFunction* );
+
+		void ReleaseContext();
+
+		AngelScriptEngine* m_engine;
+		asIScriptFunction* m_function;
+
+		// context is created when the function is called and released on destruction or a new call
+		asIScriptContext* m_context;
+	};
+
 
 	class AngelScriptEngine
 	{
@@ -33,7 +75,7 @@ namespace dd
 		void RegisterType();
 
 		template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
-		void RegisterMember( const char* name );
+		void RegisterMember( const char* name, const TypeInfo* classType );
 
 		template <typename FnType, FnType Fn>
 		void RegisterFunction( const char* name );
@@ -42,6 +84,10 @@ namespace dd
 		void RegisterGlobalVariable( const char* name );
 
 		bool Evaluate( const String& script, String& output );
+
+		bool LoadFile( const char* module, String& output );
+		
+		AngelScriptFunction* GetFunction( const char* module, const char* functionSig );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 
@@ -53,6 +99,9 @@ namespace dd
 		friend struct ASInternal::RegisterTypeForwarder;
 
 		asIScriptEngine* m_engine;
+		WriteStream* m_output = nullptr;
+
+		void SetOutput( String* output );
 
 		void MessageCallback( const asSMessageInfo* msg, void* param );
 		static String64 ReplacePointer( const char* typeName );

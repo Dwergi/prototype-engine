@@ -15,10 +15,10 @@ namespace dd
 	public:
 
 		JobThread( JobThread&& other );
-		JobThread( JobSystem& owner, const char* name );
 		~JobThread();
 
 		JobThread( const JobThread& ) = delete;
+		JobThread& operator=( const JobThread& ) = delete;
 
 		void Kill();
 
@@ -27,12 +27,11 @@ namespace dd
 		bool m_killed;
 		String128 m_name;
 		JobSystem& m_owner;
-		Vector<JobHandle> m_pendingJobs;
+
+		JobThread( JobSystem& owner, const char* name );
 
 		void Run();
 		void ProcessJob();
-
-		void WaitForCategory( const char* category, uint timeout_ms );
 		
 		friend class JobSystem;
 	};

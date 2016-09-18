@@ -94,6 +94,12 @@
     <Filter Include="Includes\stb">
       <UniqueIdentifier>{a6d272e9-35c9-466a-9682-69fa40ba0a3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{96ea3d00-f897-4b95-be6c-dcf3fa40176c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\ArduinoJSON">
+      <UniqueIdentifier>{42f68baa-971f-4e9d-9926-980613074687}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -212,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="src\TypeInfoHelpers.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Serializers.h">
-      <Filter>Serialization</Filter>
     </ClInclude>
     <ClInclude Include="include\base64\include\cdecode.h">
       <Filter>Includes\Base64</Filter>
@@ -420,6 +423,30 @@
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
     </ClInclude>
+    <ClInclude Include="src\TerrainChunkKey.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StringBinding.h">
+      <Filter>Script\AngelScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ASInternal.h">
+      <Filter>Script\AngelScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Memory.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Socket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BinarySerializer.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\arduinojson\ArduinoJson.h">
+      <Filter>Includes\ArduinoJSON</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -500,9 +527,6 @@
     </ClCompile>
     <ClCompile Include="src\FunctionSignature.cpp">
       <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Serializers.cpp">
-      <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="include\base64\src\cdecode.c">
       <Filter>Includes\Base64</Filter>
@@ -687,6 +711,27 @@
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
     </ClCompile>
+    <ClCompile Include="src\TerrainChunkKey.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AngelScriptTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
+      <Filter>Script\AngelScript\Add-Ons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringBinding.cpp">
+      <Filter>Script\AngelScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Socket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BinarySerializer.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -727,6 +772,9 @@
     </None>
     <None Include="src\Services.inl">
       <Filter>Core</Filter>
+    </None>
+    <None Include="src\TerrainChunk.inl">
+      <Filter>Systems</Filter>
     </None>
   </ItemGroup>
 </Project>

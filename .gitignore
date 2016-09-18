@@ -62,3 +62,7 @@ AS_DEBUG/
 *.user
 *.opendb
 DD.VC.db
+*.log
+*.cache
+*.pdb
+*.lib

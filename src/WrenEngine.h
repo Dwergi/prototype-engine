@@ -6,6 +6,8 @@
 
 #pragma once
 
+#ifdef USE_WREN
+
 #include "wren/src/include/wren.h"
 
 namespace dd
@@ -148,3 +150,5 @@ namespace dd
 }
 
 #include "WrenEngine.inl"
+
+#endif

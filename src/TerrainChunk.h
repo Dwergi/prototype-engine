@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "TerrainChunkKey.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -17,25 +18,6 @@ namespace dd
 	class Camera;
 	class ShaderProgram;
 
-	struct ChunkKey
-	{
-		ChunkKey() :
-			X( 0xFFFFFFF ),
-			Y( 0xFFFFFFF ),
-			Size( 0 ),
-			IsSplit( false ) {}
-
-		int64 X;
-		int64 Y;
-		int Size;
-		bool IsSplit;
-	};
-
-	template <>
-	uint64 Hash( const ChunkKey& key );
-
-	bool operator<( const ChunkKey& a, const ChunkKey& b );
-
 	class TerrainChunk
 	{
 	public:
@@ -43,7 +25,7 @@ namespace dd
 		static float HeightRange;
 		static const int VerticesPerDim = 64 + 1;
 
-		TerrainChunk( const ChunkKey& key );
+		TerrainChunk( const TerrainChunkKey& key );
 		~TerrainChunk();
 
 		void CreateRenderResources( ShaderProgram& shader );
@@ -55,18 +37,38 @@ namespace dd
 
 	private:
 
-		static VBO m_vboIndex;
-		static std::mutex m_indexMutex;
+		template<int Width, int Height>
+		class IndexBuffer
+		{
+		public:
+			static const uint Count = (Width - 1) * (Height - 1) * 6;
+
+			uint16 Indices[Count];
+
+			IndexBuffer();
+			~IndexBuffer();
+			void Create();
+			void Bind();
+
+		private:
+			VBO m_vbo;
+			std::atomic<bool> m_created;
+		};
+
+		static IndexBuffer<VerticesPerDim, VerticesPerDim> s_indices;
 
 		std::atomic<bool> m_generated;
+		std::atomic<bool> m_created;
 
 		VAO m_vao;
 		VBO m_vboVertex;
 		ShaderProgram* m_shader;
 
-		ChunkKey m_key;
+		TerrainChunkKey m_key;
 		glm::vec3 m_vertices[VerticesPerDim * VerticesPerDim];
 
 		float GetHeight( float x, float y );
 	};
 }
+
+#include "TerrainChunk.inl"
