@@ -34,26 +34,16 @@ namespace dd
 	}
 	//----------------------------------------------------------------------------
 
-	ReadStream::ReadStream( const String& in )
-		: Stream( in.Length() ),
-		m_pSource( nullptr ),
-		m_strSource( &in )
-	{
-
-	}
-
 	ReadStream::ReadStream( const void* in, uint capacity )
 		: Stream( capacity ),
-		m_pSource( in ),
-		m_strSource( nullptr )
+		m_pSource( in )
 	{
 
 	}
 
 	ReadStream::ReadStream( const ReadStream& other )
 		: Stream( other.m_capacity ),
-		m_pSource( other.m_pSource ),
-		m_strSource( other.m_strSource )
+		m_pSource( other.m_pSource )
 	{
 		m_current = other.m_current;
 	}
@@ -77,7 +67,7 @@ namespace dd
 	{
 		DD_ASSERT( Remaining() > 0 );
 
-		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
+		const char* src = (const char*) m_pSource;
 		src += m_current;
 
 		// we're essentially relying on null-termination here
@@ -91,7 +81,7 @@ namespace dd
 		DD_ASSERT( dst != nullptr );
 		DD_ASSERT( Remaining() >= bytes );
 
-		const char* src = m_pSource != nullptr ? (const char*) m_pSource : m_strSource->c_str();
+		const char* src = (const char*) m_pSource;
 		src += m_current;
 
 		memcpy( dst, src, bytes );

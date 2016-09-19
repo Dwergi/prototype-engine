@@ -30,8 +30,6 @@ namespace dd
 	{
 	public:
 
-		// TODO: Write a separate string stream...
-		ReadStream( const String& in );
 		ReadStream( const void* in, uint capacity );
 		ReadStream( const ReadStream& other );
 
@@ -52,8 +50,9 @@ namespace dd
 			return *(const T*) src;
 		}
 
+		const void* Data() const { return m_pSource; }
+		
 	private:
-		const String* m_strSource;
 		const void* m_pSource;
 	};
 	//===================================================================================

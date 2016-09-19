@@ -10,7 +10,8 @@
 namespace dd
 {
 	BitField::BitField( uint size )
-		: m_field( 0 )
+		: m_field( 0 ),
+		m_size( size )
 	{
 		DD_ASSERT( size <= 64, "BitField cannot support fields larger than 64 bits! Why do you have that many members?!" );
 	}
@@ -208,7 +209,10 @@ namespace dd
 
 				Variable element( contained, buffer );
 				if( !Deserialize( element ) )
+				{
+					delete[] buffer;
 					return false;
+				}
 
 				type->InsertElement( var.Data(), i, buffer );
 

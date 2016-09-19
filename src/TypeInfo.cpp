@@ -42,7 +42,6 @@ namespace dd
 	}
 
 	TypeInfo::TypeInfo()
-		: m_size( 0 )
 	{
 	}
 
@@ -54,7 +53,6 @@ namespace dd
 		m_name = typeName;
 		m_namespace = nameSpace;
 		m_size = size;
-		m_containedType = nullptr;
 	}
 
 	const Member* TypeInfo::GetMember( const char* memberName ) const
@@ -168,5 +166,7 @@ namespace dd
 
 		REGISTER_TYPE( dd::String256 );
 		REGISTER_PARENT( dd::String256, dd::String );
+
+		REGISTER_TYPE( dd::SharedString );
 	}
 }

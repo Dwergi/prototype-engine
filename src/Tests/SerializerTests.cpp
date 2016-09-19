@@ -132,156 +132,174 @@ TEST_CASE( "[Serialization] Serialize to JSON" )
 		REQUIRE( out == nested_result );
 	}
 }
-/*
 
-TEST_CASE( "[Deserialization] POD types" )
+TEST_CASE( "[Deserialization] POD From JSON" )
 {
-	String256 in;
+	char in[2048];
+	ReadStream stream( in, 2048 );
 
 	SECTION( "Int" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 
 		int i = 0;
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
+		REQUIRE( success );
 		REQUIRE( i == 125 );
 	}
 
 	SECTION( "Float" )
 	{
-		in = "125.0";
+		strcpy_s( in, "125.0" );
 
 		float i = 0;
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
 
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
+
+		REQUIRE( success );
 		REQUIRE( i == 125.0f );
 	}
 
 	SECTION( "Double" )
 	{
-		in = "125.0";
+		strcpy_s( in, "125.0" );
 
 		double i = 0;
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
 
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
+
+		REQUIRE( success );
 		REQUIRE( i == 125.0 );
 	}
 
 	SECTION( "Uint" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 
 		uint i = 0;
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
 
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
+
+		REQUIRE( success );
 		REQUIRE( i == 125 );
-	}
-
-	SECTION( "Char" )
-	{
-		in = "c";
-
-		char i = 0;
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
-		REQUIRE( i == 'c' );
 	}
 
 	SECTION( "Byte" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 
 		byte i = 0;
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
 
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
+
+		REQUIRE( success );
 		REQUIRE( i == 125 );
 	}
 
 	SECTION( "Uint16" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 		uint16 i = 0;
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
+		REQUIRE( success );
 		REQUIRE( i == 125 );
 	}
 
 	SECTION( "Uint64" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 		uint64 i = 0;
+		
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
+		REQUIRE( success );
 		REQUIRE( i == 125 );
 	}
 
-	SECTION( "Uint64" )
+	SECTION( "String" )
 	{
-		in = "\"125\"";
-		char c[256];
+		strcpy_s( in, "\"125\"" );
 
-		JSONDeserializer deserializer( in );
+		JSONDeserializer deserializer( stream );
 
+		String256 c;
 		Variable v( c );
-		deserializer.Deserialize( v );
+		bool success = deserializer.Deserialize( v );
 
-		REQUIRE( strcmp( c, "125" ) == 0 );
+		REQUIRE( success );
+		REQUIRE( c == "125" );
+	}
+
+	SECTION( "SharedString" )
+	{
+		strcpy_s( in, "\"125\"" );
+
+		JSONDeserializer deserializer( stream );
+
+		SharedString c;
+		Variable v( c );
+		bool success = deserializer.Deserialize( v );
+
+		REQUIRE( success );
+		REQUIRE( c == "125" );
 	}
 
 	SECTION( "Int64" )
 	{
-		in = "125";
+		strcpy_s( in, "125" );
 		int64 i = 0;
+		
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
+		REQUIRE( success );
 		REQUIRE( i == 125 );
 	}
 
 	SECTION( "Negative" )
 	{
-		in = "-125";
+		strcpy_s( in, "-125" );
 		int i = 0;
+		
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
+		REQUIRE( success );
 		REQUIRE( i == -125 );
 	}
 
 	SECTION( "Zero" )
 	{
-		in = "0";
+		strcpy_s( in, "0" );
 		int i = 1111;
+		
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
+		REQUIRE( success );
 		REQUIRE( i == 0 );
 	}
 
 	SECTION( "Negative float" )
 	{
-		in = "-125.0";
-
+		strcpy_s( in, "-125.0" );
 		float i = 0;
+		
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( i );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( i );
-
+		REQUIRE( success );
 		REQUIRE( i == -125.0f );
 	}
 }
@@ -291,7 +309,8 @@ TEST_CASE( "[Deserialization] Structs from JSON" )
 	REGISTER_TYPE( Test::SimpleStruct );
 	REGISTER_TYPE( Test::NestedStruct );
 
-	String256 in;
+	byte in[2048];
+	ReadStream stream( in, 2048 );
 
 	Test::SimpleStruct s;
 	s.Int = 0;
@@ -303,13 +322,16 @@ TEST_CASE( "[Deserialization] Structs from JSON" )
 
 	SECTION( "Struct" )
 	{
-		JSONSerializer serializer( in );
+		WriteStream out_stream( in, 2048 );
+		JSONSerializer serializer( out_stream );
 		serializer.Serialize( s );
 
 		Test::SimpleStruct result;
 		
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( result );
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( result );
+
+		REQUIRE( success );
 
 		REQUIRE( result.Int == 0 );
 		REQUIRE( result.Str == "LOL" );
@@ -327,13 +349,16 @@ TEST_CASE( "[Deserialization] Structs from JSON" )
 		complex.SecondInt = 50;
 		complex.Nested = s;
 
-		JSONSerializer serializer( in );
+		WriteStream out_stream( in, 2048 );
+		JSONSerializer serializer( out_stream );
 		serializer.Serialize( complex );
 
-		JSONDeserializer deserializer( in );
-		deserializer.Deserialize( complex );
+		JSONDeserializer deserializer( stream );
+		bool success = deserializer.Deserialize( complex );
+
+		REQUIRE( success );
 
 		REQUIRE( complex.Nested == s );
 		REQUIRE( complex.SecondInt == 50 );
 	}
-}*/
+}

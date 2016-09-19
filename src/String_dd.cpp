@@ -88,6 +88,16 @@ namespace dd
 		return Equals( other.m_buffer, other.m_length, false );
 	}
 
+	bool String::operator!=( const char* other ) const
+	{
+		return !(operator==( other ));
+	}
+
+	bool String::operator!=( const String& other ) const
+	{
+		return !(operator==( other ));
+	}
+
 	String& String::operator=( const String& other )
 	{
 		SetString( other.m_buffer, other.m_length );

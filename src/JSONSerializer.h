@@ -8,6 +8,11 @@
 
 #include "Serialization.h"
 
+namespace ArduinoJson
+{
+	class JsonVariant;
+}
+
 namespace dd
 {
 	class JSONSerializer : public SerializerBase
@@ -41,6 +46,10 @@ namespace dd
 	private:
 
 		ReadStream m_stream;
+
+		bool SetFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
+		bool SetArrayFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
+		bool SetObjectFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
 	};
 	//===================================================================================
 	

@@ -170,7 +170,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 	}
 }
 
-TEST_CASE( "[Deserialization] POD types" )
+TEST_CASE( "[Deserialization] POD From Binary" )
 {
 	byte in[2048];
 	ReadStream stream( in, 2048 );

@@ -24,8 +24,8 @@ namespace dd
 
 	private:
 
-		uint64 m_field;
-		uint m_size;
+		uint64 m_field { 0 };
+		uint m_size { 0 };
 	};
 	//===================================================================================
 
@@ -68,7 +68,6 @@ namespace dd
 	{
 		return Serialize( Variable( GET_TYPE( T ), const_cast<T*>(&obj) ) );
 	}
-	//===================================================================================
 
 	template <typename T>
 	bool BinaryDeserializer::Deserialize( const T& obj )

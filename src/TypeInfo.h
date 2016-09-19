@@ -31,7 +31,7 @@ namespace dd
 		inline const SharedString& Namespace() const { return m_namespace; }
 		String128 FullTypeName() const;
 
-		inline bool IsPOD() const { return m_members.Size() == 0 && !IsContainer() && m_parentType == nullptr; }
+		inline bool IsPOD() const { return m_isPOD; }
 		inline bool IsRegistered() const { return m_size != 0; }
 
 		bool IsDerivedFrom( const TypeInfo* type ) const;
@@ -100,13 +100,17 @@ namespace dd
 		static void RegisterDefaultTypes();
 
 	private:
-		uint m_size;
+
 		SharedString m_namespace;
 		SharedString m_name;
-		bool m_scriptObject;
 
-		const TypeInfo* m_parentType;
-		const TypeInfo* m_containedType;
+		uint m_size { 0 };
+
+		bool m_scriptObject { false };
+		bool m_isPOD { false };
+
+		const TypeInfo* m_parentType { nullptr };
+		const TypeInfo* m_containedType { nullptr };
 		
 		Vector<Member> m_members;
 		Vector<Method> m_methods;

@@ -70,7 +70,6 @@ namespace dd
 	JsonVariant GetArrayVariant( Variable var, JsonBuffer& buffer )
 	{
 		const TypeInfo* type = var.Type();
-		DD_ASSERT( type->IsRegistered() );
 
 		JsonArray& arr = buffer.createArray();
 
@@ -90,7 +89,6 @@ namespace dd
 	JsonVariant GetObjectVariant( Variable var, JsonBuffer& buffer )
 	{
 		const TypeInfo* type = var.Type();
-		DD_ASSERT( type->IsRegistered() );
 
 		JsonObject& root = buffer.createObject();
 
@@ -161,275 +159,155 @@ namespace dd
 
 	}
 
-	bool JSONDeserializer::Deserialize( Variable var )
+	template <typename T>
+	bool SetPOD( Variable& var, JsonVariant& variant )
 	{
-		return true;
-	}
-	//===================================================================================
-	/*
-	bool JSONSerializer::Serialize( Variable var )
-	{
-		const TypeInfo* type = var.Type();
-		
-		DD_ASSERT( type->IsRegistered() );
-		if( !type->IsRegistered() )
+		if( !variant.is<T>() )
 			return false;
 
-		if( type->HasCustomSerializers() )
+		var.GetValue<T>() = variant.as<T>();
+		return true;
+	}
+
+#define POD( T ) \
+	if( var.Type() == GET_TYPE( T ) ) \
+		return SetPOD<T>( var, variant );
+
+	bool SetPODFromVariant( Variable& var, JsonVariant& variant )
+	{
+		POD( bool );
+		POD( int );
+		POD( int8 );
+		POD( int16 );
+		POD( int32 );
+		POD( int64 );
+		POD( uint );
+		POD( uint8 );
+		POD( uint16 );
+		POD( uint32 );
+		POD( uint64 );
+		POD( float );
+		POD( double );
+
+		return false;
+	}
+
+#undef POD
+
+	bool JSONDeserializer::SetArrayFromVariant( Variable& var, JsonVariant& variant )
+	{
+		const TypeInfo* type = var.Type();
+
+		// delete and new the container to empty it
+		type->PlacementDelete( var.Data() );
+		type->PlacementNew( var.Data() );
+
+		const TypeInfo* contained = type->ContainedType();
+
+		byte* buffer = new byte[contained->Size()];
+
+		JsonArray& arr = variant.as<JsonArray>();
+
+		for( size_t i = 0; i < arr.size(); ++i )
 		{
-			type->SerializeCustom( Serialize::Mode::JSON, m_stream, var );
-		}
-		else
-		{
-			DD_ASSERT( type->Members().Size() > 0 );
+			contained->PlacementNew( buffer );
 
-			// composite object
-			ScopedJSONObject obj( *this );
-			AddString( "type", type->FullTypeName() );
-
-			AddKey( String16( "members" ) );
-			m_stream.WriteByte( '\n' );
-
+			Variable element( contained, buffer );
+			if( !SetFromVariant( element, arr.get( i ) ) )
 			{
-				ScopedJSONObject members( *this );
-
-				uint index = 0;
-				uint member_count = type->Members().Size();
-				for( const Member& member : type->Members() )
-				{
-					AddKey( member.Name() );
-
-					if( !member.Type()->IsPOD() )
-						m_stream.WriteByte( '\n' );
-
-					if( !Serialize( Variable( var, member ) ) )
-						return false;
-
-					if( index < (member_count - 1) )
-						m_stream.WriteByte( ',' );
-
-					m_stream.WriteByte( '\n' );
-
-					++index;
-				}
+				delete[] buffer;
+				return false;
 			}
 
-			m_stream.WriteByte( '\n' );
+			type->InsertElement( var.Data(), i, buffer );
+
+			contained->PlacementDelete( buffer );
+		}
+
+		delete[] buffer;
+		return true;
+	}
+
+	bool JSONDeserializer::SetObjectFromVariant( Variable& var, JsonVariant& variant )
+	{
+		const TypeInfo* type = var.Type();
+
+		JsonObject& obj = variant.as<JsonObject>();
+
+		const char* typeName = obj["type"];
+		DD_ASSERT( var.Type()->FullTypeName() == typeName );
+		if( var.Type()->FullTypeName() != typeName )
+			return false;
+
+		JsonObject& members = obj["members"];
+		for( const Member& member : type->Members() )
+		{
+			Variable member_var( var, member );
+
+			JsonVariant& member_variant = members.get( member.Name().c_str() );
+			if( !member_variant.success() )
+				return false;
+
+			if( !SetFromVariant( member_var, member_variant ) )
+				return false;
 		}
 
 		return true;
 	}
-	//===================================================================================
 
-	struct JSONKeyValuePair
+	//
+	// Central decision making for what type we're actually deserializing.
+	// 
+	bool JSONDeserializer::SetFromVariant( Variable& var, JsonVariant& variant )
 	{
-		String32 Key;
-		String32 Value;
+		const TypeInfo* type = var.Type();
 
-		bool HasChildren;
-	};
-
-	JSONDeserializer::JSONDeserializer( ReadStream& stream )
-		: m_stream( stream )
-	{
-
-	}
-
-	JSONDeserializer::JSONDeserializer( const String& buffer )
-		: m_stream( buffer )
-	{
-
-	}
-
-	JSONDeserializer::~JSONDeserializer()
-	{
-
-	}
-
-	void ReadUntil( ReadStream& stream, char until, String& result )
-	{
-		if( stream.Remaining() == 0 )
-			return;
-
-		char c = stream.PeekByte();
-		while( stream.Remaining() > 0 
-			&& c != until )
+		if( type->IsDerivedFrom( GET_TYPE( String ) ) )
 		{
-			result += c;
-			stream.ReadByte();
-			c = stream.PeekByte();
+			if( !variant.is<const char*>() )
+				return false;
+
+			var.GetValue<String>() = variant.as<const char*>();
+			return true;
 		}
-	}
-
-	void ReadUntilWhitespaceOr( ReadStream& stream, char until, String& result )
-	{
-		if( stream.Remaining() == 0 )
-			return;
-
-		char c = stream.PeekByte();
-		while( stream.Remaining() > 0
-			&& c != until
-			&& !isspace( c ) )
+		else if( type == GET_TYPE( SharedString ) )
 		{
-			result += c;
-			stream.ReadByte();
-			c = stream.PeekByte();
-		}
-	}
+			if( !variant.is<const char*>() )
+				return false;
 
-	void SkipWhitespace( ReadStream& stream )
-	{
-		while( stream.Remaining() > 0
-			&& isspace( stream.PeekByte() ) )
+			var.GetValue<SharedString>() = variant.as<const char*>();
+			return true;
+		}
+		else if( type->IsContainer() )
 		{
-			stream.ReadByte();
+			return SetArrayFromVariant( var, variant );
 		}
-	}
-
-	void SkipUntil( ReadStream& stream, char until )
-	{
-		while( stream.Remaining() > 0
-			&& stream.PeekByte() != until )
+		else if( type->IsPOD() )
 		{
-			stream.ReadByte();
+			return SetPODFromVariant( var, variant );
 		}
-	}
-
-	void ReadNextPair( ReadStream& stream, JSONKeyValuePair& kvp )
-	{
-		kvp.Key.Clear();
-		kvp.Value.Clear();
-		kvp.HasChildren = false;
-
-		char current = stream.ReadByte();
-
-		SkipWhitespace( stream );
-
-		// expecting a name here
-		current = stream.ReadByte();
-		DD_ASSERT( current == '"' );
-
-		ReadUntil( stream, '"', kvp.Key );
-
-		current = stream.ReadByte();
-		DD_ASSERT( current == '"' );
-
-		SkipUntil( stream, ':' );
-
-		current = stream.ReadByte();
-		DD_ASSERT( current == ':' );
-
-		SkipWhitespace( stream );
-			
-		current = stream.PeekByte();
-		if( current == '{' )
+		else if( type->Members().Size() > 0 )
 		{
-			kvp.HasChildren = true;
+			return SetObjectFromVariant( var, variant );
 		}
-		else if( current == '"' )
-		{
-			// serialized as string
-			kvp.Value += stream.ReadByte();
-
-			ReadUntil( stream, '"', kvp.Value );
-
-			current = stream.ReadByte();
-			kvp.Value += current;
-			DD_ASSERT( current == '"' );
-		}
-		else if( current == '[' )
-		{
-			// lists
-			ReadUntil( stream, ']', kvp.Value );
-			kvp.Value += stream.ReadByte();
-		}
-		else
-		{
-			ReadUntilWhitespaceOr( stream, ',', kvp.Value );
-		}
-
-		SkipWhitespace( stream );
+		
+		return false;
 	}
 
 	bool JSONDeserializer::Deserialize( Variable var )
 	{
 		const TypeInfo* type = var.Type();
-		
+
 		DD_ASSERT( type->IsRegistered() );
 		if( !type->IsRegistered() )
 			return false;
 
-		if( type->HasCustomSerializers() )
-		{
-			type->DeserializeCustom( Serialize::Mode::JSON, m_stream, var );
-		}
-		else
-		{
-			DD_ASSERT( type->Members().Size() > 0 );
+		DynamicJsonBuffer buffer;
+		JsonVariant variant = buffer.parse( (char*) m_stream.Data() );
+		if( !variant.success() )
+			return false;
 
-			// composite object
-			char c = m_stream.ReadByte();
-			DD_ASSERT( c == '{' );
-
-			JSONKeyValuePair pair;
-
-			// check the type
-			{			
-				ReadNextPair( m_stream, pair );
-
-				DD_ASSERT( pair.Key == "type" );
-
-				{
-					String128 strType;
-					JSONDeserializer nested( pair.Value );
-					nested.Deserialize( strType );
-
-					DD_ASSERT( strType == type->FullTypeName() );
-				}
-			}
-
-			// has to have a "members" entry
-			{
-				DD_ASSERT( m_stream.ReadByte() == ',' );
-
-				ReadNextPair( m_stream, pair );
-
-				DD_ASSERT( pair.Key == "members" && pair.HasChildren );
-				DD_ASSERT( m_stream.ReadByte() == '{' );
-			}
-
-			for( Member& member : type->Members() )
-			{
-				ReadNextPair( m_stream, pair );
-
-				DD_ASSERT( pair.Key == member.Name() );
-
-				Variable member_var( var, member );
-
-				if( pair.HasChildren )
-				{
-					// having children means there's potentially a lot of data for this pair, so pass in the stream
-					JSONDeserializer nested( m_stream );
-					nested.Deserialize( member_var );
-
-					// skip ahead to wherever the nested serializer called it quits
-					uint offset = nested.m_stream.Offset();
-					m_stream.Advance( offset - m_stream.Offset() );
-
-					SkipWhitespace( m_stream );
-				}
-				else
-				{
-					// just deserialize the value
-					JSONDeserializer nested( pair.Value );
-					nested.Deserialize( member_var );
-				}
-
-				char c = m_stream.ReadByte();
-				DD_ASSERT( c == ',' || c == '}' );
-			}
-		}
-
-		return true;
-	}*/
+		return SetFromVariant( var, variant );
+	}
+	//===================================================================================
 }

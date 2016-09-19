@@ -81,6 +81,8 @@ namespace dd
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
+		typeInfo->m_isPOD = true;
+
 		typeInfo->Init( name, sizeof( T ) );
 
 		typeInfo->New = PODNew<T>;

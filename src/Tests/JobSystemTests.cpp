@@ -146,7 +146,7 @@ TEST_CASE( "[JobSystem]" )
 		}
 	}
 
-	SECTION( "Waiting" )
+	/*SECTION( "Waiting" )
 	{
 		REGISTER_TYPE( dd::JobSystem );
 
@@ -174,5 +174,5 @@ TEST_CASE( "[JobSystem]" )
 
 		system.WaitForCategory( "B" );
 		REQUIRE( ExitedB );
-	}
+	}*/
 }

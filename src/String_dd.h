@@ -37,6 +37,9 @@ namespace dd
 		bool operator==( const char* other ) const;
 		bool operator==( const String& other ) const;
 
+		bool operator!=( const char* other ) const;
+		bool operator!=( const String& other ) const;
+
 		bool EqualsCaseless( const char* other ) const;
 		bool EqualsCaseless( const String& other ) const;
 
