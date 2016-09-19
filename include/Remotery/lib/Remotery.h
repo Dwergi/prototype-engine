@@ -64,7 +64,7 @@ documented just below this comment.
 
 // Allow OpenGL profiling
 #ifndef RMT_USE_OPENGL
-#define RMT_USE_OPENGL 1
+#define RMT_USE_OPENGL 0
 #endif
 
 // Initially use POSIX thread names to name threads instead of Thread0, 1, ...
@@ -80,17 +80,6 @@ documented just below this comment.
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 */
-
-
-
-// Compiler identification
-#if defined(_MSC_VER)
-    #define RMT_COMPILER_MSVC
-#elif defined(__GNUC__)
-    #define RMT_COMPILER_GNUC
-#elif defined(__clang__)
-    #define RMT_COMPILER_CLANG
-#endif
 
 
 // Platform identification

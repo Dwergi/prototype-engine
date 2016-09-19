@@ -41,12 +41,12 @@ namespace dd
 		glfwSetFramebufferSizeCallback( m_glfwWindow, OnFramebufferResize );
 		glfwSetWindowSizeCallback( m_glfwWindow, OnWindowResize );
 
-		DD_PROFILE_OGL_INIT();
+		//DD_PROFILE_OGL_INIT();
 	}
 
 	Window::~Window()
 	{
-		DD_PROFILE_OGL_DEINIT();
+		//DD_PROFILE_OGL_DEINIT();
 
 		glfwTerminate();
 	}

@@ -219,7 +219,7 @@ namespace dd
 				return false;
 			}
 
-			type->InsertElement( var.Data(), i, buffer );
+			type->InsertElement( var.Data(), (uint) i, buffer );
 
 			contained->PlacementDelete( buffer );
 		}
