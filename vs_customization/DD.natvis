@@ -1,0 +1,47 @@
+<AutoVisualizer>
+	<Type Name="dd::String" Inheritable="true">
+		<DisplayString>{m_buffer.m_ptr,s}</DisplayString>
+		<StringView>m_buffer.m_ptr,sb</StringView>
+	</Type>
+	<Type Name="dd::SharedString" Inheritable="true">
+		<DisplayString>{m_ptr,s}</DisplayString>
+		<StringView>m_ptr,sb</StringView>
+	</Type>
+	<Type Name="dd::TypeInfo">
+		<DisplayString Condition="m_namespace.m_ptr != 0">{m_namespace.m_ptr._Ptr,sb}::{m_name.m_ptr._Ptr,sb}</DisplayString>
+		<DisplayString Condition="m_namespace.m_ptr == 0">{m_name.m_ptr._Ptr,sb}</DisplayString>
+		<Expand>
+			<Item Name="Typename">m_name.m_ptr._Ptr,sb</Item>
+			<Item Name="Namespace">m_namespace.m_ptr._Ptr,sb</Item>
+			<Item Name="Size">m_size</Item>
+			<Item Name="Members">m_members</Item>
+			<Item Name="Methods">m_methods</Item>
+		</Expand>
+	</Type>
+	<Type Name="dd::Variable">
+		<DisplayString>{m_typeInfo}</DisplayString>
+		<Expand>
+			<Item Name="Type">m_typeInfo</Item>
+			<Item Name="Ptr">m_data</Item>
+		</Expand>
+	</Type>
+	<Type Name="dd::Member">
+		<DisplayString>{m_name} ({m_typeInfo})</DisplayString>
+		<Expand>
+			<Item Name="Type">m_typeInfo</Item>
+			<Item Name="Parent">m_parent</Item>
+			<Item Name="Offset">m_offset</Item>
+		</Expand>
+	</Type>
+	<Type Name="dd::Vector&lt;*&gt;">
+		<DisplayString>[{m_size}/{m_capacity}]</DisplayString>
+		<Expand>
+			<Item Name="[size]">m_size</Item>
+			<Item Name="[capacity]">m_capacity</Item>
+			<ArrayItems>
+				<Size>m_size</Size>
+				<ValuePointer>m_data</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+</AutoVisualizer>
