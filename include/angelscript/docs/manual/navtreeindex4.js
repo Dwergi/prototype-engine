@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"doc_datatypes_arrays.html#doc_datatypes_array_addon_ops":[0,3,3,1,1,0,0],
+"doc_datatypes_arrays.html#doc_datatypes_arrays_addon":[0,3,3,1,1,0],
 "doc_datatypes_auto.html":[0,3,3,0,3],
 "doc_datatypes_dictionary.html":[0,3,3,1,2],
 "doc_datatypes_dictionary.html#doc_datatypes_dictionary_addon":[0,3,3,1,2,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX4 =
 "functions_func_0x69.html":[3,1,1,7],
 "functions_func_0x6c.html":[3,1,1,8],
 "functions_func_0x6e.html":[3,1,1,9],
-"functions_func_0x70.html":[3,1,1,10],
-"functions_func_0x72.html":[3,1,1,11],
-"functions_func_0x73.html":[3,1,1,12]
+"functions_func_0x70.html":[3,1,1,10]
 };

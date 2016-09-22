@@ -123,7 +123,10 @@ namespace dd
 				}
 			}
 
-			SplitChunk( *closest.Chunk, split_into );
+			if( closest.Chunk != nullptr )
+			{
+				SplitChunk( *closest.Chunk, split_into );
+			}
 		}
 	}
 

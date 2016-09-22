@@ -19,6 +19,7 @@
 #include "DebugUI.h"
 #include "DoubleBuffer.h"
 #include "EntitySystem.h"
+#include "File.h"
 #include "FreeCameraController.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -387,6 +388,11 @@ int main( int argc, char const* argv[] )
 	CommandLine cmdLine( argv, argc );
 	if( cmdLine.Exists( "noassert" ) )
 		pempek::assert::implementation::ignoreAllAsserts( true );
+
+	if( cmdLine.Exists( "dataroot" ) )
+		dd::File::SetDataRoot( cmdLine.GetValue( "dataroot" ).c_str() );
+	else
+		dd::File::SetDataRoot( "../../../data" );
 
 	REGISTER_TYPE( CommandLine );
 	Services::Register( cmdLine );

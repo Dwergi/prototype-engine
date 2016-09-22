@@ -42,7 +42,8 @@ Buffer<T>::Buffer( Buffer<T>&& other ) :
 template <typename T>
 Buffer<T>::~Buffer()
 {
-	Set( nullptr, 0 );
+	m_ptr = nullptr;
+	m_size = 0;
 }
 
 template <typename T>

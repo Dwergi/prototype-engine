@@ -34,6 +34,8 @@ namespace dd
 		String& operator+=( const char* other );
 		String& operator+=( char other );
 
+		void Append( const char* other, uint length );
+
 		bool operator==( const char* other ) const;
 		bool operator==( const String& other ) const;
 
@@ -53,6 +55,9 @@ namespace dd
 		const char& operator[]( uint index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
 		char& operator[]( uint index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
 		const char* c_str() const;
+		
+		// Get a wide copy of this string.
+		bool w_str( const Buffer<wchar_t>& buffer ) const;
 
 		uint Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
@@ -74,7 +79,6 @@ namespace dd
 		
 		void Resize( uint length );
 		void SetString( const char* data, uint length );
-		void Concatenate( const char* other, uint length );
 		bool Equals( const char* other, uint length, bool caseless ) const;
 
 		void NullTerminate();

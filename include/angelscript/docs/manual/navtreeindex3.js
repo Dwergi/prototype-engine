@@ -1,5 +1,7 @@
 var NAVTREEINDEX3 =
 {
+"classas_i_script_module.html#a81d727c9677b683942b6087df4ce95ad":[3,0,7,16],
+"classas_i_script_module.html#a87e29773f7e6f2980d75288faaa74d02":[3,0,7,19],
 "classas_i_script_module.html#a88526c741b9d6cd84cf2ea6522ec805a":[3,0,7,30],
 "classas_i_script_module.html#a8acf107194c5f079d7f7507309ebe613":[3,0,7,3],
 "classas_i_script_module.html#a8b4a222e5309c6b367f136b6d2f664ba":[3,0,7,38],
@@ -247,7 +249,5 @@ var NAVTREEINDEX3 =
 "doc_datatypes.html":[0,3,3],
 "doc_datatypes_arrays.html":[0,3,3,1,1],
 "doc_datatypes_arrays.html#doc_datatypes_array_addon_example":[0,3,3,1,1,0,2],
-"doc_datatypes_arrays.html#doc_datatypes_array_addon_mthd":[0,3,3,1,1,0,1],
-"doc_datatypes_arrays.html#doc_datatypes_array_addon_ops":[0,3,3,1,1,0,0],
-"doc_datatypes_arrays.html#doc_datatypes_arrays_addon":[0,3,3,1,1,0]
+"doc_datatypes_arrays.html#doc_datatypes_array_addon_mthd":[0,3,3,1,1,0,1]
 };

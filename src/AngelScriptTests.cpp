@@ -222,3 +222,13 @@ TEST_CASE( "[AngelScript] Args" )
 
 	delete fFn;
 }
+
+TEST_CASE( "[AngelScript] Error Callback" )
+{
+	dd::AngelScriptEngine engine;
+	dd::String256 output;
+	bool success = engine.LoadFile( "test_empty", output );
+
+	REQUIRE( success == false );
+	REQUIRE( output.IsEmpty() == false );
+}

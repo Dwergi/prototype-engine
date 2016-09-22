@@ -15,6 +15,50 @@ BODY { FONT-SIZE: 12px; FONT-FAMILY: Arial; }
 
 <h1>AngelScript Change Log</h1>
 
+<h2>Version 2.31.1 - 2016/06/26</h2>
+
+<ul>
+<li>Bug fixes
+<ul>
+<li>Fixed assert failure in compiler when attempting to implicitly convert primitive to function pointer (Thanks Sir Ementaler)
+<li>Fixed compiler bug when passing funcdef by reference to a function (Thanks Sir Ementaler)
+<li>The auxiliary pointer wasn't stored with object methods registered with the asCALL_GENERIC calling convention (Thanks Phong Ba)
+<li>Fixed null pointer access crash in asBC_Thiscall1 when calling opIndex on a null pointer (Thanks gjl)
+<li>The generic calling convention wasn't properly handling funcdefs in arguments or return type (Thanks Ansjh)
+<li>Fixed null pointer access crash in compiler when compiling invalid script with value assign of function pointer (Thanks Phong Ba)
+<li>Expressions like (expr ? null : null) is now compiled correctly (Thanks Sir Ementaler)
+<li>auto var = null; no longer causes a crash in the compiler (Thanks Sir Ementaler)
+<li>Compiler wasn't giving an error on 'void &' (Thanks Sir Ementaler)
+<li>Fixed error when discarding a module if a context was still holding a reference to global var (Thanks GuyWithBeard)
+<li>Offset for bytecode ClrVPtr wasn't adjusted correctly when saving/loading bytecode when the referred to variable was a null pointer (Thanks _Engine_)
+<li>Fixed assert failure in compiler with AS_DEBUG when compiling anonymous function from class method (Thanks Phong Ba)
+<li>Fixed crash in compiler when compiling 'null();' (Thanks Nikola Stojsic)
+<li>Incorrect constructor could be used when declaring variable of object type and the initialization expression was of the same type but type had no copy constructor (Thanks loboWu)
+<li>Returning a function pointer from a registered function wasn't working properly (Thanks Sir Ementaler)
+<li>Function pointers in initialization lists would crash the application (Thanks Sir Ementaler)
+<li>opCast can now be used on types registered with asOBJ_NOHANDLE too without crashing
+<li>Function pointers wasn't properly handled in context's SetArg and GetReturn methods
+<li>Fixed some big endian compatibility issues in compiler (Thanks rfonseca)
+</ul>
+<li>Script language
+<ul>
+<li>Enum to int32 conversion is now preferred over enum to int of other sizes in function overload resolution (Thanks Sir Ementaler)
+<li>Anonymous objects initialized with initialization lists are now parsed as expression terms, rather than expressions by themselves
+</ul>
+<li>Library
+<ul>
+<li>Added asEP_HEREDOC_TRIM_MODE to allow application to decide how/if heredoc strings should be trimmed
+</ul>
+<li>Add-ons
+<ul>
+<li>Implemented parseUInt, findFirstOf, findLastOf, findFirstNotOf, findLastNotOf, insert, and erase for the string add-on
+<li>Implemented removeRange for the array add-on
+<li>Implemented insertAt for the array add-on that inserts all the elements from another array
+<li>Fixed big endian compatility problems in script dictionary (Thanks rfonseca)
+<li>Fixed compiler error in datetime add-on on gnuc (Thanks rfonseca)
+</ul>
+</ul>
+
 <h2>Version 2.31.0 - 2016/02/26</h2>
 
 <ul>

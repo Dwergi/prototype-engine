@@ -103,7 +103,7 @@ namespace dd
 
 		void SetOutput( String* output );
 
-		void MessageCallback( const asSMessageInfo* msg, void* param );
+		void MessageCallback( const asSMessageInfo* msg );
 		static String64 ReplacePointer( const char* typeName );
 
 		static String256 GetFunctionSignatureString( const char* name, const Function& fn );
@@ -119,6 +119,8 @@ namespace dd
 
 		template <typename T>
 		void RegisterStruct();
+
+		String256 LoadSource( const char* module ) const;
 	};
 }
 

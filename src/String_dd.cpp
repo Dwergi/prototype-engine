@@ -38,6 +38,15 @@ namespace dd
 		return m_buffer.Get();
 	}
 
+	bool String::w_str( const Buffer<wchar_t>& buffer ) const
+	{
+		if( buffer.Size() <= m_length )
+			return false;
+
+		size_t count;
+		return mbstowcs_s( &count, buffer.Get(), buffer.Size() / 4, m_buffer.Get(), m_length ) > 0;
+	}
+
 	bool String::Equals( const char* other, uint length, bool caseless ) const
 	{
 		if( m_length != length )
@@ -116,14 +125,14 @@ namespace dd
 
 	String& String::operator+=( const String& other )
 	{
-		Concatenate( other.m_buffer, other.m_length );
+		Append( other.m_buffer, other.m_length );
 
 		return *this;
 	}
 
 	String& String::operator+=( const char* other )
 	{
-		Concatenate( other, (uint) strlen( other ) );
+		Append( other, (uint) strlen( other ) );
 
 		return *this;
 	}
@@ -205,8 +214,11 @@ namespace dd
 		return StartsWith( other.c_str() );
 	}
 
-	void String::Concatenate( const char* buffer, uint other_length )
+	void String::Append( const char* buffer, uint other_length )
 	{
+		if( other_length == 0 )
+			return;
+
 		uint new_length = m_length + other_length;
 		Resize( new_length );
 

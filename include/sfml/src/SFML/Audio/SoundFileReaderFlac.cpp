@@ -284,7 +284,7 @@ Uint64 SoundFileReaderFlac::read(Int16* samples, Uint64 maxCount)
         {
             // There are more leftovers than needed
             std::copy(m_clientData.leftovers.begin(), m_clientData.leftovers.end(), samples);
-            std::vector<Int16> leftovers(m_clientData.leftovers.begin() + maxCount, m_clientData.leftovers.end());
+            std::vector<Int16> leftovers(m_clientData.leftovers.begin() + (int) maxCount, m_clientData.leftovers.end());
             m_clientData.leftovers.swap(leftovers);
             return maxCount;
         }

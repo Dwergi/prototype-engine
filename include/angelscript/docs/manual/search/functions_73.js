@@ -27,7 +27,7 @@ var searchData=
   ['setmoduleuserdatacleanupcallback',['SetModuleUserDataCleanupCallback',['../classas_i_script_engine.html#a7523853b9a9bf7dab603fa6a06393d51',1,'asIScriptEngine']]],
   ['setname',['SetName',['../classas_i_script_module.html#a1a7534bace9eefdc3175a1999f9cbf4a',1,'asIScriptModule']]],
   ['setobject',['SetObject',['../classas_i_script_context.html#a10d3c152b25d07584999f4d9fe5ce8b1',1,'asIScriptContext']]],
-  ['setobjecttypeuserdatacleanupcallback',['SetObjectTypeUserDataCleanupCallback',['../classas_i_script_engine.html#a2336a92d5cd2a6a37007addf81ca059f',1,'asIScriptEngine']]],
+  ['setobjecttypeuserdatacleanupcallback',['SetObjectTypeUserDataCleanupCallback',['../classas_i_script_engine.html#a8d4f19fe2d40d9da10c01a93f855b593',1,'asIScriptEngine']]],
   ['setreturnaddress',['SetReturnAddress',['../classas_i_script_generic.html#afd8ead96f17d6e77f3a26c70c3a1d80c',1,'asIScriptGeneric']]],
   ['setreturnbyte',['SetReturnByte',['../classas_i_script_generic.html#a81c42965dfccfd242e955f50b02a641c',1,'asIScriptGeneric']]],
   ['setreturndouble',['SetReturnDouble',['../classas_i_script_generic.html#a8a720ef33859981dd941c616b2c83cad',1,'asIScriptGeneric']]],

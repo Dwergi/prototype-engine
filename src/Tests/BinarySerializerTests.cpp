@@ -19,7 +19,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 	REGISTER_TYPE( Test::NestedStruct );
 
 	byte out[2048];
-	WriteStream stream( &out[0], 2048 );
+	WriteStream stream( out, 2048 );
 	BinarySerializer serializer( stream );
 
 	SECTION( "Int" )
@@ -27,7 +27,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 		int x = 5;
 		serializer.Serialize( x );
 
-		ReadStream res( &out[0], 2048 );
+		ReadStream res( out, 2048 );
 
 		int cmp = res.ReadPOD<int>();
 		REQUIRE( cmp == 5 );
@@ -38,7 +38,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 		float x = 5.0f;
 		serializer.Serialize( x );
 
-		ReadStream res( &out[0], 2048 );
+		ReadStream res( out, 2048 );
 
 		float cmp = res.ReadPOD<float>();
 		REQUIRE( cmp == 5.0f );
@@ -51,7 +51,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 
 		REQUIRE( stream.Offset() == x.Length() + 1 ); // includes null termination
 
-		char* cmp = reinterpret_cast<char*>(&out[0]);
+		char* cmp = reinterpret_cast<char*>(out);
 		REQUIRE( x == cmp );
 	}
 
@@ -67,7 +67,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 
 		REQUIRE( stream.Offset() == x.Length() + 1 ); // includes null termination
 
-		char* cmp = reinterpret_cast<char*>(&out[0]);
+		char* cmp = reinterpret_cast<char*>(out);
 		REQUIRE( x == cmp );
 	}
 
@@ -83,7 +83,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 	{
 		serializer.Serialize( simple );
 
-		ReadStream res( &out[0], 2048 );
+		ReadStream res( out, 2048 );
 
 		BitField bitfield( 4 );
 		bitfield.Read( res );
@@ -125,7 +125,7 @@ TEST_CASE( "[Serialization] Serialize to Binary" )
 
 		serializer.Serialize( nested );
 
-		ReadStream res( &out[0], 2048 );
+		ReadStream res( out, 2048 );
 
 		BitField nestedBitfield( 3 );
 		nestedBitfield.Read( res );

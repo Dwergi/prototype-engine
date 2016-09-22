@@ -291,10 +291,12 @@ static void RegisterScriptArray_Native(asIScriptEngine *engine)
 	r = engine->RegisterObjectMethod("array<T>", "array<T> &opAssign(const array<T>&in)", asMETHOD(CScriptArray, operator=), asCALL_THISCALL); assert( r >= 0 );
 
 	// Other methods
-	r = engine->RegisterObjectMethod("array<T>", "void insertAt(uint index, const T&in value)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL); assert( r >= 0 );
-	r = engine->RegisterObjectMethod("array<T>", "void removeAt(uint index)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL); assert( r >= 0 );
-	r = engine->RegisterObjectMethod("array<T>", "void insertLast(const T&in value)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void insertAt(uint index, const T&in value)", asMETHODPR(CScriptArray, InsertAt, (asUINT, void *), void), asCALL_THISCALL); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void insertAt(uint index, const array<T>& arr)", asMETHODPR(CScriptArray, InsertAt, (asUINT, const CScriptArray &), void), asCALL_THISCALL); assert(r >= 0);
+	r = engine->RegisterObjectMethod("array<T>", "void insertLast(const T&in value)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL); assert(r >= 0);
+	r = engine->RegisterObjectMethod("array<T>", "void removeAt(uint index)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL); assert(r >= 0);
 	r = engine->RegisterObjectMethod("array<T>", "void removeLast()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void removeRange(uint start, uint count)", asMETHOD(CScriptArray, RemoveRange), asCALL_THISCALL); assert(r >= 0);
 	// TODO: Should length() and resize() be deprecated as the property accessors do the same thing?
 	r = engine->RegisterObjectMethod("array<T>", "uint length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "void reserve(uint length)", asMETHOD(CScriptArray, Reserve), asCALL_THISCALL); assert( r >= 0 );
@@ -305,8 +307,10 @@ static void RegisterScriptArray_Native(asIScriptEngine *engine)
 	r = engine->RegisterObjectMethod("array<T>", "void sortDesc(uint startAt, uint count)", asMETHODPR(CScriptArray, SortDesc, (asUINT, asUINT), void), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "void reverse()", asMETHOD(CScriptArray, Reverse), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "int find(const T&in value) const", asMETHODPR(CScriptArray, Find, (void*) const, int), asCALL_THISCALL); assert( r >= 0 );
+	// TODO: It should be "int find(const T&in value, uint startAt = 0) const"
 	r = engine->RegisterObjectMethod("array<T>", "int find(uint startAt, const T&in value) const", asMETHODPR(CScriptArray, Find, (asUINT, void*) const, int), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "int findByRef(const T&in value) const", asMETHODPR(CScriptArray, FindByRef, (void*) const, int), asCALL_THISCALL); assert( r >= 0 );
+	// TODO: It should be "int findByRef(const T&in value, uint startAt = 0) const"
 	r = engine->RegisterObjectMethod("array<T>", "int findByRef(uint startAt, const T&in value) const", asMETHODPR(CScriptArray, FindByRef, (asUINT, void*) const, int), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "bool opEquals(const array<T>&in) const", asMETHOD(CScriptArray, operator==), asCALL_THISCALL); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "bool isEmpty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL); assert( r >= 0 );
@@ -332,7 +336,8 @@ static void RegisterScriptArray_Native(asIScriptEngine *engine)
 	// Same as removeLast
 	r = engine->RegisterObjectMethod("array<T>", "void pop_back()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL); assert( r >= 0 );
 	// Same as insertAt
-	r = engine->RegisterObjectMethod("array<T>", "void insert(uint, const T&in)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void insert(uint index, const T&in value)", asMETHODPR(CScriptArray, InsertAt, (asUINT, void *), void), asCALL_THISCALL); assert(r >= 0);
+	r = engine->RegisterObjectMethod("array<T>", "void insert(uint index, const array<T>& arr)", asMETHODPR(CScriptArray, InsertAt, (asUINT, const CScriptArray &), void), asCALL_THISCALL); assert(r >= 0);
 	// Same as removeAt
 	r = engine->RegisterObjectMethod("array<T>", "void erase(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL); assert( r >= 0 );
 #endif
@@ -617,9 +622,8 @@ void CScriptArray::Reserve(asUINT maxElements)
 		return;
 	}
 
-	// TODO: memcpy assumes the objects in the array doesn't hold pointers to themselves
-	//       This should really be using the objects copy/move constructor to copy each object
-	//       to the new location. It would most likely be a hit on the performance though.
+	// As objects in arrays of objects are not stored inline, it is safe to use memcpy here
+	// since we're just copying the pointers to objects and not the actual objects.
 	memcpy(newBuffer->data, buffer->data, buffer->numElements*elementSize);
 
 	// Release the old buffer
@@ -634,6 +638,34 @@ void CScriptArray::Resize(asUINT numElements)
 		return;
 
 	Resize((int)numElements - (int)buffer->numElements, (asUINT)-1);
+}
+
+void CScriptArray::RemoveRange(asUINT start, asUINT count)
+{
+	if (count == 0)
+		return;
+
+	if( buffer == 0 || start > buffer->numElements )
+	{
+		// If this is called from a script we raise a script exception
+		asIScriptContext *ctx = asGetActiveContext();
+		if (ctx)
+			ctx->SetException("Index out of bounds");
+		return;
+	}
+
+	// Cap count to the end of the array
+	if (start + count > buffer->numElements)
+		count = buffer->numElements - start;
+
+	// Destroy the elements that are being removed
+	Destruct(buffer, start, start + count);
+
+	// Compact the elements
+	// As objects in arrays of objects are not stored inline, it is safe to use memmove here
+	// since we're just copying the pointers to objects and not the actual objects.
+	memmove(buffer->data + start*elementSize, buffer->data + (start + count)*elementSize, count*elementSize);
+	buffer->numElements -= count;
 }
 
 // Internal
@@ -676,9 +708,8 @@ void CScriptArray::Resize(int delta, asUINT at)
 			return;
 		}
 
-		// TODO: memcpy assumes the objects in the array doesn't hold pointers to themselves
-		//       This should really be using the objects copy/move constructor to copy each object
-		//       to the new location. It would most likely be a hit on the performance though.
+		// As objects in arrays of objects are not stored inline, it is safe to use memcpy here
+		// since we're just copying the pointers to objects and not the actual objects.
 		memcpy(newBuffer->data, buffer->data, at*elementSize);
 		if( at < buffer->numElements )
 			memcpy(newBuffer->data + (at+delta)*elementSize, buffer->data + at*elementSize, (buffer->numElements-at)*elementSize);
@@ -694,17 +725,15 @@ void CScriptArray::Resize(int delta, asUINT at)
 	else if( delta < 0 )
 	{
 		Destruct(buffer, at, at-delta);
-		// TODO: memmove assumes the objects in the array doesn't hold pointers to themselves
-		//       This should really be using the objects copy/move constructor to copy each object
-		//       to the new location. It would most likely be a hit on the performance though.
+		// As objects in arrays of objects are not stored inline, it is safe to use memmove here
+		// since we're just copying the pointers to objects and not the actual objects.
 		memmove(buffer->data + at*elementSize, buffer->data + (at-delta)*elementSize, (buffer->numElements - (at-delta))*elementSize);
 		buffer->numElements += delta;
 	}
 	else
 	{
-		// TODO: memmove assumes the objects in the array doesn't hold pointers to themselves
-		//       This should really be using the objects copy/move constructor to copy each object
-		//       to the new location. It would most likely be a hit on the performance though.
+		// As objects in arrays of objects are not stored inline, it is safe to use memmove here
+		// since we're just copying the pointers to objects and not the actual objects.
 		memmove(buffer->data + (at+delta)*elementSize, buffer->data + at*elementSize, (buffer->numElements - at)*elementSize);
 		Construct(buffer, at, at+delta);
 		buffer->numElements += delta;
@@ -765,6 +794,61 @@ void CScriptArray::InsertAt(asUINT index, void *value)
 
 	// Set the value of the new element
 	SetValue(index, value);
+}
+
+void CScriptArray::InsertAt(asUINT index, const CScriptArray &arr)
+{
+	if (index > buffer->numElements)
+	{
+		asIScriptContext *ctx = asGetActiveContext();
+		if (ctx)
+			ctx->SetException("Index out of bounds");
+		return;
+	}
+
+	if (objType != arr.objType)
+	{
+		// This shouldn't really be possible to happen when
+		// called from a script, but let's check for it anyway
+		asIScriptContext *ctx = asGetActiveContext();
+		if (ctx)
+			ctx->SetException("Mismatching array types");
+		return;
+	}
+
+	asUINT elements = arr.GetSize();
+	Resize(elements, index);
+	if (&arr != this)
+	{
+		for (asUINT n = 0; n < arr.GetSize(); n++)
+		{
+			// This const cast is allowed, since we know the
+			// value will only be used to make a copy of it
+			void *value = const_cast<void*>(arr.At(n));
+			SetValue(index + n, value);
+		}
+	}
+	else
+	{
+		// The array that is being inserted is the same as this one.
+		// So we should iterate over the elements before the index,
+		// and then the elements after
+		for (asUINT n = 0; n < index; n++)
+		{
+			// This const cast is allowed, since we know the
+			// value will only be used to make a copy of it
+			void *value = const_cast<void*>(arr.At(n));
+			SetValue(index + n, value);
+		}
+
+		for (asUINT n = index + elements, m = 0; n < arr.GetSize(); n++, m++)
+		{
+			// This const cast is allowed, since we know the
+			// value will only be used to make a copy of it
+			void *value = const_cast<void*>(arr.At(n));
+			SetValue(index + index + m, value);
+		}
+	}
 }
 
 void CScriptArray::InsertLast(void *value)
@@ -1264,6 +1348,8 @@ int CScriptArray::Find(asUINT startAt, void *value) const
 
 // internal
 // Copy object handle or primitive value
+// Even in arrays of objects the objects are allocated on 
+// the heap and the array stores the pointers to the objects
 void CScriptArray::Copy(void *dst, void *src)
 {
 	memcpy(dst, src, elementSize);
@@ -1770,11 +1856,27 @@ static void ScriptArrayInsertAt_Generic(asIScriptGeneric *gen)
 	self->InsertAt(index, value);
 }
 
+static void ScriptArrayInsertAtArray_Generic(asIScriptGeneric *gen)
+{
+	asUINT index = gen->GetArgDWord(0);
+	CScriptArray *array = (CScriptArray*)gen->GetArgAddress(1);
+	CScriptArray *self = (CScriptArray*)gen->GetObject();
+	self->InsertAt(index, *array);
+}
+
 static void ScriptArrayRemoveAt_Generic(asIScriptGeneric *gen)
 {
 	asUINT index = gen->GetArgDWord(0);
 	CScriptArray *self = (CScriptArray*)gen->GetObject();
 	self->RemoveAt(index);
+}
+
+static void ScriptArrayRemoveRange_Generic(asIScriptGeneric *gen)
+{
+	asUINT start = gen->GetArgDWord(0);
+	asUINT count = gen->GetArgDWord(1);
+	CScriptArray *self = (CScriptArray*)gen->GetObject();
+	self->RemoveRange(start, count);
 }
 
 static void ScriptArrayInsertLast_Generic(asIScriptGeneric *gen)
@@ -1917,9 +2019,11 @@ static void RegisterScriptArray_Generic(asIScriptEngine *engine)
 	r = engine->RegisterObjectMethod("array<T>", "array<T> &opAssign(const array<T>&in)", asFUNCTION(ScriptArrayAssignment_Generic), asCALL_GENERIC); assert( r >= 0 );
 
 	r = engine->RegisterObjectMethod("array<T>", "void insertAt(uint index, const T&in value)", asFUNCTION(ScriptArrayInsertAt_Generic), asCALL_GENERIC); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void insertAt(uint index, const array<T>& arr)", asFUNCTION(ScriptArrayInsertAtArray_Generic), asCALL_GENERIC); assert(r >= 0);
+	r = engine->RegisterObjectMethod("array<T>", "void insertLast(const T&in value)", asFUNCTION(ScriptArrayInsertLast_Generic), asCALL_GENERIC); assert(r >= 0);
 	r = engine->RegisterObjectMethod("array<T>", "void removeAt(uint index)", asFUNCTION(ScriptArrayRemoveAt_Generic), asCALL_GENERIC); assert( r >= 0 );
-	r = engine->RegisterObjectMethod("array<T>", "void insertLast(const T&in value)", asFUNCTION(ScriptArrayInsertLast_Generic), asCALL_GENERIC); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "void removeLast()", asFUNCTION(ScriptArrayRemoveLast_Generic), asCALL_GENERIC); assert( r >= 0 );
+	r = engine->RegisterObjectMethod("array<T>", "void removeRange(uint start, uint count)", asFUNCTION(ScriptArrayRemoveRange_Generic), asCALL_GENERIC); assert(r >= 0);
 	r = engine->RegisterObjectMethod("array<T>", "uint length() const", asFUNCTION(ScriptArrayLength_Generic), asCALL_GENERIC); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "void reserve(uint length)", asFUNCTION(ScriptArrayReserve_Generic), asCALL_GENERIC); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("array<T>", "void resize(uint length)", asFUNCTION(ScriptArrayResize_Generic), asCALL_GENERIC); assert( r >= 0 );

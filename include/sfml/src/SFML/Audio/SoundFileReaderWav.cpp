@@ -146,7 +146,7 @@ Uint64 SoundFileReaderWav::read(Int16* samples, Uint64 maxCount)
     assert(m_stream);
 
     Uint64 count = 0;
-    while ((count < maxCount) && (m_stream->tell() < m_dataEnd))
+    while ((count < maxCount) && (m_stream->tell() < (Int64) m_dataEnd))
     {
         switch (m_bytesPerSample)
         {

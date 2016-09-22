@@ -1,5 +1,7 @@
 var NAVTREEINDEX5 =
 {
+"functions_func_0x72.html":[3,1,1,11],
+"functions_func_0x73.html":[3,1,1,12],
 "functions_func_0x75.html":[3,1,1,13],
 "functions_func_0x77.html":[3,1,1,14],
 "functions_vars.html":[3,1,2],
@@ -7,8 +9,8 @@ var NAVTREEINDEX5 =
 "globals.html":[4,1,0,0],
 "globals_defs.html":[4,1,6],
 "globals_enum.html":[4,1,4],
-"globals_eval.html":[4,1,5],
 "globals_eval.html":[4,1,5,0],
+"globals_eval.html":[4,1,5],
 "globals_func.html":[4,1,1],
 "globals_type.html":[4,1,3],
 "globals_vars.html":[4,1,2],

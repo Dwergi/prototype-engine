@@ -36,6 +36,9 @@ namespace dd
 			memory->~T();
 		}
 
+		//
+		// Register type T to be handled by value or by reference.
+		//
 		template <typename T, bool>
 		struct RegisterTypeForwarder
 		{

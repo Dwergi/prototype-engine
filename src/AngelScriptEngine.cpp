@@ -13,6 +13,7 @@
 
 #include <direct.h>
 
+#include "File.h"
 #include "Stream.h"
 
 namespace dd
@@ -77,9 +78,9 @@ namespace dd
 			delete m_output;
 	}
 
-	void AngelScriptEngine::MessageCallback( const asSMessageInfo* msg, void* param )
+	void AngelScriptEngine::MessageCallback( const asSMessageInfo* msg )
 	{
-		const char* type = "ERR ";
+		const char* type = "ERR";
 		if( msg->type == asMSGTYPE_WARNING ) 
 			type = "WARN";
 		else if( msg->type == asMSGTYPE_INFORMATION ) 
@@ -97,7 +98,7 @@ namespace dd
 
 	AngelScriptEngine::AngelScriptEngine()
 	{
-		m_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
+		m_engine = asCreateScriptEngine();
 
 		int r = m_engine->SetMessageCallback( asMETHOD( dd::AngelScriptEngine, MessageCallback ), this, asCALL_THISCALL );
 		DD_ASSERT( r >= 0 );
@@ -168,42 +169,50 @@ namespace dd
 		return result;
 	}
 
-	String256 LoadScript( const char* module )
+	String256 AngelScriptEngine::LoadSource( const char* module ) const
 	{
-		const char* path = "\\data\\as\\";
+		DD_ASSERT( module != nullptr );
 
-		char current[256];
-		_getcwd( current, 256 );
-
-		String256 filename( current );
-		filename += path;
+		String256 filename;
+		filename += "as/";
 		filename += module;
 		filename += ".as";
 
-		std::FILE* file;
-		fopen_s( &file, filename.c_str(), "rb" );
-
+		File* file = File::OpenDataFile( filename, File::Mode::Read );
 		if( file == nullptr )
+		{
+			String256 error;
+			error += "Failed to load file containing module from path: ";
+			error += filename;
+
+			m_engine->WriteMessage( module, 0, 0, asMSGTYPE_ERROR, error.c_str() );
 			return String256();
+		}
 
 		char buffer[2048];
 		String256 source;
 
-		while( std::fgets( buffer, 2048, file ) != nullptr )
+		int read = 0;
+		while( (read = file->Read( (byte*) buffer, 2048 )) == 2048 )
 		{
-			source += buffer;
+			source.Append( buffer, 2048 );
 		}
 
-		fclose( file );
+		// copy the last chunk
+		source.Append( buffer, (uint) read );
+
+		delete file;
 
 		return source;
 	}
 
 	bool AngelScriptEngine::LoadFile( const char* module, String& output )
 	{
-		dd::String256 strSource( LoadScript( module ) );
+		DD_ASSERT( module != nullptr );
 
 		SetOutput( &output );
+
+		dd::String256 strSource( LoadSource( module ) );
 
 		CScriptBuilder builder;
 		int r = builder.StartNewModule( m_engine, module );

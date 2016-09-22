@@ -357,6 +357,8 @@ var angelscript_8h =
       [ "asEP_DISABLE_INTEGER_DIVISION", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0fae6af9c6963372e11c6da873868f594cd", null ],
       [ "asEP_DISALLOW_EMPTY_LIST_ELEMENTS", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0fabed7d49670612ec27227210021926692", null ],
       [ "asEP_PRIVATE_PROP_AS_PROTECTED", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0faa6f88a81f5706542acb94f3c470ac3f3", null ],
+      [ "asEP_ALLOW_UNICODE_IDENTIFIERS", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0fa651f1843c922a61ccee5c81fac58e4d1", null ],
+      [ "asEP_HEREDOC_TRIM_MODE", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0fa9658b61d2368cc84fe816c817444e0ba", null ],
       [ "asEP_LAST_PROPERTY", "angelscript_8h.html#a53c2e8a74ade77c928316396394ebe0fa14fb03eee4d87405994b9aef761eae3c", null ]
     ] ],
     [ "asEFuncType", "angelscript_8h.html#a06fb2a1ebf5d007e0d542abced1b648f", [

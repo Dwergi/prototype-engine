@@ -100,6 +100,9 @@
     <Filter Include="Includes\ArduinoJSON">
       <UniqueIdentifier>{42f68baa-971f-4e9d-9926-980613074687}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File">
+      <UniqueIdentifier>{27d6d938-19b2-489f-bccb-1ac1423dffd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -447,6 +450,9 @@
     <ClInclude Include="include\arduinojson\ArduinoJson.h">
       <Filter>Includes\ArduinoJSON</Filter>
     </ClInclude>
+    <ClInclude Include="src\File.h">
+      <Filter>File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -731,6 +737,9 @@
     </ClCompile>
     <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\File.cpp">
+      <Filter>File</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

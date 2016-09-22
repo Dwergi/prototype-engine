@@ -87,7 +87,7 @@ var classas_i_script_engine =
     [ "SetJITCompiler", "classas_i_script_engine.html#aee4f910163604203a27db1ffea3b1c9c", null ],
     [ "SetMessageCallback", "classas_i_script_engine.html#a74192fe950808eb72a64e3e371f0ea02", null ],
     [ "SetModuleUserDataCleanupCallback", "classas_i_script_engine.html#a7523853b9a9bf7dab603fa6a06393d51", null ],
-    [ "SetObjectTypeUserDataCleanupCallback", "classas_i_script_engine.html#a2336a92d5cd2a6a37007addf81ca059f", null ],
+    [ "SetObjectTypeUserDataCleanupCallback", "classas_i_script_engine.html#a8d4f19fe2d40d9da10c01a93f855b593", null ],
     [ "SetScriptObjectUserDataCleanupCallback", "classas_i_script_engine.html#a4654e2cae0690c50e19b177f1ec54592", null ],
     [ "SetTypeInfoUserDataCleanupCallback", "classas_i_script_engine.html#afa31e7c28c63a2c876d8e08305cf5d75", null ],
     [ "SetUserData", "classas_i_script_engine.html#aabee8d6ef426c434adee85ec6d57f940", null ],
