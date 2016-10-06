@@ -14,7 +14,7 @@ namespace dd
 	public:
 
 		Vector();
-		explicit Vector( uint reserved_size );
+		Vector( T* data, uint size, uint capacity, bool can_delete );
 		Vector( const Vector& other );
 		Vector( Vector&& other );
 
@@ -133,10 +133,31 @@ namespace dd
 		uint m_capacity { 0 };
 		uint m_size { 0 };
 		T* m_data { nullptr };
+		bool m_deallocate { true };
 
 		static const float GrowthFactor;
 		static const uint GrowthFudge;
 		static const uint DefaultSize;
+	};
+
+	template <typename T, size_t N = 64> 
+	class StackVector : public Vector<T>
+	{
+	private:
+		byte m_stack[sizeof( T ) * N];
+
+	public:
+
+		StackVector() : Vector<T>( (T*) m_stack, 0, N, false ) {}
+		
+		template <size_t OtherSize>
+		StackVector( const StackVector<T, OtherSize>& other )
+			: Vector<T>( (T*) m_stack, 0, N, false )
+		{
+			AddAll( other );
+		}
+
+		bool IsOnStack() const { return Data() == (T*) m_stack;  }
 	};
 }
 

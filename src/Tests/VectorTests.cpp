@@ -282,3 +282,45 @@ TEST_CASE( "[Vector] Reverse" )
 		REQUIRE( a[i] == i );
 	}
 }
+
+TEST_CASE( "[StackVector] Basic" )
+{
+	dd::StackVector<int, 32> a;
+
+	for( int i = 0; i < 32; ++i )
+	{
+		a.Push( i );
+	}
+
+	REQUIRE( a.IsOnStack() );
+
+	a.Push( 32 );
+
+	REQUIRE( !a.IsOnStack() );
+
+	for( int i = 0; i < 33; ++i )
+	{
+		REQUIRE( a[i] == i );
+	}
+}
+
+TEST_CASE( "[StackVector] Copy" )
+{
+	dd::StackVector<int, 16> b;
+
+	for( int i = 0; i < 16; ++i )
+	{
+		b.Push( i );
+	}
+
+	REQUIRE( b.IsOnStack() );
+
+	dd::StackVector<int, 32> a( b );
+
+	REQUIRE( a.IsOnStack() );
+
+	for( int i = 0; i < 16; ++i )
+	{
+		REQUIRE( a[i] == i );
+	}
+}

@@ -25,10 +25,13 @@ namespace dd
 	}
 
 	template <typename T>
-	Vector<T>::Vector( uint reserved )
-		: m_data( nullptr )
+	Vector<T>::Vector( T* data, uint size, uint capacity, bool can_delete ) :
+		m_data( data ),
+		m_size( size ),
+		m_capacity( capacity ),
+		m_deallocate( can_delete )
 	{
-		Reserve( reserved );
+
 	}
 
 	template <typename T>
@@ -436,7 +439,8 @@ namespace dd
 			CopyRange( m_data, new_data, std::min( m_size, new_capacity ) );
 			DestroyRange( m_data, m_size );
 
-			delete[] ((char*) m_data);
+			if( m_deallocate )
+				delete[] ((char*) m_data);
 		}
 
 		m_data = new_data;
