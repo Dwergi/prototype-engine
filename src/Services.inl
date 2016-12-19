@@ -96,8 +96,6 @@ namespace dd
 	template <typename T>
 	DoubleBuffer<typename T::Pool>& Services::GetDoubleBuffer()
 	{
-		DoubleBuffer<typename T::Pool>& buffer = Services::Get<DoubleBuffer<typename T::Pool>>();
-
-		return buffer;
+		return Services::Get<DoubleBuffer<typename T::Pool>>();
 	}
 }

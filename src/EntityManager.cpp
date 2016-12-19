@@ -1,11 +1,11 @@
 //
-// EntitySystem.cpp - System that handles the batched creation/deletion of entities and stores all entities.
+// EntityManager.cpp - System that handles the batched creation/deletion of entities and stores all entities.
 // Copyright (C) Sebastian Nordgren 
 // August 6th 2015
 //
 
 #include "PrecompiledHeader.h"
-#include "EntitySystem.h"
+#include "EntityManager.h"
 
 namespace
 {
@@ -18,12 +18,12 @@ namespace
 
 namespace dd
 {
-	EntitySystem::EntitySystem()
+	EntityManager::EntityManager()
 	{
 		m_initialized = true;
 	}
 
-	EntitySystem::~EntitySystem()
+	EntityManager::~EntityManager()
 	{
 		Update( 0.0f );
 		DestroyAll();
@@ -34,7 +34,7 @@ namespace dd
 		m_free.Clear();
 	}
 
-	void EntitySystem::Update( float dt )
+	void EntityManager::Update( float dt )
 	{
 		for( const EntityCommand& command : m_commands )
 		{
@@ -42,17 +42,17 @@ namespace dd
 			{
 			case CommandType::Create:
 			{
-				EntityEntry& entry = m_entities[command.Entity.ID];
+				EntityEntry& entry = m_entities[ command.Entity.ID ];
 
 				entry.Flags |= EntityState::Active;
 
 				++m_activeEntities;
 			}
-									  break;
+			break;
 
 			case CommandType::Destroy:
 			{
-				EntityEntry& entry = m_entities[command.Entity.ID];
+				EntityEntry& entry = m_entities[ command.Entity.ID ];
 
 				// ensure that this entity has actually lived a full, productive life
 				DD_ASSERT( entry.Flags & EntityState::Valid );
@@ -67,6 +67,8 @@ namespace dd
 
 				--m_activeEntities;
 			}
+			break;
+
 			}
 		}
 
@@ -76,14 +78,14 @@ namespace dd
 	//
 	// Create an entity and return its handle.
 	// 
-	EntityHandle EntitySystem::Create()
+	EntityHandle EntityManager::Create()
 	{
 		if( m_free.Size() == 0 )
 		{
 			EntityHandle handle;
 			handle.ID = m_entities.Size();
 			handle.Version = 0;
-			handle.m_system = this;
+			handle.m_manager = this;
 
 			EntityEntry entry( handle, EntityState::None );
 
@@ -91,13 +93,12 @@ namespace dd
 			m_free.Add( handle.ID );
 		}
 
-		EntityEntry& entry = m_entities[m_free[0]];
+		EntityEntry& entry = m_entities[ m_free[ 0 ] ];
 		m_free.Remove( 0 );
 
 		entry.Flags |= EntityState::Valid;
 
-		EntityCommand command( entry.Entity, CommandType::Create );
-		m_commands.Add( command );
+		m_commands.Add( EntityCommand( entry.Entity, CommandType::Create ) );
 
 		return entry.Entity;
 	}
@@ -105,20 +106,18 @@ namespace dd
 	//
 	// Destroy an entity.
 	// 
-	void EntitySystem::Destroy( const EntityHandle& handle )
+	void EntityManager::Destroy( const EntityHandle& handle )
 	{
 		if( !IsEntityValid( handle ) )
 			return;
 
-		EntityEntry& entry = m_entities[handle.ID];
+		EntityEntry& entry = m_entities[ handle.ID ];
 		entry.Flags |= EntityState::Destroyed;
 
-		EntityCommand command( entry.Entity, CommandType::Destroy );
-
-		m_commands.Add( command );
+		m_commands.Add( EntityCommand( entry.Entity, CommandType::Destroy ) );
 	}
 
-	void EntitySystem::DestroyAll()
+	void EntityManager::DestroyAll()
 	{
 		for( EntityEntry& entry : m_entities )
 		{
@@ -126,7 +125,7 @@ namespace dd
 		}
 	}
 
-	bool EntitySystem::IsEntityValid( const EntityHandle& handle )
+	bool EntityManager::IsEntityValid( const EntityHandle& handle )
 	{
 		if( handle.ID == EntityHandle::Invalid )
 			return false;
@@ -134,7 +133,7 @@ namespace dd
 		if( handle.ID > m_entities.Size() )
 			return false;
 
-		EntityEntry& entry = m_entities[handle.ID];
+		EntityEntry& entry = m_entities[ handle.ID ];
 
 		if( entry.Entity.Version != handle.Version )
 			return false;

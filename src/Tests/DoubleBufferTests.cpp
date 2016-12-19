@@ -11,7 +11,7 @@
 
 #include "Component.h"
 #include "DenseVectorPool.h"
-#include "EntitySystem.h"
+#include "EntityManager.h"
 
 using namespace dd;
 
@@ -80,7 +80,7 @@ public:
 
 TEST_CASE( "[DoubleBuffer] Components" )
 {
-	EntitySystem system;
+	EntityManager system;
 	EntityHandle handle = system.Create();
 
 	REGISTER_TYPE( TestComponent );

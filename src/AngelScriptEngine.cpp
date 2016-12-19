@@ -178,7 +178,7 @@ namespace dd
 		filename += module;
 		filename += ".as";
 
-		File* file = File::OpenDataFile( filename, File::Mode::Read );
+		std::unique_ptr<File> file = File::OpenDataFile( filename, File::Mode::Read );
 		if( file == nullptr )
 		{
 			String256 error;
@@ -200,8 +200,6 @@ namespace dd
 
 		// copy the last chunk
 		source.Append( buffer, (uint) read );
-
-		delete file;
 
 		return source;
 	}

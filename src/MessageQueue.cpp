@@ -24,7 +24,7 @@ namespace dd
 
 	}
 
-	MessageSubscription MessageQueue::Subscribe( uint message_type, Function handler )
+	MessageSubscription MessageQueue::Subscribe( MessageID message_type, Function handler )
 	{
 		std::lock_guard<std::mutex> lock( m_mutex );
 
@@ -113,7 +113,7 @@ namespace dd
 		m_pendingMessages.GetWrite().Clear();
 	}
 
-	uint MessageQueue::GetSubscriberCount( uint message_type ) const
+	uint MessageQueue::GetSubscriberCount( MessageID message_type ) const
 	{
 		Vector<HandlerID>* subs = m_subscribers.Find( message_type );
 

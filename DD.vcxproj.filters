@@ -108,9 +108,6 @@
     <ClInclude Include="src\EntityHandle.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntitySystem.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\Component.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -453,12 +450,12 @@
     <ClInclude Include="src\File.h">
       <Filter>File</Filter>
     </ClInclude>
+    <ClInclude Include="src\EntityManager.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntitySystem.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\BoundingBox.cpp">
@@ -741,6 +738,12 @@
     <ClCompile Include="src\File.cpp">
       <Filter>File</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntityManager.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\EntityManagerTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -784,6 +787,12 @@
     </None>
     <None Include="src\TerrainChunk.inl">
       <Filter>Systems</Filter>
+    </None>
+    <None Include="src\EntityManager.inl">
+      <Filter>Entities</Filter>
+    </None>
+    <None Include="src\DoubleBuffer.inl">
+      <Filter>Containers</Filter>
     </None>
   </ItemGroup>
 </Project>

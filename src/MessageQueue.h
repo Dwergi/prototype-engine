@@ -17,13 +17,13 @@ namespace dd
 {
 	struct MessageSubscription;
 
-	class MessageQueue : public ISystem
+	class MessageQueue 
+		: public ISystem
 	{
-	private:
+	public:
+
 		typedef uint HandlerID;
 		typedef uint MessageID;
-
-	public:
 
 		MessageQueue();
 		~MessageQueue();
@@ -32,7 +32,7 @@ namespace dd
 		// Subscribe to a given message with the given handler.
 		// If you ever want to unsubscribe, you must keep the returned token.
 		//
-		MessageSubscription Subscribe( uint message_type, Function handler );
+		MessageSubscription Subscribe( MessageID message_type, Function handler );
 
 		//
 		// Unsubscribe the given token. 
@@ -49,7 +49,7 @@ namespace dd
 		//
 		virtual void Update( float dt ) override;
 
-		uint GetSubscriberCount( uint message_type ) const;
+		uint GetSubscriberCount( MessageID message_type ) const;
 
 		uint GetTotalSubscriberCount() const;
 

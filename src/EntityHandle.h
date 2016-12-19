@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	class EntitySystem;
+	class EntityManager;
 
 	class EntityHandle
 	{
@@ -29,13 +29,22 @@ namespace dd
 		
 		EntityHandle();
 		EntityHandle( const EntityHandle& other );
-		EntityHandle( uint id, EntitySystem* m_system );
+		EntityHandle( uint id, EntityManager* m_manager );
 
 		bool IsValid() const;
 
 		EntityHandle& operator=( const EntityHandle& other );
 		bool operator==( const EntityHandle& other ) const;
 		bool operator!=( const EntityHandle& other ) const;
+
+		template <typename Component>
+		bool Has() const;
+
+		template <typename Component>
+		Component& Get() const;
+
+		template <typename... Components>
+		void Unpack( Components&... args ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( EntityHandle, Handle )
@@ -44,12 +53,39 @@ namespace dd
 
 	private: 
 	
-		friend class EntitySystem;
+		friend class EntityManager;
 		friend std::hash<EntityHandle>;
 
-		EntitySystem* m_system;
+		EntityManager* m_manager;
 		static const int Invalid = -1;
+
+		template <typename C, typename... Rest>
+		void UnpackHelper( C& c, Rest&... r ) const
+		{
+			c = Get<C>();
+			UnpackHelper( r... );
+		}
+
+		void UnpackHelper() const {}
 	};
+
+	template <typename Component>
+	Component& EntityHandle::Get() const
+	{
+		return m_manager->GetComponent<Component>( *this );
+	}
+
+	template <typename Component>
+	bool EntityHandle::Has() const
+	{
+		return m_manager->HasComponent<Component>( *this );
+	}
+
+	template <typename... Components>
+	void EntityHandle::Unpack( Components&... args ) const
+	{
+		UnpackHelper( args... );
+	}
 }
 
 // hash for STL containers

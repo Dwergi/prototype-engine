@@ -22,7 +22,6 @@ namespace dd
 		path.w_str( buffer );
 
 		tinydir_dir dir;
-
 		if( tinydir_open( &dir, wpath ) == -1 )
 		{
 			DD_ASSERT( false, "Invalid data root given!" );
@@ -32,12 +31,12 @@ namespace dd
 		s_dataRoot = root;
 	}
 
-	File* File::OpenDataFile( const char* path, Mode mode )
+	std::unique_ptr<File> File::OpenDataFile( const char* path, Mode mode )
 	{
 		return OpenDataFile( String256( path ), mode );
 	}
 
-	File* File::OpenDataFile( const String& path, Mode mode )
+	std::unique_ptr<File> File::OpenDataFile( const String& path, Mode mode )
 	{
 		String256 fullpath( s_dataRoot );
 		fullpath += '/';
@@ -48,8 +47,7 @@ namespace dd
 		if( error != 0 )
 			return nullptr;
 
-		File* out = new File( file_handle );
-		return out;
+		return std::unique_ptr<File>( new File( file_handle ) );
 	}
 
 	int File::Read( byte* buffer, uint size )

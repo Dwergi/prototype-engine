@@ -410,7 +410,7 @@
     <ClInclude Include="src\DenseMapPool.h" />
     <ClInclude Include="src\DenseVectorPool.h" />
     <ClInclude Include="src\EntityHandle.h" />
-    <ClInclude Include="src\EntitySystem.h" />
+    <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\Services.h" />
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
@@ -553,6 +553,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Tests\EntityManagerTests.cpp" />
     <ClCompile Include="src\tests\FunctionTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
@@ -596,7 +597,7 @@
     <ClCompile Include="src\DebugConsole.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="src\EntityHandle.cpp" />
-    <ClCompile Include="src\EntitySystem.cpp" />
+    <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\Function.cpp" />
     <ClCompile Include="src\FunctionSignature.cpp" />
@@ -789,6 +790,8 @@
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseMap.inl" />
     <None Include="src\DenseVectorPool.inl" />
+    <None Include="src\DoubleBuffer.inl" />
+    <None Include="src\EntityManager.inl" />
     <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
     <None Include="src\AngelScriptEngine.inl" />

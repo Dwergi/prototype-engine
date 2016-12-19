@@ -3,7 +3,7 @@
 
 #include "AABB.h"
 #include "Camera.h"
-#include "EntitySystem.h"
+#include "EntityManager.h"
 #include "Frustum.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -112,7 +112,7 @@ namespace dd
 	{
 		MeshHandle mesh_h = Mesh::Create( meshName, shader );
 
-		EntityHandle handle = Services::Get<EntitySystem>().CreateEntity<TransformComponent, MeshComponent>();
+		EntityHandle handle = Services::Get<EntityManager>().CreateEntity<TransformComponent, MeshComponent>();
 
 		TransformComponent* transform_cmp = Services::GetWritePool<TransformComponent>().Find( handle );
 		transform_cmp->Transform = transform;

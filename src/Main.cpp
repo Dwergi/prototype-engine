@@ -18,7 +18,7 @@
 #include "Camera.h"
 #include "DebugUI.h"
 #include "DoubleBuffer.h"
-#include "EntitySystem.h"
+#include "EntityManager.h"
 #include "File.h"
 #include "FreeCameraController.h"
 #include "Input.h"
@@ -114,7 +114,7 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 
 EntityHandle GetEntityHandle( uint id )
 {
-	EntitySystem& system = Services::Get<EntitySystem>();
+	EntityManager& system = Services::Get<EntityManager>();
 
 	EntityHandle handle( id, &system );
 	return handle;
@@ -282,8 +282,8 @@ int GameMain()
 		JobSystem jobsystem( 2u );
 		Services::Register( jobsystem );
 
-		EntitySystem entitySystem;
-		REGISTER_TYPE( EntitySystem );
+		EntityManager entitySystem;
+		REGISTER_TYPE( EntityManager );
 		Services::Register( entitySystem );
 
 		SwarmSystem swarm_system;

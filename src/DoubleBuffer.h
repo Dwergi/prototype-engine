@@ -15,38 +15,33 @@ namespace dd
 	{
 	public:
 
-		DoubleBuffer( T* read, T* write )
-			: m_read( read ),
-			m_write( write )
-		{
-		}
+		DoubleBuffer( T* read, T* write );
+		~DoubleBuffer();
 
-		~DoubleBuffer()
-		{
-		}
+		DoubleBuffer( const DoubleBuffer<T>& ) = delete;
+		DoubleBuffer( DoubleBuffer&& ) = delete;
 
-		void Swap()
-		{
-			std::swap( m_read, m_write );
-		}
+		DoubleBuffer& operator=( const DoubleBuffer& ) = delete;
+		DoubleBuffer& operator=( DoubleBuffer&& ) = delete;
+
+		//
+		// Swap the read and write buffers.
+		//
+		void Swap();
 
 		//
 		// Duplicate the read buffer into the write buffer.
 		//
-		void Duplicate() const
-		{
-			*m_write = *m_read;
-		}
+		void Duplicate() const;
 
-		const T& GetRead() const
-		{
-			return *m_read;
-		}
+		//
+		// Clear the contents of both the read and write buffers.
+		//
+		void Clear();
 
-		T& GetWrite() const
-		{
-			return *m_write;
-		}
+		const T& GetRead() const;
+
+		T& GetWrite() const;
 
 		BASIC_TYPE( DoubleBuffer<T> )
 
@@ -56,3 +51,5 @@ namespace dd
 		T* m_read;
 	};
 }
+
+#include "DoubleBuffer.inl"
