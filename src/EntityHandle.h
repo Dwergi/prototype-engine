@@ -8,6 +8,8 @@
 
 #include <functional>
 
+#include "ComponentHandle.h"
+
 namespace dd
 {
 	class EntityManager;
@@ -29,10 +31,12 @@ namespace dd
 		
 		EntityHandle();
 		EntityHandle( const EntityHandle& other );
-		EntityHandle( uint id, EntityManager* m_manager );
+		EntityHandle( EntityHandle&& other );
+		EntityHandle( uint id, EntityManager& manager );
 
 		bool IsValid() const;
 
+		EntityHandle& operator=( EntityHandle&& other );
 		EntityHandle& operator=( const EntityHandle& other );
 		bool operator==( const EntityHandle& other ) const;
 		bool operator!=( const EntityHandle& other ) const;
@@ -41,10 +45,10 @@ namespace dd
 		bool Has() const;
 
 		template <typename Component>
-		Component& Get() const;
+		ComponentHandle<Component> Get() const;
 
 		template <typename... Components>
-		void Unpack( Components&... args ) const;
+		void Unpack( ComponentHandle<Components>&... args ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( EntityHandle, Handle )
@@ -55,12 +59,14 @@ namespace dd
 	
 		friend class EntityManager;
 		friend std::hash<EntityHandle>;
+		template <typename C>
+		friend class ComponentHandle;
 
 		EntityManager* m_manager;
 		static const int Invalid = -1;
 
 		template <typename C, typename... Rest>
-		void UnpackHelper( C& c, Rest&... r ) const
+		void UnpackHelper( ComponentHandle<C>& c, ComponentHandle<Rest>&... r ) const
 		{
 			c = Get<C>();
 			UnpackHelper( r... );
@@ -70,7 +76,7 @@ namespace dd
 	};
 
 	template <typename Component>
-	Component& EntityHandle::Get() const
+	ComponentHandle<Component> EntityHandle::Get() const
 	{
 		return m_manager->GetComponent<Component>( *this );
 	}
@@ -82,7 +88,7 @@ namespace dd
 	}
 
 	template <typename... Components>
-	void EntityHandle::Unpack( Components&... args ) const
+	void EntityHandle::Unpack( ComponentHandle<Components>&... args ) const
 	{
 		UnpackHelper( args... );
 	}

@@ -20,7 +20,7 @@ namespace dd
 
 	template <typename T>
 	class SortedVectorPool
-		: public ComponentPool<T>
+		: public ComponentPoolBase
 	{
 	private:
 		struct EntityEntry
@@ -36,33 +36,33 @@ namespace dd
 		SortedVectorPool();
 		~SortedVectorPool();
 
-		virtual void Clear() override;
+		void Clear();
 
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		virtual uint Size() const override;
+		uint Size() const;
 
 		//
 		// Create a new component of this type for the given entity.
 		// 
-		virtual T* Create( const EntityHandle& entity ) override;
+		T* Create( const EntityHandle& entity );
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		virtual T* Find( const EntityHandle& entity ) const override;
+		T* Find( const EntityHandle& entity ) const;
 
 		//
 		// Remove the component associated with the given entity.
 		// 
-		virtual void Remove( const EntityHandle& entity ) override;
+		void Remove( const EntityHandle& entity );
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		virtual bool Exists( const EntityHandle& entity ) const override;
+		bool Exists( const EntityHandle& entity ) const;
 
 		iterator begin() const;
 		iterator end() const;

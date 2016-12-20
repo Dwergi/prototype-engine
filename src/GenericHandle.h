@@ -5,35 +5,35 @@
 // Uses the [] operator to access it each time. 
 //
 template <typename TValue, typename TKey, typename TContainer>
-class Handle
+class GenericHandle
 {
 private:
 
-	typedef Handle<TValue, TKey, TContainer> TThis;
+	typedef GenericHandle<TValue, TKey, TContainer> TThis;
 
 	TKey m_key;
 	TContainer* m_container;
 
 public:
 
-	Handle()
+	GenericHandle()
 		: m_container( nullptr )
 	{
 	}
 
-	Handle( const TThis& other )
+	GenericHandle( const TThis& other )
 		: m_key( other.m_key ),
 		m_container( other.m_container )
 	{
 	}
 
-	Handle( TKey key, TContainer& container ) 
+	GenericHandle( TKey key, TContainer& container ) 
 		: m_key( key ), m_container( &container )
 	{
 
 	}
 
-	~Handle()
+	~GenericHandle()
 	{
 		m_container = nullptr;
 	}

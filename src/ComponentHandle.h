@@ -6,80 +6,62 @@
 
 #pragma once
 
-#include "EntityHandle.h"
-
 namespace dd
 {
-	template <typename T>
-	class ComponentPool;
+	class EntityHandle;
 
 	//
-	// A component handle is meant to be stored for a long time. 
-	// It's not the most efficient way to access a component repeatedly in a short span,
-	// but it is more tolerant to components ceasing to exist.
+	// A component handle - this can be both readable and writable, but you must be explicit in how you're going to use it.
 	//
-	template <typename ComponentType>
+	template <typename TComponent>
 	class ComponentHandle
 	{
 	public:
 
-		ComponentHandle( EntityHandle entity, const ComponentPool<ComponentType>& pool )
-			: m_pool( &pool ),
-			m_entity( entity )
+		ComponentHandle()
+		{
+		}
+
+		ComponentHandle( EntityHandle entity )
+			: m_entity( entity )
 		{
 		}
 
 		ComponentHandle( const ComponentHandle& other )
-			: m_pool( other.m_pool ),
-			m_entity( other.m_entity )
+			: m_entity( other.m_entity )
 		{
 		}
 
 		bool IsValid() const
 		{
-			return m_pool != nullptr && m_entity.IsValid() && m_pool->Exists( m_entity );
+			// valid if entity is valid
+			return m_entity.IsValid() && m_entity.Has<TComponent>();
 		}
 
-		ComponentType* Get() const 
+		const TComponent* Read() const 
 		{
-			DD_ASSERT( m_pool != nullptr );
-			DD_ASSERT( IsValid(), "Handle not valid!" );
-
 			if( !IsValid() )
+			{
+				DD_ASSERT( false, "Handle not valid!" );
 				return nullptr;
+			}
 
-			return m_pool->Find( m_entity )
+			return m_entity.m_manager->GetReadable<TComponent>( m_entity );
 		}
 
-		ComponentType* operator->()
+		TComponent* Write() const
 		{
-			return Get();
-		}
+			if( !IsValid() )
+			{
+				DD_ASSERT( false, "Handle not valid!" );
+				return nullptr;
+			}
 
-		ComponentType& operator*()
-		{
-			DD_ASSERT( IsValid(), "Handle not valid!" );
-
-			return *m_pool->Find( m_entity );
-		}
-
-		ComponentType* operator->() const
-		{
-			DD_ASSERT( IsValid(), "Handle not valid!" );
-
-			return m_pool->Find( m_entity );
-		}
-
-		ComponentType& operator*() const
-		{
-			DD_ASSERT( IsValid(), "Handle not valid!" );
-
-			return *m_pool->Find( m_entity );
+			return m_entity.m_manager->GetWritable<TComponent>( m_entity );
 		}
 
 	private:
 
-		const ComponentPool<ComponentType>* m_pool;
 		EntityHandle m_entity;
 	};
 }

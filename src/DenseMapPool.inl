@@ -115,7 +115,7 @@ namespace dd
 		m_components.Add( entity.ID, T() );
 		T* cmp = &m_components[ entity.ID ];
 
-		Component* baseptr = static_cast<Component*>(cmp);
+		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;

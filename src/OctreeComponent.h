@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "Component.h"
+#include "ComponentBase.h"
 #include "AABBOctree.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
-	class OctreeComponent : public Component
+	class OctreeComponent : public ComponentBase
 	{
 	public:
 		typedef DenseMapPool<OctreeComponent> Pool;
@@ -22,7 +22,7 @@ namespace dd
 		OctreeComponent() {}
 
 		BEGIN_TYPE( OctreeComponent )
-			PARENT( Component )
+			PARENT( ComponentBase )
 			MEMBER( OctreeComponent, Entry )
 		END_TYPE
 	};

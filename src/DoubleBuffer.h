@@ -10,12 +10,43 @@
 
 namespace dd
 {
-	template <typename T>
-	class DoubleBuffer
+	class DoubleBufferBase
 	{
 	public:
 
-		DoubleBuffer( T* read, T* write );
+		virtual ~DoubleBufferBase();
+
+		DoubleBufferBase( const DoubleBufferBase& ) = delete;
+		DoubleBufferBase( DoubleBufferBase&& ) = delete;
+
+		DoubleBufferBase& operator=( const DoubleBufferBase& ) = delete;
+		DoubleBufferBase& operator=( DoubleBufferBase&& ) = delete;
+
+		//
+		// Swap the read and write buffers.
+		//
+		void Swap();
+
+		virtual void Clear() const = 0;
+
+		virtual void Duplicate() const = 0;
+
+	protected:
+
+		void* m_write;
+		void* m_read;
+
+		bool m_isOwner;
+
+		DoubleBufferBase( void* read, void* write, bool is_owner );
+	};
+
+	template <typename T>
+	class DoubleBuffer : public DoubleBufferBase
+	{
+	public:
+
+		DoubleBuffer( T* read, T* write, bool is_owner = true );
 		~DoubleBuffer();
 
 		DoubleBuffer( const DoubleBuffer<T>& ) = delete;
@@ -25,30 +56,20 @@ namespace dd
 		DoubleBuffer& operator=( DoubleBuffer&& ) = delete;
 
 		//
-		// Swap the read and write buffers.
-		//
-		void Swap();
-
-		//
 		// Duplicate the read buffer into the write buffer.
 		//
-		void Duplicate() const;
+		virtual void Duplicate() const override;
 
 		//
 		// Clear the contents of both the read and write buffers.
 		//
-		void Clear();
+		virtual void Clear() const override;
 
 		const T& GetRead() const;
 
 		T& GetWrite() const;
 
 		BASIC_TYPE( DoubleBuffer<T> )
-
-	private:
-
-		T* m_write;
-		T* m_read;
 	};
 }
 

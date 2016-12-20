@@ -161,9 +161,8 @@ namespace dd
 		Entry* entry = FindEntry( key );
 
 		if( entry == nullptr )
-			return nullptr;
+			return nullptr; // not found
 
-		// not found
 		return &entry->Value;
 	}
 

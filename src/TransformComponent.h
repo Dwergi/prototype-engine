@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Component.h"
+#include "ComponentBase.h"
 #include "DenseVectorPool.h"
 #include "Vector4.h"
 
 namespace dd
 {
-	class TransformComponent : public Component
+	class TransformComponent : public ComponentBase
 	{
 	public:
 		glm::mat4 Transform;
@@ -14,7 +14,7 @@ namespace dd
 		typedef DenseVectorPool<TransformComponent> Pool;
 
 		TransformComponent() { }
-		TransformComponent( const TransformComponent& other ) : Component( other ), Transform( other.Transform ) {}
+		TransformComponent( const TransformComponent& other ) : ComponentBase( other ), Transform( other.Transform ) {}
 
 		glm::vec3 GetPosition() const { return Transform[3].xyz(); }
 		void SetPosition( const glm::vec3& pos ) { Transform[3].xyz = pos; }
@@ -22,7 +22,7 @@ namespace dd
 		ALIGNED_ALLOCATORS( 16 )
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
-			PARENT( Component )
+			PARENT( ComponentBase )
 		END_TYPE
 	};
 }

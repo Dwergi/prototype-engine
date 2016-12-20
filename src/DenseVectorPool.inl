@@ -132,7 +132,35 @@ namespace dd
 
 		T* cmp = new (&m_components[entity.ID]) T();
 
-		Component* baseptr = static_cast<Component*>(cmp);
+		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
+		baseptr->Entity = entity;
+
+		return cmp;
+	}
+
+	template <typename T>
+	template <typename... Args>
+	virtual T* DenseVectorPool<T>::Construct( const EntityHandle& entity, Args&&... args )
+	{
+		// already allocated!
+		if( Exists( entity ) )
+		{
+			DD_ASSERT( false, "Entity already exists!" );
+			return nullptr;
+		}
+
+		if( entity.ID >= (int) m_components.Size() )
+		{
+			m_components.Resize( entity.ID + 1 );
+
+			m_valid.Resize( (entity.ID / (sizeof( char ) * 8)) + 1 );
+		}
+
+		SetValid( entity.ID, true );
+
+		T* cmp = new (&m_components[ entity.ID ]) T( std::forward( args )... );
+
+		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;

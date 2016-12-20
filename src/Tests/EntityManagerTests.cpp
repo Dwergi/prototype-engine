@@ -1,5 +1,5 @@
 //
-// EntityManagerTests.h - Tests for EntityManager.
+// EntityManagerTests.h - Tests for Entitys_manager->
 // Copyright (C) Sebastian Nordgren 
 // December 19th 2016
 //
@@ -8,13 +8,13 @@
 #include "catch/catch.hpp"
 
 #include "EntityManager.h"
-#include "Component.h"
+#include "ComponentBase.h"
 #include "DenseVectorPool.h"
 
 
 using namespace dd;
 
-class FooComponent : public Component
+class FooComponent : public ComponentBase
 {
 public:
 	int A;
@@ -26,7 +26,7 @@ public:
 	END_TYPE
 };
 
-class BarComponent : public Component
+class BarComponent : public ComponentBase
 {
 public:
 	float B;
@@ -38,63 +38,66 @@ public:
 	END_TYPE
 };
 
+EntityManager* s_manager = nullptr;
+
 void SetUp()
 {
+	if( s_manager != nullptr )
+	{
+		delete s_manager;
+	}
+
+	s_manager = new EntityManager();
+
 	REGISTER_TYPE( FooComponent ); 
 	REGISTER_TYPE( BarComponent );
 
 	Services::RegisterComponent<FooComponent>();
 	Services::RegisterComponent<BarComponent>();
 
-	auto& fooBuffer = Services::GetDoubleBuffer<FooComponent>();
-	fooBuffer.Clear();
-
-	auto& barBuffer = Services::GetDoubleBuffer<BarComponent>();
-	barBuffer.Clear();
+	s_manager->RegisterComponent<FooComponent>();
+	s_manager->RegisterComponent<BarComponent>();
 }
 
 void Swap()
 {
-	Services::GetDoubleBuffer<FooComponent>().Swap();
-	Services::GetDoubleBuffer<FooComponent>().Duplicate();
-
-	Services::GetDoubleBuffer<BarComponent>().Swap();
-	Services::GetDoubleBuffer<BarComponent>().Duplicate();
+	s_manager->Update( 1.0f );
 }
 
 TEST_CASE( "[EntityManager] Create" )
 {
 	SetUp();
 
-	EntityManager manager;
-	EntityHandle handle = manager.Create();
-	manager.AddComponent<FooComponent>( handle );
+	EntityHandle handle = s_manager->Create();
+	s_manager->AddComponent<FooComponent>( handle );
+
+	REQUIRE( s_manager->HasWritable<FooComponent>( handle ) );
 
 	Swap();
 
-	REQUIRE( manager.HasComponent<FooComponent>( handle ) );
+	REQUIRE( s_manager->HasReadable<FooComponent>( handle ) );
 	
-	manager.RemoveComponent<FooComponent>( handle );
+	s_manager->RemoveComponent<FooComponent>( handle );
+
+	REQUIRE_FALSE( s_manager->HasWritable<FooComponent>( handle ) );
 
 	Swap();
 
-	REQUIRE_FALSE( manager.HasComponent<FooComponent>( handle ) );
+	REQUIRE_FALSE( s_manager->HasReadable<FooComponent>( handle ) );
 }
 
-TEST_CASE( "[EntityManager] FindAllWith" )
+TEST_CASE( "[EntityManager] FindAllWithReadable" )
 {
 	SetUp();
 
-	EntityManager manager;
-	
 	SECTION( "Single Entity" )
 	{
-		EntityHandle handle = manager.Create();
-		manager.AddComponent<FooComponent>( handle );
+		EntityHandle handle = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( handle );
 
 		Swap();
 
-		Vector<EntityHandle> handles = manager.FindAllWith<FooComponent>();
+		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
 		REQUIRE( handles.Size() == 1 );
 		REQUIRE( handles[ 0 ] == handle );
@@ -102,15 +105,15 @@ TEST_CASE( "[EntityManager] FindAllWith" )
 
 	SECTION( "Single Valid Entity" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle bar = manager.Create();
-		manager.AddComponent<BarComponent>( bar );
+		EntityHandle bar = s_manager->Create();
+		s_manager->AddComponent<BarComponent>( bar );
 
 		Swap();
 
-		Vector<EntityHandle> handles = manager.FindAllWith<FooComponent>();
+		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
 		REQUIRE( handles.Size() == 1 );
 		REQUIRE( handles[ 0 ] == foo );
@@ -118,33 +121,33 @@ TEST_CASE( "[EntityManager] FindAllWith" )
 
 	SECTION( "Multiple Entities" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle foo2 = manager.Create();
-		manager.AddComponent<FooComponent>( foo2 );
+		EntityHandle foo2 = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo2 );
 
 		Swap();
 
-		Vector<EntityHandle> handles = manager.FindAllWith<FooComponent>();
+		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
 		REQUIRE( handles.Size() == 2 );
 	}
 
 	SECTION( "Multiple Valid Entities" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle bar = manager.Create();
-		manager.AddComponent<BarComponent>( bar );
+		EntityHandle bar = s_manager->Create();
+		s_manager->AddComponent<BarComponent>( bar );
 
-		EntityHandle foo2 = manager.Create();
-		manager.AddComponent<FooComponent>( foo2 );
+		EntityHandle foo2 = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo2 );
 
 		Swap();
 
-		Vector<EntityHandle> handles = manager.FindAllWith<FooComponent>();
+		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
 		REQUIRE( handles.Size() == 2 );
 		REQUIRE( !handles.Contains( bar ) );
@@ -156,32 +159,33 @@ TEST_CASE( "[EntityManager] Single Instance of Component" )
 	SetUp();
 
 	EntityManager manager;
-	EntityHandle handle = manager.Create();
+	EntityHandle handle = s_manager->Create();
 
-	FooComponent& foo = *manager.AddComponent<FooComponent>( handle );
-	foo.A = 0;
+	ComponentHandle<FooComponent> foo = s_manager->AddComponent<FooComponent>( handle );
 
 	Swap();
 
-	FooComponent& foo1 = manager.GetComponent<FooComponent>( handle );
+	foo.Write()->A = 0;
 
-	foo.A = 1;
-	REQUIRE( foo1.A == foo.A );
+	ComponentHandle<FooComponent> foo1 = s_manager->GetComponent<FooComponent>( handle );
 
-	Vector<EntityHandle> handles = manager.FindAllWith<FooComponent>();
+	foo.Write()->A = 1;
+	REQUIRE( foo1.Write()->A == foo.Write()->A );
 
-	foo1.A = 2;
+	Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
-	FooComponent& foo2 = handles[ 0 ].Get<FooComponent>();
-	REQUIRE( foo.A == foo1.A );
-	REQUIRE( foo1.A == foo2.A );
+	foo1.Write()->A = 2;
 
-	foo.A = 3;
+	ComponentHandle<FooComponent> foo2 = handles[ 0 ].Get<FooComponent>();
+	REQUIRE( foo.Write()->A == foo1.Write()->A );
+	REQUIRE( foo1.Write()->A == foo2.Write()->A );
 
-	manager.ForAllWith<FooComponent>( [&foo]( EntityHandle h, FooComponent& f ) { REQUIRE( f.A == foo.A ); } );
+	foo.Write()->A = 3;
+
+	s_manager->ForAllWithReadable<FooComponent>( [&foo]( EntityHandle h, ComponentHandle<FooComponent> f ) { REQUIRE( f.Write()->A == foo.Write()->A ); } );
 }
 
-TEST_CASE( "[EntityManager] ForAllWith" )
+TEST_CASE( "[EntityManager] ForAllWithReadable" )
 {
 	SetUp();
 
@@ -189,13 +193,13 @@ TEST_CASE( "[EntityManager] ForAllWith" )
 
 	SECTION( "Single Entity" )
 	{
-		EntityHandle handle = manager.Create();
-		manager.AddComponent<FooComponent>( handle );
+		EntityHandle handle = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( handle );
 
 		Swap();
 
 		Vector<EntityHandle> handles;
-		manager.ForAllWith<FooComponent>( [&handles]( EntityHandle h, FooComponent& f ) { handles.Add( h ); } );
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
 
 		REQUIRE( handles.Size() == 1 );
 		REQUIRE( handles[ 0 ] == handle );
@@ -203,16 +207,16 @@ TEST_CASE( "[EntityManager] ForAllWith" )
 
 	SECTION( "Single Valid Entity" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle bar = manager.Create();
-		manager.AddComponent<BarComponent>( bar );
+		EntityHandle bar = s_manager->Create();
+		s_manager->AddComponent<BarComponent>( bar );
 
 		Swap();
 
 		Vector<EntityHandle> handles;
-		manager.ForAllWith<FooComponent>( [&handles]( EntityHandle h, FooComponent& f ) { handles.Add( h ); } );
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
 
 		REQUIRE( handles.Size() == 1 );
 		REQUIRE( handles[ 0 ] == foo );
@@ -220,35 +224,35 @@ TEST_CASE( "[EntityManager] ForAllWith" )
 
 	SECTION( "Multiple Entities" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle foo2 = manager.Create();
-		manager.AddComponent<FooComponent>( foo2 );
+		EntityHandle foo2 = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo2 );
 
 		Swap();
 
 		Vector<EntityHandle> handles;
-		manager.ForAllWith<FooComponent>( [&handles]( EntityHandle h, FooComponent& f ) { handles.Add( h ); } );
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
 
 		REQUIRE( handles.Size() == 2 );
 	}
 
 	SECTION( "Multiple Valid Entities" )
 	{
-		EntityHandle foo = manager.Create();
-		manager.AddComponent<FooComponent>( foo );
+		EntityHandle foo = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo );
 
-		EntityHandle bar = manager.Create();
-		manager.AddComponent<BarComponent>( bar );
+		EntityHandle bar = s_manager->Create();
+		s_manager->AddComponent<BarComponent>( bar );
 
-		EntityHandle foo2 = manager.Create();
-		manager.AddComponent<FooComponent>( foo2 );
+		EntityHandle foo2 = s_manager->Create();
+		s_manager->AddComponent<FooComponent>( foo2 );
 
 		Swap();
 
 		Vector<EntityHandle> handles;
-		manager.ForAllWith<FooComponent>( [&handles]( EntityHandle h, FooComponent& f ) { handles.Add( h ); } );
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
 
 		REQUIRE( handles.Size() == 2 );
 		REQUIRE( !handles.Contains( bar ) );
@@ -256,14 +260,14 @@ TEST_CASE( "[EntityManager] ForAllWith" )
 
 	SECTION( "Multiple Components" )
 	{
-		EntityHandle foobar = manager.Create();		
-		manager.AddComponent<FooComponent>( foobar );
-		manager.AddComponent<BarComponent>( foobar );
+		EntityHandle foobar = s_manager->Create();		
+		s_manager->AddComponent<FooComponent>( foobar );
+		s_manager->AddComponent<BarComponent>( foobar );
 
 		Swap();
 
 		Vector<EntityHandle> handles;
-		manager.ForAllWith<FooComponent, BarComponent>( [&handles]( EntityHandle h, FooComponent& f, BarComponent& b ) { handles.Add( h ); } );
+		s_manager->ForAllWithReadable<FooComponent, BarComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f, ComponentHandle<BarComponent> b ) { handles.Add( h ); } );
 
 		REQUIRE( handles.Size() == 1 );
 	}
@@ -275,21 +279,21 @@ TEST_CASE( "[EntityHandle] Unpack" )
 
 	EntityManager manager;
 
-	EntityHandle foobar = manager.Create();
-	manager.AddComponent<FooComponent>( foobar );
-	manager.AddComponent<BarComponent>( foobar );
+	EntityHandle foobar = s_manager->Create();
+	s_manager->AddComponent<FooComponent>( foobar );
+	s_manager->AddComponent<BarComponent>( foobar );
 
 	Swap();
 
-	FooComponent& rfoo = manager.GetComponent<FooComponent>( foobar );
-	rfoo.A = 1;
-	BarComponent& rbar = manager.GetComponent<BarComponent>( foobar );
-	rbar.B = 3.0f;
+	ComponentHandle<FooComponent> foo1 = s_manager->GetComponent<FooComponent>( foobar );
+	foo1.Write()->A = 1;
+	ComponentHandle<BarComponent> bar1 = s_manager->GetComponent<BarComponent>( foobar );
+	bar1.Write()->B = 3.0f;
 
-	FooComponent foo;
-	BarComponent bar;
-	foobar.Unpack( foo, bar );
+	ComponentHandle<FooComponent> foo2;
+	ComponentHandle<BarComponent> bar2;
+	foobar.Unpack( foo2, bar2 );
 
-	REQUIRE( foo.A == rfoo.A );
-	REQUIRE( bar.B == rbar.B );
+	REQUIRE( foo1.Write()->A == foo2.Write()->A );
+	REQUIRE( bar1.Write()->B == bar2.Write()->B );
 }

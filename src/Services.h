@@ -33,19 +33,9 @@ namespace dd
 		template <typename T>
 		static void RegisterComponent();
 
-		template <typename T>
-		static typename T::Pool& GetWritePool();
-
-		template <typename T>
-		static const typename T::Pool& GetReadPool();
-
-		template <typename T>
-		static DoubleBuffer<typename T::Pool>& GetDoubleBuffer();
-
 	private:
 
 		static Services* m_instance;
-
 		DenseMap<uint64, void*> m_services;
 
 		Services();

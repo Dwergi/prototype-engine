@@ -21,7 +21,7 @@ namespace dd
 
 	template <typename T>
 	class DenseMapPool
-		: public ComponentPool<T>
+		: public ComponentPoolBase
 	{
 	public:
 
@@ -35,37 +35,36 @@ namespace dd
 		DenseMapPool<T>& operator=( DenseMapPool<T>&& other );
 		DenseMapPool<T>& operator=( const DenseMapPool<T>& other );
 
-
 		//
 		// Clear this component pool.
 		//
-		virtual void Clear() override;
+		virtual void Clear();
 
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		uint Size() const override;
+		uint Size() const;
 
 		//
 		// Create a new component of this type for the given entity.
 		// 
-		T* Create( const EntityHandle& entity ) override;
+		T* Create( const EntityHandle& entity );
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		T* Find( const EntityHandle& entity ) const override;
+		T* Find( const EntityHandle& entity ) const;
 
 		//
 		// Remove the component associated with the given entity.
 		// 
-		void Remove( const EntityHandle& entity ) override;
+		void Remove( const EntityHandle& entity );
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		bool Exists( const EntityHandle& entity ) const override;
+		bool Exists( const EntityHandle& entity ) const;
 
 		iterator begin() const;
 		iterator end() const;

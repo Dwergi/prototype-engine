@@ -99,7 +99,7 @@ namespace dd
 	{
 	public:
 		MeshHandle() : m_hash( 0 ) {}
-		Mesh* Get() { return Mesh::Get( *this ); }
+		Mesh* Get() const { return Mesh::Get( *this ); }
 
 		BASIC_TYPE( MeshHandle )
 		

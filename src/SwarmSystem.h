@@ -13,13 +13,15 @@
 
 namespace dd
 {
+	class EntityManager;
+
 	class SwarmSystem : public ISystem
 	{
 	public:
 		SwarmSystem();
 		virtual ~SwarmSystem();
 
-		virtual void Update( float dt ) override;
+		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
 		BASIC_TYPE( SwarmSystem )
 

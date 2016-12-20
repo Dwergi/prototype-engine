@@ -54,6 +54,18 @@ namespace dd
 	}
 
 	template <typename T>
+	Vector<T>& Vector<T>::operator=( Vector&& other )
+	{
+		Swap( other );
+
+		other.m_data = nullptr;
+		other.m_size = 0;
+		other.m_capacity = 0;
+
+		return *this;
+	}
+
+	template <typename T>
 	Vector<T>& Vector<T>::operator=( const Vector& other )
 	{
 		Clear();

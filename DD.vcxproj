@@ -322,7 +322,7 @@
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
-    <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\ComponentBase.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
@@ -338,7 +338,7 @@
     <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\GLError.h" />
     <ClInclude Include="src\Globals.h" />
-    <ClInclude Include="src\Handle.h" />
+    <ClInclude Include="src\GenericHandle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\InputAction.h" />
@@ -505,6 +505,7 @@
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\Frustum.cpp" />

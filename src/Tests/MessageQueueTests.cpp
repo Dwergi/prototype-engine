@@ -8,6 +8,7 @@
 
 #include "catch/catch.hpp"
 
+#include "EntityManager.h"
 #include "MessageQueue.h"
 
 bool called = false;
@@ -47,6 +48,8 @@ TEST_CASE( "[MessageSystem]" )
 	dd::Function f = FUNCTION( TestFunction );
 	Received = nullptr;
 
+	dd::EntityManager manager;
+
 	SECTION( "Subscribe/Unsubscribe" )
 	{
 		REQUIRE( system.GetTotalSubscriberCount() == 0 );
@@ -72,7 +75,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( 0 );
+		system.Update( manager, 0 );
 
 		REQUIRE( Received == &msg );
 
@@ -91,7 +94,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( 0 );
+		system.Update( manager, 0 );
 
 		REQUIRE( Received == nullptr );
 	}
@@ -110,7 +113,7 @@ TEST_CASE( "[MessageSystem]" )
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( 0 );
+		system.Update( manager, 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == &msg );
@@ -121,7 +124,7 @@ TEST_CASE( "[MessageSystem]" )
 		Received2 = nullptr;
 
 		system.Send( &msg );
-		system.Update( 0 );
+		system.Update( manager, 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == nullptr );

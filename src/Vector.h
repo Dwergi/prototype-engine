@@ -18,6 +18,7 @@ namespace dd
 		Vector( const Vector& other );
 		Vector( Vector&& other );
 
+		Vector<T>& operator=( Vector&& other );
 		Vector<T>& operator=( const Vector& other );
 		T& operator[]( uint index ) const;
 

@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "Component.h"
+#include "ComponentBase.h"
 #include "DenseMapPool.h"
 #include "Vector4.h"
 #include "AABBOctree.h"
 
 namespace dd
 {
-	class SwarmAgentComponent : public Component
+	class SwarmAgentComponent : public ComponentBase
 	{
 	public:
 
@@ -26,7 +26,7 @@ namespace dd
 		virtual ~SwarmAgentComponent();
 
 		BEGIN_SCRIPT_OBJECT( SwarmAgentComponent )
-			PARENT( Component )
+			PARENT( ComponentBase )
 			MEMBER( SwarmAgentComponent, Velocity )
 			MEMBER( SwarmAgentComponent, OctreeHandle )
 		END_TYPE

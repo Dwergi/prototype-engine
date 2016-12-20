@@ -8,7 +8,7 @@
 #include "DenseVectorPool.h"
 
 struct TestComponent
-	: public dd::Component
+	: public dd::ComponentBase
 {
 	int ID;
 };
@@ -67,7 +67,7 @@ void TestPool()
 		REQUIRE( !pool.Exists( handles[i] ) );
 	}
 
-	REQUIRE( pool.Empty() );
+	REQUIRE( pool.Size() == 0 );
 
 	CreateEntities( handles, pool, 10 );
 

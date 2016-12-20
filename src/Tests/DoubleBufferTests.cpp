@@ -9,7 +9,7 @@
 
 #include "DoubleBuffer.h"
 
-#include "Component.h"
+#include "ComponentBase.h"
 #include "DenseVectorPool.h"
 #include "EntityManager.h"
 
@@ -18,7 +18,7 @@ using namespace dd;
 TEST_CASE( "[DoubleBuffer] Swap" )
 {
 	Vector<int> v1, v2;
-	DoubleBuffer<Vector<int>> buffer( &v1, &v2 );
+	DoubleBuffer<Vector<int>> buffer( &v1, &v2, false );
 
 	{
 		Vector<int>& write = buffer.GetWrite();
@@ -43,7 +43,7 @@ TEST_CASE( "[DoubleBuffer] Swap" )
 TEST_CASE( "[DoubleBuffer] Duplicate" )
 {
 	Vector<int> v1, v2;
-	DoubleBuffer<Vector<int>> buffer( &v1, &v2 );
+	DoubleBuffer<Vector<int>> buffer( &v1, &v2, false );
 
 	{
 		Vector<int>& write = buffer.GetWrite();
@@ -66,29 +66,32 @@ TEST_CASE( "[DoubleBuffer] Duplicate" )
 	}
 }
 
-class TestComponent : public Component
+TEST_CASE( "[DoubleBuffer] Duplicate With Copy" )
 {
-public:
-	int A;
-
-	typedef DenseVectorPool<TestComponent> Pool;
-
-	BEGIN_TYPE( TestComponent )
-		MEMBER( TestComponent, A )
-	END_TYPE
-};
-
-TEST_CASE( "[DoubleBuffer] Components" )
-{
-	EntityManager system;
-	EntityHandle handle = system.Create();
-
-	REGISTER_TYPE( TestComponent );
+	Vector<String16> v1, v2;
 	
-	TestComponent::Pool pool;
-	pool.Create( handle );
+	DoubleBuffer<Vector<String16>> buffer( &v1, &v2, false );
 
-	ComponentHandle<TestComponent> cmp_handle( handle, pool );
-	
-	REQUIRE( cmp_handle.IsValid() );
+	{
+		Vector<String16>& write = buffer.GetWrite();
+
+		for( int i = 0; i < 16; ++i )
+		{
+			char buf[ 16 ] = { 0 };
+			_itoa_s( i, buf, 10 );
+			write.Add( String16( buf ) );
+		}
+	}
+
+	buffer.Swap();
+	buffer.Duplicate();
+
+	{
+		Vector<String16>& write = buffer.GetWrite();
+		for( int i = 0; i < 16; ++i )
+		{
+			int test = atoi( write[ i ].c_str() );
+			REQUIRE( test == i );
+		}
+	}
 }

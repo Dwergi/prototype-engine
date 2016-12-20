@@ -6,10 +6,11 @@
 
 namespace dd
 {
+	
+
 	template <typename T>
-	DoubleBuffer<T>::DoubleBuffer( T* read, T* write )
-		: m_read( read ),
-		m_write( write )
+	DoubleBuffer<T>::DoubleBuffer( T* read, T* write, bool is_owner )
+		: DoubleBufferBase( read, write, is_owner )
 	{
 	}
 
@@ -19,33 +20,27 @@ namespace dd
 	}
 
 	template <typename T>
-	void DoubleBuffer<T>::Swap()
+	void DoubleBuffer<T>::Clear() const
 	{
-		std::swap( m_read, m_write );
-	}
-
-	template <typename T>
-	void DoubleBuffer<T>::Clear()
-	{
-		m_write->Clear();
-		m_read->Clear();
+		reinterpret_cast<T*>(m_read)->Clear();
+		reinterpret_cast<T*>(m_write)->Clear();
 	}
 
 	template <typename T>
 	void DoubleBuffer<T>::Duplicate() const
 	{
-		*m_write = *m_read;
+		GetWrite() = GetRead();
 	}
 
 	template <typename T>
 	const T& DoubleBuffer<T>::GetRead() const
 	{
-		return *m_read;
+		return *reinterpret_cast<T*>( m_read );
 	}
 
 	template <typename T>
 	T& DoubleBuffer<T>::GetWrite() const
 	{
-		return *m_write;
+		return *reinterpret_cast<T*>( m_write );
 	}
 }

@@ -108,9 +108,6 @@
     <ClInclude Include="src\EntityHandle.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Component.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -172,9 +169,6 @@
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="src\DoubleBuffer.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Handle.h">
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="src\Hash.h">
@@ -452,6 +446,12 @@
     </ClInclude>
     <ClInclude Include="src\EntityManager.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentBase.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GenericHandle.h">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -743,6 +743,9 @@
     </ClCompile>
     <ClCompile Include="src\Tests\EntityManagerTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleBuffer.cpp">
+      <Filter>Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -105,18 +105,14 @@ void DrawFPS( float delta_t )
 
 TransformComponent* GetTransformComponent( EntityHandle entity )
 {
-	auto& transform_pool = Services::GetReadPool<TransformComponent>();
-	
-	TransformComponent* cmp = transform_pool.Find( entity );
-
-	return cmp;
+	return entity.Get<TransformComponent>().Write();
 }
 
 EntityHandle GetEntityHandle( uint id )
 {
 	EntityManager& system = Services::Get<EntityManager>();
 
-	EntityHandle handle( id, &system );
+	EntityHandle handle( id, system );
 	return handle;
 }
 
@@ -131,7 +127,7 @@ void RegisterGlobalScriptFunctions()
 	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
 }
 
-void RegisterGameTypes()
+void RegisterGameTypes( EntityManager& manager )
 {
 #ifdef USE_ANGELSCRIPT
 	dd::RegisterString( Services::Get<AngelScriptEngine>() );
@@ -155,7 +151,7 @@ void RegisterGameTypes()
 	REGISTER_POD( glm::mat4 );
 
 	REGISTER_TYPE( EntityHandle );
-	REGISTER_TYPE( Component );
+	REGISTER_TYPE( ComponentBase );
 	REGISTER_TYPE( Message );
 	REGISTER_TYPE( JobSystem );
 	REGISTER_TYPE( MeshHandle );
@@ -169,6 +165,11 @@ void RegisterGameTypes()
 	Services::RegisterComponent<OctreeComponent>();
 	Services::RegisterComponent<SwarmAgentComponent>();
 	Services::RegisterComponent<MeshComponent>();
+
+	manager.RegisterComponent<TransformComponent>();
+	manager.RegisterComponent<OctreeComponent>();
+	manager.RegisterComponent<SwarmAgentComponent>();
+	manager.RegisterComponent<MeshComponent>();
 
 	REGISTER_TYPE( SwarmSystem );
 
@@ -271,7 +272,7 @@ int TestMain( int argc, char const* argv[] )
 
 #endif
 
-int GameMain()
+int GameMain( EntityManager& entity_manager )
 {
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
@@ -281,10 +282,6 @@ int GameMain()
 	{
 		JobSystem jobsystem( 2u );
 		Services::Register( jobsystem );
-
-		EntityManager entitySystem;
-		REGISTER_TYPE( EntityManager );
-		Services::Register( entitySystem );
 
 		SwarmSystem swarm_system;
 		Services::Register( swarm_system );
@@ -300,7 +297,7 @@ int GameMain()
 		BindKeys( *s_input );
 
 		Renderer renderer;
-		renderer.Initialize( *s_window );
+		renderer.Initialize( *s_window, entity_manager );
 
 		TerrainSystem terrain( renderer.GetCamera() );
 		terrain.Initialize();
@@ -338,7 +335,7 @@ int GameMain()
 			if( s_drawCameraDebug )
 				free_cam.DrawCameraDebug();
 
-			jobsystem.Schedule( std::bind( &SwarmSystem::Update, Services::GetPtr<SwarmSystem>(), delta_t ), "System" );
+			jobsystem.Schedule( [&entity_manager, &swarm_system, delta_t]() { swarm_system.Update( entity_manager, delta_t ); }, "System" );
 
 			terrain.Update( delta_t );
 
@@ -403,11 +400,15 @@ int main( int argc, char const* argv[] )
 	ScriptEngine scriptEngine;
 	Services::Register( scriptEngine );
 
-	RegisterGameTypes();
+	EntityManager entity_manager;
+	REGISTER_TYPE( EntityManager );
+	Services::Register( entity_manager );
+
+	RegisterGameTypes( entity_manager );
 
 #ifdef _TEST
 	return TestMain( argc, argv );
 #else
-	return GameMain();
+	return GameMain( entity_manager );
 #endif
 }

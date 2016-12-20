@@ -8,9 +8,11 @@
 
 namespace dd
 {
+	class EntityManager;
+
 	class ISystem
 	{
 	public:
-		virtual void Update( float dt ) = 0;
+		virtual void Update( EntityManager& entity_manager, float dt ) = 0;
 	};
 }

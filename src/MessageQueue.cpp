@@ -97,7 +97,7 @@ namespace dd
 		}
 	}
 
-	void MessageQueue::Update( float dt )
+	void MessageQueue::Update( EntityManager& entity_manager, float dt )
 	{
 		{
 			std::lock_guard<std::mutex> lock( m_mutex );

@@ -25,7 +25,7 @@ namespace dd
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
-		Component( other ),
+		ComponentBase( other ),
 		Mesh( other.Mesh ),
 		Hidden( false ),
 		Colour( other.Colour )

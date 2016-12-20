@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "Component.h"
+#include "ComponentBase.h"
 #include "DenseMapPool.h"
 #include "Mesh.h"
 
 namespace dd
 {
-	class MeshComponent : public Component
+	class MeshComponent : public ComponentBase
 	{
 	public: 
 

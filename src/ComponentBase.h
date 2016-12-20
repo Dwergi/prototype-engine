@@ -10,19 +10,19 @@
 
 namespace dd
 {
-	class Component
+	class ComponentBase
 	{
 	protected:
-		Component() {}
-		Component( const Component& other ) : Entity( other.Entity ) {}
+		ComponentBase() {}
+		ComponentBase( const ComponentBase& other ) : Entity( other.Entity ) {}
 
 	public:
-		virtual ~Component() {}
+		virtual ~ComponentBase() {}
 
 		EntityHandle Entity;
 
-		BEGIN_TYPE( Component )
-			MEMBER( Component, Entity )
+		BEGIN_TYPE( ComponentBase )
+			MEMBER( ComponentBase, Entity )
 		END_TYPE
 	};
 }

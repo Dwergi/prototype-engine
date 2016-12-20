@@ -47,7 +47,7 @@ namespace dd
 		//
 		// Actually send messages in order of arrival.
 		//
-		virtual void Update( float dt ) override;
+		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
 		uint GetSubscriberCount( MessageID message_type ) const;
 

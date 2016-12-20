@@ -18,13 +18,19 @@ namespace dd
 	{
 	}
 
-	EntityHandle::EntityHandle( uint handle, EntityManager* system ) :
+	EntityHandle::EntityHandle( uint handle, EntityManager& manager ) :
 		Handle( handle ),
-		m_manager( system )
+		m_manager( &manager )
 	{
 	}
 
 	EntityHandle::EntityHandle( const EntityHandle& other ) :
+		Handle( other.Handle ),
+		m_manager( other.m_manager )
+	{
+	}
+
+	EntityHandle::EntityHandle( EntityHandle&& other ) :
 		Handle( other.Handle ),
 		m_manager( other.m_manager )
 	{
@@ -46,6 +52,14 @@ namespace dd
 	}
 
 	EntityHandle& EntityHandle::operator=( const EntityHandle& other )
+	{
+		Handle = other.Handle;
+		m_manager = other.m_manager;
+
+		return *this;
+	}
+
+	EntityHandle& EntityHandle::operator=( EntityHandle&& other )
 	{
 		Handle = other.Handle;
 		m_manager = other.m_manager;

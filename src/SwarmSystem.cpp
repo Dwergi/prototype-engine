@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "SwarmSystem.h"
 
-#include "DoubleBuffer.h"
+#include "EntityManager.h"
 #include "PlayerComponent.h"
 #include "TransformComponent.h"
 
@@ -44,12 +44,12 @@ namespace dd
 
 	}
 
-	void SwarmSystem::Update( float dt )
+	void SwarmSystem::Update( EntityManager& manager, float dt )
 	{
-		float turn_multiplier = TurnSpeed * dt;
+		/*float turn_multiplier = TurnSpeed * dt;
 		float accel_multiplier = AccelerationRate * dt;
 
-		const TransformComponent::Pool& transforms_read = Services::GetReadPool<TransformComponent>();
+		const TransformComponent::Pool& transforms_read = manager.ForAllWithReadable<TransformComponent>();
 		const TransformComponent::Pool& transforms_write = Services::GetWritePool<TransformComponent>();
 
 		SwarmAgentComponent::Pool& swarm_write = Services::GetWritePool<SwarmAgentComponent>();
@@ -135,6 +135,6 @@ namespace dd
 
 			transform_write->SetPosition( transform_read->GetPosition() + (cmp_write->Velocity * dt) );
 			cmp_write->OctreeHandle = octree_write.Add( transform_write->GetPosition() );
-		}
+		}*/
 	}
 }

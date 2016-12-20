@@ -30,6 +30,10 @@ namespace dd
 		void Destroy( const EntityHandle& entity );
 
 		void DestroyAll();
+
+		//
+		// Update all entities. This causes new entities to be created and destroyed entities to be removed. 
+		//
 		void Update( float dt );
 
 		//
@@ -38,14 +42,29 @@ namespace dd
 		template <typename... Components>
 		EntityHandle CreateEntity();
 
+		//
+		// Get a component handle to a component of the given type from the given entity.
+		//
 		template <typename Component>
-		Component& GetComponent( EntityHandle handle ) const;
+		ComponentHandle<Component> GetComponent( EntityHandle handle ) const;
+
+		//
+		// Get a component handle to a component of the given type from the given entity.
+		//
+		template <typename Component>
+		bool HasComponent( EntityHandle handle ) const;
 
 		//
 		// Add a component of the given type to the entity.
 		//
 		template <typename Component> 
-		Component* AddComponent( EntityHandle handle ) const;
+		ComponentHandle<Component> AddComponent( EntityHandle handle ) const;
+
+		//
+		// Construct a component with the given arguments.
+		//
+		template <typename Component, typename... Args>
+		ComponentHandle<Component> ConstructComponent( EntityHandle handle, Args&&... args ) const;
 
 		//
 		// Remove a component of the given type from the entity.
@@ -54,28 +73,67 @@ namespace dd
 		void RemoveComponent( EntityHandle handle ) const;
 
 		//
-		// Check if the given entity contains a component of the given type.
+		// Check if the given entity contains a readable component of the given type.
 		//
 		template <typename Component>
-		bool HasComponent( EntityHandle handle ) const;
+		bool HasReadable( EntityHandle handle ) const;
 
 		//
-		// Check if the given entity contains all the given components.
+		// Check if the given entity contains a writable component of the given type.
 		//
-		template <typename... Components>
-		bool HasAllComponents( EntityHandle handle ) const;
+		template <typename Component>
+		bool HasWritable( EntityHandle handle ) const;
 
 		//
-		// Find all entities that have all the components given.
+		// Check if the given entity contains all the given readable components.
 		//
 		template <typename... Components>
-		Vector<EntityHandle> FindAllWith() const;
+		bool HasAllReadable( EntityHandle handle ) const;
 
 		//
-		// Run the given function for all the entities that have the given component types.
+		// Check if the given entity contains all the given writable components.
 		//
 		template <typename... Components>
-		void ForAllWith( typename identity<std::function<void( EntityHandle, Components&... )>>::type f ) const;
+		bool HasAllWritable( EntityHandle handle ) const;
+
+		//
+		// Find all entities that have all the readable components given.
+		//
+		template <typename... Components>
+		Vector<EntityHandle> FindAllWithReadable() const;
+
+		//
+		// Find all entities that have all the writable components given.
+		//
+		template <typename... Components>
+		Vector<EntityHandle> FindAllWithWritable() const;
+
+		//
+		// Run the given function for all the entities that have the given readable component types.
+		//
+		template <typename... Components>
+		void ForAllWithReadable( typename identity<std::function<void( EntityHandle, ComponentHandle<Components>... )>>::type f ) const;
+
+		//
+		// Run the given function for all the entities that have the given writable component types.
+		//
+		template <typename... Components>
+		void ForAllWithWritable( typename identity<std::function<void( EntityHandle, ComponentHandle<Components>... )>>::type f ) const;
+
+		//
+		// Get a readable component of the given type for the handle h.
+		//
+		template <typename Component>
+		const Component* GetReadable( EntityHandle h ) const;
+
+		//
+		// Get a writable component of the given type for the handle h.
+		//
+		template <typename Component>
+		Component* GetWritable( EntityHandle h ) const;
+
+		template <typename Component>
+		void RegisterComponent();
 
 		BASIC_TYPE( EntityManager )
 
@@ -83,52 +141,12 @@ namespace dd
 
 		friend class EntityHandle;
 
-		// Flags for the state of each entity entry.
-		enum EntityState : short
-		{
-			// Newly created or freed.
-			None = 0,
-		
-			// Initialized, but inactive.
-			Valid = 1 << 0,
-		
-			// Active.
-			Active = 1 << 1,
-
-			// Queued for destruction.
-			Destroyed = 1 << 2
-		};
-
-		struct EntityEntry
-		{
-			EntityEntry( const EntityHandle& handle, short flags ) : Entity( handle ), Flags( flags ) {}
-
-			EntityHandle Entity;
-			short Flags;
-		};
-
-		enum class CommandType
-		{
-			Invalid,
-			Create,
-			Destroy
-		};
-
-		struct EntityCommand
-		{
-			EntityCommand( const EntityHandle& handle, CommandType type ) : Entity( handle ), Type( type ) {}
-
-			CommandType Type;
-			EntityHandle Entity;
-		};
-
 		bool m_initialized;
 
-		Vector<int> m_free;
-		Vector<EntityEntry> m_entities;
-		Vector<EntityCommand> m_commands;
+		DoubleBuffer<Vector<int>> m_free;
+		DoubleBuffer<Vector<EntityHandle>> m_entities;
 
-		int m_activeEntities;
+		DenseMap<uint64, DoubleBufferBase*> m_pools;
 
 		template <typename... Components, std::size_t... Index>
 		void CreateComponents( EntityHandle handle, std::index_sequence<Index...> );
@@ -140,6 +158,9 @@ namespace dd
 		void CreateComponent( EntityHandle handle );
 
 		bool IsEntityValid( const EntityHandle& entity );
+
+		template <typename Component>
+		DoubleBuffer<typename Component::Pool>* GetPool() const;
 	};
 }
 

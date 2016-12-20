@@ -19,9 +19,9 @@ namespace dd
 	//
 	template <typename T>
 	class DenseVectorPool 
-		: public ComponentPool<T>
+		: public ComponentPoolBase
 	{
-		static_assert(std::is_base_of<Component, T>::value, "Not derived from Component.");
+		static_assert(std::is_base_of<ComponentBase, T>::value, "Not derived from Component.");
 
 	public:
 		typedef DenseVectorPoolIterator<T> iterator;
@@ -32,34 +32,41 @@ namespace dd
 		//
 		// Clear the entire component pool.
 		//
-		virtual void Clear() override;
+		void Clear();
 
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		virtual uint Size() const override;
+		uint Size() const;
 
 		//
 		// Create a new component of this type for the given entity and return the pointer to it.
 		// Returns null if the component already exists.
 		// 
-		virtual T* Create( const EntityHandle& entity ) override;
+		T* Create( const EntityHandle& entity );
+
+		//
+		// Construct a new component of this type for the given entity with the given arguments.
+		// Returns the pointer to it or null if the component already exists.
+		//
+		template <typename... Args>
+		T* Construct( const EntityHandle& entity, Args&&... args );
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		virtual T* Find( const EntityHandle& entity ) const override;
+		T* Find( const EntityHandle& entity ) const;
 
 		//
 		// Remove the component associated with the given entity.
 		// 
-		virtual void Remove( const EntityHandle& entity ) override;
+		void Remove( const EntityHandle& entity );
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		virtual bool Exists( const EntityHandle& entity ) const override;
+		bool Exists( const EntityHandle& entity ) const;
 
 		iterator begin() const;
 		iterator end() const;

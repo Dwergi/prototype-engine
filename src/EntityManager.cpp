@@ -18,7 +18,9 @@ namespace
 
 namespace dd
 {
-	EntityManager::EntityManager()
+	EntityManager::EntityManager() :
+		m_free( new Vector<int>(), new Vector<int>() ),
+		m_entities( new Vector<EntityHandle>(), new Vector<EntityHandle>() )
 	{
 		m_initialized = true;
 	}
@@ -29,50 +31,29 @@ namespace dd
 		DestroyAll();
 
 		m_entities.Clear();
-		m_activeEntities = 0;
-
 		m_free.Clear();
+
+		for( auto it : m_pools )
+		{
+			delete it.Value;
+		}
+
+		m_pools.Clear();
 	}
 
 	void EntityManager::Update( float dt )
 	{
-		for( const EntityCommand& command : m_commands )
+		m_entities.Swap();
+		m_entities.Duplicate();
+
+		m_free.Swap();
+		m_free.Duplicate();
+
+		for( auto it : m_pools )
 		{
-			switch( command.Type )
-			{
-			case CommandType::Create:
-			{
-				EntityEntry& entry = m_entities[ command.Entity.ID ];
-
-				entry.Flags |= EntityState::Active;
-
-				++m_activeEntities;
-			}
-			break;
-
-			case CommandType::Destroy:
-			{
-				EntityEntry& entry = m_entities[ command.Entity.ID ];
-
-				// ensure that this entity has actually lived a full, productive life
-				DD_ASSERT( entry.Flags & EntityState::Valid );
-				DD_ASSERT( entry.Flags & EntityState::Active );
-				DD_ASSERT( entry.Flags & EntityState::Destroyed );
-
-				entry.Flags = EntityState::None;
-
-				entry.Entity.Version += 1;
-
-				m_free.Add( entry.Entity.ID );
-
-				--m_activeEntities;
-			}
-			break;
-
-			}
+			it.Value->Swap();
+			it.Value->Duplicate();
 		}
-
-		m_commands.Clear();
 	}
 
 	//
@@ -80,27 +61,22 @@ namespace dd
 	// 
 	EntityHandle EntityManager::Create()
 	{
-		if( m_free.Size() == 0 )
+		if( m_free.GetWrite().Size() == 0 )
 		{
 			EntityHandle handle;
-			handle.ID = m_entities.Size();
+			handle.ID = m_entities.GetWrite().Size();
 			handle.Version = 0;
 			handle.m_manager = this;
 
-			EntityEntry entry( handle, EntityState::None );
-
-			m_entities.Add( entry );
-			m_free.Add( handle.ID );
+			m_entities.GetWrite().Add( handle );
+			m_free.GetWrite().Add( handle.ID );
 		}
 
-		EntityEntry& entry = m_entities[ m_free[ 0 ] ];
-		m_free.Remove( 0 );
+		EntityHandle& handle = m_entities.GetWrite()[ m_free.GetWrite()[ 0 ] ];
+		m_free.GetWrite().Remove( 0 );
+		handle.Version += 1;
 
-		entry.Flags |= EntityState::Valid;
-
-		m_commands.Add( EntityCommand( entry.Entity, CommandType::Create ) );
-
-		return entry.Entity;
+		return handle;
 	}
 
 	//
@@ -108,20 +84,23 @@ namespace dd
 	// 
 	void EntityManager::Destroy( const EntityHandle& handle )
 	{
-		if( !IsEntityValid( handle ) )
+		if( handle.ID == EntityHandle::Invalid )
 			return;
 
-		EntityEntry& entry = m_entities[ handle.ID ];
-		entry.Flags |= EntityState::Destroyed;
+		if( handle.ID < m_entities.GetWrite().Size() )
+		{
+			if( m_entities.GetWrite()[ handle.ID ].Version != handle.Version )
+				return;
 
-		m_commands.Add( EntityCommand( entry.Entity, CommandType::Destroy ) );
+			m_free.GetWrite().Add( handle.ID );
+		}
 	}
 
 	void EntityManager::DestroyAll()
 	{
-		for( EntityEntry& entry : m_entities )
+		for( EntityHandle entity : m_entities.GetWrite() )
 		{
-			Destroy( entry.Entity );
+			Destroy( entity );
 		}
 	}
 
@@ -130,20 +109,22 @@ namespace dd
 		if( handle.ID == EntityHandle::Invalid )
 			return false;
 
-		if( handle.ID > m_entities.Size() )
-			return false;
+		// check readable
+		if( handle.ID < m_entities.GetRead().Size() )
+		{
+			EntityHandle readEntity = m_entities.GetRead()[ handle.ID ];
+			if( readEntity.Version == handle.Version )
+				return true;
+		}
 
-		EntityEntry& entry = m_entities[ handle.ID ];
-
-		if( entry.Entity.Version != handle.Version )
-			return false;
-
-		if( !(entry.Flags & EntityState::Valid) )
-			return false;
-
-		if( entry.Flags & EntityState::Destroyed )
-			return false;
-
-		return true;
+		// check writable
+		if( handle.ID < m_entities.GetWrite().Size() )
+		{
+			EntityHandle writeEntity = m_entities.GetWrite()[ handle.ID ];
+			if( writeEntity.Version == handle.Version )
+				return true;
+		}
+		
+		return false;
 	}
 }

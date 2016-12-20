@@ -71,7 +71,7 @@ namespace dd
 
 	TerrainChunk* chunk;
 
-	void Renderer::Initialize( Window& window )
+	void Renderer::Initialize( Window& window, EntityManager& entity_manager )
 	{
 		m_camera = new Camera( window );
 		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
@@ -95,29 +95,23 @@ namespace dd
 		m_shaders.Add( CreateShaders( "frustum" ) );
 		m_shaders.Add( CreateShaders( "terrain" ) );
 
-		CreateMeshEntity( "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
+		CreateMeshEntity( entity_manager, "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
 
-		CreateMeshEntity( "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-		CreateMeshEntity( "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-		CreateMeshEntity( "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
-
-		// TODO: Does not belong here.
-		Services::GetDoubleBuffer<TransformComponent>().Swap();
-		Services::GetDoubleBuffer<MeshComponent>().Swap();
-		Services::GetDoubleBuffer<TransformComponent>().Duplicate();
-		Services::GetDoubleBuffer<MeshComponent>().Duplicate();
+		CreateMeshEntity( entity_manager, "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		CreateMeshEntity( entity_manager, "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		CreateMeshEntity( entity_manager, "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 	}
 
-	void Renderer::CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform )
+	void Renderer::CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform )
 	{
 		MeshHandle mesh_h = Mesh::Create( meshName, shader );
 
-		EntityHandle handle = Services::Get<EntityManager>().CreateEntity<TransformComponent, MeshComponent>();
+		EntityHandle handle = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
 
-		TransformComponent* transform_cmp = Services::GetWritePool<TransformComponent>().Find( handle );
+		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( handle );
 		transform_cmp->Transform = transform;
 
-		MeshComponent* mesh_cmp = Services::GetWritePool<MeshComponent>().Find( handle );
+		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( handle );
 		mesh_cmp->Mesh = mesh_h;
 		mesh_cmp->Colour = colour;
 	}
@@ -141,24 +135,17 @@ namespace dd
 		if( m_terrain != nullptr )
 			m_terrain->Render( *m_camera, *m_shaders[2].Get() );	
 
-		const MeshComponent::Pool& meshes = Services::GetReadPool<MeshComponent>();
-		const TransformComponent::Pool& transforms = Services::GetReadPool<TransformComponent>();
-
-		for( MeshComponent& mesh_cmp : meshes )
+		m_entityManager->ForAllWithReadable<MeshComponent, TransformComponent>( [this]( EntityHandle, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp )
 		{
-			Mesh* mesh = mesh_cmp.Mesh.Get();
+			Mesh* mesh = mesh_cmp.Read()->Mesh.Get();
 			if( mesh != nullptr )
 			{
-				TransformComponent* transform_cmp = transforms.Find( mesh_cmp.Entity );
-				if( transform_cmp != nullptr )
-				{
-					mesh->SetColourMultiplier( mesh_cmp.Colour	);
-					mesh->Render( *m_camera, transform_cmp->Transform );
+				mesh->SetColourMultiplier( mesh_cmp.Read()->Colour );
+				mesh->Render( *m_camera, transform_cmp.Read()->Transform );
 
-					++m_meshCount;
-				}
+				++m_meshCount;
 			}
-		}
+		} );
 	}
 
 	Camera& Renderer::GetCamera() const

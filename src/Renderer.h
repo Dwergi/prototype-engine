@@ -12,6 +12,7 @@
 namespace dd
 {
 	class Camera;
+	class EntityManager;
 	class ShaderProgram;
 	class TerrainSystem;
 	class Window;
@@ -23,7 +24,7 @@ namespace dd
 		Renderer();
 		~Renderer();
 
-		void Initialize( Window& window );
+		void Initialize( Window& window, EntityManager& entity_manager );
 
 		//
 		// Render a full frame.
@@ -47,9 +48,10 @@ namespace dd
 		ShaderProgram* m_defaultShader;
 		TerrainSystem* m_terrain;
 		Vector<ShaderHandle> m_shaders;
+		EntityManager* m_entityManager;
 
 		int m_meshCount;
 
-		void CreateMeshEntity( const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
+		void CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
 	};
 }
