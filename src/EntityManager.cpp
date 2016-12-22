@@ -82,7 +82,7 @@ namespace dd
 	//
 	// Destroy an entity.
 	// 
-	void EntityManager::Destroy( const EntityHandle& handle )
+	void EntityManager::Destroy( EntityHandle handle )
 	{
 		if( handle.ID == EntityHandle::Invalid )
 			return;

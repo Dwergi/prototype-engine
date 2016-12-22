@@ -17,8 +17,7 @@ namespace dd
 {
 	struct MessageSubscription;
 
-	class MessageQueue 
-		: public ISystem
+	class MessageQueue
 	{
 	public:
 
@@ -32,7 +31,7 @@ namespace dd
 		// Subscribe to a given message with the given handler.
 		// If you ever want to unsubscribe, you must keep the returned token.
 		//
-		MessageSubscription Subscribe( MessageID message_type, Function handler );
+		MessageSubscription Subscribe( MessageID message_type, std::function<void(Message*)> handler );
 
 		//
 		// Unsubscribe the given token. 
@@ -47,12 +46,21 @@ namespace dd
 		//
 		// Actually send messages in order of arrival.
 		//
-		virtual void Update( EntityManager& entity_manager, float dt ) override;
+		void Update( float dt );
 
+		//
+		// Get the number of subscribers to the given message type.
+		//
 		uint GetSubscriberCount( MessageID message_type ) const;
 
+		//
+		// Get the total number of subscribers.
+		//
 		uint GetTotalSubscriberCount() const;
 
+		//
+		// Get the number of pending messages.
+		//
 		uint GetPendingMessageCount() const;
 
 	private:
@@ -60,7 +68,7 @@ namespace dd
 		std::mutex m_mutex;
 
 		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
-		DenseMap<HandlerID, Function> m_handlers;
+		DenseMap<HandlerID, std::function<void( Message* )>> m_handlers;
 		DoubleBuffer<Vector<Message*>> m_pendingMessages;
 
 		HandlerID m_nextHandlerID;

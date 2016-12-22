@@ -40,8 +40,7 @@ namespace dd
 
 		DenseVectorPoolIterator<T> operator++()
 		{
-			++Index;
-			for( ; Index < Pool.m_components.Size(); ++Index )
+			for( ++Index; Index < Pool.m_components.Size(); ++Index )
 			{
 				if( Pool.IsValid( Index ) )
 					return *this;

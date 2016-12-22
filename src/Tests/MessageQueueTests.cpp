@@ -45,17 +45,14 @@ TEST_CASE( "[MessageSystem]" )
 	REGISTER_TYPE( TestMessage );
 
 	dd::MessageQueue system;
-	dd::Function f = FUNCTION( TestFunction );
 	Received = nullptr;
-
-	dd::EntityManager manager;
 
 	SECTION( "Subscribe/Unsubscribe" )
 	{
 		REQUIRE( system.GetTotalSubscriberCount() == 0 );
 		REQUIRE( system.GetSubscriberCount( TestMessageID ) == 0 );
 
-		dd::MessageSubscription subbed = system.Subscribe( TestMessageID, f );
+		dd::MessageSubscription subbed = system.Subscribe( TestMessageID, TestFunction );
 
 		REQUIRE( system.GetSubscriberCount( TestMessageID ) == 1 );
 		REQUIRE( system.GetTotalSubscriberCount() == 1 );
@@ -68,14 +65,14 @@ TEST_CASE( "[MessageSystem]" )
 
 	SECTION( "Send Valid" )
 	{
-		system.Subscribe( TestMessageID, f );
+		system.Subscribe( TestMessageID, TestFunction );
 
 		TestMessage msg;
 		msg.Type = TestMessageID;
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( manager, 0 );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 
@@ -87,33 +84,32 @@ TEST_CASE( "[MessageSystem]" )
 
 	SECTION( "Send No Receivers" )
 	{
-		system.Subscribe( TestMessageID, f );
+		system.Subscribe( TestMessageID, TestFunction );
 
 		TestMessage msg;
 		msg.Type = InvalidMessageID;
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( manager, 0 );
+		system.Update( 0 );
 
 		REQUIRE( Received == nullptr );
 	}
 
 	SECTION( "Send Multiple Receivers" )
 	{
-		system.Subscribe( TestMessageID, f );
+		system.Subscribe( TestMessageID, TestFunction );
 
-		dd::Function f2 = FUNCTION( TestFunction2 );
 		Received2 = nullptr;
 
-		dd::MessageSubscription sub = system.Subscribe( TestMessageID, f2 );
+		dd::MessageSubscription sub = system.Subscribe( TestMessageID, TestFunction2 );
 
 		TestMessage msg;
 		msg.Type = TestMessageID;
 		msg.Payload = 50;
 
 		system.Send( &msg );
-		system.Update( manager, 0 );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == &msg );
@@ -124,7 +120,7 @@ TEST_CASE( "[MessageSystem]" )
 		Received2 = nullptr;
 
 		system.Send( &msg );
-		system.Update( manager, 0 );
+		system.Update( 0 );
 
 		REQUIRE( Received == &msg );
 		REQUIRE( Received2 == nullptr );

@@ -24,15 +24,9 @@ namespace dd
 
 	}
 
-	MessageSubscription MessageQueue::Subscribe( MessageID message_type, Function handler )
+	MessageSubscription MessageQueue::Subscribe( MessageID message_type, std::function<void( Message* )> handler )
 	{
 		std::lock_guard<std::mutex> lock( m_mutex );
-
-		const FunctionSignature* sig = handler.Signature();
-		const TypeInfo* arg = sig->GetArg( 0 );
-
-		DD_ASSERT( sig->ArgCount() == 1 );
-		DD_ASSERT( arg == GET_TYPE( Message* ) );
 
 		MessageSubscription new_token;
 		new_token.Handler = m_nextHandlerID++;
@@ -47,7 +41,7 @@ namespace dd
 		}
 
 		existing->Add( new_token.Handler );
-		m_handlers.Add( new_token.Handler, std::move( handler ) );
+		m_handlers.Add( new_token.Handler, handler );
 
 		return new_token;
 	}
@@ -89,7 +83,7 @@ namespace dd
 
 		for( HandlerID handler : *subs )
 		{
-			Function* fn = m_handlers.Find( handler );
+			std::function<void(Message*)>* fn = m_handlers.Find( handler );
 			if( fn != nullptr )
 			{
 				(*fn)(message);
@@ -97,7 +91,7 @@ namespace dd
 		}
 	}
 
-	void MessageQueue::Update( EntityManager& entity_manager, float dt )
+	void MessageQueue::Update( float dt )
 	{
 		{
 			std::lock_guard<std::mutex> lock( m_mutex );

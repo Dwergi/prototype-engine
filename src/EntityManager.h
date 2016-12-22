@@ -13,26 +13,36 @@ namespace dd
 {
 	class EntityManager
 	{
-	public:
-
 		template <typename T> struct identity { typedef T type; };
 
+	public:
 		EntityManager();
 		~EntityManager();
 
+		// Disable all copy and move operations.
 		EntityManager( const EntityManager& ) = delete;
 		EntityManager( EntityManager&& ) = delete;
-
 		EntityManager& operator=( const EntityManager& ) = delete;
 		EntityManager& operator=( EntityManager&& ) = delete;
 
+		//
+		// Create an entity and return a handle to it.
+		//
 		EntityHandle Create();
-		void Destroy( const EntityHandle& entity );
 
+		//
+		// Destroy the given entity.
+		//
+		void Destroy( EntityHandle entity );
+
+		//
+		// Destroy all entities.
+		//
 		void DestroyAll();
 
 		//
-		// Update all entities. This causes new entities to be created and destroyed entities to be removed. 
+		// Update all entities. 
+		// This causes the write buffer to become the read buffer.
 		//
 		void Update( float dt );
 
