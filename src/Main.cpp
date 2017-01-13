@@ -284,7 +284,9 @@ int GameMain( EntityManager& entity_manager )
 		Services::Register( jobsystem );
 
 		SwarmSystem swarm_system;
-		Services::Register( swarm_system );
+
+		Vector<ISystem*> systems;
+		systems.Add( &swarm_system );
 
 		s_window.reset( new Window( 1280, 720, "DD" ) );
 		s_input.reset( new Input( *s_window ) );
@@ -294,21 +296,19 @@ int GameMain( EntityManager& entity_manager )
 
 		DebugConsole console;
 
-		BindKeys( *s_input );
-
 		Renderer renderer;
 		renderer.Initialize( *s_window, entity_manager );
 
 		TerrainSystem terrain( renderer.GetCamera() );
-		terrain.Initialize();
+		terrain.Initialize( entity_manager );
 
-		renderer.SetTerrainSystem( terrain );
-		
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
 
 		FreeCameraController free_cam( renderer.GetCamera() );
 		free_cam.BindActions( bindings );
+
+		BindKeys( *s_input );
 
 		FrameTimer frameTimer;
 
@@ -335,9 +335,10 @@ int GameMain( EntityManager& entity_manager )
 			if( s_drawCameraDebug )
 				free_cam.DrawCameraDebug();
 
-			jobsystem.Schedule( [&entity_manager, &swarm_system, delta_t]() { swarm_system.Update( entity_manager, delta_t ); }, "System" );
-
-			terrain.Update( delta_t );
+			for( ISystem* system : systems )
+			{
+				jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System" );
+			}
 
 			jobsystem.WaitForCategory( "System" );
 

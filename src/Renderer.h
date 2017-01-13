@@ -14,7 +14,6 @@ namespace dd
 	class Camera;
 	class EntityManager;
 	class ShaderProgram;
-	class TerrainSystem;
 	class Window;
 
 	class Renderer
@@ -39,14 +38,11 @@ namespace dd
 		//
 		Camera& GetCamera() const;
 
-		void SetTerrainSystem( TerrainSystem& terrain ) { m_terrain = &terrain; }
-
 	private:
 
 		Window* m_window;
 		Camera* m_camera;
 		ShaderProgram* m_defaultShader;
-		TerrainSystem* m_terrain;
 		Vector<ShaderHandle> m_shaders;
 		EntityManager* m_entityManager;
 

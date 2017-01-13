@@ -208,12 +208,12 @@ namespace dd
 		}
 	}
 
-	void TerrainSystem::Initialize()
+	void TerrainSystem::Initialize( EntityManager& manager )
 	{
-		Update( 0 );
+		Update( manager, 0 );
 	}
 
-	void TerrainSystem::Update( float delta_t )
+	void TerrainSystem::Update( EntityManager& manager, float delta_t )
 	{
 		glm::vec3 cam_pos = m_camera.GetPosition();
 		glm::vec2 chunk_origin = glm::vec2( (int) (cam_pos.x / m_chunkSize) * (int) m_chunkSize, (int) (cam_pos.z / m_chunkSize) * (int) m_chunkSize );

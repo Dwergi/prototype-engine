@@ -6,15 +6,18 @@
 
 #pragma once
 
+#include "ISystem.h"
+
 namespace dd
 {
 	class Camera;
+	class EntityManager;
 	class ShaderProgram;
 	class TerrainChunk;
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem
+	class TerrainSystem : ISystem
 	{
 	public:
 
@@ -33,8 +36,8 @@ namespace dd
 		void SetChunkSize( uint size );
 		uint GetChunkSize() const { return m_chunkSize; }
 
-		void Initialize();
-		void Update( float delta_t );
+		void Initialize( EntityManager& manager );
+		void Update( EntityManager& manager, float delta_t );
 		void Render( Camera& camera, ShaderProgram& shader );
 
 		void SaveChunkImages() const;

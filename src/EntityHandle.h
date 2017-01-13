@@ -44,6 +44,9 @@ namespace dd
 		template <typename Component>
 		bool Has() const;
 
+		template <typename... Components>
+		bool HasAll() const;
+
 		template <typename Component>
 		ComponentHandle<Component> Get() const;
 

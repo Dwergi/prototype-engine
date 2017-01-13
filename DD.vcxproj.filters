@@ -453,6 +453,12 @@
     <ClInclude Include="src\GenericHandle.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\TrenchSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TrenchComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -746,6 +752,9 @@
     </ClCompile>
     <ClCompile Include="src\DoubleBuffer.cpp">
       <Filter>Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TrenchSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

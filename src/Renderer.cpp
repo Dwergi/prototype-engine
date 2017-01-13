@@ -9,7 +9,6 @@
 #include "MeshComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
-#include "TerrainSystem.h"
 #include "TransformComponent.h"
 #include "Window.h"
 
@@ -26,7 +25,6 @@ namespace dd
 		m_meshCount( 0 ),
 		m_camera( nullptr ),
 		m_window( nullptr ),
-		m_terrain( nullptr ),
 		m_defaultShader( nullptr )
 	{
 
@@ -68,8 +66,6 @@ namespace dd
 		ImGui::Text( "Meshes: %d", m_meshCount );
 		ImGui::End();
 	}
-
-	TerrainChunk* chunk;
 
 	void Renderer::Initialize( Window& window, EntityManager& entity_manager )
 	{
@@ -131,9 +127,6 @@ namespace dd
 		Frustum frustum( cam );
 		frustum.CreateRenderResources();
 		frustum.Render( *m_camera, *m_shaders[1].Get() );*/
-
-		if( m_terrain != nullptr )
-			m_terrain->Render( *m_camera, *m_shaders[2].Get() );	
 
 		m_entityManager->ForAllWithReadable<MeshComponent, TransformComponent>( [this]( EntityHandle, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp )
 		{

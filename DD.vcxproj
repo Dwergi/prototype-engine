@@ -403,6 +403,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\TrenchComponent.h" />
+    <ClInclude Include="src\TrenchSystem.h" />
     <ClInclude Include="src\Typedefs.h" />
     <ClInclude Include="src\TypeInfo.h" />
     <ClInclude Include="src\TypeInfoHelpers.h" />
@@ -587,6 +589,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\TrenchSystem.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
     <ClCompile Include="src\WrenEngine.cpp" />
