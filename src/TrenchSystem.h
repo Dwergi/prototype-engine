@@ -7,6 +7,9 @@
 #pragma once
 
 #include "ISystem.h"
+#include "EntityHandle.h"
+#include "TransformComponent.h"
+#include "TrenchComponent.h"
 
 namespace dd
 {

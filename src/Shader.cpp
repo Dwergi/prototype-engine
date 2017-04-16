@@ -73,7 +73,7 @@ namespace dd
 	{
 		m_id = glCreateShader( GetOpenGLShaderType( type ) );
 
-		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader %s", name );
+		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader %s", name.c_str() );
 
 		m_valid = m_id != OpenGL::InvalidID;
 		

@@ -55,7 +55,8 @@ ipch/
 Network Trash Folder
 Temporary Items
 .apdisk
-ComponentSystem.opensdf
+
+# DD-specific things
 *.opensdf
 AS_DEBUG/
 *.pch
@@ -65,4 +66,4 @@ DD.VC.db
 *.log
 *.cache
 *.pdb
-*.lib
+.vs/

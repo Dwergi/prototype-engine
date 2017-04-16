@@ -9,8 +9,6 @@
 
 #include "EntityManager.h"
 #include "PlayerComponent.h"
-#include "TransformComponent.h"
-#include "TrenchComponent.h"
 
 const float TRENCH_CHUNK_LENGTH = 10.0f;
 const float TRENCH_CHUNK_DESTRUCTION_DISTANCE = 100.0f;

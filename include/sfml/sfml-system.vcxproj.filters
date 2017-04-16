@@ -1,72 +1,72 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Clock.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Err.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Lock.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Mutex.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Sleep.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\String.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Thread.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\ThreadLocal.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Time.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\FileInputStream.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\MemoryInputStream.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ClockImpl.cpp">
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Clock.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Err.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Lock.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Mutex.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Sleep.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\String.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Thread.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\ThreadLocal.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Time.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\FileInputStream.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\MemoryInputStream.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ClockImpl.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\MutexImpl.cpp">
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\MutexImpl.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\SleepImpl.cpp">
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\SleepImpl.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadImpl.cpp">
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ThreadImpl.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadLocalImpl.cpp">
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ThreadLocalImpl.cpp">
       <Filter>windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Clock.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Err.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Export.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\InputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Lock.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Mutex.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\NativeActivity.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\NonCopyable.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Sleep.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\String.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\String.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Thread.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Thread.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocal.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocalPtr.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocalPtr.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Time.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Utf.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Utf.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector2.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector2.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector3.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector3.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\FileInputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\MemoryInputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ClockImpl.hpp">
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Clock.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Err.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Export.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\InputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Lock.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Mutex.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\NativeActivity.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Sleep.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\String.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\String.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Thread.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Thread.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocalPtr.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Time.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Utf.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Utf.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector2.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector2.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector3.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector3.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\FileInputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\MemoryInputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ClockImpl.hpp">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\MutexImpl.hpp">
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\MutexImpl.hpp">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\SleepImpl.hpp">
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\SleepImpl.hpp">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadImpl.hpp">
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ThreadImpl.hpp">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadLocalImpl.hpp">
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ThreadLocalImpl.hpp">
       <Filter>windows</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGUID>{B959B038-C230-3113-A986-6C71DAF66B1D}</ProjectGUID>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>sfml-system</ProjectName>
@@ -30,25 +30,25 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -96,10 +96,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -130,10 +130,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -160,10 +160,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -193,10 +193,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>W:\testing\DD\include\sfml\include;W:\testing\DD\include\sfml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -206,52 +206,52 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Clock.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Err.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Export.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\InputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Lock.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Mutex.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\NativeActivity.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\NonCopyable.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Sleep.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\String.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\String.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Thread.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Thread.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocal.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocalPtr.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\ThreadLocalPtr.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Time.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Utf.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Utf.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector2.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector2.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector3.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\Vector3.inl" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\FileInputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\include\SFML\System\MemoryInputStream.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ClockImpl.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\MutexImpl.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\SleepImpl.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadImpl.hpp" />
-    <ClInclude Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadLocalImpl.hpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Clock.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Err.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Lock.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Mutex.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Sleep.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\String.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Thread.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\ThreadLocal.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Time.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\FileInputStream.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\MemoryInputStream.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ClockImpl.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\MutexImpl.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\SleepImpl.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadImpl.cpp" />
-    <ClCompile Include="W:\testing\DD\include\sfml\src\SFML\System\Win32\ThreadLocalImpl.cpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Clock.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Err.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Export.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\InputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Lock.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Mutex.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\NativeActivity.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Sleep.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\String.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\String.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Thread.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Thread.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\ThreadLocalPtr.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Time.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Utf.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Utf.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector2.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector2.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector3.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\Vector3.inl" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\FileInputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)include\SFML\System\MemoryInputStream.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ClockImpl.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\MutexImpl.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\SleepImpl.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ThreadImpl.hpp" />
+    <ClInclude Include="$(ProjectDir)src\SFML\System\Win32\ThreadLocalImpl.hpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Clock.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Err.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Lock.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Mutex.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Sleep.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\String.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Thread.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\ThreadLocal.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Time.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\FileInputStream.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\MemoryInputStream.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ClockImpl.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\MutexImpl.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\SleepImpl.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ThreadImpl.cpp" />
+    <ClCompile Include="$(ProjectDir)src\SFML\System\Win32\ThreadLocalImpl.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
