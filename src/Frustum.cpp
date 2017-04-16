@@ -32,6 +32,16 @@ namespace dd
 		FAR_BR
 	};
 
+	enum Planes
+	{
+		Top,
+		Bottom,
+		Left,
+		Right,
+		Near,
+		Far
+	};
+
 	const GLushort s_indices[] =
 	{
 		// near plane
@@ -72,48 +82,31 @@ namespace dd
 	Frustum::Frustum( Camera& camera )
 		: m_camera( camera )
 	{
+		m_vao.Create();
+		m_vertices.Create( GL_ARRAY_BUFFER );
+
+		m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
+		m_indices.Bind();
+		m_indices.SetData( s_indices, sizeof( s_indices ) );
+
 		ResetFrustum( m_camera );
 	}
 
 	void Frustum::ResetFrustum( Camera& camera )
 	{
-		glm::mat4 mvp = camera.GetProjection() * camera.GetCameraMatrix();
-
-		m_planes[0] = Plane( mvp[3] + mvp[0] );
-		m_planes[1] = Plane( mvp[3] - mvp[0] );
-		m_planes[2] = Plane( mvp[3] + mvp[1] );
-		m_planes[3] = Plane( mvp[3] - mvp[1] );
-		m_planes[4] = Plane( mvp[3] + mvp[2] );
-		m_planes[5] = Plane( mvp[3] - mvp[2] );
-
 		SetCorners( camera );
-		UpdateData();
+
+		UpdateRenderData();
 	}
 
-	void Frustum::UpdateData()
+	void Frustum::UpdateRenderData()
 	{
-		if( !m_vao.IsValid() )
-		{
-			m_vao.Create();
-		}
 		m_vao.Bind();
 
-		if( !m_vertices.IsValid() )
-		{
-			m_vertices.Create( GL_ARRAY_BUFFER );
-		}
 		m_vertices.Bind();
 		m_vertices.SetData( m_corners, sizeof( m_corners ) );
-
-		if( !m_indices.IsValid() )
-		{
-			m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
-		}
-		m_indices.Bind();
-		m_indices.SetData( s_indices, sizeof( s_indices ) );
 	}
 
-	// TODO: This always returns true.
 	bool Frustum::Intersects( const AABB& bounds ) const
 	{
 		glm::vec3 corners[8];
@@ -125,7 +118,7 @@ namespace dd
 
 			for( const glm::vec3& corner : corners )
 			{
-				if( glm::dot( corner, plane.Normal() ) > 0 )
+				if( plane.DistanceTo( corner ) > 0 )
 				{
 					inside = true;
 					break;
@@ -166,7 +159,6 @@ namespace dd
 		m_vao.Unbind();
 	}
 	
-	// TODO: Move these out of world space and allow for setting pos and dir without recreating them.
 	void Frustum::SetCorners( Camera& camera )
 	{
 		// Work out corners of the frustum
@@ -183,9 +175,9 @@ namespace dd
 		glm::vec3 near_centre = pos + dir * camera.GetNear();
 
 		glm::vec3 up = glm::vec3( 0, 1, 0 );
-		glm::vec3 right = glm::normalize( glm::cross( camera.GetDirection(), up ) );
+		glm::vec3 right = glm::normalize( glm::cross( dir, up ) );
 
-		up = glm::normalize( glm::cross( right, camera.GetDirection() ) );
+		up = glm::normalize( glm::cross( right, dir ) );
 
 		glm::vec3 near_up = up * near_height;
 		glm::vec3 near_right = right * near_width;
@@ -204,5 +196,12 @@ namespace dd
 		m_corners[FAR_TL] = far_centre + far_up - far_right;
 		m_corners[FAR_BL] = far_centre - far_up - far_right;
 		m_corners[FAR_BR] = far_centre - far_up + far_right;
+
+		m_planes[Planes::Top]	 = Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
+		m_planes[Planes::Bottom] = Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
+		m_planes[Planes::Left]	 = Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
+		m_planes[Planes::Right]	 = Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
+		m_planes[Planes::Near]	 = Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
+		m_planes[Planes::Far]	 = Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
 	}
 }

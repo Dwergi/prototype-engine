@@ -55,6 +55,7 @@ namespace dd
 
 		int m_meshCount;
 
+		// TODO: Delete these and use actual camera values.
 		Camera* m_debugCamera;
 		Frustum* m_debugFrustum;
 		bool m_debugFrustumEnabled;
@@ -62,6 +63,9 @@ namespace dd
 		float m_debugFrustumFar;
 		float m_debugFrustumNear;
 		int m_debugFrustumMeshCount;
+
+		// TODO: Introduce renderer freezing.
+
 		float m_debugFocusedMeshDistance;
 		EntityHandle m_debugFocusedMesh;
 

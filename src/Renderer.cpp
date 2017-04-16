@@ -29,7 +29,7 @@ namespace dd
 		m_entityManager( nullptr ),
 		m_drawAxes( true ),
 		m_debugFrustumEnabled( false ),
-		m_debugHighlightMeshes( false ),
+		m_debugHighlightMeshes( true ),
 		m_debugFrustum( nullptr ),
 		m_debugCamera( nullptr ),
 		m_debugFrustumNear( 0.1f ),
@@ -98,7 +98,7 @@ namespace dd
 			ImGui::Checkbox( "Draw Debug Frustum", &m_debugFrustumEnabled );
 
 			ImGui::SliderFloat( "Frustum Near", &m_debugFrustumNear, 0.01f, m_debugFrustumFar - 0.01f );
-			ImGui::SliderFloat( "Frustum Far", &m_debugFrustumFar, 1.0f, 1000.f );
+			ImGui::SliderFloat( "Frustum Far", &m_debugFrustumFar, m_debugFrustumNear, 100.f );
 
 			ImGui::Text( "Meshes in Frustum: %d", m_debugFrustumMeshCount );
 		}
@@ -110,7 +110,7 @@ namespace dd
 	{
 		m_debugCamera = new Camera( window );
 		m_debugCamera->SetPosition( glm::vec3( 0, 0, 0 ) );
-		m_debugCamera->SetDirection( m_camera->GetDirection() );
+		m_debugCamera->SetDirection( glm::vec3( 1, 0, 0 ) );
 		m_debugCamera->SetVerticalFOV( m_camera->GetVerticalFOV() );
 		m_debugCamera->SetAspectRatio( 16, 9 );
 		m_debugCamera->SetNear( m_debugFrustumNear );
@@ -124,6 +124,9 @@ namespace dd
 		m_camera = new Camera( window );
 		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
 		m_camera->SetDirection( glm::vec3( -1, 0, -1 ) );
+
+		m_debugFrustumNear = m_camera->GetNear();
+		m_debugFrustumFar = m_camera->GetFar();
 
 		m_shaders.Add( CreateShaders( "mesh" ) );
 		m_defaultShader = m_shaders[0].Get();
@@ -216,6 +219,8 @@ namespace dd
 			AABB bounds = mesh->Bounds().GetTransformed( transform );
 
 			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
+
+			bool inFrustum = true;
 			
 			if( entity == m_debugFocusedMesh )
 			{
@@ -225,23 +230,28 @@ namespace dd
 			// check if it intersects with the debug frustum and tint it if it does
 			if( m_debugHighlightMeshes )
 			{
-				if( m_debugFrustum->Intersects( bounds ) )
+				inFrustum = m_debugFrustum->Intersects( bounds );
+				if( inFrustum )
 				{
 					debugMultiplier.x = 1.5f;
 					++m_debugFrustumMeshCount;
 				}
 			}
 
-			glm::vec4 colour = mesh_cmp.Read()->Colour * debugMultiplier;
-			mesh->SetColourMultiplier( colour );
-			mesh->Render( *m_camera, transform );
+			if( inFrustum )
+			{
+				glm::vec4 colour = mesh_cmp.Read()->Colour * debugMultiplier;
+				mesh->SetColourMultiplier( colour );
+				mesh->Render( *m_camera, transform );
 
-			++m_meshCount;
+				++m_meshCount;
+			}
 		}
 	}
 
 	void Renderer::RenderDebugFrustum()
 	{
+		m_debugCamera->SetPosition( m_camera->GetPosition() );
 		m_debugCamera->SetDirection( m_camera->GetDirection() );
 		m_debugCamera->SetVerticalFOV( m_camera->GetVerticalFOV() );
 		m_debugCamera->SetNear( m_debugFrustumNear );

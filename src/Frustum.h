@@ -46,6 +46,6 @@ namespace dd
 		Camera& m_camera;
 
 		void SetCorners( Camera& camera );
-		void UpdateData();
+		void UpdateRenderData();
 	};
 }

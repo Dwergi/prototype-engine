@@ -38,9 +38,9 @@ namespace dd
 		glm::vec3 diff1 = pt1 - pt2;
 		glm::vec3 diff2 = pt3 - pt2;
 
-		glm::vec3 normal = glm::cross( diff2, diff1 );
+		glm::vec3 normal = glm::normalize( glm::cross( diff2, diff1 ) );
 		
-		m_plane.xyz = glm::normalize( normal );
+		m_plane.xyz = normal;
 		m_plane.w = -glm::dot( normal, pt2 );
 	}
 
