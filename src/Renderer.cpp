@@ -25,7 +25,9 @@ namespace dd
 		m_meshCount( 0 ),
 		m_camera( nullptr ),
 		m_window( nullptr ),
-		m_defaultShader( nullptr )
+		m_defaultShader( nullptr ),
+		m_entityManager( nullptr ),
+		m_bDrawAxes( true )
 	{
 
 	}
@@ -52,7 +54,7 @@ namespace dd
 		return handle;
 	}
 
-	void Renderer::DrawDebugUI() const
+	void Renderer::DrawDebugUI()
 	{
 		bool open = true;
 		if( !ImGui::Begin( "Renderer", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
@@ -64,6 +66,14 @@ namespace dd
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowSize().y - 2 ) );
 
 		ImGui::Text( "Meshes: %d", m_meshCount );
+
+		if( ImGui::Checkbox( "Draw Axes", &m_bDrawAxes ) )
+		{
+			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_bDrawAxes;
+			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_bDrawAxes;
+			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_bDrawAxes;
+		}
+
 		ImGui::End();
 	}
 
@@ -73,32 +83,22 @@ namespace dd
 		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
 		m_camera->SetDirection( glm::vec3( -1, 0, -1 ) );
 
-		// depth test
-		glEnable( GL_DEPTH_TEST );
-		
-		// backface culling
-		glEnable( GL_CULL_FACE );
-		glFrontFace( GL_CCW );
-		glCullFace( GL_BACK );
-
-		// alpha blending
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
 		m_shaders.Add( CreateShaders( "mesh" ) );
 		m_defaultShader = m_shaders[0].Get();
 
 		m_shaders.Add( CreateShaders( "frustum" ) );
 		m_shaders.Add( CreateShaders( "terrain" ) );
 
-		CreateMeshEntity( entity_manager, "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
+		m_entityManager = &entity_manager;
 
-		CreateMeshEntity( entity_manager, "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-		CreateMeshEntity( entity_manager, "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-		CreateMeshEntity( entity_manager, "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+		CreateMeshEntity( *m_entityManager, "cube", *m_defaultShader, glm::vec4( 1, 0, 1, 1 ), glm::mat4() );
+
+		m_xAxis = CreateMeshEntity( *m_entityManager, "x_axis", *m_defaultShader, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		m_yAxis = CreateMeshEntity( *m_entityManager, "y_axis", *m_defaultShader, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		m_zAxis = CreateMeshEntity( *m_entityManager, "z_axis", *m_defaultShader, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 	}
 
-	void Renderer::CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform )
+	EntityHandle Renderer::CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform )
 	{
 		MeshHandle mesh_h = Mesh::Create( meshName, shader );
 
@@ -110,10 +110,33 @@ namespace dd
 		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( handle );
 		mesh_cmp->Mesh = mesh_h;
 		mesh_cmp->Colour = colour;
+		mesh_cmp->Hidden = false;
+
+		return handle;
+	}
+
+	void Renderer::SetRenderState()
+	{
+		// depth test
+		glEnable( GL_DEPTH_TEST );
+		glDepthFunc( GL_LESS );
+
+		// backface culling
+		glEnable( GL_CULL_FACE );
+		glFrontFace( GL_CCW );
+		glCullFace( GL_BACK );
+
+		// alpha blending
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	}
 
 	void Renderer::Render( float delta_t )
 	{
+		DD_ASSERT( m_entityManager != nullptr );
+
+		DrawDebugUI();
+
 		m_meshCount = 0;
 
 		/*Camera cam;
@@ -128,10 +151,12 @@ namespace dd
 		frustum.CreateRenderResources();
 		frustum.Render( *m_camera, *m_shaders[1].Get() );*/
 
+		SetRenderState();
+
 		m_entityManager->ForAllWithReadable<MeshComponent, TransformComponent>( [this]( EntityHandle, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp )
 		{
 			Mesh* mesh = mesh_cmp.Read()->Mesh.Get();
-			if( mesh != nullptr )
+			if( mesh != nullptr && !mesh_cmp.Read()->Hidden )
 			{
 				mesh->SetColourMultiplier( mesh_cmp.Read()->Colour );
 				mesh->Render( *m_camera, transform_cmp.Read()->Transform );

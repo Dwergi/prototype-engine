@@ -2,6 +2,7 @@
 #include "catch/catch.hpp"
 
 #include "DenseMap.h"
+#include "MeshComponent.h"
 
 TEST_CASE( "[DenseMap] Add" )
 {
@@ -111,5 +112,31 @@ TEST_CASE( "[DenseMap] Resize" )
 	for( int i = 0; i < 128; ++i )
 	{
 		REQUIRE( map[i] == i * 10 );
+	}
+}
+
+TEST_CASE( "[DenseMap] MeshComponent Assign" )
+{
+	dd::DenseMap<int, dd::MeshComponent> a;
+	dd::DenseMap<int, dd::MeshComponent> b;
+
+	dd::MeshComponent meshes[10];
+
+	for( int i = 0; i < 10; ++i )
+	{
+		meshes[i] = dd::MeshComponent();
+		meshes[i].Colour = glm::vec4( i, i, i, i );
+		meshes[i].Hidden = i % 2;
+		a.Add( i, meshes[i] );
+	}
+
+	b = a;
+
+	for( int i = 0; i < 10; ++i )
+	{
+		REQUIRE( b[i].Colour == a[i].Colour );
+		REQUIRE( b[i].Colour == meshes[i].Colour );
+		REQUIRE( b[i].Hidden == a[i].Hidden );
+		REQUIRE( b[i].Hidden == meshes[i].Hidden );
 	}
 }

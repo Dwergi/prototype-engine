@@ -4,6 +4,8 @@
 // August 6th 2015
 //
 
+#include <type_traits>
+
 namespace dd
 {
 	template <typename T>
@@ -66,6 +68,8 @@ namespace dd
 	template <typename T>
 	void Services::RegisterComponent()
 	{
+		static_assert(std::is_assignable_v<T, T>, "Component type must be assignable to itself!");
+
 		const TypeInfo* typeInfo = GET_TYPE( T );
 
 		String128 typeName( typeInfo->Name().c_str() );

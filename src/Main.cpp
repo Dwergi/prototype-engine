@@ -65,7 +65,7 @@ float s_frameTimes[SLIDING_WINDOW_SIZE];
 int s_currentFrame = 0;
 
 bool s_drawConsole = false;
-
+bool s_freeCamEnabled = true;
 bool s_drawCameraDebug = true;
 
 std::unique_ptr<Window> s_window;
@@ -178,17 +178,33 @@ void RegisterGameTypes( EntityManager& manager )
 
 void ToggleConsole( InputAction action, InputType type )
 {
-	if( action == InputAction::CONSOLE && type == InputType::RELEASED )
+	if( action == InputAction::SHOW_CONSOLE && type == InputType::RELEASED )
 	{
 		s_drawConsole = !s_drawConsole;
+	}
+}
 
-		s_input->CaptureMouse( !s_drawConsole );
+void ToggleFreeCam( InputAction action, InputType type )
+{
+	if( action == InputAction::TOGGLE_FREECAM && type == InputType::RELEASED )
+	{
+		s_freeCamEnabled = !s_freeCamEnabled;
+	}
+}
+
+void Exit( InputAction action, InputType type )
+{
+	if( action == InputAction::EXIT && type == InputType::RELEASED )
+	{
+		s_window->SetToClose();
 	}
 }
 
 void BindKeys( Input& input )
 {
-	input.BindKey( '`', InputAction::CONSOLE );
+	input.BindKey( '`', InputAction::SHOW_CONSOLE );
+	input.BindKey( Input::Key::ESCAPE, InputAction::EXIT );
+	input.BindKey( Input::Key::CAPS_LOCK, InputAction::TOGGLE_FREECAM );
 	input.BindKey( 'W', InputAction::FORWARD );
 	input.BindKey( 'S', InputAction::BACKWARD );
 	input.BindKey( 'A', InputAction::LEFT );
@@ -196,6 +212,21 @@ void BindKeys( Input& input )
 	input.BindKey( ' ', InputAction::UP );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
+}
+
+void UpdateFreeCam( FreeCameraController& free_cam, float delta_t )
+{
+	bool captureMouse = !s_drawConsole && s_freeCamEnabled;
+	s_input->CaptureMouse( captureMouse );
+	if( captureMouse )
+	{
+		free_cam.UpdateMouse( s_input->GetMousePosition() );
+		free_cam.UpdateScroll( s_input->GetScrollPosition() );
+		free_cam.Update( delta_t );
+	}
+
+	if( s_drawCameraDebug )
+		free_cam.DrawCameraDebug();
 }
 
 class FrameTimer
@@ -290,7 +321,6 @@ int GameMain( EntityManager& entity_manager )
 
 		s_window.reset( new Window( 1280, 720, "DD" ) );
 		s_input.reset( new Input( *s_window ) );
-		s_input->CaptureMouse( !s_drawConsole );
 
 		DebugUI debugUI( *s_window, *s_input );
 
@@ -303,7 +333,9 @@ int GameMain( EntityManager& entity_manager )
 		terrain.Initialize( entity_manager );
 
 		InputBindings bindings;
-		bindings.RegisterHandler( InputAction::CONSOLE, &ToggleConsole );
+		bindings.RegisterHandler( InputAction::SHOW_CONSOLE, &ToggleConsole );
+		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
+		bindings.RegisterHandler( InputAction::EXIT, &Exit );
 
 		FreeCameraController free_cam( renderer.GetCamera() );
 		free_cam.BindActions( bindings );
@@ -319,6 +351,8 @@ int GameMain( EntityManager& entity_manager )
 			frameTimer.Update();
 			float delta_t = frameTimer.Delta();
 
+			entity_manager.Update( delta_t );
+
 			s_input->Update( delta_t );
 
 			// update input
@@ -328,12 +362,7 @@ int GameMain( EntityManager& entity_manager )
 
 			debugUI.Update( delta_t );
 
-			free_cam.UpdateMouse( s_input->GetMousePosition() );
-			free_cam.UpdateScroll( s_input->GetScrollPosition() );
-			free_cam.Update( delta_t );
-
-			if( s_drawCameraDebug )
-				free_cam.DrawCameraDebug();
+			UpdateFreeCam( free_cam, delta_t );
 
 			for( ISystem* system : systems )
 			{
@@ -343,7 +372,6 @@ int GameMain( EntityManager& entity_manager )
 			jobsystem.WaitForCategory( "System" );
 
 			renderer.Render( delta_t );
-			renderer.DrawDebugUI();
 
 			if( s_drawConsole )
 				console.Draw( "Console", s_drawConsole );
@@ -370,7 +398,6 @@ int GameMain( EntityManager& entity_manager )
 
 	DD_PROFILE_DEINIT(); 
 
-	DD_ASSERT( false, "DONE!" );
 	return 0;
 }
 

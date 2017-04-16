@@ -19,7 +19,9 @@ namespace dd
 		DOWN,
 		SHOOT,
 		BOOST,
-		CONSOLE
+		SHOW_CONSOLE,
+		TOGGLE_FREECAM,
+		EXIT
 	};
 
 	enum class InputType : unsigned int

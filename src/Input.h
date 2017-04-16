@@ -43,6 +43,8 @@ namespace dd
 		// these map to GLFW_KEY values
 		enum class Key : int
 		{
+			ESCAPE = 256,
+			CAPS_LOCK = 280,
 			LSHIFT = 340,
 			LCTRL = 341,
 			LALT = 342

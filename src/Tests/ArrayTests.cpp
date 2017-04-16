@@ -75,10 +75,10 @@ namespace ArrayTests
 
 	TEST_CASE( "[Array] Copy" )
 	{
-		dd::Array<int, 128> int_a;
-		dd::Array<int, 128> int_b;
+		dd::Array<int, 16> int_a;
+		dd::Array<int, 16> int_b;
 
-		for( int i = 0; i < 128; ++i )
+		for( int i = 0; i < 16; ++i )
 		{
 			int_a.Push( i );
 		}
@@ -92,10 +92,10 @@ namespace ArrayTests
 			REQUIRE( int_a[ i ] == int_b[ i ] );
 		}
 
-		dd::Array<Test::NestedStruct, 128> complex_a;
-		dd::Array<Test::NestedStruct, 128> complex_b;
+		dd::Array<Test::NestedStruct, 16> complex_a;
+		dd::Array<Test::NestedStruct, 16> complex_b;
 
-		for( int i = 0; i < 128; ++i )
+		for( int i = 0; i < 16; ++i )
 		{
 			Test::NestedStruct s;
 			s.SecondInt = i;
@@ -104,7 +104,7 @@ namespace ArrayTests
 
 		complex_b = complex_a;
 
-		for( int i = 0; i < 128; ++i )
+		for( int i = 0; i < 16; ++i )
 		{
 			REQUIRE( complex_a[ i ].SecondInt == complex_b[ i ].SecondInt );
 		}

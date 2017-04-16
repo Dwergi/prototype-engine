@@ -27,7 +27,7 @@ namespace dd
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
 		ComponentBase( other ),
 		Mesh( other.Mesh ),
-		Hidden( false ),
+		Hidden( other.Hidden ),
 		Colour( other.Colour )
 	{
 
@@ -36,5 +36,14 @@ namespace dd
 	MeshComponent::~MeshComponent()
 	{
 
+	}
+
+	MeshComponent& MeshComponent::operator=( const MeshComponent& other )
+	{
+		Mesh = other.Mesh;
+		Hidden = other.Hidden;
+		Colour = other.Colour;
+
+		return *this;
 	}
 }

@@ -27,6 +27,8 @@ namespace dd
 		bool Hidden;
 		glm::vec4 Colour;
 
+		MeshComponent& operator=( const MeshComponent& other );
+
 		BEGIN_TYPE( MeshComponent )
 			MEMBER( MeshComponent, Mesh )
 			MEMBER( MeshComponent, Hidden )

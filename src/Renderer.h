@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "EntityHandle.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
 
@@ -31,8 +32,6 @@ namespace dd
 		//
 		void Render( float delta_t );
 
-		void DrawDebugUI() const;
-
 		//
 		// Retrieve the active camera.
 		//
@@ -46,8 +45,15 @@ namespace dd
 		Vector<ShaderHandle> m_shaders;
 		EntityManager* m_entityManager;
 
+		EntityHandle m_xAxis;
+		EntityHandle m_yAxis;
+		EntityHandle m_zAxis;
+		bool m_bDrawAxes;
+
 		int m_meshCount;
 
-		void CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
+		void DrawDebugUI();
+		EntityHandle CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
+		void SetRenderState();
 	};
 }

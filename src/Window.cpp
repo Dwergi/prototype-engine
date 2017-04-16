@@ -98,6 +98,11 @@ namespace dd
 		return glfwWindowShouldClose( m_glfwWindow ) != 0;
 	}
 
+	void Window::SetToClose() const
+	{
+		glfwSetWindowShouldClose( m_glfwWindow, true );
+	}
+
 	bool Window::IsFocused() const
 	{
 		return m_focused;

@@ -24,6 +24,7 @@ namespace dd
 		bool IsFocused() const;
 		bool IsValid() const;
 		bool ShouldClose() const;
+		void SetToClose() const;
 
 		void MakeBorderless();
 
