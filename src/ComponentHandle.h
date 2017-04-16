@@ -32,6 +32,11 @@ namespace dd
 		{
 		}
 
+		const EntityHandle& Entity() const
+		{
+			return m_entity;
+		}
+
 		bool IsValid() const
 		{
 			// valid if entity is valid

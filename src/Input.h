@@ -44,7 +44,11 @@ namespace dd
 		enum class Key : int
 		{
 			ESCAPE = 256,
+			ENTER = 257,
+			TAB = 258,
 			CAPS_LOCK = 280,
+			F1 = 290,
+			F2 = 291,
 			LSHIFT = 340,
 			LCTRL = 341,
 			LALT = 342

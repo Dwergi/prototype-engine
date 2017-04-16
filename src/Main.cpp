@@ -202,9 +202,9 @@ void Exit( InputAction action, InputType type )
 
 void BindKeys( Input& input )
 {
-	input.BindKey( '`', InputAction::SHOW_CONSOLE );
+	input.BindKey( Input::Key::F1, InputAction::TOGGLE_FREECAM );
+	input.BindKey( Input::Key::F2, InputAction::SHOW_CONSOLE );
 	input.BindKey( Input::Key::ESCAPE, InputAction::EXIT );
-	input.BindKey( Input::Key::CAPS_LOCK, InputAction::TOGGLE_FREECAM );
 	input.BindKey( 'W', InputAction::FORWARD );
 	input.BindKey( 'S', InputAction::BACKWARD );
 	input.BindKey( 'A', InputAction::LEFT );

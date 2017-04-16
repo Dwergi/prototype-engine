@@ -14,16 +14,22 @@ namespace dd
 		AABB( const AABB& other );
 		~AABB();
 
+		//
+		// Expand the bounding box to contain the given point.
+		//
 		void Expand( const glm::vec3& pt );
 
 		bool Contains( const AABB& other ) const;
 		bool Contains( const glm::vec3& pt ) const;
 
 		bool Intersects( const AABB& other ) const;
+		bool IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const;
 
-		glm::vec3 Center() const;
+		glm::vec3 Center() const { return (Min + Max) * 0.5f; }
+		glm::vec3 Extents() const { return Max - Min; }
+
+		AABB GetTransformed( const glm::mat4& transform ) const;
 		void GetCorners( glm::vec3 (&corners)[8] ) const;
-		glm::vec3 Extents() const;
 
 		bool operator==( const AABB& other ) const;
 		bool operator!=( const AABB& other ) const;

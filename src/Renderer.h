@@ -14,8 +14,11 @@ namespace dd
 {
 	class Camera;
 	class EntityManager;
+	class Frustum;
 	class ShaderProgram;
 	class Window;
+	class MeshComponent;
+	class TransformComponent;
 
 	class Renderer
 	{
@@ -48,12 +51,28 @@ namespace dd
 		EntityHandle m_xAxis;
 		EntityHandle m_yAxis;
 		EntityHandle m_zAxis;
-		bool m_bDrawAxes;
+		bool m_drawAxes;
 
 		int m_meshCount;
+
+		Camera* m_debugCamera;
+		Frustum* m_debugFrustum;
+		bool m_debugFrustumEnabled;
+		bool m_debugHighlightMeshes;
+		float m_debugFrustumFar;
+		float m_debugFrustumNear;
+		int m_debugFrustumMeshCount;
+		float m_debugFocusedMeshDistance;
+		EntityHandle m_debugFocusedMesh;
 
 		void DrawDebugUI();
 		EntityHandle CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
 		void SetRenderState();
+
+		void CreateDebugFrustum( Window& window );
+		void RenderDebugFrustum();
+
+		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
+		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
 	};
 }

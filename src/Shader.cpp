@@ -42,7 +42,7 @@ const char* s_pixel = "#version 330 core\n"
 ""
 "void main()"
 "{"
-"	color.a = 1.0;"
+"	color.a = fragColour.a;"
 "	color.rgb = vec3(1,1,1);"
 "	color *= fragColour;"
 "}";

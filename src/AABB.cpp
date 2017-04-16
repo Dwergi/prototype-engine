@@ -11,9 +11,8 @@ namespace dd
 {
 	AABB::AABB()
 		: Min( FLT_MAX, FLT_MAX, FLT_MAX ),
-		Max( FLT_MIN, FLT_MIN, FLT_MIN )
+		Max( -FLT_MAX, -FLT_MAX, -FLT_MAX )
 	{
-
 	}
 
 	AABB::AABB( const AABB& other )
@@ -66,16 +65,62 @@ namespace dd
 		return glm::all( glm::lessThan( Min, other.Max ) ) && glm::all( glm::greaterThan( Max, other.Min ) );
 	}
 
-	glm::vec3 AABB::Center() const
+	bool AABB::IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const
 	{
-		return (Min + Max) * 0.5f;
+		glm::vec3 invDir( 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z );
+
+		float tMin;
+		float tMax;
+
+		{
+			float xMin = (Min.x - start.x) * invDir.x;
+			float xMax = (Max.x - start.x) * invDir.x;
+
+			tMin = std::min( xMin, xMax );
+			tMax = std::max( xMin, xMax );
+		}
+
+		{
+			float yMin = (Min.y - start.y) * invDir.y;
+			float yMax = (Max.y - start.y) * invDir.y;
+
+			tMin = std::max( tMin, std::min( yMin, yMax ) );
+			tMax = std::min( tMax, std::max( yMin, yMax ) );
+		}
+
+		{
+			float zMin = (Min.z - start.z) * invDir.z;
+			float zMax = (Max.z - start.z) * invDir.z;
+
+			tMin = std::max( tMin, std::min( zMin, zMax ) );
+			tMax = std::min( tMax, std::max( zMin, zMax ) );
+		}
+
+		if( tMax >= std::max( 0.0f, tMin ) )
+		{
+			distance = tMax;
+			return true;
+		}
+
+		distance = FLT_MAX;
+		return false;
 	}
 
-	glm::vec3 AABB::Extents() const
+	AABB AABB::GetTransformed( const glm::mat4& transform ) const
 	{
-		return Max - Min;
-	}
+		glm::vec3 corners[8];
+		GetCorners( corners );
 
+		AABB transformed;
+		for( int i = 0; i < 8; ++i )
+		{
+			glm::vec4 corner = glm::vec4( corners[i], 1.0f ) * transform + transform[3];
+			transformed.Expand( corner.xyz() );
+		}
+
+		return transformed;
+	}
+	
 	bool AABB::operator==( const AABB& other ) const
 	{
 		return Min == other.Min && Max == other.Max;

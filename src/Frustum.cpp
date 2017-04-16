@@ -70,56 +70,72 @@ namespace dd
 	};
 
 	Frustum::Frustum( Camera& camera )
+		: m_camera( camera )
 	{
-		glm::mat4 mvp = camera.GetCameraMatrix() * camera.GetProjection();
-
-		m_planes[0] = Plane(  mvp[0] + mvp[3] );
-		m_planes[1] = Plane( -mvp[0] + mvp[3] );
-		m_planes[2] = Plane(  mvp[1] + mvp[3] );
-		m_planes[3] = Plane( -mvp[1] + mvp[3] );
-		m_planes[4] = Plane(  mvp[2] + mvp[3] );
-		m_planes[5] = Plane( -mvp[2] + mvp[3] );
-
-		SetCorners( camera );
+		ResetFrustum( m_camera );
 	}
 
-	void Frustum::CreateRenderResources()
+	void Frustum::ResetFrustum( Camera& camera )
 	{
-		m_vao.Create();
+		glm::mat4 mvp = camera.GetProjection() * camera.GetCameraMatrix();
+
+		m_planes[0] = Plane( mvp[3] + mvp[0] );
+		m_planes[1] = Plane( mvp[3] - mvp[0] );
+		m_planes[2] = Plane( mvp[3] + mvp[1] );
+		m_planes[3] = Plane( mvp[3] - mvp[1] );
+		m_planes[4] = Plane( mvp[3] + mvp[2] );
+		m_planes[5] = Plane( mvp[3] - mvp[2] );
+
+		SetCorners( camera );
+		UpdateData();
+	}
+
+	void Frustum::UpdateData()
+	{
+		if( !m_vao.IsValid() )
+		{
+			m_vao.Create();
+		}
 		m_vao.Bind();
 
-		m_vertices.Create( GL_ARRAY_BUFFER );
+		if( !m_vertices.IsValid() )
+		{
+			m_vertices.Create( GL_ARRAY_BUFFER );
+		}
 		m_vertices.Bind();
 		m_vertices.SetData( m_corners, sizeof( m_corners ) );
 
-		m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
+		if( !m_indices.IsValid() )
+		{
+			m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
+		}
 		m_indices.Bind();
 		m_indices.SetData( s_indices, sizeof( s_indices ) );
 	}
 
+	// TODO: This always returns true.
 	bool Frustum::Intersects( const AABB& bounds ) const
 	{
 		glm::vec3 corners[8];
 		bounds.GetCorners( corners );
 
-		int totalIn = 0;
-
 		for( const Plane& plane : m_planes )
 		{
-			int inCount = 8;
-			bool inside = true;
+			bool inside = false;
 
-			glm::vec4 pvertex = glm::vec4(
-				plane.Normal().x > 0 ? bounds.Max.x : bounds.Min.x,
-				plane.Normal().y > 0 ? bounds.Max.y : bounds.Min.y,
-				plane.Normal().z > 0 ? bounds.Max.z : bounds.Min.z,
-				1.0f
-				);
+			for( const glm::vec3& corner : corners )
+			{
+				if( glm::dot( corner, plane.Normal() ) > 0 )
+				{
+					inside = true;
+					break;
+				}
+			}
 
-			pvertex = pvertex * m_invTransform;
-
-			if( plane.DistanceTo( pvertex.xyz() ) < 0 )
+			if( !inside )
+			{
 				return false;
+			}
 		}
 
 		// we must be partly in then otherwise
@@ -140,7 +156,7 @@ namespace dd
 
 		for( int i = 0; i < 6; ++i )
 		{
-			shader.SetUniform( "colour_multiplier", glm::vec4( s_colours[i], 0.2f ) );
+			shader.SetUniform( "colour_multiplier", glm::vec4( s_colours[i], 0.5f ) );
 
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}
@@ -149,7 +165,8 @@ namespace dd
 
 		m_vao.Unbind();
 	}
-
+	
+	// TODO: Move these out of world space and allow for setting pos and dir without recreating them.
 	void Frustum::SetCorners( Camera& camera )
 	{
 		// Work out corners of the frustum

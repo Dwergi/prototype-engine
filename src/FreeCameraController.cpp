@@ -100,11 +100,11 @@ namespace dd
 		glm::vec3 position = m_camera.GetPosition();
 		glm::vec3 direction = m_camera.GetDirection();
 
-		ImGui::Text( "Yaw: %.1f", m_yaw );
-		ImGui::Text( "Pitch: %.1f", m_pitch );
+		ImGui::Text( "Yaw: %.2f", m_yaw );
+		ImGui::Text( "Pitch: %.2f", m_pitch );
 		ImGui::Text( "Position: %.1f, %.1f, %.1f", position.x, position.y, position.z );
-		ImGui::Text( "Direction: %.1f, %.1f, %.1f", direction.x, direction.y, direction.z );
-		ImGui::Text( "VFOV: %.1f", glm::degrees( m_camera.GetVerticalFOV() ) * 2.f );
+		ImGui::Text( "Direction: %.2f, %.2f, %.2f", direction.x, direction.y, direction.z );
+		ImGui::Text( "VFOV: %.1f", glm::degrees( m_camera.GetVerticalFOV() ) * 2.0f );
 		ImGui::End();
 	}
 
@@ -120,7 +120,7 @@ namespace dd
 		m_yaw = wrap( m_yaw, 0, 360 );
 
 		// clamp the y direction
-		m_pitch = glm::clamp( m_pitch, -89.f, 89.f );
+		m_pitch = glm::clamp( m_pitch, -89.0f, 89.0f );
 
 		glm::vec3 direction( std::cos( glm::radians( m_pitch ) ) * std::sin( glm::radians( m_yaw ) ),
 							 std::sin( glm::radians( m_pitch ) ),

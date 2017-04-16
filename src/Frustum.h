@@ -30,8 +30,9 @@ namespace dd
 		//
 		bool Intersects( const AABB& bounds ) const;
 
-		void CreateRenderResources();
+		Camera& GetCamera() const { return m_camera; }
 		void Render( Camera& camera, ShaderProgram& shader );
+		void ResetFrustum( Camera& camera );
 
 	private:
 
@@ -42,6 +43,9 @@ namespace dd
 		VBO m_indices;
 		VBO m_vertices;
 
+		Camera& m_camera;
+
 		void SetCorners( Camera& camera );
+		void UpdateData();
 	};
 }
