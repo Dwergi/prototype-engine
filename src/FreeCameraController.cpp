@@ -37,7 +37,8 @@ namespace dd
 	FreeCameraController::FreeCameraController( Camera& camera ) :
 		m_camera( camera ),
 		m_yaw( 0.0f ),
-		m_pitch( 0.0f )
+		m_pitch( 0.0f ),
+		m_debugOpen( true )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
 
@@ -86,10 +87,9 @@ namespace dd
 			*state = false;
 	}
 
-	void FreeCameraController::DrawCameraDebug() const
+	void FreeCameraController::DrawCameraDebug()
 	{
-		bool open = true;
-		if( !ImGui::Begin( "FreeCamera", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
+		if( !ImGui::Begin( "FreeCamera", &m_debugOpen, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings ) )
 		{
 			ImGui::End();
 			return;
@@ -97,14 +97,33 @@ namespace dd
 
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, 2 ) );
 
-		glm::vec3 position = m_camera.GetPosition();
-		glm::vec3 direction = m_camera.GetDirection();
-
 		ImGui::Text( "Yaw: %.2f", m_yaw );
 		ImGui::Text( "Pitch: %.2f", m_pitch );
+		
+		glm::vec3 position = m_camera.GetPosition();
 		ImGui::Text( "Position: %.1f, %.1f, %.1f", position.x, position.y, position.z );
+
+		glm::vec3 direction = m_camera.GetDirection();
 		ImGui::Text( "Direction: %.2f, %.2f, %.2f", direction.x, direction.y, direction.z );
-		ImGui::Text( "VFOV: %.1f", glm::degrees( m_camera.GetVerticalFOV() ) * 2.0f );
+
+		float vfov = glm::degrees( m_camera.GetVerticalFOV() * 2.0f );
+		if( ImGui::SliderFloat( "VFOV", &vfov, 0.1f, 178.0f, "%.2f" ) )
+		{
+			m_camera.SetVerticalFOV( glm::radians( vfov / 2.0f ) );
+		}
+		
+		float near_distance = m_camera.GetNear();
+		float far_distance = m_camera.GetFar();
+		if( ImGui::SliderFloat( "Near", &near_distance, 0.01f, far_distance - 0.01f, "%.2f" ) )
+		{
+			m_camera.SetNear( near_distance );
+		}
+
+		if( ImGui::SliderFloat( "Far", &far_distance, near_distance + 0.01f, 100.f, "%.2f" ) )
+		{
+			m_camera.SetFar( far_distance );
+		}
+		
 		ImGui::End();
 	}
 

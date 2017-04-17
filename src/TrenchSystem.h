@@ -8,23 +8,35 @@
 
 #include "ISystem.h"
 #include "EntityHandle.h"
+#include "Mesh.h"
 #include "TransformComponent.h"
 #include "TrenchComponent.h"
 
 namespace dd
 {
+	class Camera;
+	class Mesh;
+
 	class TrenchSystem : public ISystem
 	{
 	public: 
 
-		TrenchSystem();
+		TrenchSystem( Camera& camera );
 		~TrenchSystem();
 
 		void Update( EntityManager& entity_manager, float delta_t ) override;
+		void CreateRenderResources();
 
 	private:
 
-		// update a single trench component
-		void UpdateComponent( EntityManager& entity_manager, EntityHandle handle, ComponentHandle<TrenchComponent> trench_comp, ComponentHandle<TransformComponent> transform_comp, glm::vec3 player_pos, glm::vec3 player_dir );
+		MeshHandle m_chunkMesh;
+		ShaderHandle m_shader;
+
+		Camera& m_camera;
+		glm::vec3 m_trenchDirection;
+		glm::vec3 m_trenchOrigin;
+		dd::DenseMap<glm::vec3, EntityHandle> m_chunks;
+
+		EntityHandle CreateTrenchChunk( glm::vec3 position, EntityManager& entity_manager );
 	};
 }

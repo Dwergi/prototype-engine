@@ -25,8 +25,6 @@ namespace dd
 		glm::vec3 GetDirection() const;
 		void SetDirection( const glm::vec3& dir );
 
-		glm::mat4 GetCameraMatrix() const;
-
 		float GetNear() const;
 		void SetNear( float dist_near );
 
@@ -40,6 +38,9 @@ namespace dd
 		void SetVerticalFOV( float vfov );
 
 		glm::mat4 GetProjection() const;
+		glm::mat4 GetCameraMatrix() const;
+
+		void CopyValuesFrom( const Camera& other );
 		
 		BEGIN_SCRIPT_OBJECT( Camera )
 			METHOD( Camera, GetPosition )

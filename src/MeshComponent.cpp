@@ -13,7 +13,6 @@ namespace dd
 {
 	MeshComponent::MeshComponent()
 	{
-
 	}
 	
 	MeshComponent::MeshComponent( MeshHandle mesh ) :
@@ -21,16 +20,15 @@ namespace dd
 		Hidden( false ),
 		Colour( glm::vec4( 1, 1, 1, 1 ) )
 	{
-
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
 		ComponentBase( other ),
 		Mesh( other.Mesh ),
 		Hidden( other.Hidden ),
-		Colour( other.Colour )
+		Colour( other.Colour ),
+		Bounds( other.Bounds )
 	{
-
 	}
 
 	MeshComponent::~MeshComponent()
@@ -43,7 +41,16 @@ namespace dd
 		Mesh = other.Mesh;
 		Hidden = other.Hidden;
 		Colour = other.Colour;
-
+		Bounds = other.Bounds;
+		
 		return *this;
+	}
+
+	void MeshComponent::UpdateBounds( const glm::mat4& transform )
+	{
+		if( Mesh.Get() != nullptr )
+		{
+			Bounds = Mesh.Get()->Bounds().GetTransformed( transform );
+		}
 	}
 }

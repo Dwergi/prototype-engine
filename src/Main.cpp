@@ -37,6 +37,7 @@
 #include "TerrainSystem.h"
 #include "Timer.h"
 #include "TransformComponent.h"
+#include "TrenchSystem.h"
 #include "Window.h"
 
 #include "DebugConsole.h"
@@ -75,8 +76,8 @@ std::unique_ptr<Input> s_input;
 
 void DrawFPS( float delta_t )
 {
-	ImGui::SetNextWindowPos( ImVec2( 2, 2 ) );
-	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
+	ImGui::SetNextWindowPos( ImVec2( 2.0f, 2.0f ) );
+	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings ) )
 	{
 		ImGui::End();
 		return;
@@ -98,7 +99,8 @@ void DrawFPS( float delta_t )
 
 	float sliding_delta = (total_time / SLIDING_WINDOW_SIZE) * 1000.f;
 
-	ImGui::Text( "Frame time: %.1f", ms );
+	ImGui::Text( "FPS: %.1f", 1000.0f / sliding_delta );
+	ImGui::Text( "Frame Time: %.1f", ms );
 	ImGui::Text( "Sliding: %.1f", sliding_delta );
 	ImGui::End();
 }
@@ -316,9 +318,6 @@ int GameMain( EntityManager& entity_manager )
 
 		SwarmSystem swarm_system;
 
-		Vector<ISystem*> systems;
-		systems.Add( &swarm_system );
-
 		s_window.reset( new Window( 1280, 720, "DD" ) );
 		s_input.reset( new Input( *s_window ) );
 
@@ -329,8 +328,11 @@ int GameMain( EntityManager& entity_manager )
 		Renderer renderer;
 		renderer.Initialize( *s_window, entity_manager );
 
-		TerrainSystem terrain( renderer.GetCamera() );
-		terrain.Initialize( entity_manager );
+		TerrainSystem terrain_system( renderer.GetCamera() );
+		terrain_system.Initialize( entity_manager );
+
+		TrenchSystem trench_system( renderer.GetCamera() );
+		trench_system.CreateRenderResources();
 
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::SHOW_CONSOLE, &ToggleConsole );
@@ -339,6 +341,10 @@ int GameMain( EntityManager& entity_manager )
 
 		FreeCameraController free_cam( renderer.GetCamera() );
 		free_cam.BindActions( bindings );
+
+		Vector<ISystem*> systems;
+		systems.Add( &swarm_system );
+		systems.Add( &trench_system );
 
 		BindKeys( *s_input );
 

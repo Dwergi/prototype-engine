@@ -9,7 +9,6 @@
 
 #include "Camera.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 
 #include "GL/gl3w.h"
 
@@ -79,13 +78,13 @@ namespace dd
 		return m_instances.Find( handle.m_hash );
 	}
 
-	MeshHandle Mesh::Create( const char* name, ShaderProgram& program )
+	MeshHandle Mesh::Create( const char* name, ShaderHandle program )
 	{
 		DD_ASSERT( name != nullptr );
 		DD_ASSERT( strlen( name ) > 0 );
 
 		uint64 hash = dd::Hash( name );
-		hash ^= dd::Hash( program.Name() );
+		hash ^= dd::Hash( program.Get()->Name() );
 
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
@@ -108,10 +107,10 @@ namespace dd
 		m_instances.Remove( handle.m_hash );
 	}
 
-	Mesh::Mesh( const char* name, ShaderProgram& program ) :
+	Mesh::Mesh( const char* name, ShaderHandle program ) :
 		m_refCount( nullptr ),
 		m_vbo( OpenGL::InvalidID ),
-		m_shader( &program ),
+		m_shader( program ),
 		m_name( name ),
 		m_stride( 0 )
 	{
@@ -120,18 +119,6 @@ namespace dd
 		m_vao.Create();
 
 		glGenBuffers( 1, &m_vbo );
-
-		// TODO: load this from assimp or something
-		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
-		BindAttribute( "position", MeshAttribute::Position, 3, false );
-		BindAttribute( "uv", MeshAttribute::UV, 2, false );
-		BindAttribute( "normal", MeshAttribute::Normal, 3, true );
-
-		// TODO: Create an AABB constructor that takes min and max.
-		AABB bounds;
-		bounds.Expand( glm::vec3( -1, -1, -1 ) );
-		bounds.Expand( glm::vec3( 1, 1, 1 ) );
-		SetBounds( bounds );
 
 		m_refCount = new std::atomic<int>( 1 );
 
@@ -190,7 +177,7 @@ namespace dd
 
 		m_vao.Bind();
 
-		m_shader->BindAttributeFloat( shaderAttribute, count, m_stride * sizeof( float ), normalized );
+		m_shader.Get()->BindAttributeFloat( shaderAttribute, count, m_stride * sizeof( float ), normalized );
 
 		m_vao.Unbind();
 	}
@@ -209,10 +196,11 @@ namespace dd
 	{
 		DD_PROFILE_START( Mesh_Render );
 
-		DD_ASSERT( m_shader != nullptr );
-		DD_ASSERT( m_shader->IsValid() );
+		DD_ASSERT( m_shader.IsValid() );
 
-		m_shader->Use( true );
+		ShaderProgram& shader = *m_shader.Get();
+
+		shader.Use( true );
 
 		m_vao.Bind();
 
@@ -222,14 +210,14 @@ namespace dd
 
 		glm::mat4 mvp = projection * view * model;
 
-		m_shader->SetUniform( "mvp", mvp );
-		m_shader->SetUniform( "colour_multiplier", m_colour );
+		shader.SetUniform( "mvp", mvp );
+		shader.SetUniform( "colour_multiplier", m_colour );
 
 		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
 
 		m_vao.Unbind();
 
-		m_shader->Use( false );
+		shader.Use( false );
 
 		DD_PROFILE_END();
 	}
@@ -260,5 +248,18 @@ namespace dd
 			if( data != nullptr )
 				delete data;
 		}
+	}
+
+	void Mesh::MakeUnitCube()
+	{
+		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
+		BindAttribute( "position", MeshAttribute::Position, 3, false );
+		BindAttribute( "uv", MeshAttribute::UV, 2, false );
+		BindAttribute( "normal", MeshAttribute::Normal, 3, true );
+
+		AABB bounds;
+		bounds.Expand( glm::vec3( -1, -1, -1 ) );
+		bounds.Expand( glm::vec3( 1, 1, 1 ) );
+		SetBounds( bounds );
 	}
 }

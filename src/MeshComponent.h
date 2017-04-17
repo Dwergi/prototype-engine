@@ -9,9 +9,12 @@
 #include "ComponentBase.h"
 #include "DenseMapPool.h"
 #include "Mesh.h"
+#include "AABB.h"
 
 namespace dd
 {
+	class TransformComponent;
+
 	class MeshComponent : public ComponentBase
 	{
 	public: 
@@ -26,8 +29,10 @@ namespace dd
 		MeshHandle Mesh;
 		bool Hidden;
 		glm::vec4 Colour;
+		AABB Bounds;
 
 		MeshComponent& operator=( const MeshComponent& other );
+		void UpdateBounds( const glm::mat4& transform );
 
 		BEGIN_TYPE( MeshComponent )
 			MEMBER( MeshComponent, Mesh )

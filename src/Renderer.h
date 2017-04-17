@@ -44,7 +44,8 @@ namespace dd
 
 		Window* m_window;
 		Camera* m_camera;
-		ShaderProgram* m_defaultShader;
+		Frustum* m_frustum;
+
 		Vector<ShaderHandle> m_shaders;
 		EntityManager* m_entityManager;
 
@@ -54,29 +55,21 @@ namespace dd
 		bool m_drawAxes;
 
 		int m_meshCount;
+		int m_frustumMeshCount;
 
-		// TODO: Delete these and use actual camera values.
-		Camera* m_debugCamera;
-		Frustum* m_debugFrustum;
-		bool m_debugFrustumEnabled;
 		bool m_debugHighlightMeshes;
-		float m_debugFrustumFar;
-		float m_debugFrustumNear;
-		int m_debugFrustumMeshCount;
 
-		// TODO: Introduce renderer freezing.
-
+		bool m_debugHitTestMeshes;
 		float m_debugFocusedMeshDistance;
 		EntityHandle m_debugFocusedMesh;
 
+		bool m_debugMeshGridCreated;
+
 		void DrawDebugUI();
-		EntityHandle CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderProgram& shader, glm::vec4& colour, const glm::mat4& transform );
+		EntityHandle CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
 		void SetRenderState();
 
-		void CreateDebugFrustum( Window& window );
-		void RenderDebugFrustum();
-
-		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
+		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp );
 		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
 	};
 }

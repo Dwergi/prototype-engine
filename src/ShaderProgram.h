@@ -77,7 +77,10 @@ namespace dd
 	{
 	public:
 		ShaderHandle() : m_hash( 0 ) {}
+
 		ShaderProgram* Get() { return ShaderProgram::Get( *this ); }
+
+		bool IsValid() const { return m_hash != 0; }
 
 	private:
 		friend class ShaderProgram;

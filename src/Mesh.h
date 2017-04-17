@@ -7,6 +7,7 @@
 #pragma once
 
 #include "AABB.h"
+#include "ShaderProgram.h"
 #include "VAO.h"
 
 #include <atomic>
@@ -37,7 +38,7 @@ namespace dd
 		//
 		// Create (or retrieve) a handle to a mesh with the given name using the given shader.
 		//
-		static MeshHandle Create( const char* name, ShaderProgram& program );
+		static MeshHandle Create( const char* name, ShaderHandle program );
 
 		//
 		// Get the mesh instance associated with the given handle.
@@ -66,6 +67,8 @@ namespace dd
 
 		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
+		void MakeUnitCube();
+
 		Mesh& operator=( const Mesh& other );
 		Mesh( const Mesh& other );
 		~Mesh();
@@ -78,7 +81,7 @@ namespace dd
 		uint m_vbo;
 		VAO m_vao;
 		String128 m_name;
-		ShaderProgram* m_shader;
+		ShaderHandle m_shader;
 		AABB m_bounds;
 		Buffer<float> m_data;
 		uint m_stride;
@@ -88,7 +91,7 @@ namespace dd
 		void Retain();
 		void Release();
 
-		Mesh( const char* name, ShaderProgram& program );
+		Mesh( const char* name, ShaderHandle program );
 	};
 
 	//
@@ -99,7 +102,10 @@ namespace dd
 	{
 	public:
 		MeshHandle() : m_hash( 0 ) {}
+
 		Mesh* Get() const { return Mesh::Get( *this ); }
+
+		bool IsValid() const { return m_hash != 0; }
 
 		BASIC_TYPE( MeshHandle )
 		

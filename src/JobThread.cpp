@@ -55,7 +55,7 @@ namespace dd
 			ProcessJob();
 
 			// let someone else have a go at the CPU
-			::Sleep( 0 );
+			::Sleep( 1 );
 		}
 	}
 }

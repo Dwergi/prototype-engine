@@ -32,7 +32,7 @@ namespace dd
 
 		void BindActions( InputBindings& bindings );
 
-		void DrawCameraDebug() const;
+		void DrawCameraDebug();
 
 	private:
 
@@ -40,6 +40,7 @@ namespace dd
 		float m_yaw;
 		float m_pitch;
 		glm::vec2 m_mouseDelta;
+		bool m_debugOpen;
 
 		DenseMap<InputAction, bool> m_inputs;
 	};

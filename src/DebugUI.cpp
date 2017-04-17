@@ -123,12 +123,12 @@ namespace dd
 		if( last_enable_scissor_test ) glEnable( GL_SCISSOR_TEST ); else glDisable( GL_SCISSOR_TEST );
 	}
 
-	static const char* GetClipboardText()
+	static const char* GetClipboardText( void* data )
 	{
 		return glfwGetClipboardString( s_window );
 	}
 
-	static void SetClipboardText( const char* text )
+	static void SetClipboardText( void* data, const char* text )
 	{
 		glfwSetClipboardString( s_window, text );
 	}

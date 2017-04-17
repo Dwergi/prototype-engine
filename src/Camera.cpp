@@ -13,12 +13,12 @@
 
 namespace dd
 {
-	Camera::Camera()
+	Camera::Camera() :
+		m_far( 0.0f ),
+		m_near( 0.0f ),
+		m_aspectRatio( 0.0f ),
+		m_vfov( 0.0f )
 	{
-		m_far = 0.f;
-		m_near = 0.f;
-		m_aspectRatio = 0.f;
-		m_vfov = 0.f;
 	}
 
 	Camera::Camera( Window& window ) :
@@ -47,11 +47,6 @@ namespace dd
 	void Camera::SetDirection( const glm::vec3& dir )
 	{
 		m_direction = glm::normalize( dir );
-	}
-
-	glm::mat4 Camera::GetCameraMatrix() const
-	{
-		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
 	}
 
 	float Camera::GetNear() const
@@ -97,5 +92,20 @@ namespace dd
 	glm::mat4 Camera::GetProjection() const
 	{
 		return glm::perspective( m_vfov, m_aspectRatio, m_near, m_far );
+	}
+
+	glm::mat4 Camera::GetCameraMatrix() const
+	{
+		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
+	}
+
+	void Camera::CopyValuesFrom( const Camera& other )
+	{
+		m_vfov = other.m_vfov;
+		m_aspectRatio = other.m_aspectRatio;
+		m_near = other.m_near;
+		m_far = other.m_far;
+		m_direction = other.m_direction;
+		m_position = other.m_position;
 	}
 }
