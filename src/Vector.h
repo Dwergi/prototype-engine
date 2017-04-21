@@ -63,8 +63,6 @@ namespace dd
 		//
 		void Add( T&& value );
 		void Add( const T& value );
-		void Push( T&& value );
-		void Push( const T& value );
 
 		//
 		// Insert at the given index. 
@@ -112,6 +110,12 @@ namespace dd
 		void ShrinkToFit();
 
 		bool operator==( const Vector<T>& other ) const;
+
+		//
+		// Get the first and last entries in the vector.
+		//
+		T& First() const;
+		T& Last() const;
 
 		//
 		// Iteration

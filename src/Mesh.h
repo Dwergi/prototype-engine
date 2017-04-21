@@ -62,6 +62,10 @@ namespace dd
 		const AABB& Bounds() const;
 		void SetBounds( const AABB& bounds );
 
+		//
+		// Set the vertex buffer that the mesh will use.
+		// The mesh does *NOT* take ownership of this.
+		//
 		void SetData( float* data, uint count, uint stride );
 		void BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized );
 

@@ -19,6 +19,7 @@ namespace dd
 		ArrayBase<T>& operator=( const ArrayBase<T>& other );
 
 		void Push( const T& value );
+		void Add( const T& value );
 		void PushAll( const ArrayBase<T>& other );
 
 		void RemoveAt( uint index );
@@ -30,6 +31,9 @@ namespace dd
 		const T& operator[]( uint index ) const;
 		bool Contains( const T& val );
 		int IndexOf( const T& val );
+
+		T& Last() const;
+		T& First() const;
 
 		T* Data() { return m_data; }
 		void SetSize( uint size ) { m_size = size; }

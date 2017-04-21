@@ -236,18 +236,6 @@ namespace dd
 	}
 
 	template <typename T>
-	void Vector<T>::Push( T&& entry )
-	{
-		Add( std::move( entry ) );
-	}
-
-	template <typename T>
-	void Vector<T>::Push( const T& entry )
-	{
-		Add( entry );
-	}
-
-	template <typename T>
 	void Vector<T>::Insert( const T&& entry, uint index )
 	{
 		DD_ASSERT( index <= m_size );
@@ -373,6 +361,18 @@ namespace dd
 	bool Vector<T>::Contains( const T& entry ) const
 	{
 		return Find( entry ) != -1;
+	}
+
+	template <typename T>
+	T& Vector<T>::Last() const
+	{
+		return m_data[m_size - 1];
+	}
+
+	template <typename T>
+	T& Vector<T>::First() const
+	{
+		return m_data[0];
 	}
 
 	template <typename T>

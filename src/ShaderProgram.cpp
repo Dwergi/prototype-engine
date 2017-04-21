@@ -20,7 +20,7 @@ namespace dd
 
 	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
 	{
-		DD_PROFILE_START( ShaderProgram_Create );
+		DD_PROFILE_SCOPED( ShaderProgram_Create );
 
 		uint64 hash = dd::Hash( name );
 
@@ -42,8 +42,6 @@ namespace dd
 
 		ShaderHandle handle;
 		handle.m_hash = hash;
-
-		DD_PROFILE_END();
 
 		return handle;
 	}
@@ -139,7 +137,7 @@ namespace dd
 
 	String256 ShaderProgram::Link()
 	{
-		DD_PROFILE_START( ShaderProgram_Link );
+		DD_PROFILE_SCOPED( ShaderProgram_Link );
 
 		glLinkProgram( m_id );
 
@@ -164,8 +162,6 @@ namespace dd
 		{
 			m_valid = true;
 		}
-
-		DD_PROFILE_END();
 
 		return msg;
 	}

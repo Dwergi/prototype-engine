@@ -64,9 +64,6 @@ namespace dd
 	void Renderer::Initialize( Window& window, EntityManager& entity_manager )
 	{
 		m_camera = new Camera( window );
-		m_camera->SetPosition( glm::vec3( 10, 0, 10 ) );
-		m_camera->SetDirection( glm::vec3( -1, 0, -1 ) );
-
 		m_frustum = new Frustum( *m_camera );
 		m_frustum->ResetFrustum( *m_camera );
 

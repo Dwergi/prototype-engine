@@ -114,15 +114,13 @@ namespace dd
 		m_name( name ),
 		m_stride( 0 )
 	{
-		DD_PROFILE_START( Mesh_Create );
+		DD_PROFILE_SCOPED( Mesh_Create );
 
 		m_vao.Create();
 
 		glGenBuffers( 1, &m_vbo );
 
 		m_refCount = new std::atomic<int>( 1 );
-
-		DD_PROFILE_END();
 	}
 
 	Mesh::Mesh( const Mesh& other ) :
@@ -194,7 +192,7 @@ namespace dd
 
 	void Mesh::Render( const Camera& camera, const glm::mat4& transform )
 	{
-		DD_PROFILE_START( Mesh_Render );
+		DD_PROFILE_SCOPED( Mesh_Render );
 
 		DD_ASSERT( m_shader.IsValid() );
 
@@ -218,8 +216,6 @@ namespace dd
 		m_vao.Unbind();
 
 		shader.Use( false );
-
-		DD_PROFILE_END();
 	}
 
 	void Mesh::Retain()
@@ -233,7 +229,7 @@ namespace dd
 	{
 		DD_ASSERT( m_refCount != nullptr );
 
-		float* data = m_data.Release();
+		m_data.Release();
 
 		if( --*m_refCount <= 0 )
 		{
@@ -244,9 +240,6 @@ namespace dd
 			delete m_refCount;
 
 			m_vbo = OpenGL::InvalidID;
-
-			if( data != nullptr )
-				delete data;
 		}
 	}
 

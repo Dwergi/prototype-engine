@@ -169,8 +169,6 @@ namespace dd
 	template <typename TKey, typename TValue>
 	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
 	{
-		DD_PROFILE_SCOPED( DenseMap_FindEntry );
-
 		uint index = 0;
 		Entry& entry = GetEntry( key );
 
@@ -221,8 +219,6 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
 	{
-		DD_PROFILE_START( DenseMap_Resize );
-
 		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
 		for( uint i = 0; i < new_capacity; ++i )
 		{
@@ -247,8 +243,6 @@ namespace dd
 
 			delete[] (byte*) old_data.Release();
 		}
-
-		DD_PROFILE_END();
 	}
 
 	template <typename TKey, typename TValue>

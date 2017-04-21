@@ -166,6 +166,8 @@ namespace dd
 
 	void DebugConsole::Draw( const char* title, bool& opened )
 	{
+		DD_PROFILE_START( DebugConsole_Draw );
+
 		ImGui::SetNextWindowSize( ImVec2( 520, 600 ), ImGuiSetCond_FirstUseEver );
 		if( !ImGui::Begin( title, &opened ) )
 		{
@@ -250,6 +252,8 @@ namespace dd
 			ImGui::SetKeyboardFocusHere( -1 ); // Auto focus
 
 		ImGui::End();
+
+		DD_PROFILE_END();
 	}
 
 	void DebugConsole::ExecCommand( const String& command_line )

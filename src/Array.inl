@@ -73,6 +73,12 @@ namespace dd
 	}
 
 	template <typename T>
+	void ArrayBase<T>::Add( const T& value )
+	{
+		Push( value );
+	}
+
+	template <typename T>
 	void ArrayBase<T>::PushAll( const ArrayBase<T>& other )
 	{
 		DD_ASSERT( m_capacity - m_size >= other.Size() );
@@ -139,5 +145,17 @@ namespace dd
 		}
 
 		return -1;
+	}
+
+	template <typename T>
+	T& ArrayBase<T>::Last() const
+	{
+		return m_data[m_size - 1];
+	}
+
+	template <typename T>
+	T& ArrayBase<T>::First() const
+	{
+		return m_data[0];
 	}
 }

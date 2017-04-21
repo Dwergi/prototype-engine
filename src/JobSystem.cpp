@@ -12,6 +12,9 @@
 #include "Timer.h"
 
 #include <thread>
+#include <chrono>
+
+//#define NO_JOB_SCHEDULING // Uncomment to run all jobs on the scheduling thread.
 
 #pragma pack(push,8)
 typedef struct tagTHREADNAME_INFO
@@ -42,8 +45,8 @@ void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName )
 
 namespace dd
 {
-	JobSystem::Job::Job( const Job& other )
-		: Func( other.Func ),
+	JobSystem::Job::Job( const Job& other ) :
+		Func( other.Func ),
 		Category( other.Category ),
 		Status( other.Status ),
 		ID( other.ID )
@@ -51,11 +54,24 @@ namespace dd
 
 	}
 
-	JobSystem::Job::Job( const std::function<void()>& fn, const char* category, uint id )
-		: Func( fn ),
+	JobSystem::Job::Job( const std::function<void()>& fn, JobSystem::Category* category, uint id ) :
+		Func( fn ),
 		Category( category ),
 		Status( JobStatus::Pending ),
 		ID( id )
+	{
+
+	}
+
+	JobSystem::Category::Category() :
+		Pending( 0 )
+	{
+
+	}
+
+	JobSystem::Category::Category( const char* name ) :
+		Pending( 0 ),
+		Name( name )
 	{
 
 	}
@@ -64,6 +80,7 @@ namespace dd
 	{
 		ID = 0;
 		Status = JobStatus::Free;
+		Category = nullptr;
 	}
 
 	JobSystem::JobSystem( uint thread_count )
@@ -85,7 +102,12 @@ namespace dd
 		for( uint i = 0; i < m_workers.Size(); ++i )
 		{
 			m_workers[i]->Kill();
+		}
 
+		m_jobsPending.notify_all(); // signal workers to wake up
+
+		for( uint i = 0; i < m_workers.Size(); ++i )
+		{
 			m_threads[i].join();
 		}
 	}
@@ -112,38 +134,38 @@ namespace dd
 		}
 	}
 
-	void JobSystem::Schedule( const Function& fn, const char* category )
+	void JobSystem::Schedule( const Function& fn, const char* category_name )
 	{
 		DD_ASSERT( fn.Signature()->ArgCount() == 0 );
 		DD_ASSERT( !fn.IsMethod() || fn.Context().IsValid() ); // must be free or already be bound
 
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
+		Schedule( [fn]() { fn(); }, category_name );
+	}
 
-		// find a free slot
-		for( uint i = 0; i < m_jobs.Size(); ++i )
+	void JobSystem::Schedule( const std::function<void()>& fn, const char* category_name )
+	{
+		DD_PROFILE_SCOPED( JobSystem_Schedule );
+
+#ifndef NO_JOB_SCHEDULING
+		std::unique_lock<std::mutex> lock( m_jobsMutex );
+
+		Category* category = FindCategory( category_name );
+		if( category == nullptr )
 		{
-			if( m_jobs[i].Status == JobStatus::Free )
+			DD_ASSERT( m_categories.Size() < m_categories.Capacity(), "JobSystem categories list out of space, allocate more!" );
+
+			if( m_categories.Size() < m_categories.Capacity() )
 			{
-				new (&m_jobs[i]) Job( [fn]() { fn(); }, category, i );
-				m_pendingJobs.Add( i );
-				return;
+				category = m_categories.Data() + m_categories.Size();
+				new (category) Category( category_name );
+				m_categories.SetSize( m_categories.Size() + 1 );
 			}
 		}
 
-		DD_ASSERT( m_jobs.Size() < m_jobs.Capacity(), "JobSystem out of space, allocate more!" );
-
-		// add if we won't cause a reallocate
-		if( m_jobs.Size() < m_jobs.Capacity() )
 		{
-			int id = m_jobs.Size();
-			m_jobs.Add( Job( [fn]() { fn(); }, category, id ) );
-			m_pendingJobs.Add( id );
+			std::lock_guard<std::mutex> lock( category->Mutex );
+			++category->Pending;
 		}
-	}
-
-	void JobSystem::Schedule( const std::function<void ()>& fn, const char* category )
-	{
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
 
 		// find a free slot
 		for( uint i = 0; i < m_jobs.Size(); ++i )
@@ -152,6 +174,9 @@ namespace dd
 			{
 				new (&m_jobs[i]) Job( fn, category, i );
 				m_pendingJobs.Add( i );
+
+				lock.unlock();
+				m_jobsPending.notify_one();
 				return;
 			}
 		}
@@ -164,42 +189,54 @@ namespace dd
 			int id = m_jobs.Size();
 			m_jobs.Add( Job( fn, category, id ) );
 			m_pendingJobs.Add( id );
+
+			lock.unlock();
+			m_jobsPending.notify_one();
+			return;
 		}
-	}
-
-	bool JobSystem::HasPendingJobs( const char* category )
-	{
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-
-		for( int job : m_pendingJobs )
-		{
-			if( m_jobs[job].Category == category )
-				return true;
-		}
-
-		return false;
+#else
+		fn();
+#endif
 	}
 
 	void JobSystem::MarkDone( const Job& job )
 	{
+		std::lock_guard<std::mutex> lock( m_jobsMutex );
+
+		Category* category = job.Category;
 		int id = job.ID;
 		m_jobs[id].~Job();
-		m_jobs[id].Status = JobStatus::Free;
+
+		if( category != nullptr )
+		{
+			std::unique_lock<std::mutex> lock( category->Mutex );
+			if( --category->Pending == 0 )
+			{
+				lock.unlock();
+				category->Condition.notify_one();
+			}
+
+			DD_ASSERT( category->Pending >= 0, "Should never go negative in pending jobs!" );
+		}
 	}
 
-	bool JobSystem::GetPendingJob( Job*& out_job )
+	bool JobSystem::WaitForJob( Job*& out_job )
 	{
 		out_job = nullptr;
 
-		std::lock_guard<std::mutex> lock( m_jobsMutex );
-		
-		if( m_pendingJobs.Size() == 0 )
-			return false;	
+		std::unique_lock<std::mutex> lock( m_jobsMutex );
+		m_jobsPending.wait( lock, [this] { return true; } );
 
-		out_job = &m_jobs[m_pendingJobs[0]];
-		m_pendingJobs.RemoveOrdered( 0 );
+		if( m_pendingJobs.Size() > 0 )
+		{
+			out_job = &m_jobs[m_pendingJobs[0]];
+			m_pendingJobs.RemoveOrdered( 0 );
 
-		return true;
+			return true;
+		}
+
+		// woken up for some other reason, go find out why
+		return false;
 	}
 
 	JobThread* JobSystem::FindCurrentWorker() const
@@ -217,21 +254,40 @@ namespace dd
 		return nullptr;
 	}
 
-	void JobSystem::WaitForCategory( const char* category, uint timeout_ms )
+	JobSystem::Category* JobSystem::FindCategory( const char* category_name ) const
 	{
-		Timer timer;
-		timer.Start();
+		for( Category& category : m_categories )
+		{
+			if( category.Name == category_name )
+				return &category;
+		}
 
+		return nullptr;
+	}
+
+	void JobSystem::WaitForCategory( const char* category_name, uint timeout_ms )
+	{
 		JobThread* thread = FindCurrentWorker();
 		DD_ASSERT_ERROR( thread == nullptr, "Cannot wait for categories inside jobs!" );
 		
-		do
+		Category* category = FindCategory( category_name );
+		if( category != nullptr )
 		{
-			if( !HasPendingJobs( category ) )
-				return;
-			
-			::Sleep( 0 );
-		} 
-		while( timeout_ms == 0 || timer.Time() < timeout_ms );
+			std::unique_lock<std::mutex> lock( category->Mutex );
+
+			DD_PROFILE_START( JobSystem_WaitForCategory );
+
+			if( timeout_ms > 0 )
+			{
+				category->Condition.wait_for( lock, std::chrono::milliseconds( timeout_ms ), [category] { return category->Pending == 0; } );
+			}
+			else
+			{
+				category->Condition.wait( lock, [category] { return category->Pending == 0; } );
+			}
+
+			DD_PROFILE_END();
+			DD_ASSERT_ERROR( category->Pending == 0, "Category still has pending jobs!" );
+		}
 	}
 }

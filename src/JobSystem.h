@@ -52,17 +52,29 @@ namespace dd
 			Free
 		};
 
+		struct Category
+		{
+			Category();
+			Category( const char* name );
+			Category( const Category& ) = delete;
+
+			String128 Name;
+			int Pending;
+			std::condition_variable Condition;
+			std::mutex Mutex;
+		};
+
 		//
 		// A job structure.
 		//
 		struct Job
 		{
 			Job( const Job& other );
-			Job( const std::function<void()>& fn, const char* category, uint id );
+			Job( const std::function<void()>& fn, Category* category, uint id );
 			~Job();
 
 			JobStatus Status;
-			String128 Category;
+			Category* Category;
 			uint ID;
 			std::function<void()> Func;
 		};
@@ -70,19 +82,22 @@ namespace dd
 		friend class JobThread;
 
 		std::thread m_threads[MAX_THREADS];
+
+		Array<Category, 32> m_categories;
 		Vector<JobThread*> m_workers;
 		Vector<Job> m_jobs;
 		Vector<int> m_pendingJobs;
 
 		std::mutex m_jobsMutex;
+		std::condition_variable m_jobsPending;
 
 		void CreateWorkers( uint thread_count );
 		JobThread* FindCurrentWorker() const;
 
-		bool HasPendingJobs( const char* category );
+		Category* FindCategory( const char* category_name ) const;
 
 		// JobThread interface
-		bool GetPendingJob( Job*& out_job );
+		bool WaitForJob( Job*& out_job );
 		void MarkDone( const Job& job );
 	};
 }

@@ -17,7 +17,6 @@ namespace dd
 		m_owner( std::move( other.m_owner ) ),
 		m_name( other.m_name )
 	{
-		DD_PROFILE_THREAD_NAME( m_name.c_str() );
 	}
 
 	JobThread::JobThread( JobSystem& owner, const char* name )
@@ -25,12 +24,10 @@ namespace dd
 		m_owner( owner ),
 		m_name( name )
 	{
-		DD_PROFILE_THREAD_NAME( m_name.c_str() );
 	}
 
 	JobThread::~JobThread()
 	{
-
 	}
 
 	void JobThread::Kill()
@@ -40,22 +37,26 @@ namespace dd
 
 	void JobThread::ProcessJob()
 	{
+		DD_PROFILE_SCOPED( JobThread_ProcessJob );
+
 		JobSystem::Job* job;
-		if( m_owner.GetPendingJob( job ) )
+		if( m_owner.WaitForJob( job ) )
 		{
+			DD_PROFILE_SCOPED( JobThread_RunJob );
+
 			job->Func();
+
 			m_owner.MarkDone( *job );
 		}
 	}
 
 	void JobThread::Run()
 	{
+		DD_PROFILE_THREAD_NAME( m_name.c_str() );
+
 		while( !m_killed )
 		{
 			ProcessJob();
-
-			// let someone else have a go at the CPU
-			::Sleep( 1 );
 		}
 	}
 }

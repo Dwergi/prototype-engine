@@ -70,11 +70,74 @@ bool s_freeCamEnabled = true;
 bool s_drawCameraDebug = true;
 
 std::unique_ptr<Window> s_window;
-std::unique_ptr<Input> s_input;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
-void DrawFPS( float delta_t )
+class FrameTimer
+{
+public:
+
+	FrameTimer()
+	{
+		m_targetDelta = 1.0f / s_maxFPS;
+		m_lastFrameTime = 0.0f;
+		m_currentFrameTime = -m_targetDelta;
+		m_delta = m_targetDelta;
+		m_deltaWithoutDelay = m_targetDelta;
+
+		// fill history with standard deltas
+		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
+		{
+			s_frameTimes[i] = m_targetDelta;
+		}
+
+		m_timer.Start();
+	}
+
+	void Update()
+	{
+		m_targetDelta = 1.0f / s_maxFPS;
+		m_lastFrameTime = m_currentFrameTime;
+		m_currentFrameTime = m_timer.Time();
+		m_delta = m_currentFrameTime - m_lastFrameTime;
+	}
+
+	float Delta() const
+	{
+		return m_delta;
+	}
+
+	float DeltaWithoutDelay() const
+	{
+		return m_deltaWithoutDelay;
+	}
+
+	void DelayFrame()
+	{
+		DD_PROFILE_SCOPED( FrameTimer_DelayFrame );
+
+		float now = m_timer.Time();
+		m_deltaWithoutDelay = now - m_lastFrameTime;
+
+		while( now - m_lastFrameTime < m_targetDelta )
+		{
+			::Sleep( 0 );
+
+			now = m_timer.Time();
+		}
+	}
+
+private:
+
+	Timer m_timer;
+	float m_targetDelta;
+	float m_lastFrameTime;
+	float m_currentFrameTime;
+	float m_delta;
+	float m_deltaWithoutDelay;
+};
+
+void DrawFPS( FrameTimer& frameTimer )
 {
 	ImGui::SetNextWindowPos( ImVec2( 2.0f, 2.0f ) );
 	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings ) )
@@ -82,6 +145,8 @@ void DrawFPS( float delta_t )
 		ImGui::End();
 		return;
 	}
+
+	float delta_t = frameTimer.DeltaWithoutDelay();
 
 	s_frameTimes[s_currentFrame] = delta_t;
 	++s_currentFrame;
@@ -216,14 +281,14 @@ void BindKeys( Input& input )
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 }
 
-void UpdateFreeCam( FreeCameraController& free_cam, float delta_t )
+void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
 {
 	bool captureMouse = !s_drawConsole && s_freeCamEnabled;
-	s_input->CaptureMouse( captureMouse );
+	input.CaptureMouse( captureMouse );
 	if( captureMouse )
 	{
-		free_cam.UpdateMouse( s_input->GetMousePosition() );
-		free_cam.UpdateScroll( s_input->GetScrollPosition() );
+		free_cam.UpdateMouse( input.GetMousePosition() );
+		free_cam.UpdateScroll( input.GetScrollPosition() );
 		free_cam.Update( delta_t );
 	}
 
@@ -231,63 +296,61 @@ void UpdateFreeCam( FreeCameraController& free_cam, float delta_t )
 		free_cam.DrawCameraDebug();
 }
 
-class FrameTimer
+void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
 {
-public:
-
-	FrameTimer()
+	for( ISystem* system : systems )
 	{
-		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrameTime = 0.0f;
-		m_currentFrameTime = -m_targetDelta;
-		m_delta = m_targetDelta;
-
-		// fill history with standard deltas
-		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
-		{
-			s_frameTimes[i] = m_targetDelta;
-		}
-
-		m_timer.Start();
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::PreUpdate" );
 	}
 
-	void Update()
+	jobsystem.WaitForCategory( "System::PreUpdate" );
+}
+
+void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
+{
+	for( ISystem* system : systems )
 	{
-		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrameTime = m_currentFrameTime;
-		m_currentFrameTime = m_timer.Time();
-		m_delta = m_currentFrameTime - m_lastFrameTime;
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::Update" );
 	}
 
-	float Delta() const
+	jobsystem.WaitForCategory( "System::Update" );
+}
+
+void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
+{
+	for( ISystem* system : systems )
 	{
-		return m_delta;
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::PostRender" );
 	}
 
-	void DelayFrame()
-	{
-		DD_PROFILE_START( FrameTimer_DelayFrame );
+	jobsystem.WaitForCategory( "System::PostRender" );
+}
 
-		float now = m_timer.Time();
-		while( now - m_lastFrameTime < m_targetDelta )
-		{
-			::Sleep( 0 );
+void Render( Renderer& renderer, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
+{
+	renderer.Render( delta_t );
 
-			now = m_timer.Time();
-		}
+	if( s_drawConsole )
+		console.Draw( "Console", s_drawConsole );
 
-		DD_PROFILE_END();
-	}
+	if( s_drawFPS )
+		DrawFPS( frame_timer );
 
-private:
+	ImGui::Render();
 
-	Timer m_timer;
-	float m_targetDelta;
-	float m_lastFrameTime;
-	float m_currentFrameTime;
-	float m_delta;
+	s_window->Swap();
+}
 
-};
+Array<InputEvent, 64> s_inputEvents;
+
+void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
+{
+	input.Update( delta_t );
+
+	// update input
+	input.GetKeyEvents( s_inputEvents );
+	bindings.Dispatch( s_inputEvents );
+}
 
 #ifdef _TEST
 
@@ -319,19 +382,23 @@ int GameMain( EntityManager& entity_manager )
 		SwarmSystem swarm_system;
 
 		s_window.reset( new Window( 1280, 720, "DD" ) );
-		s_input.reset( new Input( *s_window ) );
+		Input input( *s_window );
 
-		DebugUI debugUI( *s_window, *s_input );
+		DebugUI debugUI( *s_window, input );
 
 		DebugConsole console;
 
 		Renderer renderer;
 		renderer.Initialize( *s_window, entity_manager );
 
-		TerrainSystem terrain_system( renderer.GetCamera() );
-		terrain_system.Initialize( entity_manager );
+		Camera& camera = renderer.GetCamera();
+		camera.SetPosition( glm::vec3( 5, 5, 0 ) );
+		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
 
-		TrenchSystem trench_system( renderer.GetCamera() );
+		//TerrainSystem terrain_system( camera );
+		//terrain_system.Initialize( entity_manager );
+
+		TrenchSystem trench_system( camera );
 		trench_system.CreateRenderResources();
 
 		InputBindings bindings;
@@ -339,70 +406,60 @@ int GameMain( EntityManager& entity_manager )
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
 		bindings.RegisterHandler( InputAction::EXIT, &Exit );
 
-		FreeCameraController free_cam( renderer.GetCamera() );
+		FreeCameraController free_cam( camera );
 		free_cam.BindActions( bindings );
 
 		Vector<ISystem*> systems;
 		systems.Add( &swarm_system );
 		systems.Add( &trench_system );
 
-		BindKeys( *s_input );
+		BindKeys( input );
 
-		FrameTimer frameTimer;
+		FrameTimer frame_timer;
 
 		while( !s_window->ShouldClose() )
 		{
-			DD_PROFILE_START( Frame );
+			DD_PROFILE_SCOPED( Frame );
 
-			frameTimer.Update();
-			float delta_t = frameTimer.Delta();
+			// frame timer
+			frame_timer.Update();
+			float delta_t = frame_timer.Delta();
 
+			// entity manager
 			entity_manager.Update( delta_t );
 
-			s_input->Update( delta_t );
+			// systems pre-update
+			PreUpdateSystems( jobsystem, entity_manager, systems, delta_t );
 
-			// update input
-			Array<InputEvent, 64> events;
-			s_input->GetKeyEvents( events );
-			bindings.Dispatch( events );
+			// input
+			UpdateInput( input, bindings, delta_t );
 
+			// debug UI
 			debugUI.Update( delta_t );
 
-			UpdateFreeCam( free_cam, delta_t );
+			// camera
+			UpdateFreeCam( free_cam, input, delta_t );
 
-			for( ISystem* system : systems )
-			{
-				jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System" );
-			}
+			// systems update
+			UpdateSystems( jobsystem, entity_manager, systems, delta_t );
 
-			jobsystem.WaitForCategory( "System" );
+			// render
+			Render( renderer, console, frame_timer, delta_t );
 
-			renderer.Render( delta_t );
+			// systems post-render
+			PostRenderSystems( jobsystem, entity_manager, systems, delta_t );
 
-			if( s_drawConsole )
-				console.Draw( "Console", s_drawConsole );
-
-			if( s_drawFPS )
-				DrawFPS( delta_t );
-
-			ImGui::Render();
-
-			s_window->Swap();
-
-			frameTimer.DelayFrame();
-
-			DD_PROFILE_END();
+			// wait for frame delta
+			frame_timer.DelayFrame();
 
 			DD_PROFILE_LOG( "End Frame" );
 		}
 
 		s_window->Close();
-
-		s_input.reset();
 		s_window.reset();
 	}
 
-	DD_PROFILE_DEINIT(); 
+	DD_PROFILE_DEINIT();
 
 	return 0;
 }
