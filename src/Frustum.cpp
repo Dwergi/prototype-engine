@@ -141,15 +141,16 @@ namespace dd
 		m_vertices.Bind();
 		m_indices.Bind();
 
-		shader.BindAttributeFloat( "position", 3, 3 * sizeof( GLfloat ), false );
+		shader.BindAttributeFloat( "Position", 3, 3 * sizeof( GLfloat ), false );
 		shader.Use( true );
 
-		glm::mat4 mvp = camera.GetProjection() * camera.GetCameraMatrix();
-		shader.SetUniform( "mvp", mvp );
+		shader.SetUniform( "Model", camera.GetCameraMatrix() );
+		shader.SetUniform( "View", camera.GetCameraMatrix() );
+		shader.SetUniform( "Projection", camera.GetProjection() );
 
 		for( int i = 0; i < 6; ++i )
 		{
-			shader.SetUniform( "colour_multiplier", glm::vec4( s_colours[i], 0.5f ) );
+			shader.SetUniform( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
 
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}

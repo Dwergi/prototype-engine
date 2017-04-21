@@ -459,6 +459,9 @@
     <ClInclude Include="src\TrenchComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\PointLight.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -755,6 +758,9 @@
     </ClCompile>
     <ClCompile Include="src\TrenchSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PointLight.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@
 namespace dd
 {
 	class Shader;
-	struct ShaderHandle;
+	class ShaderHandle;
 
 	typedef int GLint;
 	typedef GLint ShaderLocation;
@@ -21,8 +21,10 @@ namespace dd
 	{
 	public:
 
+		//
+		// Create a shader with the given name and shaders.
+		//
 		static ShaderHandle Create( const String& name, const Vector<Shader>& shaders );
-		static ShaderProgram* Get( ShaderHandle handle );
 		static void Destroy( ShaderHandle handle );
 
 		ShaderProgram( const ShaderProgram& other );
@@ -37,9 +39,6 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
-		ShaderLocation GetAttribute( const char* name ) const;
-		ShaderLocation GetUniform( const char* name ) const;
-
 		bool BindAttributeFloat( const char* name, uint count, uint stride, bool normalized );
 
 		void SetUniform( const char* name, const glm::mat4& matrix ) const;
@@ -48,6 +47,8 @@ namespace dd
 		void SetUniform( const char* name, float f ) const;
 
 	private:
+
+		friend class ShaderHandle;
 
 		static std::mutex m_instanceMutex;
 		static DenseMap<uint64, ShaderProgram> m_instances;
@@ -67,13 +68,18 @@ namespace dd
 
 		void Retain();
 		void Release();
+
+		ShaderLocation GetAttribute( const char* name ) const;
+		ShaderLocation GetUniform( const char* name ) const;
+
+		static ShaderProgram* Get( ShaderHandle handle );
 	};
 
 	//
 	// A very simple handle to be used to reference a single global instance of a shader in a semi-safe way.
 	// Use ShaderProgram::Create to get a handle to a shader.
 	//
-	struct ShaderHandle
+	class ShaderHandle
 	{
 	public:
 		ShaderHandle() : m_hash( 0 ) {}

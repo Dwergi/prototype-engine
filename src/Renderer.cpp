@@ -7,6 +7,7 @@
 #include "Frustum.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
+#include "PointLight.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -31,7 +32,9 @@ namespace dd
 		m_debugHitTestMeshes( false ),
 		m_frustumMeshCount( 0 ),
 		m_debugFocusedMeshDistance( FLT_MAX ),
-		m_debugMeshGridCreated( false )
+		m_debugMeshGridCreated( false ),
+		m_ambientStrength( 0.1f ),
+		m_specularStrength( 0.5f )
 	{
 
 	}
@@ -71,16 +74,19 @@ namespace dd
 
 		m_entityManager = &entity_manager;
 
-		m_xAxis = CreateMeshEntity( *m_entityManager, "x_axis", m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-		m_yAxis = CreateMeshEntity( *m_entityManager, "y_axis", m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-		m_zAxis = CreateMeshEntity( *m_entityManager, "z_axis", m_shaders[0], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+		m_unitCube = Mesh::Create( "cube", m_shaders[0] );
+		m_unitCube.Get()->MakeUnitCube();
+
+		m_pointLight = new PointLight( glm::vec3( 10, 10, 10 ), glm::vec3( 1, 1, 1 ), 1.0f );
+		m_pointLightMesh = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 1, 1, 1, 1 ), glm::scale( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
+
+		m_xAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		m_yAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		m_zAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 	}
 
-	EntityHandle Renderer::CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform )
+	EntityHandle Renderer::CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform )
 	{
-		MeshHandle mesh_h = Mesh::Create( meshName, shader );
-		mesh_h.Get()->MakeUnitCube();
-
 		EntityHandle handle = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
 
 		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( handle );
@@ -131,6 +137,30 @@ namespace dd
 			}
 		}
 
+		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			ImGui::SliderFloat( "Ambient", &m_ambientStrength, 0.0f, 1.0f );
+			ImGui::SliderFloat( "Specular", &m_specularStrength, 0.0f, 1.0f );
+
+			glm::vec3 colour = m_pointLight->GetColour();
+			float fltColor[3];
+			fltColor[0] = colour.r; fltColor[1] = colour.g; fltColor[2] = colour.b;
+			if( ImGui::ColorEdit3( "Colour", fltColor ) )
+			{
+				m_pointLight->SetColour( glm::vec3( fltColor[0], fltColor[1], fltColor[2] ) );
+			}
+
+			glm::vec3 position = m_pointLight->GetPosition();
+			float fltPosition[3];
+			fltPosition[0] = position.x; fltPosition[1] = position.y; fltPosition[2] = position.z;
+			if( ImGui::DragFloat3( "Position", fltPosition ) )
+			{
+				m_pointLight->SetPosition( glm::vec3( fltPosition[0], fltPosition[1], fltPosition[2] ) );
+			}
+
+			ImGui::TreePop();
+		}
+
 		if( ImGui::TreeNodeEx( "Frustum", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightMeshes );
@@ -146,7 +176,7 @@ namespace dd
 				{
 					for( int z = -5; z < 5; ++z )
 					{
-						CreateMeshEntity( *m_entityManager, "cube", m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
+						CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
 					}
 				}
 			}
@@ -218,6 +248,17 @@ namespace dd
 					debugMultiplier.x = 1.5f;
 				}
 
+				ShaderProgram* shader = mesh->GetShader().Get();
+				shader->Use( true );
+
+				shader->SetUniform( "LightPosition", m_pointLight->GetPosition() );
+				shader->SetUniform( "LightColour", m_pointLight->GetColour() );
+				shader->SetUniform( "LightIntensity", m_pointLight->GetIntensity() );
+				shader->SetUniform( "AmbientStrength", m_ambientStrength );
+				shader->SetUniform( "SpecularStrength", m_specularStrength );
+
+				shader->Use( false );
+
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
 				mesh->Render( *m_camera, transform );
@@ -227,6 +268,16 @@ namespace dd
 		}
 
 		++m_meshCount;
+	}
+
+	void Renderer::UpdateDebugLight()
+	{
+		TransformComponent* transform_cmp = m_pointLightMesh.Get<TransformComponent>().Write();
+		transform_cmp->Transform = glm::translate( m_pointLight->GetPosition() );
+
+		MeshComponent* mesh_cmp = m_pointLightMesh.Get<MeshComponent>().Write();
+		mesh_cmp->Colour = glm::vec4( m_pointLight->GetColour(), 1.0f );
+		mesh_cmp->UpdateBounds( transform_cmp->Transform );
 	}
 
 	void Renderer::Render( float delta_t )
@@ -240,6 +291,8 @@ namespace dd
 		m_meshCount = 0;
 
 		SetRenderState();
+
+		UpdateDebugLight();
 
 		m_frustum->ResetFrustum( *m_camera );
 
@@ -256,5 +309,10 @@ namespace dd
 	Camera& Renderer::GetCamera() const
 	{
 		return *m_camera;
+	}
+
+	PointLight& Renderer::GetLight() const
+	{
+		return *m_pointLight;
 	}
 }

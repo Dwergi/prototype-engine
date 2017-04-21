@@ -202,14 +202,13 @@ namespace dd
 
 		m_vao.Bind();
 
-		glm::mat4 model = transform;
 		glm::mat4 view = camera.GetCameraMatrix();
-		glm::mat4 projection = camera.GetProjection();
 
-		glm::mat4 mvp = projection * view * model;
-
-		shader.SetUniform( "mvp", mvp );
-		shader.SetUniform( "colour_multiplier", m_colour );
+		shader.SetUniform( "ViewPosition", view[3] );
+		shader.SetUniform( "Model", transform );
+		shader.SetUniform( "View", view );
+		shader.SetUniform( "Projection", camera.GetProjection() );
+		shader.SetUniform( "ObjectColour", m_colour );
 
 		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
 
@@ -246,9 +245,15 @@ namespace dd
 	void Mesh::MakeUnitCube()
 	{
 		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
-		BindAttribute( "position", MeshAttribute::Position, 3, false );
-		BindAttribute( "uv", MeshAttribute::UV, 2, false );
-		BindAttribute( "normal", MeshAttribute::Normal, 3, true );
+		
+		ShaderProgram& shader = *m_shader.Get();
+		shader.Use( true );
+
+		BindAttribute( "Position", MeshAttribute::Position, 3, false );
+		BindAttribute( "UV", MeshAttribute::UV, 2, false );
+		BindAttribute( "Normal", MeshAttribute::Normal, 3, true );
+
+		shader.Use( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( -1, -1, -1 ) );

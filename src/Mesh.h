@@ -18,7 +18,7 @@ namespace dd
 	class Camera;
 	class ShaderProgram;
 
-	struct MeshHandle;
+	class MeshHandle;
 
 	enum class MeshAttribute
 	{
@@ -39,12 +39,6 @@ namespace dd
 		// Create (or retrieve) a handle to a mesh with the given name using the given shader.
 		//
 		static MeshHandle Create( const char* name, ShaderHandle program );
-
-		//
-		// Get the mesh instance associated with the given handle.
-		// Returns null if the handle does not reference a mesh that still exists.
-		//
-		static Mesh* Get( MeshHandle handle );
 
 		//
 		// Destroy the mesh associated with the given handle. All handles will become invalidated.
@@ -71,6 +65,8 @@ namespace dd
 
 		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
+		ShaderHandle GetShader() const { return m_shader; }
+
 		void MakeUnitCube();
 
 		Mesh& operator=( const Mesh& other );
@@ -78,6 +74,8 @@ namespace dd
 		~Mesh();
 
 	private:
+
+		friend class MeshHandle;
 
 		static std::mutex m_instanceMutex;
 		static DenseMap<uint64, Mesh> m_instances;
@@ -96,13 +94,19 @@ namespace dd
 		void Release();
 
 		Mesh( const char* name, ShaderHandle program );
+
+		//
+		// Get the mesh instance associated with the given handle.
+		// Returns null if the handle does not reference a mesh that still exists.
+		//
+		static Mesh* Get( MeshHandle handle );
 	};
 
 	//
 	// A very simple handle to be used to reference a single global instance of a mesh in a semi-safe way.
 	// Use Mesh::Create to get a handle to a given mesh.
 	//
-	struct MeshHandle
+	class MeshHandle
 	{
 	public:
 		MeshHandle() : m_hash( 0 ) {}

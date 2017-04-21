@@ -15,10 +15,11 @@ namespace dd
 	class Camera;
 	class EntityManager;
 	class Frustum;
-	class ShaderProgram;
-	class Window;
 	class MeshComponent;
+	class PointLight;
+	class ShaderProgram;
 	class TransformComponent;
+	class Window;
 
 	class Renderer
 	{
@@ -39,6 +40,11 @@ namespace dd
 		// Retrieve the active camera.
 		//
 		Camera& GetCamera() const;
+
+		//
+		// Retrieve the point light.
+		//
+		PointLight& GetLight() const;
 
 	private:
 
@@ -65,8 +71,19 @@ namespace dd
 
 		bool m_debugMeshGridCreated;
 
+		PointLight* m_pointLight;
+		EntityHandle m_pointLightMesh;
+
+		float m_ambientStrength;
+		float m_specularStrength;
+
+		MeshHandle m_unitCube;
+
 		void DrawDebugUI();
-		EntityHandle CreateMeshEntity( EntityManager& entity_manager, const char* meshName, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
+		void UpdateDebugLight();
+
+		EntityHandle CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
+
 		void SetRenderState();
 
 		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp );

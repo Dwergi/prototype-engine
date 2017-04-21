@@ -133,8 +133,9 @@ namespace dd
 
 		glm::mat4 model = glm::translate( glm::vec3( m_key.X, 0, m_key.Y ) );
 
-		glm::mat4 mvp = camera.GetProjection() * camera.GetCameraMatrix() * model;
-		m_shader->SetUniform( "mvp", mvp );
+		m_shader->SetUniform( "Model", model );
+		m_shader->SetUniform( "View", camera.GetCameraMatrix() );
+		m_shader->SetUniform( "Projection", camera.GetProjection() );
 
 		float clr = m_key.Size / 128.f;
 		glm::vec4 colour( clr, clr, clr, 1.0 );

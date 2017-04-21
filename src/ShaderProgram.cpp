@@ -182,6 +182,7 @@ namespace dd
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
@@ -192,6 +193,10 @@ namespace dd
 
 	bool ShaderProgram::BindAttributeFloat( const char* name, uint count, uint stride, bool normalized )
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
 		ShaderLocation loc = GetAttribute( name );
 
 		if( loc != InvalidLocation )
@@ -207,6 +212,7 @@ namespace dd
 
 	ShaderLocation ShaderProgram::GetUniform( const char* name ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
@@ -217,6 +223,7 @@ namespace dd
 
 	void ShaderProgram::SetUniform( const char* name, float f ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
@@ -231,6 +238,7 @@ namespace dd
 
 	void ShaderProgram::SetUniform( const char* name, const glm::vec3& vec ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
@@ -245,6 +253,7 @@ namespace dd
 
 	void ShaderProgram::SetUniform( const char* name, const glm::vec4& vec ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
@@ -259,6 +268,7 @@ namespace dd
 
 	void ShaderProgram::SetUniform( const char* name, const glm::mat4& mat ) const
 	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( m_valid, "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 

@@ -26,6 +26,10 @@ namespace dd
 			Geometry
 		};
 
+		//
+		// Create a shader with the given name and type.
+		// Load the contents from the given path.
+		//
 		static Shader Create( const String& name, const String& path, Type type );
 
 		Shader( const Shader& other );

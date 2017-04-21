@@ -24,7 +24,7 @@ const float TRENCH_CHUNK_CREATION_DISTANCE = 100.0f;
 
 float s_trenchChunk[] =
 {
-	//  X     Y     Z       U     V          Normal
+	//  X  Y  Z       U     V       Normal
 	// bottom
 	1.0f,0.0f,0.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,
 	0.0f,0.0f,0.0f,   0.0f, 0.0f,   0.0f, 1.0f, 0.0f,
@@ -108,9 +108,12 @@ namespace dd
 
 		Mesh* mesh = m_chunkMesh.Get();
 		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 8 );
-		mesh->BindAttribute( "position", MeshAttribute::Position, 3, false );
-		mesh->BindAttribute( "uv", MeshAttribute::UV, 2, false );
-		mesh->BindAttribute( "normal", MeshAttribute::Normal, 3, true );
+
+		m_shader.Get()->Use( true );
+		mesh->BindAttribute( "Position", MeshAttribute::Position, 3, false );
+		mesh->BindAttribute( "UV", MeshAttribute::UV, 2, false );
+		mesh->BindAttribute( "Normal", MeshAttribute::Normal, 3, true );
+		m_shader.Get()->Use( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( 0, 0, 0 ) );
