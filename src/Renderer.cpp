@@ -103,7 +103,7 @@ namespace dd
 		EntityHandle handle = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
 
 		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( handle );
-		transform_cmp->Transform = transform;
+		transform_cmp->SetLocalTransform( transform );
 
 		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( handle );
 		mesh_cmp->Mesh = mesh_h;
@@ -141,7 +141,7 @@ namespace dd
 		{
 			if( m_debugFocusedMesh.IsValid() )
 			{
-				glm::vec3 focusedMesh = m_debugFocusedMesh.Get<TransformComponent>().Read()->GetPosition();
+				glm::vec3 focusedMesh = m_debugFocusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
 				ImGui::Text( "Focused Mesh: %.2f %.2f %.2f", focusedMesh.x, focusedMesh.y, focusedMesh.z );
 			}
 			else
@@ -244,7 +244,7 @@ namespace dd
 		Mesh* mesh = mesh_cmp->Mesh.Get();
 		if( mesh != nullptr && !mesh_cmp->Hidden )
 		{
-			const glm::mat4& transform = transform_handle.Read()->Transform;
+			const glm::mat4& transform = transform_handle.Read()->GetWorldTransform();
 
 			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
 
@@ -286,11 +286,11 @@ namespace dd
 	void Renderer::UpdateDebugLight()
 	{
 		TransformComponent* transform_cmp = m_pointLightMesh.Get<TransformComponent>().Write();
-		transform_cmp->Transform = glm::translate( m_pointLight->GetPosition() );
+		transform_cmp->SetLocalTransform( glm::translate( m_pointLight->GetPosition() ) );
 
 		MeshComponent* mesh_cmp = m_pointLightMesh.Get<MeshComponent>().Write();
 		mesh_cmp->Colour = glm::vec4( m_pointLight->GetColour(), 1.0f );
-		mesh_cmp->UpdateBounds( transform_cmp->Transform );
+		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 	}
 
 	void Renderer::Render( float delta_t )

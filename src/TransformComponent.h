@@ -1,3 +1,9 @@
+//
+// TransformComponent.h - A component to store the transform of an object.
+// Copyright (C) Sebastian Nordgren 
+// April 22nd 2017
+//
+
 #pragma once
 
 #include "ComponentBase.h"
@@ -9,22 +15,34 @@ namespace dd
 	class TransformComponent : public ComponentBase
 	{
 	public:
-		glm::mat4 Transform;
 
 		typedef DenseVectorPool<TransformComponent> Pool;
 
-		TransformComponent() { }
-		TransformComponent( const TransformComponent& other ) : ComponentBase( other ), Transform( other.Transform ) {}
+		TransformComponent();
+		TransformComponent( const TransformComponent& other );
 
-		glm::vec3 GetPosition() const { return Transform[3].xyz(); }
-		void SetPosition( const glm::vec3& pos ) { Transform[3].xyz = pos; }
+		void SetLocalPosition( const glm::vec3& pos );
+		void SetLocalTransform( const glm::mat4& transform );
 
-		glm::vec3 GetDirection() const { return ((glm::vec4( 0, 0, 1, 0 ) * Transform) - Transform[3]).xyz(); }
+		glm::vec3 GetLocalPosition() const { return m_local[3].xyz(); }
+		const glm::mat4& GetLocalTransform() const { return m_local; }
+
+		glm::vec3 GetWorldPosition() const { return m_world[3].xyz(); }
+		const glm::mat4& GetWorldTransform() const { return m_world; }
+
+		void UpdateWorldTransform();
 
 		ALIGNED_ALLOCATORS( 16 )
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
 			PARENT( ComponentBase )
 		END_TYPE
+
+	private:
+
+		EntityHandle m_parent;
+		bool m_dirty;
+		glm::mat4 m_local;
+		glm::mat4 m_world;
 	};
 }

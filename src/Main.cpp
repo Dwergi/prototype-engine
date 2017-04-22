@@ -30,6 +30,7 @@
 #include "Random.h"
 #include "Recorder.h"
 #include "Renderer.h"
+#include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "StringBinding.h"
 #include "SwarmAgentComponent.h"
@@ -300,7 +301,7 @@ void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vect
 {
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::PreUpdate" );
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); }, "System::PreUpdate" );
 	}
 
 	jobsystem.WaitForCategory( "System::PreUpdate" );
@@ -320,7 +321,7 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vec
 {
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::PostRender" );
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); }, "System::PostRender" );
 	}
 
 	jobsystem.WaitForCategory( "System::PostRender" );
@@ -398,6 +399,8 @@ int GameMain( EntityManager& entity_manager )
 		//TerrainSystem terrain_system( camera );
 		//terrain_system.Initialize( entity_manager );
 
+		SceneGraphSystem scene_graph;
+
 		TrenchSystem trench_system( camera );
 		trench_system.CreateRenderResources();
 
@@ -410,6 +413,7 @@ int GameMain( EntityManager& entity_manager )
 		free_cam.BindActions( bindings );
 
 		Vector<ISystem*> systems;
+		systems.Add( &scene_graph );
 		systems.Add( &swarm_system );
 		systems.Add( &trench_system );
 

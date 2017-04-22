@@ -404,6 +404,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\SceneGraphSystem.h" />
     <ClInclude Include="src\TrenchComponent.h" />
     <ClInclude Include="src\TrenchSystem.h" />
     <ClInclude Include="src\Typedefs.h" />
@@ -534,6 +535,7 @@
     </ClCompile>
     <ClCompile Include="src\PointLight.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\SceneGraphSystem.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
@@ -596,6 +598,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\TransformComponent.cpp" />
     <ClCompile Include="src\TrenchSystem.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />

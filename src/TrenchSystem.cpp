@@ -129,7 +129,7 @@ namespace dd
 		glm::mat4 transform = translate * scale;
 
 		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( handle );
-		transform_cmp->Transform = transform;
+		transform_cmp->SetLocalTransform( transform );
 
 		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( handle );
 		mesh_cmp->Mesh = m_chunkMesh;

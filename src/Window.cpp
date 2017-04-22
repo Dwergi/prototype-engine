@@ -44,6 +44,8 @@ namespace dd
 		glfwSetFramebufferSizeCallback( m_glfwWindow, OnFramebufferResize );
 		glfwSetWindowSizeCallback( m_glfwWindow, OnWindowResize );
 
+		Swap();
+
 		//DD_PROFILE_OGL_INIT();
 	}
 

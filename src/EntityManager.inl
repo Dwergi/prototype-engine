@@ -184,7 +184,7 @@ namespace dd
 	void EntityManager::ForAllWithWritable( typename identity<std::function<void( EntityHandle, ComponentHandle<Components>... )>>::type f ) const
 	{
 		Vector<EntityHandle> result;
-		for( EntityEntry e : m_entities.GetWrite() )
+		for( EntityHandle e : m_entities.GetWrite() )
 		{
 			if( HasAllWritable<Components...>( e ) )
 			{

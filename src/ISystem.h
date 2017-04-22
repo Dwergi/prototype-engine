@@ -14,7 +14,7 @@ namespace dd
 	{
 	public:
 		virtual void PreUpdate( EntityManager& entity_manager, float dt ) {}
-		virtual void Update( EntityManager& entity_manager, float dt ) = 0;
+		virtual void Update( EntityManager& entity_manager, float dt ) {}
 		virtual void PostRender( EntityManager& entity_manager, float dt ) {}
 	};
 }

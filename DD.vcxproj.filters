@@ -462,6 +462,9 @@
     <ClInclude Include="src\PointLight.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\SceneGraphSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -761,6 +764,12 @@
     </ClCompile>
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneGraphSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
