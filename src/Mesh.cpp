@@ -21,7 +21,7 @@ namespace dd
 
 	float s_unitCube[] = 
 	{
-		//  X     Y     Z       U     V          Normal
+		//  X    Y    Z     U     V       Normal
 		// bottom
 		-1.0f,-1.0f,-1.0f,  0.0f, 0.0f,   0.0f, -1.0f, 0.0f,
 		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,
@@ -168,14 +168,14 @@ namespace dd
 		m_vao.Unbind();
 	}
 
-	void Mesh::BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized )
+	void Mesh::BindAttribute( const char* shaderAttribute, uint components, uint first, bool normalized )
 	{
 		DD_ASSERT( m_data.Get() != nullptr );
 		DD_ASSERT( m_stride > 0 );
 
 		m_vao.Bind();
 
-		m_shader.Get()->BindAttributeFloat( shaderAttribute, count, m_stride * sizeof( float ), normalized );
+		m_shader.Get()->BindAttributeFloat( shaderAttribute, components, m_stride, first, normalized );
 
 		m_vao.Unbind();
 	}
@@ -204,8 +204,8 @@ namespace dd
 
 		glm::mat4 view = camera.GetCameraMatrix();
 
-		shader.SetUniform( "ViewPosition", view[3] );
 		shader.SetUniform( "Model", transform );
+		shader.SetUniform( "NormalMatrix", glm::mat3( glm::transpose( glm::inverse( transform ) ) ) );
 		shader.SetUniform( "View", view );
 		shader.SetUniform( "Projection", camera.GetProjection() );
 		shader.SetUniform( "ObjectColour", m_colour );
@@ -249,9 +249,8 @@ namespace dd
 		ShaderProgram& shader = *m_shader.Get();
 		shader.Use( true );
 
-		BindAttribute( "Position", MeshAttribute::Position, 3, false );
-		BindAttribute( "UV", MeshAttribute::UV, 2, false );
-		BindAttribute( "Normal", MeshAttribute::Normal, 3, true );
+		BindAttribute( "Position", 3, 0, false );
+		BindAttribute( "Normal", 3, 5, true );
 
 		shader.Use( false );
 

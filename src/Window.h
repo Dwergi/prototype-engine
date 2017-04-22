@@ -23,6 +23,8 @@ namespace dd
 
 		bool IsFocused() const;
 		bool IsValid() const;
+		bool IsContextValid() const;
+
 		bool ShouldClose() const;
 		void SetToClose() const;
 

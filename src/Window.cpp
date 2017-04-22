@@ -33,11 +33,14 @@ namespace dd
 		if( m_glfwWindow != nullptr )
 		{
 			glfwMakeContextCurrent( m_glfwWindow );
+
+			DD_ASSERT( IsContextValid() );
 		}
 
 		if( gl3wInit() || !gl3wIsSupported( 4, 5 ) )
 			throw std::exception( "Failed to create gl3w context!" );
 
+		glfwSwapInterval( 0 );
 		glfwSetFramebufferSizeCallback( m_glfwWindow, OnFramebufferResize );
 		glfwSetWindowSizeCallback( m_glfwWindow, OnWindowResize );
 
@@ -128,5 +131,10 @@ namespace dd
 		glfwPollEvents();
 
 		m_focused = glfwGetWindowAttrib( m_glfwWindow, GLFW_FOCUSED ) != 0;
+	}
+
+	bool Window::IsContextValid() const
+	{
+		return glfwGetCurrentContext() == m_glfwWindow;
 	}
 }

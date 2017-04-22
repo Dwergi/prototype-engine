@@ -39,12 +39,13 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
-		bool BindAttributeFloat( const char* name, uint count, uint stride, bool normalized );
+		bool BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized );
 
+		void SetUniform( const char* name, const glm::mat3& matrix ) const;
 		void SetUniform( const char* name, const glm::mat4& matrix ) const;
-		void SetUniform( const char* name, const glm::vec3& vec ) const;
-		void SetUniform( const char* name, const glm::vec4& vec ) const;
-		void SetUniform( const char* name, float f ) const;
+		void SetUniform( const char* name, const glm::vec3& vector ) const;
+		void SetUniform( const char* name, const glm::vec4& vector ) const;
+		void SetUniform( const char* name, float flt ) const;
 
 	private:
 
@@ -92,4 +93,4 @@ namespace dd
 		friend class ShaderProgram;
 		uint64 m_hash;
 	};
-}
+} 

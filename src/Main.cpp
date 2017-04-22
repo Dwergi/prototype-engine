@@ -455,9 +455,12 @@ int GameMain( EntityManager& entity_manager )
 			DD_PROFILE_LOG( "End Frame" );
 		}
 
-		s_window->Close();
-		s_window.reset();
+		systems.Clear();
+		renderer.Shutdown();
 	}
+
+	s_window->Close();
+	s_window.reset();
 
 	DD_PROFILE_DEINIT();
 

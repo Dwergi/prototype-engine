@@ -29,6 +29,7 @@ namespace dd
 		~Renderer();
 
 		void Initialize( Window& window, EntityManager& entity_manager );
+		void Shutdown();
 
 		//
 		// Render a full frame.

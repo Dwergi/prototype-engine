@@ -24,30 +24,30 @@ const float TRENCH_CHUNK_CREATION_DISTANCE = 100.0f;
 
 float s_trenchChunk[] =
 {
-	//  X  Y  Z       U     V       Normal
+	//  X  Y  Z       Normal
 	// bottom
-	1.0f,0.0f,0.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-	0.0f,0.0f,0.0f,   0.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-	0.0f,0.0f,1.0f,   0.0f, 1.0f,   0.0f, 1.0f, 0.0f,
-	1.0f,0.0f,1.0f,   1.0f, 1.0f,   0.0f, 1.0f, 0.0f,
-	1.0f,0.0f,0.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-	0.0f,0.0f,1.0f,   0.0f, 1.0f,   0.0f, 1.0f, 0.0f,
+	1.0f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
+	0.0f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
+	0.0f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
+	1.0f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
+	1.0f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
+	0.0f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
 
 	// left
-	0.0f,1.0f,0.0f,   1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-	0.0f,0.0f,1.0f,   0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
-	0.0f,0.0f,0.0f,   0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-	0.0f,1.0f,1.0f,   1.0f, 1.0f,  1.0f, 0.0f, 0.0f,
-	0.0f,0.0f,1.0f,   0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
-	0.0f,1.0f,0.0f,   1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+	0.0f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
+	0.0f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
+	0.0f,0.0f,0.0f,   1.0f, 0.0f, 0.0f,
+	0.0f,1.0f,1.0f,   1.0f, 0.0f, 0.0f,
+	0.0f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
+	0.0f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
 
 	// right
-	1.0f,0.0f,0.0f,   1.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-	1.0f,0.0f,1.0f,   1.0f, 1.0f,   -1.0f, 0.0f, 0.0f,
-	1.0f,1.0f,0.0f,   0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-	1.0f,1.0f,0.0f,   0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,
-	1.0f,0.0f,1.0f,   1.0f, 1.0f,   -1.0f, 0.0f, 0.0f,
-	1.0f,1.0f,1.0f,   0.0f, 1.0f,   -1.0f, 0.0f, 0.0f
+	1.0f,0.0f,0.0f,   -1.0f, 0.0f, 0.0f,
+	1.0f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
+	1.0f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
+	1.0f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
+	1.0f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
+	1.0f,1.0f,1.0f,   -1.0f, 0.0f, 0.0f
 };
 
 /*
@@ -107,12 +107,11 @@ namespace dd
 		m_chunkMesh = Mesh::Create( "trench_chunk", m_shader );
 
 		Mesh* mesh = m_chunkMesh.Get();
-		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 8 );
+		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 6 );
 
 		m_shader.Get()->Use( true );
-		mesh->BindAttribute( "Position", MeshAttribute::Position, 3, false );
-		mesh->BindAttribute( "UV", MeshAttribute::UV, 2, false );
-		mesh->BindAttribute( "Normal", MeshAttribute::Normal, 3, true );
+		mesh->BindAttribute( "Position", 3, 0, false );
+		mesh->BindAttribute( "Normal", 3, 3, true );
 		m_shader.Get()->Use( false );
 
 		AABB bounds;

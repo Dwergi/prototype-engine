@@ -61,7 +61,7 @@ namespace dd
 		m_vboVertex.SetData( &m_vertices[0], sizeof( m_vertices[0] ) * VerticesPerDim * VerticesPerDim );
 
 		m_shader = &shader;
-		m_shader->BindAttributeFloat( "position", 3, 3 * sizeof( GLfloat ), false );
+		m_shader->BindAttributeFloat( "Position", 3, 3, 0, false );
 
 		m_vao.Unbind();
 

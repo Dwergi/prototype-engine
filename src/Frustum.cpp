@@ -141,8 +141,9 @@ namespace dd
 		m_vertices.Bind();
 		m_indices.Bind();
 
-		shader.BindAttributeFloat( "Position", 3, 3 * sizeof( GLfloat ), false );
 		shader.Use( true );
+
+		shader.BindAttributeFloat( "Position", 3, 3, 0, false );
 
 		shader.SetUniform( "Model", camera.GetCameraMatrix() );
 		shader.SetUniform( "View", camera.GetCameraMatrix() );

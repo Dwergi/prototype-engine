@@ -66,7 +66,8 @@ namespace dd
 
 	void Renderer::Initialize( Window& window, EntityManager& entity_manager )
 	{
-		m_camera = new Camera( window );
+		m_window = &window;
+		m_camera = new Camera( *m_window );
 		m_frustum = new Frustum( *m_camera );
 		m_frustum->ResetFrustum( *m_camera );
 
@@ -83,6 +84,18 @@ namespace dd
 		m_xAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 		m_yAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
 		m_zAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+	}
+
+	void Renderer::Shutdown()
+	{
+		Mesh::Destroy( m_unitCube );
+
+		delete m_frustum;
+		m_frustum = nullptr;
+		delete m_camera;
+		m_camera = nullptr;
+
+		m_shaders.Clear();
 	}
 
 	EntityHandle Renderer::CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform )
@@ -283,6 +296,7 @@ namespace dd
 	void Renderer::Render( float delta_t )
 	{
 		DD_ASSERT( m_entityManager != nullptr );
+		DD_ASSERT( m_window->IsContextValid() );
 
 		m_debugFocusedMeshDistance = 0;
 		m_debugFocusedMesh = EntityHandle();

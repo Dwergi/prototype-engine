@@ -20,14 +20,6 @@ namespace dd
 
 	class MeshHandle;
 
-	enum class MeshAttribute
-	{
-		Position,
-		Normal,
-		UV,
-		Other
-	};
-
 	//
 	// A ref-counted mesh asset.
 	//
@@ -61,7 +53,11 @@ namespace dd
 		// The mesh does *NOT* take ownership of this.
 		//
 		void SetData( float* data, uint count, uint stride );
-		void BindAttribute( const char* shaderAttribute, MeshAttribute type, uint count, bool normalized );
+
+		//
+		// Bind the attribute of the given name and type.
+		//
+		void BindAttribute( const char* shaderAttribute, uint count, uint first, bool normalized );
 
 		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
