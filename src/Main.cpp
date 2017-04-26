@@ -26,6 +26,7 @@
 #include "JobSystem.h"
 #include "MeshComponent.h"
 #include "Message.h"
+#include "MousePicking.h"
 #include "OctreeComponent.h"
 #include "Random.h"
 #include "Recorder.h"
@@ -280,6 +281,7 @@ void BindKeys( Input& input )
 	input.BindKey( ' ', InputAction::UP );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
+	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
 }
 
 void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
@@ -327,9 +329,9 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vec
 	jobsystem.WaitForCategory( "System::PostRender" );
 }
 
-void Render( Renderer& renderer, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
+void Render( Renderer& renderer, EntityManager& entity_manager, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
 {
-	renderer.Render( delta_t );
+	renderer.Render( entity_manager, delta_t );
 
 	if( s_drawConsole )
 		console.Draw( "Console", s_drawConsole );
@@ -409,6 +411,10 @@ int GameMain( EntityManager& entity_manager )
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
 		bindings.RegisterHandler( InputAction::EXIT, &Exit );
 
+		MousePicking mouse_picking( *s_window.get(), camera, input );
+		mouse_picking.BindActions( bindings );
+		renderer.SetMousePicking( &mouse_picking );
+
 		FreeCameraController free_cam( camera );
 		free_cam.BindActions( bindings );
 
@@ -447,8 +453,11 @@ int GameMain( EntityManager& entity_manager )
 			// systems update
 			UpdateSystems( jobsystem, entity_manager, systems, delta_t );
 
+			// mouse picking
+			mouse_picking.UpdatePicking( entity_manager );
+
 			// render
-			Render( renderer, console, frame_timer, delta_t );
+			Render( renderer, entity_manager, console, frame_timer, delta_t );
 
 			// systems post-render
 			PostRenderSystems( jobsystem, entity_manager, systems, delta_t );

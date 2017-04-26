@@ -21,7 +21,8 @@ namespace dd
 		BOOST,
 		SHOW_CONSOLE,
 		TOGGLE_FREECAM,
-		EXIT
+		EXIT,
+		SELECT_MESH
 	};
 
 	enum class InputType : unsigned int

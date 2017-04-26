@@ -54,6 +54,15 @@ namespace dd
 			LALT = 342
 		};
 
+		enum class MouseButton : int
+		{
+			LEFT = 0,
+			RIGHT = 1,
+			MIDDLE = 2,
+			BUTTON_4 = 3,
+			BUTTON_5 = 4
+		};
+
 		typedef void( *KeyboardCallbackFunction )(GLFWwindow*, int, int, int, int);
 		typedef void( *MouseButtonCallbackFunction )(GLFWwindow*, int, int, int);
 		typedef void( *ScrollCallbackFunction )(GLFWwindow*, double, double);
@@ -75,6 +84,7 @@ namespace dd
 
 		void BindKey( char c, InputAction action );
 		void BindKey( Key k, InputAction action );
+		void BindMouseButton( MouseButton btn, InputAction action );
 
 		// these shouldn't be used by default, mainly used by imgui
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );

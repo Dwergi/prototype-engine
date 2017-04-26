@@ -79,6 +79,16 @@ namespace dd
 		m_vfov = vfov;
 	}
 
+	float Camera::GetHorizontalFOV() const
+	{
+		return m_vfov * m_aspectRatio;
+	}
+
+	void Camera::SetHorizontalFOV( float hfov )
+	{
+		m_vfov = hfov / m_aspectRatio;
+	}
+
 	float Camera::GetAspectRatio() const
 	{
 		return m_aspectRatio;

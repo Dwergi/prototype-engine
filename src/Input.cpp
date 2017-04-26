@@ -46,6 +46,11 @@ namespace dd
 		m_bindings.Add( (int) k, action );
 	}
 
+	void Input::BindMouseButton( MouseButton btn, InputAction action )
+	{
+		m_bindings.Add( (int) btn, action );
+	}
+
 	void Input::Update( float delta_t )
 	{
 		double newX, newY;
@@ -127,6 +132,16 @@ namespace dd
 
 	void Input::MouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
 	{
+		InputType event_type = GetEventType( action );
+		InputAction event_action = m_pInstance->m_bindings.Contains( button ) ? m_pInstance->m_bindings[button] : InputAction::NONE;
+
+		if( event_type != InputType::NONE && event_action != InputAction::NONE )
+		{
+			InputEvent& new_event = m_pInstance->m_pendingEvents.Allocate();
+			new_event.Action = event_action;
+			new_event.Type = event_type;
+		}
+
 		for( GLFWmousebuttonfun fn : m_pInstance->m_mouseButtonCallbacks )
 		{
 			(*fn)(window, button, action, mods);

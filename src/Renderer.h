@@ -16,7 +16,9 @@ namespace dd
 	class EntityManager;
 	class Frustum;
 	class MeshComponent;
+	class MousePicking;
 	class PointLight;
+	class Ray;
 	class ShaderProgram;
 	class TransformComponent;
 	class Window;
@@ -35,7 +37,7 @@ namespace dd
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		void Render( float delta_t );
+		void Render( EntityManager& entity_manager, float delta_t );
 
 		//
 		// Retrieve the active camera.
@@ -47,14 +49,19 @@ namespace dd
 		//
 		PointLight& GetLight() const;
 
+		//
+		// Set the mouse picking helper to use.
+		//
+		void SetMousePicking( MousePicking* mouse_picking ) { m_mousePicking = mouse_picking; }
+
 	private:
 
 		Window* m_window;
 		Camera* m_camera;
 		Frustum* m_frustum;
+		MousePicking* m_mousePicking;
 
 		Vector<ShaderHandle> m_shaders;
-		EntityManager* m_entityManager;
 
 		EntityHandle m_xAxis;
 		EntityHandle m_yAxis;
@@ -64,12 +71,7 @@ namespace dd
 		int m_meshCount;
 		int m_frustumMeshCount;
 
-		bool m_debugHighlightMeshes;
-
-		bool m_debugHitTestMeshes;
-		float m_debugFocusedMeshDistance;
-		EntityHandle m_debugFocusedMesh;
-
+		bool m_debugHighlightFrustumMeshes;
 		bool m_debugMeshGridCreated;
 
 		PointLight* m_pointLight;
@@ -80,14 +82,13 @@ namespace dd
 
 		MeshHandle m_unitCube;
 
-		void DrawDebugUI();
+		void DrawDebugUI( EntityManager& entity_manager );
 		void UpdateDebugLight();
 
 		EntityHandle CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
 
 		void SetRenderState();
 
-		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp );
-		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
+		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const MousePicking* mouse_picking );
 	};
 }

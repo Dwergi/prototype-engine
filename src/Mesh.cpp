@@ -205,7 +205,7 @@ namespace dd
 		glm::mat4 view = camera.GetCameraMatrix();
 
 		shader.SetUniform( "Model", transform );
-		shader.SetUniform( "NormalMatrix", glm::mat3( glm::transpose( glm::inverse( transform ) ) ) );
+		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "View", view );
 		shader.SetUniform( "Projection", camera.GetProjection() );
 		shader.SetUniform( "ObjectColour", m_colour );

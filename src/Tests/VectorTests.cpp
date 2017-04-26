@@ -262,7 +262,7 @@ TEST_CASE( "[Vector] Reverse" )
 
 	for( int i = 0; i < 32; ++i )
 	{
-		a.Push( i );
+		a.Add( i );
 	}
 
 	a.Reverse();
@@ -289,12 +289,12 @@ TEST_CASE( "[StackVector] Basic" )
 
 	for( int i = 0; i < 32; ++i )
 	{
-		a.Push( i );
+		a.Add( i );
 	}
 
 	REQUIRE( a.IsOnStack() );
 
-	a.Push( 32 );
+	a.Add( 32 );
 
 	REQUIRE( !a.IsOnStack() );
 
@@ -310,7 +310,7 @@ TEST_CASE( "[StackVector] Copy" )
 
 	for( int i = 0; i < 16; ++i )
 	{
-		b.Push( i );
+		b.Add( i );
 	}
 
 	REQUIRE( b.IsOnStack() );

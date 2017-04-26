@@ -1,3 +1,9 @@
+//
+// Renderer.cpp - Master renderer class, coordinates all rendering.
+// Copyright (C) Sebastian Nordgren 
+// April 14th 2016
+//
+
 #include "PrecompiledHeader.h"
 #include "Renderer.h"
 
@@ -7,6 +13,7 @@
 #include "Frustum.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
+#include "MousePicking.h"
 #include "PointLight.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -26,12 +33,9 @@ namespace dd
 		m_meshCount( 0 ),
 		m_camera( nullptr ),
 		m_window( nullptr ),
-		m_entityManager( nullptr ),
 		m_drawAxes( true ),
-		m_debugHighlightMeshes( false ),
-		m_debugHitTestMeshes( false ),
+		m_debugHighlightFrustumMeshes( false ),
 		m_frustumMeshCount( 0 ),
-		m_debugFocusedMeshDistance( FLT_MAX ),
 		m_debugMeshGridCreated( false ),
 		m_ambientStrength( 0.1f ),
 		m_specularStrength( 0.5f )
@@ -73,17 +77,15 @@ namespace dd
 
 		m_shaders.Add( CreateShaders( "mesh" ) );
 
-		m_entityManager = &entity_manager;
-
 		m_unitCube = Mesh::Create( "cube", m_shaders[0] );
 		m_unitCube.Get()->MakeUnitCube();
 
 		m_pointLight = new PointLight( glm::vec3( 10, 10, 10 ), glm::vec3( 1, 1, 1 ), 1.0f );
-		m_pointLightMesh = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 1, 1, 1, 1 ), glm::scale( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
+		m_pointLightMesh = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 1, 1, 1, 1 ), glm::scale( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
 
-		m_xAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-		m_yAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-		m_zAxis = CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+		m_xAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+		m_yAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+		m_zAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 	}
 
 	void Renderer::Shutdown()
@@ -114,7 +116,7 @@ namespace dd
 		return handle;
 	}
 
-	void Renderer::DrawDebugUI()
+	void Renderer::DrawDebugUI( EntityManager& entity_manager )
 	{
 		bool open = true;
 		if( !ImGui::Begin( "Renderer", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
@@ -133,21 +135,6 @@ namespace dd
 			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
 			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
 			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
-		}
-
-		ImGui::Checkbox( "Hit Test Meshes", &m_debugHitTestMeshes );
-
-		if( m_debugHitTestMeshes )
-		{
-			if( m_debugFocusedMesh.IsValid() )
-			{
-				glm::vec3 focusedMesh = m_debugFocusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Text( "Focused Mesh: %.2f %.2f %.2f", focusedMesh.x, focusedMesh.y, focusedMesh.z );
-			}
-			else
-			{
-				ImGui::Text( "Focused Mesh: <none>" );
-			}
 		}
 
 		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
@@ -176,7 +163,7 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Frustum", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightMeshes );
+			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightFrustumMeshes );
 
 			ImGui::TreePop();
 		}
@@ -189,7 +176,7 @@ namespace dd
 				{
 					for( int z = -5; z < 5; ++z )
 					{
-						CreateMeshEntity( *m_entityManager, m_unitCube, m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
+						CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
 					}
 				}
 			}
@@ -214,31 +201,8 @@ namespace dd
 		// blending
 		glDisable( GL_BLEND );
 	}
-	
-	void Renderer::HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle )
-	{
-		if( entity == m_xAxis || entity == m_yAxis || entity == m_zAxis )
-			return;
 
-		const MeshComponent* mesh_cmp = mesh_handle.Read();
-		Mesh* mesh = mesh_cmp->Mesh.Get();
-		if( mesh != nullptr && !mesh_cmp->Hidden )
-		{
-			const AABB& bounds = mesh_cmp->Bounds;
-
-			float distance;
-			if( bounds.IntersectsRay( m_camera->GetPosition(), m_camera->GetDirection(), distance ) )
-			{
-				if( distance < m_debugFocusedMeshDistance )
-				{
-					m_debugFocusedMeshDistance = distance;
-					m_debugFocusedMesh = entity;
-				}
-			}
-		}
-	}
-
-	void Renderer::RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, ComponentHandle<TransformComponent> transform_handle )
+	void Renderer::RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, ComponentHandle<TransformComponent> transform_handle, const MousePicking* mouse_picking )
 	{
 		const MeshComponent* mesh_cmp = mesh_handle.Read();
 		Mesh* mesh = mesh_cmp->Mesh.Get();
@@ -248,15 +212,23 @@ namespace dd
 
 			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
 
-			if( entity == m_debugFocusedMesh )
+			if( mouse_picking != nullptr )
 			{
-				debugMultiplier.y = 1.5f;
+				if( entity == mouse_picking->GetFocusedMesh() )
+				{
+					debugMultiplier.z = 1.5f;
+				}
+
+				if( entity == mouse_picking->GetSelectedMesh() )
+				{
+					debugMultiplier.y = 1.5f;
+				}
 			}
 
 			// check if it intersects with the frustum
 			if( m_frustum->Intersects( mesh_cmp->Bounds ) )
 			{
-				if( m_debugHighlightMeshes )
+				if( m_debugHighlightFrustumMeshes )
 				{
 					debugMultiplier.x = 1.5f;
 				}
@@ -293,14 +265,10 @@ namespace dd
 		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 	}
 
-	void Renderer::Render( float delta_t )
+	void Renderer::Render( EntityManager& entity_manager, float delta_t )
 	{
-		DD_ASSERT( m_entityManager != nullptr );
 		DD_ASSERT( m_window->IsContextValid() );
 
-		m_debugFocusedMeshDistance = 0;
-		m_debugFocusedMesh = EntityHandle();
-		m_debugFocusedMeshDistance = FLT_MAX;
 		m_frustumMeshCount = 0;
 		m_meshCount = 0;
 
@@ -310,14 +278,9 @@ namespace dd
 
 		m_frustum->ResetFrustum( *m_camera );
 
-		if( m_debugHitTestMeshes )
-		{
-			m_entityManager->ForAllWithReadable<MeshComponent>( [this]( auto entity, auto mesh ) { HitTestMesh( entity, mesh ); } );
-		}
+		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this]( auto entity, auto mesh, auto transform ) { RenderMesh( entity, mesh, transform, m_mousePicking ); } );
 
-		m_entityManager->ForAllWithReadable<MeshComponent, TransformComponent>( [this]( auto entity, auto mesh, auto transform ) { RenderMesh( entity, mesh, transform ); } );
-
-		DrawDebugUI();
+		DrawDebugUI( entity_manager );
 	}
 
 	Camera& Renderer::GetCamera() const

@@ -34,6 +34,9 @@ namespace dd
 		float GetAspectRatio() const;
 		void SetAspectRatio( int w, int h );
 
+		float GetHorizontalFOV() const;
+		void SetHorizontalFOV( float hfov );
+
 		float GetVerticalFOV() const;
 		void SetVerticalFOV( float vfov );
 
