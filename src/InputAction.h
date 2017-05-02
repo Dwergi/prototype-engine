@@ -19,10 +19,11 @@ namespace dd
 		DOWN,
 		SHOOT,
 		BOOST,
-		SHOW_CONSOLE,
-		TOGGLE_FREECAM,
 		EXIT,
-		SELECT_MESH
+		SELECT_MESH,
+		TOGGLE_DEBUG_UI,
+		TOGGLE_CONSOLE,
+		TOGGLE_FREECAM
 	};
 
 	enum class InputType : unsigned int

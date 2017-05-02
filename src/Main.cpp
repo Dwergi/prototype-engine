@@ -58,15 +58,13 @@
 
 using namespace dd;
 
-
 extern float s_maxFPS;
 float s_maxFPS = 60.0f;
 
 bool s_showDebugUI = false;
-
 bool s_freeCamEnabled = true;
 
-std::unique_ptr<Window> s_window;
+Window* s_window;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -250,7 +248,7 @@ void RegisterGameTypes( EntityManager& manager )
 
 void ToggleConsole( InputAction action, InputType type )
 {
-	if( action == InputAction::SHOW_CONSOLE && type == InputType::RELEASED )
+	if( action == InputAction::TOGGLE_CONSOLE && type == InputType::RELEASED )
 	{
 		s_showDebugUI = true;
 	}
@@ -264,20 +262,27 @@ void ToggleFreeCam( InputAction action, InputType type )
 	}
 }
 
+void ToggleDebugUI( InputAction action, InputType type )
+{
+	if( action == InputAction::TOGGLE_DEBUG_UI && type == InputType::RELEASED )
+	{
+		s_showDebugUI = !s_showDebugUI;
+	}
+}
+
 void Exit( InputAction action, InputType type )
 {
 	if( action == InputAction::EXIT && type == InputType::RELEASED )
 	{
-		s_showDebugUI = !s_showDebugUI;
-		//s_window->SetToClose();
+		s_window->SetToClose();
 	}
 }
 
 void BindKeys( Input& input )
 {
 	input.BindKey( Input::Key::F1, InputAction::TOGGLE_FREECAM );
-	input.BindKey( Input::Key::F2, InputAction::SHOW_CONSOLE );
-	input.BindKey( Input::Key::ESCAPE, InputAction::EXIT );
+	input.BindKey( Input::Key::F2, InputAction::TOGGLE_CONSOLE );
+	input.BindKey( Input::Key::ESCAPE, InputAction::TOGGLE_DEBUG_UI );
 	input.BindKey( 'W', InputAction::FORWARD );
 	input.BindKey( 'S', InputAction::BACKWARD );
 	input.BindKey( 'A', InputAction::LEFT );
@@ -373,15 +378,14 @@ void Render( Renderer& renderer, EntityManager& entity_manager, DebugConsole& co
 	s_window->Swap();
 }
 
-Array<InputEvent, 64> s_inputEvents;
-
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 {
+	Array<InputEvent, 64> events;
 	input.Update( delta_t );
 
 	// update input
-	input.GetKeyEvents( s_inputEvents );
-	bindings.Dispatch( s_inputEvents );
+	input.GetKeyEvents( events );
+	bindings.Dispatch( events );
 }
 
 #ifdef _TEST
@@ -413,12 +417,10 @@ int GameMain( EntityManager& entity_manager )
 
 		SwarmSystem swarm_system;
 
-		s_window.reset( new Window( 1280, 720, "DD" ) );
+		s_window = new Window( 1280, 720, "DD" );
 		Input input( *s_window );
 
 		DebugUI debugUI( *s_window, input );
-
-		DebugConsole console;
 
 		Renderer renderer;
 		renderer.Initialize( *s_window, entity_manager );
@@ -436,16 +438,16 @@ int GameMain( EntityManager& entity_manager )
 		trench_system.CreateRenderResources();
 
 		InputBindings bindings;
-		bindings.RegisterHandler( InputAction::SHOW_CONSOLE, &ToggleConsole );
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
+		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
 		bindings.RegisterHandler( InputAction::EXIT, &Exit );
-
-		MousePicking mouse_picking( *s_window.get(), camera, input );
-		mouse_picking.BindActions( bindings );
-		renderer.SetMousePicking( &mouse_picking );
 
 		FreeCameraController free_cam( camera );
 		free_cam.BindActions( bindings );
+
+		MousePicking mouse_picking( *s_window, camera, input );
+		mouse_picking.BindActions( bindings );
+		renderer.SetMousePicking( &mouse_picking );
 
 		Vector<ISystem*> systems;
 		systems.Add( &scene_graph );
@@ -456,6 +458,7 @@ int GameMain( EntityManager& entity_manager )
 		BindKeys( input );
 
 		FrameTimer frame_timer;
+		DebugConsole console;
 
 		Vector<IDebugDraw*> debug_views;
 		debug_views.Add( &frame_timer );
@@ -510,7 +513,7 @@ int GameMain( EntityManager& entity_manager )
 	}
 
 	s_window->Close();
-	s_window.reset();
+	delete s_window;
 
 	DD_PROFILE_DEINIT();
 
