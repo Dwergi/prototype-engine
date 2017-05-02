@@ -6,18 +6,23 @@
 
 #pragma once
 
+#include "IDebugDraw.h"
+
 struct ImGuiTextEditCallbackData;
 
 namespace dd
 {
-	class DebugConsole
+	class DebugConsole : public IDebugDraw
 	{
 	public:
 
 		DebugConsole();
 		~DebugConsole();
 
-		void Draw( const char* title, bool& opened );
+		virtual const char* GetDebugTitle() const override { return "Console"; }
+
+	protected:
+		virtual void DrawDebugInternal() override;
 
 	private:
 

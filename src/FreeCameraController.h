@@ -7,13 +7,14 @@
 #pragma once
 
 #include "Camera.h"
+#include "IDebugDraw.h"
 #include "Input.h"
 
 namespace dd
 {
 	class InputBindings;
 
-	class FreeCameraController
+	class FreeCameraController : public IDebugDraw
 	{
 	public:
 
@@ -32,7 +33,11 @@ namespace dd
 
 		void BindActions( InputBindings& bindings );
 
-		void DrawCameraDebug();
+		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
+
+	protected:
+
+		virtual void DrawDebugInternal() override;
 
 	private:
 
@@ -40,7 +45,6 @@ namespace dd
 		float m_yaw;
 		float m_pitch;
 		glm::vec2 m_mouseDelta;
-		bool m_debugOpen;
 
 		DenseMap<InputAction, bool> m_inputs;
 	};

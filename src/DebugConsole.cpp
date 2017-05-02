@@ -151,7 +151,7 @@ namespace dd
 	void DebugConsole::AddLog( const char* fmt, ... )
 	{
 		const int ArraySize = 1024;
-		static __declspec(thread) char buf[ArraySize];
+		static thread_local char buf[ArraySize];
 
 		va_list args;
 		va_start( args, fmt );
@@ -164,16 +164,11 @@ namespace dd
 		m_scrollToBottom = true;
 	}
 
-	void DebugConsole::Draw( const char* title, bool& opened )
+	void DebugConsole::DrawDebugInternal()
 	{
 		DD_PROFILE_START( DebugConsole_Draw );
 
-		ImGui::SetNextWindowSize( ImVec2( 520, 600 ), ImGuiSetCond_FirstUseEver );
-		if( !ImGui::Begin( title, &opened ) )
-		{
-			ImGui::End();
-			return;
-		}
+		ImGui::SetWindowSize( ImVec2( 520, 600 ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 0, 0 ) );
 
@@ -250,8 +245,6 @@ namespace dd
 		// Demonstrate keeping auto focus on the input box
 		if( ImGui::IsItemHovered() || (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked( 0 )) )
 			ImGui::SetKeyboardFocusHere( -1 ); // Auto focus
-
-		ImGui::End();
 
 		DD_PROFILE_END();
 	}

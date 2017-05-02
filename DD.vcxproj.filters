@@ -471,6 +471,9 @@
     <ClInclude Include="src\Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\IDebugDraw.h">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -782,6 +785,9 @@
     </ClCompile>
     <ClCompile Include="src\MousePicking.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDebugDraw.cpp">
+      <Filter>DebugUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

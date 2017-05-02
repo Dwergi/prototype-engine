@@ -38,7 +38,8 @@ namespace dd
 		m_frustumMeshCount( 0 ),
 		m_debugMeshGridCreated( false ),
 		m_ambientStrength( 0.1f ),
-		m_specularStrength( 0.5f )
+		m_specularStrength( 0.5f ),
+		m_createDebugMeshGrid( false )
 	{
 
 	}
@@ -116,17 +117,8 @@ namespace dd
 		return handle;
 	}
 
-	void Renderer::DrawDebugUI( EntityManager& entity_manager )
+	void Renderer::DrawDebugInternal()
 	{
-		bool open = true;
-		if( !ImGui::Begin( "Renderer", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
-		{
-			ImGui::End();
-			return;
-		}
-
-		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowSize().y - 2 ) );
-
 		ImGui::Text( "Meshes: %d", m_meshCount );
 		ImGui::Text( "Unculled Meshes: %d", m_frustumMeshCount );
 
@@ -170,21 +162,8 @@ namespace dd
 
 		if( !m_debugMeshGridCreated && ImGui::Button( "Create Mesh Grid" ) )
 		{
-			for( int x = -5; x < 5; ++x )
-			{
-				for( int y = -5; y < 5; ++y )
-				{
-					for( int z = -5; z < 5; ++z )
-					{
-						CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
-					}
-				}
-			}
-
-			m_debugMeshGridCreated = true;
+			m_createDebugMeshGrid = true;
 		}
-
-		ImGui::End();
 	}
 
 	void Renderer::SetRenderState()
@@ -265,6 +244,25 @@ namespace dd
 		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 	}
 
+	void Renderer::CreateDebugMeshGrid( EntityManager& entity_manager )
+	{
+		if( m_debugMeshGridCreated || !m_createDebugMeshGrid )
+			return;	
+
+		for( int x = -5; x < 5; ++x )
+		{
+			for( int y = -5; y < 5; ++y )
+			{
+				for( int z = -5; z < 5; ++z )
+				{
+					CreateMeshEntity( entity_manager, m_unitCube, m_shaders[ 0 ], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
+				}
+			}
+		}
+
+		m_debugMeshGridCreated = true;
+	}
+
 	void Renderer::Render( EntityManager& entity_manager, float delta_t )
 	{
 		DD_ASSERT( m_window->IsContextValid() );
@@ -272,6 +270,8 @@ namespace dd
 		m_frustumMeshCount = 0;
 		m_meshCount = 0;
 
+		CreateDebugMeshGrid( entity_manager );
+		
 		SetRenderState();
 
 		UpdateDebugLight();
@@ -279,8 +279,6 @@ namespace dd
 		m_frustum->ResetFrustum( *m_camera );
 
 		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this]( auto entity, auto mesh, auto transform ) { RenderMesh( entity, mesh, transform, m_mousePicking ); } );
-
-		DrawDebugUI( entity_manager );
 	}
 
 	Camera& Renderer::GetCamera() const

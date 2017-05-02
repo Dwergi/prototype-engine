@@ -7,6 +7,7 @@
 #pragma once
 
 #include "EntityHandle.h"
+#include "IDebugDraw.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
 
@@ -23,7 +24,7 @@ namespace dd
 	class TransformComponent;
 	class Window;
 
-	class Renderer
+	class Renderer : public IDebugDraw
 	{
 	public:
 
@@ -54,6 +55,15 @@ namespace dd
 		//
 		void SetMousePicking( MousePicking* mouse_picking ) { m_mousePicking = mouse_picking; }
 
+		virtual const char* GetDebugTitle() const override { return "Renderer"; }
+
+	protected:
+
+		//
+		// Draw the debug menu.
+		//
+		virtual void DrawDebugInternal() override;
+
 	private:
 
 		Window* m_window;
@@ -73,6 +83,7 @@ namespace dd
 
 		bool m_debugHighlightFrustumMeshes;
 		bool m_debugMeshGridCreated;
+		bool m_createDebugMeshGrid;
 
 		PointLight* m_pointLight;
 		EntityHandle m_pointLightMesh;
@@ -82,9 +93,9 @@ namespace dd
 
 		MeshHandle m_unitCube;
 
-		void DrawDebugUI( EntityManager& entity_manager );
 		void UpdateDebugLight();
 
+		void CreateDebugMeshGrid( EntityManager& entity_manager );
 		EntityHandle CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
 
 		void SetRenderState();

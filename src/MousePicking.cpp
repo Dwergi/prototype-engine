@@ -44,19 +44,8 @@ namespace dd
 		}
 	}
 
-	void MousePicking::UpdatePicking( const EntityManager& entity_manager )
+	void MousePicking::Update( EntityManager& entity_manager, float dt )
 	{
-		bool open = true;
-		if( !ImGui::Begin( "Picking", &open, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings ) )
-		{
-			ImGui::End();
-			return;
-		}
-
-		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowSize().y - 2 ) );
-
-		ImGui::Checkbox( "Hit Test Meshes", &m_enabled );
-
 		if( m_enabled )
 		{
 			Ray mouse_ray = GetScreenRay( m_input->GetMousePosition() );
@@ -68,33 +57,41 @@ namespace dd
 
 			if( m_focusedMesh.IsValid() )
 			{
-				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Text( "Focused Mesh: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
-
 				if( m_select )
 				{
 					m_selectedMesh = m_focusedMesh;
 				}
 			}
-			else
-			{
-				ImGui::Text( "Focused Mesh: <none>" );
-			}
-
-			if( m_selectedMesh.IsValid() )
-			{
-				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Text( "Selected Mesh: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
-			}
-			else
-			{
-				ImGui::Text( "Selected Mesh: <none>" );
-			}
 		}
 
-		ImGui::End();
-
 		m_select = false;
+	}
+
+	void MousePicking::DrawDebugInternal()
+	{
+		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
+
+		ImGui::Checkbox( "Hit Test Meshes", &m_enabled );
+
+		if( m_focusedMesh.IsValid() )
+		{
+			glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
+			ImGui::Text( "Focused Mesh: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
+		}
+		else
+		{
+			ImGui::Text( "Focused Mesh: <none>" );
+		}
+
+		if( m_selectedMesh.IsValid() )
+		{
+			glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
+			ImGui::Text( "Selected Mesh: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
+		}
+		else
+		{
+			ImGui::Text( "Selected Mesh: <none>" );
+		}
 	}
 
 	void MousePicking::HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, const Ray& mouse_ray, float& nearest_distance )

@@ -341,6 +341,7 @@
     <ClInclude Include="src\GenericHandle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
+    <ClInclude Include="src\IDebugDraw.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
@@ -524,6 +525,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\GLError.cpp" />
+    <ClCompile Include="src\IDebugDraw.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />

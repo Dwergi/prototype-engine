@@ -37,8 +37,7 @@ namespace dd
 	FreeCameraController::FreeCameraController( Camera& camera ) :
 		m_camera( camera ),
 		m_yaw( 0.0f ),
-		m_pitch( 0.0f ),
-		m_debugOpen( true )
+		m_pitch( 0.0f )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
 
@@ -87,15 +86,9 @@ namespace dd
 			*state = false;
 	}
 
-	void FreeCameraController::DrawCameraDebug()
+	void FreeCameraController::DrawDebugInternal()
 	{
-		if( !ImGui::Begin( "FreeCamera", &m_debugOpen, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings ) )
-		{
-			ImGui::End();
-			return;
-		}
-
-		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x - 2, 2 ) );
+		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::Text( "Yaw: %.2f", m_yaw );
 		ImGui::Text( "Pitch: %.2f", m_pitch );
@@ -123,10 +116,8 @@ namespace dd
 		{
 			m_camera.SetFar( far_distance );
 		}
-		
-		ImGui::End();
 	}
-
+	
 	void FreeCameraController::Update( float dt )
 	{
 		DD_PROFILE_SCOPED( FreeCameraController_Update );

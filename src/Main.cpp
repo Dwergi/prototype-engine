@@ -21,6 +21,7 @@
 #include "EntityManager.h"
 #include "File.h"
 #include "FreeCameraController.h"
+#include "IDebugDraw.h"
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
@@ -57,25 +58,19 @@
 
 using namespace dd;
 
-extern bool s_drawFPS;
-bool s_drawFPS = true;
 
 extern float s_maxFPS;
 float s_maxFPS = 60.0f;
 
-const int SLIDING_WINDOW_SIZE = 60;
-float s_frameTimes[SLIDING_WINDOW_SIZE];
-int s_currentFrame = 0;
+bool s_showDebugUI = false;
 
-bool s_drawConsole = false;
 bool s_freeCamEnabled = true;
-bool s_drawCameraDebug = true;
 
 std::unique_ptr<Window> s_window;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
-class FrameTimer
+class FrameTimer : public IDebugDraw
 {
 public:
 
@@ -90,7 +85,7 @@ public:
 		// fill history with standard deltas
 		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
 		{
-			s_frameTimes[i] = m_targetDelta;
+			m_frameTimes[i] = m_targetDelta;
 		}
 
 		m_timer.Start();
@@ -102,11 +97,31 @@ public:
 		m_lastFrameTime = m_currentFrameTime;
 		m_currentFrameTime = m_timer.Time();
 		m_delta = m_currentFrameTime - m_lastFrameTime;
+
+		// update sliding window
+		m_frameTimes[ m_currentSlidingFrame ] = m_deltaWithoutDelay;
+		++m_currentSlidingFrame;
+
+		if( m_currentSlidingFrame >= SLIDING_WINDOW_SIZE )
+			m_currentSlidingFrame = 0;
+
+		float total_time = 0;
+		for( float f : m_frameTimes )
+		{
+			total_time += f;
+		}
+
+		m_slidingDelta = (total_time / SLIDING_WINDOW_SIZE);
 	}
 
 	float Delta() const
 	{
 		return m_delta;
+	}
+
+	float SlidingDelta() const
+	{
+		return m_slidingDelta;
 	}
 
 	float DeltaWithoutDelay() const
@@ -129,6 +144,23 @@ public:
 		}
 	}
 
+	virtual const char* GetDebugTitle() const override
+	{
+		return "FPS";
+	}
+
+protected:
+
+	virtual void DrawDebugInternal() override
+	{
+		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetWindowSize( ImVec2( 150.0f, 80.0f ), ImGuiSetCond_FirstUseEver );
+
+		ImGui::Text( "FPS: %.1f", 1.0f / m_slidingDelta );
+		ImGui::Text( "Frame Time: %.1f", m_deltaWithoutDelay * 1000.f );
+		ImGui::Text( "Sliding: %.1f", m_slidingDelta * 1000.f );
+	}
+
 private:
 
 	Timer m_timer;
@@ -137,40 +169,12 @@ private:
 	float m_currentFrameTime;
 	float m_delta;
 	float m_deltaWithoutDelay;
+	float m_slidingDelta;
+
+	static const int SLIDING_WINDOW_SIZE = 60;
+	float m_frameTimes[ SLIDING_WINDOW_SIZE ];
+	int m_currentSlidingFrame = 0;
 };
-
-void DrawFPS( FrameTimer& frameTimer )
-{
-	ImGui::SetNextWindowPos( ImVec2( 2.0f, 2.0f ) );
-	if( !ImGui::Begin( "FPS", &s_drawFPS, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings ) )
-	{
-		ImGui::End();
-		return;
-	}
-
-	float delta_t = frameTimer.DeltaWithoutDelay();
-
-	s_frameTimes[s_currentFrame] = delta_t;
-	++s_currentFrame;
-
-	if( s_currentFrame >= SLIDING_WINDOW_SIZE )
-		s_currentFrame = 0;
-
-	float ms = delta_t * 1000.f;
-
-	float total_time = 0;
-	for( float f : s_frameTimes )
-	{
-		total_time += f;
-	}
-
-	float sliding_delta = (total_time / SLIDING_WINDOW_SIZE) * 1000.f;
-
-	ImGui::Text( "FPS: %.1f", 1000.0f / sliding_delta );
-	ImGui::Text( "Frame Time: %.1f", ms );
-	ImGui::Text( "Sliding: %.1f", sliding_delta );
-	ImGui::End();
-}
 
 TransformComponent* GetTransformComponent( EntityHandle entity )
 {
@@ -192,7 +196,6 @@ void RegisterGlobalScriptFunctions()
 	engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
 	engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
 
-	REGISTER_GLOBAL_VARIABLE( engine, s_drawFPS );
 	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
 }
 
@@ -249,7 +252,7 @@ void ToggleConsole( InputAction action, InputType type )
 {
 	if( action == InputAction::SHOW_CONSOLE && type == InputType::RELEASED )
 	{
-		s_drawConsole = !s_drawConsole;
+		s_showDebugUI = true;
 	}
 }
 
@@ -265,7 +268,8 @@ void Exit( InputAction action, InputType type )
 {
 	if( action == InputAction::EXIT && type == InputType::RELEASED )
 	{
-		s_window->SetToClose();
+		s_showDebugUI = !s_showDebugUI;
+		//s_window->SetToClose();
 	}
 }
 
@@ -286,7 +290,7 @@ void BindKeys( Input& input )
 
 void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
 {
-	bool captureMouse = !s_drawConsole && s_freeCamEnabled;
+	bool captureMouse = !s_showDebugUI;
 	input.CaptureMouse( captureMouse );
 	if( captureMouse )
 	{
@@ -294,9 +298,6 @@ void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t 
 		free_cam.UpdateScroll( input.GetScrollPosition() );
 		free_cam.Update( delta_t );
 	}
-
-	if( s_drawCameraDebug )
-		free_cam.DrawCameraDebug();
 }
 
 void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
@@ -329,15 +330,43 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vec
 	jobsystem.WaitForCategory( "System::PostRender" );
 }
 
+void DrawDebugUI( const Vector<IDebugDraw*>& views )
+{
+	if( !s_showDebugUI )
+		return;
+
+	if( ImGui::BeginMainMenuBar() )
+	{
+		if( ImGui::BeginMenu( "File" ) )
+		{
+			if( ImGui::MenuItem( "Exit" ) )
+				s_window->SetToClose();
+
+			ImGui::EndMenu();
+		}
+
+		if( ImGui::BeginMenu( "Views" ) )
+		{
+			for( IDebugDraw* debug_view : views )
+			{
+				ImGui::MenuItem( debug_view->GetDebugTitle(), nullptr, &debug_view->IsDebugOpen() );
+			}
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+
+	for( IDebugDraw* debug_view : views )
+	{
+		if( debug_view->IsDebugOpen() )
+			debug_view->DrawDebug();
+	}
+}
+
 void Render( Renderer& renderer, EntityManager& entity_manager, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
 {
 	renderer.Render( entity_manager, delta_t );
-
-	if( s_drawConsole )
-		console.Draw( "Console", s_drawConsole );
-
-	if( s_drawFPS )
-		DrawFPS( frame_timer );
 
 	ImGui::Render();
 
@@ -422,10 +451,18 @@ int GameMain( EntityManager& entity_manager )
 		systems.Add( &scene_graph );
 		systems.Add( &swarm_system );
 		systems.Add( &trench_system );
+		systems.Add( &mouse_picking );
 
 		BindKeys( input );
 
 		FrameTimer frame_timer;
+
+		Vector<IDebugDraw*> debug_views;
+		debug_views.Add( &frame_timer );
+		debug_views.Add( &console );
+		debug_views.Add( &renderer );
+		debug_views.Add( &mouse_picking );
+		debug_views.Add( &free_cam );
 
 		while( !s_window->ShouldClose() )
 		{
@@ -453,8 +490,8 @@ int GameMain( EntityManager& entity_manager )
 			// systems update
 			UpdateSystems( jobsystem, entity_manager, systems, delta_t );
 
-			// mouse picking
-			mouse_picking.UpdatePicking( entity_manager );
+			// debug UI
+			DrawDebugUI( debug_views );
 
 			// render
 			Render( renderer, entity_manager, console, frame_timer, delta_t );

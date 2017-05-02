@@ -20,5 +20,5 @@ TEST_CASE( "[Frustum]" )
 	cam.SetNear( 1 );
 	cam.SetVerticalFOV( glm::radians( 90.f / 2 ) );
 
-	dd::Frustum f( cam );
+	//dd::Frustum f( cam );
 }

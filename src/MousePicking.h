@@ -7,7 +7,9 @@
 #pragma once
 
 #include "EntityHandle.h"
+#include "IDebugDraw.h"
 #include "InputAction.h"
+#include "ISystem.h"
 #include "Ray.h"
 
 struct GLFWwindow;
@@ -22,18 +24,24 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking
+	class MousePicking : public ISystem, public IDebugDraw
 	{
 	public:
 
 		MousePicking( Window& window, Camera& camera, Input& input );
 
-		void UpdatePicking( const EntityManager& entity_manager );
+		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
 		EntityHandle GetFocusedMesh() const { return m_focusedMesh; }
 		EntityHandle GetSelectedMesh() const { return m_selectedMesh; }
 
 		void BindActions( InputBindings& bindings );
+
+		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
+
+	protected:
+
+		virtual void DrawDebugInternal() override;
 
 	private:
 
