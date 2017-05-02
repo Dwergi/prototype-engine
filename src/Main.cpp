@@ -64,8 +64,9 @@ extern float s_maxFPS;
 float s_maxFPS = 60.0f;
 
 bool s_showDebugUI = false;
-bool s_freeCamEnabled = true;
 
+FreeCameraController* s_freeCam;
+ShipSystem* s_shipSystem;
 Window* s_window;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
@@ -263,8 +264,8 @@ void ToggleFreeCam( InputAction action, InputType type )
 {
 	if( action == InputAction::TOGGLE_FREECAM && type == InputType::RELEASED )
 	{
-		s_freeCamEnabled = !s_freeCamEnabled;
-		s_shipEnabled = !s_shipEnabled;
+		s_freeCam->Enable( !s_freeCam->IsEnabled() );
+		s_shipSystem->Enable( !s_shipSystem->IsEnabled() );
 	}
 }
 
@@ -301,8 +302,6 @@ void BindKeys( Input& input )
 
 void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
 {
-	free_cam.Enable( s_freeCamEnabled );
-
 	bool captureMouse = !s_showDebugUI;
 	if( captureMouse != input.IsMouseCaptured() )
 	{
@@ -349,29 +348,29 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vec
 
 void DrawDebugUI( const Vector<IDebugDraw*>& views )
 {
-	if( !s_showDebugUI )
-		return;
-
-	if( ImGui::BeginMainMenuBar() )
+	if( s_showDebugUI )
 	{
-		if( ImGui::BeginMenu( "File" ) )
+		if( ImGui::BeginMainMenuBar() )
 		{
-			if( ImGui::MenuItem( "Exit" ) )
-				s_window->SetToClose();
-
-			ImGui::EndMenu();
-		}
-
-		if( ImGui::BeginMenu( "Views" ) )
-		{
-			for( IDebugDraw* debug_view : views )
+			if( ImGui::BeginMenu( "File" ) )
 			{
-				ImGui::MenuItem( debug_view->GetDebugTitle(), nullptr, &debug_view->IsDebugOpen() );
-			}
-			ImGui::EndMenu();
-		}
+				if( ImGui::MenuItem( "Exit" ) )
+					s_window->SetToClose();
 
-		ImGui::EndMainMenuBar();
+				ImGui::EndMenu();
+			}
+
+			if( ImGui::BeginMenu( "Views" ) )
+			{
+				for( IDebugDraw* debug_view : views )
+				{
+					ImGui::MenuItem( debug_view->GetDebugTitle(), nullptr, &debug_view->IsDebugOpen() );
+				}
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMainMenuBar();
+		}
 	}
 
 	for( IDebugDraw* debug_view : views )
@@ -454,14 +453,14 @@ int GameMain( EntityManager& entity_manager )
 		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
 		bindings.RegisterHandler( InputAction::EXIT, &Exit );
 
-		FreeCameraController free_cam( camera );
-		free_cam.BindActions( bindings );
-		free_cam.Enable( s_freeCamEnabled );
+		s_freeCam = new FreeCameraController( camera );
+		s_freeCam->BindActions( bindings );
+		s_freeCam->Enable( false );
 
-		ShipSystem ship_system( camera );
-		ship_system.BindActions( bindings );
-		ship_system.CreateShip( entity_manager );
-		ship_system.Enable( s_shipEnabled );
+		s_shipSystem = new ShipSystem( camera );
+		s_shipSystem->BindActions( bindings );
+		s_shipSystem->CreateShip( entity_manager );
+		s_shipSystem->Enable( true );
 
 		MousePicking mouse_picking( *s_window, camera, input );
 		mouse_picking.BindActions( bindings );
@@ -472,7 +471,7 @@ int GameMain( EntityManager& entity_manager )
 		systems.Add( &swarm_system );
 		systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
-		systems.Add( &ship_system );
+		systems.Add( s_shipSystem );
 
 		BindKeys( input );
 
@@ -484,7 +483,8 @@ int GameMain( EntityManager& entity_manager )
 		debug_views.Add( &console );
 		debug_views.Add( &renderer );
 		debug_views.Add( &mouse_picking );
-		debug_views.Add( &free_cam );
+		debug_views.Add( s_freeCam );
+		debug_views.Add( s_shipSystem );
 
 		while( !s_window->ShouldClose() )
 		{
@@ -507,9 +507,7 @@ int GameMain( EntityManager& entity_manager )
 			debugUI.Update( delta_t );
 
 			// camera
-			UpdateFreeCam( free_cam, input, delta_t );
-
-			ship_system.Enable( s_shipEnabled );
+			UpdateFreeCam( *s_freeCam, input, delta_t );
 
 			// systems update
 			UpdateSystems( jobsystem, entity_manager, systems, delta_t );
@@ -532,6 +530,9 @@ int GameMain( EntityManager& entity_manager )
 		systems.Clear();
 		renderer.Shutdown();
 	}
+
+	delete s_freeCam;
+	delete s_shipSystem;
 
 	s_window->Close();
 	delete s_window;

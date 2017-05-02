@@ -71,7 +71,7 @@ namespace dd
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
-		ImGui::Checkbox( "Hit Test Meshes", &m_enabled );
+		ImGui::Checkbox( "Enabled", &m_enabled );
 
 		if( m_focusedMesh.IsValid() )
 		{

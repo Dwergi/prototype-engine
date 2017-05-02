@@ -33,6 +33,7 @@ namespace dd
 		void BindActions( InputBindings& bindings );
 
 		void Enable( bool enabled ) { m_enabled = enabled; }
+		bool IsEnabled() const { return m_enabled; }
 
 		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
 
@@ -48,6 +49,7 @@ namespace dd
 		glm::vec2 m_mouseDelta;
 
 		bool m_enabled;
+		bool m_invert;
 		
 		DenseMap<InputAction, bool> m_inputs;
 	};

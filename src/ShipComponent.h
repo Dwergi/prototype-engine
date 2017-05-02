@@ -27,6 +27,12 @@ namespace dd
 		// The amount of time you can boost for, in seconds.
 		float BoostRemaining; 
 
+		// The number of seconds it takes to recharge one second of boost.
+		float BoostRechargeRate; 
+
+		// The number of seconds to recharge to full boost.
+		float BoostMaximum;
+
 		BEGIN_SCRIPT_OBJECT( ShipComponent )
 			PARENT( ComponentBase )
 		END_TYPE

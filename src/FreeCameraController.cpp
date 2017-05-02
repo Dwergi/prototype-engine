@@ -37,7 +37,8 @@ namespace dd
 		m_camera( camera ),
 		m_yaw( 0.0f ),
 		m_pitch( 0.0f ),
-		m_enabled( true )
+		m_enabled( true ),
+		m_invert( false )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
 
@@ -93,6 +94,8 @@ namespace dd
 	{
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiSetCond_FirstUseEver );
 
+		ImGui::Checkbox( "Enabled", &m_enabled );
+
 		ImGui::Text( "Yaw: %.2f", m_yaw );
 		ImGui::Text( "Pitch: %.2f", m_pitch );
 		
@@ -119,6 +122,8 @@ namespace dd
 		{
 			m_camera.SetFar( far_distance );
 		}
+
+		ImGui::Checkbox( "Invert", &m_invert );
 	}
 	
 	void FreeCameraController::Update( float dt )
@@ -127,7 +132,13 @@ namespace dd
 
 		// rotate around up axis, ie. Y
 		m_yaw += m_mouseDelta.x * TurnSpeed;
-		m_pitch += m_mouseDelta.y * TurnSpeed;
+
+		float y_delta = m_mouseDelta.y * TurnSpeed;
+
+		if( m_invert )
+			y_delta = -y_delta;
+
+		m_pitch += y_delta;
 
 		// wrap the x direction
 		m_yaw = wrap( m_yaw, 0, 360 );
