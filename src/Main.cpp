@@ -34,6 +34,8 @@
 #include "Renderer.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
+#include "ShipComponent.h"
+#include "ShipSystem.h"
 #include "StringBinding.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
@@ -230,16 +232,19 @@ void RegisterGameTypes( EntityManager& manager )
 	REGISTER_TYPE( OctreeComponent );
 	REGISTER_TYPE( SwarmAgentComponent );
 	REGISTER_TYPE( MeshComponent );
+	REGISTER_TYPE( ShipComponent );
 
 	Services::RegisterComponent<TransformComponent>();
 	Services::RegisterComponent<OctreeComponent>();
 	Services::RegisterComponent<SwarmAgentComponent>();
 	Services::RegisterComponent<MeshComponent>();
+	Services::RegisterComponent<ShipComponent>();
 
 	manager.RegisterComponent<TransformComponent>();
 	manager.RegisterComponent<OctreeComponent>();
 	manager.RegisterComponent<SwarmAgentComponent>();
 	manager.RegisterComponent<MeshComponent>();
+	manager.RegisterComponent<ShipComponent>();
 
 	REGISTER_TYPE( SwarmSystem );
 
@@ -259,6 +264,7 @@ void ToggleFreeCam( InputAction action, InputType type )
 	if( action == InputAction::TOGGLE_FREECAM && type == InputType::RELEASED )
 	{
 		s_freeCamEnabled = !s_freeCamEnabled;
+		s_shipEnabled = !s_shipEnabled;
 	}
 }
 
@@ -295,8 +301,14 @@ void BindKeys( Input& input )
 
 void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
 {
+	free_cam.Enable( s_freeCamEnabled );
+
 	bool captureMouse = !s_showDebugUI;
-	input.CaptureMouse( captureMouse );
+	if( captureMouse != input.IsMouseCaptured() )
+	{
+		input.CaptureMouse( captureMouse );
+	}
+
 	if( captureMouse )
 	{
 		free_cam.UpdateMouse( input.GetMousePosition() );
@@ -426,7 +438,7 @@ int GameMain( EntityManager& entity_manager )
 		renderer.Initialize( *s_window, entity_manager );
 
 		Camera& camera = renderer.GetCamera();
-		camera.SetPosition( glm::vec3( 5, 5, 0 ) );
+		camera.SetPosition( glm::vec3( 0, 5, 0 ) );
 		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
 
 		//TerrainSystem terrain_system( camera );
@@ -444,6 +456,12 @@ int GameMain( EntityManager& entity_manager )
 
 		FreeCameraController free_cam( camera );
 		free_cam.BindActions( bindings );
+		free_cam.Enable( s_freeCamEnabled );
+
+		ShipSystem ship_system( camera );
+		ship_system.BindActions( bindings );
+		ship_system.CreateShip( entity_manager );
+		ship_system.Enable( s_shipEnabled );
 
 		MousePicking mouse_picking( *s_window, camera, input );
 		mouse_picking.BindActions( bindings );
@@ -454,6 +472,7 @@ int GameMain( EntityManager& entity_manager )
 		systems.Add( &swarm_system );
 		systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
+		systems.Add( &ship_system );
 
 		BindKeys( input );
 
@@ -489,6 +508,8 @@ int GameMain( EntityManager& entity_manager )
 
 			// camera
 			UpdateFreeCam( free_cam, input, delta_t );
+
+			ship_system.Enable( s_shipEnabled );
 
 			// systems update
 			UpdateSystems( jobsystem, entity_manager, systems, delta_t );

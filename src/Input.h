@@ -76,6 +76,7 @@ namespace dd
 		MousePosition GetScrollPosition() const;
 
 		void CaptureMouse( bool capture );
+		bool IsMouseCaptured() const { return m_mouseCaptured; }
 
 		// get all key events received in the last update
 		// returns true if the output array successfully contained all of them
@@ -102,8 +103,9 @@ namespace dd
 		GLFWwindow* m_glfwWindow;
 		MousePosition m_mousePosition;
 		MousePosition m_scrollPosition;
-
 		MousePosition m_tempScrollPosition;
+
+		bool m_mouseCaptured;
 
 		Vector<InputEvent> m_pendingEvents;
 		Vector<InputEvent> m_currentEvents;

@@ -242,6 +242,9 @@ namespace dd
 		MeshComponent* mesh_cmp = m_pointLightMesh.Get<MeshComponent>().Write();
 		mesh_cmp->Colour = glm::vec4( m_pointLight->GetColour(), 1.0f );
 		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
+
+		// DEBUG
+		mesh_cmp->Hidden = true;
 	}
 
 	void Renderer::CreateDebugMeshGrid( EntityManager& entity_manager )

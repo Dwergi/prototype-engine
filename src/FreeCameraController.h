@@ -30,15 +30,16 @@ namespace dd
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
 		void HandleInput( InputAction action, InputType type );
-
 		void BindActions( InputBindings& bindings );
+
+		void Enable( bool enabled ) { m_enabled = enabled; }
 
 		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
 
 	protected:
 
 		virtual void DrawDebugInternal() override;
-
+	
 	private:
 
 		Camera& m_camera;
@@ -46,6 +47,8 @@ namespace dd
 		float m_pitch;
 		glm::vec2 m_mouseDelta;
 
+		bool m_enabled;
+		
 		DenseMap<InputAction, bool> m_inputs;
 	};
 }

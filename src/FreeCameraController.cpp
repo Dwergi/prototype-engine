@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "FreeCameraController.h"
 
-#include "InputAction.h"
 #include "InputBindings.h"
 
 #include "glm/gtx/transform.hpp"
@@ -37,7 +36,8 @@ namespace dd
 	FreeCameraController::FreeCameraController( Camera& camera ) :
 		m_camera( camera ),
 		m_yaw( 0.0f ),
-		m_pitch( 0.0f )
+		m_pitch( 0.0f ),
+		m_enabled( true )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
 
@@ -75,6 +75,9 @@ namespace dd
 
 	void FreeCameraController::HandleInput( InputAction action, InputType type )
 	{
+		if( !m_enabled )
+			return;
+
 		bool* state = m_inputs.Find( action );
 		if( state == nullptr )
 			return;

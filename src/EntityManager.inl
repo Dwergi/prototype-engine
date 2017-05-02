@@ -192,7 +192,7 @@ namespace dd
 			}
 		}
 	}
-	
+
 	template <typename Component>
 	const Component* EntityManager::GetReadable( EntityHandle h ) const
 	{

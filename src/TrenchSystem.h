@@ -22,6 +22,7 @@ namespace dd
 	public: 
 
 		TrenchSystem( Camera& camera );
+		TrenchSystem( const TrenchSystem& other ) = delete;
 		~TrenchSystem();
 
 		void Update( EntityManager& entity_manager, float delta_t ) override;

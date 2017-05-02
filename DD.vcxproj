@@ -379,6 +379,8 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\SharedString.h" />
+    <ClInclude Include="src\ShipComponent.h" />
+    <ClInclude Include="src\ShipSystem.h" />
     <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\SortedVectorPool.h" />
     <ClInclude Include="src\Array.h" />
@@ -545,6 +547,7 @@
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\StringBinding.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />

@@ -21,6 +21,8 @@ namespace dd
 
 		m_pInstance = this;
 
+		m_mouseCaptured = false;
+
 		m_glfwWindow = window.GetInternalWindow();
 		glfwSetKeyCallback( m_glfwWindow, &KeyboardCallback );
 		glfwSetMouseButtonCallback( m_glfwWindow, &MouseButtonCallback );
@@ -106,7 +108,11 @@ namespace dd
 
 	void Input::CaptureMouse( bool capture )
 	{
-		glfwSetInputMode( m_glfwWindow, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL );
+		if( m_mouseCaptured != capture )
+		{
+			m_mouseCaptured = capture;
+			glfwSetInputMode( m_glfwWindow, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL );
+		}
 	}
 
 	void Input::KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods )

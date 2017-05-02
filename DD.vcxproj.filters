@@ -474,6 +474,12 @@
     <ClInclude Include="src\IDebugDraw.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShipComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShipSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -788,6 +794,9 @@
     </ClCompile>
     <ClCompile Include="src\IDebugDraw.cpp">
       <Filter>DebugUI</Filter>
+    </ClCompile>
+     <ClCompile Include="src\ShipSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
