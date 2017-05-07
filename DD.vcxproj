@@ -332,6 +332,7 @@
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
     <ClInclude Include="src\File.h" />
+    <ClInclude Include="src\FrameTimer.h" />
     <ClInclude Include="src\FreeCameraController.h" />
     <ClInclude Include="src\Frustum.h" />
     <ClInclude Include="src\Function.h" />
@@ -516,6 +517,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
+    <ClCompile Include="src\FrameTimer.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\Frustum.cpp" />
     <ClCompile Include="src\FrustumTests.cpp">

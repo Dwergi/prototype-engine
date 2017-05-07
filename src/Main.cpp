@@ -20,6 +20,7 @@
 #include "DoubleBuffer.h"
 #include "EntityManager.h"
 #include "File.h"
+#include "FrameTimer.h"
 #include "FreeCameraController.h"
 #include "IDebugDraw.h"
 #include "Input.h"
@@ -60,8 +61,8 @@
 
 using namespace dd;
 
-extern float s_maxFPS;
-float s_maxFPS = 60.0f;
+extern uint s_maxFPS;
+uint s_maxFPS = 60;
 
 bool s_showDebugUI = false;
 
@@ -70,112 +71,6 @@ ShipSystem* s_shipSystem;
 Window* s_window;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
-
-class FrameTimer : public IDebugDraw
-{
-public:
-
-	FrameTimer()
-	{
-		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrameTime = 0.0f;
-		m_currentFrameTime = -m_targetDelta;
-		m_delta = m_targetDelta;
-		m_deltaWithoutDelay = m_targetDelta;
-
-		// fill history with standard deltas
-		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
-		{
-			m_frameTimes[i] = m_targetDelta;
-		}
-
-		m_timer.Start();
-	}
-
-	void Update()
-	{
-		m_targetDelta = 1.0f / s_maxFPS;
-		m_lastFrameTime = m_currentFrameTime;
-		m_currentFrameTime = m_timer.Time();
-		m_delta = m_currentFrameTime - m_lastFrameTime;
-
-		// update sliding window
-		m_frameTimes[ m_currentSlidingFrame ] = m_deltaWithoutDelay;
-		++m_currentSlidingFrame;
-
-		if( m_currentSlidingFrame >= SLIDING_WINDOW_SIZE )
-			m_currentSlidingFrame = 0;
-
-		float total_time = 0;
-		for( float f : m_frameTimes )
-		{
-			total_time += f;
-		}
-
-		m_slidingDelta = (total_time / SLIDING_WINDOW_SIZE);
-	}
-
-	float Delta() const
-	{
-		return m_delta;
-	}
-
-	float SlidingDelta() const
-	{
-		return m_slidingDelta;
-	}
-
-	float DeltaWithoutDelay() const
-	{
-		return m_deltaWithoutDelay;
-	}
-
-	void DelayFrame()
-	{
-		DD_PROFILE_SCOPED( FrameTimer_DelayFrame );
-
-		float now = m_timer.Time();
-		m_deltaWithoutDelay = now - m_lastFrameTime;
-
-		while( now - m_lastFrameTime < m_targetDelta )
-		{
-			::Sleep( 0 );
-
-			now = m_timer.Time();
-		}
-	}
-
-	virtual const char* GetDebugTitle() const override
-	{
-		return "FPS";
-	}
-
-protected:
-
-	virtual void DrawDebugInternal() override
-	{
-		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
-		ImGui::SetWindowSize( ImVec2( 150.0f, 80.0f ), ImGuiSetCond_FirstUseEver );
-
-		ImGui::Text( "FPS: %.1f", 1.0f / m_slidingDelta );
-		ImGui::Text( "Frame Time: %.1f", m_deltaWithoutDelay * 1000.f );
-		ImGui::Text( "Sliding: %.1f", m_slidingDelta * 1000.f );
-	}
-
-private:
-
-	Timer m_timer;
-	float m_targetDelta;
-	float m_lastFrameTime;
-	float m_currentFrameTime;
-	float m_delta;
-	float m_deltaWithoutDelay;
-	float m_slidingDelta;
-
-	static const int SLIDING_WINDOW_SIZE = 60;
-	float m_frameTimes[ SLIDING_WINDOW_SIZE ];
-	int m_currentSlidingFrame = 0;
-};
 
 TransformComponent* GetTransformComponent( EntityHandle entity )
 {
@@ -491,6 +386,7 @@ int GameMain( EntityManager& entity_manager )
 			DD_PROFILE_SCOPED( Frame );
 
 			// frame timer
+			frame_timer.SetMaxFPS( s_maxFPS );
 			frame_timer.Update();
 			float delta_t = frame_timer.Delta();
 

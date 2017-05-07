@@ -480,6 +480,9 @@
     <ClInclude Include="src\ShipSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="src\FrameTimer.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -795,8 +798,11 @@
     <ClCompile Include="src\IDebugDraw.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
-     <ClCompile Include="src\ShipSystem.cpp">
+    <ClCompile Include="src\ShipSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrameTimer.cpp">
+      <Filter>Application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
