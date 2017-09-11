@@ -118,7 +118,7 @@ namespace dd
 			m_camera.SetNear( near_distance );
 		}
 
-		if( ImGui::SliderFloat( "Far", &far_distance, near_distance + 0.01f, 100.f, "%.2f" ) )
+		if( ImGui::SliderFloat( "Far", &far_distance, near_distance + 0.01f, 5000.f, "%.2f" ) )
 		{
 			m_camera.SetFar( far_distance );
 		}

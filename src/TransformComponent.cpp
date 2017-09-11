@@ -60,5 +60,4 @@ namespace dd
 			m_dirty = false;
 		}
 	}
-
 }

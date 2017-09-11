@@ -19,8 +19,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 const float TRENCH_CHUNK_LENGTH = 10.0f;
-const float TRENCH_CHUNK_DESTRUCTION_DISTANCE = 100.0f;
-const float TRENCH_CHUNK_CREATION_DISTANCE = 100.0f;
 
 float s_trenchChunk[] =
 {
@@ -56,7 +54,7 @@ DATA:
 Each TrenchComponent:
 - Represents a segment of trench TRENCH_CHUNK_LENGTH long.
 - Is a cube, with 2 sides open
-    - 4 of the sides are made up of meshes and potentially some gameplay component (turret, target, etc.)
+	- 4 of the sides are made up of meshes and potentially some gameplay component (turret, target, etc.)
 	- 2 of the sides are open
 	- In the case where there is a corner, the player is forced to turn
 
@@ -147,7 +145,7 @@ namespace dd
 
 		int chunk_index = (int) (player_pos / (m_trenchDirection * TRENCH_CHUNK_LENGTH)).z;
 		
-		const int chunk_count = (int) (TRENCH_CHUNK_CREATION_DISTANCE / TRENCH_CHUNK_LENGTH);
+		const int chunk_count = (int) (m_camera.GetFar() / TRENCH_CHUNK_LENGTH);
 
 		for( int i = 0; i < chunk_count; ++i )
 		{

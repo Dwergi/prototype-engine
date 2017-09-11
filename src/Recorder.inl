@@ -7,7 +7,7 @@ namespace dd
 	}
 
 	template <typename T>
-	Recorder<T>::Recorder( T& value, int size = HISTORY_SIZE )
+	Recorder<T>::Recorder( T& value, int size )
 		: m_current( &value )
 	{
 		m_undo.Reserve( HISTORY_SIZE );
@@ -74,7 +74,7 @@ namespace dd
 	//---------------------------------------------------------------------------
 
 	template <typename T>
-	FullRecorder<T>::FullRecorder( T& value, int history_size = Recorder<T>::HISTORY_SIZE )
+	FullRecorder<T>::FullRecorder( T& value, int history_size )
 		: base( value, history_size )
 	{
 		m_redo.Reserve( history_size );
