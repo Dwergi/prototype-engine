@@ -273,7 +273,7 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 	}
 }
 
-TEST_CASE( "[EntityHandle] Unpack" )
+TEST_CASE( "[EntityHandle] GetAll" )
 {
 	SetUp();
 
@@ -292,7 +292,7 @@ TEST_CASE( "[EntityHandle] Unpack" )
 
 	ComponentHandle<FooComponent> foo2;
 	ComponentHandle<BarComponent> bar2;
-	foobar.Unpack( foo2, bar2 );
+	foobar.GetAll( foo2, bar2 );
 
 	REQUIRE( foo1.Write()->A == foo2.Write()->A );
 	REQUIRE( bar1.Write()->B == bar2.Write()->B );

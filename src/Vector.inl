@@ -448,7 +448,7 @@ namespace dd
 
 		if( m_data != nullptr )
 		{
-			CopyRange( m_data, new_data, std::min( m_size, new_capacity ) );
+			CopyRange( m_data, new_data, dd::min( m_size, new_capacity ) );
 			DestroyRange( m_data, m_size );
 
 			if( m_deallocate )

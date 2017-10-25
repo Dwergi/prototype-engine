@@ -8,6 +8,8 @@
 #include "PrecompiledHeader.h"
 #include "AABBOctree.h"
 
+#include <algorithm> // sort
+
 #include "AABB.h"
 
 namespace dd

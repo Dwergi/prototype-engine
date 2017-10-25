@@ -15,7 +15,7 @@ namespace dd
 	class OctreeComponent : public ComponentBase
 	{
 	public:
-		typedef DenseMapPool<OctreeComponent> Pool;
+		using Pool = DenseMapPool<OctreeComponent>;
 
 		OctreeEntry Entry;
 

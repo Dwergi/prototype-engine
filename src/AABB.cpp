@@ -76,27 +76,27 @@ namespace dd
 			float xMin = (Min.x - start.x) * invDir.x;
 			float xMax = (Max.x - start.x) * invDir.x;
 
-			tMin = std::min( xMin, xMax );
-			tMax = std::max( xMin, xMax );
+			tMin = dd::min( xMin, xMax );
+			tMax = dd::max( xMin, xMax );
 		}
 
 		{
 			float yMin = (Min.y - start.y) * invDir.y;
 			float yMax = (Max.y - start.y) * invDir.y;
 
-			tMin = std::max( tMin, std::min( yMin, yMax ) );
-			tMax = std::min( tMax, std::max( yMin, yMax ) );
+			tMin = dd::max( tMin, dd::min( yMin, yMax ) );
+			tMax = dd::min( tMax, dd::max( yMin, yMax ) );
 		}
 
 		{
 			float zMin = (Min.z - start.z) * invDir.z;
 			float zMax = (Max.z - start.z) * invDir.z;
 
-			tMin = std::max( tMin, std::min( zMin, zMax ) );
-			tMax = std::min( tMax, std::max( zMin, zMax ) );
+			tMin = dd::max( tMin, dd::min( zMin, zMax ) );
+			tMax = dd::min( tMax, dd::max( zMin, zMax ) );
 		}
 
-		if( tMax >= std::max( 0.0f, tMin ) )
+		if( tMax >= dd::max( 0.0f, tMin ) )
 		{
 			distance = tMax;
 			return true;

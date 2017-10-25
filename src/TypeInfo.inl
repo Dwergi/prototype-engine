@@ -149,12 +149,10 @@ namespace dd
 		m.Name = name;
 		m.Function = dd::BuildFunction<FnType, Fn>( Fn );
 
-		ScriptEngine* scriptEngine = Services::GetPtr<ScriptEngine>();
-
 		// don't register with script if this isn't a script object
-		if( m_scriptObject && scriptEngine != nullptr )
+		if( m_scriptObject && sm_scriptEngine != nullptr )
 		{
-			scriptEngine->RegisterFunction<FnType, Fn>( name );
+			sm_scriptEngine->RegisterFunction<FnType, Fn>( name );
 		}
 	}
 	
@@ -172,26 +170,22 @@ namespace dd
 		member.m_parent = this;
 		member.m_offset = (uint64) (&(((TClass*) nullptr)->*MemberPtr));
 
-		ScriptEngine* scriptEngine = Services::GetPtr<ScriptEngine>();
-		DD_ASSERT( scriptEngine != nullptr );
-
-		if( m_scriptObject && scriptEngine != nullptr )
+		if( m_scriptObject && sm_scriptEngine != nullptr )
 		{
-			scriptEngine->RegisterMember<TClass, TProp, MemberPtr>( name, this );
+			sm_scriptEngine->RegisterMember<TClass, TProp, MemberPtr>( name, this );
 		}
 	}
 
 	template <typename T, bool byValue>
 	void TypeInfo::RegisterScriptType()
 	{
-		ScriptEngine* scriptEngine = Services::GetPtr<ScriptEngine>();
-		DD_ASSERT( scriptEngine != nullptr );
+		DD_ASSERT( sm_scriptEngine != nullptr );
 
-		if( scriptEngine != nullptr )
+		if( sm_scriptEngine != nullptr )
 		{
 			m_scriptObject = true;
 
-			scriptEngine->RegisterType<T, byValue>();
+			sm_scriptEngine->RegisterType<T, byValue>();
 		}
 	}
 }

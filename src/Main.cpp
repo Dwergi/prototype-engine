@@ -85,17 +85,23 @@ EntityHandle GetEntityHandle( uint id )
 	return handle;
 }
 
-void RegisterGlobalScriptFunctions()
+void RegisterGlobalScriptFunctions( ScriptEngine& script_engine )
 {
-	ScriptEngine& engine = Services::Get<ScriptEngine>();
+	script_engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
+	script_engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
 
-	engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
-	engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
-
-	REGISTER_GLOBAL_VARIABLE( engine, s_maxFPS );
+	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
 }
 
-void RegisterGameTypes( EntityManager& manager )
+template <typename Component>
+void RegisterComponent( EntityManager& entity_manager, const char* typeName )
+{
+	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<Component>::type>( typeName );
+	Services::RegisterComponent<Component>();
+	entity_manager.RegisterComponent<Component>();
+}
+
+void RegisterGameTypes( EntityManager& entity_manager )
 {
 #ifdef USE_ANGELSCRIPT
 	dd::RegisterString( Services::Get<AngelScriptEngine>() );
@@ -124,27 +130,11 @@ void RegisterGameTypes( EntityManager& manager )
 	REGISTER_TYPE( JobSystem );
 	REGISTER_TYPE( MeshHandle );
 
-	REGISTER_TYPE( TransformComponent );
-	REGISTER_TYPE( OctreeComponent );
-	REGISTER_TYPE( SwarmAgentComponent );
-	REGISTER_TYPE( MeshComponent );
-	REGISTER_TYPE( ShipComponent );
-
-	Services::RegisterComponent<TransformComponent>();
-	Services::RegisterComponent<OctreeComponent>();
-	Services::RegisterComponent<SwarmAgentComponent>();
-	Services::RegisterComponent<MeshComponent>();
-	Services::RegisterComponent<ShipComponent>();
-
-	manager.RegisterComponent<TransformComponent>();
-	manager.RegisterComponent<OctreeComponent>();
-	manager.RegisterComponent<SwarmAgentComponent>();
-	manager.RegisterComponent<MeshComponent>();
-	manager.RegisterComponent<ShipComponent>();
-
-	REGISTER_TYPE( SwarmSystem );
-
-	RegisterGlobalScriptFunctions();
+	RegisterComponent<TransformComponent>( entity_manager, "TransformComponent" );
+	RegisterComponent<OctreeComponent>( entity_manager, "OctreeComponent" );
+	RegisterComponent<SwarmAgentComponent>( entity_manager, "SwarmAgentComponent" );
+	RegisterComponent<MeshComponent>( entity_manager, "MeshComponent" );
+	RegisterComponent<ShipComponent>( entity_manager, "ShipComponent" );
 }
 
 void ToggleConsole( InputAction action, InputType type )
@@ -460,16 +450,14 @@ int main( int argc, char const* argv[] )
 	Services::Register( cmdLine );
 
 	// TODO: this is bad, not compatible with Wren, and registered too early anyway
+	ScriptEngine script_engine;
 	REGISTER_TYPE( ScriptEngine );
-
-	ScriptEngine scriptEngine;
-	Services::Register( scriptEngine );
 
 	EntityManager entity_manager;
 	REGISTER_TYPE( EntityManager );
-	Services::Register( entity_manager );
 
 	RegisterGameTypes( entity_manager );
+	RegisterGlobalScriptFunctions( script_engine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );

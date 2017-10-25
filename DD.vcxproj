@@ -318,6 +318,7 @@
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CommandLine.h" />
+    <ClCompile Include="src\ComponentHandleTests.cpp" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
@@ -343,6 +344,7 @@
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\IDebugDraw.h" />
+    <ClInclude Include="src\Math_dd.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />

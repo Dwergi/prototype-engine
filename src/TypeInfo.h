@@ -99,6 +99,8 @@ namespace dd
 
 		static void RegisterDefaultTypes();
 
+		static void SetScriptEngine( ScriptEngine* scriptEngine );
+
 	private:
 
 		SharedString m_namespace;
@@ -117,6 +119,8 @@ namespace dd
 
 		static bool sm_defaultsRegistered;
 		static DenseMap<SharedString, TypeInfo*> sm_typeMap;
+
+		static ScriptEngine* sm_scriptEngine;
 
 		template <typename T>
 		void RegisterFunctions();

@@ -11,9 +11,6 @@
 #include <windows.h>
 #endif
 
-// min & max, mostly
-#include <algorithm>
-
 #define GLM_SWIZZLE 1
 
 #include "glm/fwd.hpp"
@@ -27,6 +24,7 @@
 #include "Typedefs.h"
 #include "TypeInfoMacros.h"
 
+#include "Math_dd.h"
 #include "Buffer.h"
 #include "DenseMap.h"
 #include "String_dd.h"
@@ -50,6 +48,13 @@
 //#include "Serialization.h"
 #include "RefCounter.h"
 
+
+#ifdef USE_ANGELSCRIPT
+	#include "AngelScriptEngine.h"
+#elif USE_WREN
+	#include "WrenEngine.h"
+#endif 
+
 namespace dd
 {
 	const double M_PI = 3.14159265358979323846;
@@ -59,17 +64,3 @@ namespace dd
 	void* PointerAdd( void* base, uint64 offset );
 	const void* PointerAdd( const void* base, uint64 offset );
 }
-
-#ifdef USE_ANGELSCRIPT
-#include "AngelScriptEngine.h"
-namespace dd
-{
-	typedef AngelScriptEngine ScriptEngine;
-}
-#elif USE_WREN
-#include "WrenEngine.h"
-namespace dd
-{
-	typedef WrenEngine ScriptEngine;
-}
-#endif 

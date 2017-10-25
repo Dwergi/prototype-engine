@@ -19,7 +19,7 @@ namespace dd
 	{
 	public: 
 
-		typedef DenseMapPool<MeshComponent> Pool;
+		using Pool = DenseMapPool<MeshComponent>;
 
 		MeshComponent();
 		MeshComponent( MeshHandle mesh );

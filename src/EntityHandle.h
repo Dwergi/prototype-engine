@@ -51,7 +51,7 @@ namespace dd
 		ComponentHandle<Component> Get() const;
 
 		template <typename... Components>
-		void Unpack( ComponentHandle<Components>&... args ) const;
+		void GetAll( ComponentHandle<Components>&... args ) const;
 
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( EntityHandle, Handle )
@@ -69,19 +69,38 @@ namespace dd
 		static const int Invalid = -1;
 
 		template <typename C, typename... Rest>
-		void UnpackHelper( ComponentHandle<C>& c, ComponentHandle<Rest>&... r ) const
+		void GetAllHelper( ComponentHandle<C>& c, ComponentHandle<Rest>&... r ) const
 		{
 			c = Get<C>();
-			UnpackHelper( r... );
+			GetAllHelper( r... );
 		}
 
-		void UnpackHelper() const {}
+		void GetAllHelper() const {}
+
+		template <typename C = void, typename... Rest>
+		bool HasAllHelper() const
+		{
+			bool ret = Has<C>();
+			return ret && HasAllHelper<Rest...>();
+		}
+
+		template <>
+		bool HasAllHelper<>() const
+		{
+			return true;
+		}
 	};
 
 	template <typename Component>
 	ComponentHandle<Component> EntityHandle::Get() const
 	{
 		return m_manager->GetComponent<Component>( *this );
+	}
+
+	template <typename... Components>
+	void EntityHandle::GetAll( ComponentHandle<Components>&... args ) const
+	{
+		GetAllHelper( args... );
 	}
 
 	template <typename Component>
@@ -91,9 +110,9 @@ namespace dd
 	}
 
 	template <typename... Components>
-	void EntityHandle::Unpack( ComponentHandle<Components>&... args ) const
+	bool EntityHandle::HasAll() const
 	{
-		UnpackHelper( args... );
+		return HasAllHelper<Components...>();
 	}
 }
 

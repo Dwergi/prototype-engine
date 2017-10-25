@@ -7,7 +7,7 @@
 #include "DenseMapPool.h"
 #include "DenseVectorPool.h"
 
-struct TestComponent
+struct FooComponent
 	: public dd::ComponentBase
 {
 	int ID;
@@ -24,7 +24,7 @@ void CreateEntities( dd::Vector<dd::EntityHandle>& handles, PoolType& pool, int 
 		*(int*) (&handle) = i;
 		handles.Add( handle );
 
-		TestComponent* cmp = pool.Create( handle );
+		FooComponent* cmp = pool.Create( handle );
 		REQUIRE( cmp != nullptr );
 
 		cmp->ID = i;
@@ -47,13 +47,13 @@ void TestPool()
 		bool exists = pool.Exists( handles[i] );
 		REQUIRE( exists );
 
-		TestComponent* cmp = pool.Find( handles[i] );
+		FooComponent* cmp = pool.Find( handles[i] );
 		REQUIRE( cmp != nullptr );
 		REQUIRE( cmp->ID == i );
 	}
 
 	int count = 0;
-	for( TestComponent& cmp : pool )
+	for( FooComponent& cmp : pool )
 	{
 		++count;
 	}
@@ -75,7 +75,7 @@ void TestPool()
 
 	REQUIRE( !pool.Exists( handles[5] ) );
 
-	for( TestComponent& cmp : pool )
+	for( FooComponent& cmp : pool )
 	{
 		REQUIRE( cmp.Entity != handles[5] );
 	}
@@ -83,15 +83,15 @@ void TestPool()
 
 TEST_CASE( "Dense Vector Pool" )
 {
-	TestPool<dd::DenseVectorPool<TestComponent>>();
+	TestPool<dd::DenseVectorPool<FooComponent>>();
 }
 
 TEST_CASE( "Unordered Map Pool" )
 {
-	TestPool<dd::DenseMapPool<TestComponent>>();
+	TestPool<dd::DenseMapPool<FooComponent>>();
 }
 
 TEST_CASE( "Sorted Vector Pool" )
 {
-	TestPool<dd::SortedVectorPool<TestComponent>>();
+	TestPool<dd::SortedVectorPool<FooComponent>>();
 }

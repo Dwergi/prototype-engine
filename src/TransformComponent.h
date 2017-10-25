@@ -30,6 +30,9 @@ namespace dd
 		glm::vec3 GetWorldPosition() const { return m_world[3].xyz(); }
 		const glm::mat4& GetWorldTransform() const { return m_world; }
 
+		EntityHandle GetParent() const { return m_parent; }
+		void SetParent( EntityHandle parent ) { m_parent = parent; }
+
 		void UpdateWorldTransform();
 
 		ALIGNED_ALLOCATORS( 16 )

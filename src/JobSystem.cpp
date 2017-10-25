@@ -89,7 +89,7 @@ namespace dd
 
 		DD_ASSERT( thread_count <= MAX_THREADS );
 
-		CreateWorkers( std::min( thread_count, MAX_THREADS ) );
+		CreateWorkers( dd::min( thread_count, MAX_THREADS ) );
 	}
 
 	JobSystem::~JobSystem()

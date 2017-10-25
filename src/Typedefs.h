@@ -6,6 +6,20 @@
 
 #pragma once
 
+#ifdef USE_ANGELSCRIPT
+namespace dd
+{
+	class AngelScriptEngine;
+	using ScriptEngine = AngelScriptEngine;
+}
+#elif USE_WREN
+namespace dd
+{
+	class WrenEngine;
+	using ScriptEngine = WrenEngine;
+}
+#endif 
+
 typedef unsigned int uint;
 typedef unsigned char byte;
 
