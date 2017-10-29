@@ -16,7 +16,7 @@ namespace dd
 	class Camera;
 	class ShaderProgram;
 
-	class Frustum
+	__declspec(align(16)) class Frustum
 	{
 	public:
 
@@ -33,6 +33,9 @@ namespace dd
 		Camera& GetCamera() const { return m_camera; }
 		void Render( Camera& camera, ShaderProgram& shader );
 		void ResetFrustum( Camera& camera );
+
+		void* operator new( size_t i );
+		void operator delete( void* ptr);
 
 	private:
 

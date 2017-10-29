@@ -206,4 +206,14 @@ namespace dd
 		m_planes[Planes::Near]	 = Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
 		m_planes[Planes::Far]	 = Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
 	}
+
+	void* Frustum::operator new( size_t i )
+	{
+		return _aligned_malloc( i, 16 );
+	}
+
+	void Frustum::operator delete( void* ptr )
+	{
+		_aligned_free( ptr );
+	}
 }
