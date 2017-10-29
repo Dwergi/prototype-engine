@@ -9,6 +9,7 @@
 
 #include "AABB.h"
 #include "Camera.h"
+#include "DirectionalLight.h"
 #include "EntityManager.h"
 #include "Frustum.h"
 #include "Mesh.h"
@@ -56,11 +57,11 @@ namespace dd
 		{
 			Vector<Shader> shaders;
 
-			Shader vert = Shader::Create( String8( "vertex" ), String8( "" ), Shader::Type::Vertex );
+			Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
 			DD_ASSERT( vert.IsValid() );
 			shaders.Add( vert );
 
-			Shader pixel = Shader::Create( String8( "pixel" ), String8( "" ), Shader::Type::Pixel );
+			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
 			DD_ASSERT( pixel.IsValid() );
 			shaders.Add( pixel );
 
@@ -81,8 +82,12 @@ namespace dd
 		m_unitCube = Mesh::Create( "cube", m_shaders[0] );
 		m_unitCube.Get()->MakeUnitCube();
 
-		m_pointLight = new PointLight( glm::vec3( 10, 10, 10 ), glm::vec3( 1, 1, 1 ), 1.0f );
-		m_pointLightMesh = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 1, 1, 1, 1 ), glm::scale( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
+		glm::vec3 direction( 0.5, 0.4, -0.3 );
+		m_directionalLight.SetDirection( direction );
+		m_directionalLight.SetColour( glm::vec3( 1, 1, 1 ) );
+		m_directionalLight.SetIntensity( 0.5 );
+
+		m_pointLights.Add( PointLight( glm::vec3( 0, 10, 10 ), 0.1, glm::vec3( 0.5, 0.5, 0.5 ), 10 ) );
 
 		m_xAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 		m_yAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[0], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
@@ -134,20 +139,92 @@ namespace dd
 			ImGui::SliderFloat( "Ambient", &m_ambientStrength, 0.0f, 1.0f );
 			ImGui::SliderFloat( "Specular", &m_specularStrength, 0.0f, 1.0f );
 
-			glm::vec3 colour = m_pointLight->GetColour();
-			float fltColor[3];
-			fltColor[0] = colour.r; fltColor[1] = colour.g; fltColor[2] = colour.b;
-			if( ImGui::ColorEdit3( "Colour", fltColor ) )
+			if( ImGui::TreeNodeEx( "Directional", ImGuiTreeNodeFlags_CollapsingHeader ) )
 			{
-				m_pointLight->SetColour( glm::vec3( fltColor[0], fltColor[1], fltColor[2] ) );
+				glm::vec3 colour = m_directionalLight.GetColour();
+				float fltColour[3];
+				fltColour[0] = colour.r; fltColour[1] = colour.g; fltColour[2] = colour.b;
+				if( ImGui::ColorEdit3( "Colour", fltColour ) )
+				{
+					m_directionalLight.SetColour( glm::vec3( fltColour[0], fltColour[1], fltColour[2] ) );
+				}
+
+				float intensity = m_directionalLight.GetIntensity();
+				if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
+				{
+					m_directionalLight.SetIntensity( intensity );
+				}
+
+				glm::vec3 direction = m_directionalLight.GetDirection();
+				float fltDirection[3];
+				fltDirection[0] = direction.x; fltDirection[1] = direction.y; fltDirection[2] = direction.z;
+				if( ImGui::DragFloat3( "Direction", fltDirection, 0.01f, -1.0f, 1.0f ) )
+				{
+					m_directionalLight.SetDirection( glm::vec3( fltDirection[0], fltDirection[1], fltDirection[2] ) );
+				}
+
+				ImGui::TreePop();
 			}
 
-			glm::vec3 position = m_pointLight->GetPosition();
-			float fltPosition[3];
-			fltPosition[0] = position.x; fltPosition[1] = position.y; fltPosition[2] = position.z;
-			if( ImGui::DragFloat3( "Position", fltPosition ) )
+			int toDelete = -1;
+
+			for( uint i = 0; i < m_pointLights.Size(); ++i )
 			{
-				m_pointLight->SetPosition( glm::vec3( fltPosition[0], fltPosition[1], fltPosition[2] ) );
+				String64 pointLightLabel( "Point " );
+				char buffer[16];
+				_itoa_s( i, buffer, 10 );
+				pointLightLabel += buffer;
+
+				if( ImGui::TreeNodeEx( pointLightLabel.c_str(), ImGuiTreeNodeFlags_CollapsingHeader ) )
+				{
+					glm::vec3 colour = m_pointLights[i].GetColour();
+					float fltColor[3];
+					fltColor[0] = colour.r; fltColor[1] = colour.g; fltColor[2] = colour.b;
+					if( ImGui::ColorEdit3( "Colour", fltColor ) )
+					{
+						m_pointLights[i].SetColour( glm::vec3( fltColor[0], fltColor[1], fltColor[2] ) );
+					}
+
+					float intensity = m_pointLights[i].GetIntensity();
+					if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
+					{
+						m_pointLights[i].SetIntensity( intensity );
+					}
+
+					float attenuation = m_pointLights[i].GetAttenuation();
+					if( ImGui::DragFloat( "Attenuation", &attenuation, 0.01, 0, 1 ) )
+					{
+						m_pointLights[i].SetAttenuation( attenuation );
+					}
+
+					glm::vec3 position = m_pointLights[i].GetPosition();
+					float fltPosition[3];
+					fltPosition[0] = position.x; fltPosition[1] = position.y; fltPosition[2] = position.z;
+					if( ImGui::DragFloat3( "Position", fltPosition ) )
+					{
+						m_pointLights[i].SetPosition( glm::vec3( fltPosition[0], fltPosition[1], fltPosition[2] ) );
+					}
+
+					if( ImGui::Button( "Delete" ) )
+					{
+						toDelete = (int) i;
+					}
+
+					ImGui::TreePop();
+				}
+			}
+
+			if( toDelete != -1 )
+			{
+				m_pointLights.RemoveOrdered( (uint) toDelete );
+			}
+			
+			if( m_pointLights.Size() < 10 )
+			{
+				if( ImGui::Button( "Create Point Light" ) )
+				{
+					m_pointLights.Add( PointLight( glm::vec3( 10, 10, 10 ), 1, glm::vec3( 0.5, 0.5, 0.5 ), 10 ) );
+				}
 			}
 
 			ImGui::TreePop();
@@ -181,7 +258,22 @@ namespace dd
 		glDisable( GL_BLEND );
 	}
 
-	void Renderer::RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, ComponentHandle<TransformComponent> transform_handle, const MousePicking* mouse_picking )
+	String256 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
+	{
+		String256 result;
+		result += arrayName;
+		result += "[";
+		
+		char buffer[32];
+		_itoa_s( index, buffer, 10 );
+		result += buffer;
+
+		result += "].";
+		result += uniform;
+		return result;
+	}
+
+	void Renderer::RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, ComponentHandle<TransformComponent> transform_handle, const MousePicking* mousePicking )
 	{
 		const MeshComponent* mesh_cmp = mesh_handle.Read();
 		Mesh* mesh = mesh_cmp->Mesh.Get();
@@ -191,14 +283,14 @@ namespace dd
 
 			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
 
-			if( mouse_picking != nullptr )
+			if( mousePicking != nullptr )
 			{
-				if( entity == mouse_picking->GetFocusedMesh() )
+				if( entity == mousePicking->GetFocusedMesh() )
 				{
 					debugMultiplier.z = 1.5f;
 				}
 
-				if( entity == mouse_picking->GetSelectedMesh() )
+				if( entity == mousePicking->GetSelectedMesh() )
 				{
 					debugMultiplier.y = 1.5f;
 				}
@@ -215,11 +307,23 @@ namespace dd
 				ShaderProgram* shader = mesh->GetShader().Get();
 				shader->Use( true );
 
-				shader->SetUniform( "LightPosition", m_pointLight->GetPosition() );
-				shader->SetUniform( "LightColour", m_pointLight->GetColour() );
-				shader->SetUniform( "LightIntensity", m_pointLight->GetIntensity() );
-				shader->SetUniform( "AmbientStrength", m_ambientStrength );
-				shader->SetUniform( "SpecularStrength", m_specularStrength );
+				shader->SetUniform( "LightCount", (int) (m_pointLights.Size() + 1) );
+
+				shader->SetUniform( GetArrayUniformName( "Lights", 0, "Position" ).c_str(), glm::vec4( m_directionalLight.GetDirection(), 0 ) );
+				shader->SetUniform( GetArrayUniformName( "Lights", 0, "Colour" ).c_str(), m_directionalLight.GetColour() );
+				shader->SetUniform( GetArrayUniformName( "Lights", 0, "Intensity" ).c_str(), m_directionalLight.GetIntensity() );
+				shader->SetUniform( GetArrayUniformName( "Lights", 0, "AmbientStrength" ).c_str(), m_ambientStrength );
+				shader->SetUniform( GetArrayUniformName( "Lights", 0, "SpecularStrength" ).c_str(), m_specularStrength );
+
+				for( uint i = 0; i < m_pointLights.Size(); ++i )
+				{
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Position" ).c_str(), glm::vec4( m_pointLights[i].GetPosition(), 1 ) );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Colour" ).c_str(), m_pointLights[i].GetColour() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Intensity" ).c_str(), m_pointLights[i].GetIntensity() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Attenuation" ).c_str(), m_pointLights[i].GetAttenuation() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "AmbientStrength" ).c_str(), m_ambientStrength );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "SpecularStrength" ).c_str(), m_specularStrength );
+				}
 
 				shader->Use( false );
 
@@ -232,19 +336,6 @@ namespace dd
 		}
 
 		++m_meshCount;
-	}
-
-	void Renderer::UpdateDebugLight()
-	{
-		TransformComponent* transform_cmp = m_pointLightMesh.Get<TransformComponent>().Write();
-		transform_cmp->SetLocalTransform( glm::translate( m_pointLight->GetPosition() ) );
-
-		MeshComponent* mesh_cmp = m_pointLightMesh.Get<MeshComponent>().Write();
-		mesh_cmp->Colour = glm::vec4( m_pointLight->GetColour(), 1.0f );
-		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
-
-		// DEBUG
-		mesh_cmp->Hidden = true;
 	}
 
 	void Renderer::CreateDebugMeshGrid( EntityManager& entity_manager )
@@ -277,8 +368,6 @@ namespace dd
 		
 		SetRenderState();
 
-		UpdateDebugLight();
-
 		m_frustum->ResetFrustum( *m_camera );
 
 		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this]( auto entity, auto mesh, auto transform ) { RenderMesh( entity, mesh, transform, m_mousePicking ); } );
@@ -287,10 +376,5 @@ namespace dd
 	Camera& Renderer::GetCamera() const
 	{
 		return *m_camera;
-	}
-
-	PointLight& Renderer::GetLight() const
-	{
-		return *m_pointLight;
 	}
 }

@@ -38,7 +38,7 @@ namespace dd
 		Shader& operator=( const Shader& other );
 
 		bool IsValid() const { return m_valid; }
-
+		
 	private:
 
 		friend class ShaderProgram;
@@ -47,6 +47,9 @@ namespace dd
 		uint m_id;
 		String64 m_name;
 		std::atomic<int>* m_refCount;
+
+		static DenseMap<String128, String256> sm_shaderCache;
+		static bool LoadFile( const String& path, String& outSource );
 
 		Shader( const String& name, Type type );
 

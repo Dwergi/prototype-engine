@@ -7,72 +7,14 @@
 #include "PrecompiledHeader.h"
 #include "Shader.h"
 
+#include "File.h"
+
 #include "GL/gl3w.h"
-
-const char* s_vertex = "#version 330 core\n"
-""
-"layout( location = 0 ) in vec3 Position;\n"
-"layout( location = 1 ) in vec3 Normal;\n"
-""
-"out vec3 FragmentPosition;\n"
-"out vec2 FragmentUV;\n"
-"flat out vec3 FragmentNormal;\n"
-"out vec4 FragmentColour;\n"
-""
-"uniform vec4 ObjectColour;\n"
-"uniform mat4 Model;\n"
-"uniform mat3 NormalMatrix;\n"
-"uniform mat4 View;\n"
-"uniform mat4 Projection;\n"
-""
-"void main()"
-"{"
-"	FragmentPosition = vec3( Model * vec4( Position, 1 ) );\n"
-"	FragmentNormal = NormalMatrix * Normal;\n"
-"	//FragmentNormal = Normal;\n"
-"	FragmentColour = ObjectColour;\n"
-""
-"	gl_Position = Projection * View * Model * vec4( Position, 1 );\n"
-"}";
-
-const char* s_pixel = "#version 330 core\n"
-"out vec4 color;\n"
-""
-"in vec3 FragmentPosition;\n"
-"flat in vec3 FragmentNormal;\n"
-"in vec4 FragmentColour;\n"
-""
-"uniform vec3 ViewPosition;\n"
-
-"uniform vec3 LightPosition;\n"
-"uniform vec3 LightColour;\n"
-
-"uniform float LightIntensity;\n"
-"uniform float AmbientStrength;\n"
-"uniform float SpecularStrength;\n"
-""
-"void main()"
-"{"
-"	vec3 lightColour = LightColour * LightIntensity;\n"
-"	vec3 ambientColour = AmbientStrength * lightColour;\n"
-""
-"	vec3 normal = normalize( FragmentNormal );"
-"	vec3 lightDir = normalize( LightPosition - FragmentPosition );\n"
-"	float diffAmount = max( dot( normal, lightDir ), 0.0 );\n"
-"	vec3 diffuseColour = diffAmount * lightColour;\n"
-""
-"	vec3 viewDir = normalize( ViewPosition - FragmentPosition );\n"
-"	vec3 reflectDir = reflect( -lightDir, normal );\n"
-"	float specularAmount = pow( max( dot( viewDir, reflectDir ), 0.0 ), 32 );\n"
-"	vec3 specularColour = SpecularStrength * specularAmount * lightColour;\n"
-""
-"	color.rgb = (specularColour + diffuseColour + ambientColour) * FragmentColour.rgb;\n"
-"	//color.rgb = (vec3(1,1,1) + FragmentNormal) * 0.5;\n"
-"	color.a = FragmentColour.a;\n"
-"}";
 
 namespace dd
 {
+	DenseMap<String128, String256> Shader::sm_shaderCache;
+
 	GLenum GetOpenGLShaderType( Shader::Type type )
 	{
 		switch( type )
@@ -162,21 +104,43 @@ namespace dd
 		return msg;
 	}
 
+	bool Shader::LoadFile( const String& path, String& outSource )
+	{
+		String256* ptr = sm_shaderCache.Find( path );
+		if( ptr != nullptr )
+		{
+			outSource = *ptr;
+			return true;
+		}
+
+		std::unique_ptr<File> file = File::OpenDataFile( path, File::Mode::Read );
+		if( file == nullptr )
+		{
+			return false;
+		}
+
+		char buffer[2048];
+		int read = 0;
+		while( (read = file->Read( (byte*) buffer, 2048 )) == 2048 )
+		{
+			outSource.Append( buffer, 2048 );
+		}
+
+		outSource.Append( buffer, (uint) read );
+
+		sm_shaderCache.Add( path, outSource );
+
+		return true;
+	}
+
 	Shader Shader::Create( const String& name, const String& path, Shader::Type type )
 	{
 		DD_PROFILE_SCOPED( Shader_Create );
 
 		String256 source;
-
-		// TODO: Load source from file.
-		if( type == Type::Vertex )
+		if( !LoadFile( path, source ) )
 		{
-			source = s_vertex;
-		}
-
-		if( type == Type::Pixel )
-		{
-			source = s_pixel;
+			DD_ASSERT_ERROR( false, "Failed to load shader from path!" );
 		}
 
 		Shader shader( name, type );

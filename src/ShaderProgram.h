@@ -45,6 +45,7 @@ namespace dd
 		void SetUniform( const char* name, const glm::mat4& matrix ) const;
 		void SetUniform( const char* name, const glm::vec3& vector ) const;
 		void SetUniform( const char* name, const glm::vec4& vector ) const;
+		void SetUniform( const char* name, int i ) const;
 		void SetUniform( const char* name, float flt ) const;
 
 	private:

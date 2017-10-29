@@ -328,6 +328,7 @@
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\DebugConsole.h" />
     <ClInclude Include="src\DebugUI.h" />
+    <ClInclude Include="src\DirectionalLight.h" />
     <ClInclude Include="src\DLL.h" />
     <ClInclude Include="src\DoubleBuffer.h" />
     <ClInclude Include="src\Exception.h" />
@@ -343,6 +344,7 @@
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\IDebugDraw.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Math_dd.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
@@ -514,6 +516,7 @@
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\DirectionalLight.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
@@ -530,6 +533,7 @@
     <ClCompile Include="src\GLError.cpp" />
     <ClCompile Include="src\IDebugDraw.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MousePicking.cpp" />

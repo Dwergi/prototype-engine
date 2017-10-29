@@ -6,14 +6,17 @@
 
 #pragma once
 
+#include "DirectionalLight.h"
 #include "EntityHandle.h"
 #include "IDebugDraw.h"
 #include "Mesh.h"
+#include "PointLight.h"
 #include "ShaderProgram.h"
 
 namespace dd
 {
 	class Camera;
+	class DirectionalLight;
 	class EntityManager;
 	class Frustum;
 	class MeshComponent;
@@ -44,11 +47,6 @@ namespace dd
 		// Retrieve the active camera.
 		//
 		Camera& GetCamera() const;
-
-		//
-		// Retrieve the point light.
-		//
-		PointLight& GetLight() const;
 
 		//
 		// Set the mouse picking helper to use.
@@ -85,15 +83,13 @@ namespace dd
 		bool m_debugMeshGridCreated;
 		bool m_createDebugMeshGrid;
 
-		PointLight* m_pointLight;
-		EntityHandle m_pointLightMesh;
+		DirectionalLight m_directionalLight;
+		Vector<PointLight> m_pointLights;
 
 		float m_ambientStrength;
 		float m_specularStrength;
 
 		MeshHandle m_unitCube;
-
-		void UpdateDebugLight();
 
 		void CreateDebugMeshGrid( EntityManager& entity_manager );
 		EntityHandle CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );

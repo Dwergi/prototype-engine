@@ -242,6 +242,21 @@ namespace dd
 		}
 	}
 
+	void ShaderProgram::SetUniform( const char* name, int i ) const
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != -1 )
+		{
+			glUniform1i( uniform, i );
+
+			CheckGLError();
+		}
+	}
+
 	void ShaderProgram::SetUniform( const char* name, const glm::vec3& vec ) const
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );

@@ -86,11 +86,11 @@ namespace dd
 		{
 			Vector<Shader> shaders;
 
-			Shader vert = Shader::Create( String8( "vertex" ), String8( "" ), Shader::Type::Vertex );
+			Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
 			DD_ASSERT( vert.IsValid() );
 			shaders.Add( vert );
 
-			Shader pixel = Shader::Create( String8( "pixel" ), String8( "" ), Shader::Type::Pixel );
+			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
 			DD_ASSERT( pixel.IsValid() );
 			shaders.Add( pixel );
 
@@ -113,8 +113,8 @@ namespace dd
 		m_shader.Get()->Use( false );
 
 		AABB bounds;
-		bounds.Expand( glm::vec3( 0, 0, 0 ) );
-		bounds.Expand( glm::vec3( 1, 1, 1 ) );
+		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
+		bounds.Expand( glm::vec3( 0.5, 1, 1 ) );
 		mesh->SetBounds( bounds );
 	}
 

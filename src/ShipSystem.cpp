@@ -102,11 +102,11 @@ namespace dd
 		{
 			Vector<Shader> shaders;
 
-			Shader vert = Shader::Create( String8( "vertex" ), String8( "" ), Shader::Type::Vertex );
+			Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
 			DD_ASSERT( vert.IsValid() );
 			shaders.Add( vert );
 
-			Shader pixel = Shader::Create( String8( "pixel" ), String8( "" ), Shader::Type::Pixel );
+			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
 			DD_ASSERT( pixel.IsValid() );
 			shaders.Add( pixel );
 

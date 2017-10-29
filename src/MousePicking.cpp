@@ -63,6 +63,10 @@ namespace dd
 				}
 			}
 		}
+		else
+		{
+			m_focusedMesh = EntityHandle();
+		}
 
 		m_select = false;
 	}
