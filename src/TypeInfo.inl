@@ -128,6 +128,25 @@ namespace dd
 		return typeInfo;
 	}
 
+	template <typename TComponent>
+	const TypeInfo* TypeInfo::RegisterComponent( const char* typeName )
+	{
+		static_assert(std::is_assignable_v<TComponent, TComponent>, "Component type must be assignable to itself!");
+
+		const TypeInfo* typeInfo = RegisterType<RemoveQualifiers<TComponent>::type>( typeName );
+
+		String128 poolTypeName( typeInfo->Name().c_str() );
+		poolTypeName += "Pool";
+		RegisterType<TComponent::Pool>( poolTypeName.c_str() );
+
+		String128 doubleBufferName( "dd::DoubleBuffer<" );
+		doubleBufferName += typeName;
+		doubleBufferName += ">";
+		TypeInfo::RegisterType<DoubleBuffer<typename TComponent::Pool>>( doubleBufferName.c_str() );
+
+		return typeInfo;
+	}
+
 	template <typename T>
 	void TypeInfo::RegisterParentType()
 	{

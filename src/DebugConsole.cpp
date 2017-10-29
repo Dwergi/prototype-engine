@@ -72,52 +72,45 @@ namespace
 
 namespace dd
 {
-	void RegisterScriptCommands( Vector<String64>& commands )
+	void RegisterScriptCommands( AngelScriptEngine& scriptEngine, Vector<String64>& commands )
 	{
-		AngelScriptEngine* wrapper = Services::GetPtr<AngelScriptEngine>();
-		if( wrapper != nullptr )
+		asIScriptEngine* engine = scriptEngine.GetInternalEngine();
+
+		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
-			asIScriptEngine* engine = wrapper->GetInternalEngine();
+			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
 
-			for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
-			{
-				asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
+			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
+			if( func->GetName()[0] != '_' )
+				commands.Add( String64( func->GetName() ) );
+		}
 
-				// Skip the functions that start with _ as these are not meant to be called explicitly by the user
-				if( func->GetName()[0] != '_' )
-					commands.Add( String64( func->GetName() ) );
-			}
-
-			for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
-			{
-				const char* name;
-				int res = engine->GetGlobalPropertyByIndex( i, &name );
-				if( res >= 0 )
-					commands.Add( String64( name ) );
-			}
+		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
+		{
+			const char* name;
+			int res = engine->GetGlobalPropertyByIndex( i, &name );
+			if( res >= 0 )
+				commands.Add( String64( name ) );
 		}
 	}
 
-	void RegisterConsoleHelpers()
+	void RegisterConsoleHelpers( AngelScriptEngine& engine )
 	{
-		AngelScriptEngine* engine = dd::Services::GetPtr<AngelScriptEngine>();
-		if( engine == nullptr )
-			return;
-
 		// Register special function with overloads to catch any type.
 		// This is used by the exec command to output the resulting value from the statement.
-		engine->RegisterFunction<decltype(&grabBool), &grabBool>( "_grab" );
-		engine->RegisterFunction<decltype(&grabInt), &grabInt>( "_grab" );
-		engine->RegisterFunction<decltype(&grabUint), &grabUint>( "_grab" );
-		engine->RegisterFunction<decltype(&grabFloat), &grabFloat>( "_grab" );
-		engine->RegisterFunction<decltype(&grabDouble), &grabDouble>( "_grab" );
-		engine->RegisterFunction<decltype(&grabEntityHandle), &grabEntityHandle>( "_grab" );
-		engine->RegisterFunction<decltype(&grabTransformComponent), &grabTransformComponent>( "_grab" );
-		engine->RegisterFunction<decltype(&grab), &grab>( "_grab" );
-		/*engine->RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
+		engine.RegisterFunction<decltype(&grabBool), &grabBool>( "_grab" );
+		engine.RegisterFunction<decltype(&grabInt), &grabInt>( "_grab" );
+		engine.RegisterFunction<decltype(&grabUint), &grabUint>( "_grab" );
+		engine.RegisterFunction<decltype(&grabFloat), &grabFloat>( "_grab" );
+		engine.RegisterFunction<decltype(&grabDouble), &grabDouble>( "_grab" );
+		engine.RegisterFunction<decltype(&grabEntityHandle), &grabEntityHandle>( "_grab" );
+		engine.RegisterFunction<decltype(&grabTransformComponent), &grabTransformComponent>( "_grab" );
+		engine.RegisterFunction<decltype(&grab), &grab>( "_grab" );
+		/*engine.RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
 	}
 
-	DebugConsole::DebugConsole()
+	DebugConsole::DebugConsole( AngelScriptEngine& scriptEngine )
+		: m_scriptEngine( scriptEngine )
 	{
 		ClearLog();
 
@@ -130,8 +123,8 @@ namespace dd
 		m_commands.Add( String64( "Functions" ) );
 		m_commands.Add( String64( "Variables" ) );
 
-		RegisterConsoleHelpers();
-		RegisterScriptCommands( m_commands );
+		RegisterConsoleHelpers( m_scriptEngine );
+		RegisterScriptCommands( m_scriptEngine, m_commands );
 	}
 
 	DebugConsole::~DebugConsole()
@@ -294,16 +287,12 @@ namespace dd
 		}
 		else
 		{
-			EvaluateScript( command_line );			
+			EvaluateScript( command_line );
 		}
 	}
 
 	void DebugConsole::EvaluateScript( const String& script )
 	{
-		AngelScriptEngine* script_engine = Services::GetPtr<AngelScriptEngine>();
-		if( script_engine == nullptr )
-			return;
-
 		// add our grab commands
 		String256 completeString( "_grab(" );
 		completeString += script;
@@ -316,7 +305,7 @@ namespace dd
 		String256 errors;
 
 		// pass to AngelScript to evaluate 
-		if( script_engine->Evaluate( completeString, errors ) )
+		if( m_scriptEngine.Evaluate( completeString, errors ) )
 			AddLog( "\t%s\n", s_scriptOutput.c_str() );
 		else
 			AddLog( "\tScript error: %s!", errors.c_str() );
@@ -326,7 +315,7 @@ namespace dd
 	{
 		AddLog( "Functions:\n" );
 
-		asIScriptEngine* engine = Services::Get<AngelScriptEngine>().GetInternalEngine();
+		asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
 			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
@@ -341,7 +330,7 @@ namespace dd
 	{
 		AddLog( "Variables:\n" );
 
-		asIScriptEngine* engine = Services::Get<AngelScriptEngine>().GetInternalEngine();
+		asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
 		{
 			const char* name;
@@ -372,124 +361,124 @@ namespace dd
 		//AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
 		switch( data->EventFlag )
 		{
-			case ImGuiInputTextFlags_CallbackCompletion:
+		case ImGuiInputTextFlags_CallbackCompletion:
+		{
+			// Example of TEXT COMPLETION
+
+			String256 buffer( data->Buf );
+
+			uint last_index = data->CursorPos;
+			uint first_index = last_index;
+
+			while( first_index > 0 )
 			{
-				// Example of TEXT COMPLETION
+				char c = buffer[first_index - 1];
+				if( isspace( c ) || c == ',' || c == ';' || c == '(' || c == ')' )
+					break;
 
-				String256 buffer( data->Buf );
+				--first_index;
+			}
 
-				uint last_index = data->CursorPos;
-				uint first_index = last_index;
-				
-				while( first_index > 0 )
+			uint word_length = last_index - first_index;
+
+			String64 word = buffer.Substring( first_index, word_length );
+
+			// Build a list of candidates
+			Vector<String64> candidates;
+			for( uint i = 0; i < m_commands.Size(); ++i )
+			{
+				String64 substring = m_commands[i].Substring( 0, word_length );
+				if( substring.EqualsCaseless( word ) )
+					candidates.Add( m_commands[i] );
+			}
+
+			if( candidates.Size() == 0 )
+			{
+				// No match
+				AddLog( "No match for \"%s\"!\n", buffer.c_str() );
+			}
+			else if( candidates.Size() == 1 )
+			{
+				// Single match. Delete the beginning of the word and replace it entirely so we've got nice casing
+				data->DeleteChars( first_index, word_length );
+				data->InsertChars( data->CursorPos, candidates[0].c_str() );
+				data->InsertChars( data->CursorPos, " " );
+			}
+			else
+			{
+				// Multiple matches. Complete as much as we can, so inputing "C" will complete to "CL" and display "CLEAR" and "CLASSIFY"
+				uint max_match_length = word_length;
+				for( ;; )
 				{
-					char c = buffer[first_index - 1];
-					if( isspace( c ) || c == ',' || c == ';' || c == '(' || c == ')' )
+					bool all_match = true;
+					char test_char;
+
+					for( uint c = 0; c < candidates.Size(); ++c )
+					{
+						char candidate_char = candidates[c][max_match_length];
+						if( c == 0 )
+						{
+							test_char = candidate_char;
+						}
+						else if( tolower( test_char ) != tolower( candidate_char ) )
+						{
+							all_match = false;
+							break;
+						}
+					}
+
+					if( !all_match )
 						break;
 
-					--first_index;
+					++max_match_length;
 				}
 
-				uint word_length = last_index - first_index;
-
-				String64 word = buffer.Substring( first_index, word_length );
-
-				// Build a list of candidates
-				Vector<String64> candidates;
-				for( uint i = 0; i < m_commands.Size(); ++i )
+				if( max_match_length > 0 )
 				{
-					String64 substring = m_commands[i].Substring( 0, word_length );
-					if( substring.EqualsCaseless( word ) )
-						candidates.Add( m_commands[i] );
+					data->DeleteChars( first_index, last_index - first_index );
+
+					String64 match = candidates[0].Substring( 0, max_match_length );
+					data->InsertChars( data->CursorPos, match.c_str() );
 				}
 
-				if( candidates.Size() == 0 )
-				{
-					// No match
-					AddLog( "No match for \"%s\"!\n", buffer.c_str() );
-				}
-				else if( candidates.Size() == 1 )
-				{
-					// Single match. Delete the beginning of the word and replace it entirely so we've got nice casing
-					data->DeleteChars( first_index, word_length );
-					data->InsertChars( data->CursorPos, candidates[0].c_str() );
-					data->InsertChars( data->CursorPos, " " );
-				}
-				else
-				{
-					// Multiple matches. Complete as much as we can, so inputing "C" will complete to "CL" and display "CLEAR" and "CLASSIFY"
-					uint max_match_length = word_length;
-					for( ;; )
-					{
-						bool all_match = true;
-						char test_char;
-
-						for( uint c = 0; c < candidates.Size(); ++c )
-						{
-							char candidate_char = candidates[c][max_match_length];
-							if( c == 0 )
-							{
-								test_char = candidate_char;
-							}
-							else if( tolower( test_char ) != tolower( candidate_char ) )
-							{
-								all_match = false;
-								break;
-							}
-						}
-
-						if( !all_match )
-							break;
-
-						++max_match_length;
-					}
-
-					if( max_match_length > 0 )
-					{
-						data->DeleteChars( first_index, last_index - first_index );
-
-						String64 match = candidates[0].Substring( 0, max_match_length );
-						data->InsertChars( data->CursorPos, match.c_str() );
-					}
-
-					// List matches
-					AddLog( "Possible matches:\n" );
-					for( uint i = 0; i < candidates.Size(); i++ )
-						AddLog( "- %s\n", candidates[i].c_str() );
-				}
-
-				break;
+				// List matches
+				AddLog( "Possible matches:\n" );
+				for( uint i = 0; i < candidates.Size(); i++ )
+					AddLog( "- %s\n", candidates[i].c_str() );
 			}
-			case ImGuiInputTextFlags_CallbackHistory:
+
+			break;
+		}
+		case ImGuiInputTextFlags_CallbackHistory:
+		{
+			// Example of HISTORY
+			const int prev_history_pos = m_historyPos;
+			if( data->EventKey == ImGuiKey_UpArrow )
 			{
-				// Example of HISTORY
-				const int prev_history_pos = m_historyPos;
-				if( data->EventKey == ImGuiKey_UpArrow )
+				if( m_historyPos == -1 )
+					m_historyPos = m_history.Size() - 1;
+				else if( m_historyPos > 0 )
+					m_historyPos--;
+			}
+			else if( data->EventKey == ImGuiKey_DownArrow )
+			{
+				if( m_historyPos != -1 )
 				{
-					if( m_historyPos == -1 )
-						m_historyPos = m_history.Size() - 1;
-					else if( m_historyPos > 0 )
-						m_historyPos--;
-				}
-				else if( data->EventKey == ImGuiKey_DownArrow )
-				{
-					if( m_historyPos != -1 )
-					{
-						if( ++m_historyPos >= (int) m_history.Size() )
-							m_historyPos = -1;
-					}
-				}
-
-				// A better implementation would preserve the data on the current input line along with cursor position.
-				if( prev_history_pos != m_historyPos )
-				{
-					if( snprintf( data->Buf, data->BufSize, "%s", (m_historyPos >= 0) ? m_history[m_historyPos].c_str() : "" ) == 0 )
-					{
-						data->BufDirty = true;
-						data->CursorPos = data->SelectionStart = data->SelectionEnd = (int) strlen( data->Buf );
-					}
+					if( ++m_historyPos >= (int) m_history.Size() )
+						m_historyPos = -1;
 				}
 			}
+
+			// A better implementation would preserve the data on the current input line along with cursor position.
+			if( prev_history_pos != m_historyPos )
+			{
+				if( snprintf( data->Buf, data->BufSize, "%s", (m_historyPos >= 0) ? m_history[m_historyPos].c_str() : "" ) == 0 )
+				{
+					data->BufDirty = true;
+					data->CursorPos = data->SelectionStart = data->SelectionEnd = (int) strlen( data->Buf );
+				}
+			}
+		}
 		}
 		return 0;
 	}

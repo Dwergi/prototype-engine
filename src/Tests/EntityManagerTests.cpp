@@ -51,10 +51,7 @@ void SetUp()
 
 	REGISTER_TYPE( FooComponent ); 
 	REGISTER_TYPE( BarComponent );
-
-	Services::RegisterComponent<FooComponent>();
-	Services::RegisterComponent<BarComponent>();
-
+	
 	s_manager->RegisterComponent<FooComponent>();
 	s_manager->RegisterComponent<BarComponent>();
 }

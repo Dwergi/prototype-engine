@@ -63,6 +63,9 @@ namespace dd
 		template <typename T>
 		static const TypeInfo* RegisterType( const char* name );
 
+		template <typename T>
+		static const TypeInfo* RegisterComponent( const char* name );
+
 		template <typename TContainer, typename TItem>
 		static const TypeInfo* RegisterContainer( const char* container, const TypeInfo* containing );
 
@@ -99,7 +102,7 @@ namespace dd
 
 		static void RegisterDefaultTypes();
 
-		static void SetScriptEngine( ScriptEngine* scriptEngine );
+		static void SetScriptEngine( AngelScriptEngine* scriptEngine );
 
 	private:
 
@@ -120,7 +123,7 @@ namespace dd
 		static bool sm_defaultsRegistered;
 		static DenseMap<SharedString, TypeInfo*> sm_typeMap;
 
-		static ScriptEngine* sm_scriptEngine;
+		static AngelScriptEngine* sm_scriptEngine;
 
 		template <typename T>
 		void RegisterFunctions();

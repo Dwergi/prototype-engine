@@ -7,7 +7,7 @@
 #pragma once
 
 #include "EntityHandle.h"
-#include "Services.h"
+#include "DoubleBuffer.h"
 
 namespace dd
 {
@@ -142,6 +142,9 @@ namespace dd
 		template <typename Component>
 		Component* GetWritable( EntityHandle h ) const;
 
+		//
+		// Register the given component type.
+		//
 		template <typename Component>
 		void RegisterComponent();
 

@@ -42,18 +42,11 @@
 #include "TypeInfoHelpers.h"
 #include "TypeInfo.h"
 
-#include "Services.h"
 #include "Globals.h"
 
 //#include "Serialization.h"
 #include "RefCounter.h"
-
-
-#ifdef USE_ANGELSCRIPT
-	#include "AngelScriptEngine.h"
-#elif USE_WREN
-	#include "WrenEngine.h"
-#endif 
+#include "AngelScriptEngine.h"
 
 namespace dd
 {

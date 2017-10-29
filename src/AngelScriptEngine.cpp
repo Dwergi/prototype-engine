@@ -21,44 +21,44 @@ namespace dd
 
 	AngelScriptFunction::~AngelScriptFunction()
 	{
-		Invalidate();
-	}
-
-	AngelScriptFunction::AngelScriptFunction( AngelScriptFunction&& other )
-	{
-		m_context = nullptr;
-
-		std::swap( m_context, other.m_context );
-		std::swap( m_function, other.m_function );
-	}
-
-	AngelScriptFunction& AngelScriptFunction::operator=( AngelScriptFunction&& other )
-	{
-		std::swap( m_context, other.m_context );
-		std::swap( m_function, other.m_function );
-		std::swap( m_engine, other.m_engine );
-
-		return *this;
-	}
-
-	AngelScriptFunction::AngelScriptFunction( AngelScriptEngine* engine, asIScriptFunction* fn )
-	{
-		m_function = fn;
-		m_engine = engine;
-		m_context = nullptr;
-	}
-
-	bool AngelScriptFunction::Valid() const
-	{
-		return m_engine != nullptr && m_function != nullptr;
-	}
-
-	void AngelScriptFunction::Invalidate()
-	{
 		ReleaseContext();
 
 		m_engine = nullptr;
 		m_function = nullptr;
+	}
+
+	AngelScriptFunction::AngelScriptFunction( AngelScriptFunction&& other )
+	{
+		ReleaseContext();
+
+		std::swap( m_context, other.m_context );
+		std::swap( m_function, other.m_function );
+		std::swap( m_engine, other.m_engine );
+		std::swap( m_object, other.m_object );
+	}
+
+	AngelScriptFunction& AngelScriptFunction::operator=( AngelScriptFunction&& other )
+	{
+		ReleaseContext();
+
+		std::swap( m_context, other.m_context );
+		std::swap( m_function, other.m_function );
+		std::swap( m_engine, other.m_engine );
+		std::swap( m_object, other.m_object );
+
+		return *this;
+	}
+
+	AngelScriptFunction::AngelScriptFunction( AngelScriptEngine* engine, asIScriptFunction* fn, asIScriptObject* obj )
+	{
+		m_function = fn;
+		m_engine = engine;
+		m_object = obj;
+	}
+
+	bool AngelScriptFunction::IsValid() const
+	{
+		return m_engine != nullptr && m_function != nullptr;
 	}
 
 	void AngelScriptFunction::ReleaseContext()
@@ -68,6 +68,63 @@ namespace dd
 			m_context->Release();
 			m_context = nullptr;
 		}
+	}
+
+	AngelScriptObject::AngelScriptObject( AngelScriptEngine* engine, asITypeInfo* typeInfo, asIScriptObject* obj )
+	{
+		m_engine = engine;
+		m_typeInfo = typeInfo;
+		m_object = obj;
+	}
+
+	AngelScriptObject::~AngelScriptObject()
+	{
+		ReleaseObject();
+		m_engine = nullptr;
+	}
+
+	AngelScriptObject::AngelScriptObject( AngelScriptObject&& other )
+	{
+		std::swap( m_engine, other.m_engine );
+		std::swap( m_object, other.m_object );
+		std::swap( m_typeInfo, other.m_typeInfo );
+	}
+
+	AngelScriptObject& AngelScriptObject::operator=( AngelScriptObject&& other )
+	{
+		ReleaseObject();
+		m_engine = nullptr;
+
+		std::swap( m_engine, other.m_engine );
+		std::swap( m_object, other.m_object );
+		std::swap( m_typeInfo, other.m_typeInfo );
+
+		return *this;
+	}
+
+	bool AngelScriptObject::IsValid() const
+	{
+		return m_engine != nullptr && m_typeInfo != nullptr && m_object != nullptr;
+	}
+
+	void AngelScriptObject::ReleaseObject()
+	{
+		if( m_object != nullptr )
+		{
+			m_object->Release();
+			m_object = nullptr;
+		}
+	}
+
+	AngelScriptFunction* AngelScriptObject::GetMethod( const char* signature )
+	{
+		asIScriptFunction* fn = m_typeInfo->GetMethodByDecl( signature );
+		if( fn != nullptr )
+		{
+			return new AngelScriptFunction( m_engine, fn, m_object );
+		}
+
+		return nullptr;
 	}
 
 	void AngelScriptEngine::SetOutput( String* output )
@@ -229,6 +286,49 @@ namespace dd
 		return r >= 0;
 	}
 
+	bool AngelScriptEngine::IsModuleLoaded( const char* module ) const
+	{
+		asIScriptModule* mod = m_engine->GetModule( module );
+		return mod != nullptr;
+	}
+
+	AngelScriptObject* AngelScriptEngine::GetScriptObject( const char* module, const char* className )
+	{
+		asIScriptModule* mod = m_engine->GetModule( module );
+		if( module != nullptr )
+		{
+			asITypeInfo* typeInfo = mod->GetTypeInfoByDecl( className );
+			if( typeInfo != nullptr )
+			{
+				String256 factoryName;
+				factoryName += className;
+				factoryName += " @";
+				factoryName += className;
+				factoryName += "()";
+
+				asIScriptFunction* factory = typeInfo->GetFactoryByDecl( factoryName.c_str() );
+				if( factory != nullptr )
+				{
+					asIScriptContext* context = m_engine->CreateContext();
+					if( context != nullptr )
+					{
+						context->Prepare( factory );
+						context->Execute();
+						
+						asIScriptObject* obj = *(asIScriptObject**) context->GetAddressOfReturnValue();
+						if( obj != nullptr )
+						{
+							obj->AddRef();
+							return new AngelScriptObject( this, typeInfo, obj );
+						}
+					}
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
 	AngelScriptFunction* AngelScriptEngine::GetFunction( const char* module, const char* functionSig )
 	{
 		asIScriptModule* mod = m_engine->GetModule( module );
@@ -237,7 +337,7 @@ namespace dd
 			asIScriptFunction* func = mod->GetFunctionByDecl( functionSig );
 			if( func != nullptr )
 			{
-				return new AngelScriptFunction( this, func );
+				return new AngelScriptFunction( this, func, nullptr );
 			}
 		}
 

@@ -79,9 +79,6 @@
     <Filter Include="Script\AngelScript">
       <UniqueIdentifier>{a9ec13a1-e651-4551-bc2c-adcd707e8c9b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script\Wren">
-      <UniqueIdentifier>{0d3f1fa4-bdc8-4de3-856e-0640f20631b1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Script\AngelScript\Add-Ons">
       <UniqueIdentifier>{b184cb4f-9bd7-4dbf-a594-7e9dfda46ced}</UniqueIdentifier>
     </Filter>
@@ -116,9 +113,6 @@
     </ClInclude>
     <ClInclude Include="src\Recorder.h">
       <Filter>Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Services.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\OctreeComponent.h">
       <Filter>Components</Filter>
@@ -348,20 +342,11 @@
     <ClInclude Include="src\AngelScriptEngine.h">
       <Filter>Script\AngelScript</Filter>
     </ClInclude>
-    <ClInclude Include="src\WrenEngine.h">
-      <Filter>Script\Wren</Filter>
-    </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
       <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
       <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WrenArgument.h">
-      <Filter>Script\Wren</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WrenForeignFunction.h">
-      <Filter>Script\Wren</Filter>
     </ClInclude>
     <ClInclude Include="src\PlayerComponent.h">
       <Filter>Components</Filter>
@@ -483,11 +468,14 @@
     <ClInclude Include="src\FrameTimer.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComponentHandleTests.cpp">
-      <Filter>Tests</Filter>
-    </ClInclude>
     <ClInclude Include="src\Math_dd.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScriptComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScriptSystem.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -669,9 +657,6 @@
     <ClCompile Include="src\AngelScriptEngine.cpp">
       <Filter>Script\AngelScript</Filter>
     </ClCompile>
-    <ClCompile Include="src\WrenEngine.cpp">
-      <Filter>Script\Wren</Filter>
-    </ClCompile>
     <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
       <Filter>Script\AngelScript\Add-Ons</Filter>
     </ClCompile>
@@ -689,9 +674,6 @@
     </ClCompile>
     <ClCompile Include="src\Tests\JobSystemTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Services.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Camera.cpp">
       <Filter>Rendering</Filter>
@@ -723,9 +705,6 @@
     <ClCompile Include="src\Frustum.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlaneTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\FrustumTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -743,9 +722,6 @@
     </ClCompile>
     <ClCompile Include="src\TerrainSystem.cpp">
       <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainChunkTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
@@ -810,6 +786,24 @@
     <ClCompile Include="src\FrameTimer.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScriptComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\ComponentHandleTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\PlaneTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\TerrainChunkTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\ScriptSystemTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScriptSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -844,12 +838,6 @@
     </None>
     <None Include="src\AngelScriptEngine.inl">
       <Filter>Script\AngelScript</Filter>
-    </None>
-    <None Include="src\WrenEngine.inl">
-      <Filter>Script\Wren</Filter>
-    </None>
-    <None Include="src\Services.inl">
-      <Filter>Core</Filter>
     </None>
     <None Include="src\TerrainChunk.inl">
       <Filter>Systems</Filter>

@@ -196,6 +196,7 @@ namespace dd
 	template <typename Component>
 	const Component* EntityManager::GetReadable( EntityHandle h ) const
 	{
+
 		DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
 		return pool->GetRead().Find( h );
 	}
@@ -212,11 +213,12 @@ namespace dd
 	template <typename Component>
 	void EntityManager::RegisterComponent()
 	{
-		DoubleBuffer<typename Component::Pool>* double_buffer = new DoubleBuffer<typename Component::Pool>( new typename Component::Pool(), new typename Component::Pool() );
-		
 		const TypeInfo* typeInfo = TypeInfo::GetType<Component>();
+
+		DoubleBuffer<typename Component::Pool>* doubleBuffer = new DoubleBuffer<typename Component::Pool>( new typename Component::Pool(), new typename Component::Pool() );
+
 		uint64 key = reinterpret_cast<uint64>(typeInfo);
-		m_pools.Add( key, double_buffer );
+		m_pools.Add( key, doubleBuffer );
 	}
 
 	template <typename Component>

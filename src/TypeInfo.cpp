@@ -14,7 +14,7 @@ namespace dd
 
 	bool TypeInfo::sm_defaultsRegistered = false;
 
-	ScriptEngine* TypeInfo::sm_scriptEngine = nullptr;
+	AngelScriptEngine* TypeInfo::sm_scriptEngine = nullptr;
 
 	void FindNamespace( const char* name, String& nameSpace, String& typeName )
 	{
@@ -172,10 +172,8 @@ namespace dd
 		REGISTER_TYPE( dd::SharedString );
 	}
 
-	void TypeInfo::SetScriptEngine( ScriptEngine* scriptEngine )
+	void TypeInfo::SetScriptEngine( AngelScriptEngine* scriptEngine )
 	{
-		DD_ASSERT( sm_scriptEngine == nullptr, "Script engine already set!" );
-
 		sm_scriptEngine = scriptEngine;
 	}
 }

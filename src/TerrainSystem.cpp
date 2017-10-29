@@ -15,8 +15,9 @@
 
 namespace dd
 {
-	TerrainSystem::TerrainSystem( Camera& camera ) :
+	TerrainSystem::TerrainSystem( Camera& camera, JobSystem& jobSystem ) :
 		m_camera( camera ),
+		m_jobSystem( jobSystem ),
 		m_chunkSize( LowDetailChunkSize )
 	{
 		DD_ASSERT( LowDetailChunkSize / (1 << (LODLevels - 1)) >= 2 );
@@ -161,8 +162,7 @@ namespace dd
 				TerrainChunk* new_chunk = new TerrainChunk( chunk );
 				m_activeChunks.Add( chunk, new_chunk );
 
-				JobSystem& jobsystem = Services::Get<JobSystem>();
-				jobsystem.Schedule( std::bind( &TerrainChunk::Generate, new_chunk ), "TerrainGeneration" );
+				m_jobSystem.Schedule( std::bind( &TerrainChunk::Generate, new_chunk ), "TerrainGeneration" );
 			}
 		}
 	}
@@ -247,8 +247,7 @@ namespace dd
 
 	void TerrainSystem::WaitForGeneration() const
 	{
-		JobSystem& jobsystem = Services::Get<JobSystem>();
-		jobsystem.WaitForCategory( "TerrainGeneration" );
+		m_jobSystem.WaitForCategory( "TerrainGeneration" );
 	}
 
 	void TerrainSystem::Render( Camera& camera, ShaderProgram& shader )

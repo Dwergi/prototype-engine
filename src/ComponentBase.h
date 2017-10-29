@@ -13,6 +13,7 @@ namespace dd
 	class ComponentBase
 	{
 	protected:
+
 		ComponentBase() {}
 		ComponentBase( const ComponentBase& other ) : Entity( other.Entity ) {}
 

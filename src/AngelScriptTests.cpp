@@ -84,6 +84,7 @@ TEST_CASE( "[AngelScript] Register Class" )
 	REGISTER_TYPE( AngelScriptTest );
 
 	dd::AngelScriptEngine engine;
+
 	engine.RegisterType<AngelScriptTest, false>();
 
 	SECTION( "Members" )
@@ -104,6 +105,7 @@ TEST_CASE( "[AngelScript] Register Class" )
 TEST_CASE( "[AngelScript] Register Free Function" )
 {
 	dd::AngelScriptEngine engine;
+
 	engine.RegisterFunction<decltype(&Test::AngelScript::FreeFunction), &Test::AngelScript::FreeFunction>( "FreeFunction" );
 	engine.RegisterFunction<decltype(&Test::AngelScript::FreeFunctionWithArg), &Test::AngelScript::FreeFunctionWithArg>( "FreeFunctionWithArg" );
 }
@@ -111,12 +113,14 @@ TEST_CASE( "[AngelScript] Register Free Function" )
 TEST_CASE( "[AngelScript] Register Global Var" )
 {
 	dd::AngelScriptEngine engine;
+
 	engine.RegisterGlobalVariable<decltype(Test::AngelScript::s_counter), Test::AngelScript::s_counter>( "Counter" );
 }
 
 TEST_CASE( "[AngelScript] Evaluate String" )
 {
 	dd::AngelScriptEngine engine;
+
 	dd::String256 output;
 	bool success = engine.Evaluate( dd::String256( "int i = 5; bool b = true;" ), output );
 
@@ -125,8 +129,15 @@ TEST_CASE( "[AngelScript] Evaluate String" )
 
 TEST_CASE( "[AngelScript] Call Function" )
 {
-	// our test script uses other types registered elsewhere
-	dd::AngelScriptEngine& engine = dd::Services::Get<dd::AngelScriptEngine>();
+	dd::AngelScriptEngine engine;
+	dd::TypeInfo::SetScriptEngine( &engine );
+
+	REGISTER_POD( glm::vec3 );
+	dd::TypeInfo* vec3Type = dd::TypeInfo::AccessType<glm::vec3>();
+	vec3Type->RegisterScriptType<glm::vec3, true>();
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
+	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
 	dd::String256 output;
 	bool success = engine.LoadFile( "test", output );
@@ -144,6 +155,7 @@ TEST_CASE( "[AngelScript] Call Function" )
 TEST_CASE( "[AngelScript] Return Values" )
 {
 	dd::AngelScriptEngine engine;
+
 	dd::String256 output;
 	bool success = engine.LoadFile( "test_returns", output );
 	REQUIRE( success == true );
@@ -188,6 +200,7 @@ TEST_CASE( "[AngelScript] Return Values" )
 TEST_CASE( "[AngelScript] Args" )
 {
 	dd::AngelScriptEngine engine;
+
 	dd::String256 output;
 	bool success = engine.LoadFile( "test_args", output );
 	REQUIRE( success == true );
@@ -223,9 +236,47 @@ TEST_CASE( "[AngelScript] Args" )
 	delete fFn;
 }
 
+TEST_CASE( "[AngelScript] Class" )
+{
+	dd::AngelScriptEngine engine;
+
+	dd::String256 output;
+	bool success = engine.LoadFile( "test_class", output );
+
+	dd::AngelScriptObject* object = engine.GetScriptObject( "test_class", "TestClass" );
+	REQUIRE( object != nullptr );
+	REQUIRE( object->IsValid() );
+	
+	dd::AngelScriptFunction* getter = object->GetMethod( "int GetA()" );
+	success = (*getter)();
+	REQUIRE( success == true );
+
+	int ret = 0;
+	getter->Returned( ret );
+	REQUIRE( ret == 42 );
+
+	dd::AngelScriptFunction* setter = object->GetMethod( "void SetA( int a )" );
+
+	success = (*setter)(111);
+	REQUIRE( success == true );
+
+	success = (*getter)();
+	REQUIRE( success == true );
+	
+	getter->Returned( ret );
+	REQUIRE( ret == 111 );
+
+	delete getter;
+	delete setter;
+
+	delete object;
+}
+
 TEST_CASE( "[AngelScript] Error Callback" )
 {
 	dd::AngelScriptEngine engine;
+	dd::TypeInfo::SetScriptEngine( &engine );
+
 	dd::String256 output;
 	bool success = engine.LoadFile( "test_empty", output );
 

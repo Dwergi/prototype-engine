@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 
 #include "CommandLine.h"
-#include "Services.h"
 
 #ifdef _TEST
 
@@ -35,6 +34,7 @@
 #include "Renderer.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
+#include "ScriptComponent.h"
 #include "ShipComponent.h"
 #include "ShipSystem.h"
 #include "StringBinding.h"
@@ -69,6 +69,7 @@ bool s_showDebugUI = false;
 FreeCameraController* s_freeCam;
 ShipSystem* s_shipSystem;
 Window* s_window;
+EntityManager* s_entityManager;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -79,13 +80,11 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 
 EntityHandle GetEntityHandle( uint id )
 {
-	EntityManager& system = Services::Get<EntityManager>();
-
-	EntityHandle handle( id, system );
+	EntityHandle handle( id, *s_entityManager );
 	return handle;
 }
 
-void RegisterGlobalScriptFunctions( ScriptEngine& script_engine )
+void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
 {
 	script_engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
 	script_engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
@@ -93,19 +92,9 @@ void RegisterGlobalScriptFunctions( ScriptEngine& script_engine )
 	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
 }
 
-template <typename Component>
-void RegisterComponent( EntityManager& entity_manager, const char* typeName )
+void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 {
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<Component>::type>( typeName );
-	Services::RegisterComponent<Component>();
-	entity_manager.RegisterComponent<Component>();
-}
-
-void RegisterGameTypes( EntityManager& entity_manager )
-{
-#ifdef USE_ANGELSCRIPT
-	dd::RegisterString( Services::Get<AngelScriptEngine>() );
-#endif
+	dd::RegisterString( scriptEngine );
 
 	REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
@@ -130,11 +119,23 @@ void RegisterGameTypes( EntityManager& entity_manager )
 	REGISTER_TYPE( JobSystem );
 	REGISTER_TYPE( MeshHandle );
 
-	RegisterComponent<TransformComponent>( entity_manager, "TransformComponent" );
-	RegisterComponent<OctreeComponent>( entity_manager, "OctreeComponent" );
-	RegisterComponent<SwarmAgentComponent>( entity_manager, "SwarmAgentComponent" );
-	RegisterComponent<MeshComponent>( entity_manager, "MeshComponent" );
-	RegisterComponent<ShipComponent>( entity_manager, "ShipComponent" );
+	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
+	entityManager.RegisterComponent<TransformComponent>();
+
+	TypeInfo::RegisterComponent<OctreeComponent>( "OctreeComponent" );
+	entityManager.RegisterComponent<OctreeComponent>();
+
+	TypeInfo::RegisterComponent<SwarmAgentComponent>( "SwarmAgentComponent" );
+	entityManager.RegisterComponent<SwarmAgentComponent>();
+
+	TypeInfo::RegisterComponent<MeshComponent>( "MeshComponent" );
+	entityManager.RegisterComponent<MeshComponent>();
+
+	TypeInfo::RegisterComponent<ShipComponent>( "ShipComponent" );
+	entityManager.RegisterComponent<ShipComponent>();
+
+	TypeInfo::RegisterComponent<ScriptComponent>( "ScriptComponent" );
+	entityManager.RegisterComponent<ScriptComponent>();
 }
 
 void ToggleConsole( InputAction action, InputType type )
@@ -300,7 +301,7 @@ int TestMain( int argc, char const* argv[] )
 
 #endif
 
-int GameMain( EntityManager& entity_manager )
+int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 {
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
@@ -309,8 +310,6 @@ int GameMain( EntityManager& entity_manager )
 
 	{
 		JobSystem jobsystem( 2u );
-		Services::Register( jobsystem );
-
 		SwarmSystem swarm_system;
 
 		s_window = new Window( 1280, 720, "DD" );
@@ -319,7 +318,7 @@ int GameMain( EntityManager& entity_manager )
 		DebugUI debugUI( *s_window, input );
 
 		Renderer renderer;
-		renderer.Initialize( *s_window, entity_manager );
+		renderer.Initialize( *s_window, entityManager );
 
 		Camera& camera = renderer.GetCamera();
 		camera.SetPosition( glm::vec3( 0, 5, 0 ) );
@@ -344,7 +343,7 @@ int GameMain( EntityManager& entity_manager )
 
 		s_shipSystem = new ShipSystem( camera );
 		s_shipSystem->BindActions( bindings );
-		s_shipSystem->CreateShip( entity_manager );
+		s_shipSystem->CreateShip( entityManager );
 		s_shipSystem->Enable( true );
 
 		MousePicking mouse_picking( *s_window, camera, input );
@@ -361,7 +360,7 @@ int GameMain( EntityManager& entity_manager )
 		BindKeys( input );
 
 		FrameTimer frame_timer;
-		DebugConsole console;
+		DebugConsole console( scriptEngine );
 
 		Vector<IDebugDraw*> debug_views;
 		debug_views.Add( &frame_timer );
@@ -381,10 +380,10 @@ int GameMain( EntityManager& entity_manager )
 			float delta_t = frame_timer.Delta();
 
 			// entity manager
-			entity_manager.Update( delta_t );
+			entityManager.Update( delta_t );
 
 			// systems pre-update
-			PreUpdateSystems( jobsystem, entity_manager, systems, delta_t );
+			PreUpdateSystems( jobsystem, entityManager, systems, delta_t );
 
 			// input
 			UpdateInput( input, bindings, delta_t );
@@ -396,16 +395,16 @@ int GameMain( EntityManager& entity_manager )
 			UpdateFreeCam( *s_freeCam, input, delta_t );
 
 			// systems update
-			UpdateSystems( jobsystem, entity_manager, systems, delta_t );
+			UpdateSystems( jobsystem, entityManager, systems, delta_t );
 
 			// debug UI
 			DrawDebugUI( debug_views );
 
 			// render
-			Render( renderer, entity_manager, console, frame_timer, delta_t );
+			Render( renderer, entityManager, console, frame_timer, delta_t );
 
 			// systems post-render
-			PostRenderSystems( jobsystem, entity_manager, systems, delta_t );
+			PostRenderSystems( jobsystem, entityManager, systems, delta_t );
 
 			// wait for frame delta
 			frame_timer.DelayFrame();
@@ -433,8 +432,6 @@ int GameMain( EntityManager& entity_manager )
 //
 int main( int argc, char const* argv[] )
 {
-	Services::Initialize();
-
 	TypeInfo::RegisterDefaultTypes();
 
 	CommandLine cmdLine( argv, argc );
@@ -447,21 +444,23 @@ int main( int argc, char const* argv[] )
 		dd::File::SetDataRoot( "../../../data" );
 
 	REGISTER_TYPE( CommandLine );
-	Services::Register( cmdLine );
 
 	// TODO: this is bad, not compatible with Wren, and registered too early anyway
-	ScriptEngine script_engine;
-	REGISTER_TYPE( ScriptEngine );
+	AngelScriptEngine scriptEngine;
+	REGISTER_TYPE( AngelScriptEngine );
 
-	EntityManager entity_manager;
+	EntityManager entityManager;
 	REGISTER_TYPE( EntityManager );
+	s_entityManager = &entityManager;
 
-	RegisterGameTypes( entity_manager );
-	RegisterGlobalScriptFunctions( script_engine );
+	TypeInfo::SetScriptEngine( &scriptEngine );
+
+	RegisterGameTypes( entityManager, scriptEngine );
+	RegisterGlobalScriptFunctions( scriptEngine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );
 #else
-	return GameMain( entity_manager );
+	return GameMain( entityManager, scriptEngine );
 #endif
 }

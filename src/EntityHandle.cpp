@@ -8,7 +8,6 @@
 #include "EntityHandle.h"
 
 #include "EntityManager.h"
-#include "Services.h"
 
 namespace dd
 {

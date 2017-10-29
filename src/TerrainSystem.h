@@ -12,6 +12,7 @@ namespace dd
 {
 	class Camera;
 	class EntityManager;
+	class JobSystem;
 	class ShaderProgram;
 	class TerrainChunk;
 
@@ -27,7 +28,7 @@ namespace dd
 		static const uint ChunksToSplit = 4; // chunks to split at each LOD level
 		static const uint MaxInactiveChunks = 8;
 
-		TerrainSystem( Camera& camera );
+		TerrainSystem( Camera& camera, JobSystem& jobSystem );
 		~TerrainSystem();
 
 		//
@@ -48,6 +49,7 @@ namespace dd
 
 		uint m_chunkSize;
 		Camera& m_camera;
+		JobSystem& m_jobSystem;
 		DenseMap<TerrainChunkKey, TerrainChunk*> m_activeChunks;
 		DenseMap<TerrainChunkKey, TerrainChunk*> m_inactiveChunks;
 

@@ -16,7 +16,7 @@ namespace dd
 	{
 	public:
 
-		DebugConsole();
+		DebugConsole( AngelScriptEngine& scriptEngine );
 		~DebugConsole();
 
 		virtual const char* GetDebugTitle() const override { return "Console"; }
@@ -32,6 +32,7 @@ namespace dd
 		Vector<String128>	m_history;
 		int					m_historyPos;    // -1: new line, 0..History.Size-1 browsing history.
 		Vector<String64>	m_commands;
+		AngelScriptEngine&  m_scriptEngine;
 
 		int TextEditCallback( ImGuiTextEditCallbackData* data );
 		void AddLog( const char* fmt, ... );

@@ -80,6 +80,11 @@ namespace dd
 		m_context = m_engine->GetInternalEngine()->CreateContext();
 		m_context->Prepare( m_function );
 
+		if( m_object != nullptr )
+		{
+			m_context->SetObject( m_object );
+		}
+
 		ASInternal::MethodCallHelper( m_context, std::make_tuple( args... ), std::make_index_sequence<ArgCount>() );
 
 		int r = m_context->Execute();

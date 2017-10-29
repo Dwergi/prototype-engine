@@ -11,7 +11,7 @@
 namespace dd
 {
 	class WriteStream;
-	
+
 	namespace ASInternal
 	{
 		template <typename T, bool>
@@ -19,7 +19,7 @@ namespace dd
 	}
 
 	//
-	// A wrapper around a Wren method that is callable from C++.
+	// A wrapper around a AngelScript method that is callable from C++.
 	//
 	class AngelScriptFunction
 	{
@@ -34,8 +34,7 @@ namespace dd
 		AngelScriptFunction& operator=( AngelScriptFunction&& );
 		AngelScriptFunction& operator=( const AngelScriptFunction& ) = delete;
 
-		bool Valid() const;
-		void Invalidate();
+		bool IsValid() const;
 
 		template <typename... Args>
 		bool operator()( Args... );
@@ -45,18 +44,48 @@ namespace dd
 
 	private:
 		friend class AngelScriptEngine;
+		friend class AngelScriptObject;
 
-		AngelScriptFunction( AngelScriptEngine*, asIScriptFunction* );
+		AngelScriptFunction( AngelScriptEngine*, asIScriptFunction*, asIScriptObject* );
 
 		void ReleaseContext();
 
-		AngelScriptEngine* m_engine;
-		asIScriptFunction* m_function;
+		AngelScriptEngine* m_engine { nullptr };
+		asIScriptFunction* m_function { nullptr };
+		asIScriptObject* m_object { nullptr };
 
 		// context is created when the function is called and released on destruction or a new call
-		asIScriptContext* m_context;
+		asIScriptContext* m_context { nullptr };
 	};
 
+	class AngelScriptObject
+	{
+	public:
+		AngelScriptObject() = delete;
+		~AngelScriptObject();
+
+		AngelScriptObject( AngelScriptObject&& );
+		AngelScriptObject( const AngelScriptObject& ) = delete;
+
+		AngelScriptObject& operator=( AngelScriptObject&& );
+		AngelScriptObject& operator=( const AngelScriptObject& ) = delete;
+
+		bool IsValid() const;
+
+		AngelScriptFunction* GetMethod( const char* signature );
+
+	private:
+
+		friend class AngelScriptEngine;
+
+		AngelScriptObject( AngelScriptEngine*, asITypeInfo*, asIScriptObject* );
+
+		void ReleaseObject();
+
+		AngelScriptEngine* m_engine { nullptr };
+		asIScriptObject* m_object { nullptr };
+		asITypeInfo* m_typeInfo { nullptr };
+	};
 
 	class AngelScriptEngine
 	{
@@ -87,7 +116,11 @@ namespace dd
 
 		bool LoadFile( const char* module, String& output );
 		
+		bool IsModuleLoaded( const char* module ) const;
+
 		AngelScriptFunction* GetFunction( const char* module, const char* functionSig );
+
+		AngelScriptObject* GetScriptObject( const char* module, const char* className );
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 
