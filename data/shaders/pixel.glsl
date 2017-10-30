@@ -84,6 +84,8 @@ void main()
 			finalColour.rgb += ApplyLight( Lights[ i ], FragmentColour.rgb, normal, FragmentPosition, viewDir );
 		}
 		
+		vec3 gamma = vec3( 1.0 / 2.2 );
+    	finalColour.rgb = pow( finalColour.rgb, gamma );
 		finalColour.a = FragmentColour.a;
 	}
 	//color.rgb = (vec3(1,1,1) + FragmentNormal) * 0.5;
