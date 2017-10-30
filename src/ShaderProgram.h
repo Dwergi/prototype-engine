@@ -40,13 +40,16 @@ namespace dd
 		bool IsValid() const { return m_valid; }
 
 		bool BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized );
+		void EnableAttribute( const char* name );
+		void DisableAttribute( const char* name );
 
-		void SetUniform( const char* name, const glm::mat3& matrix ) const;
-		void SetUniform( const char* name, const glm::mat4& matrix ) const;
-		void SetUniform( const char* name, const glm::vec3& vector ) const;
-		void SetUniform( const char* name, const glm::vec4& vector ) const;
-		void SetUniform( const char* name, int i ) const;
-		void SetUniform( const char* name, float flt ) const;
+		void SetUniform( const char* name, const glm::mat3& matrix );
+		void SetUniform( const char* name, const glm::mat4& matrix );
+		void SetUniform( const char* name, const glm::vec3& vector );
+		void SetUniform( const char* name, const glm::vec4& vector );
+		void SetUniform( const char* name, int i );
+		void SetUniform( const char* name, bool b );
+		void SetUniform( const char* name, float flt );
 
 	private:
 

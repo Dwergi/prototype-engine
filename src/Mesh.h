@@ -61,6 +61,8 @@ namespace dd
 
 		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
+		void SetWireframe( bool enabled );
+
 		ShaderHandle GetShader() const { return m_shader; }
 
 		void MakeUnitCube();

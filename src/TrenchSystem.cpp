@@ -24,28 +24,28 @@ float s_trenchChunk[] =
 {
 	//  X  Y  Z       Normal
 	// bottom
-	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
-	-0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
-	0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
-	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
+	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,		1,0,0,
+	-0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,	0,1,0,
+	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,	0,0,1,
+	0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,		1,0,0,
+	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,		0,1,0,
+	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,	0,0,1,
 
 	// left
-	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,0.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,1.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
+	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,	1,0,0,
+	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,	0,1,0,
+	-0.5f,0.0f,0.0f,   1.0f, 0.0f, 0.0f,	0,0,1,
+	-0.5f,1.0f,1.0f,   1.0f, 0.0f, 0.0f,	1,0,0,
+	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,	0,1,0,
+	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,	0,0,1,
 
 	// right
-	0.5f,0.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,1.0f,   -1.0f, 0.0f, 0.0f
+	0.5f,0.0f,0.0f,   -1.0f, 0.0f, 0.0f,	1,0,0,
+	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,	0,1,0,
+	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,	0,0,1,
+	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,	1,0,0,
+	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,	0,1,0,
+	0.5f,1.0f,1.0f,   -1.0f, 0.0f, 0.0f,	0,0,1
 };
 
 /*
@@ -105,11 +105,12 @@ namespace dd
 		m_chunkMesh = Mesh::Create( "trench_chunk", m_shader );
 
 		Mesh* mesh = m_chunkMesh.Get();
-		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 6 );
+		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 9 );
 
 		m_shader.Get()->Use( true );
 		mesh->BindAttribute( "Position", 3, 0, false );
 		mesh->BindAttribute( "Normal", 3, 3, true );
+		mesh->BindAttribute( "Wireframe", 3, 6, true );
 		m_shader.Get()->Use( false );
 
 		AABB bounds;

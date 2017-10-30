@@ -1,9 +1,15 @@
 #version 330 core
+#extension GL_OES_standard_derivatives : enable
+
 out vec4 color;
 
 in vec3 FragmentPosition;
 flat in vec3 FragmentNormal;
 in vec4 FragmentColour;
+
+uniform bool UseWireframe;
+uniform vec3 WireframeColour;
+uniform float WireframeWidth;
 
 uniform vec3 ViewPosition;
 
@@ -54,17 +60,32 @@ vec3 ApplyLight( Light light, vec3 fragColour, vec3 fragNormal, vec3 fragPositio
 	return finalColour;
 }
 
+vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth )
+{
+	vec3 d = fwidth( triangle );
+	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, triangle );
+	vec4 colour = mix( vec4( wireColour, 1 ), vec4( 0.0 ), min( min( tdist.x, tdist.y ), tdist.z ) );
+	return colour;
+}
+
 void main()
 {
-	vec3 normal = normalize( FragmentNormal );
-	vec3 viewDir = normalize( ViewPosition - FragmentPosition );
-
-	vec3 finalColour = vec3( 0 );
-	for( int i = 0; i < LightCount; ++i )
+	vec4 finalColour = vec4( 0 );
+	if( UseWireframe )
 	{
-		finalColour += ApplyLight( Lights[ i ], FragmentColour.rgb, normal, FragmentPosition, viewDir );
+		finalColour = CalculateWireframe( FragmentColour.rgb, WireframeColour, WireframeWidth );
+	}
+	else
+	{
+		vec3 normal = normalize( FragmentNormal );
+		vec3 viewDir = normalize( ViewPosition - FragmentPosition );
+		for( int i = 0; i < LightCount; ++i )
+		{
+			finalColour.rgb += ApplyLight( Lights[ i ], FragmentColour.rgb, normal, FragmentPosition, viewDir );
+		}
+		
+		finalColour.a = FragmentColour.a;
 	}
 	//color.rgb = (vec3(1,1,1) + FragmentNormal) * 0.5;
-	color.rgb = finalColour;
-	color.a = FragmentColour.a;
+	color = finalColour;
 };

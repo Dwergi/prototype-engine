@@ -34,15 +34,9 @@ namespace dd
 		m_meshCount( 0 ),
 		m_camera( nullptr ),
 		m_window( nullptr ),
-		m_drawAxes( true ),
-		m_debugHighlightFrustumMeshes( false ),
-		m_frustumMeshCount( 0 ),
-		m_debugMeshGridCreated( false ),
-		m_ambientStrength( 0.1f ),
-		m_specularStrength( 0.5f ),
-		m_createDebugMeshGrid( false )
+		m_frustumMeshCount( 0 )
 	{
-
+		m_debugWireframeColour = glm::vec3( 0, 1, 0 );
 	}
 
 	Renderer::~Renderer()
@@ -132,6 +126,19 @@ namespace dd
 			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
 			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
 			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
+		}
+
+		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			ImGui::Checkbox( "Enabled", &m_debugWireframe );
+
+			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
+
+			float fltColour[ 3 ];
+			fltColour[ 0 ] = m_debugWireframeColour.r; fltColour[ 1 ] = m_debugWireframeColour.g; fltColour[ 2 ] = m_debugWireframeColour.b;
+			ImGui::ColorEdit3( "Colour", fltColour );
+
+			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
@@ -245,17 +252,27 @@ namespace dd
 
 	void Renderer::SetRenderState()
 	{
-		// depth test
-		glEnable( GL_DEPTH_TEST );
-		glDepthFunc( GL_LESS );
+		if( !m_debugWireframe )
+		{
+			// depth test
+			glEnable( GL_DEPTH_TEST );
+			glDepthFunc( GL_LESS );
 
-		// backface culling
-		glEnable( GL_CULL_FACE );
-		glFrontFace( GL_CCW );
-		glCullFace( GL_BACK );
+			// backface culling
+			glEnable( GL_CULL_FACE );
+			glFrontFace( GL_CCW );
+			glCullFace( GL_BACK );
 
-		// blending
-		glDisable( GL_BLEND );
+			// blending
+			glDisable( GL_BLEND );
+		}
+		else
+		{
+			glDisable( GL_CULL_FACE );
+			glDisable( GL_DEPTH_TEST );
+			glEnable( GL_BLEND );
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		}
 	}
 
 	String256 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
@@ -317,18 +334,23 @@ namespace dd
 
 				for( uint i = 0; i < m_pointLights.Size(); ++i )
 				{
-					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Position" ).c_str(), glm::vec4( m_pointLights[i].GetPosition(), 1 ) );
-					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Colour" ).c_str(), m_pointLights[i].GetColour() );
-					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Intensity" ).c_str(), m_pointLights[i].GetIntensity() );
-					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Attenuation" ).c_str(), m_pointLights[i].GetAttenuation() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Position" ).c_str(), glm::vec4( m_pointLights[ i ].GetPosition(), 1 ) );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Colour" ).c_str(), m_pointLights[ i ].GetColour() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Intensity" ).c_str(), m_pointLights[ i ].GetIntensity() );
+					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "Attenuation" ).c_str(), m_pointLights[ i ].GetAttenuation() );
 					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "AmbientStrength" ).c_str(), m_ambientStrength );
 					shader->SetUniform( GetArrayUniformName( "Lights", i + 1, "SpecularStrength" ).c_str(), m_specularStrength );
 				}
+
+				shader->SetUniform( "UseWireframe", m_debugWireframe );
+				shader->SetUniform( "WireframeColour", m_debugWireframeColour );
+				shader->SetUniform( "WireframeWidth", m_debugWireframeWidth );
 
 				shader->Use( false );
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
+				mesh->SetWireframe( m_debugWireframe );
 				mesh->Render( *m_camera, transform );
 
 				++m_frustumMeshCount;

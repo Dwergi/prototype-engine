@@ -74,20 +74,23 @@ namespace dd
 		EntityHandle m_xAxis;
 		EntityHandle m_yAxis;
 		EntityHandle m_zAxis;
-		bool m_drawAxes;
+		bool m_drawAxes { true };
 
 		int m_meshCount;
 		int m_frustumMeshCount;
 
-		bool m_debugHighlightFrustumMeshes;
-		bool m_debugMeshGridCreated;
-		bool m_createDebugMeshGrid;
+		bool m_debugHighlightFrustumMeshes { false };
+		bool m_debugMeshGridCreated { false };
+		bool m_createDebugMeshGrid { false };
+		bool m_debugWireframe { false };
+		glm::vec3 m_debugWireframeColour;
+		float m_debugWireframeWidth { 2.0f };
 
 		DirectionalLight m_directionalLight;
 		Vector<PointLight> m_pointLights;
 
-		float m_ambientStrength;
-		float m_specularStrength;
+		float m_ambientStrength { 0.05f };
+		float m_specularStrength { 0.5f };
 
 		MeshHandle m_unitCube;
 
