@@ -74,7 +74,7 @@ namespace dd
 
 	bool Input::GetKeyEvents( ArrayBase<InputEvent>& events ) const
 	{
-		for( uint i = 0; i < m_currentEvents.Size(); ++i )
+		for( int i = 0; i < m_currentEvents.Size(); ++i )
 		{
 			if( events.Size() == events.Capacity() )
 				return false;

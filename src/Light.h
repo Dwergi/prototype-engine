@@ -18,13 +18,23 @@ namespace dd
 		glm::vec3 GetColour() const { return m_colour; }
 
 		void SetIntensity( float intensity ) { m_intensity = intensity; }
-		const float GetIntensity() const { return m_intensity; }
+		float GetIntensity() const { return m_intensity; }
+
+		void SetAmbient( float ambient ) { m_ambient = ambient; }
+		float GetAmbient() const { return m_ambient; }
+
+		void SetSpecular( float specular ) { m_specular = specular; }
+		float GetSpecular() const { return m_specular; }
 
 	protected:
 		Light();
-		Light( glm::vec3 colour, float intensity );
+		Light( glm::vec3 colour, float intensity, float ambient, float specular );
+		Light( const Light& other );
+		Light( Light&& other );
 
 		glm::vec3 m_colour;
-		float m_intensity;
+		float m_intensity { 1.0f };
+		float m_ambient { 0.05f };
+		float m_specular { 0.5f };
 	};
 }

@@ -25,7 +25,7 @@ namespace dd
 	private:
 		struct EntityEntry
 		{
-			uint Entity;
+			int Entity;
 			T Component;
 		};
 
@@ -41,7 +41,7 @@ namespace dd
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		uint Size() const;
+		int Size() const;
 
 		//
 		// Create a new component of this type for the given entity.

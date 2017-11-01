@@ -22,7 +22,7 @@ namespace dd
 	{
 	public:
 
-		explicit JobSystem( uint thread_count );
+		explicit JobSystem( int thread_count );
 		~JobSystem();
 
 		JobSystem() = delete;
@@ -35,14 +35,14 @@ namespace dd
 		//
 		void Schedule( const Function& fn, const char* category );
 		void Schedule( const std::function<void()>& fn, const char* category );
-		void WaitForCategory( const char* category, uint timeout_ms = 0 );
+		void WaitForCategory( const char* category, int timeout_ms = 0 );
 
 		BASIC_TYPE( JobSystem )
 
 	private:
 
-		static const uint MAX_THREADS = 8;
-		static const uint JOB_QUEUE_SIZE = 1024;
+		static const int MAX_THREADS = 8;
+		static const int JOB_QUEUE_SIZE = 1024;
 
 		enum class JobStatus
 		{
@@ -70,12 +70,12 @@ namespace dd
 		struct Job
 		{
 			Job( const Job& other );
-			Job( const std::function<void()>& fn, Category* category, uint id );
+			Job( const std::function<void()>& fn, Category* category, int id );
 			~Job();
 
 			JobStatus Status;
 			Category* Category;
-			uint ID;
+			int ID;
 			std::function<void()> Func;
 		};
 
@@ -91,7 +91,7 @@ namespace dd
 		std::mutex m_jobsMutex;
 		std::condition_variable m_jobsPending;
 
-		void CreateWorkers( uint thread_count );
+		void CreateWorkers( int thread_count );
 		JobThread* FindCurrentWorker() const;
 
 		Category* FindCategory( const char* category_name ) const;

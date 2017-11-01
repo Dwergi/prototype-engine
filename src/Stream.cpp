@@ -13,19 +13,19 @@ namespace dd
 {
 	__declspec(thread) static char s_temp[ 2048 ];
 
-	Stream::Stream( uint capacity )
+	Stream::Stream( int capacity )
 		: m_capacity( capacity ),
 		m_current( 0 )
 	{
 
 	}
 
-	void Stream::Advance( uint bytes )
+	void Stream::Advance( int bytes )
 	{
 		m_current += bytes;
 	}
 
-	uint Stream::Remaining() const
+	int Stream::Remaining() const
 	{
 		if( m_capacity == -1 )
 			return -1;
@@ -34,7 +34,7 @@ namespace dd
 	}
 	//----------------------------------------------------------------------------
 
-	ReadStream::ReadStream( const void* in, uint capacity )
+	ReadStream::ReadStream( const void* in, int capacity )
 		: Stream( capacity ),
 		m_pSource( in )
 	{
@@ -76,7 +76,7 @@ namespace dd
 		Advance( dst.Length() + 1 );
 	}
 
-	void ReadStream::Read( void* dst, uint bytes )
+	void ReadStream::Read( void* dst, int bytes )
 	{
 		DD_ASSERT( dst != nullptr );
 		DD_ASSERT( Remaining() >= bytes );
@@ -98,7 +98,7 @@ namespace dd
 
 	}
 
-	WriteStream::WriteStream( void* out, uint capacity )
+	WriteStream::WriteStream( void* out, int capacity )
 		: Stream( capacity ),
 		m_pDest( out ),
 		m_strDest( nullptr )
@@ -158,7 +158,7 @@ namespace dd
 
 	void WriteStream::Write( const char* str )
 	{
-		Write( str, (uint) strlen( str ) );
+		Write( str, (int) strlen( str ) );
 
 		if( m_pDest != nullptr )
 		{
@@ -166,7 +166,7 @@ namespace dd
 		}
 	}
 
-	void WriteStream::Write( const void* src, uint bytes )
+	void WriteStream::Write( const void* src, int bytes )
 	{
 		DD_ASSERT( Remaining() >= bytes );
 
@@ -192,7 +192,7 @@ namespace dd
 
 	void WriteStream::WriteFormat( const char* format, ... )
 	{
-		DD_ASSERT( Remaining() > 0 );
+		DD_ASSERT( Remaining() != -1 || Remaining() > 0 );
 
 		void* dest = m_pDest != nullptr ? PointerAdd( m_pDest, m_current ) : s_temp;
 

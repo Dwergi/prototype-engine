@@ -15,21 +15,21 @@ namespace dd
 	public:
 
 		Buffer();
-		Buffer( T* ptr, uint size );
+		Buffer( T* ptr, int size );
 		Buffer( const Buffer<T>& other );
 		Buffer( Buffer<T>&& other );
 		~Buffer();
 
 		operator T*() const;
-		T& operator[]( uint idx ) const;
+		T& operator[]( int idx ) const;
 
 		Buffer<T>& operator=( const Buffer<T>& other );
 		Buffer<T>& operator=( Buffer<T>&& other );
-		void Set( T* ptr, uint size );
+		void Set( T* ptr, int size );
 
 		T* Get() const;
 		T* Release();
-		uint Size() const;
+		int Size() const;
 
 		bool operator==( const Buffer<T>& other ) const;
 		bool operator!=( const Buffer<T>& other ) const;
@@ -37,7 +37,7 @@ namespace dd
 	private:
 
 		T* m_ptr;
-		uint m_size;
+		int m_size;
 	};
 
 	#include "Buffer.inl"

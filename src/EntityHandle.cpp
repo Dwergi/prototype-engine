@@ -17,7 +17,7 @@ namespace dd
 	{
 	}
 
-	EntityHandle::EntityHandle( uint handle, EntityManager& manager ) :
+	EntityHandle::EntityHandle( int handle, EntityManager& manager ) :
 		Handle( handle ),
 		m_manager( &manager )
 	{

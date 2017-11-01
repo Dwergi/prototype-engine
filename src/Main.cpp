@@ -339,12 +339,10 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 
 		s_freeCam = new FreeCameraController( camera );
 		s_freeCam->BindActions( bindings );
-		s_freeCam->Enable( false );
 
 		s_shipSystem = new ShipSystem( camera );
 		s_shipSystem->BindActions( bindings );
 		s_shipSystem->CreateShip( entityManager );
-		s_shipSystem->Enable( true );
 
 		MousePicking mouse_picking( *s_window, camera, input );
 		mouse_picking.BindActions( bindings );

@@ -17,7 +17,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	class DenseMap
 	{
-		static const uint DefaultSize = 16;
+		static const int DefaultSize = 16;
 
 	public:
 
@@ -36,7 +36,7 @@ namespace dd
 		DenseMap<TKey, TValue>& operator=( DenseMap<TKey, TValue>&& other );
 		DenseMap<TKey, TValue>& operator=( const DenseMap<TKey, TValue>& other );
 
-		void Reserve( uint size );
+		void Reserve( int size );
 
 		void SetHashFunction( void (*hash)( const TKey& ) );
 
@@ -51,7 +51,7 @@ namespace dd
 		bool Contains( const TKey& key ) const;
 		TValue& operator[]( const TKey& key ) const;
 
-		inline uint Size() const { return m_entries; }
+		inline int Size() const { return m_entries; }
 
 		DenseMapIterator<TKey, TValue> begin() const;
 		inline DenseMapIterator<TKey, TValue> end() const { return DenseMapIterator<TKey, TValue>( m_data + m_data.Size(), *this ); }
@@ -60,7 +60,7 @@ namespace dd
 
 		friend class DenseMapIterator<TKey, TValue>;
 
-		uint m_entries { 0 };
+		int m_entries { 0 };
 		Buffer<Entry> m_data;
 
 		uint64 (*m_hash)( const TKey& );
@@ -76,7 +76,7 @@ namespace dd
 		bool IsEmpty( const Entry& entry ) const;
 
 		void Grow();
-		void Resize( uint new_size );
+		void Resize( int new_size );
 		void Rehash( const Buffer<Entry>& data );
 	};
 }

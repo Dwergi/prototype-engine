@@ -54,12 +54,12 @@ namespace dd
 		//
 		// Get all entries containing the given point. Returns the number of entries found for convenience.
 		//
-		uint GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
+		int GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
 
 		//
 		// Get all entries that intersect with the given bounds.
 		//
-		uint GetAllIntersecting( const AABB& bounds, Vector<OctreeEntry>& outResults ) const;
+		int GetAllIntersecting( const AABB& bounds, Vector<OctreeEntry>& outResults ) const;
 
 		//
 		// Get the bounds of the tree.
@@ -70,12 +70,12 @@ namespace dd
 		// Get the internal node count of the tree.
 		// Really just a diagnostic.
 		// 
-		uint GetNodeCount() const { return m_nodes.Size(); }
+		int GetNodeCount() const { return m_nodes.Size(); }
 
 		//
 		// Get the number of entries in this tree.
 		//
-		uint GetEntryCount() const { return m_entries.Size() - m_free.Size(); }
+		int GetEntryCount() const { return m_entries.Size() - m_free.Size(); }
 
 	private:
 
@@ -97,16 +97,16 @@ namespace dd
 		bool IsFull( NodeHandle node ) const;
 		bool HasChildren( NodeHandle handle ) const;
 		NodeHandle GetRoot() const;
-		NodeHandle GetChild( NodeHandle handle, uint index ) const;
+		NodeHandle GetChild( NodeHandle handle, int index ) const;
 		Node* GetNodePtr( NodeHandle handle ) const;
 
 		NodeHandle CreateNode();
 
 		void Rebuild();
 		
-		void CreateChildrenFor( NodeHandle handle, const AABB& bounds, uint depth );
-		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds, uint depth );
-		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds, uint depth );
+		void CreateChildrenFor( NodeHandle handle, const AABB& bounds, int depth );
+		void AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle node_handle, const AABB& node_bounds, int depth );
+		void AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, NodeHandle parent_handle, const AABB& parent_bounds, int depth );
 
 		void GetContaining( const glm::vec3& pt, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;
 		void GetIntersecting( const AABB& bounds, NodeHandle node_handle, const AABB& node_bounds, Vector<OctreeEntry>& outResults ) const;

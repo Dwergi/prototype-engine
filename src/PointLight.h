@@ -15,8 +15,9 @@ namespace dd
 	public:
 
 		PointLight();
-		PointLight( glm::vec3 position, float attenuation, glm::vec3 colour, float intensity );
+		PointLight( glm::vec3 position, glm::vec3 colour, float intensity, float attenuation = 1.0f, float ambient = 0.05f, float specular = 0.5f );
 		PointLight( const PointLight& other );
+		PointLight( PointLight&& other );
 		virtual ~PointLight();
 
 		void SetPosition( glm::vec3 position ) { m_position = position; }
@@ -28,6 +29,6 @@ namespace dd
 	private:
 
 		glm::vec3 m_position;
-		float m_attenuation;
+		float m_attenuation { 1.0f };
 	};
 }

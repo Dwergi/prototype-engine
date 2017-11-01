@@ -17,12 +17,11 @@ namespace dd
 		m_attenuation = 0;
 	}
 
-	PointLight::PointLight( glm::vec3 position, float attenuation, glm::vec3 colour, float intensity ) :
-		Light( colour, intensity ),
+	PointLight::PointLight( glm::vec3 position, glm::vec3 colour, float intensity, float attenuation, float ambient, float specular ) :
+		Light( colour, intensity, ambient, specular ),
 		m_position( position ),
 		m_attenuation( attenuation )
 	{
-		
 	}
 	
 	PointLight::PointLight( const PointLight& other ) :
@@ -30,7 +29,13 @@ namespace dd
 		m_position( other.m_position ),
 		m_attenuation( other.m_attenuation )
 	{
-		
+	}
+
+	PointLight::PointLight( PointLight&& other ) :
+		Light( other ),
+		m_position( other.m_position ),
+		m_attenuation( other.m_attenuation )
+	{
 	}
 
 	PointLight::~PointLight()

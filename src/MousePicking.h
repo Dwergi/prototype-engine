@@ -49,8 +49,8 @@ namespace dd
 		Input* m_input;
 		Window* m_window;
 
-		bool m_select;
-		bool m_enabled;
+		bool m_select { false };
+		bool m_enabled { false };
 
 		EntityHandle m_selectedMesh;
 		EntityHandle m_focusedMesh;

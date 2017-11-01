@@ -12,16 +12,16 @@ namespace dd
 	{
 	public:
 
-		Stream( uint capacity );
+		Stream( int capacity );
 
-		uint Remaining() const;
-		void Advance( uint bytes );
-		uint Offset() const { return m_current; }
+		int Remaining() const;
+		void Advance( int bytes );
+		int Offset() const { return m_current; }
 
 	protected:
 
-		uint m_capacity;
-		uint m_current;
+		int m_capacity;
+		int m_current;
 	};
 	//===================================================================================
 
@@ -30,13 +30,13 @@ namespace dd
 	{
 	public:
 
-		ReadStream( const void* in, uint capacity );
+		ReadStream( const void* in, int capacity );
 		ReadStream( const ReadStream& other );
 
 		char PeekByte();
 		char ReadByte();
 		void Read( String& dst );
-		void Read( void* dst, uint bytes );
+		void Read( void* dst, int bytes );
 
 		template <typename T>
 		T ReadPOD()
@@ -64,7 +64,7 @@ namespace dd
 
 		// TODO: Write a separate string stream...
 		WriteStream( String& out );
-		WriteStream( void* out, uint capacity );
+		WriteStream( void* out, int capacity );
 		WriteStream( const WriteStream& other );
 
 		void Reset();
@@ -72,7 +72,7 @@ namespace dd
 		void WriteByte( byte c );
 		void Write( const String& str );
 		void Write( const char* str );
-		void Write( const void* src, uint bytes );
+		void Write( const void* src, int bytes );
 		void WriteFormat( const char* format, ... );
 
 		template <typename T>

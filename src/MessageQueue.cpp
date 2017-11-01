@@ -57,7 +57,7 @@ namespace dd
 		if( subs == nullptr )
 			return;
 
-		for( uint i = 0; i < subs->Size(); ++i )
+		for( int i = 0; i < subs->Size(); ++i )
 		{
 			if( (*subs)[i] == token.Handler )
 			{
@@ -107,7 +107,7 @@ namespace dd
 		m_pendingMessages.GetWrite().Clear();
 	}
 
-	uint MessageQueue::GetSubscriberCount( MessageID message_type ) const
+	int MessageQueue::GetSubscriberCount( MessageID message_type ) const
 	{
 		Vector<HandlerID>* subs = m_subscribers.Find( message_type );
 
@@ -117,12 +117,12 @@ namespace dd
 		return subs->Size();
 	}
 
-	uint MessageQueue::GetTotalSubscriberCount() const
+	int MessageQueue::GetTotalSubscriberCount() const
 	{
 		return m_handlers.Size();
 	}
 
-	uint MessageQueue::GetPendingMessageCount() const
+	int MessageQueue::GetPendingMessageCount() const
 	{
 		return m_pendingMessages.GetWrite().Size();
 	}

@@ -120,11 +120,11 @@ namespace dd
 	//
 	// Create all the child nodes for the given node.
 	//
-	void AABBOctree::CreateChildrenFor( AABBOctree::NodeHandle handle, const AABB& bounds, uint depth )
+	void AABBOctree::CreateChildrenFor( AABBOctree::NodeHandle handle, const AABB& bounds, int depth )
 	{
-		GetNodePtr( handle )->m_children = (int) m_nodes.Size();
+		GetNodePtr( handle )->m_children = m_nodes.Size();
 
-		for( uint i = 0; i < 8; ++i )
+		for( int i = 0; i < 8; ++i )
 		{
 			CreateNode();
 		}
@@ -173,7 +173,7 @@ namespace dd
 	//
 	// Get the bounds of the child at the given index from a parent with the given bounds.
 	//
-	AABB GetChildBounds( const AABB& parent_bounds, uint index )
+	AABB GetChildBounds( const AABB& parent_bounds, int index )
 	{
 		glm::vec3 parent_center = parent_bounds.Center();
 		glm::vec3 child_extents = parent_bounds.Extents() * 0.5f;
@@ -217,7 +217,7 @@ namespace dd
 	//
 	// Get the child at the given index from the parent node given.
 	//
-	AABBOctree::NodeHandle AABBOctree::GetChild( AABBOctree::NodeHandle handle, uint index ) const
+	AABBOctree::NodeHandle AABBOctree::GetChild( AABBOctree::NodeHandle handle, int index ) const
 	{
 		DD_ASSERT( handle + index >= 0 && handle + index < m_nodes.Size() );
 
@@ -259,12 +259,12 @@ namespace dd
 	//
 	// Add a node to the given node's children. It is assumed that the entry has been checked against the parent's bounds.
 	//
-	void AABBOctree::AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle parent_handle, const AABB& parent_bounds, uint depth )
+	void AABBOctree::AddToChildren( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle parent_handle, const AABB& parent_bounds, int depth )
 	{
 		DD_ASSERT( HasChildren( parent_handle ) );
 		DD_ASSERT( entry_bounds.Intersects( parent_bounds ) );
 
-		for( uint i = 0; i < 8; ++i )
+		for( int i = 0; i < 8; ++i )
 		{
 			AABB child_bounds = GetChildBounds( parent_bounds, i );
 			if( child_bounds.Intersects( entry_bounds ) )
@@ -279,7 +279,7 @@ namespace dd
 	// Add the given entry to the given node or one of its children. 
 	// It is assumed that a test has already been done to see that this node intersects with the given entry.
 	//
-	void AABBOctree::AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle node_handle, const AABB& node_bounds, uint depth )
+	void AABBOctree::AddToNode( OctreeEntry entry_handle, const AABB& entry_bounds, AABBOctree::NodeHandle node_handle, const AABB& node_bounds, int depth )
 	{
 		DD_ASSERT( depth <= MAX_DEPTH );
 		DD_ASSERT( entry_bounds.Intersects( node_bounds ) );
@@ -325,7 +325,7 @@ namespace dd
 		}
 		else
 		{
-			for( uint i = 0; i < 8; ++i )
+			for( int i = 0; i < 8; ++i )
 			{
 				AABB child_bounds = GetChildBounds( node_bounds, i );
 				if( child_bounds.Contains( pt ) )
@@ -339,7 +339,7 @@ namespace dd
 	//
 	// Get all entries that contain the given point.
 	//
-	uint AABBOctree::GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const
+	int AABBOctree::GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const
 	{
 		outResults.Clear();
 
@@ -386,7 +386,7 @@ namespace dd
 		}
 		else
 		{
-			for( uint i = 0; i < 8; ++i )
+			for( int i = 0; i < 8; ++i )
 			{
 				AABB child_bounds = GetChildBounds( node_bounds, i );
 				if( child_bounds.Intersects( bounds ) )
@@ -400,7 +400,7 @@ namespace dd
 	//
 	// Get all entries that intersect with the given bounds.
 	//
-	uint AABBOctree::GetAllIntersecting( const AABB& search_bounds, Vector<OctreeEntry>& outResults ) const
+	int AABBOctree::GetAllIntersecting( const AABB& search_bounds, Vector<OctreeEntry>& outResults ) const
 	{
 		outResults.Clear();
 
@@ -439,7 +439,7 @@ namespace dd
 
 		m_treeBounds = CalculateRequiredSize( m_entries );
 
-		for( uint i = 0; i < m_entries.Size(); ++i )
+		for( int i = 0; i < m_entries.Size(); ++i )
 		{
 			AddToNode( OctreeEntry( i ), m_entries[ i ], root, m_treeBounds, 0 );
 		}

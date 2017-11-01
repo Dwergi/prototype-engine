@@ -14,22 +14,21 @@ namespace dd
 	public:
 
 		Vector();
-		Vector( T* data, uint size, uint capacity, bool can_delete );
+		Vector( T* data, int size, int capacity, bool can_delete );
 		Vector( const Vector& other );
 		Vector( Vector&& other );
 
 		Vector<T>& operator=( Vector&& other );
 		Vector<T>& operator=( const Vector& other );
-		T& operator[]( uint index ) const;
+		T& operator[]( int index ) const;
 
-		uint Size() const;
-		uint Capacity() const;
+		int Size() const;
+		int Capacity() const;
 
 		//
 		// Remove from the given index in an unordered way. 
 		// Swaps the last element with the given index.
 		//
-		void Remove( uint index );
 		void Remove( int index );
 
 		//
@@ -41,7 +40,7 @@ namespace dd
 		// Remove from the given index in an ordered way.
 		// This will invalidate indices or pointers into the vector after the given index.
 		//
-		void RemoveOrdered( uint index );
+		void RemoveOrdered( int index );
 		void RemoveAll( const Vector<T>& to_remove );
 		void Clear();
 
@@ -55,7 +54,7 @@ namespace dd
 		// Extremely unsafe, because this does not decrement the size of the container. 
 		// You're basically on your own at this point.
 		//
-		void Zero( uint index ) const;
+		void Zero( int index ) const;
 
 		//
 		// Add the given value.
@@ -68,8 +67,8 @@ namespace dd
 		// Insert at the given index. 
 		// Index must be <= Size() and >= 0
 		//
-		void Insert( const T&& value, uint index );
-		void Insert( const T& value, uint index );
+		void Insert( const T&& value, int index );
+		void Insert( const T& value, int index );
 
 		//
 		// Add all the entries from the given vector to the end of this vector.
@@ -99,13 +98,13 @@ namespace dd
 		// Does NOT change the size of the container.
 		// Does NOT destroy any elements, even if capacity is less than the current size.
 		//
-		void Reserve( uint capacity );
+		void Reserve( int capacity );
 
 		//
 		// Resize the vector to contain exactly size elements.
 		// Will destroy any outside it and create any missing ones.
 		//
-		void Resize( uint size );
+		void Resize( int size );
 
 		void ShrinkToFit();
 
@@ -128,21 +127,21 @@ namespace dd
 		// Grows the vector to contain at least target elements.
 		// The actual capacity will depend on the growth factor.
 		//
-		void Grow( uint capacity );
+		void Grow( int capacity );
 		void Grow();
 
-		void Reallocate( uint new_capacity );
+		void Reallocate( int new_capacity );
 
-		T& GetEntry( uint index ) const;
+		T& GetEntry( int index ) const;
 
-		uint m_capacity { 0 };
-		uint m_size { 0 };
+		int m_capacity { 0 };
+		int m_size { 0 };
 		T* m_data { nullptr };
 		bool m_deallocate { true };
 
 		static const float GrowthFactor;
-		static const uint GrowthFudge;
-		static const uint DefaultSize;
+		static const int GrowthFudge;
+		static const int DefaultSize;
 	};
 
 	template <typename T, size_t N = 64> 

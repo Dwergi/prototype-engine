@@ -44,12 +44,13 @@ namespace dd
 	private:
 
 		Camera& m_camera;
-		float m_yaw;
-		float m_pitch;
 		glm::vec2 m_mouseDelta;
 
-		bool m_enabled;
-		bool m_invert;
+		float m_yaw { 0.0f };
+		float m_pitch { 0.0f };
+
+		bool m_enabled { true };
+		bool m_invert { false };
 		
 		DenseMap<InputAction, bool> m_inputs;
 	};

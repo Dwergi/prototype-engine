@@ -183,7 +183,7 @@ namespace dd
 		}
 
 		ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 4, 1 ) ); // Tighten spacing
-		for( uint i = 0; i < m_items.Size(); i++ )
+		for( int i = 0; i < m_items.Size(); i++ )
 		{
 			String& item = m_items[i];
 			if( !filter.PassFilter( item.c_str() ) )
@@ -267,14 +267,14 @@ namespace dd
 		else if( command_line.EqualsCaseless( "Help" ) )
 		{
 			AddLog( "Commands:" );
-			for( uint i = 0; i < m_commands.Size(); ++i )
+			for( int i = 0; i < m_commands.Size(); ++i )
 				AddLog( "- %s", m_commands[i].c_str() );
 		}
 		else if( command_line.EqualsCaseless( "History" ) )
 		{
-			uint history_start = m_history.Size() >= 10 ? m_history.Size() - 10 : 0;
+			int history_start = m_history.Size() >= 10 ? m_history.Size() - 10 : 0;
 
-			for( uint i = history_start; i < m_history.Size(); ++i )
+			for( int i = history_start; i < m_history.Size(); ++i )
 				AddLog( "%3d: %s\n", i, m_history[i].c_str() );
 		}
 		else if( command_line.EqualsCaseless( "Functions" ) )
@@ -367,8 +367,8 @@ namespace dd
 
 			String256 buffer( data->Buf );
 
-			uint last_index = data->CursorPos;
-			uint first_index = last_index;
+			int last_index = data->CursorPos;
+			int first_index = last_index;
 
 			while( first_index > 0 )
 			{
@@ -379,13 +379,13 @@ namespace dd
 				--first_index;
 			}
 
-			uint word_length = last_index - first_index;
+			int word_length = last_index - first_index;
 
 			String64 word = buffer.Substring( first_index, word_length );
 
 			// Build a list of candidates
 			Vector<String64> candidates;
-			for( uint i = 0; i < m_commands.Size(); ++i )
+			for( int i = 0; i < m_commands.Size(); ++i )
 			{
 				String64 substring = m_commands[i].Substring( 0, word_length );
 				if( substring.EqualsCaseless( word ) )
@@ -407,13 +407,13 @@ namespace dd
 			else
 			{
 				// Multiple matches. Complete as much as we can, so inputing "C" will complete to "CL" and display "CLEAR" and "CLASSIFY"
-				uint max_match_length = word_length;
+				int max_match_length = word_length;
 				for( ;; )
 				{
 					bool all_match = true;
 					char test_char;
 
-					for( uint c = 0; c < candidates.Size(); ++c )
+					for( int c = 0; c < candidates.Size(); ++c )
 					{
 						char candidate_char = candidates[c][max_match_length];
 						if( c == 0 )
@@ -443,7 +443,7 @@ namespace dd
 
 				// List matches
 				AddLog( "Possible matches:\n" );
-				for( uint i = 0; i < candidates.Size(); i++ )
+				for( int i = 0; i < candidates.Size(); i++ )
 					AddLog( "- %s\n", candidates[i].c_str() );
 			}
 

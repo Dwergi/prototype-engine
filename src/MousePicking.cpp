@@ -26,7 +26,6 @@ namespace dd
 		m_camera = &camera;
 		m_input = &input;
 		m_window = &window;
-		m_enabled = true;
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )

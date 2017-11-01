@@ -11,12 +11,12 @@ namespace dd
 	{
 	private:
 
-		uint Index;
+		int Index;
 		const DenseVectorPool<T>& Pool;
 
 	public:
 
-		DenseVectorPoolIterator( uint index, const DenseVectorPool<T>& pool )
+		DenseVectorPoolIterator( int index, const DenseVectorPool<T>& pool )
 			: Index( index ),
 			Pool( pool )
 		{
@@ -56,7 +56,7 @@ namespace dd
 	};
 
 	template <typename T>
-	bool DenseVectorPool<T>::IsValid( uint id ) const
+	bool DenseVectorPool<T>::IsValid( int id ) const
 	{
 		char c = m_valid[id / (sizeof( char ) * 8)];
 
@@ -66,7 +66,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void DenseVectorPool<T>::SetValid( uint id, bool value )
+	void DenseVectorPool<T>::SetValid( int id, bool value )
 	{
 		char& c = m_valid[id / (sizeof( char ) * 8)];
 
@@ -98,10 +98,10 @@ namespace dd
 	}
 
 	template <typename T>
-	uint DenseVectorPool<T>::Size() const
+	int DenseVectorPool<T>::Size() const
 	{
-		uint count = 0;
-		for( uint i = 0; i < m_components.Size(); ++i )
+		int count = 0;
+		for( int i = 0; i < m_components.Size(); ++i )
 		{
 			if( IsValid( i ) )
 				++count;
@@ -204,7 +204,7 @@ namespace dd
 	template <typename T>
 	DenseVectorPoolIterator<T> DenseVectorPool<T>::begin() const
 	{
-		for( uint i = 0; i < m_components.Size(); ++i )
+		for( int i = 0; i < m_components.Size(); ++i )
 		{
 			if( IsValid( i ) )
 				return DenseVectorPoolIterator<T>( i, *this );

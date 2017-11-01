@@ -11,7 +11,7 @@ namespace dd
 {
 	const float String::GrowthFactor = 2.0f;
 
-	String::String( char* stackBuffer, uint stackCapacity )
+	String::String( char* stackBuffer, int stackCapacity )
 		: m_stack( stackBuffer, stackCapacity )
 	{
 		m_length = 0;
@@ -47,12 +47,12 @@ namespace dd
 		return mbstowcs_s( &count, buffer.Get(), buffer.Size() / 4, m_buffer.Get(), m_length ) > 0;
 	}
 
-	bool String::Equals( const char* other, uint length, bool caseless ) const
+	bool String::Equals( const char* other, int length, bool caseless ) const
 	{
 		if( m_length != length )
 			return false;
 
-		for( uint i = 0; i < m_length; ++i )
+		for( int i = 0; i < m_length; ++i )
 		{
 			if( other[i] == '\0' )
 				return false;
@@ -80,7 +80,7 @@ namespace dd
 	bool String::EqualsCaseless( const char* other ) const
 	{
 		size_t length = strlen( other );
-		return Equals( other, (uint) length, true );
+		return Equals( other, (int) length, true );
 	}
 
 	bool String::operator==( const char* other ) const
@@ -89,7 +89,7 @@ namespace dd
 
 		size_t length = strlen( other );
 
-		return Equals( other, (uint) length, false );
+		return Equals( other, (int) length, false );
 	}
 
 	bool String::operator==( const String& other ) const
@@ -118,7 +118,7 @@ namespace dd
 	{
 		DD_ASSERT( other != nullptr );
 
-		SetString( other, (uint) strlen( other ) );
+		SetString( other, (int) strlen( other ) );
 
 		return *this;
 	}
@@ -132,12 +132,12 @@ namespace dd
 
 	String& String::operator+=( const char* other )
 	{
-		Append( other, (uint) strlen( other ) );
+		Append( other, (int) strlen( other ) );
 
 		return *this;
 	}
 
-	int String::Find( const char* other, uint offset ) const
+	int String::Find( const char* other, int offset ) const
 	{
 		DD_ASSERT( m_buffer != nullptr );
 		DD_ASSERT( other != nullptr );
@@ -150,12 +150,12 @@ namespace dd
 		if( ptr == nullptr )
 			return -1;
 
-		uint location = (uint) (ptr - m_buffer);
+		int location = (int) (ptr - m_buffer);
 
 		return location;
 	}
 
-	int String::Find( const String& other, uint offset ) const
+	int String::Find( const String& other, int offset ) const
 	{
 		DD_ASSERT( m_buffer != nullptr );
 		DD_ASSERT( other.m_buffer != nullptr );
@@ -168,7 +168,7 @@ namespace dd
 		if( ptr == nullptr )
 			return -1;
 
-		uint location = (uint) (ptr - m_buffer);
+		int location = (int) (ptr - m_buffer);
 
 		return location;
 	}
@@ -177,7 +177,7 @@ namespace dd
 	{
 		DD_ASSERT( m_buffer != nullptr );
 
-		for( uint i = 0; i < m_length; ++i )
+		for( int i = 0; i < m_length; ++i )
 		{
 			if( m_buffer[i] == src )
 				m_buffer[i] = target;
@@ -202,7 +202,7 @@ namespace dd
 
 		for( size_t i = 0; i < len; ++i )
 		{
-			if( m_buffer[(uint) i] != other[i] )
+			if( m_buffer[(int) i] != other[i] )
 				return false;
 		}
 
@@ -214,12 +214,12 @@ namespace dd
 		return StartsWith( other.c_str() );
 	}
 
-	void String::Append( const char* buffer, uint other_length )
+	void String::Append( const char* buffer, int other_length )
 	{
 		if( other_length == 0 )
 			return;
 
-		uint new_length = m_length + other_length;
+		int new_length = m_length + other_length;
 		Resize( new_length );
 
 		memcpy( &m_buffer[m_length], buffer, other_length );
@@ -228,7 +228,7 @@ namespace dd
 		NullTerminate();
 	}
 
-	void String::SetString( const char* data, uint length )
+	void String::SetString( const char* data, int length )
 	{
 		if( data == nullptr || length == 0 )
 		{
@@ -257,13 +257,13 @@ namespace dd
 	// Resize to contain a string of the given length. May expand to be larger than the given size.
 	// Never shrinks a string.
 	//
-	void String::Resize( uint length )
+	void String::Resize( int length )
 	{
 		// keep growing string until we hit a size that fits
-		uint new_capacity = m_buffer.Size();
+		int new_capacity = m_buffer.Size();
 		while( length >= new_capacity )
 		{
-			new_capacity = (uint) (new_capacity * GrowthFactor);
+			new_capacity = (int) (new_capacity * GrowthFactor);
 		}
 
 		if( m_buffer.Size() == new_capacity )

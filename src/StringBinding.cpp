@@ -118,7 +118,7 @@ namespace dd
 
 	char* StringCharAt( unsigned int i, String& str )
 	{
-		if( i >= str.Length() )
+		if( i >= (unsigned int) str.Length() )
 		{
 			// Set a script exception
 			asIScriptContext* ctx = asGetActiveContext();
@@ -158,8 +158,8 @@ namespace dd
 	{
 		// Check for out-of-bounds
 		String128 ret;
-		if( start < str.Length() && count != 0 )
-			ret = ((const String128&) str).Substring( start, (uint) count );
+		if( start < (uint) str.Length() && count != 0 )
+			ret = ((const String128&) str).Substring( start, count );
 
 		return ret;
 	}

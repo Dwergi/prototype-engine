@@ -21,7 +21,7 @@ namespace dd
 
 	protected:
 
-		String( char* stackBuffer, uint stackCapacity );
+		String( char* stackBuffer, int stackCapacity );
 
 	public:
 
@@ -34,7 +34,7 @@ namespace dd
 		String& operator+=( const char* other );
 		String& operator+=( char other );
 
-		void Append( const char* other, uint length );
+		void Append( const char* other, int length );
 
 		bool operator==( const char* other ) const;
 		bool operator==( const String& other ) const;
@@ -45,21 +45,21 @@ namespace dd
 		bool EqualsCaseless( const char* other ) const;
 		bool EqualsCaseless( const String& other ) const;
 
-		int Find( const char* other, uint offset = 0 ) const;
-		int Find( const String& other, uint offset = 0 ) const;
+		int Find( const char* other, int offset = 0 ) const;
+		int Find( const String& other, int offset = 0 ) const;
 
 		void ReplaceAll( char src, char target );
 
 		void Clear() { m_length = 0; }
 
-		const char& operator[]( uint index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
-		char& operator[]( uint index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
+		const char& operator[]( int index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
+		char& operator[]( int index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
 		const char* c_str() const;
 		
 		// Get a wide copy of this string.
 		bool w_str( const Buffer<wchar_t>& buffer ) const;
 
-		uint Length() const { return m_length; }
+		int Length() const { return m_length; }
 		bool IsEmpty() const { return m_length == 0; }
 		void ShrinkToFit();
 		bool IsOnHeap() const { return m_buffer.Get() != m_stack.Get(); }
@@ -74,12 +74,12 @@ namespace dd
 	protected:
 
 		Buffer<char> m_buffer;
-		uint m_length { 0 };
+		int m_length { 0 };
 		Buffer<char> m_stack;
 		
-		void Resize( uint length );
-		void SetString( const char* data, uint length );
-		bool Equals( const char* other, uint length, bool caseless ) const;
+		void Resize( int length );
+		void SetString( const char* data, int length );
+		bool Equals( const char* other, int length, bool caseless ) const;
 
 		void NullTerminate();
 
@@ -104,10 +104,10 @@ namespace dd
 		explicit InplaceString( const char* other )
 			: String( m_stackData, Size )
 		{
-			SetString( other, (uint) strlen( other ) );
+			SetString( other, (int) strlen( other ) );
 		}
 
-		InplaceString( const char* other, uint length )
+		InplaceString( const char* other, int length )
 			: String( m_stackData, Size )
 		{
 			SetString( other, length );
@@ -158,7 +158,7 @@ namespace dd
 
 		InplaceString<Size>& operator=( const char* other )
 		{
-			SetString( other, (uint) strlen( other ) );
+			SetString( other, (int) strlen( other ) );
 			return *this;
 		}
 
@@ -167,7 +167,7 @@ namespace dd
 
 		}
 
-		InplaceString<Size> Substring( uint start, uint count = -1 ) const;
+		InplaceString<Size> Substring( int start, int count = INT_MAX ) const;
 		
 	private:
 
@@ -182,7 +182,7 @@ namespace dd
 	typedef InplaceString<256> String256;
 
 	template <int Size>
-	InplaceString<Size> InplaceString<Size>::Substring( uint start, uint count ) const
+	InplaceString<Size> InplaceString<Size>::Substring( int start, int count ) const
 	{
 		DD_ASSERT( start <= m_length );
 		DD_ASSERT( count >= 0 );

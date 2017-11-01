@@ -48,8 +48,7 @@ namespace dd
 	};
 
 	ShipSystem::ShipSystem( Camera& camera ) :
-		m_camera( camera ),
-		m_enabled( false )
+		m_camera( camera )
 	{
 		m_inputs.Add( InputAction::FORWARD, false );
 		m_inputs.Add( InputAction::BACKWARD, false );
@@ -242,8 +241,7 @@ namespace dd
 
 	void ShipSystem::DrawDebugInternal()
 	{
-		if( ImGui::Checkbox( "Enabled", &m_enabled ) )
-			m_enabled = false;
+		ImGui::Checkbox( "Enabled", &m_enabled );
 
 		TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();
 

@@ -138,7 +138,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear()
 	{
-		for( uint i = 0; i < m_data.Size(); ++i )
+		for( int i = 0; i < m_data.Size(); ++i )
 		{
 			if( !IsEmpty( m_data[i] ) )
 			{
@@ -169,7 +169,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	typename DenseMap<TKey, TValue>::Entry* DenseMap<TKey, TValue>::FindEntry( const TKey& key ) const
 	{
-		uint index = 0;
+		int index = 0;
 		Entry& entry = GetEntry( key );
 
 		if( IsMatch( entry, key ) )
@@ -211,16 +211,16 @@ namespace dd
 	}
 
 	template <typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Reserve( uint size )
+	void DenseMap<TKey, TValue>::Reserve( int size )
 	{
 		Resize( size );
 	}
 
 	template <typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Resize( uint new_capacity )
+	void DenseMap<TKey, TValue>::Resize( int new_capacity )
 	{
 		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
-		for( uint i = 0; i < new_capacity; ++i )
+		for( int i = 0; i < new_capacity; ++i )
 		{
 			new_data[i].Used = false;
 		}
@@ -233,7 +233,7 @@ namespace dd
 		{
 			Rehash( old_data );
 
-			for( uint i = 0; i < old_data.Size(); ++i )
+			for( int i = 0; i < old_data.Size(); ++i )
 			{
 				if( !IsEmpty( old_data[i] ) )
 				{
@@ -262,7 +262,7 @@ namespace dd
 	{
 		m_entries = 0; // clear this here, because we're going to be re-inserting everything
 
-		for( uint i = 0; i < from.Size(); ++i )
+		for( int i = 0; i < from.Size(); ++i )
 		{
 			if( !IsEmpty( from[i] ) )
 			{
@@ -327,7 +327,7 @@ namespace dd
 	{
 		uint64 hash = m_hash( key );
 
-		uint index = hash % m_data.Size();
+		int index = hash % m_data.Size();
 		
 		return m_data[index];
 	}
@@ -335,7 +335,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	DenseMapIterator<TKey, TValue> DenseMap<TKey, TValue>::begin() const
 	{
-		for( uint i = 0; i < m_data.Size(); ++i )
+		for( int i = 0; i < m_data.Size(); ++i )
 		{
 			if( !IsEmpty( m_data[i] ) )
 				return DenseMapIterator<TKey, TValue>( &m_data[i], *this );

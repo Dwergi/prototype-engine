@@ -1,3 +1,4 @@
+
 //
 // MessageQueue.h - A pub/sub style messaging system.
 // Copyright (C) Sebastian Nordgren 
@@ -21,8 +22,8 @@ namespace dd
 	{
 	public:
 
-		typedef uint HandlerID;
-		typedef uint MessageID;
+		typedef int HandlerID;
+		typedef int MessageID;
 
 		MessageQueue();
 		~MessageQueue();
@@ -51,17 +52,17 @@ namespace dd
 		//
 		// Get the number of subscribers to the given message type.
 		//
-		uint GetSubscriberCount( MessageID message_type ) const;
+		int GetSubscriberCount( MessageID message_type ) const;
 
 		//
 		// Get the total number of subscribers.
 		//
-		uint GetTotalSubscriberCount() const;
+		int GetTotalSubscriberCount() const;
 
 		//
 		// Get the number of pending messages.
 		//
-		uint GetPendingMessageCount() const;
+		int GetPendingMessageCount() const;
 
 	private:
 
@@ -79,8 +80,8 @@ namespace dd
 	struct MessageSubscription
 	{
 	private:
-		uint MessageID;
-		uint Handler;
+		int MessageID;
+		int Handler;
 
 		friend class MessageQueue;
 	};

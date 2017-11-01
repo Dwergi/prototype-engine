@@ -37,7 +37,7 @@ namespace dd
 		//
 		// Checks if this component pool is empty or not.
 		// 
-		uint Size() const;
+		int Size() const;
 
 		//
 		// Create a new component of this type for the given entity and return the pointer to it.
@@ -81,8 +81,8 @@ namespace dd
 		Vector<T> m_components;
 		Vector<char> m_valid; // this is actually a bitmap
 
-		bool IsValid( uint id ) const;
-		void SetValid( uint id, bool value );
+		bool IsValid( int id ) const;
+		void SetValid( int id, bool value );
 	};
 }
 

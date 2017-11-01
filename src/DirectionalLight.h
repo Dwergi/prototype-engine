@@ -16,7 +16,8 @@ namespace dd
 
 		DirectionalLight();
 		DirectionalLight( const DirectionalLight& other );
-		DirectionalLight( glm::vec3 direction, glm::vec3 colour, float intensity );
+		DirectionalLight( DirectionalLight&& other );
+		DirectionalLight( glm::vec3 direction, glm::vec3 colour, float intensity, float ambient = 0.05f, float specular = 0.5f );
 		virtual ~DirectionalLight();
 
 		glm::vec3 GetDirection() const { return m_direction; }

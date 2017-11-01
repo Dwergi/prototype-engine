@@ -34,14 +34,14 @@ namespace dd
 		Renderer();
 		~Renderer();
 
-		void Initialize( Window& window, EntityManager& entity_manager );
+		void Initialize( Window& window, EntityManager& entityManager );
 		void Shutdown();
 
 		//
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		void Render( EntityManager& entity_manager, float delta_t );
+		void Render( EntityManager& entityManager, float delta_t );
 
 		//
 		// Retrieve the active camera.
@@ -88,14 +88,15 @@ namespace dd
 
 		DirectionalLight m_directionalLight;
 		Vector<PointLight> m_pointLights;
-
-		float m_ambientStrength { 0.05f };
-		float m_specularStrength { 0.5f };
+		Vector<EntityHandle> m_pointLightMeshes;
+		bool m_createPointLight { false };
 
 		MeshHandle m_unitCube;
 
-		void CreateDebugMeshGrid( EntityManager& entity_manager );
-		EntityHandle CreateMeshEntity( EntityManager& entity_manager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
+		void CreateDebugMeshGrid( EntityManager& entityManager );
+		EntityHandle CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
+		void CreatePointLight( EntityManager& entityManager, const PointLight& pointLight );
+		void UpdateDebugPointLights( EntityManager& entityManager );
 
 		void SetRenderState();
 

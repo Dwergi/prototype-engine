@@ -75,7 +75,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 	Vector<OctreeEntry> results;
 	Vector<AABB> comparison;
 
-	for( uint i = 0; i < 128; ++i )
+	for( int i = 0; i < 128; ++i )
 	{
 		comparison.Clear();
 		results.Clear();
@@ -91,7 +91,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 				comparison.Add( aabb );
 		}
 
-		for( uint i = 0; i < results.Size(); ++i )
+		for( int i = 0; i < results.Size(); ++i )
 		{
 			const AABB& bb = octree.GetEntry( results[i] );
 
@@ -141,7 +141,7 @@ TEST_CASE( "[AABBOctree] GetIntersecting" )
 				comparison.Add( aabb );
 		}
 
-		for( uint i = 0; i < results.Size(); ++i )
+		for( int i = 0; i < results.Size(); ++i )
 		{
 			const AABB& bb = octree.GetEntry( results[i] );
 

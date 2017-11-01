@@ -49,7 +49,7 @@ namespace dd
 		EntityHandle m_lastShip;
 
 		DenseMap<InputAction, bool> m_inputs;
-		bool m_enabled;
+		bool m_enabled { false };
 	
 		void HandleInput( InputAction action, InputType type );
 		void UpdateShip( EntityHandle entity, ComponentHandle<TransformComponent> transform, ComponentHandle<ShipComponent> ship, float delta_t );

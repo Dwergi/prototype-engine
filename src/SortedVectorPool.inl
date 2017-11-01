@@ -71,7 +71,7 @@ namespace dd
 	}
 
 	template <typename T>
-	uint SortedVectorPool<T>::Size() const
+	int SortedVectorPool<T>::Size() const
 	{
 		return m_components.Size();
 	}
@@ -92,7 +92,7 @@ namespace dd
 			if( current == m_components.Size() )
 				break;
 
-			uint current_handle = m_components[current].Entity;
+			int current_handle = m_components[current].Entity;
 
 			if( current_handle == entity.Handle )
 			{

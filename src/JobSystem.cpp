@@ -54,7 +54,7 @@ namespace dd
 
 	}
 
-	JobSystem::Job::Job( const std::function<void()>& fn, JobSystem::Category* category, uint id ) :
+	JobSystem::Job::Job( const std::function<void()>& fn, JobSystem::Category* category, int id ) :
 		Func( fn ),
 		Category( category ),
 		Status( JobStatus::Pending ),
@@ -83,7 +83,7 @@ namespace dd
 		Category = nullptr;
 	}
 
-	JobSystem::JobSystem( uint thread_count )
+	JobSystem::JobSystem( int thread_count )
 	{
 		m_jobs.Reserve( JOB_QUEUE_SIZE );
 
@@ -99,22 +99,22 @@ namespace dd
 			m_jobs.Clear();
 		}
 
-		for( uint i = 0; i < m_workers.Size(); ++i )
+		for( int i = 0; i < m_workers.Size(); ++i )
 		{
 			m_workers[i]->Kill();
 		}
 
 		m_jobsPending.notify_all(); // signal workers to wake up
 
-		for( uint i = 0; i < m_workers.Size(); ++i )
+		for( int i = 0; i < m_workers.Size(); ++i )
 		{
 			m_threads[i].join();
 		}
 	}
 
-	void JobSystem::CreateWorkers( uint thread_count )
+	void JobSystem::CreateWorkers( int thread_count )
 	{
-		for( uint i = 0; i < thread_count; ++i )
+		for( int i = 0; i < thread_count; ++i )
 		{
 			char name[32] = "DD Jobs ";
 			char count[8];
@@ -168,7 +168,7 @@ namespace dd
 		}
 
 		// find a free slot
-		for( uint i = 0; i < m_jobs.Size(); ++i )
+		for( int i = 0; i < m_jobs.Size(); ++i )
 		{
 			if( m_jobs[i].Status == JobStatus::Free )
 			{
@@ -243,7 +243,7 @@ namespace dd
 	{
 		std::thread::id current_id = std::this_thread::get_id();
 
-		for( uint i = 0; i < m_workers.Size(); ++i )
+		for( int i = 0; i < m_workers.Size(); ++i )
 		{
 			if( m_threads[i].get_id() == current_id )
 			{
@@ -265,7 +265,7 @@ namespace dd
 		return nullptr;
 	}
 
-	void JobSystem::WaitForCategory( const char* category_name, uint timeout_ms )
+	void JobSystem::WaitForCategory( const char* category_name, int timeout_ms )
 	{
 		JobThread* thread = FindCurrentWorker();
 		DD_ASSERT_ERROR( thread == nullptr, "Cannot wait for categories inside jobs!" );

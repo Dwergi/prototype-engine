@@ -21,8 +21,15 @@ namespace dd
 
 	}
 
-	DirectionalLight::DirectionalLight( glm::vec3 direction, glm::vec3 colour, float intensity )
-		: Light( colour, intensity )
+	DirectionalLight::DirectionalLight( DirectionalLight&& other )
+		: Light( other ),
+		m_direction( other.m_direction )
+	{
+
+	}
+
+	DirectionalLight::DirectionalLight( glm::vec3 direction, glm::vec3 colour, float intensity, float ambient, float specular )
+		: Light( colour, intensity, ambient, specular )
 	{
 		m_direction = direction;
 	}

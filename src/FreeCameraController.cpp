@@ -34,11 +34,7 @@ namespace dd
 	const float TurnSpeed = 180.f / 3840.f;
 
 	FreeCameraController::FreeCameraController( Camera& camera ) :
-		m_camera( camera ),
-		m_yaw( 0.0f ),
-		m_pitch( 0.0f ),
-		m_enabled( true ),
-		m_invert( false )
+		m_camera( camera )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
 

@@ -13,7 +13,7 @@ Buffer<T>::Buffer() :
 }
 
 template <typename T>
-Buffer<T>::Buffer( T* ptr, uint size ) :
+Buffer<T>::Buffer( T* ptr, int size ) :
 	m_ptr( ptr ),
 	m_size( size )
 {
@@ -64,7 +64,7 @@ Buffer<T>& Buffer<T>::operator=( Buffer<T>&& other )
 }
 
 template <typename T>
-void Buffer<T>::Set( T* ptr, uint size )
+void Buffer<T>::Set( T* ptr, int size )
 {
 	DD_ASSERT( m_ptr == nullptr, "Overwriting a Buffer pointer! Call Release first." );
 
@@ -96,7 +96,7 @@ T* Buffer<T>::Release()
 }
 
 template <typename T>
-T& Buffer<T>::operator[]( uint index ) const
+T& Buffer<T>::operator[]( int index ) const
 {
 	DD_ASSERT( index < m_size );
 
@@ -116,7 +116,7 @@ bool Buffer<T>::operator!=( const Buffer<T>& other ) const
 }
 
 template <typename T>
-uint Buffer<T>::Size() const
+int Buffer<T>::Size() const
 {
 	return m_size;
 }

@@ -38,7 +38,7 @@ vec3 ApplyLight( Light light, vec3 fragColour, vec3 fragNormal, vec3 fragPositio
 	if( light.Position.w == 0.0 )
 	{
 		lightDir = normalize( light.Position.xyz );
-		attenuation = 0.0; 
+		attenuation = 1.0; 
 	}
 	else
 	{

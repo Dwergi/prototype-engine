@@ -22,17 +22,17 @@ namespace dd
 		{
 			struct
 			{
-				uint ID : 22;
-				uint Version : 10;
+				int ID : 22;
+				int Version : 10;
 			};
 
-			uint Handle;
+			int Handle;
 		};
 		
 		EntityHandle();
 		EntityHandle( const EntityHandle& other );
 		EntityHandle( EntityHandle&& other );
-		EntityHandle( uint id, EntityManager& manager );
+		EntityHandle( int id, EntityManager& manager );
 
 		bool IsValid() const;
 
