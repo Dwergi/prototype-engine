@@ -9,7 +9,6 @@
 
 namespace
 {
-	const unsigned int Invalid = -1;
 	const unsigned int Maximum = ((unsigned int) -1) - 1;
 
 	const unsigned int DefaultEntityCount = 512;
@@ -92,6 +91,7 @@ namespace dd
 			if( m_entities.GetWrite()[ handle.ID ].Version != handle.Version )
 				return;
 
+			m_entities.GetWrite()[ handle.ID ] = EntityHandle();
 			m_free.GetWrite().Add( handle.ID );
 		}
 	}

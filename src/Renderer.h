@@ -74,7 +74,7 @@ namespace dd
 		EntityHandle m_zAxis;
 		bool m_drawAxes { true };
 
-		Vector<EntityHandle> m_lights;
+		Vector<EntityHandle> m_debugLights;
 
 		int m_meshCount;
 		int m_frustumMeshCount;

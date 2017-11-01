@@ -27,6 +27,8 @@
 
 #include "imgui/imgui.h"
 
+#pragma optimize( "", off )
+
 namespace dd
 {
 	Renderer::Renderer() :
@@ -118,14 +120,14 @@ namespace dd
 	{
 		EntityHandle handle = entityManager.CreateEntity<TransformComponent, MeshComponent>();
 
-		TransformComponent* transform_cmp = entityManager.GetWritable<TransformComponent>( handle );
-		transform_cmp->SetLocalTransform( transform );
+		ComponentHandle<TransformComponent> transform_cmp = handle.Get<TransformComponent>();
+		transform_cmp.Write()->SetLocalTransform( transform );
 
-		MeshComponent* mesh_cmp = entityManager.GetWritable<MeshComponent>( handle );
-		mesh_cmp->Mesh = mesh_h;
-		mesh_cmp->Colour = colour;
-		mesh_cmp->Hidden = false;
-		mesh_cmp->UpdateBounds( transform );
+		ComponentHandle<MeshComponent> mesh_cmp = handle.Get<MeshComponent>();
+		mesh_cmp.Write()->Mesh = mesh_h;
+		mesh_cmp.Write()->Colour = colour;
+		mesh_cmp.Write()->Hidden = false;
+		mesh_cmp.Write()->UpdateBounds( transform );
 
 		return handle;
 	}
@@ -157,14 +159,14 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_lights.Size(); ++i )
+			for( int i = 0; i < m_debugLights.Size(); ++i )
 			{
 				String64 lightLabel( "Light " );
 				char buffer[16];
 				_itoa_s( i, buffer, 10 );
 				lightLabel += buffer;
 
-				EntityHandle entity = m_lights[ i ];
+				EntityHandle entity = m_debugLights[ i ];
 				ComponentHandle<LightComponent> light = entity.Get<LightComponent>();
 				ComponentHandle<TransformComponent> transform = entity.Get<TransformComponent>();
 
@@ -228,9 +230,9 @@ namespace dd
 			}
 
 
-			if( m_lights.Size() < 10 )
+			if( m_debugLights.Size() < 10 )
 			{
-				if( ImGui::Button( "Create Point Light" ) )
+				if( ImGui::Button( "Create Light" ) )
 				{
 					m_createLight = true;
 				}
@@ -327,7 +329,7 @@ namespace dd
 				ShaderProgram* shader = mesh->GetShader().Get();
 				shader->Use( true );
 
-				int lightCount = lights.Size() + 1;
+				int lightCount = lights.Size();
 				DD_ASSERT( lightCount <= 10 );
 				shader->SetUniform( "LightCount", lightCount );
 
@@ -433,13 +435,15 @@ namespace dd
 
 		m_frustum->ResetFrustum( *m_camera );
 
-		m_lights = entityManager.FindAllWithReadable<LightComponent, TransformComponent>();
 		UpdateDebugPointLights( entityManager );
+		Vector<EntityHandle> lights = entityManager.FindAllWithReadable<LightComponent, TransformComponent>();
 
-		entityManager.ForAllWithReadable<MeshComponent, TransformComponent>( [this]( auto entity, auto mesh, auto transform )
+		entityManager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &lights]( auto entity, auto mesh, auto transform )
 		{ 
-			RenderMesh( entity, mesh, transform, m_lights, m_mousePicking );
+			RenderMesh( entity, mesh, transform, lights, m_mousePicking );
 		} );
+
+		m_debugLights = entityManager.FindAllWithWritable<LightComponent, TransformComponent>();
 	}
 
 	Camera& Renderer::GetCamera() const
