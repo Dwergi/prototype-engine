@@ -15,6 +15,8 @@ namespace dd
 		Function Function;
 	};
 
+	class EntityManager;
+
 	class TypeInfo : public AutoList<TypeInfo>
 	{
 	public:
@@ -33,6 +35,7 @@ namespace dd
 
 		inline bool IsPOD() const { return m_isPOD; }
 		inline bool IsRegistered() const { return m_size != 0; }
+		inline bool IsComponent() const { return m_component; }
 
 		bool IsDerivedFrom( const TypeInfo* type ) const;
 
@@ -113,6 +116,7 @@ namespace dd
 
 		bool m_scriptObject { false };
 		bool m_isPOD { false };
+		bool m_component { false };
 
 		const TypeInfo* m_parentType { nullptr };
 		const TypeInfo* m_containedType { nullptr };

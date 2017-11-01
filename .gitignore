@@ -67,3 +67,4 @@ DD.VC.db
 *.cache
 *.pdb
 .vs/
+.srctrldb,.srctrlbm,.srctrlprj

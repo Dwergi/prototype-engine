@@ -25,6 +25,7 @@
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
+#include "LightComponent.h"
 #include "MeshComponent.h"
 #include "Message.h"
 #include "MousePicking.h"
@@ -136,6 +137,9 @@ void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptE
 
 	TypeInfo::RegisterComponent<ScriptComponent>( "ScriptComponent" );
 	entityManager.RegisterComponent<ScriptComponent>();
+
+	TypeInfo::RegisterComponent<LightComponent>( "LightComponent" );
+	entityManager.RegisterComponent<LightComponent>();
 }
 
 void ToggleConsole( InputAction action, InputType type )

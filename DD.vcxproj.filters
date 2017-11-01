@@ -444,9 +444,6 @@
     <ClInclude Include="src\TrenchComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\PointLight.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\SceneGraphSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
@@ -477,11 +474,8 @@
     <ClInclude Include="src\ScriptSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\Light.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DirectionalLight.h">
-      <Filter>Rendering</Filter>
+    <ClInclude Include="src\LightComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -768,9 +762,6 @@
     <ClCompile Include="src\TrenchSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\PointLight.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneGraphSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
@@ -810,11 +801,8 @@
     <ClCompile Include="src\ScriptSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\Light.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DirectionalLight.cpp">
-      <Filter>Rendering</Filter>
+    <ClCompile Include="src\LightComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

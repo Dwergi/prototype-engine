@@ -14,8 +14,7 @@ namespace dd
 	__declspec(thread) static char s_temp[ 2048 ];
 
 	Stream::Stream( int capacity )
-		: m_capacity( capacity ),
-		m_current( 0 )
+		: m_capacity( capacity )
 	{
 
 	}
@@ -28,7 +27,7 @@ namespace dd
 	int Stream::Remaining() const
 	{
 		if( m_capacity == -1 )
-			return -1;
+			return INT_MAX;
 
 		return m_capacity - m_current;
 	}
@@ -192,7 +191,7 @@ namespace dd
 
 	void WriteStream::WriteFormat( const char* format, ... )
 	{
-		DD_ASSERT( Remaining() != -1 || Remaining() > 0 );
+		DD_ASSERT( Remaining() > 0 );
 
 		void* dest = m_pDest != nullptr ? PointerAdd( m_pDest, m_current ) : s_temp;
 

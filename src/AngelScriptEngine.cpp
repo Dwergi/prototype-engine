@@ -165,6 +165,7 @@ namespace dd
 
 	AngelScriptEngine::~AngelScriptEngine()
 	{
+		m_engine->ClearMessageCallback();
 		m_engine->ShutDownAndRelease();
 		m_engine = nullptr;
 	}

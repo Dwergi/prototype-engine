@@ -16,23 +16,19 @@ namespace dd
 	class Camera;
 	class ShaderProgram;
 
-	__declspec(align(16)) class Frustum
+	class alignas(16) Frustum
 	{
 	public:
 
-		//
-		// Create a view frustum from the given camera's parameters.
-		//
-		Frustum( Camera& camera );
+		Frustum();
 
 		//
 		// Check if the frustum intersects with the given bounds.
 		//
 		bool Intersects( const AABB& bounds ) const;
 
-		Camera& GetCamera() const { return m_camera; }
-		void Render( Camera& camera, ShaderProgram& shader );
-		void ResetFrustum( Camera& camera );
+		void Render( const Camera& camera, ShaderProgram& shader );
+		void ResetFrustum( const Camera& camera );
 
 		void* operator new( size_t i );
 		void operator delete( void* ptr);
@@ -46,9 +42,7 @@ namespace dd
 		VBO m_indices;
 		VBO m_vertices;
 
-		Camera& m_camera;
-
-		void SetCorners( Camera& camera );
+		void SetCorners( const Camera& camera );
 		void UpdateRenderData();
 	};
 }

@@ -20,8 +20,8 @@ namespace dd
 
 	protected:
 
-		int m_capacity;
-		int m_current;
+		int m_capacity { 0 };
+		int m_current { 0 };
 	};
 	//===================================================================================
 
@@ -53,7 +53,7 @@ namespace dd
 		const void* Data() const { return m_pSource; }
 		
 	private:
-		const void* m_pSource;
+		const void* m_pSource { nullptr };
 	};
 	//===================================================================================
 
@@ -88,8 +88,8 @@ namespace dd
 
 	private:
 
-		String* m_strDest;
-		void* m_pDest;
+		String* m_strDest { nullptr };
+		void* m_pDest { nullptr };
 	};
 	//===================================================================================
 }

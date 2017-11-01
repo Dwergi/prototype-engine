@@ -131,9 +131,11 @@ namespace dd
 	template <typename TComponent>
 	const TypeInfo* TypeInfo::RegisterComponent( const char* typeName )
 	{
+		static_assert(std::is_base_of_v<ComponentBase, TComponent>, "Component type must be derived from ComponentBase!");
 		static_assert(std::is_assignable_v<TComponent, TComponent>, "Component type must be assignable to itself!");
 
-		const TypeInfo* typeInfo = RegisterType<RemoveQualifiers<TComponent>::type>( typeName );
+		TypeInfo* typeInfo = const_cast<TypeInfo*>( RegisterType<RemoveQualifiers<TComponent>::type>( typeName ) );
+		typeInfo->m_component = true;
 
 		String128 poolTypeName( typeInfo->Name().c_str() );
 		poolTypeName += "Pool";

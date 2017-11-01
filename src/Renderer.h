@@ -6,22 +6,20 @@
 
 #pragma once
 
-#include "DirectionalLight.h"
 #include "EntityHandle.h"
 #include "IDebugDraw.h"
 #include "Mesh.h"
-#include "PointLight.h"
 #include "ShaderProgram.h"
 
 namespace dd
 {
 	class Camera;
-	class DirectionalLight;
+	class DirectionalLightComponent;
 	class EntityManager;
 	class Frustum;
 	class MeshComponent;
 	class MousePicking;
-	class PointLight;
+	class PointLightComponent;
 	class Ray;
 	class ShaderProgram;
 	class TransformComponent;
@@ -76,6 +74,8 @@ namespace dd
 		EntityHandle m_zAxis;
 		bool m_drawAxes { true };
 
+		Vector<EntityHandle> m_lights;
+
 		int m_meshCount;
 		int m_frustumMeshCount;
 
@@ -86,20 +86,18 @@ namespace dd
 		glm::vec3 m_debugWireframeColour;
 		float m_debugWireframeWidth { 2.0f };
 
-		DirectionalLight m_directionalLight;
-		Vector<PointLight> m_pointLights;
-		Vector<EntityHandle> m_pointLightMeshes;
-		bool m_createPointLight { false };
+		EntityHandle m_deleteLight;
+		bool m_createLight { false };
 
 		MeshHandle m_unitCube;
 
 		void CreateDebugMeshGrid( EntityManager& entityManager );
 		EntityHandle CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform );
-		void CreatePointLight( EntityManager& entityManager, const PointLight& pointLight );
+		EntityHandle CreatePointLight( EntityManager& entityManager );
 		void UpdateDebugPointLights( EntityManager& entityManager );
 
 		void SetRenderState();
 
-		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const MousePicking* mouse_picking );
+		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const Vector<EntityHandle>& pointLights, const MousePicking* mouse_picking );
 	};
 }

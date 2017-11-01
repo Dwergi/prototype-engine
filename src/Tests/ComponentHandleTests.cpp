@@ -28,20 +28,19 @@ TEST_CASE( "[ComponentHandle] Has All Components" )
 	REGISTER_TYPE( FooComponent );
 	REGISTER_TYPE( BarComponent );
 
-	FooComponent::Pool fooPool;
-	BarComponent::Pool barPool;
-
 	dd::EntityManager manager;
+	manager.RegisterComponent<FooComponent>();
+	manager.RegisterComponent<BarComponent>();
+
 	dd::EntityHandle entity = manager.CreateEntity();
-
-	FooComponent* foo = fooPool.Create( entity );
-
+	dd::ComponentHandle<FooComponent> foo = manager.AddComponent<FooComponent>( entity );
+	
 	REQUIRE( entity.Has<FooComponent>() );
 	REQUIRE( entity.HasAll<FooComponent>() );
 
-	BarComponent* bar = barPool.Create( entity );
-	
+	dd::ComponentHandle<BarComponent> bar = manager.AddComponent<BarComponent>( entity );
 	REQUIRE( entity.Has<BarComponent>() );
+	REQUIRE( entity.HasAll<BarComponent>() );
 
 	bool hasAll = entity.HasAll<FooComponent, BarComponent>();
 	REQUIRE( hasAll );

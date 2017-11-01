@@ -79,8 +79,7 @@ namespace dd
 		glm::vec3( 0, 1, 1 )
 	};
 
-	Frustum::Frustum( Camera& camera )
-		: m_camera( camera )
+	Frustum::Frustum()
 	{
 		m_vao.Create();
 		m_vertices.Create( GL_ARRAY_BUFFER );
@@ -88,11 +87,9 @@ namespace dd
 		m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
 		m_indices.Bind();
 		m_indices.SetData( s_indices, sizeof( s_indices ) );
-
-		ResetFrustum( m_camera );
 	}
 
-	void Frustum::ResetFrustum( Camera& camera )
+	void Frustum::ResetFrustum( const Camera& camera )
 	{
 		SetCorners( camera );
 
@@ -135,7 +132,7 @@ namespace dd
 		return true;
 	}
 
-	void Frustum::Render( Camera& camera, ShaderProgram& shader )
+	void Frustum::Render( const Camera& camera, ShaderProgram& shader )
 	{
 		m_vao.Bind();
 		m_vertices.Bind();
@@ -161,7 +158,7 @@ namespace dd
 		m_vao.Unbind();
 	}
 	
-	void Frustum::SetCorners( Camera& camera )
+	void Frustum::SetCorners( const Camera& camera )
 	{
 		// Work out corners of the frustum
 		float far_height = std::tanf( camera.GetVerticalFOV() ) * camera.GetFar();
