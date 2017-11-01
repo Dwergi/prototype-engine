@@ -1,11 +1,16 @@
 #version 330 core
 #extension GL_OES_standard_derivatives : enable
 
-out vec4 color;
+out vec4 Colour;
 
-in vec3 FragmentPosition;
+in struct FragmentData
+{
+	vec3 Position;
+	vec4 Colour;
+	vec3 WireframeDistance;
+} Fragment;
+
 flat in vec3 FragmentNormal;
-in vec4 FragmentColour;
 
 uniform bool UseWireframe;
 uniform vec3 WireframeColour;
@@ -73,21 +78,22 @@ void main()
 	vec4 finalColour = vec4( 0 );
 	if( UseWireframe )
 	{
-		finalColour = CalculateWireframe( FragmentColour.rgb, WireframeColour, WireframeWidth );
+		finalColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth );
+		//finalColour = vec4( WireframeDistance, 1 );
 	}
 	else
 	{
 		vec3 normal = normalize( FragmentNormal );
-		vec3 viewDir = normalize( ViewPosition - FragmentPosition );
+		vec3 viewDir = normalize( ViewPosition - Fragment.Position );
 		for( int i = 0; i < LightCount; ++i )
 		{
-			finalColour.rgb += ApplyLight( Lights[ i ], FragmentColour.rgb, normal, FragmentPosition, viewDir );
+			finalColour.rgb += ApplyLight( Lights[ i ], Fragment.Colour.rgb, normal, Fragment.Position, viewDir );
 		}
 		
 		vec3 gamma = vec3( 1.0 / 2.2 );
     	finalColour.rgb = pow( finalColour.rgb, gamma );
-		finalColour.a = FragmentColour.a;
+		finalColour.a = Fragment.Colour.a;
 	}
 	//color.rgb = (vec3(1,1,1) + FragmentNormal) * 0.5;
-	color = finalColour;
+	Colour = finalColour;
 };

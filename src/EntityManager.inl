@@ -170,7 +170,6 @@ namespace dd
 	template <typename... Components>
 	void EntityManager::ForAllWithReadable( typename identity<std::function<void(EntityHandle, ComponentHandle<Components>...)>>::type f ) const
 	{
-		Vector<EntityHandle> result;
 		for( EntityHandle e : m_entities.GetRead() )
 		{
 			if( HasAllReadable<Components...>( e ) )
@@ -183,7 +182,6 @@ namespace dd
 	template <typename... Components>
 	void EntityManager::ForAllWithWritable( typename identity<std::function<void( EntityHandle, ComponentHandle<Components>... )>>::type f ) const
 	{
-		Vector<EntityHandle> result;
 		for( EntityHandle e : m_entities.GetWrite() )
 		{
 			if( HasAllWritable<Components...>( e ) )
@@ -196,8 +194,9 @@ namespace dd
 	template <typename Component>
 	const Component* EntityManager::GetReadable( EntityHandle h ) const
 	{
-
 		DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
+
+		DD_ASSERT( pool != nullptr, "No pool found for component!" );
 		return pool->GetRead().Find( h );
 	}
 

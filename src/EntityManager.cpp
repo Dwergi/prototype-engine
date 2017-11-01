@@ -7,6 +7,10 @@
 #include "PrecompiledHeader.h"
 #include "EntityManager.h"
 
+#include "ComponentPoolBase.h"
+
+#pragma optimize( "", off )
+
 namespace
 {
 	const unsigned int Maximum = ((unsigned int) -1) - 1;
@@ -73,7 +77,6 @@ namespace dd
 
 		EntityHandle& handle = m_entities.GetWrite()[ m_free.GetWrite()[ 0 ] ];
 		m_free.GetWrite().Remove( 0 );
-		handle.Version += 1;
 
 		return handle;
 	}
@@ -91,8 +94,17 @@ namespace dd
 			if( m_entities.GetWrite()[ handle.ID ].Version != handle.Version )
 				return;
 
-			m_entities.GetWrite()[ handle.ID ] = EntityHandle();
+			m_entities.GetWrite()[ handle.ID ].Version++;
 			m_free.GetWrite().Add( handle.ID );
+
+			for( auto& it : m_pools )
+			{
+				ComponentPoolBase* pool = reinterpret_cast<ComponentPoolBase*>(it.Value->GetWrite());
+				if( pool->Exists( handle ) )
+				{
+					pool->Remove( handle );
+				}
+			}
 		}
 	}
 

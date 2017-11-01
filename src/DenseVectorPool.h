@@ -43,30 +43,30 @@ namespace dd
 		// Create a new component of this type for the given entity and return the pointer to it.
 		// Returns null if the component already exists.
 		// 
-		T* Create( const EntityHandle& entity );
+		T* Create( EntityHandle entity );
 
 		//
 		// Construct a new component of this type for the given entity with the given arguments.
 		// Returns the pointer to it or null if the component already exists.
 		//
 		template <typename... Args>
-		T* Construct( const EntityHandle& entity, Args&&... args );
+		T* Construct( EntityHandle entity, Args&&... args );
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		T* Find( const EntityHandle& entity ) const;
-
-		//
-		// Remove the component associated with the given entity.
-		// 
-		void Remove( const EntityHandle& entity );
+		T* Find( EntityHandle entity ) const;
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		bool Exists( const EntityHandle& entity ) const;
+		virtual bool Exists( EntityHandle entity ) const override;
+
+		//
+		// Remove the component associated with the given entity.
+		// 
+		virtual void Remove( EntityHandle entity ) override;
 
 		iterator begin() const;
 		iterator end() const;

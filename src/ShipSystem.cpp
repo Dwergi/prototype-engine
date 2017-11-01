@@ -105,6 +105,10 @@ namespace dd
 			DD_ASSERT( vert.IsValid() );
 			shaders.Add( vert );
 
+			Shader geom = Shader::Create( String8( "vertex" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+			DD_ASSERT( geom.IsValid() );
+			shaders.Add( geom );
+
 			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
 			DD_ASSERT( pixel.IsValid() );
 			shaders.Add( pixel );

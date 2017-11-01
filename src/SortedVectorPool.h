@@ -46,23 +46,23 @@ namespace dd
 		//
 		// Create a new component of this type for the given entity.
 		// 
-		T* Create( const EntityHandle& entity );
+		T* Create( EntityHandle entity );
 
 		//
 		// Find the component for the given entity.
 		// Returns null if the component hasn't been created.
 		// 
-		T* Find( const EntityHandle& entity ) const;
+		T* Find( EntityHandle entity ) const;
 
 		//
 		// Remove the component associated with the given entity.
 		// 
-		void Remove( const EntityHandle& entity );
+		virtual void Remove( EntityHandle entity ) override;
 
 		// 
 		// Checks if the given entity has a component of this type.
 		// 
-		bool Exists( const EntityHandle& entity ) const;
+		virtual bool Exists( EntityHandle entity ) const override;
 
 		iterator begin() const;
 		iterator end() const;

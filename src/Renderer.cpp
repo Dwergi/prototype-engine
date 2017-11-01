@@ -56,6 +56,10 @@ namespace dd
 			DD_ASSERT( vert.IsValid() );
 			shaders.Add( vert );
 
+			Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+			DD_ASSERT( geom.IsValid() );
+			shaders.Add( geom );
+
 			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
 			DD_ASSERT( pixel.IsValid() );
 			shaders.Add( pixel );
@@ -80,9 +84,9 @@ namespace dd
 		{
 			EntityHandle directionalLight = entityManager.CreateEntity<LightComponent, TransformComponent>();
 			ComponentHandle<LightComponent> light = directionalLight.Get<LightComponent>();
-			light.Write()->SetDirectional( true );
-			light.Write()->SetColour( glm::vec3( 1, 1, 1 ) );
-			light.Write()->SetIntensity( 0.5 );
+			light.Write()->IsDirectional = true;
+			light.Write()->Colour = glm::vec3( 1, 1, 1 );
+			light.Write()->Intensity = 0.5;
 
 			ComponentHandle<TransformComponent> transform = directionalLight.Get<TransformComponent>();
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
@@ -92,8 +96,8 @@ namespace dd
 		{
 			EntityHandle pointLight = CreatePointLight( entityManager );
 			ComponentHandle<LightComponent> light = pointLight.Get<LightComponent>();
-			light.Write()->SetColour( glm::vec3( 0.5, 0.5, 0.5 ) );
-			light.Write()->SetIntensity( 10 );
+			light.Write()->Colour = glm::vec3( 0.5, 0.5, 0.5 );
+			light.Write()->Intensity = 10;
 
 			ComponentHandle<TransformComponent> transform = pointLight.Get<TransformComponent>();
 			transform.Write()->SetLocalPosition( glm::vec3( 0, 10, 10 ) );
@@ -146,13 +150,16 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &m_debugWireframe );
+			ImGui::Checkbox( "Enabled?", &m_debugWireframe );
 
 			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
 
 			float fltColour[3];
 			fltColour[0] = m_debugWireframeColour.r; fltColour[1] = m_debugWireframeColour.g; fltColour[2] = m_debugWireframeColour.b;
-			ImGui::ColorEdit3( "Colour", fltColour );
+			if( ImGui::ColorEdit3( "Colour", fltColour ) )
+			{
+				m_debugWireframeColour = glm::vec3( fltColour[0], fltColour[1], fltColour[2] );
+			}
 
 			ImGui::TreePop();
 		}
@@ -172,52 +179,52 @@ namespace dd
 
 				if( ImGui::TreeNodeEx( lightLabel.c_str(), ImGuiTreeNodeFlags_CollapsingHeader ) )
 				{
-					bool directional = light.Read()->IsDirectional();
+					bool directional = light.Read()->IsDirectional;
 					if( ImGui::Checkbox( "Directional?", &directional ) )
 					{
-						light.Write()->SetDirectional( directional );
+						light.Write()->IsDirectional = directional;
 					}
 
-					glm::vec3 colour = light.Read()->GetColour();
-					float fltColor[3];
-					fltColor[0] = colour.r; fltColor[1] = colour.g; fltColor[2] = colour.b;
-					if( ImGui::ColorEdit3( "Colour", fltColor ) )
+					glm::vec3 colour = light.Read()->Colour;
+					float fltColour[3];
+					fltColour[0] = colour.r; fltColour[1] = colour.g; fltColour[2] = colour.b;
+					if( ImGui::ColorEdit3( "Colour", fltColour ) )
 					{
-						light.Write()->SetColour( glm::vec3( fltColor[0], fltColor[1], fltColor[2] ) );
+						light.Write()->Colour = glm::vec3( fltColour[0], fltColour[1], fltColour[2] );
 					}
 
-					float intensity = light.Read()->GetIntensity();
+					float intensity = light.Read()->Intensity;
 					if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
 					{
-						light.Write()->SetIntensity( intensity );
+						light.Write()->Intensity = intensity;
 					}
 
-					float attenuation = light.Read()->GetAttenuation();
+					float attenuation = light.Read()->Attenuation;
 					if( ImGui::DragFloat( "Attenuation", &attenuation, 0.01, 0, 1 ) )
 					{
-						light.Write()->SetAttenuation( attenuation );
+						light.Write()->Attenuation = attenuation;
 					}
 
 					glm::vec3 position = transform.Read()->GetLocalPosition();
 					float fltPosition[3];
 					fltPosition[0] = position.x; fltPosition[1] = position.y; fltPosition[2] = position.z;
 
-					const char* positionLabel = light.Read()->IsDirectional() ? "Direction" : "Position";
+					const char* positionLabel = light.Read()->IsDirectional ? "Direction" : "Position";
 					if( ImGui::DragFloat3( positionLabel, fltPosition ) )
 					{
 						transform.Write()->SetLocalPosition( glm::vec3( fltPosition[0], fltPosition[1], fltPosition[2] ) );
 					}
 
-					float ambient = light.Read()->GetAmbient();
+					float ambient = light.Read()->Ambient;
 					if( ImGui::SliderFloat( "Ambient", &ambient, 0.0f, 1.0f ) )
 					{
-						light.Write()->SetAmbient( ambient );
+						light.Write()->Ambient = ambient;
 					}
 
-					float specular = light.Read()->GetSpecular();
+					float specular = light.Read()->Specular;
 					if( ImGui::SliderFloat( "Specular", &specular, 0.0f, 1.0f ) )
 					{
-						light.Write()->SetSpecular( specular );
+						light.Write()->Specular = specular;
 					}
 
 					if( ImGui::Button( "Delete" ) )
@@ -340,17 +347,17 @@ namespace dd
 					ComponentHandle<LightComponent> lightCmp = light.Get<LightComponent>();
 
 					glm::vec4 position( transformCmp.Read()->GetWorldPosition(), 1 );
-					if( lightCmp.Read()->IsDirectional() )
+					if( lightCmp.Read()->IsDirectional )
 					{
 						position.w = 0;
 					}
 
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "Position" ).c_str(), position );
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "Colour" ).c_str(), lightCmp.Read()->GetColour() );
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "Intensity" ).c_str(), lightCmp.Read()->GetIntensity() );
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "Attenuation" ).c_str(), lightCmp.Read()->GetAttenuation() );
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "AmbientStrength" ).c_str(), lightCmp.Read()->GetAmbient() );
-					shader->SetUniform( GetArrayUniformName( "Lights", index + 1, "SpecularStrength" ).c_str(), lightCmp.Read()->GetSpecular() );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "Position" ).c_str(), position );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "Colour" ).c_str(), lightCmp.Read()->Colour );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "Intensity" ).c_str(), lightCmp.Read()->Intensity );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "Attenuation" ).c_str(), lightCmp.Read()->Attenuation );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "AmbientStrength" ).c_str(), lightCmp.Read()->Ambient );
+					shader->SetUniform( GetArrayUniformName( "Lights", index, "SpecularStrength" ).c_str(), lightCmp.Read()->Specular );
 
 					++index;
 				}
@@ -363,7 +370,6 @@ namespace dd
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
-				mesh->SetWireframe( m_debugWireframe );
 				mesh->Render( *m_camera, transform );
 
 				++m_frustumMeshCount;
@@ -397,7 +403,7 @@ namespace dd
 		glm::mat4 transform = glm::translate( glm::vec3( 0 ) ) * glm::scale( glm::vec3( 0.1f ) );
 		EntityHandle entity = CreateMeshEntity( entityManager, m_unitCube, m_shaders[ 0 ], glm::vec4( 1 ), transform );
 		ComponentHandle<LightComponent> light = entityManager.AddComponent<LightComponent>( entity );
-		light.Write()->SetAmbient( 0.01f );
+		light.Write()->Ambient = 0.01f;
 
 		return entity;
 	}
@@ -416,9 +422,12 @@ namespace dd
 			m_deleteLight = EntityHandle();
 		}
 
-		entityManager.ForAllWithReadable<MeshComponent, LightComponent>( []( auto entity, auto mesh, auto pointLight )
+		entityManager.ForAllWithReadable<MeshComponent, LightComponent>( []( auto entity, auto mesh, auto light )
 		{
-			mesh.Write()->Colour = glm::vec4( pointLight.Read()->GetColour(), 1 );
+			if( mesh.Write() != nullptr )
+			{
+				mesh.Write()->Colour = glm::vec4( light.Read()->Colour, 1);
+			}
 		} );
 	}
 

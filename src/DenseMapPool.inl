@@ -102,7 +102,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* DenseMapPool<T>::Create( const EntityHandle& entity )
+	T* DenseMapPool<T>::Create( EntityHandle entity )
 	{
 		// already allocated!
 		T* pCmp = Find( entity );
@@ -122,20 +122,20 @@ namespace dd
 	}
 
 	template <typename T>
-	T* DenseMapPool<T>::Find( const EntityHandle& entity ) const
+	T* DenseMapPool<T>::Find( EntityHandle entity ) const
 	{
 		T* value = m_components.Find( entity.ID );
 		return value;
 	}
 
 	template <typename T>
-	void DenseMapPool<T>::Remove( const EntityHandle& entity )
+	void DenseMapPool<T>::Remove( EntityHandle entity )
 	{
 		m_components.Remove( entity.ID );
 	}
 
 	template <typename T>
-	bool DenseMapPool<T>::Exists( const EntityHandle& entity ) const
+	bool DenseMapPool<T>::Exists( EntityHandle entity ) const
 	{
 		T* cmp = Find( entity );
 

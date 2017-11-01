@@ -77,7 +77,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* SortedVectorPool<T>::Create( const EntityHandle& entity )
+	T* SortedVectorPool<T>::Create( EntityHandle entity )
 	{
 		// use insertion with a binary search to make sure we keep the list in order
 		int min = 0;
@@ -129,7 +129,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* SortedVectorPool<T>::Find( const EntityHandle& entity ) const
+	T* SortedVectorPool<T>::Find( EntityHandle entity ) const
 	{
 		int min = 0;
 		int max = (int) m_components.Size();
@@ -162,7 +162,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void SortedVectorPool<T>::Remove( const EntityHandle& entity )
+	void SortedVectorPool<T>::Remove( EntityHandle entity )
 	{
 		int min = 0;
 		int max = (int) m_components.Size();
@@ -198,7 +198,7 @@ namespace dd
 	}
 
 	template <typename T>
-	bool SortedVectorPool<T>::Exists( const EntityHandle& entity ) const
+	bool SortedVectorPool<T>::Exists( EntityHandle entity ) const
 	{
 		T* cmp = Find( entity );
 

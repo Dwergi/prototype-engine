@@ -111,7 +111,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* DenseVectorPool<T>::Create( const EntityHandle& entity )
+	T* DenseVectorPool<T>::Create( EntityHandle entity )
 	{
 		// already allocated!
 		if( Exists( entity ) )
@@ -139,7 +139,7 @@ namespace dd
 
 	template <typename T>
 	template <typename... Args>
-	virtual T* DenseVectorPool<T>::Construct( const EntityHandle& entity, Args&&... args )
+	virtual T* DenseVectorPool<T>::Construct( EntityHandle entity, Args&&... args )
 	{
 		// already allocated!
 		if( Exists( entity ) )
@@ -166,7 +166,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* DenseVectorPool<T>::Find( const EntityHandle& entity ) const
+	T* DenseVectorPool<T>::Find( EntityHandle entity ) const
 	{
 		if( !Exists( entity ) )
 		{
@@ -179,7 +179,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void DenseVectorPool<T>::Remove( const EntityHandle& entity )
+	void DenseVectorPool<T>::Remove( EntityHandle entity )
 	{
 		if( entity.ID >= (int) m_components.Size() )
 		{
@@ -193,7 +193,7 @@ namespace dd
 	}
 
 	template <typename T>
-	bool DenseVectorPool<T>::Exists( const EntityHandle& entity ) const
+	bool DenseVectorPool<T>::Exists( EntityHandle entity ) const
 	{
 		if( entity.ID >= (int) m_components.Size() )
 			return false;

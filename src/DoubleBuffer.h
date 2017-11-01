@@ -31,6 +31,10 @@ namespace dd
 
 		virtual void Duplicate() const = 0;
 
+		void* GetWrite() const { return m_write; }
+
+		void* GetRead() const { return m_read; }
+
 	protected:
 
 		void* m_write;
@@ -65,8 +69,14 @@ namespace dd
 		//
 		virtual void Clear() const override;
 
+		//
+		// Get the read buffer.
+		//
 		const T& GetRead() const;
 
+		//
+		// Get the write buffer.
+		//
 		T& GetWrite() const;
 
 		BASIC_TYPE( DoubleBuffer<T> )

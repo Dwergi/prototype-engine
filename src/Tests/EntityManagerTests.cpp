@@ -294,3 +294,14 @@ TEST_CASE( "[EntityHandle] GetAll" )
 	REQUIRE( foo1.Write()->A == foo2.Write()->A );
 	REQUIRE( bar1.Write()->B == bar2.Write()->B );
 }
+
+TEST_CASE( "[EntityManager] Destroy" )
+{
+	EntityHandle foo = s_manager->Create();
+	s_manager->AddComponent<FooComponent>( foo );
+
+	REQUIRE( foo.Has<FooComponent>() );
+	s_manager->Destroy( foo );
+
+	REQUIRE( !foo.IsValid() );
+}

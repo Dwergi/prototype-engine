@@ -5,27 +5,27 @@ namespace dd
 {
 	LightComponent::LightComponent()
 	{
-		m_colour = glm::vec3( 0 );
+		Colour = glm::vec3( 0 );
 	}
 
 	LightComponent::LightComponent( const LightComponent& other )
 	{
-		m_colour = other.m_colour;
-		m_intensity = other.m_intensity;
-		m_ambient = other.m_ambient;
-		m_specular = other.m_specular;
-		m_attenuation = other.m_attenuation;
-		m_directional = other.m_directional;
+		Colour = other.Colour;
+		Intensity = other.Intensity;
+		Ambient = other.Ambient;
+		Specular = other.Specular;
+		Attenuation = other.Attenuation;
+		IsDirectional = other.IsDirectional;
 	}
 
 	LightComponent::LightComponent( LightComponent&& other )
 	{
-		m_colour = other.m_colour;
-		m_intensity = other.m_intensity;
-		m_ambient = other.m_ambient;
-		m_specular = other.m_specular;
-		m_attenuation = other.m_attenuation;
-		m_directional = other.m_directional;
+		Colour = other.Colour;
+		Intensity = other.Intensity;
+		Ambient = other.Ambient;
+		Specular = other.Specular;
+		Attenuation = other.Attenuation;
+		IsDirectional = other.IsDirectional;
 	}
 
 	LightComponent::~LightComponent()
@@ -35,23 +35,24 @@ namespace dd
 
 	LightComponent& LightComponent::operator=( const LightComponent& other )
 	{
-		m_colour = other.m_colour;
-		m_intensity = other.m_intensity;
-		m_ambient = other.m_ambient;
-		m_specular = other.m_specular;
-		m_attenuation = other.m_attenuation;
+		Colour = other.Colour;
+		Intensity = other.Intensity;
+		Ambient = other.Ambient;
+		Specular = other.Specular;
+		Attenuation = other.Attenuation;
+		IsDirectional = other.IsDirectional;
 
 		return *this;
 	}
 
 	LightComponent& LightComponent::operator=( LightComponent&& other )
 	{
-		m_colour = other.m_colour;
-		m_intensity = other.m_intensity;
-		m_ambient = other.m_ambient;
-		m_specular = other.m_specular;
-		m_attenuation = other.m_attenuation;
-		m_directional = other.m_directional;
+		Colour = other.Colour;
+		Intensity = other.Intensity;
+		Ambient = other.Ambient;
+		Specular = other.Specular;
+		Attenuation = other.Attenuation;
+		IsDirectional = other.IsDirectional;
 
 		return *this;
 	}
