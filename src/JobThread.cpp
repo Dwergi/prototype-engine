@@ -14,7 +14,7 @@ namespace dd
 {
 	JobThread::JobThread( JobThread&& other )
 		: m_killed( other.m_killed ),
-		m_owner( std::move( other.m_owner ) ),
+		m_owner( other.m_owner ),
 		m_name( other.m_name )
 	{
 	}

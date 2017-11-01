@@ -94,7 +94,7 @@ namespace dd
 		MeshHandle m_unitCube;
 
 		void CreateDebugMeshGrid( EntityManager& entityManager );
-		EntityHandle CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform );
+		EntityHandle CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform );
 		void CreatePointLight( EntityManager& entityManager, const PointLight& pointLight );
 		void UpdateDebugPointLights( EntityManager& entityManager );
 

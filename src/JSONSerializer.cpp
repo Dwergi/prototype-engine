@@ -160,7 +160,7 @@ namespace dd
 	}
 
 	template <typename T>
-	bool SetPOD( Variable& var, JsonVariant& variant )
+	bool SetPOD( Variable& var, const JsonVariant& variant )
 	{
 		if( !variant.is<T>() )
 			return false;
@@ -173,7 +173,7 @@ namespace dd
 	if( var.Type() == GET_TYPE( T ) ) \
 		return SetPOD<T>( var, variant );
 
-	bool SetPODFromVariant( Variable& var, JsonVariant& variant )
+	bool SetPODFromVariant( Variable& var, const JsonVariant& variant )
 	{
 		POD( bool );
 		POD( int );
@@ -194,7 +194,7 @@ namespace dd
 
 #undef POD
 
-	bool JSONDeserializer::SetArrayFromVariant( Variable& var, JsonVariant& variant )
+	bool JSONDeserializer::SetArrayFromVariant( Variable& var, const JsonVariant& variant )
 	{
 		const TypeInfo* type = var.Type();
 
@@ -228,7 +228,7 @@ namespace dd
 		return true;
 	}
 
-	bool JSONDeserializer::SetObjectFromVariant( Variable& var, JsonVariant& variant )
+	bool JSONDeserializer::SetObjectFromVariant( Variable& var, const JsonVariant& variant )
 	{
 		const TypeInfo* type = var.Type();
 
@@ -244,7 +244,7 @@ namespace dd
 		{
 			Variable member_var( var, member );
 
-			JsonVariant& member_variant = members.get( member.Name().c_str() );
+			const JsonVariant& member_variant = members.get( member.Name().c_str() );
 			if( !member_variant.success() )
 				return false;
 
@@ -258,7 +258,7 @@ namespace dd
 	//
 	// Central decision making for what type we're actually deserializing.
 	// 
-	bool JSONDeserializer::SetFromVariant( Variable& var, JsonVariant& variant )
+	bool JSONDeserializer::SetFromVariant( Variable& var, const JsonVariant& variant )
 	{
 		const TypeInfo* type = var.Type();
 

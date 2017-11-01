@@ -47,9 +47,9 @@ namespace dd
 
 		ReadStream m_stream;
 
-		bool SetFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
-		bool SetArrayFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
-		bool SetObjectFromVariant( Variable& var, ArduinoJson::JsonVariant& variant );
+		bool SetFromVariant( Variable& var, const ArduinoJson::JsonVariant& variant );
+		bool SetArrayFromVariant( Variable& var, const ArduinoJson::JsonVariant& variant );
+		bool SetObjectFromVariant( Variable& var, const ArduinoJson::JsonVariant& variant );
 	};
 	//===================================================================================
 	

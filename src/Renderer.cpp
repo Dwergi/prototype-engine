@@ -100,7 +100,7 @@ namespace dd
 		m_shaders.Clear();
 	}
 
-	EntityHandle Renderer::CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4& colour, const glm::mat4& transform )
+	EntityHandle Renderer::CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform )
 	{
 		EntityHandle handle = entityManager.CreateEntity<TransformComponent, MeshComponent>();
 
