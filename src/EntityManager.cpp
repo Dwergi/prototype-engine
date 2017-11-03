@@ -116,24 +116,24 @@ namespace dd
 		}
 	}
 
-	bool EntityManager::IsEntityValid( const EntityHandle& handle )
+	bool EntityManager::IsEntityValid( EntityHandle entity )
 	{
-		if( handle.ID == EntityHandle::Invalid )
+		if( entity.ID == EntityHandle::Invalid )
 			return false;
 
 		// check readable
-		if( handle.ID < m_entities.GetRead().Size() )
+		if( entity.ID < m_entities.GetRead().Size() )
 		{
-			EntityHandle readEntity = m_entities.GetRead()[ handle.ID ];
-			if( readEntity.Version == handle.Version )
+			EntityHandle readEntity = m_entities.GetRead()[ entity.ID ];
+			if( readEntity.Version == entity.Version )
 				return true;
 		}
 
 		// check writable
-		if( handle.ID < m_entities.GetWrite().Size() )
+		if( entity.ID < m_entities.GetWrite().Size() )
 		{
-			EntityHandle writeEntity = m_entities.GetWrite()[ handle.ID ];
-			if( writeEntity.Version == handle.Version )
+			EntityHandle writeEntity = m_entities.GetWrite()[ entity.ID ];
+			if( writeEntity.Version == entity.Version )
 				return true;
 		}
 		

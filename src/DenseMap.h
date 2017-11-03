@@ -18,6 +18,8 @@ namespace dd
 	class DenseMap
 	{
 		static const int DefaultSize = 16;
+		const float MaxOccupancy = 0.75f;
+		static const int OverflowSize = 16;
 
 	public:
 
@@ -59,9 +61,11 @@ namespace dd
 	private:
 
 		friend class DenseMapIterator<TKey, TValue>;
+		static const int EntrySize = sizeof( Entry );
 
 		int m_entries { 0 };
 		Buffer<Entry> m_data;
+		Buffer<Entry> m_overflow;
 
 		uint64 (*m_hash)( const TKey& );
 

@@ -5,13 +5,13 @@
 //
 
 // A temporary buffer for copying containers around.
-const int BUFFER_SIZE = 1 * 1024 * 1024;
+const int BUFFER_SIZE = 2 * 1024 * 1024;
 static __declspec(thread) char s_buffer[BUFFER_SIZE];
 
 template <typename T>
 void CopyRange( const T* src, T* dest, uint count )
 {
-	DD_ASSERT( (count * sizeof( T )) < BUFFER_SIZE );
+	DD_ASSERT( (count * sizeof( T )) <= BUFFER_SIZE );
 
 	T* temp = reinterpret_cast<T*>(s_buffer);
 

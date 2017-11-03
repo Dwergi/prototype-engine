@@ -62,9 +62,11 @@ AS_DEBUG/
 *.pch
 *.user
 *.opendb
-DD.VC.db
+*.VC.db
 *.log
 *.cache
 *.pdb
 .vs/
-.srctrldb,.srctrlbm,.srctrlprj
+*.srctrldb
+*.srctrlbm
+*.srctrlprj

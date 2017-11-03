@@ -96,7 +96,7 @@ namespace dd
 		{
 			EntityHandle pointLight = CreatePointLight( entityManager );
 			ComponentHandle<LightComponent> light = pointLight.Get<LightComponent>();
-			light.Write()->Colour = glm::vec3( 0.5, 0.5, 0.5 );
+			light.Write()->Colour = glm::vec3( 1 );
 			light.Write()->Intensity = 10;
 
 			ComponentHandle<TransformComponent> transform = pointLight.Get<TransformComponent>();

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ISystem.h"
+#include "TerrainChunkKey.h"
 
 namespace dd
 {

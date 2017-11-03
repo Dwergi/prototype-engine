@@ -69,7 +69,8 @@ vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth )
 {
 	vec3 d = fwidth( triangle );
 	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, triangle );
-	vec4 colour = mix( vec4( wireColour, 1 ), vec4( 0.0 ), min( min( tdist.x, tdist.y ), tdist.z ) );
+	float t = min( min( tdist.x, tdist.y ), tdist.z );
+	vec4 colour = mix( vec4( wireColour, 1 ), vec4( 0.0 ), t );
 	return colour;
 }
 
@@ -79,7 +80,6 @@ void main()
 	if( UseWireframe )
 	{
 		finalColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth );
-		//finalColour = vec4( WireframeDistance, 1 );
 	}
 	else
 	{
@@ -94,6 +94,6 @@ void main()
     	finalColour.rgb = pow( finalColour.rgb, gamma );
 		finalColour.a = Fragment.Colour.a;
 	}
-	//color.rgb = (vec3(1,1,1) + FragmentNormal) * 0.5;
+
 	Colour = finalColour;
-};
+}

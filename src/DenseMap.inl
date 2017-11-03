@@ -57,13 +57,17 @@ namespace dd
 	DenseMap<TKey, TValue>::DenseMap() :
 		m_hash( &Hash )
 	{
+		Entry* overflow = (Entry*) new byte[ EntrySize * OverflowSize ];
+		memset( overflow, 0, EntrySize * OverflowSize );
+		m_overflow.Set( overflow, OverflowSize );
 		Resize( DefaultSize );
 	}
 
 	template <typename TKey, typename TValue>
 	DenseMap<TKey, TValue>::DenseMap( DenseMap&& other ) :
 		m_data( std::move( other.m_data ) ),
-		m_hash( std::move( other.m_hash ) )
+		m_hash( std::move( other.m_hash ) ),
+		m_overflow( std::move( other.m_overflow ) )
 	{
 
 	}
@@ -72,7 +76,12 @@ namespace dd
 	DenseMap<TKey, TValue>::DenseMap( const DenseMap& other ) :
 		m_hash( other.m_hash )
 	{
+		Entry* overflow = (Entry*) new byte[ EntrySize * OverflowSize ];
+		memset( overflow, 0, EntrySize * OverflowSize );
+		m_overflow.Set( overflow, OverflowSize );
+
 		Resize( other.m_data.Size() );
+
 		Rehash( other.m_data );
 	}
 
@@ -115,11 +124,6 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Add( const TKey& key, const TValue& value )
 	{
-		if( m_entries == m_data.Size() )
-		{
-			Grow();
-		}
-
 		Insert( key, value );
 	}
 
@@ -194,6 +198,15 @@ namespace dd
 			}
 		}
 
+		// still not found, check overflow
+		for( int i = 0; i < OverflowSize; ++i )
+		{
+			if( IsMatch( m_overflow[ i ], key ) )
+			{
+				return &m_overflow[ i ];
+			}
+		}
+
 		// not found
 		return nullptr;
 	}
@@ -219,11 +232,9 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Resize( int new_capacity )
 	{
-		Entry* new_data = reinterpret_cast<Entry*>( new byte[new_capacity * sizeof( Entry )] );
-		for( int i = 0; i < new_capacity; ++i )
-		{
-			new_data[i].Used = false;
-		}
+		int byte_size = new_capacity * sizeof( Entry );
+		Entry* new_data = reinterpret_cast<Entry*>( new byte[ byte_size ] );
+		memset( new_data, 0, byte_size );
 
 		Buffer<Entry> old_data( m_data );
 		m_data.Release();
@@ -235,13 +246,27 @@ namespace dd
 
 			for( int i = 0; i < old_data.Size(); ++i )
 			{
-				if( !IsEmpty( old_data[i] ) )
-				{
-					Clear( old_data[i] );
-				}
+				Clear( old_data[i] );
 			}
 
 			delete[] (byte*) old_data.Release();
+
+			byte overflow_data[ OverflowSize * EntrySize ];
+			Entry* old_overflow = (Entry*) overflow_data;
+			memcpy( overflow_data, m_overflow.Get(), OverflowSize * EntrySize );
+
+			for( int i = 0; i < OverflowSize; ++i )
+			{
+				Clear( m_overflow[ i ] );
+			}
+
+			for( int i = 0; i < OverflowSize; ++i )
+			{
+				if( !IsEmpty( old_overflow[ i ] ) )
+				{
+					Insert( old_overflow[ i ].Key, old_overflow[ i ].Value );
+				}
+			}
 		}
 	}
 
@@ -274,15 +299,24 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Clear( typename DenseMap<TKey, TValue>::Entry& entry ) const
 	{
-		entry.Used = false;
-		entry.~Entry();
+		if( !IsEmpty( entry ) )
+		{
+			entry.~Entry();
+		}
+
+		memset( &entry, 0, EntrySize );
 	}
 
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Insert( const TKey& key, const TValue& value )
 	{
-		Entry& entry = GetEntry( key );
+		float occupancy = ((float) m_entries) / m_data.Size();
+		if( occupancy > MaxOccupancy )
+		{
+			Grow();
+		}
 
+		Entry& entry = GetEntry( key );
 		if( IsEmpty( entry ) )
 		{
 			// slot is free, create entry
@@ -307,9 +341,16 @@ namespace dd
 			}
 		}
 
-		// couldn't find a slot, need to grow and try again
-		Grow();
-		Insert( key, value );
+		for( int i = 0; i < m_overflow.Size(); ++i )
+		{
+			if( IsEmpty( m_overflow[ i ] ) )
+			{
+				CreateEntry( &m_overflow[ i ], key, value );
+				return;
+			}
+		}
+
+		DD_ASSERT_FATAL( false, "Overflow full, what the dick?" );
 	}
 
 	template <typename TKey, typename TValue>

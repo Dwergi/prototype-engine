@@ -187,7 +187,8 @@ namespace dd
 
 		for( auto& entry : m_inactiveChunks )
 		{
-			distances.Add( entry.Key, DistanceTo( m_camera.GetPosition(), entry.Key ) );
+			TerrainChunkKey key = entry.Key;
+			distances.Add( key, DistanceTo( m_camera.GetPosition(), key ) );
 		}
 
 		// TODO: This is probably slow as balls. 
@@ -239,7 +240,8 @@ namespace dd
 		// Move previously active chunks to inactive
 		for( auto& entry : activeChunks )
 		{
-			m_inactiveChunks.Add( entry.Key, entry.Value );
+			TerrainChunkKey key = entry.Key;
+			m_inactiveChunks.Add( key, entry.Value );
 		}
 
 		PurgeInactiveChunks();
