@@ -110,6 +110,7 @@ namespace dd
 	Mesh::Mesh( const char* name, ShaderHandle program ) :
 		m_refCount( nullptr ),
 		m_vbo( OpenGL::InvalidID ),
+		m_indexVBO( OpenGL::InvalidID ),
 		m_shader( program ),
 		m_name( name ),
 		m_stride( 0 )
@@ -168,6 +169,19 @@ namespace dd
 		m_vao.Unbind();
 	}
 
+	void Mesh::SetIndices( uint* data, uint count )
+	{
+		m_indices.Set( data, count );
+		
+		m_vao.Bind();
+
+		glGenBuffers( 1, &m_indexVBO );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_indexVBO );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, count * sizeof( uint ), data, GL_STATIC_DRAW );
+
+		m_vao.Unbind();
+	}
+
 	void Mesh::BindAttribute( const char* shaderAttribute, uint components, uint first, bool normalized )
 	{
 		DD_ASSERT( m_data.Get() != nullptr );
@@ -209,7 +223,14 @@ namespace dd
 
 		m_vao.Bind();
 
-		glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
+		if( m_indices.Get() == nullptr )
+		{
+			glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
+		}
+		else
+		{
+			glDrawElements( GL_TRIANGLES, m_indices.Size(), GL_UNSIGNED_INT, 0 );
+		}
 
 		m_vao.Unbind();
 
@@ -232,12 +253,18 @@ namespace dd
 		if( --*m_refCount <= 0 )
 		{
 			glDeleteBuffers( 1, &m_vbo );
+
+			if( m_indices.Get() != nullptr )
+			{
+				glDeleteBuffers( 1, &m_indexVBO );
+			}
 			
 			m_vao.Destroy();
 
 			delete m_refCount;
 
 			m_vbo = OpenGL::InvalidID;
+			m_indexVBO = OpenGL::InvalidID;
 		}
 	}
 

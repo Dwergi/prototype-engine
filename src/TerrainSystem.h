@@ -18,15 +18,15 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : ISystem
+	class TerrainSystem : public ISystem
 	{
 	public:
 
-		static const uint LowDetailChunkSize = 128;
-		static const uint LODLevels = 4;
-		static const uint LowDetailChunksPerDim = 4; // 4 per dimension
-		static const uint ChunksToSplit = 4; // chunks to split at each LOD level
-		static const uint MaxInactiveChunks = 8;
+		static const int LowDetailChunkSize = 128;
+		static const int LODLevels = 4;
+		static const int LowDetailChunksPerDim = 4; // 4 per dimension
+		static const int ChunksToSplit = 4; // chunks to split at each LOD level
+		static const int MaxInactiveChunks = 8;
 
 		TerrainSystem( Camera& camera, JobSystem& jobSystem );
 		~TerrainSystem();
@@ -34,27 +34,26 @@ namespace dd
 		//
 		// Set the size in metres of each chunk.
 		//
-		void SetChunkSize( uint size );
-		uint GetChunkSize() const { return m_chunkSize; }
+		void SetChunkSize( int size ) { m_chunkSize = size; }
+		int GetChunkSize() const { return m_chunkSize; }
 
-		void Initialize( EntityManager& manager );
-		void Update( EntityManager& manager, float delta_t );
-		void Render( Camera& camera, ShaderProgram& shader );
+		void Initialize( EntityManager& entity_manager );
+		void Update( EntityManager& entity_manager, float delta_t );
 
 		void SaveChunkImages() const;
 
 		void WaitForGeneration() const;
 
 	private:
-
-		uint m_chunkSize;
+		
+		int m_chunkSize;
 		Camera& m_camera;
 		JobSystem& m_jobSystem;
 		DenseMap<TerrainChunkKey, TerrainChunk*> m_activeChunks;
 		DenseMap<TerrainChunkKey, TerrainChunk*> m_inactiveChunks;
 
-		void GenerateTerrain( const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
-		void GenerateChunk( const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
-		void PurgeInactiveChunks();
+		void GenerateTerrain( EntityManager& entity_manager, const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
+		void GenerateChunk( EntityManager& entity_manager, const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks );
+		void PurgeInactiveChunks( EntityManager& entity_manager );
 	};
 }

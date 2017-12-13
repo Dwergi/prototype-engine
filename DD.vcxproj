@@ -838,7 +838,6 @@
     <None Include="src\RingBuffer.inl" />
     <None Include="src\AngelScriptEngine.inl" />
     <None Include="src\SortedVectorPool.inl" />
-    <None Include="src\TerrainChunk.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\DenseMapPool.inl" />
     <None Include="src\Vector.inl" />

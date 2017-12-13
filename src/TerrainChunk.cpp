@@ -8,10 +8,12 @@
 #include "TerrainChunk.h"
 
 #include "Camera.h"
+#include "EntityManager.h"
 #include "GLError.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
+#include "Shader.h"
 #include "ShaderProgram.h"
-#include "VAO.h"
-#include "VBO.h"
 
 #include "GL/gl3w.h"
 
@@ -23,49 +25,21 @@
 namespace dd
 {
 	float TerrainChunk::HeightRange = 8.f;
+	float TerrainChunk::Wavelength = 128.0;
+	float TerrainChunk::Amplitudes[Octaves];
 
-	TerrainChunk::IndexBuffer<TerrainChunk::VerticesPerDim, TerrainChunk::VerticesPerDim> TerrainChunk::s_indices;
+	int TerrainChunk::s_indices[(VerticesPerDim - 1) * (VerticesPerDim - 1) * 6];
+
+	ShaderHandle TerrainChunk::s_shader;
 
 	TerrainChunk::TerrainChunk( const TerrainChunkKey& key ) :
-		m_key( key ),
-		m_generated( false ),
-		m_created( false )
+		m_key( key )
 	{
 
 	}
 
 	TerrainChunk::~TerrainChunk()
 	{
-		if( !m_created )
-			return;
-
-		m_vboVertex.Destroy();
-		m_vao.Destroy();
-	}
-
-	void TerrainChunk::CreateRenderResources( ShaderProgram& shader )
-	{
-		if( !m_generated ||	m_created )
-			return;
-
-		m_created = true;
-
-		m_vao.Create();
-		m_vao.Bind();
-
-		s_indices.Create();
-		s_indices.Bind();
-
-		m_vboVertex.Create( GL_ARRAY_BUFFER );
-		m_vboVertex.Bind();
-		m_vboVertex.SetData( &m_vertices[0], sizeof( m_vertices[0] ) * VerticesPerDim * VerticesPerDim );
-
-		m_shader = &shader;
-		m_shader->BindAttributeFloat( "Position", 3, 3, 0, false );
-
-		m_vao.Unbind();
-
-		CheckGLError();
 	}
 
 	float TerrainChunk::GetHeight( float x, float y )
@@ -95,13 +69,63 @@ namespace dd
 		return normalized;
 	}
 
-	void TerrainChunk::Generate()
+	void TerrainChunk::GenerateSharedResources()
 	{
-		if( m_generated )
-			return;
+		uint index = 0;
 
-		m_generated = true;
+		for( uint16 y = 0; y < VerticesPerDim - 1; ++y )
+		{
+			for( uint16 x = 0; x < VerticesPerDim; ++x )
+			{
+				bool first = x == 0;
+				bool last = x == (VerticesPerDim - 1);
 
+				uint16 next_row = (y + 1) * VerticesPerDim + x;
+
+				if( !last )
+				{
+					s_indices[index] = y * VerticesPerDim + x;
+					s_indices[index + 1] = next_row;
+					s_indices[index + 2] = y * VerticesPerDim + x + 1;
+
+					index += 3;
+				}
+
+				if( !first )
+				{
+					s_indices[index] = y * VerticesPerDim + x;
+					s_indices[index + 1] = next_row - 1;
+					s_indices[index + 2] = next_row;
+
+					index += 3;
+				}
+			}
+		}
+
+		Vector<Shader> shaders;
+
+		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
+		DD_ASSERT( vert.IsValid() );
+		shaders.Add( vert );
+
+		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+		DD_ASSERT( geom.IsValid() );
+		shaders.Add( geom );
+
+		Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
+		DD_ASSERT( pixel.IsValid() );
+		shaders.Add( pixel );
+
+		s_shader = ShaderProgram::Create( String8( "terrain" ), shaders );
+	}
+	
+	void TerrainChunk::Destroy( EntityManager& entity_manager )
+	{
+		entity_manager.Destroy( m_entity );
+	}
+
+	void TerrainChunk::Generate( EntityManager& entity_manager )
+	{
 		float offset = (float) m_key.Size / (VerticesPerDim - 1);
 		float height_range = HeightRange / 2; // noise returns between -1 and 1
 
@@ -120,34 +144,17 @@ namespace dd
 				m_vertices[y * VerticesPerDim + x].z = y * offset;
 			}
 		}
-	}
 
-	void TerrainChunk::Render( Camera& camera )
-	{
-		if( !m_generated || !m_created )
-			return;
+		m_entity = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
+		MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
 
-		m_vao.Bind();
+		MeshHandle mesh_h = Mesh::Create( "terrain", s_shader );
+		Mesh* mesh = mesh_h.Get();
+		mesh->SetData( (float*) &m_vertices[0].x, VerticesPerDim * VerticesPerDim * 3, 3 );
 
-		m_shader->Use( true );
+		mesh->BindAttribute( "Position", 3, 0, false );
 
-		glm::mat4 model = glm::translate( glm::vec3( m_key.X, 0, m_key.Y ) );
-
-		m_shader->SetUniform( "Model", model );
-		m_shader->SetUniform( "View", camera.GetCameraMatrix() );
-		m_shader->SetUniform( "Projection", camera.GetProjection() );
-
-		float clr = m_key.Size / 128.f;
-		glm::vec4 colour( clr, clr, clr, 1.0 );
-		m_shader->SetUniform( "colour_multiplier", colour );
-
-		glDrawElements( GL_TRIANGLES, s_indices.Count, GL_UNSIGNED_SHORT, 0 );
-
-		m_shader->Use( false );
-
-		m_vao.Unbind();
-
-		CheckGLError();
+		m_enabled = true;
 	}
 
 	void TerrainChunk::Write( const char* filename )

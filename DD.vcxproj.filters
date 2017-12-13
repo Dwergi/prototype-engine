@@ -839,9 +839,6 @@
     <None Include="src\AngelScriptEngine.inl">
       <Filter>Script\AngelScript</Filter>
     </None>
-    <None Include="src\TerrainChunk.inl">
-      <Filter>Systems</Filter>
-    </None>
     <None Include="src\EntityManager.inl">
       <Filter>Entities</Filter>
     </None>

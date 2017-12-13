@@ -55,6 +55,11 @@ namespace dd
 		void SetData( float* data, uint count, uint stride );
 
 		//
+		// Set the index buffer that the mesh will use.
+		//
+		void SetIndices( uint* data, uint count );
+
+		//
 		// Bind the attribute of the given name and type.
 		//
 		void BindAttribute( const char* shaderAttribute, uint count, uint first, bool normalized );
@@ -76,13 +81,17 @@ namespace dd
 		static std::mutex m_instanceMutex;
 		static DenseMap<uint64, Mesh> m_instances;
 		
+		uint m_indexVBO;
 		uint m_vbo;
 		VAO m_vao;
+
+		Buffer<uint> m_indices;
+		Buffer<float> m_data;
+		uint m_stride;
+
 		String128 m_name;
 		ShaderHandle m_shader;
 		AABB m_bounds;
-		Buffer<float> m_data;
-		uint m_stride;
 		glm::vec4 m_colour;
 
 		std::atomic<int>* m_refCount;

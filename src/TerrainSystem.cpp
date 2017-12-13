@@ -9,12 +9,24 @@
 
 #include "Camera.h"
 #include "JobSystem.h"
+#include "Stream.h"
 #include "TerrainChunk.h"
 
-#include "Stream.h"
+#include <algorithm>
 
 namespace dd
 {
+	struct ChunkDistance
+	{
+		float Distance;
+		TerrainChunkKey* Chunk;
+
+		bool operator<( const ChunkDistance& other )
+		{
+			return Distance < other.Distance;
+		}
+	};
+
 	TerrainSystem::TerrainSystem( Camera& camera, JobSystem& jobSystem ) :
 		m_camera( camera ),
 		m_jobSystem( jobSystem ),
@@ -89,16 +101,10 @@ namespace dd
 		}
 	}
 
-	struct ChunkDistance
-	{
-		TerrainChunkKey* Chunk;
-		float Distance;
-	};
-
 	//
 	// Find the closest num_to_split chunks in chunks to the cam_pos, and create new chunks into split_into.
 	//
-	void SplitChunks( Vector<TerrainChunkKey>& chunks, Vector<TerrainChunkKey>& split_into, const glm::vec3& cam_pos, uint num_to_split )
+	void SplitChunks( Vector<TerrainChunkKey>& chunks, Vector<TerrainChunkKey>& split_into, const glm::vec3& cam_pos, int num_to_split )
 	{
 		Vector<ChunkDistance> distances;
 		distances.Reserve( chunks.Size() );
@@ -110,24 +116,11 @@ namespace dd
 			dist.Distance = DistanceTo( cam_pos, chunk );
 		}
 
-		for( uint i = 0; i < num_to_split; ++i )
-		{
-			ChunkDistance closest;
-			closest.Chunk = nullptr;
-			closest.Distance = std::numeric_limits<float>::max();
-			for( const ChunkDistance& chunk_dist : distances )
-			{
-				if( chunk_dist.Distance < closest.Distance && !chunk_dist.Chunk->IsSplit )
-				{
-					closest.Distance = chunk_dist.Distance;
-					closest.Chunk = chunk_dist.Chunk;
-				}
-			}
+		std::sort( distances.begin(), distances.end() );
 
-			if( closest.Chunk != nullptr )
-			{
-				SplitChunk( *closest.Chunk, split_into );
-			}
+		for( int i = 0; i < num_to_split; ++i )
+		{
+			SplitChunk( *distances[i].Chunk, split_into );
 		}
 	}
 
@@ -136,7 +129,7 @@ namespace dd
 	// If an inactive chunk is found, it is moved to m_activeChunks.
 	// If an active chunk is found, it stays in m_activeChunks.
 	//
-	void TerrainSystem::GenerateChunk( const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
+	void TerrainSystem::GenerateChunk( EntityManager& entity_manager, const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
 	{
 		// find existing chunk
 		TerrainChunk** terrain_chunk = activeChunks.Find( chunk );
@@ -162,12 +155,12 @@ namespace dd
 				TerrainChunk* new_chunk = new TerrainChunk( chunk );
 				m_activeChunks.Add( chunk, new_chunk );
 
-				m_jobSystem.Schedule( std::bind( &TerrainChunk::Generate, new_chunk ), "TerrainGeneration" );
+				new_chunk->Generate( entity_manager );
 			}
 		}
 	}
 
-	void TerrainSystem::GenerateTerrain( const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
+	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager, const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
 	{
 		for( const Vector<TerrainChunkKey>& lod_level : chunks )
 		{
@@ -175,45 +168,46 @@ namespace dd
 			{
 				if( !chunk.IsSplit )
 				{
-					GenerateChunk( chunk, activeChunks );
+					GenerateChunk( entity_manager, chunk, activeChunks );
 				}
 			}
 		}
 	}
 
-	void TerrainSystem::PurgeInactiveChunks()
+	void TerrainSystem::PurgeInactiveChunks( EntityManager& entity_manager )
 	{
-		DenseMap<TerrainChunkKey, float> distances;
+		int to_remove = m_inactiveChunks.Size() - MaxInactiveChunks;
+		if( to_remove <= 0 )
+			return;
+
+		Vector<ChunkDistance> distances;
+		distances.Reserve( m_inactiveChunks.Size() );
 
 		for( auto& entry : m_inactiveChunks )
 		{
-			distances.Add( entry.Key, DistanceTo( m_camera.GetPosition(), entry.Key ) );
+			ChunkDistance& distance = distances.Allocate();
+			distance.Distance = DistanceTo( m_camera.GetPosition(), entry.Key );
+			distance.Chunk = &entry.Key;
 		}
 
-		// TODO: This is probably slow as balls. 
-		while( m_inactiveChunks.Size() > MaxInactiveChunks )
+		std::sort( distances.begin(), distances.end() );
+
+		for( int i = 0; i < to_remove; ++i )
 		{
-			TerrainChunkKey closest;
-			float closest_distance = std::numeric_limits<float>::max();
+			TerrainChunkKey chunk_key = *distances[distances.Size() - i - 1].Chunk;
+			TerrainChunk* chunk = m_inactiveChunks[chunk_key];
 
-			for( auto& entry : distances )
-			{
-				if( entry.Value < closest_distance )
-				{
-					m_inactiveChunks.Remove( entry.Key );
-					distances.Remove( entry.Key );
-					break;
-				}
-			}
+			chunk->Destroy( entity_manager );
+			delete chunk;
 		}
 	}
 
-	void TerrainSystem::Initialize( EntityManager& manager )
+	void TerrainSystem::Initialize( EntityManager& entity_manager )
 	{
-		Update( manager, 0 );
+		Update( entity_manager, 0 );
 	}
 
-	void TerrainSystem::Update( EntityManager& manager, float delta_t )
+	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )
 	{
 		glm::vec3 cam_pos = m_camera.GetPosition();
 		glm::vec2 chunk_origin = glm::vec2( (int) (cam_pos.x / m_chunkSize) * (int) m_chunkSize, (int) (cam_pos.z / m_chunkSize) * (int) m_chunkSize );
@@ -234,29 +228,21 @@ namespace dd
 		DenseMap<TerrainChunkKey, TerrainChunk*> activeChunks( std::move( m_activeChunks ) );
 		m_activeChunks.Clear();
 
-		GenerateTerrain( chunks, activeChunks );
+		GenerateTerrain( entity_manager, chunks, activeChunks );
 
 		// Move previously active chunks to inactive
 		for( auto& entry : activeChunks )
 		{
+			entry.Value->SetEnabled( false );
 			m_inactiveChunks.Add( entry.Key, entry.Value );
 		}
 
-		PurgeInactiveChunks();
+		PurgeInactiveChunks( entity_manager );
 	}
 
 	void TerrainSystem::WaitForGeneration() const
 	{
-		m_jobSystem.WaitForCategory( "TerrainGeneration" );
-	}
-
-	void TerrainSystem::Render( Camera& camera, ShaderProgram& shader )
-	{
-		for( auto& chunk : m_activeChunks )
-		{
-			chunk.Value->CreateRenderResources( shader );
-			chunk.Value->Render( camera );
-		}
+		//m_jobSystem.WaitForCategory( "TerrainGeneration" );
 	}
 
 	void TerrainSystem::SaveChunkImages() const
@@ -277,10 +263,5 @@ namespace dd
 
 			++chunk_index;
 		}
-	}
-
-	void TerrainSystem::SetChunkSize( uint size )
-	{
-		m_chunkSize = size;
 	}
 }

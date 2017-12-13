@@ -7,11 +7,8 @@
 #pragma once
 
 #include "TerrainChunkKey.h"
-#include "VAO.h"
-#include "VBO.h"
-
-#include <atomic>
-#include <memory>
+#include "ShaderProgram.h"
+#include "EntityHandle.h"
 
 namespace dd
 {
@@ -22,47 +19,33 @@ namespace dd
 	{
 	public:
 
-		static float HeightRange;
+		static const int Octaves = 8;
 		static const int VerticesPerDim = 64 + 1;
+
+		static float HeightRange;
+		static float Amplitudes[Octaves];
+		static float Wavelength;
+
+		static void GenerateSharedResources();
 
 		TerrainChunk( const TerrainChunkKey& key );
 		~TerrainChunk();
+		
+		void Generate( EntityManager& entityManager );
+		void Destroy( EntityManager& entityManager );
 
-		void CreateRenderResources( ShaderProgram& shader );
-
-		void Generate();
-		void Render( Camera& camera );
+		void SetEnabled( bool enabled ) { m_enabled = enabled; }
 
 		void Write( const char* filename );
 
 	private:
 
-		template<int Width, int Height>
-		class IndexBuffer
-		{
-		public:
-			static const uint Count = (Width - 1) * (Height - 1) * 6;
+		static int s_indices[(VerticesPerDim - 1) * (VerticesPerDim - 1) * 6];
+		static ShaderHandle s_shader;
 
-			uint16 Indices[Count];
-
-			IndexBuffer();
-			~IndexBuffer();
-			void Create();
-			void Bind();
-
-		private:
-			VBO m_vbo;
-			std::atomic<bool> m_created;
-		};
-
-		static IndexBuffer<VerticesPerDim, VerticesPerDim> s_indices;
-
-		std::atomic<bool> m_generated;
-		std::atomic<bool> m_created;
-
-		VAO m_vao;
-		VBO m_vboVertex;
-		ShaderProgram* m_shader;
+		int m_chunkSize;
+		bool m_enabled;
+		EntityHandle m_entity;
 
 		TerrainChunkKey m_key;
 		glm::vec3 m_vertices[VerticesPerDim * VerticesPerDim];
@@ -70,5 +53,3 @@ namespace dd
 		float GetHeight( float x, float y );
 	};
 }
-
-#include "TerrainChunk.inl"

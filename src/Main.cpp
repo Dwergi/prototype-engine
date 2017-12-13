@@ -313,7 +313,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 	//::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 	{
-		JobSystem jobsystem( 2u );
+		JobSystem jobSystem( 2u );
 		SwarmSystem swarm_system;
 
 		s_window = new Window( 1280, 720, "DD" );
@@ -328,8 +328,8 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		camera.SetPosition( glm::vec3( 0, 5, 0 ) );
 		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
 
-		//TerrainSystem terrain_system( camera );
-		//terrain_system.Initialize( entity_manager );
+		//TerrainSystem terrain_system( camera, jobSystem );
+		//terrain_system.Initialize( entityManager );
 
 		SceneGraphSystem scene_graph;
 
@@ -358,6 +358,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
 		systems.Add( s_shipSystem );
+		//systems.Add( &terrain_system );
 
 		BindKeys( input );
 
@@ -385,7 +386,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			entityManager.Update( delta_t );
 
 			// systems pre-update
-			PreUpdateSystems( jobsystem, entityManager, systems, delta_t );
+			PreUpdateSystems( jobSystem, entityManager, systems, delta_t );
 
 			// input
 			UpdateInput( input, bindings, delta_t );
@@ -397,7 +398,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			UpdateFreeCam( *s_freeCam, input, delta_t );
 
 			// systems update
-			UpdateSystems( jobsystem, entityManager, systems, delta_t );
+			UpdateSystems( jobSystem, entityManager, systems, delta_t );
 
 			// debug UI
 			DrawDebugUI( debug_views );
@@ -406,7 +407,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			Render( renderer, entityManager, console, frame_timer, delta_t );
 
 			// systems post-render
-			PostRenderSystems( jobsystem, entityManager, systems, delta_t );
+			PostRenderSystems( jobSystem, entityManager, systems, delta_t );
 
 			// wait for frame delta
 			frame_timer.DelayFrame();
