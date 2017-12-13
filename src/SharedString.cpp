@@ -119,8 +119,8 @@ namespace dd
 
 		std::lock_guard<std::mutex> lock( s_mutex );
 
-		std::shared_ptr<const char>& instance = s_instances[m_hash];
-		if( instance.unique() )
+		std::shared_ptr<const char>* existing = s_instances.Find( m_hash );
+		if( existing != nullptr && existing->unique() )
 		{
 			// only instance remaining
 			s_instances.Remove( m_hash );

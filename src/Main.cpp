@@ -291,7 +291,7 @@ void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 
 #ifdef _TEST
 
-int TestMain( int argc, char const* argv[] )
+int TestMain( int argc, char* argv[] )
 {
 	int iError = tests::RunTests( argc, argv );
 
@@ -433,7 +433,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 //
 // ENTRY POINT
 //
-int main( int argc, char const* argv[] )
+int main( int argc, char* argv[] )
 {
 	TypeInfo::RegisterDefaultTypes();
 

@@ -9,8 +9,9 @@
 
 #include "EntityManager.h"
 #include "ComponentBase.h"
+#include "DenseMapPool.h"
 #include "DenseVectorPool.h"
-
+#include "SortedVectorPool.h"
 
 using namespace dd;
 
@@ -35,6 +36,42 @@ public:
 
 	BEGIN_TYPE( BarComponent )
 		MEMBER( BarComponent, B )
+	END_TYPE
+};
+
+class DenseVectorComponent : public ComponentBase
+{
+public: 
+	int Integer;
+
+	using Pool = DenseVectorPool<DenseVectorComponent>;
+
+	BEGIN_TYPE( DenseVectorComponent )
+		MEMBER( DenseVectorComponent, Integer )
+	END_TYPE
+};
+
+class SortedVectorComponent : public ComponentBase
+{
+public:
+	int Integer;
+
+	using Pool = SortedVectorPool<SortedVectorComponent>;
+
+	BEGIN_TYPE( SortedVectorComponent )
+		MEMBER( SortedVectorComponent, Integer )
+	END_TYPE
+};
+
+class DenseMapComponent : public ComponentBase
+{
+public:
+	int Integer;
+
+	using Pool = DenseMapPool<DenseMapComponent>;
+
+	BEGIN_TYPE( DenseMapComponent )
+		MEMBER( DenseMapComponent, Integer )
 	END_TYPE
 };
 
@@ -304,4 +341,133 @@ TEST_CASE( "[EntityManager] Destroy" )
 	s_manager->Destroy( foo );
 
 	REQUIRE( !foo.IsValid() );
+}
+
+TEST_CASE( "[EntityManager] Stress Test" )
+{
+	return; // comment to run this, beware, it takes a minute or so
+
+	const int MaxItems = 32 * 1024;
+	const int Iterations = 5;
+	const int Seed = 0;
+	srand( Seed );
+
+	TypeInfo::RegisterComponent<DenseMapComponent>( "DenseMapComponent" );
+	s_manager->RegisterComponent<DenseMapComponent>();
+
+	TypeInfo::RegisterComponent<DenseVectorComponent>( "DenseVectorComponent" );
+	s_manager->RegisterComponent<DenseVectorComponent>();
+
+	TypeInfo::RegisterComponent<SortedVectorComponent>( "SortedVectorComponent" );
+	s_manager->RegisterComponent<SortedVectorComponent>();
+
+	Vector<EntityHandle> entities;
+	entities.Reserve( MaxItems );
+
+	for( int iteration = 0; iteration < Iterations; ++iteration )
+	{
+		BENCHMARK( "Entity Manager Add" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				EntityHandle entity = s_manager->Create();
+				entities.Add( entity );
+			}
+		}
+
+		BENCHMARK( "Dense Map Add" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					s_manager->AddComponent<DenseMapComponent>( entities[ i ] );
+				}
+			}
+		}
+
+		BENCHMARK( "Dense Vector Add" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					s_manager->AddComponent<DenseVectorComponent>( entities[ i ] );
+				}
+			}
+		}
+
+		BENCHMARK( "Sorted Vector Add" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					s_manager->AddComponent<SortedVectorComponent>( entities[ i ] );
+				}
+			}
+		}
+
+
+		s_manager->Update( 1.0f );
+
+		BENCHMARK( "Dense Map Remove" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					EntityHandle entity = entities[ i ];
+					if( entity.Has<DenseMapComponent>() )
+					{
+						s_manager->RemoveComponent<DenseMapComponent>( entity );
+					}
+				}
+			}
+		}
+
+		BENCHMARK( "Dense Vector Remove" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					EntityHandle entity = entities[ i ];
+					if( entity.Has<DenseVectorComponent>() )
+					{
+						s_manager->RemoveComponent<DenseVectorComponent>( entity );
+					}
+				}
+			}
+		}
+
+		BENCHMARK( "Sorted Vector Remove" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				if( rand() % 2 == 0 )
+				{
+					EntityHandle entity = entities[ i ];
+					if( entity.Has<SortedVectorComponent>() )
+					{
+						s_manager->RemoveComponent<SortedVectorComponent>( entity );
+					}
+				}
+			}
+		}
+
+		s_manager->Update( 1.0f );
+
+		BENCHMARK( "Destroy" )
+		{
+			for( int i = 0; i < MaxItems; ++i )
+			{
+				s_manager->Destroy( entities[ i ] );
+			}
+		}
+
+		s_manager->Update( 1.0f );
+
+		entities.Clear();
+	}
 }

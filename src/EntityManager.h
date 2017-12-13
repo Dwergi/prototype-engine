@@ -170,7 +170,7 @@ namespace dd
 		template <typename Component, std::size_t Index>
 		void CreateComponent( EntityHandle handle );
 
-		bool IsEntityValid( const EntityHandle& entity );
+		bool IsEntityValid( EntityHandle entity );
 
 		template <typename Component>
 		DoubleBuffer<typename Component::Pool>* GetPool() const;

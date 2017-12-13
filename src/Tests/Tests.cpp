@@ -9,8 +9,10 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch/catch.hpp"
 
-int tests::RunTests( int argc, char const* argv[] )
+int tests::RunTests( int argc, char* argv[] )
 {
 	Catch::Session session;
+	Catch::ConfigData& config = session.configData();
+	config.showDurations = Catch::ShowDurations::Always;
 	return session.run( argc, argv );
 }
