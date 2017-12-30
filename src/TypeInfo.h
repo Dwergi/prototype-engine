@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 namespace dd
 {
 	struct Method
@@ -125,7 +127,7 @@ namespace dd
 		Vector<Method> m_methods;
 
 		static bool sm_defaultsRegistered;
-		static DenseMap<SharedString, TypeInfo*> sm_typeMap;
+		static std::unordered_map<SharedString, TypeInfo*> sm_typeMap;
 
 		static AngelScriptEngine* sm_scriptEngine;
 

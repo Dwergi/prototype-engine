@@ -328,13 +328,13 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		camera.SetPosition( glm::vec3( 0, 5, 0 ) );
 		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
 
-		//TerrainSystem terrain_system( camera, jobSystem );
-		//terrain_system.Initialize( entityManager );
+		TerrainSystem terrain_system( camera, jobSystem );
+		terrain_system.Initialize( entityManager );
 
 		SceneGraphSystem scene_graph;
 
-		TrenchSystem trench_system( camera );
-		trench_system.CreateRenderResources();
+		//TrenchSystem trench_system( camera );
+		//trench_system.CreateRenderResources();
 
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
@@ -355,10 +355,10 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		Vector<ISystem*> systems;
 		systems.Add( &scene_graph );
 		systems.Add( &swarm_system );
-		systems.Add( &trench_system );
+		//systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
 		systems.Add( s_shipSystem );
-		//systems.Add( &terrain_system );
+		systems.Add( &terrain_system );
 
 		BindKeys( input );
 
@@ -372,6 +372,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( &mouse_picking );
 		debug_views.Add( s_freeCam );
 		debug_views.Add( s_shipSystem );
+		debug_views.Add( &terrain_system );
 
 		while( !s_window->ShouldClose() )
 		{

@@ -53,6 +53,8 @@ namespace dd
 		template <typename... Components>
 		void GetAll( ComponentHandle<Components>&... args ) const;
 
+		void Destroy();
+
 		BEGIN_SCRIPT_STRUCT( EntityHandle )
 			MEMBER( EntityHandle, Handle )
 			METHOD( EntityHandle, IsValid )

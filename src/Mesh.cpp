@@ -17,7 +17,7 @@
 namespace dd
 {
 	std::mutex Mesh::m_instanceMutex;
-	DenseMap<uint64, Mesh> Mesh::m_instances;
+	std::unordered_map<uint64, Mesh> Mesh::m_instances;
 
 	float s_unitCube[] = 
 	{
@@ -75,7 +75,13 @@ namespace dd
 	{
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
-		return m_instances.Find( handle.m_hash );
+		auto it = m_instances.find( handle.m_hash );
+		if( it == m_instances.end() )
+		{
+			return nullptr;
+		}
+
+		return &it->second;
 	}
 
 	MeshHandle Mesh::Create( const char* name, ShaderHandle program )
@@ -83,15 +89,15 @@ namespace dd
 		DD_ASSERT( name != nullptr );
 		DD_ASSERT( strlen( name ) > 0 );
 
-		uint64 hash = dd::Hash( name );
-		hash ^= dd::Hash( program.Get()->Name() );
+		uint64 hash = dd::HashString( name, strlen( name ) );
+		hash ^= program.m_hash;
 
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
-		Mesh* mesh = m_instances.Find( hash );
-		if( mesh == nullptr )
+		auto it = m_instances.find( hash );
+		if( it == m_instances.end() )
 		{
-			m_instances.Add( hash, Mesh( name, program ) );
+			m_instances.insert( std::make_pair( hash, Mesh( name, program ) ) );
 		}
 
 		MeshHandle handle;
@@ -104,7 +110,7 @@ namespace dd
 	{
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
-		m_instances.Remove( handle.m_hash );
+		m_instances.erase( handle.m_hash );
 	}
 
 	Mesh::Mesh( const char* name, ShaderHandle program ) :
@@ -156,7 +162,7 @@ namespace dd
 		return *this;
 	}
 
-	void Mesh::SetData( float* data, uint count, uint stride )
+	void Mesh::SetData( float* data, int count, int stride )
 	{
 		m_data.Set( data, count );
 		m_stride = stride;
@@ -169,7 +175,16 @@ namespace dd
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetIndices( uint* data, uint count )
+	void Mesh::UpdateData()
+	{
+		m_vao.Bind();
+
+		glBufferData( GL_ARRAY_BUFFER, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
+
+		m_vao.Unbind();
+	}
+
+	void Mesh::SetIndices( uint* data, int count )
 	{
 		m_indices.Set( data, count );
 		
@@ -229,7 +244,9 @@ namespace dd
 		}
 		else
 		{
-			glDrawElements( GL_TRIANGLES, m_indices.Size(), GL_UNSIGNED_INT, 0 );
+			int size;  
+			glGetBufferParameteriv( GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size );
+			glDrawElements( GL_TRIANGLES, size / sizeof(uint), GL_UNSIGNED_INT, 0 );
 		}
 
 		m_vao.Unbind();

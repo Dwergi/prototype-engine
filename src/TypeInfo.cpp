@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	DenseMap<SharedString, TypeInfo*> TypeInfo::sm_typeMap;
+	std::unordered_map<SharedString, TypeInfo*> TypeInfo::sm_typeMap;
 
 	bool TypeInfo::sm_defaultsRegistered = false;
 
@@ -91,14 +91,13 @@ namespace dd
 
 	const TypeInfo* TypeInfo::GetType( const SharedString& typeName )
 	{
-		DD_ASSERT( sm_typeMap.Contains( typeName ) );
+		DD_ASSERT( sm_typeMap.find( typeName ) != sm_typeMap.end() );
 
-		TypeInfo** pType = sm_typeMap.Find( typeName );
-
-		if( pType == nullptr )
+		auto it = sm_typeMap.find( typeName );
+		if( it == sm_typeMap.end() )
 			return nullptr;
 
-		return *pType;
+		return it->second;
 	}
 
 	bool TypeInfo::IsDerivedFrom( const TypeInfo* type ) const

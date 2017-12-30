@@ -11,7 +11,9 @@
 
 namespace dd
 {
-	MeshComponent::MeshComponent()
+	MeshComponent::MeshComponent() : 
+		Hidden( false ),
+		Colour( glm::vec4( 1, 1, 1, 1 ) )
 	{
 	}
 	

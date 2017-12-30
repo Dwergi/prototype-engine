@@ -50,7 +50,7 @@ namespace dd
 
 		typeInfo->RegisterFunctions<T>();
 
-		sm_typeMap.Add( SharedString( name ), typeInfo );
+		sm_typeMap.insert( std::make_pair( SharedString( name ), typeInfo ) );
 
 		// register pointer and references as well
 		{
@@ -58,13 +58,13 @@ namespace dd
 			ptrName += "*";
 			TypeInfo* ptrInfo = AccessType<T*>();
 			ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
-			sm_typeMap.Add( SharedString( ptrName ), ptrInfo );
+			sm_typeMap.insert( std::make_pair( SharedString( ptrName ), ptrInfo ) );
 
 			String64 refName( name );
 			refName += "&";
 			TypeInfo* refInfo = AccessType<T&>();
 			refInfo->Init( refName.c_str(), sizeof( T& ) );
-			sm_typeMap.Add( SharedString( refName ), refInfo );
+			sm_typeMap.insert( std::make_pair( SharedString( refName ), refInfo ) );
 		}
 
 		T::RegisterMembers( typeInfo );
@@ -93,7 +93,7 @@ namespace dd
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
 
-		sm_typeMap.Add( SharedString( name ), typeInfo );
+		sm_typeMap.insert( std::make_pair( SharedString( name ), typeInfo ) );
 		
 		RegisterContainer<Vector<T>, T>( "dd::Vector", typeInfo );
 
@@ -123,7 +123,7 @@ namespace dd
 		typeInfo->ElementAt = dd::ElementAt<TContainer>;
 		typeInfo->InsertElement = dd::InsertElement<TContainer, TItem>;
 
-		sm_typeMap.Add( SharedString( finalName ), typeInfo );
+		sm_typeMap.insert( std::make_pair( SharedString( finalName ), typeInfo ) );
 
 		return typeInfo;
 	}

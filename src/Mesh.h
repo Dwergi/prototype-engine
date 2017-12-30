@@ -12,6 +12,7 @@
 
 #include <atomic>
 #include <memory>
+#include <unordered_map>
 
 namespace dd
 {
@@ -52,12 +53,17 @@ namespace dd
 		// Set the vertex buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetData( float* data, uint count, uint stride );
+		void SetData( float* data, int count, int stride );
+
+		//
+		// Send updated mesh data to the GPU from the same place it currently is.
+		//
+		void UpdateData();
 
 		//
 		// Set the index buffer that the mesh will use.
 		//
-		void SetIndices( uint* data, uint count );
+		void SetIndices( uint* data, int count );
 
 		//
 		// Bind the attribute of the given name and type.
@@ -79,7 +85,7 @@ namespace dd
 		friend class MeshHandle;
 
 		static std::mutex m_instanceMutex;
-		static DenseMap<uint64, Mesh> m_instances;
+		static std::unordered_map<uint64, Mesh> m_instances;
 		
 		uint m_indexVBO;
 		uint m_vbo;

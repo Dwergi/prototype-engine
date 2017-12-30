@@ -14,12 +14,14 @@ namespace dd
 			X( 0xFFFFFFF ),
 			Y( 0xFFFFFFF ),
 			Size( 0 ),
-			IsSplit( false ) {}
+			LOD( 0 ) {}
 
-		int64 X;
-		int64 Y;
-		int Size;
-		bool IsSplit;
+		float X;
+		float Y;
+		float Size;
+		int LOD;
+
+		bool operator==( const dd::TerrainChunkKey& other ) const;
 	};
 
 	template <>
@@ -27,4 +29,16 @@ namespace dd
 }
 
 bool operator<( const dd::TerrainChunkKey& a, const dd::TerrainChunkKey& b );
-bool operator==( const dd::TerrainChunkKey& a, const dd::TerrainChunkKey& b );
+
+
+namespace std
+{
+	template <>
+	struct hash<dd::TerrainChunkKey>
+	{
+		std::size_t operator()( const dd::TerrainChunkKey& key ) const
+		{
+			return (std::size_t( key.X ) << 36) + (std::size_t( key.Y ) << 8) + ~(key.LOD & 0xff);
+		}
+	};
+}

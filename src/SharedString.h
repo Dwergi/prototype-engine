@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <mutex>
+#include <functional>
 
 #include "Iteration.h"
 
@@ -59,5 +60,17 @@ namespace dd
 		static DenseMap<uint64, std::shared_ptr<const char>> s_instances;
 
 		void Assign( const char* str );
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<dd::SharedString>
+	{
+		std::size_t operator()( const dd::SharedString& str ) const
+		{
+			return dd::HashString( str.c_str(), str.Length() );
+		}
 	};
 }

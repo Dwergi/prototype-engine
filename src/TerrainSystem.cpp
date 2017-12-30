@@ -14,254 +14,157 @@
 
 #include <algorithm>
 
+#include "imgui/imgui.h"
+
 namespace dd
 {
-	struct ChunkDistance
-	{
-		float Distance;
-		TerrainChunkKey* Chunk;
-
-		bool operator<( const ChunkDistance& other )
-		{
-			return Distance < other.Distance;
-		}
-	};
+	const float TerrainSystem::DefaultVertexDistance = 0.5f;
 
 	TerrainSystem::TerrainSystem( Camera& camera, JobSystem& jobSystem ) :
 		m_camera( camera ),
-		m_jobSystem( jobSystem ),
-		m_chunkSize( LowDetailChunkSize )
+		m_jobSystem( jobSystem )
 	{
-		DD_ASSERT( LowDetailChunkSize / (1 << (LODLevels - 1)) >= 2 );
+		SetVertexDistance( DefaultVertexDistance );
+		SetLODLevels( DefaultLODLevels );
 	}
 
 	TerrainSystem::~TerrainSystem()
 	{
-		for( auto& chunk : m_activeChunks )
-		{
-			delete chunk.Value;
-		}
-
-		for( auto& chunk : m_inactiveChunks )
-		{
-			delete chunk.Value;
-		}
-
-		m_activeChunks.Clear();
+		
 	}
 
-	float DistanceTo( const glm::vec3& pos, const TerrainChunkKey& key )
+	static float DistanceTo( const glm::vec3& pos, const TerrainChunkKey& key )
 	{
 		glm::vec3 chunk_pos( key.X + key.Size / 2, 0, key.Y + key.Size / 2 );
 
 		return glm::distance( pos, chunk_pos );
 	}
 
-	void SplitChunk( TerrainChunkKey& chunk, Vector<TerrainChunkKey>& split_into )
+	void TerrainSystem::ClearChunks( EntityManager& entityManager )
 	{
-		chunk.IsSplit = true;
+		for( auto& chunk : m_chunks )
+		{
+			chunk.second->Destroy( entityManager );
+			delete chunk.second;
+		}
 
-		uint new_size = chunk.Size / 2;
-
-		TerrainChunkKey& bottom_left = split_into.Allocate();
-		bottom_left.Size = new_size;
-		bottom_left.X = chunk.X;
-		bottom_left.Y = chunk.Y;
-
-		TerrainChunkKey& bottom_right = split_into.Allocate();
-		bottom_right.Size = new_size;
-		bottom_right.X = chunk.X + new_size;
-		bottom_right.Y = chunk.Y;
-
-		TerrainChunkKey& top_left = split_into.Allocate();
-		top_left.Size = new_size;
-		top_left.X = chunk.X;
-		top_left.Y = chunk.Y + new_size;
-
-		TerrainChunkKey& top_right = split_into.Allocate();
-		top_right.Size = new_size;
-		top_right.X = chunk.X + new_size;
-		top_right.Y = chunk.Y + new_size;
+		m_chunks.clear();
 	}
 
-	void CreateLowDetailChunks( Vector<TerrainChunkKey>& chunks, glm::vec2 chunk_origin, uint chunk_size, uint chunks_per_dim )
+	void TerrainSystem::SetVertexDistance( float distance )
 	{
-		int half_chunks = (int) chunks_per_dim / 2;
-		int low_detail_chunk_size = (int) chunk_size;
-
-		for( int y = -half_chunks; y < half_chunks; ++y )
-		{
-			for( int x = -half_chunks; x < half_chunks; ++x )
-			{
-				TerrainChunkKey& key = chunks.Allocate();
-				key.Size = low_detail_chunk_size;
-				key.X = int( chunk_origin.x ) + x * low_detail_chunk_size;
-				key.Y = int( chunk_origin.y ) + y * low_detail_chunk_size;
-			}
-		}
+		m_vertexDistance = distance;
+		m_requiresRegeneration = true;
 	}
 
-	//
-	// Find the closest num_to_split chunks in chunks to the cam_pos, and create new chunks into split_into.
-	//
-	void SplitChunks( Vector<TerrainChunkKey>& chunks, Vector<TerrainChunkKey>& split_into, const glm::vec3& cam_pos, int num_to_split )
+	void TerrainSystem::SetLODLevels( int lods )
 	{
-		Vector<ChunkDistance> distances;
-		distances.Reserve( chunks.Size() );
-
-		for( TerrainChunkKey& chunk : chunks )
-		{
-			ChunkDistance& dist = distances.Allocate();
-			dist.Chunk = &chunk;
-			dist.Distance = DistanceTo( cam_pos, chunk );
-		}
-
-		std::sort( distances.begin(), distances.end() );
-
-		for( int i = 0; i < num_to_split; ++i )
-		{
-			SplitChunk( *distances[i].Chunk, split_into );
-		}
+		m_lodLevels = lods;
+		m_requiresRegeneration = true;
 	}
 
-	//
-	// Find or create a single chunk of terrain.
-	// If an inactive chunk is found, it is moved to m_activeChunks.
-	// If an active chunk is found, it stays in m_activeChunks.
-	//
-	void TerrainSystem::GenerateChunk( EntityManager& entity_manager, const TerrainChunkKey& chunk, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
+	void TerrainSystem::Initialize( EntityManager& entityManager )
 	{
-		// find existing chunk
-		TerrainChunk** terrain_chunk = activeChunks.Find( chunk );
-		if( terrain_chunk != nullptr )
-		{
-			// found, add it to the active chunks and continue
-			activeChunks.Remove( chunk );
-			m_activeChunks.Add( chunk, *terrain_chunk );
-		}
-		else
-		{
-			// doesn't exist, find inactive chunk
-			terrain_chunk = m_inactiveChunks.Find( chunk );
-			if( terrain_chunk != nullptr )
-			{
-				// found, add it to the active chunks and continue
-				m_inactiveChunks.Remove( chunk );
-				m_activeChunks.Add( chunk, *terrain_chunk );
-			}
-			else
-			{
-				// doesn't exist, create new
-				TerrainChunk* new_chunk = new TerrainChunk( chunk );
-				m_activeChunks.Add( chunk, new_chunk );
+		TerrainChunk::GenerateSharedResources();
 
-				new_chunk->Generate( entity_manager );
-			}
-		}
+		Update( entityManager, 0 );
 	}
 
-	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager, const Vector<Vector<TerrainChunkKey>>& chunks, DenseMap<TerrainChunkKey, TerrainChunk*>& activeChunks )
+	void TerrainSystem::Update( EntityManager& entityManager, float delta_t )
 	{
-		for( const Vector<TerrainChunkKey>& lod_level : chunks )
+		if( m_requiresRegeneration )
 		{
-			for( const TerrainChunkKey& chunk : lod_level )
-			{
-				if( !chunk.IsSplit )
-				{
-					GenerateChunk( entity_manager, chunk, activeChunks );
-				}
-			}
+			ClearChunks( entityManager );
+
+			GenerateTerrain( entityManager );
+
+			m_requiresRegeneration = false;
 		}
-	}
-
-	void TerrainSystem::PurgeInactiveChunks( EntityManager& entity_manager )
-	{
-		int to_remove = m_inactiveChunks.Size() - MaxInactiveChunks;
-		if( to_remove <= 0 )
-			return;
-
-		Vector<ChunkDistance> distances;
-		distances.Reserve( m_inactiveChunks.Size() );
-
-		for( auto& entry : m_inactiveChunks )
-		{
-			ChunkDistance& distance = distances.Allocate();
-			distance.Distance = DistanceTo( m_camera.GetPosition(), entry.Key );
-			distance.Chunk = &entry.Key;
-		}
-
-		std::sort( distances.begin(), distances.end() );
-
-		for( int i = 0; i < to_remove; ++i )
-		{
-			TerrainChunkKey chunk_key = *distances[distances.Size() - i - 1].Chunk;
-			TerrainChunk* chunk = m_inactiveChunks[chunk_key];
-
-			chunk->Destroy( entity_manager );
-			delete chunk;
-		}
-	}
-
-	void TerrainSystem::Initialize( EntityManager& entity_manager )
-	{
-		Update( entity_manager, 0 );
-	}
-
-	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )
-	{
-		glm::vec3 cam_pos = m_camera.GetPosition();
-		glm::vec2 chunk_origin = glm::vec2( (int) (cam_pos.x / m_chunkSize) * (int) m_chunkSize, (int) (cam_pos.z / m_chunkSize) * (int) m_chunkSize );
-
-		// generate chunk keys
-		Vector<Vector<TerrainChunkKey>> chunks;
-		chunks.Resize( LODLevels );
-
-		// create just low detail chunks
-		CreateLowDetailChunks( chunks[LODLevels - 1], chunk_origin, m_chunkSize, LowDetailChunksPerDim );
-
-		// split it into higher detail
-		for( int lod = LODLevels - 1; lod > 0; --lod )
-		{
-			SplitChunks( chunks[lod], chunks[lod - 1], cam_pos, ChunksToSplit );
-		}
-
-		DenseMap<TerrainChunkKey, TerrainChunk*> activeChunks( std::move( m_activeChunks ) );
-		m_activeChunks.Clear();
-
-		GenerateTerrain( entity_manager, chunks, activeChunks );
-
-		// Move previously active chunks to inactive
-		for( auto& entry : activeChunks )
-		{
-			entry.Value->SetEnabled( false );
-			m_inactiveChunks.Add( entry.Key, entry.Value );
-		}
-
-		PurgeInactiveChunks( entity_manager );
-	}
-
-	void TerrainSystem::WaitForGeneration() const
-	{
-		//m_jobSystem.WaitForCategory( "TerrainGeneration" );
 	}
 
 	void TerrainSystem::SaveChunkImages() const
 	{
-		WaitForGeneration();
-
 		String64 filename( "chunk_" );
 
 		int chunk_index = 0;
 
-		for( auto& chunk : m_activeChunks )
+		for( auto& chunk : m_chunks )
 		{
 			String64 chunk_file( filename );
 			WriteStream write( chunk_file );
-			write.WriteFormat( "%d.tga", chunk_index );
+			write.WriteFormat( "terrain_%d.tga", chunk_index );
 
-			chunk.Value->Write( chunk_file.c_str() );
+			chunk.second->Write( chunk_file.c_str() );
 
 			++chunk_index;
+		}
+	}
+	
+	void TerrainSystem::GenerateTerrain( EntityManager& entityManager )
+	{
+		// start with a 4x4 grid of the lowest LOD level, 
+		// then at each level split the centermost 2x2 grid into a 4x4 grid of one LOD level lower
+		
+		for( int lod = m_lodLevels - 1; lod >= 0; --lod )
+		{
+			GenerateLODLevel( entityManager, lod );
+		}
+	}
+
+	void TerrainSystem::GenerateLODLevel( EntityManager& entityManager, int lod )
+	{
+		const float vertexDistance = m_vertexDistance * (1 << lod);
+		const float chunkSize = TerrainChunk::Vertices * vertexDistance;
+
+		DD_PROFILE_START( TerrainSystem_GenerateLODLevel );
+
+		for( int y = -ChunksPerDimension / 2; y < ChunksPerDimension / 2; ++y )
+		{
+			for( int x = -ChunksPerDimension / 2; x < ChunksPerDimension / 2; ++x )
+			{
+				if( lod != 0 )
+				{
+					// don't generate chunks for the middle-most grid unless we're at LOD 0
+					if( (x == -1 || x == 0) &&
+						(y == -1 || y == 0) )
+					{
+						continue;
+					}
+				}
+
+				TerrainChunkKey key;
+				key.X = x * chunkSize;
+				key.Y = y * chunkSize;
+				key.LOD = lod;
+				key.Size = vertexDistance;
+
+				TerrainChunk* chunk = GenerateChunk( entityManager, key );
+
+				m_chunks.insert( std::make_pair( key, chunk ) );
+			}
+		}
+
+		DD_PROFILE_END();
+	}
+
+	TerrainChunk* TerrainSystem::GenerateChunk( EntityManager& entityManager, const TerrainChunkKey& key )
+	{
+		TerrainChunk* chunk = new TerrainChunk( key );
+		chunk->Generate( entityManager );
+
+		return chunk;
+	}
+
+	void TerrainSystem::DrawDebugInternal()
+	{
+		if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
+		{
+			SetLODLevels( m_lodLevels );
+		}
+
+		if( ImGui::DragFloat( "Vertex Distance", &m_vertexDistance, 0.05f, 0.01f, 2.0f ) )
+		{
+			SetVertexDistance( m_vertexDistance );
 		}
 	}
 }

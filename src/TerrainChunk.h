@@ -20,7 +20,7 @@ namespace dd
 	public:
 
 		static const int Octaves = 8;
-		static const int VerticesPerDim = 64 + 1;
+		static const int Vertices = 4;
 
 		static float HeightRange;
 		static float Amplitudes[Octaves];
@@ -34,21 +34,19 @@ namespace dd
 		void Generate( EntityManager& entityManager );
 		void Destroy( EntityManager& entityManager );
 
-		void SetEnabled( bool enabled ) { m_enabled = enabled; }
-
 		void Write( const char* filename );
 
 	private:
 
-		static int s_indices[(VerticesPerDim - 1) * (VerticesPerDim - 1) * 6];
+		static const int IndexCount = Vertices * Vertices * 6;
+		static const int VertexCount = (Vertices + 1) * (Vertices + 1);
+
+		static uint s_indices[IndexCount];
 		static ShaderHandle s_shader;
 
-		int m_chunkSize;
-		bool m_enabled;
 		EntityHandle m_entity;
-
 		TerrainChunkKey m_key;
-		glm::vec3 m_vertices[VerticesPerDim * VerticesPerDim];
+		glm::vec3 m_vertices[VertexCount];
 
 		float GetHeight( float x, float y );
 	};

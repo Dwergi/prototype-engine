@@ -40,6 +40,17 @@ namespace dd
 		return m_manager != nullptr && m_manager->IsEntityValid( *this );
 	}
 
+	void EntityHandle::Destroy()
+	{
+		if( m_manager != nullptr )
+		{
+			m_manager->Destroy( *this );
+			m_manager = nullptr;
+			
+			Handle = EntityHandle::Invalid;
+		}
+	}
+
 	bool EntityHandle::operator==( const EntityHandle& other ) const
 	{
 		return m_manager == other.m_manager && Handle == other.Handle;

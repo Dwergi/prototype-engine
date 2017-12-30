@@ -30,6 +30,6 @@ namespace dd
 	template <>
 	inline uint64 Hash( const dd::String& value )
 	{
-		return HashBytes( (const uint8*) value.c_str(), value.Length() );
+		return HashBytes( (const byte*) value.c_str(), value.Length() );
 	}
 }

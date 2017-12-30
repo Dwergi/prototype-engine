@@ -28,7 +28,7 @@ namespace dd
 	float TerrainChunk::Wavelength = 128.0;
 	float TerrainChunk::Amplitudes[Octaves];
 
-	int TerrainChunk::s_indices[(VerticesPerDim - 1) * (VerticesPerDim - 1) * 6];
+	uint TerrainChunk::s_indices[IndexCount];
 
 	ShaderHandle TerrainChunk::s_shader;
 
@@ -73,29 +73,32 @@ namespace dd
 	{
 		uint index = 0;
 
-		for( uint16 y = 0; y < VerticesPerDim - 1; ++y )
+		for( uint y = 0; y < Vertices; ++y )
 		{
-			for( uint16 x = 0; x < VerticesPerDim; ++x )
+			for( uint x = 0; x < Vertices + 1; ++x )
 			{
 				bool first = x == 0;
-				bool last = x == (VerticesPerDim - 1);
+				bool last = x == Vertices;
 
-				uint16 next_row = (y + 1) * VerticesPerDim + x;
+				const uint next_row = (y + 1) * (Vertices + 1) + x;
+				const uint current = y * (Vertices + 1) + x;
 
-				if( !last )
+				DD_ASSERT( next_row < (Vertices + 1) * (Vertices + 1) );
+
+				if( !first )
 				{
-					s_indices[index] = y * VerticesPerDim + x;
-					s_indices[index + 1] = next_row;
-					s_indices[index + 2] = y * VerticesPerDim + x + 1;
+					s_indices[index] = current;
+					s_indices[index + 1] = next_row - 1;
+					s_indices[index + 2] = next_row;
 
 					index += 3;
 				}
 
-				if( !first )
+				if( !last )
 				{
-					s_indices[index] = y * VerticesPerDim + x;
-					s_indices[index + 1] = next_row - 1;
-					s_indices[index + 2] = next_row;
+					s_indices[index] = current;
+					s_indices[index + 1] = next_row;
+					s_indices[index + 2] = current + 1;
 
 					index += 3;
 				}
@@ -104,11 +107,11 @@ namespace dd
 
 		Vector<Shader> shaders;
 
-		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
+		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\terrain_vertex.glsl" ), Shader::Type::Vertex );
 		DD_ASSERT( vert.IsValid() );
 		shaders.Add( vert );
 
-		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\terrain_geometry.glsl" ), Shader::Type::Geometry );
 		DD_ASSERT( geom.IsValid() );
 		shaders.Add( geom );
 
@@ -126,49 +129,74 @@ namespace dd
 
 	void TerrainChunk::Generate( EntityManager& entity_manager )
 	{
-		float offset = (float) m_key.Size / (VerticesPerDim - 1);
-		float height_range = HeightRange / 2; // noise returns between -1 and 1
+		DD_PROFILE_START( TerrainChunk_GenerateVerts );
 
-		for( uint y = 0; y < VerticesPerDim; ++y )
+		const float heightRange = HeightRange / 2; // noise returns between -1 and 1
+
+		for( int z = 0; z < Vertices + 1; ++z )
 		{
-			for( uint x = 0; x < VerticesPerDim; ++x )
+			for( int x = 0; x < Vertices + 1; ++x )
 			{
-				float x_coord = m_key.X + x * offset;
-				float y_coord = m_key.Y + y * offset;
+				const float x_coord = m_key.X + x * m_key.Size;
+				const float z_coord = m_key.Y + z * m_key.Size;
 
-				float height = GetHeight( x_coord, y_coord );
+				const int current = z * (Vertices + 1) + x;
+
+				float height = GetHeight( x_coord, z_coord );
 
 				// height is y
-				m_vertices[y * VerticesPerDim + x].y = (1 + height) * height_range;
-				m_vertices[y * VerticesPerDim + x].x = x * offset;
-				m_vertices[y * VerticesPerDim + x].z = y * offset;
+				m_vertices[current].y = (1 + height) * heightRange;
+				m_vertices[current].x = x * m_key.Size;
+				m_vertices[current].z = z * m_key.Size;
 			}
 		}
+		
+		DD_PROFILE_END();
+
+		DD_PROFILE_START( TerrainChunk_CreateEntity );
 
 		m_entity = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
 		MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
 
-		MeshHandle mesh_h = Mesh::Create( "terrain", s_shader );
+		TransformComponent* transform_cmp = m_entity.Get<TransformComponent>().Write();
+		transform_cmp->SetLocalPosition( glm::vec3( m_key.X, 0, m_key.Y ) );
+
+		DD_PROFILE_END();
+
+		DD_PROFILE_START( TerrainChunk_CreateMesh );
+
+		char name[128];
+		sprintf_s( name, 128, "%.2fx%.2f_%d", m_key.X, m_key.Y, m_key.LOD );
+
+		MeshHandle mesh_h = Mesh::Create( name, s_shader );
+
 		Mesh* mesh = mesh_h.Get();
-		mesh->SetData( (float*) &m_vertices[0].x, VerticesPerDim * VerticesPerDim * 3, 3 );
+		mesh->SetData( (float*) &m_vertices[0].x, sizeof( m_vertices ), 3 );
+		mesh->SetIndices( s_indices, sizeof( s_indices ) / sizeof( uint ) );
+
+		mesh_cmp->Mesh = mesh_h;
+
+		s_shader.Get()->Use( true );
 
 		mesh->BindAttribute( "Position", 3, 0, false );
 
-		m_enabled = true;
+		s_shader.Get()->Use( false );
+
+		DD_PROFILE_END();
 	}
 
 	void TerrainChunk::Write( const char* filename )
 	{
-		byte pixels[VerticesPerDim * VerticesPerDim];
+		byte pixels[Vertices * Vertices];
 
-		for( int y = 0; y < VerticesPerDim; ++y )
+		for( int y = 0; y < Vertices; ++y )
 		{
-			for( int x = 0; x < VerticesPerDim; ++x )
+			for( int x = 0; x < Vertices; ++x )
 			{
-				pixels[y * VerticesPerDim + x] = (int) ((m_vertices[y * VerticesPerDim + x].y / HeightRange) * 255);
+				pixels[y * Vertices + x] = (int) ((m_vertices[y * Vertices + x].y / HeightRange) * 255);
 			}
 		}
 
-		stbi_write_tga( filename, VerticesPerDim, VerticesPerDim, 1, pixels );
+		stbi_write_tga( filename, Vertices, Vertices, 1, pixels );
 	}
 }

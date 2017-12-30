@@ -95,6 +95,8 @@ namespace dd
 
 	private:
 		friend class ShaderProgram;
+		friend class Mesh;
+
 		uint64 m_hash;
 	};
 } 
