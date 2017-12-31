@@ -80,6 +80,16 @@ namespace dd
 
 			m_requiresRegeneration = false;
 		}
+
+		glm::vec3 origin = m_camera.GetPosition();
+		origin.y = 0;
+		origin.x = int( origin.x / m_vertexDistance ) * m_vertexDistance;
+		origin.z = int( origin.z / m_vertexDistance ) * m_vertexDistance;
+
+		for( auto& chunk : m_chunks )
+		{
+			chunk.second->Update( origin );
+		}
 	}
 
 	void TerrainSystem::SaveChunkImages() const
@@ -166,5 +176,22 @@ namespace dd
 		{
 			SetVertexDistance( m_vertexDistance );
 		}
+
+		ImGui::DragFloat( "Height Range", &TerrainChunk::HeightRange, 1.0f, 0.0f, 200.0f );
+
+		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			for( int i = 0; i < TerrainChunk::Octaves; ++i )
+			{
+				char name[64];
+				snprintf( name, 64, "Amplitude %d", i );
+
+				ImGui::DragFloat( name, &TerrainChunk::Amplitudes[i], 0.01f, 0.0f, 1.0f );
+			}
+
+			ImGui::TreePop();
+		}
+
+		ImGui::DragFloat( "Wavelength", &TerrainChunk::Wavelength, 1.0f, 0.0f, 512.0f );
 	}
 }

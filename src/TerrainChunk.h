@@ -20,7 +20,7 @@ namespace dd
 	public:
 
 		static const int Octaves = 8;
-		static const int Vertices = 4;
+		static const int Vertices = 8;
 
 		static float HeightRange;
 		static float Amplitudes[Octaves];
@@ -32,6 +32,7 @@ namespace dd
 		~TerrainChunk();
 		
 		void Generate( EntityManager& entityManager );
+		void Update( glm::vec3& origin );
 		void Destroy( EntityManager& entityManager );
 
 		void Write( const char* filename );
@@ -46,8 +47,12 @@ namespace dd
 
 		EntityHandle m_entity;
 		TerrainChunkKey m_key;
-		glm::vec3 m_vertices[VertexCount];
+		glm::vec3 m_vertices[VertexCount * 2]; // vertices and normals
+		glm::vec2 m_lastPosition;
 
 		float GetHeight( float x, float y );
+
+		void UpdateVertices( const glm::vec2& chunkPos );
+		void UpdateNormals();
 	};
 }

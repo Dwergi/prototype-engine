@@ -26,7 +26,7 @@ namespace dd
 {
 	float TerrainChunk::HeightRange = 8.f;
 	float TerrainChunk::Wavelength = 128.0;
-	float TerrainChunk::Amplitudes[Octaves];
+	float TerrainChunk::Amplitudes[Octaves] = { 0.5f, 0.3f, 0.2f, 0.1f, 0.05f, 0.025f, 0.0125f, 0.005f };
 
 	uint TerrainChunk::s_indices[IndexCount];
 
@@ -45,23 +45,20 @@ namespace dd
 	float TerrainChunk::GetHeight( float x, float y )
 	{
 		float height = 0;
-		float amplitude = 0.5f;
-		float wavelength = 128.0f;
+		float wavelength = Wavelength;
 
 		float total_amplitude = 0;
 
-		for( int i = 0; i < 8; ++i )
+		for( int i = 0; i < Octaves; ++i )
 		{
 			float multiplier = 1.f / wavelength;
 			glm::vec2 coord( x * multiplier, y * multiplier );
 
 			float noise = glm::simplex( coord );
 			
-			height += noise * amplitude;
+			height += noise * Amplitudes[i];
 
-			total_amplitude += amplitude;
-
-			amplitude /= 2;
+			total_amplitude += Amplitudes[i];
 			wavelength /= 2;
 		}
 
@@ -107,11 +104,11 @@ namespace dd
 
 		Vector<Shader> shaders;
 
-		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\terrain_vertex.glsl" ), Shader::Type::Vertex );
+		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
 		DD_ASSERT( vert.IsValid() );
 		shaders.Add( vert );
 
-		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\terrain_geometry.glsl" ), Shader::Type::Geometry );
+		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
 		DD_ASSERT( geom.IsValid() );
 		shaders.Add( geom );
 
@@ -124,42 +121,40 @@ namespace dd
 	
 	void TerrainChunk::Destroy( EntityManager& entity_manager )
 	{
-		entity_manager.Destroy( m_entity );
+		if( m_entity.IsValid() )
+		{
+			const MeshComponent* pMesh = m_entity.Get<MeshComponent>().Read();
+			if( pMesh->Mesh.IsValid() )
+			{
+				Mesh::Destroy( pMesh->Mesh );
+			}
+
+			entity_manager.Destroy( m_entity );
+		}
 	}
 
 	void TerrainChunk::Generate( EntityManager& entity_manager )
 	{
-		DD_PROFILE_START( TerrainChunk_GenerateVerts );
-
-		const float heightRange = HeightRange / 2; // noise returns between -1 and 1
+		DD_PROFILE_START( TerrainChunk_InitializeVerts );
 
 		for( int z = 0; z < Vertices + 1; ++z )
 		{
 			for( int x = 0; x < Vertices + 1; ++x )
 			{
-				const float x_coord = m_key.X + x * m_key.Size;
-				const float z_coord = m_key.Y + z * m_key.Size;
-
-				const int current = z * (Vertices + 1) + x;
-
-				float height = GetHeight( x_coord, z_coord );
+				const int current = 2 * z * (Vertices + 1) + 2 * x;
 
 				// height is y
-				m_vertices[current].y = (1 + height) * heightRange;
+				m_vertices[current].y = 0;
 				m_vertices[current].x = x * m_key.Size;
 				m_vertices[current].z = z * m_key.Size;
 			}
 		}
-		
+
 		DD_PROFILE_END();
 
 		DD_PROFILE_START( TerrainChunk_CreateEntity );
 
 		m_entity = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
-		MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
-
-		TransformComponent* transform_cmp = m_entity.Get<TransformComponent>().Write();
-		transform_cmp->SetLocalPosition( glm::vec3( m_key.X, 0, m_key.Y ) );
 
 		DD_PROFILE_END();
 
@@ -171,18 +166,97 @@ namespace dd
 		MeshHandle mesh_h = Mesh::Create( name, s_shader );
 
 		Mesh* mesh = mesh_h.Get();
-		mesh->SetData( (float*) &m_vertices[0].x, sizeof( m_vertices ), 3 );
+		mesh->SetData( (float*) &m_vertices[0].x, sizeof( m_vertices ), 6 );
 		mesh->SetIndices( s_indices, sizeof( s_indices ) / sizeof( uint ) );
 
+		MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
 		mesh_cmp->Mesh = mesh_h;
 
 		s_shader.Get()->Use( true );
 
 		mesh->BindAttribute( "Position", 3, 0, false );
+		mesh->BindAttribute( "Normal", 3, 3, true );
 
 		s_shader.Get()->Use( false );
 
 		DD_PROFILE_END();
+	}
+
+	void TerrainChunk::UpdateNormals()
+	{
+		for( int i = 0; i < IndexCount; i += 3 )
+		{
+			uint indexA = s_indices[i] * 2;
+			uint indexB = s_indices[i + 1] * 2;
+			uint indexC = s_indices[i + 2] * 2;
+
+			glm::vec3 a = m_vertices[indexA];
+			glm::vec3 b = m_vertices[indexB];
+			glm::vec3 c = m_vertices[indexC];
+
+			glm::vec3 normal = glm::normalize( glm::cross( b - a, c - a ) );
+			if( normal.y < 0 )
+			{
+				normal = glm::normalize( glm::cross( c - a, b - a ) );
+
+				// should always be pointing at least a little bit up
+				DD_ASSERT( normal.y > 0 );
+			}
+
+			m_vertices[indexA + 1] = normal;
+			m_vertices[indexB + 1] = normal;
+			m_vertices[indexC + 1] = normal;
+		}
+	}
+
+	void TerrainChunk::UpdateVertices( const glm::vec2& chunkPos )
+	{
+		DD_PROFILE_START( TerrainChunk_GenerateVerts );
+
+		for( int z = 0; z < Vertices + 1; ++z )
+		{
+			for( int x = 0; x < Vertices + 1; ++x )
+			{
+				const float x_coord = chunkPos.x + x * m_key.Size;
+				const float z_coord = chunkPos.y + z * m_key.Size;
+
+				const int current = 2 * z * (Vertices + 1) + 2 * x;
+
+				float height = GetHeight( x_coord, z_coord );
+
+				// height is y
+				m_vertices[current].y = ((1 + height) / 2) * HeightRange;
+			}
+		}
+
+		DD_PROFILE_END();
+	}
+
+	void TerrainChunk::Update( glm::vec3& origin )
+	{
+		glm::vec2 chunkPos = glm::vec2( m_key.X + origin.x, m_key.Y + origin.z );
+
+		if( chunkPos != m_lastPosition )
+		{
+			UpdateVertices( chunkPos );
+			UpdateNormals();
+
+			MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
+			Mesh* mesh = mesh_cmp->Mesh.Get();
+
+			mesh->UpdateData();
+
+			AABB bounds;
+			bounds.Expand( glm::vec3( 0 ) );
+			bounds.Expand( glm::vec3( m_key.Size * Vertices, HeightRange, m_key.Size * Vertices ) );
+
+			mesh->SetBounds( bounds );
+
+			TransformComponent* transform_cmp = m_entity.Get<TransformComponent>().Write();
+			transform_cmp->SetLocalPosition( glm::vec3( chunkPos.x, 0, chunkPos.y ) );
+
+			m_lastPosition = chunkPos;
+		}
 	}
 
 	void TerrainChunk::Write( const char* filename )

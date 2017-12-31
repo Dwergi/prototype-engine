@@ -358,7 +358,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		//systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
 		systems.Add( s_shipSystem );
-		systems.Add( &terrain_system );
+		//systems.Add( &terrain_system );
 
 		BindKeys( input );
 
@@ -400,6 +400,8 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 
 			// systems update
 			UpdateSystems( jobSystem, entityManager, systems, delta_t );
+
+			terrain_system.Update( entityManager, delta_t );
 
 			// debug UI
 			DrawDebugUI( debug_views );

@@ -28,7 +28,7 @@ namespace dd
 
 		static const float DefaultVertexDistance;
 
-		static const int DefaultLODLevels = 8;
+		static const int DefaultLODLevels = 4;
 		static const int ChunksPerDimension = 4;
 
 		TerrainSystem( Camera& camera, JobSystem& jobSystem );

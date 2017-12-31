@@ -8,6 +8,7 @@
 #include "Mesh.h"
 
 #include "Camera.h"
+#include "GLError.h"
 #include "Shader.h"
 
 #include "GL/gl3w.h"
@@ -170,7 +171,9 @@ namespace dd
 		m_vao.Bind();
 
 		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
-		glBufferData( GL_ARRAY_BUFFER, count, data, GL_STATIC_DRAW );
+		glNamedBufferData( m_vbo, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
+
+		CheckGLError();
 
 		m_vao.Unbind();
 	}
@@ -179,7 +182,15 @@ namespace dd
 	{
 		m_vao.Bind();
 
-		glBufferData( GL_ARRAY_BUFFER, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
+		// orphan the buffer
+		glNamedBufferData( m_vbo, m_data.Size(), NULL, GL_STATIC_DRAW );
+
+		CheckGLError();
+
+		// replace it
+		glNamedBufferData( m_vbo, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
+
+		CheckGLError();
 
 		m_vao.Unbind();
 	}
@@ -192,7 +203,12 @@ namespace dd
 
 		glGenBuffers( 1, &m_indexVBO );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_indexVBO );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, count * sizeof( uint ), data, GL_STATIC_DRAW );
+
+		CheckGLError();
+
+		glNamedBufferData( m_indexVBO, count * sizeof( uint ), data, GL_STATIC_DRAW );
+
+		CheckGLError();
 
 		m_vao.Unbind();
 	}
@@ -241,12 +257,14 @@ namespace dd
 		if( m_indices.Get() == nullptr )
 		{
 			glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
+
+			CheckGLError();
 		}
 		else
 		{
-			int size;  
-			glGetBufferParameteriv( GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size );
-			glDrawElements( GL_TRIANGLES, size / sizeof(uint), GL_UNSIGNED_INT, 0 );
+			glDrawElements( GL_TRIANGLES, m_indices.Size(), GL_UNSIGNED_INT, 0 );
+
+			CheckGLError();
 		}
 
 		m_vao.Unbind();

@@ -47,6 +47,10 @@ namespace dd
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
 		const AABB& Bounds() const;
+
+		//
+		// Set the bounds of this mesh.
+		//
 		void SetBounds( const AABB& bounds );
 
 		//
@@ -70,8 +74,14 @@ namespace dd
 		//
 		void BindAttribute( const char* shaderAttribute, uint count, uint first, bool normalized );
 
+		//
+		// Set a colour multiplier that is applied to all vertices of the mesh.
+		//
 		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
 
+		//
+		// Get the shader used for this mesh.
+		//
 		ShaderHandle GetShader() const { return m_shader; }
 
 		void MakeUnitCube();
