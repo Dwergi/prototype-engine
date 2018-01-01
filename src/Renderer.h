@@ -13,7 +13,7 @@
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class DirectionalLightComponent;
 	class EntityManager;
 	class Frustum;
@@ -29,22 +29,17 @@ namespace dd
 	{
 	public:
 
-		Renderer();
+		Renderer( const Window& window );
 		~Renderer();
 
-		void Initialize( Window& window, EntityManager& entityManager );
+		void Initialize( const ICamera& camera, EntityManager& entityManager );
 		void Shutdown();
 
 		//
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		void Render( EntityManager& entityManager, float delta_t );
-
-		//
-		// Retrieve the active camera.
-		//
-		Camera& GetCamera() const;
+		void Render( EntityManager& entityManager, const ICamera& camera, float delta_t );
 
 		//
 		// Set the mouse picking helper to use.
@@ -62,8 +57,7 @@ namespace dd
 
 	private:
 
-		Window* m_window;
-		Camera* m_camera;
+		const Window& m_window;
 		Frustum* m_frustum;
 		MousePicking* m_mousePicking;
 
@@ -72,17 +66,22 @@ namespace dd
 		EntityHandle m_xAxis;
 		EntityHandle m_yAxis;
 		EntityHandle m_zAxis;
-		bool m_drawAxes { true };
 
 		Vector<EntityHandle> m_debugLights;
 
 		int m_meshCount;
 		int m_frustumMeshCount;
 
+		bool m_frustumCulling { true };
+		bool m_debugDrawAxes { true };
+		bool m_debugDrawBounds { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
 		bool m_debugWireframe { false };
+		bool m_debugFreezeFrustum { false };
+		bool m_forceUpdateFrustum { false };
+
 		glm::vec3 m_debugWireframeColour;
 		float m_debugWireframeWidth { 2.0f };
 
@@ -98,6 +97,6 @@ namespace dd
 
 		void SetRenderState();
 
-		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const Vector<EntityHandle>& pointLights, const MousePicking* mouse_picking );
+		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const Vector<EntityHandle>& pointLights, const ICamera& camera, const MousePicking* mouse_picking );
 	};
 }

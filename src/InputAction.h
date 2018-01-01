@@ -23,7 +23,9 @@ namespace dd
 		SELECT_MESH,
 		TOGGLE_DEBUG_UI,
 		TOGGLE_CONSOLE,
-		TOGGLE_FREECAM
+		TOGGLE_FREECAM,
+		ADD_MINOR_TRAUMA,
+		ADD_MAJOR_TRAUMA
 	};
 
 	enum class InputType : unsigned int

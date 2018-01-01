@@ -20,10 +20,12 @@ namespace dd
 
 		void DrawDebug();
 
+		//
+		// Is this debug menu open?
+		//
 		bool& IsDebugOpen() { return m_debugOpen; }
 
 		virtual const char* GetDebugTitle() const = 0;
-
 
 	protected:
 

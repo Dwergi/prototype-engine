@@ -22,4 +22,15 @@ namespace dd
 	{
 		return a >= b ? a : b;
 	}
+
+	template <typename T>
+	T wrap( T value, T min, T max )
+	{
+		value = min + std::fmod( value - min, max - min );
+
+		if( value < 0 )
+			value += max;
+
+		return value;
+	}
 }

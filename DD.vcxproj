@@ -316,7 +316,7 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
@@ -342,6 +342,7 @@
     <ClInclude Include="src\GenericHandle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
+    <ClInclude Include="src\ICamera.h" />
     <ClInclude Include="src\IDebugDraw.h" />
     <ClInclude Include="src\LightComponent.h" />
     <ClInclude Include="src\Math_dd.h" />
@@ -382,6 +383,7 @@
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
     <ClInclude Include="src\ShipComponent.h" />
     <ClInclude Include="src\ShipSystem.h" />
@@ -513,7 +515,7 @@
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
@@ -541,6 +543,7 @@
     <ClCompile Include="src\ScriptSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\StringBinding.cpp" />

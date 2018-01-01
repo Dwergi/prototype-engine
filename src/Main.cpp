@@ -14,13 +14,13 @@
 
 #endif
 
-#include "Camera.h"
 #include "DebugUI.h"
 #include "DoubleBuffer.h"
 #include "EntityManager.h"
 #include "File.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
+#include "FPSCamera.h"
 #include "IDebugDraw.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -36,6 +36,7 @@
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
+#include "ShakyCamera.h"
 #include "ShipComponent.h"
 #include "ShipSystem.h"
 #include "StringBinding.h"
@@ -185,6 +186,8 @@ void BindKeys( Input& input )
 	input.BindKey( 'A', InputAction::LEFT );
 	input.BindKey( 'D', InputAction::RIGHT );
 	input.BindKey( ' ', InputAction::UP );
+	input.BindKey( 'R', InputAction::ADD_MINOR_TRAUMA );
+	input.BindKey( 'T', InputAction::ADD_MAJOR_TRAUMA );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
@@ -270,9 +273,9 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	}
 }
 
-void Render( Renderer& renderer, EntityManager& entity_manager, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
+void Render( Renderer& renderer, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
 {
-	renderer.Render( entity_manager, delta_t );
+	renderer.Render( entity_manager, camera, delta_t );
 
 	ImGui::Render();
 
@@ -319,14 +322,21 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		s_window = new Window( 1280, 720, "DD" );
 		Input input( *s_window );
 
+		InputBindings bindings;
+		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
+		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
+		bindings.RegisterHandler( InputAction::EXIT, &Exit );
+
+		FPSCamera camera( *s_window );
+		camera.SetPosition( glm::vec3( 0, 10, 0 ) );
+		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
+
+		ShakyCamera shakyCam( camera, bindings );
+
 		DebugUI debugUI( *s_window, input );
 
-		Renderer renderer;
-		renderer.Initialize( *s_window, entityManager );
-
-		Camera& camera = renderer.GetCamera();
-		camera.SetPosition( glm::vec3( 0, 5, 0 ) );
-		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
+		Renderer renderer( *s_window );
+		renderer.Initialize( shakyCam, entityManager );
 
 		TerrainSystem terrain_system( camera, jobSystem );
 		terrain_system.Initialize( entityManager );
@@ -335,11 +345,6 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 
 		//TrenchSystem trench_system( camera );
 		//trench_system.CreateRenderResources();
-
-		InputBindings bindings;
-		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
-		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
-		bindings.RegisterHandler( InputAction::EXIT, &Exit );
 
 		s_freeCam = new FreeCameraController( camera );
 		s_freeCam->BindActions( bindings );
@@ -373,6 +378,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( s_freeCam );
 		debug_views.Add( s_shipSystem );
 		debug_views.Add( &terrain_system );
+		debug_views.Add( &shakyCam );
 
 		while( !s_window->ShouldClose() )
 		{
@@ -397,6 +403,7 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 
 			// camera
 			UpdateFreeCam( *s_freeCam, input, delta_t );
+			shakyCam.Update( delta_t );
 
 			// systems update
 			UpdateSystems( jobSystem, entityManager, systems, delta_t );
@@ -407,10 +414,12 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			DrawDebugUI( debug_views );
 
 			// render
-			Render( renderer, entityManager, console, frame_timer, delta_t );
+			Render( renderer, entityManager, shakyCam, console, frame_timer, delta_t );
 
 			// systems post-render
 			PostRenderSystems( jobSystem, entityManager, systems, delta_t );
+
+			camera.SetClean();
 
 			// wait for frame delta
 			frame_timer.DelayFrame();

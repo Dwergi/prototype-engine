@@ -6,19 +6,19 @@
 
 #pragma once
 
-#include "Camera.h"
 #include "IDebugDraw.h"
 #include "Input.h"
 
 namespace dd
 {
+	class FPSCamera;
 	class InputBindings;
 
 	class FreeCameraController : public IDebugDraw
 	{
 	public:
 
-		FreeCameraController( Camera& camera );
+		FreeCameraController( FPSCamera& camera );
 		FreeCameraController( FreeCameraController&& other );
 		~FreeCameraController();
 		
@@ -43,11 +43,8 @@ namespace dd
 	
 	private:
 
-		Camera& m_camera;
+		FPSCamera& m_camera;
 		glm::vec2 m_mouseDelta;
-
-		float m_yaw { 0.0f };
-		float m_pitch { 0.0f };
 
 		bool m_enabled { true };
 		bool m_invert { false };

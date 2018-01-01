@@ -13,7 +13,7 @@
 namespace dd 
 {
 	struct AABB;
-	class Camera;
+	class ICamera;
 	class ShaderProgram;
 
 	class alignas(16) Frustum
@@ -27,8 +27,8 @@ namespace dd
 		//
 		bool Intersects( const AABB& bounds ) const;
 
-		void Render( const Camera& camera, ShaderProgram& shader );
-		void ResetFrustum( const Camera& camera );
+		void Render( const ICamera& camera, ShaderProgram& shader );
+		void ResetFrustum( const ICamera& camera );
 
 		void* operator new( size_t i );
 		void operator delete( void* ptr);
@@ -37,12 +37,13 @@ namespace dd
 
 		glm::vec3 m_corners[8];
 		Plane m_planes[6];
-		glm::mat4 m_invTransform;
+		glm::mat4 m_transform;
+
 		VAO m_vao;
 		VBO m_indices;
 		VBO m_vertices;
 
-		void SetCorners( const Camera& camera );
+		void SetCorners( const ICamera& camera );
 		void UpdateRenderData();
 	};
 }

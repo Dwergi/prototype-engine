@@ -8,9 +8,9 @@
 #include "Renderer.h"
 
 #include "AABB.h"
-#include "Camera.h"
 #include "EntityManager.h"
 #include "Frustum.h"
+#include "ICamera.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "MousePicking.h"
@@ -27,14 +27,11 @@
 
 #include "imgui/imgui.h"
 
-#pragma optimize( "", off )
-
 namespace dd
 {
-	Renderer::Renderer() :
+	Renderer::Renderer( const Window& window ) :
 		m_meshCount( 0 ),
-		m_camera( nullptr ),
-		m_window( nullptr ),
+		m_window( window ),
 		m_frustumMeshCount( 0 )
 	{
 		m_debugWireframeColour = glm::vec3( 0, 1, 0 );
@@ -69,12 +66,10 @@ namespace dd
 		}
 	}
 
-	void Renderer::Initialize( Window& window, EntityManager& entityManager )
+	void Renderer::Initialize( const ICamera& camera, EntityManager& entityManager )
 	{
-		m_window = &window;
-		m_camera = new Camera( *m_window );
 		m_frustum = new Frustum();
-		m_frustum->ResetFrustum( *m_camera );
+		m_frustum->ResetFrustum( camera );
 
 		m_shaders.Add( CreateShaders( "mesh" ) );
 
@@ -114,8 +109,6 @@ namespace dd
 
 		delete m_frustum;
 		m_frustum = nullptr;
-		delete m_camera;
-		m_camera = nullptr;
 
 		m_shaders.Clear();
 	}
@@ -141,11 +134,13 @@ namespace dd
 		ImGui::Text( "Meshes: %d", m_meshCount );
 		ImGui::Text( "Unculled Meshes: %d", m_frustumMeshCount );
 
-		if( ImGui::Checkbox( "Draw Axes", &m_drawAxes ) )
+		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
+
+		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
-			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
-			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
-			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_drawAxes;
+			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
 		}
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
@@ -250,6 +245,12 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Frustum", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
+			if( ImGui::Checkbox( "Freeze", &m_debugFreezeFrustum ) && m_debugFreezeFrustum )
+			{
+				m_forceUpdateFrustum = true;
+			}
+
+			ImGui::Checkbox( "Enable Culling", &m_frustumCulling );
 			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightFrustumMeshes );
 
 			ImGui::TreePop();
@@ -302,14 +303,22 @@ namespace dd
 	}
 
 	void Renderer::RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, ComponentHandle<TransformComponent> transform_handle, 
-		const Vector<EntityHandle>& lights, const MousePicking* mousePicking )
+		const Vector<EntityHandle>& lights, const ICamera& camera, const MousePicking* mousePicking )
 	{
+		glm::mat4 transform = transform_handle.Read()->GetWorldTransform();
+
 		const MeshComponent* mesh_cmp = mesh_handle.Read();
 		Mesh* mesh = mesh_cmp->Mesh.Get();
+		if( m_debugDrawBounds )
+		{
+			mesh = m_unitCube.Get();
+
+			glm::vec3 scale = mesh_cmp->Bounds.Max - mesh_cmp->Bounds.Min;
+			transform = glm::translate( mesh_cmp->Bounds.Center() ) * glm::scale( scale / 2.0f );
+		}
+
 		if( mesh != nullptr && !mesh_cmp->Hidden )
 		{
-			const glm::mat4& transform = transform_handle.Read()->GetWorldTransform();
-
 			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
 
 			if( mousePicking != nullptr )
@@ -326,7 +335,7 @@ namespace dd
 			}
 
 			// check if it intersects with the frustum
-			if( m_frustum->Intersects( mesh_cmp->Bounds ) )
+			if( !m_frustumCulling || m_frustum->Intersects( mesh_cmp->Bounds ) )
 			{
 				if( m_debugHighlightFrustumMeshes )
 				{
@@ -370,7 +379,7 @@ namespace dd
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
-				mesh->Render( *m_camera, transform );
+				mesh->Render( camera, transform );
 
 				++m_frustumMeshCount;
 			}
@@ -431,9 +440,9 @@ namespace dd
 		} );
 	}
 
-	void Renderer::Render( EntityManager& entityManager, float delta_t )
+	void Renderer::Render( EntityManager& entityManager, const ICamera& camera, float delta_t )
 	{
-		DD_ASSERT( m_window->IsContextValid() );
+		DD_ASSERT( m_window.IsContextValid() );
 
 		m_frustumMeshCount = 0;
 		m_meshCount = 0;
@@ -442,21 +451,27 @@ namespace dd
 
 		SetRenderState();
 
-		m_frustum->ResetFrustum( *m_camera );
+		if( !m_debugFreezeFrustum && camera.IsDirty() || m_forceUpdateFrustum )
+		{
+			m_frustum->ResetFrustum( camera );
+
+			m_forceUpdateFrustum = false;
+		}
 
 		UpdateDebugPointLights( entityManager );
 		Vector<EntityHandle> lights = entityManager.FindAllWithReadable<LightComponent, TransformComponent>();
 
-		entityManager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &lights]( auto entity, auto mesh, auto transform )
+		entityManager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &lights, &camera]( auto entity, auto mesh, auto transform )
 		{ 
-			RenderMesh( entity, mesh, transform, lights, m_mousePicking );
+			RenderMesh( entity, mesh, transform, lights, camera, m_mousePicking );
 		} );
 
-		m_debugLights = entityManager.FindAllWithWritable<LightComponent, TransformComponent>();
-	}
+		if( m_debugFreezeFrustum )
+		{
+			ShaderProgram* shader = m_shaders[0].Get();
+			m_frustum->Render( camera, *shader );
+		}
 
-	Camera& Renderer::GetCamera() const
-	{
-		return *m_camera;
+		m_debugLights = entityManager.FindAllWithWritable<LightComponent, TransformComponent>();
 	}
 }

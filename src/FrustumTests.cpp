@@ -8,7 +8,7 @@
 #include "catch/catch.hpp"
 
 #include "Frustum.h"
-#include "Camera.h"
+#include "ICamera.h"
 
 TEST_CASE( "[Frustum]" )
 {

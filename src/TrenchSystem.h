@@ -14,14 +14,14 @@
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class Mesh;
 
 	class TrenchSystem : public ISystem
 	{
 	public: 
 
-		TrenchSystem( Camera& camera );
+		TrenchSystem( const ICamera& camera );
 		TrenchSystem( const TrenchSystem& other ) = delete;
 		~TrenchSystem();
 
@@ -33,7 +33,7 @@ namespace dd
 		MeshHandle m_chunkMesh;
 		ShaderHandle m_shader;
 
-		Camera& m_camera;
+		const ICamera& m_camera;
 		glm::vec3 m_trenchDirection;
 		glm::vec3 m_trenchOrigin;
 		dd::DenseMap<glm::vec3, EntityHandle> m_chunks;

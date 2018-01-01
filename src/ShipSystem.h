@@ -13,7 +13,7 @@
 
 namespace dd
 {
-	class Camera;
+	class FPSCamera;
 	class InputBindings;
 	class ShipComponent;
 	class TransformComponent;
@@ -22,7 +22,7 @@ namespace dd
 	{
 	public:
 
-		ShipSystem( Camera& camera );
+		ShipSystem( FPSCamera& camera );
 		ShipSystem( const ShipSystem& other ) = delete;
 
 		void BindActions( InputBindings& bindings );
@@ -43,7 +43,7 @@ namespace dd
 
 	private:
 
-		Camera& m_camera;
+		FPSCamera& m_camera;
 		glm::vec3 m_nextCameraPos;
 
 		EntityHandle m_lastShip;

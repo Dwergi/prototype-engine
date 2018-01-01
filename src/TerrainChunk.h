@@ -12,7 +12,7 @@
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class ShaderProgram;
 
 	class TerrainChunk
@@ -25,6 +25,7 @@ namespace dd
 		static float HeightRange;
 		static float Amplitudes[Octaves];
 		static float Wavelength;
+		static bool UseDebugColours;
 
 		static void GenerateSharedResources();
 

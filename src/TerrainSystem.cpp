@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "TerrainSystem.h"
 
-#include "Camera.h"
+#include "ICamera.h"
 #include "JobSystem.h"
 #include "Stream.h"
 #include "TerrainChunk.h"
@@ -20,7 +20,7 @@ namespace dd
 {
 	const float TerrainSystem::DefaultVertexDistance = 0.5f;
 
-	TerrainSystem::TerrainSystem( Camera& camera, JobSystem& jobSystem ) :
+	TerrainSystem::TerrainSystem( const ICamera& camera, JobSystem& jobSystem ) :
 		m_camera( camera ),
 		m_jobSystem( jobSystem )
 	{
@@ -167,6 +167,8 @@ namespace dd
 
 	void TerrainSystem::DrawDebugInternal()
 	{
+		ImGui::Checkbox( "Debug Colours", &TerrainChunk::UseDebugColours );
+
 		if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
 		{
 			SetLODLevels( m_lodLevels );

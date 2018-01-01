@@ -351,9 +351,6 @@
     <ClInclude Include="src\PlayerComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -476,6 +473,15 @@
     </ClInclude>
     <ClInclude Include="src\LightComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShakyCamera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICamera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FPSCamera.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -675,9 +681,6 @@
     <ClCompile Include="src\Tests\JobSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -803,6 +806,12 @@
     </ClCompile>
     <ClCompile Include="src\LightComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShakyCamera.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FPSCamera.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "Mesh.h"
 
-#include "Camera.h"
+#include "ICamera.h"
 #include "GLError.h"
 #include "Shader.h"
 
@@ -235,7 +235,7 @@ namespace dd
 		m_bounds = bounds;
 	}
 
-	void Mesh::Render( const Camera& camera, const glm::mat4& transform )
+	void Mesh::Render( const ICamera& camera, const glm::mat4& transform )
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
@@ -248,7 +248,7 @@ namespace dd
 
 		shader.SetUniform( "Model", transform );
 		shader.SetUniform( "View", view );
-		shader.SetUniform( "Projection", camera.GetProjection() );
+		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "ObjectColour", m_colour );
 

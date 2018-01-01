@@ -9,7 +9,7 @@
 #include "PrecompiledHeader.h"
 #include "ShipSystem.h"
 
-#include "Camera.h"
+#include "FPSCamera.h"
 #include "EntityManager.h"
 #include "InputBindings.h"
 #include "MeshComponent.h"
@@ -47,7 +47,7 @@ namespace dd
 		-0.5f,0.0f,-1.0f,	0.0f,-1.0f,0.0f
 	};
 
-	ShipSystem::ShipSystem( Camera& camera ) :
+	ShipSystem::ShipSystem( FPSCamera& camera ) :
 		m_camera( camera )
 	{
 		m_inputs.Add( InputAction::FORWARD, false );
@@ -245,31 +245,34 @@ namespace dd
 
 	void ShipSystem::DrawDebugInternal()
 	{
-		ImGui::Checkbox( "Enabled", &m_enabled );
-
-		TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();
-
-		glm::vec3 pos = transform->GetWorldPosition();
-		ImGui::Text( "Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z );
-
-		ShipComponent* ship = m_lastShip.Get<ShipComponent>().Write();
-
-		glm::vec3 velocity = ship->Velocity;
-		ImGui::Text( "Velocity: %.2f %.2f %.2f", velocity.x, velocity.y, velocity.z );
-
-		ImGui::SliderFloat( "Acceleration", &ship->Acceleration, 0.0f, 100.0f, "%.2f" );
-
-		ImGui::DragFloatRange2( "Speed", &ship->MinimumSpeed, &ship->MaximumSpeed, 1.0f, 0.0f, 100.0f, "%.2f" );
-
-		ImGui::Text( "Current Boost: %.2f", ship->BoostRemaining );
-
-		if( ImGui::TreeNodeEx( "Boost", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		if( m_lastShip.IsValid() )
 		{
-			ImGui::SliderFloat( "Maximum", &ship->BoostMaximum, 0.0f, 100.0f, "%.2f" );
-			ImGui::SliderFloat( "Recharge Rate", &ship->BoostRechargeRate, 0.0f, 100.0f, "%.2f" );
-			ImGui::SliderFloat( "Factor", &ship->BoostFactor, 0.0f, 10.0f, "%.2f" );
+			ImGui::Checkbox( "Enabled", &m_enabled );
 
-			ImGui::TreePop();
+			TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();
+
+			glm::vec3 pos = transform->GetWorldPosition();
+			ImGui::Text( "Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z );
+
+			ShipComponent* ship = m_lastShip.Get<ShipComponent>().Write();
+
+			glm::vec3 velocity = ship->Velocity;
+			ImGui::Text( "Velocity: %.2f %.2f %.2f", velocity.x, velocity.y, velocity.z );
+
+			ImGui::SliderFloat( "Acceleration", &ship->Acceleration, 0.0f, 100.0f, "%.2f" );
+
+			ImGui::DragFloatRange2( "Speed", &ship->MinimumSpeed, &ship->MaximumSpeed, 1.0f, 0.0f, 100.0f, "%.2f" );
+
+			ImGui::Text( "Current Boost: %.2f", ship->BoostRemaining );
+
+			if( ImGui::TreeNodeEx( "Boost", ImGuiTreeNodeFlags_CollapsingHeader ) )
+			{
+				ImGui::SliderFloat( "Maximum", &ship->BoostMaximum, 0.0f, 100.0f, "%.2f" );
+				ImGui::SliderFloat( "Recharge Rate", &ship->BoostRechargeRate, 0.0f, 100.0f, "%.2f" );
+				ImGui::SliderFloat( "Factor", &ship->BoostFactor, 0.0f, 10.0f, "%.2f" );
+
+				ImGui::TreePop();
+			}
 		}
 	}
 }

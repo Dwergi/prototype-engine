@@ -14,7 +14,7 @@
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class EntityManager;
 	class JobSystem;
 	class ShaderProgram;
@@ -26,12 +26,22 @@ namespace dd
 	{
 	public:
 
+		//
+		// The default distance between vertices at LOD 0 (highest detail).
+		//
 		static const float DefaultVertexDistance;
 
+		//
+		// The default number of LODs to use.
+		//
 		static const int DefaultLODLevels = 4;
+
+		//
+		// The number of chunks we have per dimension (X/Y).
+		//
 		static const int ChunksPerDimension = 4;
 
-		TerrainSystem( Camera& camera, JobSystem& jobSystem );
+		TerrainSystem( const ICamera& camera, JobSystem& jobSystem );
 		~TerrainSystem();
 
 		//
@@ -44,14 +54,24 @@ namespace dd
 		//
 		float GetVertexDistance() const { return m_vertexDistance; }
 
+		//
+		// Set the number of LOD levels to use.
+		//
 		void SetLODLevels( int lodLevels );
 
+		//
+		// Get the number of LOD levels in use.
+		//
 		int GetLODLevels() const { return m_lodLevels; }
 		
 		//
 		// Initialize the terrain system. Rendering must be initialized at this point.
 		//
 		void Initialize( EntityManager& entityManager );
+
+		//
+		// Update the terrain system.
+		//
 		void Update( EntityManager& entityManager, float delta_t ) override;
 
 		//
@@ -59,6 +79,9 @@ namespace dd
 		//
 		void SaveChunkImages() const;
 
+		//
+		// The name to display in the debug view list.
+		//
 		const char* GetDebugTitle() const override { return "Terrain"; }
 
 	protected:
@@ -71,7 +94,7 @@ namespace dd
 		float m_vertexDistance;
 		int m_lodLevels;
 
-		Camera& m_camera;
+		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
 

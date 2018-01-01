@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "FreeCameraController.h"
 
+#include "FPSCamera.h"
 #include "InputBindings.h"
 
 #include "glm/gtx/transform.hpp"
@@ -15,16 +16,6 @@
 
 namespace dd
 {
-	float wrap( float value, float min, float max )
-	{
-		value = min + std::fmod( value - min, max - min );
-
-		if( value < 0 )
-			value += max;
-
-		return value;
-	}
-
 	// camera movement speed in meters per second
 	const float MovementSpeed = 10.0f;
 	const float BoostMultiplier = 5.0f;
@@ -33,7 +24,7 @@ namespace dd
 	// mouse sensitivity - 3840 pixels turns 180 degrees
 	const float TurnSpeed = 180.f / 3840.f;
 
-	FreeCameraController::FreeCameraController( Camera& camera ) :
+	FreeCameraController::FreeCameraController( FPSCamera& camera ) :
 		m_camera( camera )
 	{
 		m_mouseDelta = glm::vec2( 0, 0 );
@@ -92,8 +83,8 @@ namespace dd
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
 
-		ImGui::Text( "Yaw: %.2f", m_yaw );
-		ImGui::Text( "Pitch: %.2f", m_pitch );
+		ImGui::Text( "Yaw: %.2f", m_camera.GetYaw() );
+		ImGui::Text( "Pitch: %.2f", m_camera.GetPitch() );
 		
 		glm::vec3 position = m_camera.GetPosition();
 		ImGui::Text( "Position: %.1f, %.1f, %.1f", position.x, position.y, position.z );
@@ -127,30 +118,24 @@ namespace dd
 		DD_PROFILE_SCOPED( FreeCameraController_Update );
 
 		// rotate around up axis, ie. Y
-		m_yaw += m_mouseDelta.x * TurnSpeed;
+		float yaw = m_camera.GetYaw();
+		yaw += m_mouseDelta.x * TurnSpeed;
 
 		float y_delta = m_mouseDelta.y * TurnSpeed;
 
 		if( m_invert )
 			y_delta = -y_delta;
 
-		m_pitch += y_delta;
+		float pitch = m_camera.GetPitch();
+		pitch += y_delta;
 
-		// wrap the x direction
-		m_yaw = wrap( m_yaw, 0, 360 );
+		m_camera.SetRotation( yaw, pitch );
 
-		// clamp the y direction
-		m_pitch = glm::clamp( m_pitch, -89.0f, 89.0f );
-
-		glm::vec3 direction( std::cos( glm::radians( m_pitch ) ) * std::sin( glm::radians( m_yaw ) ),
-							 std::sin( glm::radians( m_pitch ) ),
-							 std::cos( glm::radians( m_pitch ) ) * std::cos( glm::radians( m_yaw ) ) );
-
-		direction = glm::normalize( direction );
+		glm::vec3 direction = m_camera.GetDirection();
 
 		glm::vec3 up = glm::vec3( 0, 1, 0 );
 
-		glm::vec3 right = glm::normalize( glm::cross( direction.xyz(), up ) );
+		glm::vec3 right = glm::normalize( glm::cross( direction, up ) );
 
 		glm::vec3 movement( 0, 0, 0 );
 
@@ -187,8 +172,6 @@ namespace dd
 			position += scaled;
 			m_camera.SetPosition( position );
 		}
-
-		m_camera.SetDirection( direction );
 	}
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )

@@ -16,7 +16,7 @@
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class ShaderProgram;
 
 	class MeshHandle;
@@ -41,7 +41,7 @@ namespace dd
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( const Camera& camera, const glm::mat4& transform );
+		void Render( const ICamera& camera, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.

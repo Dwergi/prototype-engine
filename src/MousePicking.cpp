@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "MousePicking.h"
 
-#include "Camera.h"
+#include "ICamera.h"
 #include "EntityManager.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -21,11 +21,11 @@
 
 namespace dd
 {
-	MousePicking::MousePicking( Window& window, Camera& camera, Input& input )
+	MousePicking::MousePicking( const Window& window, const ICamera& camera, const Input& input ) : 
+		m_window( window ),
+		m_camera( camera ),
+		m_input( input )
 	{
-		m_camera = &camera;
-		m_input = &input;
-		m_window = &window;
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
@@ -47,7 +47,7 @@ namespace dd
 	{
 		if( m_enabled )
 		{
-			Ray mouse_ray = GetScreenRay( m_input->GetMousePosition() );
+			Ray mouse_ray = GetScreenRay( m_input.GetMousePosition() );
 
 			m_focusedMesh = EntityHandle();
 
@@ -119,30 +119,30 @@ namespace dd
 
 	Ray MousePicking::GetScreenRay( const MousePosition& pos ) const
 	{
-		glm::vec3 camera_dir( m_camera->GetDirection() );
+		glm::vec3 camera_dir( m_camera.GetDirection() );
 		glm::vec3 dir( camera_dir );
 		glm::vec3 up( 0, 1, 0 );
 
 		{
-			float width = (float) m_window->GetWidth();
+			float width = (float) m_window.GetWidth();
 			float x_percent = (pos.X - (width / 2)) / width;
-			float hfov = m_camera->GetHorizontalFOV();
+			float hfov = m_camera.GetVerticalFOV() * m_camera.GetAspectRatio();
 			float x_angle = hfov * x_percent;
 
 			dir = glm::rotate( camera_dir, -x_angle, up );
 		}
 
 		{
-			float height = (float) m_window->GetHeight();
+			float height = (float) m_window.GetHeight();
 			float y_percent = (pos.Y - (height / 2)) / height;
-			float vfov = m_camera->GetVerticalFOV();
+			float vfov = m_camera.GetVerticalFOV();
 			float y_angle = vfov * y_percent;
 
-			glm::vec3 right = glm::normalize( glm::cross( m_camera->GetDirection(), up ) );
+			glm::vec3 right = glm::normalize( glm::cross( m_camera.GetDirection(), up ) );
 
 			dir = glm::rotate( dir, -y_angle, right );
 		}
 
-		return Ray( m_camera->GetPosition(), dir );
+		return Ray( m_camera.GetPosition(), dir );
 	}
 }

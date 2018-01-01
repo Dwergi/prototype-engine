@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "TerrainChunk.h"
 
-#include "Camera.h"
+#include "ICamera.h"
 #include "EntityManager.h"
 #include "GLError.h"
 #include "MeshComponent.h"
@@ -29,6 +29,7 @@ namespace dd
 	float TerrainChunk::Amplitudes[Octaves] = { 0.5f, 0.3f, 0.2f, 0.1f, 0.05f, 0.025f, 0.0125f, 0.005f };
 
 	uint TerrainChunk::s_indices[IndexCount];
+	bool TerrainChunk::UseDebugColours = false;
 
 	ShaderHandle TerrainChunk::s_shader;
 
@@ -133,6 +134,40 @@ namespace dd
 		}
 	}
 
+	static glm::vec4 GetMeshColour( const TerrainChunkKey& key )
+	{
+		glm::vec4 colour( 0, 0, 0, 1 );
+
+		int element = key.LOD % 3;
+		int intensity = key.LOD / 3 + 1;
+
+		int xElement = 0;
+		int yElement = 0;
+		switch( element )
+		{
+		case 0:
+			xElement = 1;
+			yElement = 2;
+			break;
+
+		case 1:
+			xElement = 0;
+			yElement = 2;
+			break;
+
+		case 2:
+			xElement = 0;
+			yElement = 1;
+			break;
+		}
+
+		colour[xElement] = std::abs( std::fmod( key.X, 255.f ) ) / 255.f;
+		colour[yElement] = std::abs( std::fmod( key.Y, 255.f ) ) / 255.f;
+		colour[element] = 1.0f / intensity;
+
+		return colour;
+	}
+
 	void TerrainChunk::Generate( EntityManager& entity_manager )
 	{
 		DD_PROFILE_START( TerrainChunk_InitializeVerts );
@@ -168,6 +203,11 @@ namespace dd
 		Mesh* mesh = mesh_h.Get();
 		mesh->SetData( (float*) &m_vertices[0].x, sizeof( m_vertices ), 6 );
 		mesh->SetIndices( s_indices, sizeof( s_indices ) / sizeof( uint ) );
+
+		AABB bounds;
+		bounds.Expand( glm::vec3( 0 ) );
+		bounds.Expand( glm::vec3( m_key.Size * Vertices, HeightRange, m_key.Size * Vertices ) );
+		mesh->SetBounds( bounds );
 
 		MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
 		mesh_cmp->Mesh = mesh_h;
@@ -234,12 +274,22 @@ namespace dd
 
 	void TerrainChunk::Update( glm::vec3& origin )
 	{
+		if( TerrainChunk::UseDebugColours )
+		{
+			MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
+			mesh_cmp->Colour = GetMeshColour( m_key );
+		}
+
 		glm::vec2 chunkPos = glm::vec2( m_key.X + origin.x, m_key.Y + origin.z );
 
 		if( chunkPos != m_lastPosition )
 		{
 			UpdateVertices( chunkPos );
 			UpdateNormals();
+
+			TransformComponent* transform_cmp = m_entity.Get<TransformComponent>().Write();
+			transform_cmp->SetLocalPosition( glm::vec3( chunkPos.x, 0, chunkPos.y ) );
+			transform_cmp->UpdateWorldTransform();
 
 			MeshComponent* mesh_cmp = m_entity.Get<MeshComponent>().Write();
 			Mesh* mesh = mesh_cmp->Mesh.Get();
@@ -248,12 +298,11 @@ namespace dd
 
 			AABB bounds;
 			bounds.Expand( glm::vec3( 0 ) );
-			bounds.Expand( glm::vec3( m_key.Size * Vertices, HeightRange, m_key.Size * Vertices ) );
+			bounds.Expand( glm::vec3( m_key.Size * Vertices, HeightRange + (1 - (m_key.LOD / 10.0f)), m_key.Size * Vertices ) );
 
 			mesh->SetBounds( bounds );
-
-			TransformComponent* transform_cmp = m_entity.Get<TransformComponent>().Write();
-			transform_cmp->SetLocalPosition( glm::vec3( chunkPos.x, 0, chunkPos.y ) );
+			
+			mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 
 			m_lastPosition = chunkPos;
 		}

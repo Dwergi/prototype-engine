@@ -16,7 +16,7 @@ struct GLFWwindow;
 
 namespace dd
 {
-	class Camera;
+	class ICamera;
 	class Input; 
 	class InputBindings;
 	class MeshComponent;
@@ -28,7 +28,7 @@ namespace dd
 	{
 	public:
 
-		MousePicking( Window& window, Camera& camera, Input& input );
+		MousePicking( const Window& window, const ICamera& camera, const Input& input );
 
 		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
@@ -45,9 +45,9 @@ namespace dd
 
 	private:
 
-		Camera* m_camera;
-		Input* m_input;
-		Window* m_window;
+		const ICamera& m_camera;
+		const Input& m_input;
+		const Window& m_window;
 
 		bool m_select { false };
 		bool m_enabled { false };

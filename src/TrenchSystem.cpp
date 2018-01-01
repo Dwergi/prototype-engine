@@ -7,8 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "TrenchSystem.h"
 
-#include "Camera.h"
 #include "EntityManager.h"
+#include "ICamera.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
@@ -67,7 +67,7 @@ On each update:
 
 namespace dd
 {
-	TrenchSystem::TrenchSystem( Camera& camera ) :
+	TrenchSystem::TrenchSystem( const ICamera& camera ) :
 		m_trenchDirection( 0.0f, 0.0f, 1.0f ),
 		m_trenchOrigin( 0.0f, 0.0f, 0.0f ),
 		m_camera( camera )

@@ -8,7 +8,7 @@
 #include "Frustum.h"
 
 #include "AABB.h"
-#include "Camera.h"
+#include "ICamera.h"
 #include "ShaderProgram.h"
 #include "VAO.h"
 
@@ -82,26 +82,34 @@ namespace dd
 	Frustum::Frustum()
 	{
 		m_vao.Create();
+
+		m_vao.Bind();
+
 		m_vertices.Create( GL_ARRAY_BUFFER );
+		m_vertices.Bind();
 
 		m_indices.Create( GL_ELEMENT_ARRAY_BUFFER );
+
 		m_indices.Bind();
 		m_indices.SetData( s_indices, sizeof( s_indices ) );
+
+		m_vao.Unbind();
 	}
 
-	void Frustum::ResetFrustum( const Camera& camera )
+	void Frustum::ResetFrustum( const ICamera& camera )
 	{
 		SetCorners( camera );
 
-		UpdateRenderData();
+		m_transform = camera.GetCameraMatrix();
 	}
 
 	void Frustum::UpdateRenderData()
 	{
 		m_vao.Bind();
 
-		m_vertices.Bind();
 		m_vertices.SetData( m_corners, sizeof( m_corners ) );
+
+		m_vao.Unbind();
 	}
 
 	bool Frustum::Intersects( const AABB& bounds ) const
@@ -132,19 +140,19 @@ namespace dd
 		return true;
 	}
 
-	void Frustum::Render( const Camera& camera, ShaderProgram& shader )
+	void Frustum::Render( const ICamera& camera, ShaderProgram& shader )
 	{
+		UpdateRenderData();
+
 		m_vao.Bind();
-		m_vertices.Bind();
-		m_indices.Bind();
 
 		shader.Use( true );
 
 		shader.BindAttributeFloat( "Position", 3, 3, 0, false );
 
-		shader.SetUniform( "Model", camera.GetCameraMatrix() );
+		shader.SetUniform( "Model", glm::mat4() );
 		shader.SetUniform( "View", camera.GetCameraMatrix() );
-		shader.SetUniform( "Projection", camera.GetProjection() );
+		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 
 		for( int i = 0; i < 6; ++i )
 		{
@@ -158,13 +166,15 @@ namespace dd
 		m_vao.Unbind();
 	}
 	
-	void Frustum::SetCorners( const Camera& camera )
+	void Frustum::SetCorners( const ICamera& camera )
 	{
 		// Work out corners of the frustum
-		float far_height = std::tanf( camera.GetVerticalFOV() ) * camera.GetFar();
+		float tan_fov = std::tanf( camera.GetVerticalFOV() );
+
+		float far_height = tan_fov * camera.GetFar();
 		float far_width = far_height * camera.GetAspectRatio();
 
-		float near_height = std::tanf( camera.GetVerticalFOV() ) * camera.GetNear();
+		float near_height = tan_fov * camera.GetNear();
 		float near_width = near_height * camera.GetAspectRatio();
 
 		glm::vec3 pos = camera.GetPosition();
