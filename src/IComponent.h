@@ -10,20 +10,20 @@
 
 namespace dd
 {
-	class ComponentBase
+	class IComponent
 	{
 	protected:
 
-		ComponentBase() {}
-		ComponentBase( const ComponentBase& other ) : Entity( other.Entity ) {}
+		IComponent() {}
+		IComponent( const IComponent& other ) : Entity( other.Entity ) {}
 
 	public:
-		virtual ~ComponentBase() {}
+		virtual ~IComponent() {}
 
 		EntityHandle Entity;
 
-		BEGIN_TYPE( ComponentBase )
-			MEMBER( ComponentBase, Entity )
+		BEGIN_TYPE( IComponent )
+			MEMBER( IComponent, Entity )
 		END_TYPE
 	};
 }

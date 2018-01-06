@@ -9,7 +9,7 @@
 
 #include "DoubleBuffer.h"
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseVectorPool.h"
 #include "EntityManager.h"
 

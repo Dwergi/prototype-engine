@@ -429,9 +429,6 @@
     <ClInclude Include="src\EntityManager.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComponentBase.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\GenericHandle.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -482,6 +479,12 @@
     </ClInclude>
     <ClInclude Include="src\FPSCamera.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainChunkComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -812,6 +815,9 @@
     </ClCompile>
     <ClCompile Include="src\FPSCamera.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainChunkComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

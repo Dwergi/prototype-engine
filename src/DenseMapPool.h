@@ -10,6 +10,8 @@
 #include "ComponentPairIterator.h"
 #include "DenseMap.h"
 
+#include <unordered_map>
+
 //
 // A component pool for components that are rare(ish).
 // All operations are somewhat more costly than for a dense component pool, but uses less space for large numbers of entities.
@@ -73,7 +75,7 @@ namespace dd
 
 	private:
 
-		DenseMap<int, T> m_components;
+		std::unordered_map<int, T> m_components;
 	};
 }
 

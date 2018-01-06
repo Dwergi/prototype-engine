@@ -8,14 +8,14 @@
 #include "catch/catch.hpp"
 
 #include "EntityManager.h"
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 #include "DenseVectorPool.h"
 #include "SortedVectorPool.h"
 
 using namespace dd;
 
-class FooComponent : public ComponentBase
+class FooComponent : public IComponent
 {
 public:
 	int A;
@@ -27,7 +27,7 @@ public:
 	END_TYPE
 };
 
-class BarComponent : public ComponentBase
+class BarComponent : public IComponent
 {
 public:
 	float B;
@@ -39,7 +39,7 @@ public:
 	END_TYPE
 };
 
-class DenseVectorComponent : public ComponentBase
+class DenseVectorComponent : public IComponent
 {
 public: 
 	int Integer;
@@ -51,7 +51,7 @@ public:
 	END_TYPE
 };
 
-class SortedVectorComponent : public ComponentBase
+class SortedVectorComponent : public IComponent
 {
 public:
 	int Integer;
@@ -63,7 +63,7 @@ public:
 	END_TYPE
 };
 
-class DenseMapComponent : public ComponentBase
+class DenseMapComponent : public IComponent
 {
 public:
 	int Integer;

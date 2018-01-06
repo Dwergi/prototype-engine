@@ -6,9 +6,13 @@
 
 #pragma once
 
+#include "ComponentHandle.h"
 #include "IDebugDraw.h"
 #include "ISystem.h"
+#include "MeshComponent.h"
 #include "TerrainChunkKey.h"
+#include "TerrainChunkComponent.h"
+#include "TransformComponent.h"
 
 #include <unordered_map>
 
@@ -17,8 +21,11 @@ namespace dd
 	class ICamera;
 	class EntityManager;
 	class JobSystem;
+	class MeshComponent;
 	class ShaderProgram;
 	class TerrainChunk;
+	class TerrainChunkComponent;
+	class TransformComponent;
 
 	struct TerrainChunkKey;
 
@@ -27,14 +34,9 @@ namespace dd
 	public:
 
 		//
-		// The default distance between vertices at LOD 0 (highest detail).
-		//
-		static const float DefaultVertexDistance;
-
-		//
 		// The default number of LODs to use.
 		//
-		static const int DefaultLODLevels = 4;
+		static const int DefaultLODLevels = 6;
 
 		//
 		// The number of chunks we have per dimension (X/Y).
@@ -43,16 +45,6 @@ namespace dd
 
 		TerrainSystem( const ICamera& camera, JobSystem& jobSystem );
 		~TerrainSystem();
-
-		//
-		// Set the distance in metres between vertices at the maximum resolution.
-		//
-		void SetVertexDistance( float distance );
-
-		//
-		// Get the distance in metres between vertices at the maximum resolution.
-		//
-		float GetVertexDistance() const { return m_vertexDistance; }
 
 		//
 		// Set the number of LOD levels to use.
@@ -91,17 +83,24 @@ namespace dd
 	private:
 		
 		bool m_requiresRegeneration;
-		float m_vertexDistance;
 		int m_lodLevels;
 
 		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
-
-		void ClearChunks( EntityManager& entityManager );
+		std::unordered_map<TerrainChunkKey, EntityHandle> m_entities;
 
 		void GenerateTerrain( EntityManager& entityManager );
 		void GenerateLODLevel( EntityManager& entityManager, int lodLevel );
 		TerrainChunk* GenerateChunk( EntityManager& entityManager, const TerrainChunkKey& chunk );
+
+		EntityHandle CreateChunkEntity( EntityManager& entityManager, const TerrainChunkKey& key, TerrainChunk* chunk );
+		void UpdateChunk( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
+
+		void ClearChunks( EntityManager& entityManager );
+
+		void SetOrigin( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, glm::vec3 pos );
+
+		TerrainChunk* GetChunk( const TerrainChunkKey& key );
 	};
 }

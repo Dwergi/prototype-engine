@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
-	class ShipComponent : public ComponentBase
+	class ShipComponent : public IComponent
 	{
 	public:
 		typedef DenseMapPool<ShipComponent> Pool;
@@ -34,7 +34,7 @@ namespace dd
 		float BoostMaximum;
 
 		BEGIN_SCRIPT_OBJECT( ShipComponent )
-			PARENT( ComponentBase )
+			PARENT( IComponent )
 		END_TYPE
 	};
 };

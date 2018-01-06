@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
-	class TrenchComponent : public ComponentBase
+	class TrenchComponent : public IComponent
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace dd
 		TrenchComponent() { }
 
 		BEGIN_SCRIPT_OBJECT( TrenchComponent )
-			PARENT( ComponentBase )
+			PARENT( IComponent )
 		END_TYPE
 	};
 }

@@ -322,7 +322,7 @@
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
-    <ClInclude Include="src\ComponentBase.h" />
+    <ClInclude Include="src\IComponent.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
@@ -396,6 +396,7 @@
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
     <ClInclude Include="src\TerrainChunk.h" />
+    <ClInclude Include="src\TerrainChunkComponent.h" />
     <ClInclude Include="src\TerrainChunkKey.h" />
     <ClInclude Include="src\TerrainSystem.h" />
     <ClInclude Include="src\Tests.h">
@@ -548,6 +549,7 @@
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\StringBinding.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
+    <ClCompile Include="src\TerrainChunkComponent.cpp" />
     <ClCompile Include="src\TerrainChunkKey.cpp" />
     <ClCompile Include="src\TerrainSystem.cpp" />
     <ClCompile Include="src\Tests\BinarySerializerTests.cpp">

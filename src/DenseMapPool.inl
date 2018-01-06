@@ -11,11 +11,11 @@ namespace dd
 	{
 	private:
 
-		DenseMapIterator<int, T> Iter;
+		typename std::unordered_map<int, T>::iterator Iter;
 
 	public:
 
-		DenseMapPoolIterator( DenseMapIterator<int, T>& it )
+		DenseMapPoolIterator( typename std::unordered_map<int, T>::iterator& it )
 			: Iter( it )
 		{
 		}
@@ -27,12 +27,12 @@ namespace dd
 
 		const T& operator*() const
 		{
-			return (*Iter).Value;
+			return (*Iter).second;
 		}
 
 		T& operator*()
 		{
-			return (*Iter).Value;
+			return (*Iter).second;
 		}
 
 		DenseMapPoolIterator<T> operator++()
@@ -92,7 +92,7 @@ namespace dd
 	template <typename T>
 	void DenseMapPool<T>::Clear()
 	{
-		m_components.Clear();
+		m_components.clear();
 	}
 
 	template <typename T>
@@ -112,10 +112,10 @@ namespace dd
 			return nullptr;
 		}
 
-		m_components.Add( entity.ID, T() );
+		m_components.insert( std::make_pair<int, T>( entity.ID, T() ) );
 		T* cmp = &m_components[ entity.ID ];
 
-		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
+		IComponent* baseptr = static_cast<IComponent*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;
@@ -124,14 +124,17 @@ namespace dd
 	template <typename T>
 	T* DenseMapPool<T>::Find( EntityHandle entity ) const
 	{
-		T* value = m_components.Find( entity.ID );
-		return value;
+		auto it = m_components.find( entity.ID );
+		if( it == m_components.end() )
+			return nullptr;
+
+		return const_cast<T*>( &it->second );
 	}
 
 	template <typename T>
 	void DenseMapPool<T>::Remove( EntityHandle entity )
 	{
-		m_components.Remove( entity.ID );
+		m_components.erase( entity.ID );
 	}
 
 	template <typename T>

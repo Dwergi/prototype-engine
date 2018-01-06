@@ -21,7 +21,7 @@ namespace dd
 	class DenseVectorPool 
 		: public ComponentPoolBase
 	{
-		static_assert(std::is_base_of<ComponentBase, T>::value, "Not derived from Component.");
+		static_assert(std::is_base_of<IComponent, T>::value, "Not derived from Component.");
 
 	public:
 		typedef DenseVectorPoolIterator<T> iterator;

@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
-	class PlayerComponent : public ComponentBase
+	class PlayerComponent : public IComponent
 	{
 	public:
 
@@ -21,7 +21,7 @@ namespace dd
 		virtual ~PlayerComponent() {}
 
 		BEGIN_TYPE( PlayerComponent )
-			PARENT( ComponentBase )
+			PARENT( IComponent )
 		END_TYPE
 	};
 }

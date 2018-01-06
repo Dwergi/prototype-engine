@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
 	class SharedString;
 
-	class ScriptComponent : public ComponentBase
+	class ScriptComponent : public IComponent
 	{
 	public:
 		using Pool = DenseMapPool<ScriptComponent>;

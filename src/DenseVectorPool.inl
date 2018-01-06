@@ -131,7 +131,7 @@ namespace dd
 
 		T* cmp = new (&m_components[entity.ID]) T();
 
-		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
+		IComponent* baseptr = static_cast<IComponent*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;
@@ -159,7 +159,7 @@ namespace dd
 
 		T* cmp = new (&m_components[ entity.ID ]) T( std::forward( args )... );
 
-		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
+		IComponent* baseptr = static_cast<IComponent*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;

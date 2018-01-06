@@ -19,7 +19,7 @@ namespace dd
 	}
 
 	TransformComponent::TransformComponent( const TransformComponent& other ) :
-		ComponentBase( other ),
+		IComponent( other ),
 		m_local( other.m_local ),
 		m_parent( other.m_parent ),
 		m_dirty( other.m_dirty )

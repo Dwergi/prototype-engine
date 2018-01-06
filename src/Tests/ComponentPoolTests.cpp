@@ -8,7 +8,7 @@
 #include "DenseVectorPool.h"
 
 struct FooComponent
-	: public dd::ComponentBase
+	: public dd::IComponent
 {
 	int ID;
 };

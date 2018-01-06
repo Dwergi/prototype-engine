@@ -122,7 +122,7 @@ namespace dd
 
 		T* cmp = &m_components[current].Component;
 
-		ComponentBase* baseptr = static_cast<ComponentBase*>(cmp);
+		IComponent* baseptr = static_cast<IComponent*>(cmp);
 		baseptr->Entity = entity;
 
 		return cmp;

@@ -6,22 +6,24 @@
 
 #pragma once
 
-#include "TerrainChunkKey.h"
 #include "ShaderProgram.h"
-#include "EntityHandle.h"
+#include "Mesh.h"
 
 namespace dd
 {
 	class ICamera;
 	class ShaderProgram;
 
+	struct TerrainChunkKey;
+
 	class TerrainChunk
 	{
 	public:
 
-		static const int Octaves = 8;
-		static const int Vertices = 8;
+		static const int Octaves = 6;
+		static const int Vertices = 16;
 
+		static float VertexDistance;
 		static float HeightRange;
 		static float Amplitudes[Octaves];
 		static float Wavelength;
@@ -29,14 +31,17 @@ namespace dd
 
 		static void GenerateSharedResources();
 
-		TerrainChunk( const TerrainChunkKey& key );
+		TerrainChunk();
 		~TerrainChunk();
 		
-		void Generate( EntityManager& entityManager );
-		void Update( glm::vec3& origin );
-		void Destroy( EntityManager& entityManager );
+		MeshHandle Generate( const TerrainChunkKey& key );
+		void SetOrigin( const TerrainChunkKey& key, glm::vec2 origin );
+
+		void Destroy();
 
 		void Write( const char* filename );
+
+		MeshHandle GetMesh() const { return m_mesh; }
 
 	private:
 
@@ -46,14 +51,12 @@ namespace dd
 		static uint s_indices[IndexCount];
 		static ShaderHandle s_shader;
 
-		EntityHandle m_entity;
-		TerrainChunkKey m_key;
+		MeshHandle m_mesh;
 		glm::vec3 m_vertices[VertexCount * 2]; // vertices and normals
-		glm::vec2 m_lastPosition;
-
+		
 		float GetHeight( float x, float y );
 
-		void UpdateVertices( const glm::vec2& chunkPos );
+		void UpdateVertices( const TerrainChunkKey& key, const glm::vec2& chunkPos );
 		void UpdateNormals();
 	};
 }

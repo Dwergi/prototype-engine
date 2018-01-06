@@ -2,7 +2,7 @@
 
 #include "catch/catch.hpp"
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "ComponentHandle.h"
 #include "DenseVectorPool.h"
 #include "EntityHandle.h"
@@ -10,13 +10,13 @@
 
 namespace
 {
-	struct FooComponent : dd::ComponentBase
+	struct FooComponent : dd::IComponent
 	{
 		using Pool = dd::DenseVectorPool<FooComponent>;
 		int ID;
 	};
 
-	struct BarComponent : dd::ComponentBase
+	struct BarComponent : dd::IComponent
 	{
 		using Pool = dd::DenseVectorPool<BarComponent>;
 		bool Valid;

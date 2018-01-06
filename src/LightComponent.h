@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 
 namespace dd
 {
-	class LightComponent : public ComponentBase
+	class LightComponent : public IComponent
 	{
 	public:
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "ComponentHandle.h"
 #include "EntityHandle.h"
 

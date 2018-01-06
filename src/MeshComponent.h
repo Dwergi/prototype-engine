@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseMapPool.h"
 #include "Mesh.h"
 #include "AABB.h"
@@ -15,7 +15,7 @@ namespace dd
 {
 	class TransformComponent;
 
-	class MeshComponent : public ComponentBase
+	class MeshComponent : public IComponent
 	{
 	public: 
 

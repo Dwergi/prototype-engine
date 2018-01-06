@@ -43,7 +43,7 @@ namespace dd
 			return m_entity.IsValid() && m_entity.Has<TComponent>();
 		}
 
-		const TComponent* Read() const 
+		const TComponent* Read() 
 		{
 			if( !IsValid() )
 			{
@@ -51,10 +51,15 @@ namespace dd
 				return nullptr;
 			}
 
-			return m_entity.m_manager->GetReadable<TComponent>( m_entity );
+			if( m_read == nullptr )
+			{
+				m_read = m_entity.m_manager->GetReadable<TComponent>( m_entity );
+			}
+			
+			return m_read;
 		}
 
-		TComponent* Write() const
+		TComponent* Write()
 		{
 			if( !IsValid() )
 			{
@@ -62,11 +67,18 @@ namespace dd
 				return nullptr;
 			}
 
-			return m_entity.m_manager->GetWritable<TComponent>( m_entity );
+			if( m_write == nullptr )
+			{
+				m_write = m_entity.m_manager->GetWritable<TComponent>( m_entity );
+			}
+
+			return m_write;
 		}
 
 	private:
 
 		EntityHandle m_entity;
+		TComponent* m_write { nullptr };
+		const TComponent* m_read { nullptr };
 	};
 }

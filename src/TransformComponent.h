@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "ComponentBase.h"
+#include "IComponent.h"
 #include "DenseVectorPool.h"
 #include "Vector4.h"
 
 namespace dd
 {
-	class TransformComponent : public ComponentBase
+	class TransformComponent : public IComponent
 	{
 	public:
 
@@ -38,7 +38,7 @@ namespace dd
 		ALIGNED_ALLOCATORS( 16 )
 		
 		BEGIN_SCRIPT_OBJECT( TransformComponent )
-			PARENT( ComponentBase )
+			PARENT( IComponent )
 		END_TYPE
 
 	private:

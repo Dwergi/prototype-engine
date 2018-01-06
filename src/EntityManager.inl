@@ -227,6 +227,8 @@ namespace dd
 		uint64 key = reinterpret_cast<uint64>(typeInfo);
 
 		DoubleBuffer<typename Component::Pool>* pool = reinterpret_cast<DoubleBuffer<typename Component::Pool>*>( *m_pools.Find( key ) );
+		DD_ASSERT( pool != nullptr, "No pool found for component!" );
+
 		return pool;
 	}
 }

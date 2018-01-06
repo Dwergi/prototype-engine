@@ -44,6 +44,7 @@
 #include "SwarmSystem.h"
 #include "TerrainSystem.h"
 #include "Timer.h"
+#include "TerrainChunkComponent.h"
 #include "TransformComponent.h"
 #include "TrenchSystem.h"
 #include "Window.h"
@@ -116,7 +117,7 @@ void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptE
 	REGISTER_POD( glm::mat4 );
 
 	REGISTER_TYPE( EntityHandle );
-	REGISTER_TYPE( ComponentBase );
+	REGISTER_TYPE( IComponent );
 	REGISTER_TYPE( Message );
 	REGISTER_TYPE( JobSystem );
 	REGISTER_TYPE( MeshHandle );
@@ -141,6 +142,9 @@ void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptE
 
 	TypeInfo::RegisterComponent<LightComponent>( "LightComponent" );
 	entityManager.RegisterComponent<LightComponent>();
+
+	TypeInfo::RegisterComponent<TerrainChunkComponent>( "TerrainChunkComponent" );
+	entityManager.RegisterComponent<TerrainChunkComponent>();
 }
 
 void ToggleConsole( InputAction action, InputType type )
