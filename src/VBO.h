@@ -6,11 +6,10 @@
 
 #pragma once
 
+#include "OpenGL.h"
+
 namespace dd
 {
-	typedef unsigned int GLuint;
-	typedef unsigned int GLenum;
-
 	class VBO
 	{
 	public:
@@ -19,20 +18,29 @@ namespace dd
 		VBO( const VBO& other );
 		~VBO();
 
-		void Create( GLenum target );
+		//
+		// Create a buffer with a target and usage. 
+		// Target is generally GL_ELEMENT_ARRAY_BUFFER for indices, and GL_ARRAY_BUFFER for everything else.
+		// Usage is generally GL_STATIC_DRAW.
+		//
+		void Create( GLenum target, GLenum usage );
 		void Destroy();
 
-		void SetData( const void* data, uint size );
+		void SetData( const IBuffer& buffer );
 		void Bind();
+		void Update();
 
-		bool IsValid() const { return m_id != 0; }
+		bool IsValid() const { return m_id != OpenGL::InvalidID; }
 		GLuint ID() const { return m_id; }
 
 		VBO& operator=( const VBO& other );
 
 	private:
 
-		GLuint m_id;
-		GLenum m_target;
+		GLuint m_id { OpenGL::InvalidID };
+		GLenum m_target { OpenGL::InvalidID };
+		GLenum m_usage { OpenGL::InvalidID };
+
+		const IBuffer* m_buffer { nullptr };
 	};
 }

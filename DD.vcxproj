@@ -346,6 +346,7 @@
     <ClInclude Include="src\IDebugDraw.h" />
     <ClInclude Include="src\LightComponent.h" />
     <ClInclude Include="src\Math_dd.h" />
+    <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
@@ -382,6 +383,7 @@
     <ClInclude Include="src\ScriptSystem.h" />
     <ClInclude Include="src\Serialization.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\ShaderHandle.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
@@ -516,6 +518,7 @@
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
@@ -543,6 +546,7 @@
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderHandle.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\ShipSystem.cpp" />

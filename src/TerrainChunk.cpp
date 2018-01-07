@@ -34,6 +34,8 @@ namespace dd
 
 	ShaderHandle TerrainChunk::s_shader;
 
+	Buffer<uint> TerrainChunk::s_bufferIndices( s_indices, IndexCount );
+
 	TerrainChunk::TerrainChunk() 
 	{
 
@@ -118,17 +120,28 @@ namespace dd
 		shaders.Add( pixel );
 
 		s_shader = ShaderProgram::Create( String8( "terrain" ), shaders );
+
+		ShaderProgram* shader = s_shader.Get();
+		shader->Use( true );
+
+		shader->SetPositionsName( "Position" );
+		shader->SetNormalsName( "Normal" );
+
+		shader->Use( false );
 	}
 
 	MeshHandle TerrainChunk::Generate( const TerrainChunkKey& key )
 	{
 		DD_PROFILE_START( TerrainChunk_InitializeVerts );
 
-		for( int z = 0; z < Vertices + 1; ++z )
+		m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
+
+		const int actualVertices = Vertices + 1;
+		for( int z = 0; z < actualVertices; ++z )
 		{
-			for( int x = 0; x < Vertices + 1; ++x )
+			for( int x = 0; x < actualVertices; ++x )
 			{
-				const int current = 2 * z * (Vertices + 1) + 2 * x;
+				const int current = z * actualVertices + x;
 
 				// height is y
 				m_vertices[current].y = 0;
@@ -136,6 +149,8 @@ namespace dd
 				m_vertices[current].z = z * key.Size;
 			}
 		}
+		
+		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
 
 		DD_PROFILE_END();
 
@@ -147,20 +162,22 @@ namespace dd
 		m_mesh = Mesh::Create( name, s_shader );
 
 		Mesh* mesh = m_mesh.Get();
-		mesh->SetData( (float*) &m_vertices[0].x, sizeof( m_vertices ), 6 );
-		mesh->SetIndices( s_indices, sizeof( s_indices ) / sizeof( uint ) );
+		mesh->UseShader( true );
+
+		mesh->SetPositions( m_vertices );
+
+		mesh->EnableNormals( true );
+		mesh->SetNormals( m_normals );
+
+		mesh->EnableIndices( true );
+		mesh->SetIndices( s_bufferIndices );
+
+		mesh->UseShader( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( 0 ) );
 		bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange, key.Size * Vertices ) );
 		mesh->SetBounds( bounds );
-		
-		s_shader.Get()->Use( true );
-
-		mesh->BindAttribute( "Position", 3, 0, false );
-		mesh->BindAttribute( "Normal", 3, 3, true );
-
-		s_shader.Get()->Use( false );
 
 		DD_PROFILE_END();
 
@@ -171,9 +188,9 @@ namespace dd
 	{
 		for( int i = 0; i < IndexCount; i += 3 )
 		{
-			uint indexA = s_indices[i] * 2;
-			uint indexB = s_indices[i + 1] * 2;
-			uint indexC = s_indices[i + 2] * 2;
+			uint indexA = s_indices[i];
+			uint indexB = s_indices[i + 1];
+			uint indexC = s_indices[i + 2];
 
 			glm::vec3 a = m_vertices[indexA];
 			glm::vec3 b = m_vertices[indexB];
@@ -188,24 +205,25 @@ namespace dd
 				DD_ASSERT( normal.y > 0 );
 			}
 
-			m_vertices[indexA + 1] = normal;
-			m_vertices[indexB + 1] = normal;
-			m_vertices[indexC + 1] = normal;
+			m_normals[indexA] = normal;
+			m_normals[indexB] = normal;
+			m_normals[indexC] = normal;
 		}
 	}
 
 	void TerrainChunk::UpdateVertices( const TerrainChunkKey& key, const glm::vec2& origin )
 	{
 		glm::vec2 chunk_pos = origin + glm::vec2( key.X, key.Y );
+		const int actualVertices = Vertices + 1;
 
-		for( int z = 0; z < Vertices + 1; ++z )
+		for( int z = 0; z < actualVertices; ++z )
 		{
-			for( int x = 0; x < Vertices + 1; ++x )
+			for( int x = 0; x < actualVertices; ++x )
 			{
 				const float x_coord = chunk_pos.x + x * key.Size;
 				const float z_coord = chunk_pos.y + z * key.Size;
 
-				const int current = 2 * z * (Vertices + 1) + 2 * x;
+				const int current = z * actualVertices + x;
 
 				float height = GetHeight( x_coord, z_coord );
 
@@ -221,7 +239,7 @@ namespace dd
 		UpdateNormals();
 
 		Mesh* mesh = m_mesh.Get();
-		mesh->UpdateData();
+		mesh->UpdateBuffers();
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( 0 ) );
@@ -237,16 +255,43 @@ namespace dd
 
 	void TerrainChunk::Write( const char* filename )
 	{
-		byte pixels[Vertices * Vertices];
+		const int actualVertices = Vertices + 1;
+		byte pixels[actualVertices * actualVertices];
 
-		for( int y = 0; y < Vertices; ++y )
+		for( int y = 0; y < actualVertices; ++y )
 		{
-			for( int x = 0; x < Vertices; ++x )
+			for( int x = 0; x < actualVertices; ++x )
 			{
-				pixels[y * Vertices + x] = (int) ((m_vertices[y * Vertices + x].y / HeightRange) * 255);
+				pixels[y * actualVertices + x] = (byte) ((m_vertices[y * actualVertices + x].y / HeightRange) * 255);
 			}
 		}
 
-		stbi_write_tga( filename, Vertices, Vertices, 1, pixels );
+		stbi_write_tga( filename, actualVertices, actualVertices, 1, pixels );
+	}
+
+	static byte NormalToColour( float f )
+	{
+		return (byte) (((f + 1.0f) / 2.0f) * 255.f);
+	}
+
+	void TerrainChunk::WriteNormals( const char* filename )
+	{
+		const int actualVertices = Vertices + 1;
+		byte pixels[actualVertices * actualVertices * 3];
+
+		for( int y = 0; y < actualVertices; ++y )
+		{
+			for( int x = 0; x < actualVertices; ++x )
+			{
+				int index = y * actualVertices + x;
+
+				glm::vec3 normal = m_normals[index];
+				pixels[3 * index] = NormalToColour( normal.x );
+				pixels[3 * index + 1] = NormalToColour( normal.y );
+				pixels[3 * index + 2] = NormalToColour( normal.z );
+			}
+		}
+
+		stbi_write_tga( filename, actualVertices, actualVertices, 3, pixels );
 	}
 }

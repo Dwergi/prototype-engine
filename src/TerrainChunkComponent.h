@@ -1,3 +1,9 @@
+//
+// TerrainChunkComponent.h
+// Copyright (C) Sebastian Nordgren 
+// January 6th 2018
+//
+
 #pragma once
 
 #include "IComponent.h"

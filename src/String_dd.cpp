@@ -35,6 +35,11 @@ namespace dd
 
 	const char* String::c_str() const
 	{
+		return m_buffer.GetConst();
+	}
+
+	char* String::data()
+	{
 		return m_buffer.Get();
 	}
 
@@ -74,7 +79,7 @@ namespace dd
 
 	bool String::EqualsCaseless( const String& other ) const
 	{
-		return Equals( other.m_buffer, other.m_length, true );
+		return Equals( other.m_buffer.Get(), other.m_length, true );
 	}
 
 	bool String::EqualsCaseless( const char* other ) const
@@ -94,7 +99,7 @@ namespace dd
 
 	bool String::operator==( const String& other ) const
 	{
-		return Equals( other.m_buffer, other.m_length, false );
+		return Equals( other.m_buffer.Get(), other.m_length, false );
 	}
 
 	bool String::operator!=( const char* other ) const
@@ -109,7 +114,7 @@ namespace dd
 
 	String& String::operator=( const String& other )
 	{
-		SetString( other.m_buffer, other.m_length );
+		SetString( other.m_buffer.Get(), other.m_length );
 
 		return *this;
 	}
@@ -125,7 +130,7 @@ namespace dd
 
 	String& String::operator+=( const String& other )
 	{
-		Append( other.m_buffer, other.m_length );
+		Append( other.m_buffer.Get(), other.m_length );
 
 		return *this;
 	}
@@ -139,43 +144,43 @@ namespace dd
 
 	int String::Find( const char* other, int offset ) const
 	{
-		DD_ASSERT( m_buffer != nullptr );
+		DD_ASSERT( m_buffer.Get() != nullptr );
 		DD_ASSERT( other != nullptr );
 
 		if( other == nullptr || offset >= m_length )
 			return -1;
 
-		const char* ptr = strstr( m_buffer + offset, other );
+		const char* ptr = strstr( m_buffer.Get() + offset, other );
 
 		if( ptr == nullptr )
 			return -1;
 
-		int location = (int) (ptr - m_buffer);
+		int location = (int) (ptr - m_buffer.Get());
 
 		return location;
 	}
 
 	int String::Find( const String& other, int offset ) const
 	{
-		DD_ASSERT( m_buffer != nullptr );
-		DD_ASSERT( other.m_buffer != nullptr );
+		DD_ASSERT( m_buffer.Get() != nullptr );
+		DD_ASSERT( other.m_buffer.Get() != nullptr );
 
 		if( offset >= m_length )
 			return -1;
 
-		const char* ptr = strstr( m_buffer, other.m_buffer );
+		const char* ptr = strstr( m_buffer.Get(), other.m_buffer.Get() );
 
 		if( ptr == nullptr )
 			return -1;
 
-		int location = (int) (ptr - m_buffer);
+		int location = (int) (ptr - m_buffer.Get());
 
 		return location;
 	}
 
 	void String::ReplaceAll( char src, char target )
 	{
-		DD_ASSERT( m_buffer != nullptr );
+		DD_ASSERT( m_buffer.Get() != nullptr );
 
 		for( int i = 0; i < m_length; ++i )
 		{
@@ -247,7 +252,7 @@ namespace dd
 
 		Resize( length );
 
-		memcpy( m_buffer, data, length );
+		memcpy( m_buffer.Get(), data, length );
 		m_length = length;
 
 		NullTerminate();
@@ -304,7 +309,7 @@ namespace dd
 
 			m_buffer.Set( new char[m_length + 1], m_length + 1 );
 
-			memcpy( m_buffer, old_buffer, m_length );
+			memcpy( m_buffer.Get(), old_buffer, m_length );
 
 			delete[] old_buffer;
 		}

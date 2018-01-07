@@ -20,56 +20,163 @@ namespace dd
 	std::mutex Mesh::m_instanceMutex;
 	std::unordered_map<uint64, Mesh> Mesh::m_instances;
 
-	float s_unitCube[] = 
+	static const glm::vec3 s_unitCubePositions[] =
 	{
-		//  X    Y    Z     U     V       Normal				
+		//  X    Y    Z     
 		// bottom
-		-1.0f,-1.0f,-1.0f,  0.0f, 0.0f,   0.0f, -1.0f, 0.0f,
-		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,
-		-1.0f,-1.0f, 1.0f,  0.0f, 1.0f,   0.0f, -1.0f, 0.0f,
-		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,
-		1.0f,-1.0f, 1.0f,   1.0f, 1.0f,   0.0f, -1.0f, 0.0f,
-		-1.0f,-1.0f, 1.0f,  0.0f, 1.0f,   0.0f, -1.0f, 0.0f,
-
-		// top
-		-1.0f, 1.0f,-1.0f,  0.0f, 0.0f,   0.0f, 1.0f, 0.0f,	
-		-1.0f, 1.0f, 1.0f,  0.0f, 1.0f,   0.0f, 1.0f, 0.0f,	
-		1.0f, 1.0f,-1.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,	
-		1.0f, 1.0f,-1.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,	
-		-1.0f, 1.0f, 1.0f,  0.0f, 1.0f,   0.0f, 1.0f, 0.0f,	
-		1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   0.0f, 1.0f, 0.0f,	
-
+		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	-1.0f ), 
+		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+				
+		// top			 
+		glm::vec3( -1.0f,	1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+		
 		// front
-		-1.0f,-1.0f, 1.0f,  1.0f, 0.0f,   0.0f, 0.0f, 1.0f,	
-		1.0f,-1.0f, 1.0f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f,	
-		-1.0f, 1.0f, 1.0f,  1.0f, 1.0f,   0.0f, 0.0f, 1.0f,	
-		1.0f,-1.0f, 1.0f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f,	
-		1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   0.0f, 0.0f, 1.0f,	
-		-1.0f, 1.0f, 1.0f,  1.0f, 1.0f,   0.0f, 0.0f, 1.0f,	
-
+		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		
 		// back
-		-1.0f,-1.0f,-1.0f,  0.0f, 0.0f,   0.0f, 0.0f, -1.0f,
-		-1.0f, 1.0f,-1.0f,  0.0f, 1.0f,   0.0f, 0.0f, -1.0f,
-		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   0.0f, 0.0f, -1.0f,
-		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   0.0f, 0.0f, -1.0f,
-		-1.0f, 1.0f,-1.0f,  0.0f, 1.0f,   0.0f, 0.0f, -1.0f,
-		1.0f, 1.0f,-1.0f,   1.0f, 1.0f,   0.0f, 0.0f, -1.0f,
+		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	1.0f,	-1.0f ),
 
 		// left
-		-1.0f,-1.0f, 1.0f,   0.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
-		-1.0f, 1.0f,-1.0f,   1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
-		-1.0f,-1.0f,-1.0f,   0.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
-		-1.0f,-1.0f, 1.0f,   0.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
-		-1.0f, 1.0f, 1.0f,   1.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
-		-1.0f, 1.0f,-1.0f,   1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+		glm::vec3( -1.0f,	1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( -1.0f,	1.0f,	-1.0f ),
 
 		// right
-		1.0f,-1.0f, 1.0f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,	
-		1.0f,-1.0f,-1.0f,   1.0f, 0.0f,   1.0f, 0.0f, 0.0f,	
-		1.0f, 1.0f,-1.0f,   0.0f, 0.0f,   1.0f, 0.0f, 0.0f,	
-		1.0f,-1.0f, 1.0f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,	
-		1.0f, 1.0f,-1.0f,   0.0f, 0.0f,   1.0f, 0.0f, 0.0f,	
-		1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   1.0f, 0.0f, 0.0f
+		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+	};
+
+	static ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, sizeof( s_unitCubePositions ) / sizeof( glm::vec3 ) );
+
+	static const glm::vec3 s_unitCubeNormals[] =
+	{
+		// bottom
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+
+		// top
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+
+		// front
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+
+		// back
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+
+		// left
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+
+		// right
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f )
+	};
+
+	static const ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, sizeof( s_unitCubeNormals ) / sizeof( glm::vec3 ) );
+
+	static const glm::vec2 s_unitCubeUVs[] =
+	{
+		// U     V
+		// bottom
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+
+		// top
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// front
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// back
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// left
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+
+		// right
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
 	};
 
 	Mesh* Mesh::Get( MeshHandle handle )
@@ -116,30 +223,21 @@ namespace dd
 
 	Mesh::Mesh( const char* name, ShaderHandle program ) :
 		m_refCount( nullptr ),
-		m_vbo( OpenGL::InvalidID ),
-		m_indexVBO( OpenGL::InvalidID ),
 		m_shader( program ),
-		m_name( name ),
-		m_stride( 0 )
+		m_name( name )
 	{
 		DD_PROFILE_SCOPED( Mesh_Create );
 
 		m_vao.Create();
-
-		glGenBuffers( 1, &m_vbo );
+		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 
 		m_refCount = new std::atomic<int>( 1 );
 	}
 
-	Mesh::Mesh( const Mesh& other ) :
-		m_refCount( other.m_refCount ),
-		m_vao( other.m_vao ),
-		m_vbo( other.m_vbo ),
-		m_name( other.m_name ),
-		m_shader( other.m_shader ),
-		m_bounds( other.m_bounds ),
-		m_colour( other.m_colour )
+	Mesh::Mesh( const Mesh& other )
 	{
+		Assign( other );
+
 		Retain();
 	}
 
@@ -152,87 +250,140 @@ namespace dd
 	{
 		Release();
 
-		m_refCount = other.m_refCount;
-		m_vao = other.m_vao;
-		m_vbo = other.m_vbo;
-		m_name = other.m_name;
-		m_shader = other.m_shader;
+		Assign( other );
 
 		Retain();
 
 		return *this;
 	}
 
-	void Mesh::SetData( float* data, int count, int stride )
+	void Mesh::Assign( const Mesh& other )
 	{
-		m_data.Set( data, count );
-		m_stride = stride;
+		m_vboPosition = other.m_vboPosition;
+		m_bufferPosition = other.m_bufferPosition;
+
+		m_useNormal = other.m_useNormal;
+		m_vboNormal = other.m_vboNormal;
+		m_bufferNormal = other.m_bufferNormal;
+
+		m_useIndex = other.m_useIndex;
+		m_vboIndex = other.m_vboIndex;
+		m_bufferIndex = other.m_bufferIndex;
+
+		m_useUV = other.m_useUV;
+		m_vboUV = other.m_vboUV;
+		m_bufferUV = other.m_bufferUV;
+
+		m_useVertexColour = other.m_useVertexColour;
+		m_vboVertexColour = other.m_vboVertexColour;
+		m_bufferVertexColour = other.m_bufferVertexColour;
+
+		m_vao = other.m_vao;
+
+		m_name = other.m_name;
+		m_shader = other.m_shader;
+		m_bounds = other.m_bounds;
+
+		m_colourMultiplier = other.m_colourMultiplier;
+
+		m_refCount = other.m_refCount;
+	}
+
+	void Mesh::SetPositions( const ConstBuffer<glm::vec3>& positions )
+	{
+		m_bufferPosition = positions;
 
 		m_vao.Bind();
 
-		glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
-		glNamedBufferData( m_vbo, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
+		m_vboPosition.Bind();
+		m_vboPosition.SetData( m_bufferPosition );
 
-		CheckGLError();
+		m_shader.Get()->BindPositions();
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::UpdateData()
+	void Mesh::SetNormals( const ConstBuffer<glm::vec3>& normals )
 	{
+		if( !m_vboNormal.IsValid() )
+		{
+			m_vboNormal.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		}
+
+		m_bufferNormal = normals;
+
 		m_vao.Bind();
 
-		// orphan the buffer
-		glNamedBufferData( m_vbo, m_data.Size(), NULL, GL_STATIC_DRAW );
+		m_vboNormal.Bind();
+		m_vboNormal.SetData( m_bufferNormal );
 
-		CheckGLError();
-
-		// replace it
-		glNamedBufferData( m_vbo, m_data.Size(), m_data.Get(), GL_STATIC_DRAW );
-
-		CheckGLError();
+		m_shader.Get()->BindNormals();
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetIndices( uint* data, int count )
+	void Mesh::SetIndices( const ConstBuffer<uint>& indices )
 	{
-		m_indices.Set( data, count );
-		
+		if( !m_vboIndex.IsValid() )
+		{
+			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
+		}
+
+		m_bufferIndex = indices;
+
 		m_vao.Bind();
 
-		glGenBuffers( 1, &m_indexVBO );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_indexVBO );
-
-		CheckGLError();
-
-		glNamedBufferData( m_indexVBO, count * sizeof( uint ), data, GL_STATIC_DRAW );
-
-		CheckGLError();
+		m_vboIndex.Bind();
+		m_vboIndex.SetData( m_bufferIndex );
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::BindAttribute( const char* shaderAttribute, uint components, uint first, bool normalized )
+	void Mesh::SetUVs( const ConstBuffer<glm::vec2>& uvs )
 	{
-		DD_ASSERT( m_data.Get() != nullptr );
-		DD_ASSERT( m_stride > 0 );
+		if( !m_vboUV.IsValid() )
+		{
+			m_vboUV.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		}
+
+		m_bufferUV = uvs;
 
 		m_vao.Bind();
 
-		m_shader.Get()->BindAttributeFloat( shaderAttribute, components, m_stride, first, normalized );
+		m_vboUV.Bind();
+		m_vboUV.SetData( m_bufferUV );
+
+		m_shader.Get()->BindUVs();
 
 		m_vao.Unbind();
 	}
 
-	const AABB& Mesh::Bounds() const
+	void Mesh::SetVertexColours( const ConstBuffer<glm::vec4>& vertexColours )
 	{
-		return m_bounds;
+		if( !m_vboVertexColour.IsValid() )
+		{
+			m_vboVertexColour.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		}
+
+		m_bufferVertexColour = vertexColours;
+
+		m_vao.Bind();
+
+		m_vboVertexColour.Bind();
+		m_vboVertexColour.SetData( m_bufferVertexColour );
+
+		m_shader.Get()->BindVertexColours();
+
+		m_vao.Unbind();
 	}
 
-	void Mesh::SetBounds( const AABB& bounds )
+	void Mesh::UpdateBuffers()
 	{
-		m_bounds = bounds;
+		m_vboPosition.Update();
+		m_vboNormal.Update();
+		m_vboIndex.Update();
+		m_vboUV.Update();
+		m_vboVertexColour.Update();
 	}
 
 	void Mesh::Render( const ICamera& camera, const glm::mat4& transform )
@@ -250,19 +401,19 @@ namespace dd
 		shader.SetUniform( "View", view );
 		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
-		shader.SetUniform( "ObjectColour", m_colour );
+		shader.SetUniform( "ObjectColour", m_colourMultiplier );
 
 		m_vao.Bind();
 
-		if( m_indices.Get() == nullptr )
+		if( !m_useIndex )
 		{
-			glDrawArrays( GL_TRIANGLES, 0, 6 * 2 * 3 );
+			glDrawArrays( GL_TRIANGLES, 0, m_bufferPosition.Size() );
 
 			CheckGLError();
 		}
 		else
 		{
-			glDrawElements( GL_TRIANGLES, m_indices.Size(), GL_UNSIGNED_INT, 0 );
+			glDrawElements( GL_TRIANGLES, m_bufferIndex.Size(), GL_UNSIGNED_INT, 0 );
 
 			CheckGLError();
 		}
@@ -283,36 +434,41 @@ namespace dd
 	{
 		DD_ASSERT( m_refCount != nullptr );
 
-		m_data.Release();
-
 		if( --*m_refCount <= 0 )
 		{
-			glDeleteBuffers( 1, &m_vbo );
+			m_vboPosition.Destroy();
+			m_vboIndex.Destroy();
+			m_vboNormal.Destroy();
+			m_vboUV.Destroy();
+			m_vboVertexColour.Destroy();
 
-			if( m_indices.Get() != nullptr )
-			{
-				glDeleteBuffers( 1, &m_indexVBO );
-			}
-			
 			m_vao.Destroy();
 
 			delete m_refCount;
-
-			m_vbo = OpenGL::InvalidID;
-			m_indexVBO = OpenGL::InvalidID;
 		}
+	}
+
+	void Mesh::UseShader( bool use )
+	{
+		m_shader.Get()->Use( use );
 	}
 
 	void Mesh::MakeUnitCube()
 	{
-		SetData( s_unitCube, sizeof( s_unitCube ), 8 );
-		
 		ShaderProgram& shader = *m_shader.Get();
 		shader.Use( true );
 
-		BindAttribute( "Position", 3, 0, false );
-		BindAttribute( "UV", 2, 3, false );
-		BindAttribute( "Normal", 3, 5, true );
+		shader.SetPositionsName( "Position" );
+		SetPositions( s_unitCubePositionsBuffer );
+
+		shader.SetNormalsName( "Normal" );
+
+		SetNormals( s_unitCubeNormalsBuffer );
+
+		//shader.SetUVsName( "UV" );
+
+		//Buffer<glm::vec2> uvs( const_cast<glm::vec2*>(s_unitCubeUVs), sizeof( s_unitCubeUVs ) / sizeof( glm::vec2 ) );
+		//SetUVs( uvs );
 
 		shader.Use( false );
 

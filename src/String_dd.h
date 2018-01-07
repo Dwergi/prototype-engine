@@ -54,7 +54,9 @@ namespace dd
 
 		const char& operator[]( int index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
 		char& operator[]( int index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
+		
 		const char* c_str() const;
+		char* data();
 		
 		// Get a wide copy of this string.
 		bool w_str( const Buffer<wchar_t>& buffer ) const;
@@ -69,7 +71,7 @@ namespace dd
 
 		BASIC_TYPE( String )
 
-		DEFINE_ITERATORS( const char, m_buffer, m_length )
+		DEFINE_ITERATORS( char, m_buffer.Get(), m_length )
 
 	protected:
 
@@ -128,7 +130,7 @@ namespace dd
 		InplaceString( InplaceString<Size>&& other )
 			: String( m_stackData, Size )
 		{
-			if( other.m_buffer == other.m_stackData )
+			if( other.m_buffer.Get() == other.m_stackData )
 			{
 				SetString( other.c_str(), other.Length() );
 			}
@@ -190,7 +192,7 @@ namespace dd
 		count = dd::min( m_length - start, count );
 
 		InplaceString<Size> substring;
-		substring.SetString( m_buffer + start, count );
+		substring.SetString( m_buffer.Get() + start, count );
 
 		return substring;
 	}

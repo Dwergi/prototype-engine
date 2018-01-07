@@ -6,16 +6,15 @@
 
 #pragma once
 
+#include "ShaderHandle.h"
+#include "OpenGL.h"
+
 #include <atomic>
+#include <unordered_map>
 
 namespace dd
 {
 	class Shader;
-	class ShaderHandle;
-
-	typedef int GLint;
-	typedef GLint ShaderLocation;
-	const ShaderLocation InvalidLocation = -1;
 
 	class ShaderProgram
 	{
@@ -39,6 +38,18 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
+		void SetPositionsName( const char* name );
+		bool BindPositions();
+
+		void SetNormalsName( const char* name );
+		bool BindNormals();
+
+		void SetUVsName( const char* name );
+		bool BindUVs();
+
+		void SetVertexColoursName( const char* name );
+		bool BindVertexColours();
+
 		bool BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized );
 		void EnableAttribute( const char* name );
 		void DisableAttribute( const char* name );
@@ -56,14 +67,19 @@ namespace dd
 		friend class ShaderHandle;
 
 		static std::mutex m_instanceMutex;
-		static DenseMap<uint64, ShaderProgram> m_instances;
+		static std::unordered_map<uint64, ShaderProgram> m_instances;
 
 		static ShaderProgram CreateInstance( const String& name, const Vector<Shader>& shaders );
 
-		uint m_id;
+		bool m_valid { false };
+		uint m_id { OpenGL::InvalidID };
 		String64 m_name;
-		bool m_valid;
-		bool m_inUse;
+		bool m_inUse { false };
+
+		String64 m_positionsName;
+		String64 m_normalsName;
+		String64 m_uvsName;
+		String64 m_vertexColoursName;
 
 		std::atomic<int>* m_refCount;
 
@@ -78,25 +94,5 @@ namespace dd
 		ShaderLocation GetUniform( const char* name ) const;
 
 		static ShaderProgram* Get( ShaderHandle handle );
-	};
-
-	//
-	// A very simple handle to be used to reference a single global instance of a shader in a semi-safe way.
-	// Use ShaderProgram::Create to get a handle to a shader.
-	//
-	class ShaderHandle
-	{
-	public:
-		ShaderHandle() : m_hash( 0 ) {}
-
-		ShaderProgram* Get() { return ShaderProgram::Get( *this ); }
-
-		bool IsValid() const { return m_hash != 0; }
-
-	private:
-		friend class ShaderProgram;
-		friend class Mesh;
-
-		uint64 m_hash;
 	};
 } 

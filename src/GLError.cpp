@@ -37,7 +37,10 @@ namespace dd
 				break;
 			}
 
-			printf( "GL_%s - %s:%d\n", error.c_str(), file, line );
+			char message[256];
+			snprintf( message, 256, "GL_%s - %s:%d\n", error.c_str(), file, line );
+
+			DD_ASSERT( false, message );
 
 			err = glGetError();
 		}

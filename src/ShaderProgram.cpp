@@ -9,6 +9,7 @@
 
 #include "GLError.h"
 #include "Shader.h"
+#include "ShaderHandle.h"
 
 #include "GL/gl3w.h"
 
@@ -17,7 +18,7 @@
 namespace dd
 {
 	std::mutex ShaderProgram::m_instanceMutex;
-	DenseMap<uint64, ShaderProgram> ShaderProgram::m_instances;
+	std::unordered_map<uint64, ShaderProgram> ShaderProgram::m_instances;
 
 	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
 	{
@@ -27,17 +28,19 @@ namespace dd
 
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
 
-		ShaderProgram* instance = m_instances.Find( hash );
-		if( instance == nullptr )
+		auto it = m_instances.find( hash );
+		if( it == m_instances.end() )
 		{
 			ShaderProgram program = CreateInstance( name, shaders );
 			if( program.IsValid() )
 			{
-				m_instances.Add( hash, program );
+				m_instances.insert( std::make_pair( hash, program ) );
 			}
 			else
 			{
 				hash = 0;
+
+				DD_ASSERT_ERROR( false, "ShaderProgram::CreateInstance returned an invalid program!" );
 			}
 		}
 
@@ -50,13 +53,20 @@ namespace dd
 	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
 	{
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
-		return m_instances.Find( handle.m_hash );
+		auto it = m_instances.find( handle.m_hash );
+
+		if( it == m_instances.end() )
+		{
+			return nullptr;
+		}
+
+		return &it->second;
 	}
 
 	void ShaderProgram::Destroy( ShaderHandle handle )
 	{
 		std::lock_guard<std::mutex> lock( m_instanceMutex );
-		return m_instances.Remove( handle.m_hash );
+		m_instances.erase( handle.m_hash );
 	}
 
 	ShaderProgram::ShaderProgram( const String& name )
@@ -65,20 +75,23 @@ namespace dd
 		m_inUse( false )
 	{
 		m_id = glCreateProgram();
+		CheckGLError();
 
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "glCreateProgram failed!" );
 
-		m_valid = m_id != OpenGL::InvalidID;
-	
 		m_refCount = new std::atomic<int>( 1 );
 	}
 
 	ShaderProgram::ShaderProgram( const ShaderProgram& other ) :
 		m_id( other.m_id ),
+		m_valid( other.m_valid ),
 		m_name( other.m_name ),
 		m_refCount( other.m_refCount ),
-		m_valid( other.m_valid ),
-		m_inUse( other.m_inUse )
+		m_inUse( other.m_inUse ),
+		m_positionsName( m_positionsName ),
+		m_normalsName( m_normalsName ),
+		m_uvsName( m_uvsName ),
+		m_vertexColoursName( m_vertexColoursName )
 	{
 		Retain();
 	}
@@ -92,11 +105,16 @@ namespace dd
 	{
 		Release();
 
+		m_valid = other.m_valid;
 		m_id = other.m_id;
 		m_name = other.m_name;
-		m_valid = other.m_valid;
 		m_refCount = other.m_refCount;
 		m_inUse = other.m_inUse;
+
+		m_positionsName = m_positionsName;
+		m_normalsName = m_normalsName;
+		m_uvsName = m_uvsName;
+		m_vertexColoursName = m_vertexColoursName;
 
 		Retain();
 
@@ -108,15 +126,18 @@ namespace dd
 		ShaderProgram program( name );
 
 		if( shaders.Size() == 0 )
-			program.m_valid = false;
+		{
+			DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
 
-		DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
+			program.m_valid = false;
+		}
 
 		for( Shader& shader : shaders )
 		{
 			DD_ASSERT_ERROR( shader.IsValid(), "Invalid shader given to program!" );
 
 			glAttachShader( program.m_id, shader.m_id );
+			CheckGLError();
 		}
 
 		String256 msg = program.Link();
@@ -124,15 +145,15 @@ namespace dd
 		if( !msg.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed!" );
-
-			program.m_valid = false;
 		}
 
 		for( Shader& shader : shaders )
 		{
 			glDetachShader( program.m_id, shader.m_id );
+			CheckGLError();
 		}
 
+		program.m_valid = true;
 		return program;
 	}
 
@@ -146,22 +167,24 @@ namespace dd
 
 		GLint status;
 		glGetProgramiv( m_id, GL_LINK_STATUS, &status );
+		CheckGLError();
+
 		if( status == GL_FALSE )
 		{
 			msg = "Program linking failure: ";
 
 			GLint infoLogLength;
 			glGetProgramiv( m_id, GL_INFO_LOG_LENGTH, &infoLogLength );
+			CheckGLError();
 
 			char* strInfoLog = new char[infoLogLength + 1];
 			glGetProgramInfoLog( m_id, infoLogLength, NULL, strInfoLog );
+			CheckGLError();
 
 			msg += strInfoLog;
 			delete[] strInfoLog;
-		}
-		else
-		{
-			m_valid = true;
+
+			m_valid = false;
 		}
 
 		return msg;
@@ -174,19 +197,31 @@ namespace dd
 
 	void ShaderProgram::Use( bool use )
 	{
-		DD_ASSERT( !m_inUse == use, "Trying to change use state to program's current state!" );
+		DD_ASSERT( use != m_inUse, "Trying to use shader that is already in use!" );
 
-		glUseProgram( use ? m_id : 0 );
-
+		int current;
+		glGetIntegerv( GL_CURRENT_PROGRAM, &current );
 		CheckGLError();
 
+		if( use )
+		{
+			DD_ASSERT( current == 0, "Shader not deactivated before trying to activate another shader!" );
+		}
+		else
+		{
+			DD_ASSERT( current == m_id, "Trying to deactivate a different shader than currently bound!" );
+		}
+
 		m_inUse = use;
+
+		glUseProgram( m_inUse ? m_id : 0 );
+		CheckGLError();
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
 		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name );
@@ -199,7 +234,7 @@ namespace dd
 	void ShaderProgram::DisableAttribute( const char* name )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
 		ShaderLocation loc = GetAttribute( name );
@@ -207,7 +242,6 @@ namespace dd
 		if( loc != InvalidLocation )
 		{
 			glDisableVertexAttribArray( loc );
-
 			CheckGLError();
 		}
 	}
@@ -215,7 +249,7 @@ namespace dd
 	void ShaderProgram::EnableAttribute( const char* name )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
 		ShaderLocation loc = GetAttribute( name );
@@ -223,15 +257,86 @@ namespace dd
 		if( loc != InvalidLocation )
 		{
 			glEnableVertexAttribArray( loc );
-
 			CheckGLError();
 		}
+	}
+
+	void ShaderProgram::SetPositionsName( const char* name )
+	{
+		ShaderLocation loc = GetAttribute( name );
+
+		DD_ASSERT( loc != InvalidLocation, "Invalid location name specified for positions!" );
+
+		m_positionsName = name;
+	}
+
+	bool ShaderProgram::BindPositions()
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( !m_positionsName.IsEmpty(), "Name has not been set for position!" );
+
+		return BindAttributeFloat( m_positionsName.c_str(), 3, 0, 0, false );
+	}
+
+	void ShaderProgram::SetNormalsName( const char* name )
+	{
+		ShaderLocation loc = GetAttribute( name );
+
+		DD_ASSERT( loc != InvalidLocation, "Invalid location name specified for normals!" );
+
+		m_normalsName = name;
+	}
+
+	bool ShaderProgram::BindNormals()
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( !m_normalsName.IsEmpty(), "Name has not been set for normals!" );
+
+		return BindAttributeFloat( m_normalsName.c_str(), 3, 0, 0, true );
+	}
+
+	void ShaderProgram::SetUVsName( const char* name )
+	{
+		ShaderLocation loc = GetAttribute( name );
+
+		DD_ASSERT( loc != InvalidLocation, "Invalid location name specified for UVs!" );
+
+		m_uvsName = name;
+	}
+
+	bool ShaderProgram::BindUVs()
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( !m_uvsName.IsEmpty(), "Name has not been set for UVs!" );
+
+		return BindAttributeFloat( m_uvsName.c_str(), 2, 0, 0, false );
+	}
+
+	void ShaderProgram::SetVertexColoursName( const char* name )
+	{
+		ShaderLocation loc = GetAttribute( name );
+
+		DD_ASSERT( loc != InvalidLocation, "Invalid location name specified for vertex colours!" );
+
+		m_vertexColoursName = name;
+	}
+
+	bool ShaderProgram::BindVertexColours()
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( !m_vertexColoursName.IsEmpty(), "Name has not been set for vertex colours!" );
+
+		return BindAttributeFloat( m_vertexColoursName.c_str(), 4, 0, 0, false );
 	}
 
 	bool ShaderProgram::BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation loc = GetAttribute( name );
@@ -239,11 +344,9 @@ namespace dd
 		if( loc != InvalidLocation )
 		{
 			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, stride * sizeof( float ), (const GLvoid*) (uint64) (first * sizeof( float )) );
-
 			CheckGLError();
 
 			glEnableVertexAttribArray( loc );
-
 			CheckGLError();
 
 			return true;
@@ -255,7 +358,7 @@ namespace dd
 	ShaderLocation ShaderProgram::GetUniform( const char* name ) const
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name );
@@ -266,7 +369,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, float f )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -281,7 +384,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, int i )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -296,7 +399,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, bool b )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -311,7 +414,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, const glm::vec3& vec )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -326,7 +429,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, const glm::vec4& vec )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -341,7 +444,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, const glm::mat3& mat )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );
@@ -356,7 +459,7 @@ namespace dd
 	void ShaderProgram::SetUniform( const char* name, const glm::mat4& mat )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( m_valid, "Program is invalid!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
 		ShaderLocation uniform = GetUniform( name );

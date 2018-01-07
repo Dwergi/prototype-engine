@@ -9,6 +9,7 @@
 #include "AABB.h"
 #include "ShaderProgram.h"
 #include "VAO.h"
+#include "VBO.h"
 
 #include <atomic>
 #include <memory>
@@ -46,43 +47,91 @@ namespace dd
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
-		const AABB& Bounds() const;
+		const AABB& Bounds() const { return m_bounds; }
 
 		//
 		// Set the bounds of this mesh.
 		//
-		void SetBounds( const AABB& bounds );
+		void SetBounds( const AABB& bounds ) { m_bounds = bounds; }
 
 		//
-		// Set the vertex buffer that the mesh will use.
+		// Set the positions that the mesh will use.
+		// The mesh does *NOT* take ownership of this.
+		// The pointer in the buffer must remain valid for the lifetime of this mesh.
+		//
+		void SetPositions( const ConstBuffer<glm::vec3>& positions );
+
+		//
+		// Enable indexed drawing.
+		// SetIndices can be called before or after this, and the old buffer will be stored (but not used) between calls.
+		//
+		void EnableIndices( bool enabled ) { m_useIndex = enabled; }
+
+		//
+		// Set the index buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetData( float* data, int count, int stride );
+		void SetIndices( const ConstBuffer<uint>& indices );
+
+		//
+		// Enable/disable normals.
+		// SetNormals can be called before or after this, and the old buffer will be stored (but not used) between calls.
+		//
+		void EnableNormals( bool enabled ) { m_useNormal = enabled; }
+
+		//
+		// Set the normal buffer that the mesh will use.
+		// The mesh does *NOT* take ownership of this.
+		//
+		void SetNormals( const ConstBuffer<glm::vec3>& normals );
+
+		//
+		// Enable/disable vertex colours.
+		// SetNormals can be called before or after this, and the old buffer will be stored (but not used) between calls.
+		//
+		void EnableVertexColours( bool enabled ) { m_useVertexColour = enabled; }
+		//
+		// Set the vertex colour buffer that the mesh will use.
+		// The mesh does *NOT* take ownership of this.
+		//
+		void SetVertexColours( const ConstBuffer<glm::vec4>& colours );
+
+		//
+		// Enable/disable UV coordinates.
+		// SetUVs can be called before or after this, and the old buffer will be stored (but not used) between calls.
+		//
+		void EnableUVs( bool enabled ) { m_useUV = enabled; }
+
+		//
+		// Set the UV buffer that the mesh will use.
+		// The mesh does *NOT* take ownership of this.
+		//
+		void SetUVs( const ConstBuffer<glm::vec2>& uvs );
 
 		//
 		// Send updated mesh data to the GPU from the same place it currently is.
 		//
-		void UpdateData();
-
-		//
-		// Set the index buffer that the mesh will use.
-		//
-		void SetIndices( uint* data, int count );
-
-		//
-		// Bind the attribute of the given name and type.
-		//
-		void BindAttribute( const char* shaderAttribute, uint count, uint first, bool normalized );
+		void UpdateBuffers();
 
 		//
 		// Set a colour multiplier that is applied to all vertices of the mesh.
 		//
-		void SetColourMultiplier( const glm::vec4& colour ) { m_colour = colour; }
+		void SetColourMultiplier( const glm::vec4& colour ) { m_colourMultiplier = colour; }
 
 		//
-		// Get the shader used for this mesh.
+		// Get this mesh's shader.
 		//
-		ShaderHandle GetShader() const { return m_shader; }
+		ShaderProgram* GetShader() { return m_shader.Get(); }
+
+		//
+		// Use or release this mesh's shader.
+		//
+		void UseShader( bool use );
+
+		//
+		// Get the name of this mesh.
+		//
+		const String& GetName() const { return m_name; }
 
 		void MakeUnitCube();
 
@@ -97,24 +146,41 @@ namespace dd
 		static std::mutex m_instanceMutex;
 		static std::unordered_map<uint64, Mesh> m_instances;
 		
-		uint m_indexVBO;
-		uint m_vbo;
-		VAO m_vao;
+		VBO m_vboPosition;
+		ConstBuffer<glm::vec3> m_bufferPosition;
 
-		Buffer<uint> m_indices;
-		Buffer<float> m_data;
-		uint m_stride;
+		bool m_useNormal { false };
+		VBO m_vboNormal;
+		ConstBuffer<glm::vec3> m_bufferNormal;
+
+		bool m_useIndex { false };
+		VBO m_vboIndex;
+		ConstBuffer<uint> m_bufferIndex;
+
+		bool m_useUV { false };
+		VBO m_vboUV;
+		ConstBuffer<glm::vec2> m_bufferUV;
+
+		bool m_useVertexColour { false };
+		VBO m_vboVertexColour;
+		ConstBuffer<glm::vec4> m_bufferVertexColour;
+		
+		VAO m_vao;
 
 		String128 m_name;
 		ShaderHandle m_shader;
 		AABB m_bounds;
-		glm::vec4 m_colour;
+
+		glm::vec4 m_colourMultiplier;
 
 		std::atomic<int>* m_refCount;
+
 		void Retain();
 		void Release();
 
 		Mesh( const char* name, ShaderHandle program );
+
+		void Assign( const Mesh& other );
 
 		//
 		// Get the mesh instance associated with the given handle.

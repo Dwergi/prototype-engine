@@ -40,6 +40,7 @@ namespace dd
 		void Destroy();
 
 		void Write( const char* filename );
+		void WriteNormals( const char* filename );
 
 		MeshHandle GetMesh() const { return m_mesh; }
 
@@ -49,10 +50,13 @@ namespace dd
 		static const int VertexCount = (Vertices + 1) * (Vertices + 1);
 
 		static uint s_indices[IndexCount];
+		static Buffer<uint> s_bufferIndices;
+
 		static ShaderHandle s_shader;
 
 		MeshHandle m_mesh;
-		glm::vec3 m_vertices[VertexCount * 2]; // vertices and normals
+		Buffer<glm::vec3> m_vertices;
+		Buffer<glm::vec3> m_normals;
 		
 		float GetHeight( float x, float y );
 

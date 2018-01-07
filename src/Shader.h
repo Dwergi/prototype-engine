@@ -6,15 +6,12 @@
 
 #pragma once
 
+#include "OpenGL.h"
+
 #include <atomic>
 
 namespace dd
 {
-	namespace OpenGL
-	{
-		const uint InvalidID = 0;
-	}
-
 	class Shader
 	{
 	public:
@@ -44,7 +41,7 @@ namespace dd
 		friend class ShaderProgram;
 
 		bool m_valid;
-		uint m_id;
+		GLuint m_id;
 		String64 m_name;
 		std::atomic<int>* m_refCount;
 

@@ -78,22 +78,38 @@ namespace dd
 
 		if( m_focusedMesh.IsValid() )
 		{
+			ImGui::CollapsingHeader( "Focused" );
+
+			const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+			ImGui::Text( "Name: %s", name.c_str() );
+
 			glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-			ImGui::Text( "Focused Mesh: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
+			ImGui::Text( "Position: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
 		}
 		else
 		{
-			ImGui::Text( "Focused Mesh: <none>" );
+			ImGui::CollapsingHeader( "Focused" );
+
+			ImGui::Text( "Name: <none>" );
+			ImGui::Text( "Position: <none>" );
 		}
 
 		if( m_selectedMesh.IsValid() )
 		{
+			ImGui::CollapsingHeader( "Selected" );
+
+			const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+			ImGui::Text( "Name: %s", name.c_str() );
+
 			glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-			ImGui::Text( "Selected Mesh: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
+			ImGui::Text( "Position: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
 		}
 		else
 		{
-			ImGui::Text( "Selected Mesh: <none>" );
+			ImGui::CollapsingHeader( "Selected" );
+
+			ImGui::Text( "Name: <none>" );
+			ImGui::Text( "Position: <none>" );
 		}
 	}
 

@@ -173,17 +173,19 @@ namespace dd
 
 	void TerrainSystem::SaveChunkImages() const
 	{
-		String64 filename( "chunk_" );
-
 		int chunk_index = 0;
 
 		for( auto& chunk : m_chunks )
 		{
-			String64 chunk_file( filename );
-			WriteStream write( chunk_file );
-			write.WriteFormat( "terrain_%d.tga", chunk_index );
-
+			String64 chunk_file;
+			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
+			
 			chunk.second->Write( chunk_file.c_str() );
+
+			String64 chunk_normals_file;
+			snprintf( chunk_normals_file.data(), 64, "terrain_%d_n.tga", chunk_index );
+
+			chunk.second->WriteNormals( chunk_normals_file.c_str() );
 
 			++chunk_index;
 		}
@@ -192,12 +194,18 @@ namespace dd
 	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager )
 	{
 		// start with a 4x4 grid of the lowest LOD level, 
-		// then at each level split the centermost 2x2 grid into a 4x4 grid of one LOD level lower
-		
-		for( int lod = m_lodLevels - 1; lod >= 0; --lod )
+		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
+		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
 			GenerateLODLevel( entity_manager, lod );
 		}
+
+		// number of expected chunks
+		const int halfChunks = ChunksPerDimension / 2;
+
+		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
+			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
+		DD_ASSERT( m_chunks.size() == expected, "Wrong number of chunks generated!" );
 	}
 
 	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod )
@@ -207,18 +215,21 @@ namespace dd
 
 		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
 
-		for( int y = -ChunksPerDimension / 2; y < ChunksPerDimension / 2; ++y )
+		const int halfChunks = ChunksPerDimension / 2;
+		const int quarterChunks = halfChunks / 2;
+
+		int generated = 0;
+
+		for( int y = -halfChunks; y < halfChunks; ++y )
 		{
-			for( int x = -ChunksPerDimension / 2; x < ChunksPerDimension / 2; ++x )
+			for( int x = -halfChunks; x < halfChunks; ++x )
 			{
-				if( lod != 0 )
+				// don't generate chunks for the middle-most grid unless we're at LOD 0
+				if( lod != 0 && 
+					(x >= -quarterChunks && x < quarterChunks) &&
+					(y >= -quarterChunks && y < quarterChunks) )
 				{
-					// don't generate chunks for the middle-most grid unless we're at LOD 0
-					if( (x == -1 || x == 0) &&
-						(y == -1 || y == 0) )
-					{
-						continue;
-					}
+					continue;
 				}
 
 				TerrainChunkKey key;
@@ -232,8 +243,15 @@ namespace dd
 
 				m_chunks.insert( std::make_pair( key, chunk ) );
 				m_entities.insert( std::make_pair( key, entity ) );
+
+				++generated;
 			}
 		}
+
+		const int expected = lod == 0 ? ChunksPerDimension * ChunksPerDimension : // lod 0
+			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
+
+		DD_ASSERT( generated == expected, "Wrong number of chunks generated for LOD!" );
 	}
 
 	TerrainChunk* TerrainSystem::GenerateChunk( EntityManager& entity_manager, const TerrainChunkKey& key )

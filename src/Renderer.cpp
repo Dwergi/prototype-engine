@@ -42,36 +42,43 @@ namespace dd
 
 	}
 
-	namespace
+	// TODO: Don't do this.
+	static ShaderHandle CreateShaders( const char* name )
 	{
-		// TODO: Don't do this.
-		ShaderHandle CreateShaders( const char* name )
-		{
-			Vector<Shader> shaders;
+		Vector<Shader> shaders;
 
-			Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
-			DD_ASSERT( vert.IsValid() );
-			shaders.Add( vert );
+		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
+		DD_ASSERT( vert.IsValid() );
+		shaders.Add( vert );
 
-			Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
-			DD_ASSERT( geom.IsValid() );
-			shaders.Add( geom );
+		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+		DD_ASSERT( geom.IsValid() );
+		shaders.Add( geom );
 
-			Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
-			DD_ASSERT( pixel.IsValid() );
-			shaders.Add( pixel );
+		Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
+		DD_ASSERT( pixel.IsValid() );
+		shaders.Add( pixel );
 
-			ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
-			return handle;
-		}
+		ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
+
+		ShaderProgram& shader = *handle.Get();
+		shader.Use( true );
+
+		shader.SetPositionsName( "Position" );
+		shader.SetNormalsName( "Normal" );
+
+		shader.Use( false );
+
+		return handle;
 	}
 
 	void Renderer::Initialize( const ICamera& camera, EntityManager& entityManager )
 	{
-		m_frustum = new Frustum();
-		m_frustum->ResetFrustum( camera );
-
 		m_shaders.Add( CreateShaders( "mesh" ) );
+
+		m_frustum = new Frustum();
+		m_frustum->CreateRenderData( m_shaders[0] );
+		m_frustum->Update( camera );
 
 		m_unitCube = Mesh::Create( "cube", m_shaders[0] );
 		m_unitCube.Get()->MakeUnitCube();
@@ -342,7 +349,7 @@ namespace dd
 					debugMultiplier.x = 1.5f;
 				}
 
-				ShaderProgram* shader = mesh->GetShader().Get();
+				ShaderProgram* shader = mesh->GetShader();
 				shader->Use( true );
 
 				int lightCount = lights.Size();
@@ -453,7 +460,7 @@ namespace dd
 
 		if( !m_debugFreezeFrustum && camera.IsDirty() || m_forceUpdateFrustum )
 		{
-			m_frustum->ResetFrustum( camera );
+			m_frustum->Update( camera );
 
 			m_forceUpdateFrustum = false;
 		}
@@ -468,8 +475,7 @@ namespace dd
 
 		if( m_debugFreezeFrustum )
 		{
-			ShaderProgram* shader = m_shaders[0].Get();
-			m_frustum->Render( camera, *shader );
+			m_frustum->Render( camera );
 		}
 
 		m_debugLights = entityManager.FindAllWithWritable<LightComponent, TransformComponent>();

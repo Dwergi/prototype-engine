@@ -1,51 +1,73 @@
+//
+// VBO.h - A wrapper around OpenGL VBOs.
+// Copyright (C) Sebastian Nordgren 
+// April 19th 2016
+//
+
 #include "PrecompiledHeader.h"
 #include "VBO.h"
+
+#include "GLError.h"
 
 #include "GL/gl3w.h"
 
 namespace dd
 {
-	VBO::VBO() :
-		m_id( 0 ),
-		m_target( 0 )
+	VBO::VBO()
 	{
 
 	}
 
 	VBO::VBO( const VBO& other ) :
 		m_id( other.m_id ),
-		m_target( other.m_target )
+		m_target( other.m_target ),
+		m_usage( other.m_usage )
 	{
 
 	}
 
 	VBO::~VBO()
 	{
-
+		m_id = OpenGL::InvalidID;
+		m_target = OpenGL::InvalidID;
+		m_usage = OpenGL::InvalidID;
 	}
 
 	VBO& VBO::operator=( const VBO& other )
 	{
 		m_id = other.m_id;
 		m_target = other.m_target;
+		m_usage = other.m_usage;
 
 		return *this;
 	}
 
-	void VBO::Create( GLenum target )
+	void VBO::Create( GLenum target, GLenum usage )
 	{
 		DD_ASSERT( !IsValid() );
 
+		DD_ASSERT( target != OpenGL::InvalidID, "Invalid target in VBO::Create!" );
+		DD_ASSERT( usage != OpenGL::InvalidID, "Invalid usage in VBO::Create!" );
+
 		glGenBuffers( 1, &m_id );
+		CheckGLError();
+
 		m_target = target;
+		m_usage = usage;
 	}
 
 	void VBO::Destroy()
 	{
-		DD_ASSERT( IsValid() );
+		if( IsValid() )
+		{
 
-		glDeleteBuffers( 1, &m_id );
-		m_id = 0;
+			glDeleteBuffers( 1, &m_id );
+			CheckGLError();
+		}
+
+		m_id = OpenGL::InvalidID;
+		m_target = OpenGL::InvalidID;
+		m_usage = OpenGL::InvalidID;
 	}
 
 	void VBO::Bind()
@@ -53,10 +75,26 @@ namespace dd
 		DD_ASSERT( IsValid() );
 
 		glBindBuffer( m_target, m_id );
+		CheckGLError();
 	}
 
-	void VBO::SetData( const void* data, uint size )
+	void VBO::Update()
 	{
-		glBufferData( m_target, size, data, GL_STATIC_DRAW );
+		if( m_buffer != nullptr )
+		{
+			glNamedBufferData( m_id, m_buffer->SizeBytes(), NULL, m_usage );
+			CheckGLError();
+
+			glNamedBufferData( m_id, m_buffer->SizeBytes(), m_buffer->GetVoid(), m_usage );
+			CheckGLError();
+		}
+	}
+
+	void VBO::SetData( const IBuffer& buffer )
+	{
+		m_buffer = &buffer;
+
+		glNamedBufferData( m_id, buffer.SizeBytes(), buffer.GetVoid(), m_usage );
+		CheckGLError();
 	}
 }

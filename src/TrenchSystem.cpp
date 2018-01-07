@@ -18,55 +18,87 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-const float TRENCH_CHUNK_LENGTH = 10.0f;
-
-float s_trenchChunk[] =
-{
-	//  X  Y  Z       Normal
-	// bottom
-	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,	
-	-0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
-	0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,	
-	0.5f,0.0f,0.0f,   0.0f, 1.0f, 0.0f,	
-	-0.5f,0.0f,1.0f,   0.0f, 1.0f, 0.0f,
-
-	// left
-	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,0.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,1.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,0.0f,1.0f,   1.0f, 0.0f, 0.0f,
-	-0.5f,1.0f,0.0f,   1.0f, 0.0f, 0.0f,
-
-	// right
-	0.5f,0.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,0.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,0.0f,1.0f,   -1.0f, 0.0f, 0.0f,
-	0.5f,1.0f,1.0f,   -1.0f, 0.0f, 0.0f,
-};
-
-/*
-DATA:
-
-Each TrenchComponent:
-- Represents a segment of trench TRENCH_CHUNK_LENGTH long.
-- Is a cube, with 2 sides open
-	- 4 of the sides are made up of meshes and potentially some gameplay component (turret, target, etc.)
-	- 2 of the sides are open
-	- In the case where there is a corner, the player is forced to turn
-
-LOGIC:
-
-On each update:
-- Check if a chunk is too far (TRENCH_CHUNK_DESTRUCTION_DISTANCE) behind the player and destroy the entity if it is
-- Create new chunks ahead of the player if necessary
-*/
-
 namespace dd
 {
+	const float TRENCH_CHUNK_LENGTH = 10.0f;
+
+	static const glm::vec3 s_trenchChunkPositions[] =
+	{
+		//  X  Y  Z       
+		// bottom
+		glm::vec3( 0.5f,0.0f,0.0f ),   
+		glm::vec3( -0.5f,0.0f,0.0f ),  
+		glm::vec3( -0.5f,0.0f,1.0f ),  
+		glm::vec3( 0.5f,0.0f,1.0f ),   
+		glm::vec3( 0.5f,0.0f,0.0f ),   
+		glm::vec3( -0.5f,0.0f,1.0f ),  
+
+		// left
+		glm::vec3( -0.5f,1.0f,0.0f ),
+		glm::vec3( -0.5f,0.0f,1.0f ),
+		glm::vec3( -0.5f,0.0f,0.0f ),
+		glm::vec3( -0.5f,1.0f,1.0f ),
+		glm::vec3( -0.5f,0.0f,1.0f ),
+		glm::vec3( -0.5f,1.0f,0.0f ),
+
+		// right
+		glm::vec3( 0.5f,0.0f,0.0f ),
+		glm::vec3( 0.5f,0.0f,1.0f ),
+		glm::vec3( 0.5f,1.0f,0.0f ),
+		glm::vec3( 0.5f,1.0f,0.0f ),
+		glm::vec3( 0.5f,0.0f,1.0f ),
+		glm::vec3( 0.5f,1.0f,1.0f ),
+	};
+
+	static const ConstBuffer<glm::vec3> s_trenchChunkPositionBuffer( s_trenchChunkPositions, sizeof( s_trenchChunkPositions ) / sizeof( glm::vec3 ) );
+
+	static const glm::vec3 s_trenchChunkNormals[] =
+	{
+		// X	Y     Z
+		// bottom
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+
+		// left
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+
+		// right
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+	};
+
+	static const ConstBuffer<glm::vec3> s_trenchChunkNormalBuffer( s_trenchChunkNormals, sizeof( s_trenchChunkNormals ) / sizeof( glm::vec3 ) );
+
+	/*
+	DATA:
+
+	Each TrenchComponent:
+	- Represents a segment of trench TRENCH_CHUNK_LENGTH long.
+	- Is a cube, with 2 sides open
+		- 4 of the sides are made up of meshes and potentially some gameplay component (turret, target, etc.)
+		- 2 of the sides are open
+		- In the case where there is a corner, the player is forced to turn
+
+	LOGIC:
+
+	On each update:
+	- Check if a chunk is too far (TRENCH_CHUNK_DESTRUCTION_DISTANCE) behind the player and destroy the entity if it is
+	- Create new chunks ahead of the player if necessary
+	*/
+
 	TrenchSystem::TrenchSystem( const ICamera& camera ) :
 		m_trenchDirection( 0.0f, 0.0f, 1.0f ),
 		m_trenchOrigin( 0.0f, 0.0f, 0.0f ),
@@ -108,13 +140,16 @@ namespace dd
 		m_shader = CreateShaders( "trench_chunk" );
 		m_chunkMesh = Mesh::Create( "trench_chunk", m_shader );
 
-		Mesh* mesh = m_chunkMesh.Get();
-		mesh->SetData( s_trenchChunk, sizeof( s_trenchChunk ), 6 );
+		ShaderProgram& shader = *m_shader.Get();
+		shader.Use( true );
+		shader.SetPositionsName( "Position" );
+		shader.SetNormalsName( "Normal" );
 
-		m_shader.Get()->Use( true );
-		mesh->BindAttribute( "Position", 3, 0, false );
-		mesh->BindAttribute( "Normal", 3, 3, true );
-		m_shader.Get()->Use( false );
+		Mesh* mesh = m_chunkMesh.Get();
+		mesh->SetPositions( s_trenchChunkPositionBuffer );
+		mesh->SetNormals( s_trenchChunkNormalBuffer );
+
+		shader.Use( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
