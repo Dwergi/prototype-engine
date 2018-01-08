@@ -59,14 +59,11 @@ namespace dd
 
 		glfwGetCursorPos( m_glfwWindow, &newX, &newY );
 
-		m_mousePosition.DeltaX = (float) (m_mousePosition.X - newX);
-		m_mousePosition.DeltaY = (float) (m_mousePosition.Y - newY);
-		m_mousePosition.X = (float) newX;
-		m_mousePosition.Y = (float) newY;
+		m_mousePosition.Delta = glm::vec2( (float) (m_mousePosition.Absolute.x - newX), (float) (m_mousePosition.Absolute.y - newY) );
+		m_mousePosition.Absolute = glm::vec2( (float) newX, (float) newY );
 
 		m_scrollPosition = m_tempScrollPosition;
-		m_tempScrollPosition.DeltaX = 0;
-		m_tempScrollPosition.DeltaY = 0;
+		m_tempScrollPosition.Delta = glm::vec2();
 
 		m_currentEvents.Swap( m_pendingEvents );
 		m_pendingEvents.Clear();
@@ -152,16 +149,14 @@ namespace dd
 		}
 	}
 
-	void Input::ScrollCallback( GLFWwindow* window, double xoffset, double yoffset )
+	void Input::ScrollCallback( GLFWwindow* window, double xOffset, double yOffset )
 	{
-		m_pInstance->m_tempScrollPosition.DeltaX = (float) xoffset;
-		m_pInstance->m_tempScrollPosition.DeltaY = (float) yoffset;
-		m_pInstance->m_tempScrollPosition.X += (float) xoffset;
-		m_pInstance->m_tempScrollPosition.Y += (float) yoffset;
+		m_pInstance->m_tempScrollPosition.Delta = glm::vec2( (float) xOffset, (float) yOffset );
+		m_pInstance->m_tempScrollPosition.Absolute += glm::vec2( (float) xOffset, (float) yOffset );
 
 		for( GLFWscrollfun fn : m_pInstance->m_scrollCallbacks )
 		{
-			(*fn)(window, xoffset, yoffset);
+			(*fn)(window, xOffset, yOffset);
 		}
 	}
 

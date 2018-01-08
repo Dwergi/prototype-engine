@@ -25,7 +25,8 @@ namespace dd
 		TOGGLE_CONSOLE,
 		TOGGLE_FREECAM,
 		ADD_MINOR_TRAUMA,
-		ADD_MAJOR_TRAUMA
+		ADD_MAJOR_TRAUMA,
+		TOGGLE_PICKING
 	};
 
 	enum class InputType : unsigned int

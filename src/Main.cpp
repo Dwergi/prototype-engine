@@ -194,12 +194,13 @@ void BindKeys( Input& input )
 	input.BindKey( ' ', InputAction::UP );
 	input.BindKey( 'R', InputAction::ADD_MINOR_TRAUMA );
 	input.BindKey( 'T', InputAction::ADD_MAJOR_TRAUMA );
+	input.BindKey( 'P', InputAction::TOGGLE_PICKING );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
 }
 
-void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t )
+void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
 {
 	bool captureMouse = !s_showDebugUI;
 	if( captureMouse != input.IsMouseCaptured() )
@@ -213,6 +214,8 @@ void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t 
 		free_cam.UpdateScroll( input.GetScrollPosition() );
 		free_cam.Update( delta_t );
 	}
+
+	shaky_cam.Update( delta_t );
 }
 
 void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems )
@@ -263,6 +266,14 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 	jobsystem.WaitForCategory( "ISystem::PostRender" );
 }
 
+void ShutdownSystems( EntityManager& entity_manager, const Vector<ISystem*>& systems )
+{
+	for( ISystem* system : systems )
+	{
+		system->Shutdown( entity_manager );
+	}
+}
+
 void DrawDebugUI( const Vector<IDebugDraw*>& views )
 {
 	if( s_showDebugUI )
@@ -281,8 +292,9 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 			{
 				for( IDebugDraw* debug_view : views )
 				{
-					ImGui::MenuItem( debug_view->GetDebugTitle(), nullptr, &debug_view->IsDebugOpen() );
+					debug_view->AddToMenu();
 				}
+
 				ImGui::EndMenu();
 			}
 
@@ -297,11 +309,25 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	}
 }
 
-void Render( const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer )
+void Render( const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer, RenderToTexture& rtt )
 {
 	for( IRenderer* renderer : renderers )
 	{
 		renderer->Render( entity_manager, camera );
+
+		if( renderer->ShouldRenderFrameBuffer() )
+		{
+			const ConstBuffer<byte>* frame_buffer_data = renderer->GetLastFrameBuffer();
+			if( frame_buffer_data != nullptr )
+			{
+				Texture* rtt_texture = rtt.GetTexture();
+				rtt_texture->Bind( 0 );
+				rtt_texture->SetData( *frame_buffer_data, 0 );
+				rtt_texture->Unbind();
+
+				rtt.Render();
+			}
+		}
 	}
 }
 
@@ -410,6 +436,16 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		InitializeSystems( jobSystem, entity_manager, systems );
 		InitializeRenderers( entity_manager, shakyCam, renderers );
 
+		glm::ivec2 picking_size( s_window->GetWidth() / MousePicking::DownScalingFactor, 
+			s_window->GetHeight() / MousePicking::DownScalingFactor );
+
+		Texture output_texture;
+		output_texture.Create( picking_size, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE );
+
+		RenderToTexture output_rtt( *s_window );
+		output_rtt.Create( output_texture, false );
+		output_rtt.PreRender();
+
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_SCOPED( Frame );
@@ -432,22 +468,16 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			debugUI.Update( delta_t );
 
 			// camera
-			UpdateFreeCam( *s_freeCam, input, delta_t );
-			shakyCam.Update( delta_t );
+			UpdateFreeCam( *s_freeCam, shakyCam, input, delta_t );
 
 			// systems update
 			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
-
-			terrain_system.Update( entity_manager, delta_t );
 
 			// debug UI
 			DrawDebugUI( debug_views );
 
 			// render
-			Render( renderers, entity_manager, shakyCam, console, frame_timer );
-
-			RenderToTexture& rtt = mouse_picking.GetRTT();
-			rtt.Render();
+			Render( renderers, entity_manager, shakyCam, console, frame_timer, output_rtt );
 
 			ImGui::Render();
 
@@ -464,7 +494,11 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			DD_PROFILE_LOG( "End Frame" );
 		}
 
+		ShutdownSystems( entity_manager, systems );
 		systems.Clear();
+
+		entity_manager.DestroyAll();
+
 		renderer.Shutdown();
 	}
 

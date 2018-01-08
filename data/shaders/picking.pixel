@@ -1,19 +1,10 @@
 #version 330 core
 
-out vec4 Colour;
+layout( location = 0 ) out int MeshID;
 
 uniform int ID;
 
-const int RMask = 0xFF;
-const int GMask = 0xFF << 8;
-const int BMask = 0xFF << 16;
-const int AMask = 0xFF << 24;
-
 void main()
 {
-	float r = (ID & RMask) / 255.0;
-	float g = (ID & BMask) / 255.0;
-	float b = (ID & GMask) / 255.0;
-	float a = (ID & AMask) / 255.0;
-	Colour = vec4( r, g, b, a );
+	MeshID = ID;
 }

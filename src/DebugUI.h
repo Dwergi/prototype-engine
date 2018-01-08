@@ -27,7 +27,7 @@ namespace dd
 		bool CreateDeviceObjects();
 
 		void SetFocused( bool focused );
-		void SetMousePosition( float x, float y );
+		void SetMousePosition( glm::vec2 pos );
 		void SetDisplaySize( int window_width, int window_height );
 
 		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );

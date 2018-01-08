@@ -41,9 +41,13 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
+		Texture* GetTexture() const { return m_texture; }
+
 		void PreRender();
 
 		void Render();
+
+		void SetClearColour( glm::vec4 clear_colour ) { m_clearColour = clear_colour; }
 
 	private:
 
@@ -51,6 +55,7 @@ namespace dd
 		bool m_valid { false };
 		GLuint m_frameBuffer { OpenGL::InvalidID };
 		GLuint m_depth { OpenGL::InvalidID };
+		glm::vec4 m_clearColour;
 
 		Texture* m_texture { nullptr };
 

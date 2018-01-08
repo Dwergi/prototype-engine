@@ -22,6 +22,8 @@
 
 #include "imgui/imgui.h"
 
+#include "GL/gl3w.h"
+
 namespace dd
 {
 	MousePicking::MousePicking( const Window& window, const ICamera& camera, const Input& input ) : 
@@ -34,48 +36,57 @@ namespace dd
 
 	void MousePicking::BindActions( InputBindings& bindings )
 	{
-		auto handle_input = std::bind( &MousePicking::HandleInput, std::ref( *this ), std::placeholders::_1, std::placeholders::_2 );
-		bindings.RegisterHandler( InputAction::SELECT_MESH, handle_input );
+		bindings.RegisterHandler( InputAction::SELECT_MESH, [this]( InputAction action, InputType type ) { HandleInput( action, type ); } );
+		bindings.RegisterHandler( InputAction::TOGGLE_PICKING, [this]( InputAction action, InputType type ) { HandleInput( action, type ); } );
 	}
 
 	void MousePicking::HandleInput( InputAction action, InputType type )
 	{
-		if( action == InputAction::SELECT_MESH && type == InputType::PRESSED )
+		if( action == InputAction::SELECT_MESH && type == InputType::RELEASED )
 		{
 			m_select = true;
 			m_selectedMesh = EntityHandle();
 		}
+
+		if( action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED )
+		{
+			m_enabled = !m_enabled;
+			IDebugDraw::SetDebugOpen( m_enabled );
+		}
+	}
+
+	int MousePicking::GetEntityHandleAt( glm::vec2 mouse_pos ) const
+	{
+		glm::ivec2 flipped = glm::ivec2( (int) mouse_pos.x, m_window.GetHeight() - (int) mouse_pos.y );
+
+		glm::ivec2 clamped = glm::clamp( flipped, glm::ivec2( 0, 0 ), glm::ivec2( m_window.GetWidth() - 1, m_window.GetHeight() - 1 ) );
+		int index = (clamped.y / DownScalingFactor) * (m_window.GetWidth() / DownScalingFactor) + (clamped.x / DownScalingFactor);
+
+		DD_ASSERT( (index * 4) < m_lastFrameBuffer.SizeBytes(), "Index out of range!" );
+
+		const int* base = (const int*) m_lastFrameBuffer.GetVoid();
+		return base[index];
 	}
 
 	void MousePicking::Update( EntityManager& entity_manager, float dt )
 	{
 		if( m_enabled )
 		{
-			//Ray mouse_ray = GetScreenRay( m_input.GetMousePosition() );
-
 			m_focusedMesh = EntityHandle();
 
-			float distance = FLT_MAX;
+			m_position = m_input.GetMousePosition().Absolute;
+			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
 
-			MousePosition pos = m_input.GetMousePosition();
-
-			int clampedX = (int) glm::clamp( pos.X, 0.0f, m_window.GetWidth() - 1.0f );
-			int clampedY = (int) glm::clamp( pos.Y, 0.0f, m_window.GetHeight() - 1.0f );
-			int index = clampedY * m_window.GetWidth() + clampedX;
-
-			int* handle = ((int*) m_textureData.Get()) + index;
-
-			m_position = glm::ivec2( clampedX, clampedY );
-			m_handle = *handle;
-			
-			EntityHandle entity( *handle, entity_manager );
-			if( entity.IsValid() && entity.Has<MeshComponent>() )
+			EntityHandle entity = EntityHandle( m_handle, entity_manager );
+			if( entity.IsValid() )
 			{
 				m_focusedMesh = entity;
 			}
+			else
+			{
+				m_handle = -1;
+			}
 			
-			//entity_manager.ForAllWithReadable<MeshComponent>( [this, &mouse_ray, &distance]( auto entity, auto mesh ) { HitTestMesh( entity, mesh, mouse_ray, distance ); } );
-
 			if( m_focusedMesh.IsValid() )
 			{
 				if( m_select )
@@ -107,37 +118,39 @@ namespace dd
 
 		shader.Use( false );
 
-		int width = m_window.GetWidth() / 2;
-		int height = m_window.GetHeight() / 2;
-		int buffer_size = width * height * 4;
+		glm::ivec2 size = glm::ivec2( m_window.GetWidth() / DownScalingFactor, m_window.GetHeight() / DownScalingFactor );
+		int buffer_size = size.x * size.y * 4;
 
-		m_textureData.Set( new byte[ buffer_size ], buffer_size );
-		memset( m_textureData.Get(), 0, m_textureData.SizeBytes() );
+		m_lastFrameBuffer.Set( new byte[buffer_size], buffer_size );
+		
+		m_texture.Create( size, GL_R32I, GL_RED_INTEGER, GL_INT );
 
-		m_texture.Create( width, height, 4 );
-
+		m_rtt.SetClearColour( glm::vec4( 1 ) );
 		m_rtt.Create( m_texture, true );
 		m_rtt.PreRender();
 	}
 
 	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera )
 	{
-		ShaderProgram& shader = *m_shader.Get();
-
-		m_rtt.Bind();
-
-		shader.Use( true );
-
-		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, &shader]( auto entity, auto mesh, auto transform )
+		if( m_enabled )
 		{
-			RenderMesh( camera, shader, entity, mesh.Read(), transform.Read() );
-		} );
+			ShaderProgram& shader = *m_shader.Get();
 
-		shader.Use( false );
+			m_rtt.Bind();
 
-		m_rtt.Unbind();
+			shader.Use( true );
 
-		m_texture.GetData( m_textureData, 0 );
+			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, &shader]( auto entity, auto mesh, auto transform )
+			{
+				RenderMesh( camera, shader, entity, mesh.Read(), transform.Read() );
+			} );
+
+			shader.Use( false );
+
+			m_rtt.Unbind();
+
+			m_texture.GetData( m_lastFrameBuffer, 0 );
+		}
 	}
 
 	void MousePicking::RenderMesh( const ICamera& camera, ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
@@ -153,9 +166,10 @@ namespace dd
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
+		ImGui::Checkbox( "Render Debug", &m_renderDebug );
 
 		ImGui::Text( "Handle: %d", m_handle );
-		ImGui::Text( "Position: %d %d", m_position.x, m_position.y );
+		ImGui::Text( "Position: %.1f %.1f", m_position.x, m_position.y );
 
 		if( m_focusedMesh.IsValid() )
 		{
@@ -194,9 +208,8 @@ namespace dd
 		}
 	}
 
-	void MousePicking::HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, const Ray& mouse_ray, float& nearest_distance )
+	void MousePicking::HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance )
 	{
-		const MeshComponent* mesh_cmp = mesh_handle.Read();
 		Mesh* mesh = mesh_cmp->Mesh.Get();
 		if( mesh != nullptr && !mesh_cmp->Hidden )
 		{
@@ -222,7 +235,7 @@ namespace dd
 
 		{
 			float width = (float) m_window.GetWidth();
-			float x_percent = (pos.X - (width / 2)) / width;
+			float x_percent = (pos.Absolute.x - (width / 2)) / width;
 			float hfov = m_camera.GetVerticalFOV() * m_camera.GetAspectRatio();
 			float x_angle = hfov * x_percent;
 
@@ -231,7 +244,7 @@ namespace dd
 
 		{
 			float height = (float) m_window.GetHeight();
-			float y_percent = (pos.Y - (height / 2)) / height;
+			float y_percent = (pos.Absolute.x - (height / 2)) / height;
 			float vfov = m_camera.GetVerticalFOV();
 			float y_angle = vfov * y_percent;
 

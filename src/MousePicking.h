@@ -34,12 +34,16 @@ namespace dd
 	{
 	public:
 
+		static const int DownScalingFactor = 2;
+
 		MousePicking( const Window& window, const ICamera& camera, const Input& input );
 
 		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
 		EntityHandle GetFocusedMesh() const { return m_focusedMesh; }
 		EntityHandle GetSelectedMesh() const { return m_selectedMesh; }
+
+		int GetEntityHandleAt( glm::vec2 mouse_pos ) const;
 
 		void BindActions( InputBindings& bindings );
 
@@ -48,11 +52,8 @@ namespace dd
 		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
 		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
 
-		RenderToTexture& GetRTT() { return m_rtt; }
-
-	protected:
-
-		virtual void DrawDebugInternal() override;
+		virtual bool ShouldRenderFrameBuffer() const override { return m_renderDebug; }
+		virtual const ConstBuffer<byte>* GetLastFrameBuffer() const override { return &m_lastFrameBuffer; }
 
 	private:
 
@@ -62,6 +63,7 @@ namespace dd
 
 		bool m_select { false };
 		bool m_enabled { false };
+		bool m_renderDebug { false };
 
 		EntityHandle m_selectedMesh;
 		EntityHandle m_focusedMesh;
@@ -69,13 +71,15 @@ namespace dd
 		ShaderHandle m_shader;
 		Texture m_texture;
 		RenderToTexture m_rtt;
-		Buffer<byte> m_textureData;
+		Buffer<byte> m_lastFrameBuffer;
 
-		glm::ivec2 m_position;
+		glm::vec2 m_position;
 		int m_handle { 0 };
 
+		virtual void DrawDebugInternal() override;
+
 		Ray GetScreenRay( const MousePosition& pos ) const;
-		void HitTestMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_handle, const Ray& mouse_ray, float& nearest_distance );
+		void HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
 
 		void HandleInput( InputAction action, InputType type );
 

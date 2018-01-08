@@ -144,7 +144,7 @@ namespace dd
 		friend class MeshHandle;
 
 		static std::mutex m_instanceMutex;
-		static std::unordered_map<uint64, Mesh> m_instances;
+		static std::unordered_map<uint64, Mesh*> m_instances;
 		
 		VBO m_vboPosition;
 		ConstBuffer<glm::vec3> m_bufferPosition;

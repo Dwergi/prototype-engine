@@ -346,10 +346,10 @@ namespace dd
 		m_focused = focused;
 	}
 
-	void DebugUI::SetMousePosition( float x, float y )
+	void DebugUI::SetMousePosition( glm::vec2 pos )
 	{
 		if( m_focused )
-			ImGui::GetIO().MousePos = ImVec2( (float) x, y );   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
+			ImGui::GetIO().MousePos = ImVec2( pos.x, pos.y );   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
 		else 
 			ImGui::GetIO().MousePos = ImVec2( -1, -1 );
 	}
@@ -369,7 +369,7 @@ namespace dd
 
 		ImGuiIO& io = ImGui::GetIO();
 
-		SetMousePosition( m_input->GetMousePosition().X, m_input->GetMousePosition().Y );
+		SetMousePosition( m_input->GetMousePosition().Absolute );
 		SetFocused( m_window->IsFocused() );
 		SetDisplaySize( m_window->GetWidth(), m_window->GetHeight() );
 

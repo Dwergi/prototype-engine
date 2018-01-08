@@ -17,7 +17,7 @@ namespace dd
 		Texture();
 		~Texture();
 
-		void Create( int width, int height, int components );
+		void Create( glm::ivec2 size, GLenum format, GLenum dataFormat, GLenum dataType );
 		void Destroy();
 
 		glm::ivec2 GetSize() const { return m_size; }
@@ -39,7 +39,9 @@ namespace dd
 
 		bool m_valid { false };
 		GLuint m_id { OpenGL::InvalidID };
-		int m_components { 0 };
+		GLenum m_format { OpenGL::InvalidID };
+		GLenum m_dataFormat { OpenGL::InvalidID };
+		GLenum m_dataType { OpenGL::InvalidID };
 
 		int m_textureUnit { -1 };
 	};

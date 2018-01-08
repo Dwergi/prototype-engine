@@ -138,13 +138,14 @@ namespace dd
 		bounds.Expand( glm::vec3( 0.5f, 0, -1.0 ) );
 		bounds.Expand( glm::vec3( -0.5f, 0, -1.0 ) );
 
-		MeshHandle mesh_h = Mesh::Create( "ship", shader );
-		mesh_h.Get()->MakeUnitCube();
+		m_shipMesh = Mesh::Create( "ship", shader );
+		m_shipMesh.Get()->MakeUnitCube();
+		
 		/*mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
 		mesh_h.Get()->SetBounds( bounds );*/
 
 		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( entity );
-		mesh_cmp->Mesh = mesh_h;
+		mesh_cmp->Mesh = m_shipMesh;
 		mesh_cmp->Colour = glm::vec4( 1, 0, 0, 1 );
 		mesh_cmp->Hidden = false;
 		mesh_cmp->UpdateBounds( transform );
@@ -158,6 +159,8 @@ namespace dd
 		ship_cmp->BoostMaximum = 2.5f;
 		ship_cmp->BoostRemaining = ship_cmp->BoostMaximum;
 		ship_cmp->BoostRechargeRate = 2.0f;
+
+		m_lastShip = entity;
 	}
 
 	void ShipSystem::UpdateShip( EntityHandle entity, ComponentHandle<TransformComponent> transform, ComponentHandle<ShipComponent> ship, float delta_t )
@@ -241,6 +244,11 @@ namespace dd
 			return;
 
 		m_camera.SetPosition( m_nextCameraPos );
+	}
+
+	void ShipSystem::Shutdown( EntityManager& entity_manager )
+	{
+		Mesh::Destroy( m_shipMesh );
 	}
 
 	void ShipSystem::DrawDebugInternal()

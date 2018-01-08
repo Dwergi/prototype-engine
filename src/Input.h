@@ -20,12 +20,10 @@ namespace dd
 
 	struct MousePosition
 	{
-		float DeltaX;
-		float DeltaY;
-		float X;
-		float Y;
+		glm::vec2 Delta;
+		glm::vec2 Absolute;
 
-		MousePosition() : DeltaX( 0 ), DeltaY( 0 ), X( 0 ), Y( 0 ) {}
+		MousePosition() {}
 	};
 	
 	struct InputEvent

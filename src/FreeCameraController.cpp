@@ -176,8 +176,7 @@ namespace dd
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )
 	{
-		m_mouseDelta.x = pos.DeltaX;
-		m_mouseDelta.y = pos.DeltaY;
+		m_mouseDelta = pos.Delta;
 	}
 
 	void FreeCameraController::UpdateScroll( const MousePosition& pos )
@@ -186,7 +185,7 @@ namespace dd
 		
 		float degs = glm::degrees( vfov );
 
-		degs *= std::powf( 2.f, -pos.DeltaY * ZoomSpeed );
+		degs *= std::powf( 2.f, -pos.Delta.y * ZoomSpeed );
 
 		//degs += ZoomSpeed * -pos.DeltaY;
 		degs = glm::clamp( degs, 5.f, 89.f );

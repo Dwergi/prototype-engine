@@ -18,7 +18,7 @@
 namespace dd
 {
 	std::mutex Mesh::m_instanceMutex;
-	std::unordered_map<uint64, Mesh> Mesh::m_instances;
+	std::unordered_map<uint64, Mesh*> Mesh::m_instances;
 
 	static const glm::vec3 s_unitCubePositions[] =
 	{
@@ -189,7 +189,7 @@ namespace dd
 			return nullptr;
 		}
 
-		return &it->second;
+		return it->second;
 	}
 
 	MeshHandle Mesh::Create( const char* name, ShaderHandle program )
@@ -205,7 +205,7 @@ namespace dd
 		auto it = m_instances.find( hash );
 		if( it == m_instances.end() )
 		{
-			m_instances.insert( std::make_pair( hash, Mesh( name, program ) ) );
+			m_instances.insert( std::make_pair( hash, new Mesh( name, program ) ) );
 		}
 
 		MeshHandle handle;
@@ -216,9 +216,14 @@ namespace dd
 
 	void Mesh::Destroy( MeshHandle handle )
 	{
-		std::lock_guard<std::mutex> lock( m_instanceMutex );
+		Mesh* mesh = Get( handle );
+		if( mesh != nullptr )
+		{
+			std::lock_guard<std::mutex> lock( m_instanceMutex );
 
-		m_instances.erase( handle.m_hash );
+			delete mesh;
+			m_instances.erase( handle.m_hash );
+		}
 	}
 
 	Mesh::Mesh( const char* name, ShaderHandle program ) :

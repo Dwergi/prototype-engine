@@ -180,7 +180,7 @@ namespace dd
 		glViewport( 0, 0, m_texture->GetSize().x, m_texture->GetSize().y );
 		CheckGLError();
 
-		glClearColor( 0, 0, 0, 0 );
+		glClearColor( m_clearColour.r, m_clearColour.g, m_clearColour.b, m_clearColour.a );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		CheckGLError();
