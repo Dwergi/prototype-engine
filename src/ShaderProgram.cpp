@@ -10,6 +10,7 @@
 #include "GLError.h"
 #include "Shader.h"
 #include "ShaderHandle.h"
+#include "Texture.h"
 
 #include "GL/gl3w.h"
 
@@ -376,7 +377,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniform1f( uniform, f );
-
 			CheckGLError();
 		}
 	}
@@ -391,7 +391,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniform1i( uniform, i );
-
 			CheckGLError();
 		}
 	}
@@ -406,7 +405,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniform1i( uniform, b );
-
 			CheckGLError();
 		}
 	}
@@ -421,7 +419,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniform3fv( uniform, 1, glm::value_ptr( vec ) );
-
 			CheckGLError();
 		}
 	}
@@ -436,7 +433,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniform4fv( uniform, 1, glm::value_ptr( vec ) );
-
 			CheckGLError();
 		}
 	}
@@ -451,7 +447,6 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniformMatrix3fv( uniform, 1, false, glm::value_ptr( mat ) );
-
 			CheckGLError();
 		}
 	}
@@ -466,7 +461,20 @@ namespace dd
 		if( uniform != InvalidLocation )
 		{
 			glUniformMatrix4fv( uniform, 1, false, glm::value_ptr( mat ) );
+			CheckGLError();
+		}
+	}
 
+	void ShaderProgram::SetUniform( const char* name, const Texture& texture )
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform1i( uniform, texture.GetTextureUnit() );
 			CheckGLError();
 		}
 	}

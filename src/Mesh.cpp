@@ -386,19 +386,12 @@ namespace dd
 		m_vboVertexColour.Update();
 	}
 
-	void Mesh::Render( const ICamera& camera, const glm::mat4& transform )
+	void Mesh::Render( const ICamera& camera, ShaderProgram& shader, const glm::mat4& transform )
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
-		ShaderProgram& shader = *m_shader.Get();
-		DD_ASSERT( shader.IsValid() );
-
-		shader.Use( true );
-
-		glm::mat4 view = camera.GetCameraMatrix();
-
 		shader.SetUniform( "Model", transform );
-		shader.SetUniform( "View", view );
+		shader.SetUniform( "View", camera.GetCameraMatrix() );
 		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "ObjectColour", m_colourMultiplier );
@@ -408,19 +401,15 @@ namespace dd
 		if( !m_useIndex )
 		{
 			glDrawArrays( GL_TRIANGLES, 0, m_bufferPosition.Size() );
-
 			CheckGLError();
 		}
 		else
 		{
 			glDrawElements( GL_TRIANGLES, m_bufferIndex.Size(), GL_UNSIGNED_INT, 0 );
-
 			CheckGLError();
 		}
 
 		m_vao.Unbind();
-
-		shader.Use( false );
 	}
 
 	void Mesh::Retain()

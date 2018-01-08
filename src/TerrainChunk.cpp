@@ -69,7 +69,7 @@ namespace dd
 		return normalized;
 	}
 
-	void TerrainChunk::GenerateSharedResources()
+	void TerrainChunk::InitializeShared()
 	{
 		uint index = 0;
 
@@ -104,18 +104,21 @@ namespace dd
 				}
 			}
 		}
+	}
 
+	void TerrainChunk::CreateRenderResources()
+	{
 		Vector<Shader> shaders;
 
-		Shader vert = Shader::Create( String8( "vertex" ), String8( "shaders\\vertex.glsl" ), Shader::Type::Vertex );
+		Shader vert = Shader::Create( String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
 		DD_ASSERT( vert.IsValid() );
 		shaders.Add( vert );
 
-		Shader geom = Shader::Create( String8( "geometry" ), String8( "shaders\\geometry.glsl" ), Shader::Type::Geometry );
+		Shader geom = Shader::Create( String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
 		DD_ASSERT( geom.IsValid() );
 		shaders.Add( geom );
 
-		Shader pixel = Shader::Create( String8( "pixel" ), String8( "shaders\\pixel.glsl" ), Shader::Type::Pixel );
+		Shader pixel = Shader::Create( String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
 		DD_ASSERT( pixel.IsValid() );
 		shaders.Add( pixel );
 
@@ -130,7 +133,7 @@ namespace dd
 		shader->Use( false );
 	}
 
-	MeshHandle TerrainChunk::Generate( const TerrainChunkKey& key )
+	void TerrainChunk::Generate( const TerrainChunkKey& key )
 	{
 		DD_PROFILE_START( TerrainChunk_InitializeVerts );
 
@@ -153,35 +156,6 @@ namespace dd
 		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
 
 		DD_PROFILE_END();
-
-		DD_PROFILE_START( TerrainChunk_CreateMesh );
-
-		char name[128];
-		sprintf_s( name, 128, "%.2fx%.2f_%d", key.X, key.Y, key.LOD );
-
-		m_mesh = Mesh::Create( name, s_shader );
-
-		Mesh* mesh = m_mesh.Get();
-		mesh->UseShader( true );
-
-		mesh->SetPositions( m_vertices );
-
-		mesh->EnableNormals( true );
-		mesh->SetNormals( m_normals );
-
-		mesh->EnableIndices( true );
-		mesh->SetIndices( s_bufferIndices );
-
-		mesh->UseShader( false );
-
-		AABB bounds;
-		bounds.Expand( glm::vec3( 0 ) );
-		bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange, key.Size * Vertices ) );
-		mesh->SetBounds( bounds );
-
-		DD_PROFILE_END();
-
-		return m_mesh;
 	}
 
 	void TerrainChunk::UpdateNormals()
@@ -202,7 +176,7 @@ namespace dd
 				normal = glm::normalize( glm::cross( c - a, b - a ) );
 
 				// should always be pointing at least a little bit up
-				DD_ASSERT( normal.y > 0 );
+				DD_ASSERT( normal.y >= 0 );
 			}
 
 			m_normals[indexA] = normal;
@@ -238,14 +212,59 @@ namespace dd
 		UpdateVertices( key, origin );
 		UpdateNormals();
 
+		m_dirty = true;
+	}
+
+	void TerrainChunk::CreateMesh( const TerrainChunkKey& key )
+	{
+		DD_PROFILE_START( TerrainChunk_CreateMesh );
+
+		char name[ 128 ];
+		sprintf_s( name, 128, "%.2fx%.2f_%d", key.X, key.Y, key.LOD );
+
+		m_mesh = Mesh::Create( name, s_shader );
+
 		Mesh* mesh = m_mesh.Get();
-		mesh->UpdateBuffers();
+		mesh->UseShader( true );
+
+		mesh->SetPositions( m_vertices );
+
+		mesh->EnableNormals( true );
+		mesh->SetNormals( m_normals );
+
+		mesh->EnableIndices( true );
+		mesh->SetIndices( s_bufferIndices );
+
+		mesh->UseShader( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( 0 ) );
-		bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange + (1 - (key.LOD / 10.0f)), key.Size * Vertices ) );
-
+		bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange, key.Size * Vertices ) );
 		mesh->SetBounds( bounds );
+
+		DD_PROFILE_END();
+	}
+
+	void TerrainChunk::RenderUpdate( const TerrainChunkKey& key )
+	{
+		if( m_dirty )
+		{
+			if( !m_mesh.IsValid() )
+			{
+				CreateMesh( key );
+			}
+
+			Mesh* mesh = m_mesh.Get();
+			mesh->UpdateBuffers();
+
+			AABB bounds;
+			bounds.Expand( glm::vec3( 0 ) );
+			bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange + (1 - (key.LOD / 10.0f)), key.Size * Vertices ) );
+
+			mesh->SetBounds( bounds );
+		}
+
+		m_dirty = false;
 	}
 
 	void TerrainChunk::Destroy()

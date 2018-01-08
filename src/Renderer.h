@@ -8,6 +8,8 @@
 
 #include "EntityHandle.h"
 #include "IDebugDraw.h"
+#include "IRenderer.h"
+#include "ISystem.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
 
@@ -25,21 +27,26 @@ namespace dd
 	class TransformComponent;
 	class Window;
 
-	class Renderer : public IDebugDraw
+	class Renderer : public IDebugDraw, public IRenderer, public ISystem
 	{
 	public:
 
 		Renderer( const Window& window );
 		~Renderer();
 
-		void Initialize( const ICamera& camera, EntityManager& entityManager );
 		void Shutdown();
+
+		virtual void Initialize( EntityManager& entity_manager ) override;
 
 		//
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		void Render( EntityManager& entityManager, const ICamera& camera, float delta_t );
+		virtual void Render( const EntityManager& entityManager, const ICamera& camera ) override;
+
+		virtual void Update( EntityManager& entity_manager, float delta_t ) override;
+
+		virtual void RenderInit( const EntityManager& entityManager, const ICamera& camera ) override;
 
 		//
 		// Set the mouse picking helper to use.
@@ -97,6 +104,6 @@ namespace dd
 
 		void SetRenderState();
 
-		void RenderMesh( EntityHandle entity, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, const Vector<EntityHandle>& pointLights, const ICamera& camera, const MousePicking* mouse_picking );
+		void RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, const Vector<EntityHandle>& pointLights, const ICamera& camera, const MousePicking* mouse_picking );
 	};
 }

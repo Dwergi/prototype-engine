@@ -17,8 +17,8 @@ TEST_CASE( "[TerrainChunk] Generate" )
 	key.Y = 0;
 	key.Size = 16;
 
-	dd::TerrainChunk chunk( key );
-	chunk.Generate();
+	dd::TerrainChunk chunk;
+	chunk.Generate( key );
 
 	//chunk.Write( "terrain_chunk.tga" );
 }

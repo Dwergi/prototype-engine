@@ -1,0 +1,12 @@
+#version 330 core
+
+in vec2 UV;
+
+out vec4 Colour;
+
+uniform sampler2D Texture;
+
+void main()
+{
+	Colour = texture( Texture, UV );
+}

@@ -98,7 +98,7 @@ namespace dd
 	template <typename T>
 	uint DenseMapPool<T>::Size() const
 	{
-		return m_components.Size();
+		return (uint) m_components.size();
 	}
 
 	template <typename T>

@@ -15,6 +15,7 @@
 namespace dd
 {
 	class Shader;
+	class Texture;
 
 	class ShaderProgram
 	{
@@ -61,6 +62,7 @@ namespace dd
 		void SetUniform( const char* name, int i );
 		void SetUniform( const char* name, bool b );
 		void SetUniform( const char* name, float flt );
+		void SetUniform( const char* name, const Texture& texture );
 
 	private:
 

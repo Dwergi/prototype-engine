@@ -33,6 +33,7 @@
 #include "Random.h"
 #include "Recorder.h"
 #include "Renderer.h"
+#include "RenderToTexture.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -42,9 +43,10 @@
 #include "StringBinding.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
-#include "TerrainSystem.h"
-#include "Timer.h"
 #include "TerrainChunkComponent.h"
+#include "TerrainSystem.h"
+#include "Texture.h"
+#include "Timer.h"
 #include "TransformComponent.h"
 #include "TrenchSystem.h"
 #include "Window.h"
@@ -72,7 +74,7 @@ bool s_showDebugUI = false;
 FreeCameraController* s_freeCam;
 ShipSystem* s_shipSystem;
 Window* s_window;
-EntityManager* s_entityManager;
+EntityManager* s_entity_manager;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -83,7 +85,7 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 
 EntityHandle GetEntityHandle( uint id )
 {
-	EntityHandle handle( id, *s_entityManager );
+	EntityHandle handle( id, *s_entity_manager );
 	return handle;
 }
 
@@ -95,7 +97,7 @@ void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
 	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
 }
 
-void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
+void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
 	dd::RegisterString( scriptEngine );
 
@@ -123,28 +125,28 @@ void RegisterGameTypes( EntityManager& entityManager, AngelScriptEngine& scriptE
 	REGISTER_TYPE( MeshHandle );
 
 	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
-	entityManager.RegisterComponent<TransformComponent>();
+	entity_manager.RegisterComponent<TransformComponent>();
 
 	TypeInfo::RegisterComponent<OctreeComponent>( "OctreeComponent" );
-	entityManager.RegisterComponent<OctreeComponent>();
+	entity_manager.RegisterComponent<OctreeComponent>();
 
 	TypeInfo::RegisterComponent<SwarmAgentComponent>( "SwarmAgentComponent" );
-	entityManager.RegisterComponent<SwarmAgentComponent>();
+	entity_manager.RegisterComponent<SwarmAgentComponent>();
 
 	TypeInfo::RegisterComponent<MeshComponent>( "MeshComponent" );
-	entityManager.RegisterComponent<MeshComponent>();
+	entity_manager.RegisterComponent<MeshComponent>();
 
 	TypeInfo::RegisterComponent<ShipComponent>( "ShipComponent" );
-	entityManager.RegisterComponent<ShipComponent>();
+	entity_manager.RegisterComponent<ShipComponent>();
 
 	TypeInfo::RegisterComponent<ScriptComponent>( "ScriptComponent" );
-	entityManager.RegisterComponent<ScriptComponent>();
+	entity_manager.RegisterComponent<ScriptComponent>();
 
 	TypeInfo::RegisterComponent<LightComponent>( "LightComponent" );
-	entityManager.RegisterComponent<LightComponent>();
+	entity_manager.RegisterComponent<LightComponent>();
 
 	TypeInfo::RegisterComponent<TerrainChunkComponent>( "TerrainChunkComponent" );
-	entityManager.RegisterComponent<TerrainChunkComponent>();
+	entity_manager.RegisterComponent<TerrainChunkComponent>();
 }
 
 void ToggleConsole( InputAction action, InputType type )
@@ -213,34 +215,52 @@ void UpdateFreeCam( FreeCameraController& free_cam, Input& input, float delta_t 
 	}
 }
 
-void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
+void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems )
 {
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); }, "System::PreUpdate" );
+		jobsystem.Schedule( [&entity_manager, system]() { system->Initialize( entity_manager ); }, "ISystem::Initialize" );
 	}
 
-	jobsystem.WaitForCategory( "System::PreUpdate" );
+	jobsystem.WaitForCategory( "ISystem::Initialize" );
 }
 
-void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
+void InitializeRenderers( const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& systems )
 {
-	for( ISystem* system : systems )
+	for( IRenderer* renderer : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "System::Update" );
+		renderer->RenderInit( entity_manager, camera );
 	}
-
-	jobsystem.WaitForCategory( "System::Update" );
 }
 
-void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, Vector<ISystem*>& systems, float delta_t )
+void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
 {
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); }, "System::PostRender" );
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); }, "ISystem::PreUpdate" );
 	}
 
-	jobsystem.WaitForCategory( "System::PostRender" );
+	jobsystem.WaitForCategory( "ISystem::PreUpdate" );
+}
+
+void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
+{
+	for( ISystem* system : systems )
+	{
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "ISystem::Update" );
+	}
+
+	jobsystem.WaitForCategory( "ISystem::Update" );
+}
+
+void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
+{
+	for( ISystem* system : systems )
+	{
+		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); }, "ISystem::PostRender" );
+	}
+
+	jobsystem.WaitForCategory( "ISystem::PostRender" );
 }
 
 void DrawDebugUI( const Vector<IDebugDraw*>& views )
@@ -277,13 +297,12 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	}
 }
 
-void Render( Renderer& renderer, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer, float delta_t )
+void Render( const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer )
 {
-	renderer.Render( entity_manager, camera, delta_t );
-
-	ImGui::Render();
-
-	s_window->Swap();
+	for( IRenderer* renderer : renderers )
+	{
+		renderer->Render( entity_manager, camera );
+	}
 }
 
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
@@ -312,7 +331,7 @@ int TestMain( int argc, char* argv[] )
 
 #endif
 
-int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
+int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
@@ -340,10 +359,8 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		DebugUI debugUI( *s_window, input );
 
 		Renderer renderer( *s_window );
-		renderer.Initialize( shakyCam, entityManager );
 
 		TerrainSystem terrain_system( camera, jobSystem );
-		terrain_system.Initialize( entityManager );
 
 		SceneGraphSystem scene_graph;
 
@@ -355,19 +372,25 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 
 		s_shipSystem = new ShipSystem( camera );
 		s_shipSystem->BindActions( bindings );
-		s_shipSystem->CreateShip( entityManager );
+		s_shipSystem->CreateShip( entity_manager );
 
 		MousePicking mouse_picking( *s_window, camera, input );
 		mouse_picking.BindActions( bindings );
 		renderer.SetMousePicking( &mouse_picking );
 
 		Vector<ISystem*> systems;
+		systems.Add( &renderer );
 		systems.Add( &scene_graph );
 		systems.Add( &swarm_system );
 		//systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
 		systems.Add( s_shipSystem );
-		//systems.Add( &terrain_system );
+		systems.Add( &terrain_system );
+
+		Vector<IRenderer*> renderers;
+		renderers.Add( &mouse_picking );
+		renderers.Add( &terrain_system );
+		renderers.Add( &renderer );
 
 		BindKeys( input );
 
@@ -384,6 +407,9 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( &terrain_system );
 		debug_views.Add( &shakyCam );
 
+		InitializeSystems( jobSystem, entity_manager, systems );
+		InitializeRenderers( entity_manager, shakyCam, renderers );
+
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_SCOPED( Frame );
@@ -394,10 +420,10 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			float delta_t = frame_timer.Delta();
 
 			// entity manager
-			entityManager.Update( delta_t );
+			entity_manager.Update( delta_t );
 
 			// systems pre-update
-			PreUpdateSystems( jobSystem, entityManager, systems, delta_t );
+			PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
 
 			// input
 			UpdateInput( input, bindings, delta_t );
@@ -410,18 +436,25 @@ int GameMain( EntityManager& entityManager, AngelScriptEngine& scriptEngine )
 			shakyCam.Update( delta_t );
 
 			// systems update
-			UpdateSystems( jobSystem, entityManager, systems, delta_t );
+			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
 
-			terrain_system.Update( entityManager, delta_t );
+			terrain_system.Update( entity_manager, delta_t );
 
 			// debug UI
 			DrawDebugUI( debug_views );
 
 			// render
-			Render( renderer, entityManager, shakyCam, console, frame_timer, delta_t );
+			Render( renderers, entity_manager, shakyCam, console, frame_timer );
+
+			RenderToTexture& rtt = mouse_picking.GetRTT();
+			rtt.Render();
+
+			ImGui::Render();
+
+			s_window->Swap();
 
 			// systems post-render
-			PostRenderSystems( jobSystem, entityManager, systems, delta_t );
+			PostRenderSystems( jobSystem, entity_manager, systems, delta_t );
 
 			camera.SetClean();
 
@@ -468,18 +501,18 @@ int main( int argc, char* argv[] )
 	AngelScriptEngine scriptEngine;
 	REGISTER_TYPE( AngelScriptEngine );
 
-	EntityManager entityManager;
+	EntityManager entity_manager;
 	REGISTER_TYPE( EntityManager );
-	s_entityManager = &entityManager;
+	s_entity_manager = &entity_manager;
 
 	TypeInfo::SetScriptEngine( &scriptEngine );
 
-	RegisterGameTypes( entityManager, scriptEngine );
+	RegisterGameTypes( entity_manager, scriptEngine );
 	RegisterGlobalScriptFunctions( scriptEngine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );
 #else
-	return GameMain( entityManager, scriptEngine );
+	return GameMain( entity_manager, scriptEngine );
 #endif
 }

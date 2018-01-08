@@ -32,14 +32,13 @@ namespace dd
 		return GL_INVALID_INDEX;
 	}
 
-	Shader::Shader( const String& name, Type type ) :
-		m_name( name ),
+	Shader::Shader( Type type ) :
 		m_refCount( nullptr ),
 		m_valid( false )
 	{
 		m_id = glCreateShader( GetOpenGLShaderType( type ) );
 
-		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader %s", name.c_str() );
+		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
 
 		m_valid = m_id != OpenGL::InvalidID;
 		
@@ -47,7 +46,6 @@ namespace dd
 	}
 
 	Shader::Shader( const Shader& other ) :
-		m_name( other.m_name ),
 		m_id( other.m_id ),
 		m_refCount( other.m_refCount ),
 		m_valid( other.m_valid )
@@ -65,7 +63,6 @@ namespace dd
 		Release();
 
 		m_id = other.m_id;
-		m_name = other.m_name;
 		m_refCount = other.m_refCount;
 
 		Retain();
@@ -133,7 +130,7 @@ namespace dd
 		return true;
 	}
 
-	Shader Shader::Create( const String& name, const String& path, Shader::Type type )
+	Shader Shader::Create( const String& path, Shader::Type type )
 	{
 		DD_PROFILE_SCOPED( Shader_Create );
 
@@ -143,7 +140,7 @@ namespace dd
 			DD_ASSERT_ERROR( false, "Failed to load shader from path!" );
 		}
 
-		Shader shader( name, type );
+		Shader shader( type );
 		if( shader.m_id == OpenGL::InvalidID )
 		{
 			DD_ASSERT_ERROR( false, "Shader creation failed!" );
@@ -152,7 +149,7 @@ namespace dd
 		String256 message = shader.Compile( source );
 		if( !message.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "Linking program failed!" );
+			DD_ASSERT_ERROR( false, "Compiling shader failed, message: %s", message.c_str() );
 		}
 
 		return shader;

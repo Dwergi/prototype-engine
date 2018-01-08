@@ -27,14 +27,13 @@ namespace dd
 
 		virtual const char* GetDebugTitle() const = 0;
 
-	protected:
+	private:
+
+		bool m_debugOpen;
 
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
 		virtual void DrawDebugInternal() = 0;
-
-	private:
-		bool m_debugOpen;
 	};
 }

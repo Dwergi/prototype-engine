@@ -27,7 +27,7 @@ namespace dd
 		// Create a shader with the given name and type.
 		// Load the contents from the given path.
 		//
-		static Shader Create( const String& name, const String& path, Type type );
+		static Shader Create( const String& path, Type type );
 
 		Shader( const Shader& other );
 		~Shader();
@@ -42,13 +42,12 @@ namespace dd
 
 		bool m_valid;
 		GLuint m_id;
-		String64 m_name;
 		std::atomic<int>* m_refCount;
 
 		static DenseMap<String128, String256> sm_shaderCache;
 		static bool LoadFile( const String& path, String& outSource );
 
-		Shader( const String& name, Type type );
+		Shader( Type type );
 
 		String256 Compile( const String& source );
 

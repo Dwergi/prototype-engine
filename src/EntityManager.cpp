@@ -118,7 +118,7 @@ namespace dd
 
 	bool EntityManager::IsEntityValid( EntityHandle entity )
 	{
-		if( entity.ID == EntityHandle::Invalid )
+		if( entity.ID == EntityHandle::Invalid || entity.ID < 0 )
 			return false;
 
 		// check readable

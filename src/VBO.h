@@ -27,8 +27,10 @@ namespace dd
 		void Destroy();
 
 		void SetData( const IBuffer& buffer );
-		void Bind();
 		void Update();
+
+		void Bind();
+		void Unbind();
 
 		bool IsValid() const { return m_id != OpenGL::InvalidID; }
 		GLuint ID() const { return m_id; }

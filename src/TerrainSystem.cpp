@@ -85,12 +85,10 @@ namespace dd
 		
 		m_chunks.clear();
 
-		for( auto& entity : m_entities )
+		entity_manager.ForAllWithWritable<TerrainChunkComponent>( []( auto entity, auto chunk_cmp )
 		{
-			entity.second.Destroy();
-		}
-
-		m_entities.clear();
+			entity.Destroy();
+		} );
 	}
 
 	void TerrainSystem::SetLODLevels( int lods )
@@ -99,11 +97,36 @@ namespace dd
 		m_requiresRegeneration = true;
 	}
 
+	void TerrainSystem::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
+	{
+		TerrainChunk::CreateRenderResources();
+	}
+
 	void TerrainSystem::Initialize( EntityManager& entity_manager )
 	{
-		TerrainChunk::GenerateSharedResources();
+		TerrainChunk::InitializeShared();
 
 		Update( entity_manager, 0 );
+	}
+
+	void TerrainSystem::Render( const EntityManager& entity_manager, const ICamera& camera )
+	{
+		for( auto it : m_chunks )
+		{
+			it.second->RenderUpdate( it.first );
+		}
+
+		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
+			[this]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp )
+		{
+			RenderUpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write() );
+		} );
+	}
+
+	void TerrainSystem::RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp )
+	{
+		TerrainChunk* chunk = GetChunk( chunk_cmp->Key );
+		mesh_cmp->Mesh = chunk->GetMesh();
 	}
 
 	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )
@@ -118,10 +141,9 @@ namespace dd
 		}
 
 		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>(
-			[&entity_manager, this]( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, 
-				ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp )
+			[&entity_manager, this]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp, auto transform_cmp )
 			{
-				UpdateChunk( entity, chunk_cmp, mesh_cmp, transform_cmp );
+				UpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write(), transform_cmp.Write() );
 			} );
 	}
 
@@ -136,23 +158,21 @@ namespace dd
 		return nullptr;
 	}
 
-	void TerrainSystem::UpdateChunk( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp )
+	void TerrainSystem::UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp )
 	{
-		MeshComponent* mesh = mesh_cmp.Write();
-
 		if( TerrainChunk::UseDebugColours )
 		{
-			mesh->Colour = GetMeshColour( chunk_cmp.Read()->Key );
+			mesh_cmp->Colour = GetMeshColour( chunk_cmp->Key );
 		}
 		else
 		{
-			mesh->Colour = glm::vec4( 1, 1, 1, 1 );
+			mesh_cmp->Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 	}
 
-	void TerrainSystem::SetOrigin( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, glm::vec3 origin )
+	void TerrainSystem::SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 origin )
 	{
-		TerrainChunkKey chunk_key = chunk_cmp.Read()->Key;
+		TerrainChunkKey chunk_key = chunk_cmp->Key;
 		TerrainChunk* chunk = GetChunk( chunk_key );
 		if( chunk == nullptr )
 		{
@@ -165,10 +185,10 @@ namespace dd
 
 		chunk->SetOrigin( chunk_key, chunk_pos );
 
-		transform_cmp.Write()->SetLocalPosition( glm::vec3( rounded_x, 0, rounded_z ) );
-		transform_cmp.Write()->UpdateWorldTransform();
+		transform_cmp->SetLocalPosition( glm::vec3( rounded_x, 0, rounded_z ) );
+		transform_cmp->UpdateWorldTransform();
 
-		mesh_cmp.Write()->UpdateBounds( transform_cmp.Write()->GetWorldTransform() );
+		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 	}
 
 	void TerrainSystem::SaveChunkImages() const
@@ -242,7 +262,6 @@ namespace dd
 				EntityHandle entity = CreateChunkEntity( entity_manager, key, chunk );
 
 				m_chunks.insert( std::make_pair( key, chunk ) );
-				m_entities.insert( std::make_pair( key, entity ) );
 
 				++generated;
 			}
@@ -274,8 +293,6 @@ namespace dd
 		TerrainChunkComponent* chunk_cmp = entity.Get<TerrainChunkComponent>().Write();
 		chunk_cmp->Key = key;
 		chunk_cmp->IsActive = true;
-
-		entity.Get<MeshComponent>().Write()->Mesh = chunk->GetMesh();
 
 		TransformComponent* transform_cmp = entity.Get<TransformComponent>().Write();
 		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );

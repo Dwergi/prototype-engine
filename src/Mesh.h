@@ -42,7 +42,7 @@ namespace dd
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( const ICamera& camera, const glm::mat4& transform );
+		void Render( const ICamera& camera, ShaderProgram& shader, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.

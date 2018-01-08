@@ -8,6 +8,7 @@
 
 #include "ComponentHandle.h"
 #include "IDebugDraw.h"
+#include "IRenderer.h"
 #include "ISystem.h"
 #include "MeshComponent.h"
 #include "TerrainChunkKey.h"
@@ -29,7 +30,7 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : public ISystem, public IDebugDraw
+	class TerrainSystem : public ISystem, public IDebugDraw, public IRenderer
 	{
 	public:
 
@@ -57,14 +58,24 @@ namespace dd
 		int GetLODLevels() const { return m_lodLevels; }
 		
 		//
-		// Initialize the terrain system. Rendering must be initialized at this point.
+		// Initialize the terrain system.
 		//
-		void Initialize( EntityManager& entityManager );
+		virtual void Initialize( EntityManager& entityManager ) override;
 
 		//
 		// Update the terrain system.
 		//
-		void Update( EntityManager& entityManager, float delta_t ) override;
+		virtual void Update( EntityManager& entityManager, float delta_t ) override;
+
+		//
+		// Initialize render resources for the terrain system.
+		//
+		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
+
+		//
+		// Update terrain chunks on the render thread.
+		//
+		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
 
 		//
 		// Save the heightmaps of the terrain chunks generated.
@@ -76,10 +87,6 @@ namespace dd
 		//
 		const char* GetDebugTitle() const override { return "Terrain"; }
 
-	protected:
-
-		virtual void DrawDebugInternal() override;
-
 	private:
 		
 		bool m_requiresRegeneration;
@@ -88,18 +95,20 @@ namespace dd
 		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
-		std::unordered_map<TerrainChunkKey, EntityHandle> m_entities;
+
+		virtual void DrawDebugInternal() override;
 
 		void GenerateTerrain( EntityManager& entityManager );
 		void GenerateLODLevel( EntityManager& entityManager, int lodLevel );
 		TerrainChunk* GenerateChunk( EntityManager& entityManager, const TerrainChunkKey& chunk );
 
 		EntityHandle CreateChunkEntity( EntityManager& entityManager, const TerrainChunkKey& key, TerrainChunk* chunk );
-		void UpdateChunk( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp );
+		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp );
+		void RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );
 
 		void ClearChunks( EntityManager& entityManager );
 
-		void SetOrigin( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_cmp, ComponentHandle<MeshComponent> mesh_cmp, ComponentHandle<TransformComponent> transform_cmp, glm::vec3 pos );
+		void SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 pos );
 
 		TerrainChunk* GetChunk( const TerrainChunkKey& key );
 	};

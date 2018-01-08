@@ -12,6 +12,9 @@
 #include "Input.h"
 #include "InputBindings.h"
 #include "MeshComponent.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Window.h"
 
@@ -24,7 +27,8 @@ namespace dd
 	MousePicking::MousePicking( const Window& window, const ICamera& camera, const Input& input ) : 
 		m_window( window ),
 		m_camera( camera ),
-		m_input( input )
+		m_input( input ),
+		m_rtt( window )
 	{
 	}
 
@@ -47,12 +51,30 @@ namespace dd
 	{
 		if( m_enabled )
 		{
-			Ray mouse_ray = GetScreenRay( m_input.GetMousePosition() );
+			//Ray mouse_ray = GetScreenRay( m_input.GetMousePosition() );
 
 			m_focusedMesh = EntityHandle();
 
 			float distance = FLT_MAX;
-			entity_manager.ForAllWithReadable<MeshComponent>( [this, &mouse_ray, &distance]( auto entity, auto mesh ) { HitTestMesh( entity, mesh, mouse_ray, distance ); } );
+
+			MousePosition pos = m_input.GetMousePosition();
+
+			int clampedX = (int) glm::clamp( pos.X, 0.0f, m_window.GetWidth() - 1.0f );
+			int clampedY = (int) glm::clamp( pos.Y, 0.0f, m_window.GetHeight() - 1.0f );
+			int index = clampedY * m_window.GetWidth() + clampedX;
+
+			int* handle = ((int*) m_textureData.Get()) + index;
+
+			m_position = glm::ivec2( clampedX, clampedY );
+			m_handle = *handle;
+			
+			EntityHandle entity( *handle, entity_manager );
+			if( entity.IsValid() && entity.Has<MeshComponent>() )
+			{
+				m_focusedMesh = entity;
+			}
+			
+			//entity_manager.ForAllWithReadable<MeshComponent>( [this, &mouse_ray, &distance]( auto entity, auto mesh ) { HitTestMesh( entity, mesh, mouse_ray, distance ); } );
 
 			if( m_focusedMesh.IsValid() )
 			{
@@ -70,11 +92,70 @@ namespace dd
 		m_select = false;
 	}
 
+	void MousePicking::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
+	{
+		Vector<Shader> shaders;
+		shaders.Add( Shader::Create( String8( "shaders\\picking.vertex" ), Shader::Type::Vertex ) );
+		shaders.Add( Shader::Create( String8( "shaders\\picking.pixel" ), Shader::Type::Pixel ) );
+
+		m_shader = ShaderProgram::Create( String8( "picking" ), shaders );
+
+		ShaderProgram& shader = *m_shader.Get();
+		shader.Use( true );
+
+		shader.SetPositionsName( "Position" );
+
+		shader.Use( false );
+
+		int width = m_window.GetWidth() / 2;
+		int height = m_window.GetHeight() / 2;
+		int buffer_size = width * height * 4;
+
+		m_textureData.Set( new byte[ buffer_size ], buffer_size );
+		memset( m_textureData.Get(), 0, m_textureData.SizeBytes() );
+
+		m_texture.Create( width, height, 4 );
+
+		m_rtt.Create( m_texture, true );
+		m_rtt.PreRender();
+	}
+
+	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera )
+	{
+		ShaderProgram& shader = *m_shader.Get();
+
+		m_rtt.Bind();
+
+		shader.Use( true );
+
+		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, &shader]( auto entity, auto mesh, auto transform )
+		{
+			RenderMesh( camera, shader, entity, mesh.Read(), transform.Read() );
+		} );
+
+		shader.Use( false );
+
+		m_rtt.Unbind();
+
+		m_texture.GetData( m_textureData, 0 );
+	}
+
+	void MousePicking::RenderMesh( const ICamera& camera, ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
+	{
+		shader.SetUniform( "ID", entity.Handle );
+
+		Mesh* mesh = mesh_cmp->Mesh.Get();
+		mesh->Render( camera, *m_shader.Get(), transform_cmp->GetWorldTransform() );
+	}
+
 	void MousePicking::DrawDebugInternal()
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
+
+		ImGui::Text( "Handle: %d", m_handle );
+		ImGui::Text( "Position: %d %d", m_position.x, m_position.y );
 
 		if( m_focusedMesh.IsValid() )
 		{

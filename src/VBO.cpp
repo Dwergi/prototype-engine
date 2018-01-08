@@ -78,6 +78,14 @@ namespace dd
 		CheckGLError();
 	}
 
+	void VBO::Unbind()
+	{
+		DD_ASSERT( IsValid() );
+
+		glBindBuffer( m_target, 0 );
+		CheckGLError();
+	}
+
 	void VBO::Update()
 	{
 		if( m_buffer != nullptr )

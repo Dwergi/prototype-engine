@@ -29,13 +29,16 @@ namespace dd
 		static float Wavelength;
 		static bool UseDebugColours;
 
-		static void GenerateSharedResources();
+		static void InitializeShared();
+		static void CreateRenderResources();
 
 		TerrainChunk();
 		~TerrainChunk();
 		
-		MeshHandle Generate( const TerrainChunkKey& key );
+		void Generate( const TerrainChunkKey& key );
 		void SetOrigin( const TerrainChunkKey& key, glm::vec2 origin );
+
+		void RenderUpdate( const TerrainChunkKey& key );
 
 		void Destroy();
 
@@ -54,6 +57,7 @@ namespace dd
 
 		static ShaderHandle s_shader;
 
+		bool m_dirty { false };
 		MeshHandle m_mesh;
 		Buffer<glm::vec3> m_vertices;
 		Buffer<glm::vec3> m_normals;
@@ -62,5 +66,7 @@ namespace dd
 
 		void UpdateVertices( const TerrainChunkKey& key, const glm::vec2& chunkPos );
 		void UpdateNormals();
+
+		void CreateMesh( const TerrainChunkKey& key );
 	};
 }

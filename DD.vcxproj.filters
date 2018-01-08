@@ -492,6 +492,15 @@
     <ClInclude Include="src\OpenGL.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\RenderToTexture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -829,6 +838,12 @@
       <Filter>Containers</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderHandle.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderToTexture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
