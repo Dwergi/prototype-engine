@@ -22,7 +22,6 @@ namespace dd
 		if( dd::Hash( *this ) == dd::Hash( other ) )
 		{
 			return LOD == other.LOD &&
-				Size == other.Size &&
 				X == other.X &&
 				Y == other.Y;
 		}

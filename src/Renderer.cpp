@@ -24,6 +24,7 @@
 
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "imgui/imgui.h"
 
@@ -35,6 +36,7 @@ namespace dd
 		m_frustumMeshCount( 0 )
 	{
 		m_debugWireframeColour = glm::vec3( 0, 1, 0 );
+		m_debugWireframeEdgeColour = glm::vec3( 0, 0, 0 );
 	}
 
 	Renderer::~Renderer()
@@ -147,12 +149,11 @@ namespace dd
 
 			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
 
-			float fltColour[3];
-			fltColour[0] = m_debugWireframeColour.r; fltColour[1] = m_debugWireframeColour.g; fltColour[2] = m_debugWireframeColour.b;
-			if( ImGui::ColorEdit3( "Colour", fltColour ) )
-			{
-				m_debugWireframeColour = glm::vec3( fltColour[0], fltColour[1], fltColour[2] );
-			}
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_debugWireframeColour ) );
+
+			ImGui::DragFloat( "Edge Width", &m_debugWireframeEdgeWidth, 0.01f, 0.0f, m_debugWireframeWidth );
+
+			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_debugWireframeEdgeColour ) );
 
 			ImGui::TreePop();
 		}
@@ -371,6 +372,9 @@ namespace dd
 				shader->SetUniform( "UseWireframe", m_debugWireframe );
 				shader->SetUniform( "WireframeColour", m_debugWireframeColour );
 				shader->SetUniform( "WireframeWidth", m_debugWireframeWidth );
+
+				shader->SetUniform( "WireframeEdgeColour", m_debugWireframeEdgeColour );
+				shader->SetUniform( "WireframeEdgeWidth", m_debugWireframeEdgeWidth );
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );

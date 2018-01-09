@@ -92,6 +92,9 @@ namespace dd
 		glm::vec3 m_debugWireframeColour;
 		float m_debugWireframeWidth { 2.0f };
 
+		glm::vec3 m_debugWireframeEdgeColour;
+		float m_debugWireframeEdgeWidth { 0.5f };
+
 		EntityHandle m_deleteLight;
 		bool m_createLight { false };
 

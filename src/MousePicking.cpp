@@ -171,40 +171,42 @@ namespace dd
 		ImGui::Text( "Handle: %d", m_handle );
 		ImGui::Text( "Position: %.1f %.1f", m_position.x, m_position.y );
 
-		if( m_focusedMesh.IsValid() )
+		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			ImGui::CollapsingHeader( "Focused" );
+			if( m_focusedMesh.IsValid() )
+			{
+				const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+				ImGui::Text( "Name: %s", name.c_str() );
 
-			const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-			ImGui::Text( "Name: %s", name.c_str() );
+				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
+				ImGui::Text( "Position: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
+			}
+			else
+			{
+				ImGui::Text( "Name: <none>" );
+				ImGui::Text( "Position: <none>" );
+			}
 
-			glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-			ImGui::Text( "Position: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
+			ImGui::TreePop();
 		}
-		else
+
+		if( ImGui::TreeNodeEx( "Selected", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			ImGui::CollapsingHeader( "Focused" );
+			if( m_selectedMesh.IsValid() )
+			{
+				const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+				ImGui::Text( "Name: %s", name.c_str() );
 
-			ImGui::Text( "Name: <none>" );
-			ImGui::Text( "Position: <none>" );
-		}
+				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
+				ImGui::Text( "Position: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
+			}
+			else
+			{
+				ImGui::Text( "Name: <none>" );
+				ImGui::Text( "Position: <none>" );
+			}
 
-		if( m_selectedMesh.IsValid() )
-		{
-			ImGui::CollapsingHeader( "Selected" );
-
-			const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-			ImGui::Text( "Name: %s", name.c_str() );
-
-			glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-			ImGui::Text( "Position: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
-		}
-		else
-		{
-			ImGui::CollapsingHeader( "Selected" );
-
-			ImGui::Text( "Name: <none>" );
-			ImGui::Text( "Position: <none>" );
+			ImGui::TreePop();
 		}
 	}
 

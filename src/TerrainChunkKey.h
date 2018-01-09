@@ -13,12 +13,10 @@ namespace dd
 		TerrainChunkKey() :
 			X( 0xFFFFFFF ),
 			Y( 0xFFFFFFF ),
-			Size( 0 ),
 			LOD( 0 ) {}
 
 		float X;
 		float Y;
-		float Size;
 		int LOD;
 
 		bool operator==( const dd::TerrainChunkKey& other ) const;
@@ -29,7 +27,6 @@ namespace dd
 }
 
 bool operator<( const dd::TerrainChunkKey& a, const dd::TerrainChunkKey& b );
-
 
 namespace std
 {

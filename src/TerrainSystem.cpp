@@ -12,6 +12,7 @@
 #include "JobSystem.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "Random.h"
 #include "Stream.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
@@ -71,12 +72,12 @@ namespace dd
 
 	static float DistanceTo( const glm::vec3& pos, const TerrainChunkKey& key )
 	{
-		glm::vec3 chunk_pos( key.X + key.Size / 2, 0, key.Y + key.Size / 2 );
+		glm::vec3 chunk_pos( key.X + TerrainChunk::VertexDistance / 2, 0, key.Y + TerrainChunk::VertexDistance / 2 );
 
 		return glm::distance( pos, chunk_pos );
 	}
 
-	void TerrainSystem::ClearChunks( EntityManager& entity_manager )
+	void TerrainSystem::Shutdown( EntityManager& entity_manager )
 	{
 		for( auto& chunk : m_chunks )
 		{
@@ -133,8 +134,6 @@ namespace dd
 	{
 		if( m_requiresRegeneration )
 		{
-			ClearChunks( entity_manager );
-
 			GenerateTerrain( entity_manager );
 
 			m_requiresRegeneration = false;
@@ -256,12 +255,30 @@ namespace dd
 				key.X = x * chunk_size;
 				key.Y = y * chunk_size;
 				key.LOD = lod;
-				key.Size = vertex_distance;
 
-				TerrainChunk* chunk = GenerateChunk( entity_manager, key );
-				EntityHandle entity = CreateChunkEntity( entity_manager, key, chunk );
+				TerrainChunk* chunk = GetChunk( key );
+				if( chunk == nullptr )
+				{
+					chunk = new TerrainChunk();
+				}
+
+				chunk->Generate( key );
+				chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
+
+				EntityHandle entity;
+
+				auto it = m_entities.find( key );
+				if( it != m_entities.end() )
+				{
+					entity = it->second;
+				}
+				else
+				{
+					entity = CreateChunkEntity( entity_manager, key, chunk );
+				}
 
 				m_chunks.insert( std::make_pair( key, chunk ) );
+				m_entities.insert( std::make_pair( key, entity ) );
 
 				++generated;
 			}
@@ -271,17 +288,6 @@ namespace dd
 			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
 
 		DD_ASSERT( generated == expected, "Wrong number of chunks generated for LOD!" );
-	}
-
-	TerrainChunk* TerrainSystem::GenerateChunk( EntityManager& entity_manager, const TerrainChunkKey& key )
-	{
-		DD_PROFILE_SCOPED( TerrainSystem_GenerateChunk );
-
-		TerrainChunk* chunk = new TerrainChunk();
-		chunk->Generate( key );
-		chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
-
-		return chunk; 
 	}
 
 	EntityHandle TerrainSystem::CreateChunkEntity( EntityManager& entity_manager, const TerrainChunkKey& key, TerrainChunk* chunk )
@@ -320,6 +326,16 @@ namespace dd
 			m_requiresRegeneration = true;
 		}
 
+		if( ImGui::DragFloat( "Wavelength", &TerrainChunk::Wavelength, 1.0f, 1.0f, 512.0f ) )
+		{
+			m_requiresRegeneration = true;
+		}
+
+		if( ImGui::DragFloat( "Seed", &TerrainChunk::Seed, 0.1f, 0.0f, 512.0f ) )
+		{
+			m_requiresRegeneration = true;
+		}
+
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			for( int i = 0; i < TerrainChunk::Octaves; ++i )
@@ -327,7 +343,7 @@ namespace dd
 				char name[64];
 				snprintf( name, 64, "Amplitude %d", i );
 
-				if( ImGui::DragFloat( name, &TerrainChunk::Amplitudes[i], 0.01f, 0.0f, 1.0f ) )
+				if( ImGui::DragFloat( name, &TerrainChunk::Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
 				{
 					m_requiresRegeneration = true;
 				}
@@ -336,11 +352,27 @@ namespace dd
 			ImGui::TreePop();
 		}
 
-		if( ImGui::DragFloat( "Wavelength", &TerrainChunk::Wavelength, 1.0f, 0.0f, 512.0f ) )
+		if( ImGui::Button( "Randomize" ) )
 		{
+			RandomFloat rng( 0.0f, 1.0f );
+
+			TerrainChunk::Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
+			TerrainChunk::HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
+			TerrainChunk::Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
+
+			float max_amplitude = 1.0f;
+			for( int i = 0; i < TerrainChunk::Octaves; ++i )
+			{
+				float amplitude = glm::mix( 0.01f, max_amplitude, rng.Next() );
+
+				TerrainChunk::Amplitudes[i] = amplitude;
+
+				max_amplitude = amplitude;
+			}
+
 			m_requiresRegeneration = true;
 		}
-
+		
 		if( ImGui::Button( "Save Chunk Heightmaps" ) )
 		{
 			SaveChunkImages();

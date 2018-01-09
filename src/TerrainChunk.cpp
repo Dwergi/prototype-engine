@@ -25,9 +25,18 @@
 namespace dd
 {
 	float TerrainChunk::VertexDistance = 1.0f;
-	float TerrainChunk::HeightRange = 8.f;
-	float TerrainChunk::Wavelength = 128.0;
-	float TerrainChunk::Amplitudes[Octaves] = { 0.5f, 0.3f, 0.2f, 0.1f, 0.05f, 0.025f };
+	float TerrainChunk::HeightRange = 64.0f;
+	float TerrainChunk::Wavelength = 96.0f;
+	float TerrainChunk::Seed = 0.0f;
+	float TerrainChunk::Amplitudes[Octaves] = { 0.5f, 0.25f, 0.125f, 0.0625f, 0.03f, 0.015f };
+	glm::vec3 TerrainChunk::HeightColours[HeightLevels] = 
+	{	
+		glm::vec3( 0.25f, 0.8f, 0.25f ), // green
+		glm::vec3( 0.25f, 0.5f, 0.25f ), // darker green
+		glm::vec3( 0.6f, 0.4f, 0.1f ), // brown
+		glm::vec3( 0.5f, 0.5f, 0.5f ), // grey
+		glm::vec3( 0.9f, 0.9f, 0.9f ) // white
+	};
 
 	uint TerrainChunk::s_indices[IndexCount];
 	bool TerrainChunk::UseDebugColours = false;
@@ -43,30 +52,6 @@ namespace dd
 
 	TerrainChunk::~TerrainChunk()
 	{
-	}
-
-	float TerrainChunk::GetHeight( float x, float y )
-	{
-		float height = 0;
-		float wavelength = Wavelength;
-
-		float total_amplitude = 0;
-
-		for( int i = 0; i < Octaves; ++i )
-		{
-			float multiplier = 1.f / wavelength;
-			glm::vec2 coord( x * multiplier, y * multiplier );
-
-			float noise = glm::simplex( coord );
-			
-			height += noise * Amplitudes[i];
-
-			total_amplitude += Amplitudes[i];
-			wavelength /= 2;
-		}
-
-		float normalized = height / total_amplitude;
-		return normalized;
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -137,23 +122,30 @@ namespace dd
 	{
 		DD_PROFILE_START( TerrainChunk_InitializeVerts );
 
-		m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
-
-		const int actualVertices = Vertices + 1;
-		for( int z = 0; z < actualVertices; ++z )
+		if( m_vertices.Get() == nullptr )
 		{
-			for( int x = 0; x < actualVertices; ++x )
+			m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
+		}
+
+		if( m_normals.Get() == nullptr )
+		{
+			m_normals.Set( new glm::vec3[VertexCount], VertexCount );
+		}
+
+		const float actual_distance = VertexDistance * (1 << key.LOD);
+		const int actual_vertices = Vertices + 1;
+		for( int z = 0; z < actual_vertices; ++z )
+		{
+			for( int x = 0; x < actual_vertices; ++x )
 			{
-				const int current = z * actualVertices + x;
+				const int current = z * actual_vertices + x;
 
 				// height is y
 				m_vertices[current].y = 0;
-				m_vertices[current].x = x * key.Size;
-				m_vertices[current].z = z * key.Size;
+				m_vertices[current].x = x * actual_distance;
+				m_vertices[current].z = z * actual_distance;
 			}
 		}
-		
-		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
 
 		DD_PROFILE_END();
 	}
@@ -185,24 +177,51 @@ namespace dd
 		}
 	}
 
+	float TerrainChunk::GetHeight( float x, float y )
+	{
+		float height = 0;
+		float wavelength = Wavelength;
+
+		float total_amplitude = 0;
+
+		for( int i = 0; i < Octaves; ++i )
+		{
+			float multiplier = 1.f / wavelength;
+			glm::vec3 coord( x * multiplier, y * multiplier, Seed );
+
+			float noise = glm::simplex( coord );
+			height += noise * Amplitudes[i];
+
+			total_amplitude += Amplitudes[i];
+			wavelength /= 2;
+		}
+
+		float normalized = height / total_amplitude;
+		return normalized;
+	}
+
 	void TerrainChunk::UpdateVertices( const TerrainChunkKey& key, const glm::vec2& origin )
 	{
 		glm::vec2 chunk_pos = origin + glm::vec2( key.X, key.Y );
-		const int actualVertices = Vertices + 1;
+		const int actual_vertices = Vertices + 1;
+		const float actual_distance = VertexDistance * (1 << key.LOD);
 
-		for( int z = 0; z < actualVertices; ++z )
+		for( int z = 0; z < actual_vertices; ++z )
 		{
-			for( int x = 0; x < actualVertices; ++x )
+			for( int x = 0; x < actual_vertices; ++x )
 			{
-				const float x_coord = chunk_pos.x + x * key.Size;
-				const float z_coord = chunk_pos.y + z * key.Size;
+				const float x_coord = chunk_pos.x + x * actual_distance;
+				const float z_coord = chunk_pos.y + z * actual_distance;
 
-				const int current = z * actualVertices + x;
+				const int current = z * actual_vertices + x;
 
 				float height = GetHeight( x_coord, z_coord );
 
 				// height is y
-				m_vertices[current].y = ((1 + height) / 2) * HeightRange;
+				float normalized_height = (1 + height) / 2;
+				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
+
+				m_vertices[current].y = normalized_height * HeightRange;
 			}
 		}
 	}
@@ -237,11 +256,6 @@ namespace dd
 
 		mesh->UseShader( false );
 
-		AABB bounds;
-		bounds.Expand( glm::vec3( 0 ) );
-		bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange, key.Size * Vertices ) );
-		mesh->SetBounds( bounds );
-
 		DD_PROFILE_END();
 	}
 
@@ -257,19 +271,22 @@ namespace dd
 			Mesh* mesh = m_mesh.Get();
 			mesh->UpdateBuffers();
 
+			float actual_distance = VertexDistance * (1 << key.LOD);
+			float total_size = actual_distance * Vertices;
+
 			AABB bounds;
 			bounds.Expand( glm::vec3( 0 ) );
-			bounds.Expand( glm::vec3( key.Size * Vertices, HeightRange + (1 - (key.LOD / 10.0f)), key.Size * Vertices ) );
+			bounds.Expand( glm::vec3( total_size, HeightRange + (1 - (key.LOD / 10.0f)), total_size ) );
 
 			mesh->SetBounds( bounds );
-		}
 
-		m_dirty = false;
+			m_dirty = false;
+		}
 	}
 
 	void TerrainChunk::Destroy()
 	{
-		Mesh::Destroy( m_mesh );
+		m_destroy = true;
 	}
 
 	void TerrainChunk::Write( const char* filename )

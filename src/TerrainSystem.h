@@ -68,6 +68,11 @@ namespace dd
 		virtual void Update( EntityManager& entityManager, float delta_t ) override;
 
 		//
+		// Shut down the terrain system and destroy terrain chunk meshes.
+		//
+		virtual void Shutdown( EntityManager& entity_manager ) override;
+
+		//
 		// Initialize render resources for the terrain system.
 		//
 		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
@@ -95,18 +100,16 @@ namespace dd
 		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
+		std::unordered_map<TerrainChunkKey, EntityHandle> m_entities;
 
 		virtual void DrawDebugInternal() override;
 
 		void GenerateTerrain( EntityManager& entityManager );
 		void GenerateLODLevel( EntityManager& entityManager, int lodLevel );
-		TerrainChunk* GenerateChunk( EntityManager& entityManager, const TerrainChunkKey& chunk );
 
 		EntityHandle CreateChunkEntity( EntityManager& entityManager, const TerrainChunkKey& key, TerrainChunk* chunk );
 		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp );
 		void RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );
-
-		void ClearChunks( EntityManager& entityManager );
 
 		void SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 pos );
 

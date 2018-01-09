@@ -23,10 +23,16 @@ namespace dd
 		static const int Octaves = 6;
 		static const int Vertices = 16;
 
+		static const int HeightLevels = 5;
+
 		static float VertexDistance;
 		static float HeightRange;
-		static float Amplitudes[Octaves];
 		static float Wavelength;
+		static float Seed;
+
+		static float Amplitudes[Octaves];
+		static glm::vec3 HeightColours[HeightLevels];
+
 		static bool UseDebugColours;
 
 		static void InitializeShared();
@@ -56,7 +62,8 @@ namespace dd
 		static Buffer<uint> s_bufferIndices;
 
 		static ShaderHandle s_shader;
-
+		
+		bool m_destroy { false };
 		bool m_dirty { false };
 		MeshHandle m_mesh;
 		Buffer<glm::vec3> m_vertices;
