@@ -19,4 +19,6 @@ namespace dd
 {
 	typedef GLint ShaderLocation;
 	static const ShaderLocation InvalidLocation = -1;
+
+	String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform = nullptr );
 }

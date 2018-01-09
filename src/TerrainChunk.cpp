@@ -27,15 +27,24 @@ namespace dd
 	float TerrainChunk::VertexDistance = 1.0f;
 	float TerrainChunk::HeightRange = 64.0f;
 	float TerrainChunk::Wavelength = 96.0f;
-	float TerrainChunk::Seed = 0.0f;
+	float TerrainChunk::Seed = 1.0f;
 	float TerrainChunk::Amplitudes[Octaves] = { 0.5f, 0.25f, 0.125f, 0.0625f, 0.03f, 0.015f };
-	glm::vec3 TerrainChunk::HeightColours[HeightLevels] = 
+	glm::vec3 TerrainChunk::HeightColours[ HeightLevelCount ] =
 	{	
 		glm::vec3( 0.25f, 0.8f, 0.25f ), // green
 		glm::vec3( 0.25f, 0.5f, 0.25f ), // darker green
 		glm::vec3( 0.6f, 0.4f, 0.1f ), // brown
 		glm::vec3( 0.5f, 0.5f, 0.5f ), // grey
-		glm::vec3( 0.9f, 0.9f, 0.9f ) // white
+		glm::vec3( 1.0f, 1.0f, 1.0f ) // white
+	};
+
+	float TerrainChunk::HeightCutoffs[ HeightLevelCount ] =
+	{
+		0.0f,
+		0.2f,
+		0.4f,
+		0.6f,
+		1.0f
 	};
 
 	uint TerrainChunk::s_indices[IndexCount];
@@ -253,6 +262,9 @@ namespace dd
 
 		mesh->EnableIndices( true );
 		mesh->SetIndices( s_bufferIndices );
+
+		mesh->EnableHeightColours( true );
+		mesh->SetHeightColours( HeightColours, HeightCutoffs, HeightLevelCount, HeightRange );
 
 		mesh->UseShader( false );
 

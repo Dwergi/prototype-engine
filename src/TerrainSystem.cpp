@@ -22,6 +22,8 @@
 
 #include "imgui/imgui.h"
 
+#include "glm/gtc/type_ptr.hpp"
+
 namespace dd
 {
 	static glm::vec4 GetMeshColour( const TerrainChunkKey& key )
@@ -336,6 +338,24 @@ namespace dd
 			m_requiresRegeneration = true;
 		}
 
+		if( ImGui::TreeNodeEx( "Height Colours", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			for( int i = 0; i < TerrainChunk::HeightLevelCount; ++i )
+			{
+				char name[ 64 ];
+				snprintf( name, 64, "Height %d", i );
+
+				if( ImGui::TreeNodeEx( name, ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
+				{
+					ImGui::ColorEdit3( "Colour", glm::value_ptr( TerrainChunk::HeightColours[i] ) );
+					ImGui::DragFloat( "Cutoff", &TerrainChunk::HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
+
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			for( int i = 0; i < TerrainChunk::Octaves; ++i )
@@ -368,6 +388,21 @@ namespace dd
 				TerrainChunk::Amplitudes[i] = amplitude;
 
 				max_amplitude = amplitude;
+			}
+
+			for( int i = 0; i < TerrainChunk::HeightLevelCount; ++i )
+			{
+				TerrainChunk::HeightColours[i] = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
+			}
+
+			float previous_cutoff = 0.0f;
+			for( int i = 1; i < TerrainChunk::HeightLevelCount - 1; ++i )
+			{
+				float cutoff = glm::mix( previous_cutoff, 1.0f, rng.Next() );
+
+				TerrainChunk::HeightCutoffs[i] = cutoff;
+
+				previous_cutoff = cutoff;
 			}
 
 			m_requiresRegeneration = true;

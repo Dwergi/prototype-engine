@@ -18,6 +18,7 @@ uniform float WireframeWidth;
 
 uniform vec3 WireframeEdgeColour;
 uniform float WireframeEdgeWidth;
+uniform float WireframeMaxDistance;
 
 uniform vec3 ViewPosition;
 
@@ -34,6 +35,46 @@ uniform struct Light {
 
 uniform int LightCount;
 
+#define MAX_HEIGHTS 10
+
+uniform struct HeightLevel { 
+	vec3 Colour;
+	float Cutoff;
+} HeightLevels[ MAX_HEIGHTS ];
+
+uniform float MaxHeight;
+uniform int HeightCount;
+
+//
+// Gets the height colour based on HeightLevels.
+// Iterates through until it reach a cutoff point that is larger than its height ratio,
+// then mixes with the next colour based on the proportion of its height.
+//
+vec3 GetHeightColour( float heightPercent )
+{
+	int previous = 0;
+	int current = 0;
+	for( ; current < HeightCount; ++current )
+	{
+		if( heightPercent < HeightLevels[current].Cutoff )
+			break;
+
+		previous = current;
+	}
+
+	if( current == 0)
+	{
+		return HeightLevels[0].Colour;
+	}
+
+	float t = (heightPercent - HeightLevels[previous].Cutoff) / (HeightLevels[current].Cutoff - HeightLevels[previous].Cutoff);
+	return mix( HeightLevels[previous].Colour, HeightLevels[current].Colour, t );
+}
+
+//
+// Apply a single light to the pixel. 
+// Deals with both directional and point lights.
+//
 vec3 ApplyLight( Light light, vec3 fragColour, vec3 fragNormal, vec3 fragPosition, vec3 viewDir )
 {
 	vec3 lightColour = light.Colour * light.Intensity;
@@ -68,39 +109,64 @@ vec3 ApplyLight( Light light, vec3 fragColour, vec3 fragNormal, vec3 fragPositio
 	return finalColour;
 }
 
-vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth, vec3 edgeColour, float edgeWidth )
+//
+// Calculate the colour of a pixel in wireframe mode by finding the minimum distance to an edge,
+// and adding an edge of a different colour.
+//
+vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth, vec3 edgeColour, float edgeWidth, float viewDistance, float maxDistance )
 {
+	vec4 colour = vec4( 0.0 );
+
+	if( viewDistance > maxDistance )
+		return colour;
+
+	wireWidth = mix( wireWidth, 0.0, viewDistance / maxDistance );
+	edgeWidth = mix( wireWidth, 0.0, viewDistance / maxDistance );
+
 	vec3 d = fwidth( triangle );
 	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, triangle );
 	float t = min( min( tdist.x, tdist.y ), tdist.z );
 
-	vec4 colour = vec4( 0.0 );
-
 	float edge_ratio = edgeWidth / wireWidth;
-	if( edge_ratio > 0 && edge_ratio < 1 )
+	if( edge_ratio > 0 )
 	{
 		float edge_t = clamp( (t - (1.0 - edge_ratio)) / edge_ratio, 0.0, 1.0 );
 		colour = mix( vec4( edgeColour, 1 ), vec4( 0.0 ), edge_t );
 	}
 
-	float wire_t = clamp( (t - edge_ratio) / (1.0 - edge_ratio), 0.0, 1.0 );
-	return mix( vec4( wireColour, 1 ), colour, wire_t );
+	if( edge_ratio < 1 )
+	{
+		float wire_t = clamp( t / (1.0 - edge_ratio), 0.0, 1.0 );
+		colour = mix( vec4( wireColour, 1 ), colour, wire_t );
+	}
+
+	return colour;
 }
 
 void main()
 {
+	vec3 toView = ViewPosition - Fragment.Position;
+
 	vec4 finalColour = vec4( 0 );
 	if( UseWireframe )
 	{
-		finalColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth );
+		float viewDistance = length( toView );
+
+		finalColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth, viewDistance, WireframeMaxDistance );
 	}
 	else
 	{
+		vec3 fragmentColour = Fragment.Colour.rgb;
+		if( HeightCount > 0 )
+		{
+			fragmentColour *= GetHeightColour( Fragment.Position.y / MaxHeight );
+		}
+
 		vec3 normal = normalize( FragmentNormal );
-		vec3 viewDir = normalize( ViewPosition - Fragment.Position );
+		vec3 viewDir = normalize( toView );
 		for( int i = 0; i < LightCount; ++i )
 		{
-			finalColour.rgb += ApplyLight( Lights[ i ], Fragment.Colour.rgb, normal, Fragment.Position, viewDir );
+			finalColour.rgb += ApplyLight( Lights[ i ], fragmentColour, normal, Fragment.Position, viewDir );
 		}
 		
 		vec3 gamma = vec3( 1.0 / 2.2 );

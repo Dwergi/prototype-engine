@@ -382,6 +382,13 @@ namespace dd
 		m_vao.Unbind();
 	}
 
+	void Mesh::SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, float& max_height )
+	{
+		m_bufferHeightColours.Set( colours, count );
+		m_bufferHeightCutoffs.Set( cutoffs, count );
+		m_maxHeight = &max_height;
+	}
+
 	void Mesh::UpdateBuffers()
 	{
 		m_vboPosition.Update();
@@ -400,6 +407,18 @@ namespace dd
 		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "ObjectColour", m_colourMultiplier );
+
+		if( m_useHeightColours )
+		{
+			for( int i = 0; i < m_bufferHeightColours.Size(); ++i )
+			{
+				shader.SetUniform( GetArrayUniformName( "HeightLevels", i, "Colour" ).c_str(), m_bufferHeightColours[ i ] );
+				shader.SetUniform( GetArrayUniformName( "HeightLevels", i, "Cutoff" ).c_str(), m_bufferHeightCutoffs[ i ] );
+			}
+
+			shader.SetUniform( "HeightCount", m_bufferHeightColours.Size() );
+			shader.SetUniform( "MaxHeight", *m_maxHeight );
+		}
 
 		m_vao.Bind();
 

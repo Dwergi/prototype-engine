@@ -525,6 +525,7 @@
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
+    <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\RenderToTexture.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />

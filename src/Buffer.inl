@@ -98,7 +98,7 @@ const T& ConstBuffer<T>::operator[]( int index ) const
 {
 	DD_ASSERT( index < m_count );
 
-	return Get()[index];
+	return GetConst()[index];
 }
 
 template <typename T>

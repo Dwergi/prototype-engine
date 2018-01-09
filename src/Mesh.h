@@ -103,6 +103,16 @@ namespace dd
 		void EnableUVs( bool enabled ) { m_useUV = enabled; }
 
 		//
+		// Enable height colours.
+		//
+		void EnableHeightColours( bool enabled ) { m_useHeightColours = true; }
+
+		//
+		// Set the height colours to use for this mesh.
+		//
+		void SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, float& max_height );
+
+		//
 		// Set the UV buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
@@ -164,6 +174,11 @@ namespace dd
 		bool m_useVertexColour { false };
 		VBO m_vboVertexColour;
 		ConstBuffer<glm::vec4> m_bufferVertexColour;
+
+		bool m_useHeightColours { false };
+		ConstBuffer<glm::vec3> m_bufferHeightColours;
+		ConstBuffer<float> m_bufferHeightCutoffs;
+		float* m_maxHeight { nullptr };
 		
 		VAO m_vao;
 

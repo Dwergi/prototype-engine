@@ -155,6 +155,8 @@ namespace dd
 
 			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_debugWireframeEdgeColour ) );
 
+			ImGui::DragFloat( "Max Distance", &m_debugWireframeMaxDistance, 1.0f, 0.0f, 1000.0f );
+
 			ImGui::TreePop();
 		}
 
@@ -286,21 +288,6 @@ namespace dd
 		}
 	}
 
-	String256 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
-	{
-		String256 result;
-		result += arrayName;
-		result += "[";
-
-		char buffer[32];
-		_itoa_s( index, buffer, 10 );
-		result += buffer;
-
-		result += "].";
-		result += uniform;
-		return result;
-	}
-
 	void Renderer::RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, 
 		const Vector<EntityHandle>& lights, const ICamera& camera, const MousePicking* mousePicking )
 	{
@@ -375,6 +362,7 @@ namespace dd
 
 				shader->SetUniform( "WireframeEdgeColour", m_debugWireframeEdgeColour );
 				shader->SetUniform( "WireframeEdgeWidth", m_debugWireframeEdgeWidth );
+				shader->SetUniform( "WireframeMaxDistance", m_debugWireframeMaxDistance );
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );

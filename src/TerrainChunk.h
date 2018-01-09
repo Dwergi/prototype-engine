@@ -20,18 +20,57 @@ namespace dd
 	{
 	public:
 
+		//
+		// The number of octaves of noise.
+		//
 		static const int Octaves = 6;
+
+		//
+		// The number of vertices per dimension of the chunk.
+		//
 		static const int Vertices = 16;
 
-		static const int HeightLevels = 5;
+		//
+		// The number of height levels for colouring.
+		//
+		static const int HeightLevelCount = 5;
 
+		//
+		// Distance between vertices on the chunk.
+		//
 		static float VertexDistance;
+
+		//
+		// The maximum height range of vertices. Heights will vary between 0 and this.
+		//
 		static float HeightRange;
+
+		//
+		// The wavelength of the noise. 
+		// Smaller numbers lead to higher frequency noise and more jagged terrain.
+		// Larger numbers lead to smooth rolling hills.
+		//
 		static float Wavelength;
+
+		//
+		// A seed for noise generation to introduce some variation.
+		//
 		static float Seed;
 
+		//
+		// The amplitudes of noise to apply at each octave.
+		//
 		static float Amplitudes[Octaves];
-		static glm::vec3 HeightColours[HeightLevels];
+
+		//
+		// The colours to display at each height level.
+		//
+		static glm::vec3 HeightColours[HeightLevelCount];
+
+		//
+		// The cutoff points for the heights, expressed as a fraction of the maximum height range.
+		//
+		static float HeightCutoffs[ HeightLevelCount ];
 
 		static bool UseDebugColours;
 
