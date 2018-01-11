@@ -4,6 +4,7 @@ namespace dd
 {
 	class EntityManager;
 	class ICamera;
+	class FrameBuffer;
 
 	class IRenderer
 	{
@@ -13,7 +14,7 @@ namespace dd
 		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) {}
 		virtual void RenderShutdown() {}
 
-		virtual const ConstBuffer<byte>* GetLastFrameBuffer() const { return nullptr; }
+		virtual FrameBuffer* GetFrameBuffer() { return nullptr; }
 		virtual bool ShouldRenderFrameBuffer() const { return false; }
 	};
 }

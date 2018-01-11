@@ -29,8 +29,7 @@ namespace dd
 	MousePicking::MousePicking( const Window& window, const ICamera& camera, const Input& input ) : 
 		m_window( window ),
 		m_camera( camera ),
-		m_input( input ),
-		m_rtt( window )
+		m_input( input )
 	{
 	}
 
@@ -123,11 +122,12 @@ namespace dd
 
 		m_lastFrameBuffer.Set( new byte[buffer_size], buffer_size );
 		
-		m_texture.Create( size, GL_R32I, GL_RED_INTEGER, GL_INT );
+		m_texture.Create( size, GL_R32I, 1 );
+		m_depth.Create( size, GL_DEPTH_COMPONENT32F, 1 );
 
-		m_rtt.SetClearColour( glm::vec4( 1 ) );
-		m_rtt.Create( m_texture, true );
-		m_rtt.PreRender();
+		m_framebuffer.SetClearColour( glm::vec4( 1 ) );
+		m_framebuffer.Create( m_texture, &m_depth );
+		m_framebuffer.RenderInit();
 	}
 
 	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera )
@@ -136,7 +136,7 @@ namespace dd
 		{
 			ShaderProgram& shader = *m_shader.Get();
 
-			m_rtt.Bind();
+			m_framebuffer.Bind();
 
 			shader.Use( true );
 
@@ -147,9 +147,9 @@ namespace dd
 
 			shader.Use( false );
 
-			m_rtt.Unbind();
+			m_framebuffer.Unbind();
 
-			m_texture.GetData( m_lastFrameBuffer, 0 );
+			m_texture.GetData( m_lastFrameBuffer, 0, GL_RED_INTEGER, GL_INT );
 		}
 	}
 

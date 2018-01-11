@@ -16,10 +16,9 @@ namespace dd
 {
 	Window* Window::m_pInstance = nullptr;
 
-	Window::Window( int resX, int resY, const char* title )
+	Window::Window( glm::ivec2 resolution, const char* title )
 		: m_title( title ),
-		m_sizeX( resX ),
-		m_sizeY( resY )
+		m_size( resolution )
 	{
 		DD_ASSERT( m_pInstance == nullptr );
 		m_pInstance = this;
@@ -31,7 +30,7 @@ namespace dd
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
 		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-		m_glfwWindow = glfwCreateWindow( m_sizeX, m_sizeY, m_title.c_str(), NULL, NULL);
+		m_glfwWindow = glfwCreateWindow( m_size.x, m_size.y, m_title.c_str(), NULL, NULL);
 		if( m_glfwWindow != nullptr )
 		{
 			glfwMakeContextCurrent( m_glfwWindow );
@@ -60,8 +59,7 @@ namespace dd
 
 	void Window::OnWindowResize( GLFWwindow* window, int width, int height )
 	{
-		m_pInstance->m_sizeX = width;
-		m_pInstance->m_sizeY = height;
+		m_pInstance->m_size = glm::ivec2( width, height );
 	}
 
 	void Window::OnFramebufferResize( GLFWwindow* window, int width, int height )
@@ -71,10 +69,9 @@ namespace dd
 
 	void Window::Resize( int resX, int resY )
 	{
-		m_sizeX = resX;
-		m_sizeY = resY;
+		m_size = glm::ivec2( resX, resY );
 
-		glfwSetWindowSize( m_glfwWindow, m_sizeX, m_sizeY );
+		glfwSetWindowSize( m_glfwWindow, m_size.x, m_size.y );
 	}
 
 	void Window::MakeBorderless()
@@ -126,10 +123,7 @@ namespace dd
 		glfwSwapBuffers( m_glfwWindow );
 
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		glViewport( 0, 0, m_sizeX, m_sizeY );
-
-		glClearColor( 1, 1, 1, 1 );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		glViewport( 0, 0, m_size.x, m_size.y );
 
 		CheckGLError();
 

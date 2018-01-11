@@ -5,8 +5,20 @@ in vec2 UV;
 out vec4 Colour;
 
 uniform sampler2D Texture;
+uniform bool DrawDepth;
+uniform float Near;
+uniform float Far;
 
 void main()
 {
-	Colour = texture( Texture, UV );
+	if( DrawDepth )
+	{
+		float depth = texture( Texture, UV ).r;
+    	float linear_colour = (2.0 * Near) / (Far + Near - depth * (Far - Near));
+    	Colour = vec4(linear_colour);
+	}
+	else
+	{
+		Colour = texture( Texture, UV );
+	}
 }

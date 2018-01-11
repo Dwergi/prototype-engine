@@ -33,7 +33,7 @@
 #include "Random.h"
 #include "Recorder.h"
 #include "Renderer.h"
-#include "RenderToTexture.h"
+#include "FrameBuffer.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -228,11 +228,13 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 	jobsystem.WaitForCategory( "ISystem::Initialize" );
 }
 
-void InitializeRenderers( const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& systems )
+void InitializeRenderers( Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
 {
-	for( IRenderer* renderer : systems )
+	renderer.RenderInit( entity_manager, camera );
+
+	for( IRenderer* current : renderers )
 	{
-		renderer->RenderInit( entity_manager, camera );
+		current->RenderInit( entity_manager, camera );
 	}
 }
 
@@ -309,26 +311,28 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	}
 }
 
-void Render( const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer, RenderToTexture& rtt )
+void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer )
 {
-	for( IRenderer* renderer : renderers )
+	renderer.BeginRender( camera );
+
+	for( IRenderer* current : renderers )
 	{
-		renderer->Render( entity_manager, camera );
+		current->Render( entity_manager, camera );
 
-		if( renderer->ShouldRenderFrameBuffer() )
+		if( current->ShouldRenderFrameBuffer() )
 		{
-			const ConstBuffer<byte>* frame_buffer_data = renderer->GetLastFrameBuffer();
-			if( frame_buffer_data != nullptr )
-			{
-				Texture* rtt_texture = rtt.GetTexture();
-				rtt_texture->Bind( 0 );
-				rtt_texture->SetData( *frame_buffer_data, 0 );
-				rtt_texture->Unbind();
-
-				rtt.Render();
-			}
+			FrameBuffer* current_fbo = current->GetFrameBuffer();
+			current_fbo->Blit();
 		}
 	}
+
+	renderer.Render( entity_manager, camera );
+
+	renderer.EndRender( camera );
+
+	ImGui::Render();
+
+	s_window->Swap();
 }
 
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
@@ -368,7 +372,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		JobSystem jobSystem( 2u );
 		SwarmSystem swarm_system;
 
-		s_window = new Window( 1280, 720, "DD" );
+		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );
 		Input input( *s_window );
 
 		InputBindings bindings;
@@ -416,7 +420,6 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		Vector<IRenderer*> renderers;
 		renderers.Add( &mouse_picking );
 		renderers.Add( &terrain_system );
-		renderers.Add( &renderer );
 
 		BindKeys( input );
 
@@ -434,17 +437,10 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( &shakyCam );
 
 		InitializeSystems( jobSystem, entity_manager, systems );
-		InitializeRenderers( entity_manager, shakyCam, renderers );
+		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
 
 		glm::ivec2 picking_size( s_window->GetWidth() / MousePicking::DownScalingFactor, 
 			s_window->GetHeight() / MousePicking::DownScalingFactor );
-
-		Texture output_texture;
-		output_texture.Create( picking_size, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE );
-
-		RenderToTexture output_rtt( *s_window );
-		output_rtt.Create( output_texture, false );
-		output_rtt.PreRender();
 
 		while( !s_window->ShouldClose() )
 		{
@@ -477,11 +473,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			DrawDebugUI( debug_views );
 
 			// render
-			Render( renderers, entity_manager, shakyCam, console, frame_timer, output_rtt );
-
-			ImGui::Render();
-
-			s_window->Swap();
+			Render( renderer, renderers, entity_manager, shakyCam, console, frame_timer );
 
 			// systems post-render
 			PostRenderSystems( jobSystem, entity_manager, systems, delta_t );

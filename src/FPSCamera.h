@@ -75,6 +75,8 @@ namespace dd
 
 		glm::vec3 m_direction;
 		glm::vec3 m_position;
+
+		// half vertical FOV in radians
 		float m_vfov { 0 };
 		float m_near { 0 };
 		float m_far { 0 };

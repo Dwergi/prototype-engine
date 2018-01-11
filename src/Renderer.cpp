@@ -101,6 +101,15 @@ namespace dd
 
 		m_unitCube = Mesh::Create( "cube", m_shaders[ 0 ] );
 		m_unitCube.Get()->MakeUnitCube();
+
+		glm::ivec2 size( m_window.GetWidth(), m_window.GetHeight() );
+		m_colourTexture.Create( size, GL_SRGB8_ALPHA8, 1 );
+		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
+
+		m_framebuffer.SetClearColour( glm::vec4( 1 ) );
+		m_framebuffer.SetClearDepth( 0.0f );
+		m_framebuffer.Create( m_colourTexture, &m_depthTexture );
+		m_framebuffer.RenderInit();
 	}
 
 	void Renderer::Shutdown()
@@ -135,6 +144,7 @@ namespace dd
 		ImGui::Text( "Unculled Meshes: %d", m_frustumMeshCount );
 
 		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
+		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
@@ -269,7 +279,7 @@ namespace dd
 		{
 			// depth test
 			glEnable( GL_DEPTH_TEST );
-			glDepthFunc( GL_LESS );
+			glDepthFunc( GL_GREATER );
 
 			// backface culling
 			glEnable( GL_CULL_FACE );
@@ -362,7 +372,7 @@ namespace dd
 
 				shader->SetUniform( "WireframeEdgeColour", m_debugWireframeEdgeColour );
 				shader->SetUniform( "WireframeEdgeWidth", m_debugWireframeEdgeWidth );
-				shader->SetUniform( "WireframeMaxDistance", m_debugWireframeMaxDistance );
+				shader->SetUniform( "WireframeMaxDistance", m_debugWireframeMaxDistance );			
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
@@ -444,6 +454,11 @@ namespace dd
 		m_debugLights = entity_manager.FindAllWithWritable<LightComponent, TransformComponent>();
 	}
 
+	void Renderer::BeginRender( const ICamera& camera )
+	{
+		m_framebuffer.Bind();
+	}
+
 	void Renderer::Render( const EntityManager& entity_manager, const ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
@@ -470,6 +485,21 @@ namespace dd
 		if( m_debugFreezeFrustum )
 		{
 			m_frustum->Render( camera );
+		}
+	}
+
+	void Renderer::EndRender( const ICamera& camera )
+	{
+		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+		glViewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
+
+		if( m_debugDrawDepth )
+		{
+			m_framebuffer.Render( true, camera );
+		}
+		else
+		{
+			m_framebuffer.Blit();
 		}
 	}
 }

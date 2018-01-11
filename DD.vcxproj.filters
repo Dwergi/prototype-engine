@@ -492,13 +492,13 @@
     <ClInclude Include="src\OpenGL.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderToTexture.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\IRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrameBuffer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
@@ -840,13 +840,13 @@
     <ClCompile Include="src\ShaderHandle.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderToTexture.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\Texture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\OpenGL.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrameBuffer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

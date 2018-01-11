@@ -25,7 +25,7 @@ namespace dd
 		Destroy();
 	}
 
-	void Texture::Create( glm::ivec2 size, GLenum format, GLenum dataFormat, GLenum dataType )
+	void Texture::Create( glm::ivec2 size, GLenum format, int mips )
 	{
 		glGenTextures( 1, &m_id );
 		CheckGLError();
@@ -34,23 +34,18 @@ namespace dd
 		CheckGLError();
 
 		m_format = format;
-		m_dataFormat = dataFormat;
-		m_dataType = dataType;
 		m_size = size;
+		m_mips = mips;
 
-		glTexImage2D( GL_TEXTURE_2D, 0, m_format, m_size.x, m_size.y, 0, m_dataFormat, m_dataType, NULL );
+		glTexStorage2D( GL_TEXTURE_2D, mips, m_format, m_size.x, m_size.y );
 		CheckGLError();
 
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-		CheckGLError();
+		glBindTexture( GL_TEXTURE_2D, 0 );
 		
 		m_valid = true;
 	}
 
-	void Texture::SetData( const ConstBuffer<byte>& data, int mip )
+	void Texture::SetData( const ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( data.GetVoid() != nullptr );
@@ -59,12 +54,11 @@ namespace dd
 		DD_ASSERT( data.SizeBytes() == expectedSize );
 		DD_ASSERT( mip >= 0 );
 
-		// orphan the data first
-		glTexImage2D( GL_TEXTURE_2D, mip, m_format, m_size.x, m_size.y, 0, m_dataFormat, m_dataType, data.GetVoid() );
+		glTexImage2D( GL_TEXTURE_2D, mip, m_format, m_size.x, m_size.y, 0, dataFormat, dataType, data.GetVoid() );
 		CheckGLError();
 	}
 
-	void Texture::GetData( Buffer<byte>& data, int mip )
+	void Texture::GetData( Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( data.GetVoid() != nullptr );
@@ -73,7 +67,7 @@ namespace dd
 		DD_ASSERT( data.SizeBytes() == expectedSize );
 		DD_ASSERT( mip >= 0 );
 
-		glGetTextureImage( m_id, mip, m_dataFormat, m_dataType, data.SizeBytes(), data.Get() );
+		glGetTextureImage( m_id, mip, dataFormat, dataType, data.SizeBytes(), data.Get() );
 		CheckGLError();
 	}
 

@@ -12,7 +12,7 @@
 #include "IRenderer.h"
 #include "ISystem.h"
 #include "Ray.h"
-#include "RenderToTexture.h"
+#include "FrameBuffer.h"
 #include "ShaderHandle.h"
 #include "Texture.h"
 
@@ -52,8 +52,8 @@ namespace dd
 		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
 		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
 
+		virtual FrameBuffer* GetFrameBuffer() override { return &m_framebuffer; }
 		virtual bool ShouldRenderFrameBuffer() const override { return m_renderDebug; }
-		virtual const ConstBuffer<byte>* GetLastFrameBuffer() const override { return &m_lastFrameBuffer; }
 
 	private:
 
@@ -70,7 +70,8 @@ namespace dd
 
 		ShaderHandle m_shader;
 		Texture m_texture;
-		RenderToTexture m_rtt;
+		Texture m_depth;
+		FrameBuffer m_framebuffer;
 		Buffer<byte> m_lastFrameBuffer;
 
 		glm::vec2 m_position;

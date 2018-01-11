@@ -323,7 +323,7 @@
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\IRenderer.h" />
-    <ClInclude Include="src\RenderToTexture.h" />
+    <ClInclude Include="src\FrameBuffer.h" />
     <ClInclude Include="src\IComponent.h" />
     <ClInclude Include="src\ComponentHandle.h" />
     <ClInclude Include="src\ComponentPoolBase.h" />
@@ -526,7 +526,7 @@
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
-    <ClCompile Include="src\RenderToTexture.cpp" />
+    <ClCompile Include="src\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\Frustum.cpp" />

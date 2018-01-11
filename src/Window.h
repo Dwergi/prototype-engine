@@ -14,7 +14,7 @@ namespace dd
 	{
 	public:
 
-		Window( int resX, int resY, const char* title );
+		Window( glm::ivec2 resolution, const char* title );
 		~Window();
 
 		void Close();
@@ -32,8 +32,9 @@ namespace dd
 
 		void Swap();
 
-		int GetWidth() const { return m_sizeX; }
-		int GetHeight() const { return m_sizeY; }
+		glm::ivec2 GetSize() const { return m_size; }
+		int GetWidth() const { return m_size.x; }
+		int GetHeight() const { return m_size.y; }
 
 		GLFWwindow* GetInternalWindow() const { return m_glfwWindow; }
 
@@ -45,7 +46,8 @@ namespace dd
 
 		GLFWwindow* m_glfwWindow;
 		String32  m_title;
-		int m_sizeX, m_sizeY;
+
+		glm::ivec2 m_size;
 		bool m_focused;
 	};
 }

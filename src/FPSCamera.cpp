@@ -137,7 +137,12 @@ namespace dd
 
 	glm::mat4 FPSCamera::GetProjectionMatrix() const
 	{
-		return glm::perspective( m_vfov, m_aspectRatio, m_near, m_far );
+		float fov = 1.0f / glm::tan( m_vfov / 2.0f );
+		return glm::mat4(
+			fov / m_aspectRatio, 0.0f, 0.0f, 0.0f,
+			0.0f, fov, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, -1.0f,
+			0.0f, 0.0f, m_near, 0.0f );
 	}
 
 	glm::mat4 FPSCamera::GetCameraMatrix() const

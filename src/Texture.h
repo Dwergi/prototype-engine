@@ -17,13 +17,13 @@ namespace dd
 		Texture();
 		~Texture();
 
-		void Create( glm::ivec2 size, GLenum format, GLenum dataFormat, GLenum dataType );
+		void Create( glm::ivec2 size, GLenum format, int mips );
 		void Destroy();
 
 		glm::ivec2 GetSize() const { return m_size; }
 
-		void SetData( const ConstBuffer<byte>& data, int mip );
-		void GetData( Buffer<byte>& data, int mip );
+		void SetData( const ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
+		void GetData( Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
 
 		void Bind( int index );
 		void Unbind();
@@ -38,10 +38,9 @@ namespace dd
 		glm::ivec2 m_size;
 
 		bool m_valid { false };
+		int m_mips { 0 };
 		GLuint m_id { OpenGL::InvalidID };
 		GLenum m_format { OpenGL::InvalidID };
-		GLenum m_dataFormat { OpenGL::InvalidID };
-		GLenum m_dataType { OpenGL::InvalidID };
 
 		int m_textureUnit { -1 };
 	};

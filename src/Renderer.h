@@ -7,11 +7,13 @@
 #pragma once
 
 #include "EntityHandle.h"
+#include "FrameBuffer.h"
 #include "IDebugDraw.h"
 #include "IRenderer.h"
 #include "ISystem.h"
 #include "Mesh.h"
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 namespace dd
 {
@@ -38,6 +40,9 @@ namespace dd
 
 		virtual void Initialize( EntityManager& entity_manager ) override;
 
+		void BeginRender( const ICamera& camera );
+		void EndRender( const ICamera& camera );
+
 		//
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
@@ -47,6 +52,8 @@ namespace dd
 		virtual void Update( EntityManager& entity_manager, float delta_t ) override;
 
 		virtual void RenderInit( const EntityManager& entityManager, const ICamera& camera ) override;
+
+		virtual FrameBuffer* GetFrameBuffer() override { return &m_framebuffer; }
 
 		//
 		// Set the mouse picking helper to use.
@@ -65,6 +72,10 @@ namespace dd
 	private:
 
 		const Window& m_window;
+		FrameBuffer m_framebuffer;
+		Texture m_colourTexture;
+		Texture m_depthTexture;
+		
 		Frustum* m_frustum;
 		MousePicking* m_mousePicking;
 
@@ -82,6 +93,7 @@ namespace dd
 		bool m_frustumCulling { true };
 		bool m_debugDrawAxes { true };
 		bool m_debugDrawBounds { false };
+		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
