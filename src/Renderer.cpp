@@ -144,7 +144,6 @@ namespace dd
 		ImGui::Text( "Unculled Meshes: %d", m_frustumMeshCount );
 
 		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
-		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
@@ -263,6 +262,16 @@ namespace dd
 
 			ImGui::Checkbox( "Enable Culling", &m_frustumCulling );
 			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightFrustumMeshes );
+
+			ImGui::TreePop();
+		}
+
+		if( ImGui::TreeNodeEx( "Depth", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			ImGui::Checkbox( "Render", &m_debugDrawDepth );
+
+			ImGui::SliderFloat( "Min", &m_debugMinDepth, 0.0f, 1.0f );
+			ImGui::SliderFloat( "Max", &m_debugMaxDepth, 0.0f, 1.0f );
 
 			ImGui::TreePop();
 		}
@@ -495,7 +504,9 @@ namespace dd
 
 		if( m_debugDrawDepth )
 		{
-			m_framebuffer.Render( true, camera );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+			m_framebuffer.RenderDepth( m_debugMinDepth, m_debugMaxDepth, camera.GetNear(), camera.GetFar() );
 		}
 		else
 		{

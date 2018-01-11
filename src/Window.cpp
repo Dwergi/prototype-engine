@@ -122,6 +122,8 @@ namespace dd
 	{
 		glfwSwapBuffers( m_glfwWindow );
 
+		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+		glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		glViewport( 0, 0, m_size.x, m_size.y );
 

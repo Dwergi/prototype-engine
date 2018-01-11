@@ -48,7 +48,8 @@ namespace dd
 
 		void RenderInit();
 
-		void Render( bool depth, const ICamera& camera );
+		void Render();
+		void RenderDepth( float min, float max, float near, float far );
 
 		void Blit();
 

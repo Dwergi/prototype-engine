@@ -93,7 +93,6 @@ namespace dd
 		bool m_frustumCulling { true };
 		bool m_debugDrawAxes { true };
 		bool m_debugDrawBounds { false };
-		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
@@ -101,6 +100,10 @@ namespace dd
 		bool m_debugFreezeFrustum { false };
 		bool m_forceUpdateFrustum { false };
 		float m_debugWireframeMaxDistance { 100.0f };
+
+		bool m_debugDrawDepth { false };
+		float m_debugMinDepth { 0.0f };
+		float m_debugMaxDepth { 1.0f };
 
 		glm::vec3 m_debugWireframeColour;
 		float m_debugWireframeWidth { 2.0f };
