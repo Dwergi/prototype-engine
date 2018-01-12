@@ -70,11 +70,14 @@ extern uint s_maxFPS;
 uint s_maxFPS = 60;
 
 bool s_showDebugUI = false;
+DebugUI* s_debugUI = nullptr;
 
-FreeCameraController* s_freeCam;
-ShipSystem* s_shipSystem;
-Window* s_window;
-EntityManager* s_entity_manager;
+Input* s_input = nullptr;
+FreeCameraController* s_freeCam = nullptr;
+ShipSystem* s_shipSystem = nullptr;
+Window* s_window = nullptr;
+EntityManager* s_entityManager = nullptr;
+FrameTimer* s_frameTimer = nullptr;
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -85,7 +88,7 @@ TransformComponent* GetTransformComponent( EntityHandle entity )
 
 EntityHandle GetEntityHandle( uint id )
 {
-	EntityHandle handle( id, *s_entity_manager );
+	EntityHandle handle( id, *s_entityManager );
 	return handle;
 }
 
@@ -180,6 +183,126 @@ void Exit( InputAction action, InputType type )
 	{
 		s_window->SetToClose();
 	}
+}
+
+struct Assert
+{
+	String256 Info;
+	String256 Message;
+	bool Open;
+};
+
+static Assert s_assert;
+
+String256 FormatAssert( int level, const char* file, int line, const char* function, const char* expression )
+{
+	String256 out;
+	switch( level )
+	{
+	case AssertLevel::Debug:
+		out += "DEBUG";
+		break;
+
+	case AssertLevel::Warning:
+		out += "WARNING";
+		break;
+
+	case AssertLevel::Error:
+		out += "ERROR";
+		break;
+
+	case AssertLevel::Fatal:
+		out += "FATAL";
+		break;
+	}
+
+	char buffer[ 1024 ];
+	snprintf( buffer, 1024, ": \"%s\" in %s() (%s:%d)", expression, function, file, line );
+
+	out += buffer;
+
+	return out;
+}
+
+AssertAction ShowAssertDialog()
+{
+	s_input->CaptureMouse( false );
+	glm::ivec2 size = s_window->GetSize();
+	ImGui::SetNextWindowPos( ImVec2( size.x / 2.0f - size.x / 6.5f, size.y / 2.0f - size.y / 6.5f ), ImGuiSetCond_FirstUseEver );
+	ImGui::SetNextWindowSize( ImVec2( size.x / 3.0f, size.y / 3.0f ), ImGuiSetCond_FirstUseEver );
+
+	AssertAction action = AssertAction::None;
+
+	float delta_t = 0.0f;
+
+	do
+	{
+		if( ImGui::Begin( "Assert", &s_assert.Open ) )
+		{
+			ImGui::TextWrapped( s_assert.Info.c_str() );
+			ImGui::TextWrapped( s_assert.Message.c_str() );
+			ImGui::NewLine();
+
+			if( ImGui::Button( "Break" ) )
+			{
+				action = AssertAction::Break;
+			}
+
+			ImGui::SameLine();
+
+			if( ImGui::Button( "Ignore" ) )
+			{
+				action = AssertAction::Ignore;
+			}
+
+			ImGui::SameLine();
+
+			if( ImGui::Button( "Ignore This" ) )
+			{
+				action = AssertAction::IgnoreLine;
+			}
+
+			ImGui::SameLine();
+
+			if( ImGui::Button( "Abort" ) )
+			{
+				action = AssertAction::Abort;
+			}
+
+			ImGui::End();
+		}
+		else
+		{
+			action = AssertAction::Ignore;
+		}
+
+		ImGui::Render();
+
+		s_window->Swap();
+
+		s_frameTimer->Update();
+		delta_t = s_frameTimer->Delta();
+		
+		s_input->Update( delta_t );
+		s_debugUI->Update( delta_t );
+	} 
+	while( action == AssertAction::None );
+
+	return action;
+}
+
+pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
+	int level, const char* message )
+{
+	s_assert.Open = true;
+	s_assert.Info = FormatAssert( level, file, line, function, expression );
+	s_assert.Message = String256( "Message: " );
+	if( message != nullptr )
+	{
+		s_assert.Message += message;
+	}
+
+	return (pempek::assert::implementation::AssertAction::AssertAction) ShowAssertDialog();
 }
 
 void BindKeys( Input& input )
@@ -373,7 +496,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		SwarmSystem swarm_system;
 
 		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );
-		Input input( *s_window );
+		s_input = new Input( *s_window );
 
 		InputBindings bindings;
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
@@ -386,7 +509,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 		ShakyCamera shakyCam( camera, bindings );
 
-		DebugUI debugUI( *s_window, input );
+		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		Renderer renderer( *s_window );
 
@@ -404,7 +527,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_shipSystem->BindActions( bindings );
 		s_shipSystem->CreateShip( entity_manager );
 
-		MousePicking mouse_picking( *s_window, camera, input );
+		MousePicking mouse_picking( *s_window, camera, *s_input );
 		mouse_picking.BindActions( bindings );
 		renderer.SetMousePicking( &mouse_picking );
 
@@ -421,13 +544,13 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		renderers.Add( &mouse_picking );
 		renderers.Add( &terrain_system );
 
-		BindKeys( input );
+		BindKeys( *s_input );
 
-		FrameTimer frame_timer;
+		s_frameTimer = new FrameTimer();
 		DebugConsole console( scriptEngine );
 
 		Vector<IDebugDraw*> debug_views;
-		debug_views.Add( &frame_timer );
+		debug_views.Add( s_frameTimer );
 		debug_views.Add( &console );
 		debug_views.Add( &renderer );
 		debug_views.Add( &mouse_picking );
@@ -447,9 +570,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			DD_PROFILE_SCOPED( Frame );
 
 			// frame timer
-			frame_timer.SetMaxFPS( s_maxFPS );
-			frame_timer.Update();
-			float delta_t = frame_timer.Delta();
+			s_frameTimer->SetMaxFPS( s_maxFPS );
+			s_frameTimer->Update();
+			float delta_t = s_frameTimer->Delta();
 
 			// entity manager
 			entity_manager.Update( delta_t );
@@ -458,13 +581,13 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
 
 			// input
-			UpdateInput( input, bindings, delta_t );
+			UpdateInput( *s_input, bindings, delta_t );
 
 			// debug UI
-			debugUI.Update( delta_t );
+			s_debugUI->Update( delta_t );
 
 			// camera
-			UpdateFreeCam( *s_freeCam, shakyCam, input, delta_t );
+			UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
 
 			// systems update
 			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
@@ -472,8 +595,10 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			// debug UI
 			DrawDebugUI( debug_views );
 
+			DD_ASSERT( false, "TEST" );
+
 			// render
-			Render( renderer, renderers, entity_manager, shakyCam, console, frame_timer );
+			Render( renderer, renderers, entity_manager, shakyCam, console, *s_frameTimer );
 
 			// systems post-render
 			PostRenderSystems( jobSystem, entity_manager, systems, delta_t );
@@ -481,7 +606,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			camera.SetClean();
 
 			// wait for frame delta
-			frame_timer.DelayFrame();
+			s_frameTimer->DelayFrame();
 
 			DD_PROFILE_LOG( "End Frame" );
 		}
@@ -512,24 +637,31 @@ int main( int argc, char* argv[] )
 {
 	TypeInfo::RegisterDefaultTypes();
 
+	pempek::assert::implementation::setAssertHandler( OnAssert );
+
 	CommandLine cmdLine( argv, argc );
 	if( cmdLine.Exists( "noassert" ) )
+	{
 		pempek::assert::implementation::ignoreAllAsserts( true );
+	}
 
 	if( cmdLine.Exists( "dataroot" ) )
+	{
 		dd::File::SetDataRoot( cmdLine.GetValue( "dataroot" ).c_str() );
+	}
 	else
+	{
 		dd::File::SetDataRoot( "../../../data" );
+	}
 
 	REGISTER_TYPE( CommandLine );
 
-	// TODO: this is bad, not compatible with Wren, and registered too early anyway
 	AngelScriptEngine scriptEngine;
 	REGISTER_TYPE( AngelScriptEngine );
 
 	EntityManager entity_manager;
 	REGISTER_TYPE( EntityManager );
-	s_entity_manager = &entity_manager;
+	s_entityManager = &entity_manager;
 
 	TypeInfo::SetScriptEngine( &scriptEngine );
 

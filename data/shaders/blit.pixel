@@ -12,8 +12,7 @@ void main()
 	if( DrawDepth )
 	{
 		float depth = texture( Texture, UV ).r;
-		float power = pow(1.0 - depth, 2);
-    	Colour = vec4(power);
+    	Colour = vec4(depth);
 	}
 	else
 	{

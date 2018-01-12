@@ -49,7 +49,7 @@ namespace dd
 		void RenderInit();
 
 		void Render();
-		void RenderDepth( float min, float max, float near, float far );
+		void RenderDepth();
 
 		void Blit();
 

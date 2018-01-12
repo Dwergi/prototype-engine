@@ -265,16 +265,8 @@ namespace dd
 
 			ImGui::TreePop();
 		}
-
-		if( ImGui::TreeNodeEx( "Depth", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			ImGui::Checkbox( "Render", &m_debugDrawDepth );
-
-			ImGui::SliderFloat( "Min", &m_debugMinDepth, 0.0f, 1.0f );
-			ImGui::SliderFloat( "Max", &m_debugMaxDepth, 0.0f, 1.0f );
-
-			ImGui::TreePop();
-		}
+		
+		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 
 		if( !m_debugMeshGridCreated && ImGui::Button( "Create Mesh Grid" ) )
 		{
@@ -504,9 +496,7 @@ namespace dd
 
 		if( m_debugDrawDepth )
 		{
-			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-			m_framebuffer.RenderDepth( m_debugMinDepth, m_debugMaxDepth, camera.GetNear(), camera.GetFar() );
+			m_framebuffer.RenderDepth();
 		}
 		else
 		{

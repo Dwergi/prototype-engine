@@ -102,8 +102,6 @@ namespace dd
 		float m_debugWireframeMaxDistance { 100.0f };
 
 		bool m_debugDrawDepth { false };
-		float m_debugMinDepth { 0.0f };
-		float m_debugMaxDepth { 1.0f };
 
 		glm::vec3 m_debugWireframeColour;
 		float m_debugWireframeWidth { 2.0f };

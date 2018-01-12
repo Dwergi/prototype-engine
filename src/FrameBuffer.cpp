@@ -129,7 +129,7 @@ namespace dd
 		}
 	}
 
-	void FrameBuffer::RenderDepth( float min, float max, float near_plane, float far_plane )
+	void FrameBuffer::RenderDepth()
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_depth != nullptr );
@@ -143,6 +143,8 @@ namespace dd
 		shader.SetUniform( "DrawDepth", true );
 		
 		m_fullScreenVAO.Bind();
+
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckGLError();

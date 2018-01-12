@@ -322,6 +322,8 @@
     <ClInclude Include="src\AutoList.h" />
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\FSM.h" />
+    <ClInclude Include="src\FunctionView.h" />
     <ClInclude Include="src\IRenderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
     <ClInclude Include="src\IComponent.h" />
@@ -525,6 +527,7 @@
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
+    <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />

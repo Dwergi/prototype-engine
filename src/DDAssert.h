@@ -25,3 +25,25 @@
 #define DD_ASSERT_USED_CUSTOM PPK_ASSERT_USED_CUSTOM
 
 #define DD_STATIC_ASSERT PPK_STATIC_ASSERT
+
+namespace dd
+{
+	enum class AssertAction
+	{
+		None = pempek::assert::implementation::AssertAction::None,
+		Abort = pempek::assert::implementation::AssertAction::Abort,
+		Break = pempek::assert::implementation::AssertAction::Break,
+		Ignore = pempek::assert::implementation::AssertAction::Ignore,
+		IgnoreLine = pempek::assert::implementation::AssertAction::IgnoreLine,
+		IgnoreAll = pempek::assert::implementation::AssertAction::IgnoreAll,
+		Throw = pempek::assert::implementation::AssertAction::Throw
+	};
+
+	enum class AssertLevel
+	{
+		Warning = pempek::assert::implementation::AssertLevel::Warning,
+		Debug = pempek::assert::implementation::AssertLevel::Debug,
+		Error = pempek::assert::implementation::AssertLevel::Error,
+		Fatal = pempek::assert::implementation::AssertLevel::Fatal
+	};
+}

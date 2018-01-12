@@ -100,6 +100,9 @@
     <Filter Include="File">
       <UniqueIdentifier>{27d6d938-19b2-489f-bccb-1ac1423dffd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{0f221ad0-206e-4f33-80fd-23a4b912c724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -501,6 +504,12 @@
     <ClInclude Include="src\FrameBuffer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\FSM.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FunctionView.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -848,6 +857,9 @@
     </ClCompile>
     <ClCompile Include="src\FrameBuffer.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FSM.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
