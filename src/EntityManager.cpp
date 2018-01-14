@@ -46,6 +46,8 @@ namespace dd
 
 	void EntityManager::Update( float dt )
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		m_entities.Swap();
 		m_entities.Duplicate();
 
@@ -64,6 +66,8 @@ namespace dd
 	// 
 	EntityHandle EntityManager::Create()
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		if( m_free.GetWrite().Size() == 0 )
 		{
 			EntityHandle handle;
@@ -89,6 +93,8 @@ namespace dd
 		if( handle.ID == EntityHandle::Invalid )
 			return;
 
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		if( handle.ID < m_entities.GetWrite().Size() )
 		{
 			if( m_entities.GetWrite()[ handle.ID ].Version != handle.Version )
@@ -110,6 +116,8 @@ namespace dd
 
 	void EntityManager::DestroyAll()
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		for( EntityHandle entity : m_entities.GetWrite() )
 		{
 			Destroy( entity );
@@ -120,6 +128,8 @@ namespace dd
 	{
 		if( entity.ID == EntityHandle::Invalid || entity.ID < 0 )
 			return false;
+
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
 
 		// check readable
 		if( entity.ID < m_entities.GetRead().Size() )

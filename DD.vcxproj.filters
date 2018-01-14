@@ -103,6 +103,9 @@
     <Filter Include="FSM">
       <UniqueIdentifier>{0f221ad0-206e-4f33-80fd-23a4b912c724}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{758bee55-cb5e-4124-9267-662811966cfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EntityHandle.h">
@@ -509,6 +512,9 @@
     </ClInclude>
     <ClInclude Include="src\DDAssertHelpers.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainParameters.h">
+      <Filter>Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

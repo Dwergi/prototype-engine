@@ -382,7 +382,7 @@ namespace dd
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, float& max_height )
+	void Mesh::SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, const float& max_height )
 	{
 		m_bufferHeightColours.Set( colours, count );
 		m_bufferHeightCutoffs.Set( cutoffs, count );
@@ -404,6 +404,7 @@ namespace dd
 
 		shader.SetUniform( "Model", transform );
 		shader.SetUniform( "View", camera.GetCameraMatrix() );
+		shader.SetUniform( "ViewPosition", camera.GetPosition() );
 		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "ObjectColour", m_colourMultiplier );

@@ -195,6 +195,8 @@ namespace dd
 	template <typename T>
 	DenseVectorPool<T>& DenseVectorPool<T>::operator=( const DenseVectorPool<T>& other )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		m_components = other.m_components;
 		m_valid = other.m_valid;
 

@@ -154,7 +154,7 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled?", &m_debugWireframe );
+			ImGui::Checkbox( "Enabled", &m_debugWireframe );
 
 			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
 
@@ -276,7 +276,7 @@ namespace dd
 
 	void Renderer::SetRenderState()
 	{
-		if( !m_debugWireframe )
+		if( m_debugDrawStandard )
 		{
 			// depth test
 			glEnable( GL_DEPTH_TEST );

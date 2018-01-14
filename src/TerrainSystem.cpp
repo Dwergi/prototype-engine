@@ -72,13 +72,6 @@ namespace dd
 		
 	}
 
-	static float DistanceTo( const glm::vec3& pos, const TerrainChunkKey& key )
-	{
-		glm::vec3 chunk_pos( key.X + TerrainChunk::VertexDistance / 2, 0, key.Y + TerrainChunk::VertexDistance / 2 );
-
-		return glm::distance( pos, chunk_pos );
-	}
-
 	void TerrainSystem::Shutdown( EntityManager& entity_manager )
 	{
 		for( auto& chunk : m_chunks )
@@ -130,14 +123,9 @@ namespace dd
 		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
 			[this]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp )
 		{
-			RenderUpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write() );
+			TerrainChunk* chunk = GetChunk( chunk_cmp.Write()->Key );
+			mesh_cmp.Write()->Mesh = chunk->GetMesh();
 		} );
-	}
-
-	void TerrainSystem::RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp )
-	{
-		TerrainChunk* chunk = GetChunk( chunk_cmp->Key );
-		mesh_cmp->Mesh = chunk->GetMesh();
 	}
 
 	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )
@@ -169,7 +157,7 @@ namespace dd
 
 	void TerrainSystem::UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp )
 	{
-		if( TerrainChunk::UseDebugColours )
+		if( m_params.UseDebugColours )
 		{
 			mesh_cmp->Colour = GetMeshColour( chunk_cmp->Key );
 		}
@@ -188,8 +176,8 @@ namespace dd
 			return;
 		}
 
-		float rounded_x = ((int) origin.x / TerrainChunk::VertexDistance) * TerrainChunk::VertexDistance;
-		float rounded_z = ((int) origin.z / TerrainChunk::VertexDistance) * TerrainChunk::VertexDistance;
+		float rounded_x = ((int) origin.x / m_params.VertexDistance) * m_params.VertexDistance;
+		float rounded_z = ((int) origin.z / m_params.VertexDistance) * m_params.VertexDistance;
 		glm::vec2 chunk_pos = glm::vec2( chunk_key.X + rounded_x, chunk_key.Y + rounded_z );
 
 		chunk->SetOrigin( chunk_key, chunk_pos );
@@ -223,13 +211,20 @@ namespace dd
 		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
 		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
-			GenerateLODLevel( entity_manager, lod );
+			//GenerateLODLevel( entity_manager, lod );
 		}
+
+		TerrainChunkKey key;
+		key.X = 0;
+		key.Y = 0;
+		key.LOD = 0;
+
+		CreateChunk( entity_manager, key );
 	}
 
 	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod )
 	{
-		const float vertex_distance = TerrainChunk::VertexDistance * (1 << lod);
+		const float vertex_distance = m_params.VertexDistance * (1 << lod);
 		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
 
 		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
@@ -256,10 +251,7 @@ namespace dd
 				key.Y = y * chunk_size;
 				key.LOD = lod;
 
-				m_jobSystem.Schedule( [this, key, &entity_manager]()
-				{
-					CreateChunk( entity_manager, key );
-				} );
+				CreateChunk( entity_manager, key );
 
 				++generated;
 			}
@@ -276,11 +268,8 @@ namespace dd
 		TerrainChunk* chunk = GetChunk( key );
 		if( chunk == nullptr )
 		{
-			chunk = new TerrainChunk();
+			chunk = new TerrainChunk( m_params );
 		}
-
-		chunk->Generate( key );
-		chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
 
 		EntityHandle entity;
 
@@ -296,6 +285,12 @@ namespace dd
 
 		m_chunks.insert( std::make_pair( key, chunk ) );
 		m_entities.insert( std::make_pair( key, entity ) );
+
+		m_jobSystem.Schedule( [this, key, chunk, &entity_manager]()
+		{
+			chunk->Generate( key );
+			chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
+		} );
 	}
 
 	EntityHandle TerrainSystem::CreateChunkEntity( EntityManager& entity_manager, const TerrainChunkKey& key, TerrainChunk* chunk )
@@ -316,44 +311,44 @@ namespace dd
 
 	void TerrainSystem::DrawDebugInternal()
 	{
-		ImGui::Checkbox( "Debug Colours", &TerrainChunk::UseDebugColours );
+		ImGui::Checkbox( "Debug Colours", &m_params.UseDebugColours );
 
 		if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
 		{
 			SetLODLevels( m_lodLevels );
 		}
 
-		if( ImGui::DragFloat( "Vertex Distance", &TerrainChunk::VertexDistance, 0.05f, 0.01f, 2.0f ) )
+		if( ImGui::DragFloat( "Vertex Distance", &m_params.VertexDistance, 0.05f, 0.01f, 2.0f ) )
 		{
 			m_requiresRegeneration = true;
 		}
 
-		if( ImGui::DragFloat( "Height Range", &TerrainChunk::HeightRange, 1.0f, 0.0f, 200.0f ) )
+		if( ImGui::DragFloat( "Height Range", &m_params.HeightRange, 1.0f, 0.0f, 200.0f ) )
 		{
 			m_requiresRegeneration = true;
 		}
 
-		if( ImGui::DragFloat( "Wavelength", &TerrainChunk::Wavelength, 1.0f, 1.0f, 512.0f ) )
+		if( ImGui::DragFloat( "Wavelength", &m_params.Wavelength, 1.0f, 1.0f, 512.0f ) )
 		{
 			m_requiresRegeneration = true;
 		}
 
-		if( ImGui::DragFloat( "Seed", &TerrainChunk::Seed, 0.1f, 0.0f, 512.0f ) )
+		if( ImGui::DragFloat( "Seed", &m_params.Seed, 0.1f, 0.0f, 512.0f ) )
 		{
 			m_requiresRegeneration = true;
 		}
 
 		if( ImGui::TreeNodeEx( "Height Colours", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < TerrainChunk::HeightLevelCount; ++i )
+			for( int i = 0; i < m_params.HeightLevelCount; ++i )
 			{
 				char name[ 64 ];
 				snprintf( name, 64, "Height %d", i );
 
 				if( ImGui::TreeNodeEx( name, ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 				{
-					ImGui::ColorEdit3( "Colour", glm::value_ptr( TerrainChunk::HeightColours[i] ) );
-					ImGui::DragFloat( "Cutoff", &TerrainChunk::HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
+					ImGui::ColorEdit3( "Colour", glm::value_ptr( m_params.HeightColours[i] ) );
+					ImGui::DragFloat( "Cutoff", &m_params.HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
 
 					ImGui::TreePop();
 				}
@@ -363,12 +358,12 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < TerrainChunk::Octaves; ++i )
+			for( int i = 0; i < m_params.Octaves; ++i )
 			{
 				char name[64];
 				snprintf( name, 64, "Amplitude %d", i );
 
-				if( ImGui::DragFloat( name, &TerrainChunk::Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
+				if( ImGui::DragFloat( name, &m_params.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
 				{
 					m_requiresRegeneration = true;
 				}
@@ -381,31 +376,31 @@ namespace dd
 		{
 			RandomFloat rng( 0.0f, 1.0f );
 
-			TerrainChunk::Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
-			TerrainChunk::HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
-			TerrainChunk::Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
+			m_params.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
+			m_params.HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
+			m_params.Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
 
 			float max_amplitude = 1.0f;
-			for( int i = 0; i < TerrainChunk::Octaves; ++i )
+			for( int i = 0; i < m_params.Octaves; ++i )
 			{
 				float amplitude = glm::mix( 0.01f, max_amplitude, rng.Next() );
 
-				TerrainChunk::Amplitudes[i] = amplitude;
+				m_params.Amplitudes[i] = amplitude;
 
 				max_amplitude = amplitude;
 			}
 
-			for( int i = 0; i < TerrainChunk::HeightLevelCount; ++i )
+			for( int i = 0; i < m_params.HeightLevelCount; ++i )
 			{
-				TerrainChunk::HeightColours[i] = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
+				m_params.HeightColours[i] = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
 			}
 
 			float previous_cutoff = 0.0f;
-			for( int i = 1; i < TerrainChunk::HeightLevelCount - 1; ++i )
+			for( int i = 1; i < m_params.HeightLevelCount - 1; ++i )
 			{
 				float cutoff = glm::mix( previous_cutoff, 1.0f, rng.Next() );
 
-				TerrainChunk::HeightCutoffs[i] = cutoff;
+				m_params.HeightCutoffs[i] = cutoff;
 
 				previous_cutoff = cutoff;
 			}

@@ -404,6 +404,7 @@
     <ClInclude Include="src\TerrainChunk.h" />
     <ClInclude Include="src\TerrainChunkComponent.h" />
     <ClInclude Include="src\TerrainChunkKey.h" />
+    <ClInclude Include="src\TerrainParameters.h" />
     <ClInclude Include="src\TerrainSystem.h" />
     <ClInclude Include="src\Tests.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

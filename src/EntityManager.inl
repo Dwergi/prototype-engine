@@ -41,6 +41,8 @@ namespace dd
 	template <typename... Components>
 	EntityHandle EntityManager::CreateEntity()
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		EntityHandle handle = Create();
 		CreateComponents<Components...>( handle, std::make_index_sequence<sizeof...(Components)>() );
 		return handle;
@@ -124,6 +126,8 @@ namespace dd
 	template <typename... Components, std::size_t... Index>
 	void EntityManager::CreateComponents( EntityHandle handle, std::index_sequence<Index...> )
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		ExpandType
 		{
 			0, (CreateComponent<Components, Index>( handle ), 0)...
@@ -133,6 +137,8 @@ namespace dd
 	template <typename Component, std::size_t Index>
 	void EntityManager::CreateComponent( EntityHandle handle )
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
 		pool->GetWrite().Create( handle );
 	}
@@ -212,6 +218,8 @@ namespace dd
 	template <typename Component>
 	void EntityManager::RegisterComponent()
 	{
+		std::lock_guard<std::recursive_mutex> lock( m_mutex );
+
 		const TypeInfo* typeInfo = TypeInfo::GetType<Component>();
 
 		DoubleBuffer<typename Component::Pool>* doubleBuffer = new DoubleBuffer<typename Component::Pool>( new typename Component::Pool(), new typename Component::Pool() );

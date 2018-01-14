@@ -15,15 +15,11 @@ namespace dd
 	class ShaderProgram;
 
 	struct TerrainChunkKey;
+	struct TerrainParameters;
 
 	class TerrainChunk
 	{
 	public:
-
-		//
-		// The number of octaves of noise.
-		//
-		static const int Octaves = 6;
 
 		//
 		// The number of vertices per dimension of the chunk.
@@ -31,53 +27,16 @@ namespace dd
 		static const int Vertices = 16;
 
 		//
-		// The number of height levels for colouring.
+		// Initialize resources that are shared between all chunks.
 		//
-		static const int HeightLevelCount = 5;
-
-		//
-		// Distance between vertices on the chunk.
-		//
-		static float VertexDistance;
-
-		//
-		// The maximum height range of vertices. Heights will vary between 0 and this.
-		//
-		static float HeightRange;
-
-		//
-		// The wavelength of the noise. 
-		// Smaller numbers lead to higher frequency noise and more jagged terrain.
-		// Larger numbers lead to smooth rolling hills.
-		//
-		static float Wavelength;
-
-		//
-		// A seed for noise generation to introduce some variation.
-		//
-		static float Seed;
-
-		//
-		// The amplitudes of noise to apply at each octave.
-		//
-		static float Amplitudes[Octaves];
-
-		//
-		// The colours to display at each height level.
-		//
-		static glm::vec3 HeightColours[HeightLevelCount];
-
-		//
-		// The cutoff points for the heights, expressed as a fraction of the maximum height range.
-		//
-		static float HeightCutoffs[ HeightLevelCount ];
-
-		static bool UseDebugColours;
-
 		static void InitializeShared();
+
+		//
+		// Create render resources for all chunks.
+		//
 		static void CreateRenderResources();
 
-		TerrainChunk();
+		TerrainChunk( const TerrainParameters& params );
 		~TerrainChunk();
 		
 		void Generate( const TerrainChunkKey& key );
@@ -94,19 +53,26 @@ namespace dd
 
 	private:
 
-		static const int IndexCount = Vertices * Vertices * 6;
-		static const int VertexCount = (Vertices + 1) * (Vertices + 1);
+		static const int MeshIndexCount = Vertices * Vertices * 6;
+		static const int FlapIndexCount = Vertices * 6 * 2;
+		static const int IndexCount = MeshIndexCount + FlapIndexCount;
+
+		static const int MeshVertexCount = (Vertices + 1) * (Vertices + 1);
+		static const int FlapVertexCount = (Vertices + 1) * 4;
+		static const int VertexCount = MeshVertexCount + FlapVertexCount;
 
 		static uint s_indices[IndexCount];
-		static Buffer<uint> s_bufferIndices;
 
 		static ShaderHandle s_shader;
+
+		const TerrainParameters& m_params;
 		
 		bool m_destroy { false };
 		bool m_dirty { false };
 		MeshHandle m_mesh;
 		Buffer<glm::vec3> m_vertices;
 		Buffer<glm::vec3> m_normals;
+		Buffer<uint> m_indices;
 		
 		float GetHeight( float x, float y );
 

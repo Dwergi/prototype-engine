@@ -54,6 +54,7 @@ namespace dd
 			if( ImGui::Button( "Break" ) )
 			{
 				assert.Action = AssertAction::Break;
+				assert.Open = false;
 			}
 
 			ImGui::SameLine();
@@ -61,6 +62,7 @@ namespace dd
 			if( ImGui::Button( "Ignore" ) )
 			{
 				assert.Action = AssertAction::Ignore;
+				assert.Open = false;
 			}
 
 			ImGui::SameLine();
@@ -68,6 +70,7 @@ namespace dd
 			if( ImGui::Button( "Ignore This" ) )
 			{
 				assert.Action = AssertAction::IgnoreLine;
+				assert.Open = false;
 			}
 
 			ImGui::SameLine();
@@ -75,6 +78,7 @@ namespace dd
 			if( ImGui::Button( "Abort" ) )
 			{
 				assert.Action = AssertAction::Abort;
+				assert.Open = false;
 			}
 
 			ImGui::End();

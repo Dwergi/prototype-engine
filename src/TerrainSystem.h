@@ -13,6 +13,7 @@
 #include "MeshComponent.h"
 #include "TerrainChunkKey.h"
 #include "TerrainChunkComponent.h"
+#include "TerrainParameters.h"
 #include "TransformComponent.h"
 
 #include <unordered_map>
@@ -97,6 +98,7 @@ namespace dd
 		bool m_requiresRegeneration;
 		int m_lodLevels;
 
+		TerrainParameters m_params;
 		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
@@ -104,17 +106,16 @@ namespace dd
 
 		virtual void DrawDebugInternal() override;
 
-		void GenerateTerrain( EntityManager& entityManager );
-		void GenerateLODLevel( EntityManager& entityManager, int lodLevel );
+		TerrainChunk* GetChunk( const TerrainChunkKey& key );
+
+		void GenerateTerrain( EntityManager& entity_manager );
+		void GenerateLODLevel( EntityManager& entity_manager, int lodLevel );
 
 		void CreateChunk( EntityManager& entity_manager, TerrainChunkKey key );
+		EntityHandle CreateChunkEntity( EntityManager& entity_manager, const TerrainChunkKey& key, TerrainChunk* chunk );
 
-		EntityHandle CreateChunkEntity( EntityManager& entityManager, const TerrainChunkKey& key, TerrainChunk* chunk );
 		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp );
-		void RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );
 
 		void SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 pos );
-
-		TerrainChunk* GetChunk( const TerrainChunkKey& key );
 	};
 }

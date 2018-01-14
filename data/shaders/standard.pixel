@@ -175,7 +175,8 @@ void main()
 	{
 		float viewDistance = length( toView );
 
-		finalColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth, viewDistance, WireframeMaxDistance );
+		vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth, viewDistance, WireframeMaxDistance );
+		finalColour = mix( finalColour, wireColour, wireColour.a );
 	}
 
 	Colour = finalColour;

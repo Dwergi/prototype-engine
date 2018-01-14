@@ -12,7 +12,7 @@ namespace dd
 	{
 		String256 Info;
 		String256 Message;
-		bool Open;
+		bool Open { false };
 		AssertAction Action;
 	};
 

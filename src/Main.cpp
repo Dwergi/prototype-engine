@@ -64,6 +64,9 @@
 #include "GL/gl3w.h"
 
 #include "SFML/Network/UdpSocket.hpp"
+
+#include <chrono>
+#include <thread>
 //---------------------------------------------------------------------------
 
 using namespace dd;
@@ -81,6 +84,9 @@ Window* s_window = nullptr;
 EntityManager* s_entityManager = nullptr;
 FrameTimer* s_frameTimer = nullptr;
 FSM* s_fsm = nullptr;
+Assert s_assert;
+
+std::thread::id s_mainThread;
 
 enum FSMStates
 {
@@ -208,7 +214,23 @@ void Exit( InputAction action, InputType type )
 	}
 }
 
-Assert s_assert;
+void CheckAssert()
+{
+	if( s_assert.Open )
+	{
+		s_input->CaptureMouse( false );
+
+		s_fsm->TransitionTo( OPEN_ASSERT );
+
+		do
+		{
+			s_fsm->TransitionTo( UPDATE_TIMER );
+			s_fsm->TransitionTo( ASSERT_DIALOG );
+			s_fsm->TransitionTo( RENDER_END_FRAME );
+		} 
+		while( s_assert.Open );
+	}
+}
 
 pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
 	int level, const char* message )
@@ -223,15 +245,16 @@ pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char*
 		s_assert.Message += message;
 	}
 
-	s_input->CaptureMouse( false );
-
-	s_fsm->TransitionTo( OPEN_ASSERT );
-
 	do
 	{
-		s_fsm->TransitionTo( UPDATE_TIMER );
-		s_fsm->TransitionTo( ASSERT_DIALOG );
-		s_fsm->TransitionTo( RENDER_END_FRAME );
+		if( std::this_thread::get_id() == s_mainThread )
+		{
+			CheckAssert();
+		}
+		else
+		{
+			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+		}
 	} 
 	while( s_assert.Action == AssertAction::None );
 
@@ -286,7 +309,7 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 
 	for( std::future<void>& f : futures )
 	{
-		f.wait();
+		f.wait_for( std::chrono::milliseconds( 1 ) );
 	}
 }
 
@@ -310,7 +333,7 @@ void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, cons
 
 	for( std::future<void>& f : futures )
 	{
-		f.wait();
+		f.wait_for( std::chrono::milliseconds( 1 ) );
 	}
 }
 
@@ -324,7 +347,7 @@ void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const V
 
 	for( std::future<void>& f : futures )
 	{
-		f.wait();
+		f.wait_for( std::chrono::milliseconds( 1 ) );
 	}
 }
 
@@ -338,7 +361,7 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 
 	for( std::future<void>& f : futures )
 	{
-		f.wait();
+		f.wait_for( std::chrono::milliseconds( 1 ) );
 	}
 }
 
@@ -434,7 +457,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
-	//::ShowWindow( GetConsoleWindow(), SW_HIDE );
+	::ShowWindow( GetConsoleWindow(), SW_HIDE );
+
+	s_mainThread = std::this_thread::get_id();
 
 	{
 		JobSystem jobSystem( 4u );
@@ -613,6 +638,8 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_SCOPED( Frame );
+
+			CheckAssert();
 			
 			s_fsm->TransitionTo( UPDATE_TIMER );
 			s_fsm->TransitionTo( PREUPDATE );

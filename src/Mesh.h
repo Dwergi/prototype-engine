@@ -110,7 +110,7 @@ namespace dd
 		//
 		// Set the height colours to use for this mesh.
 		//
-		void SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, float& max_height );
+		void SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, const float& max_height );
 
 		//
 		// Set the UV buffer that the mesh will use.
@@ -178,7 +178,7 @@ namespace dd
 		bool m_useHeightColours { false };
 		ConstBuffer<glm::vec3> m_bufferHeightColours;
 		ConstBuffer<float> m_bufferHeightCutoffs;
-		float* m_maxHeight { nullptr };
+		const float* m_maxHeight { nullptr };
 		
 		VAO m_vao;
 
