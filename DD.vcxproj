@@ -358,7 +358,6 @@
     <ClInclude Include="src\ISystem.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\JobSystem.h" />
-    <ClInclude Include="src\JobThread.h" />
     <ClInclude Include="src\JSONSerializer.h" />
     <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\MousePicking.h" />
@@ -667,7 +666,6 @@
     <ClCompile Include="src\Hash.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\JobSystem.cpp" />
-    <ClCompile Include="src\JobThread.cpp" />
     <ClCompile Include="src\JSONSerializer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />

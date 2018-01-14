@@ -76,9 +76,9 @@ namespace dd
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
 		ImGui::SetWindowSize( ImVec2( 250.0f, 100.0f ), ImGuiSetCond_FirstUseEver );
 
-		ImGui::Text( "FPS: %.1f", 1.0f / m_slidingDelta );
-		ImGui::Text( "Frame Time: %.1f", m_deltaWithoutDelay * 1000.f );
-		ImGui::Text( "Sliding: %.1f", m_slidingDelta );
+		ImGui::Value( "FPS: ", 1.0f / m_slidingDelta, "%.1f" );
+		ImGui::Value( "Frame Time: ", m_deltaWithoutDelay * 1000.f, "%.1f" );
+		ImGui::Value( "Sliding: ", m_slidingDelta, "%.1f" );
 		
 		if( ImGui::TreeNodeEx( "Frame Times", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{

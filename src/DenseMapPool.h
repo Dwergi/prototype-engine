@@ -75,6 +75,7 @@ namespace dd
 
 	private:
 
+		std::mutex m_mutex;
 		std::unordered_map<int, T> m_components;
 	};
 }

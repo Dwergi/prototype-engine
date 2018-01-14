@@ -91,6 +91,7 @@ namespace dd
 		int m_frustumMeshCount;
 
 		bool m_frustumCulling { true };
+		bool m_debugDrawStandard { true };
 		bool m_debugDrawAxes { true };
 		bool m_debugDrawBounds { false };
 		bool m_debugHighlightFrustumMeshes { false };

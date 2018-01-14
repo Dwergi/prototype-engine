@@ -133,24 +133,24 @@ namespace dd
 		mesh_cmp.Write()->Mesh = mesh_h;
 		mesh_cmp.Write()->Colour = colour;
 		mesh_cmp.Write()->Hidden = false;
-		mesh_cmp.Write()->UpdateBounds( transform );
 
 		return handle;
 	}
 
 	void Renderer::DrawDebugInternal()
 	{
-		ImGui::Text( "Meshes: %d", m_meshCount );
-		ImGui::Text( "Unculled Meshes: %d", m_frustumMeshCount );
+		ImGui::Value( "Meshes", m_meshCount );
+		ImGui::Value( "Unculled Meshes", m_frustumMeshCount );
 
 		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
+		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
 			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
 			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
 			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
-		}
+		}	
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
@@ -367,7 +367,8 @@ namespace dd
 					++index;
 				}
 
-				shader->SetUniform( "UseWireframe", m_debugWireframe );
+				shader->SetUniform( "DrawStandard", m_debugDrawStandard );
+				shader->SetUniform( "DrawWireframe", m_debugWireframe );
 				shader->SetUniform( "WireframeColour", m_debugWireframeColour );
 				shader->SetUniform( "WireframeWidth", m_debugWireframeWidth );
 

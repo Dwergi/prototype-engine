@@ -98,6 +98,14 @@ namespace dd
 	{
 		m_lodLevels = lods;
 		m_requiresRegeneration = true;
+
+		// number of expected chunks
+		const int halfChunks = ChunksPerDimension / 2;
+		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
+			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
+
+		m_entities.reserve( expected );
+		m_chunks.reserve( expected );
 	}
 
 	void TerrainSystem::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
@@ -187,9 +195,6 @@ namespace dd
 		chunk->SetOrigin( chunk_key, chunk_pos );
 
 		transform_cmp->SetLocalPosition( glm::vec3( rounded_x, 0, rounded_z ) );
-		transform_cmp->UpdateWorldTransform();
-
-		mesh_cmp->UpdateBounds( transform_cmp->GetWorldTransform() );
 	}
 
 	void TerrainSystem::SaveChunkImages() const
@@ -220,13 +225,6 @@ namespace dd
 		{
 			GenerateLODLevel( entity_manager, lod );
 		}
-
-		// number of expected chunks
-		const int halfChunks = ChunksPerDimension / 2;
-
-		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
-			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
-		DD_ASSERT( m_chunks.size() == expected, "Wrong number of chunks generated!" );
 	}
 
 	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod )
@@ -258,29 +256,10 @@ namespace dd
 				key.Y = y * chunk_size;
 				key.LOD = lod;
 
-				TerrainChunk* chunk = GetChunk( key );
-				if( chunk == nullptr )
+				m_jobSystem.Schedule( [this, key, &entity_manager]()
 				{
-					chunk = new TerrainChunk();
-				}
-
-				chunk->Generate( key );
-				chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
-
-				EntityHandle entity;
-
-				auto it = m_entities.find( key );
-				if( it != m_entities.end() )
-				{
-					entity = it->second;
-				}
-				else
-				{
-					entity = CreateChunkEntity( entity_manager, key, chunk );
-				}
-
-				m_chunks.insert( std::make_pair( key, chunk ) );
-				m_entities.insert( std::make_pair( key, entity ) );
+					CreateChunk( entity_manager, key );
+				} );
 
 				++generated;
 			}
@@ -290,6 +269,33 @@ namespace dd
 			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
 
 		DD_ASSERT( generated == expected, "Wrong number of chunks generated for LOD!" );
+	}
+
+	void TerrainSystem::CreateChunk( EntityManager& entity_manager, TerrainChunkKey key )
+	{
+		TerrainChunk* chunk = GetChunk( key );
+		if( chunk == nullptr )
+		{
+			chunk = new TerrainChunk();
+		}
+
+		chunk->Generate( key );
+		chunk->SetOrigin( key, glm::vec2( 0, 0 ) );
+
+		EntityHandle entity;
+
+		auto it = m_entities.find( key );
+		if( it != m_entities.end() )
+		{
+			entity = it->second;
+		}
+		else
+		{
+			entity = CreateChunkEntity( entity_manager, key, chunk );
+		}
+
+		m_chunks.insert( std::make_pair( key, chunk ) );
+		m_entities.insert( std::make_pair( key, entity ) );
 	}
 
 	EntityHandle TerrainSystem::CreateChunkEntity( EntityManager& entity_manager, const TerrainChunkKey& key, TerrainChunk* chunk )
@@ -304,7 +310,6 @@ namespace dd
 
 		TransformComponent* transform_cmp = entity.Get<TransformComponent>().Write();
 		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
-		transform_cmp->UpdateWorldTransform();
 
 		return entity;
 	}

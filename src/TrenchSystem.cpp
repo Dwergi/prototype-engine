@@ -172,7 +172,6 @@ namespace dd
 		mesh_cmp->Mesh = m_chunkMesh;
 		mesh_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
 		mesh_cmp->Hidden = false;
-		mesh_cmp->UpdateBounds( transform );
 
 		return handle;
 	}

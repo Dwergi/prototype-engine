@@ -57,3 +57,11 @@ namespace dd
 	void* PointerAdd( void* base, uint64 offset );
 	const void* PointerAdd( const void* base, uint64 offset );
 }
+
+namespace ImGui
+{
+	void Value( const char* prefix, const glm::ivec2& value );
+	void Value( const char* prefix, const glm::vec2& value, const char* float_format = nullptr );
+	void Value( const char* prefix, const glm::vec3& value, const char* float_format = nullptr );
+	void Value( const char* prefix, const glm::vec4& value, const char* float_format = nullptr );
+}

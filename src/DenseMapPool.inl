@@ -92,6 +92,8 @@ namespace dd
 	template <typename T>
 	void DenseMapPool<T>::Clear()
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		m_components.clear();
 	}
 
@@ -104,6 +106,8 @@ namespace dd
 	template <typename T>
 	T* DenseMapPool<T>::Create( EntityHandle entity )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		// already allocated!
 		T* pCmp = Find( entity );
 		if( pCmp != nullptr )
@@ -134,6 +138,8 @@ namespace dd
 	template <typename T>
 	void DenseMapPool<T>::Remove( EntityHandle entity )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		m_components.erase( entity.ID );
 	}
 

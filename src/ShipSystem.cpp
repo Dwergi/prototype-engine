@@ -148,7 +148,6 @@ namespace dd
 		mesh_cmp->Mesh = m_shipMesh;
 		mesh_cmp->Colour = glm::vec4( 1, 0, 0, 1 );
 		mesh_cmp->Hidden = false;
-		mesh_cmp->UpdateBounds( transform );
 
 		ShipComponent* ship_cmp = entity_manager.GetWritable<ShipComponent>( entity );
 		ship_cmp->Acceleration = 5.0f;
@@ -260,18 +259,18 @@ namespace dd
 			TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();
 
 			glm::vec3 pos = transform->GetWorldPosition();
-			ImGui::Text( "Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z );
+			ImGui::Value( "Position", pos, "%.2f" );
 
 			ShipComponent* ship = m_lastShip.Get<ShipComponent>().Write();
 
 			glm::vec3 velocity = ship->Velocity;
-			ImGui::Text( "Velocity: %.2f %.2f %.2f", velocity.x, velocity.y, velocity.z );
+			ImGui::Value( "Velocity", velocity, "%.2f" );
 
 			ImGui::SliderFloat( "Acceleration", &ship->Acceleration, 0.0f, 100.0f, "%.2f" );
 
 			ImGui::DragFloatRange2( "Speed", &ship->MinimumSpeed, &ship->MaximumSpeed, 1.0f, 0.0f, 100.0f, "%.2f" );
 
-			ImGui::Text( "Current Boost: %.2f", ship->BoostRemaining );
+			ImGui::Value( "Current Boost", ship->BoostRemaining, "%.2f" );
 
 			if( ImGui::TreeNodeEx( "Boost", ImGuiTreeNodeFlags_CollapsingHeader ) )
 			{

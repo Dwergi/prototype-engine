@@ -40,7 +40,7 @@ namespace dd
 
 		DenseVectorPoolIterator<T> operator++()
 		{
-			for( ++Index; Index < Pool.m_components.Size(); ++Index )
+			for( ++Index; Index < Pool.m_components.size(); ++Index )
 			{
 				if( Pool.IsValid( Index ) )
 					return *this;
@@ -54,29 +54,6 @@ namespace dd
 			return &Pool != &other.Pool || Index != other.Index;
 		}
 	};
-
-	template <typename T>
-	bool DenseVectorPool<T>::IsValid( int id ) const
-	{
-		char c = m_valid[id / (sizeof( char ) * 8)];
-
-		int index = id % (sizeof( char ) * 8);
-
-		return (c >> index) & 1;
-	}
-
-	template <typename T>
-	void DenseVectorPool<T>::SetValid( int id, bool value )
-	{
-		char& c = m_valid[id / (sizeof( char ) * 8)];
-
-		int index = id % (sizeof( char ) * 8);
-
-		if( value )
-			c |= (1 << index);
-		else
-			c &= ~(1 << index);
-	}
 
 	template <typename T>
 	DenseVectorPool<T>::DenseVectorPool()
@@ -93,17 +70,21 @@ namespace dd
 	template <typename T>
 	void DenseVectorPool<T>::Clear()
 	{
-		std::swap( m_components, Vector<T>() );
-		std::swap( m_valid, Vector<char>() );
+		std::lock_guard<std::mutex> lock( m_mutex );
+
+		std::swap( m_components, std::vector<T>() );
+		std::swap( m_valid, std::vector<bool>() );
 	}
 
 	template <typename T>
 	int DenseVectorPool<T>::Size() const
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		int count = 0;
-		for( int i = 0; i < m_components.Size(); ++i )
+		for( int i = 0; i < m_components.size(); ++i )
 		{
-			if( IsValid( i ) )
+			if( m_valid[ i ] )
 				++count;
 		}
 
@@ -113,6 +94,8 @@ namespace dd
 	template <typename T>
 	T* DenseVectorPool<T>::Create( EntityHandle entity )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		// already allocated!
 		if( Exists( entity ) )
 		{
@@ -120,14 +103,13 @@ namespace dd
 			return nullptr;
 		}
 
-		if( entity.ID >= (int) m_components.Size() )
+		if( entity.ID >= (int) m_components.size() )
 		{
-			m_components.Resize( entity.ID + 1 );
-
-			m_valid.Resize( (entity.ID / (sizeof( char ) * 8) ) + 1 );
+			m_components.resize( entity.ID + 1 );
+			m_valid.resize( entity.ID + 1 );
 		}
 
-		SetValid( entity.ID, true );
+		m_valid[ entity.ID ] = true;
 
 		T* cmp = new (&m_components[entity.ID]) T();
 
@@ -141,6 +123,8 @@ namespace dd
 	template <typename... Args>
 	virtual T* DenseVectorPool<T>::Construct( EntityHandle entity, Args&&... args )
 	{
+		std::lock_guard<std::mutex> lock( m_mutex );
+
 		// already allocated!
 		if( Exists( entity ) )
 		{
@@ -148,16 +132,22 @@ namespace dd
 			return nullptr;
 		}
 
-		if( entity.ID >= (int) m_components.Size() )
-		{
-			m_components.Resize( entity.ID + 1 );
+		int size = m_components.size();
 
-			m_valid.Resize( (entity.ID / (sizeof( char ) * 8)) + 1 );
+		if( entity.ID >= (int) m_components.size() )
+		{
+			m_components.resize( entity.ID + 1 ); 
+			m_valid.resize( entity.ID + 1 );
 		}
 
-		SetValid( entity.ID, true );
+		for( int i = size; i < m_components.size(); ++i )
+		{
+			m_valid[i] = false;
+		}
 
-		T* cmp = new (&m_components[ entity.ID ]) T( std::forward( args )... );
+		m_valid[entity.ID] = true;
+
+		T* cmp = new (&m_components[entity.ID]) T( std::forward( args )... );
 
 		IComponent* baseptr = static_cast<IComponent*>(cmp);
 		baseptr->Entity = entity;
@@ -174,39 +164,49 @@ namespace dd
 			return nullptr;
 		}
 
-		T& cmp = m_components[entity.ID];
-		return &cmp;
+		const T& cmp = m_components[entity.ID];
+		return &const_cast<T&>( cmp );
 	}
 
 	template <typename T>
 	void DenseVectorPool<T>::Remove( EntityHandle entity )
 	{
-		if( entity.ID >= (int) m_components.Size() )
+		std::lock_guard<std::mutex> lock( m_mutex );
+
+		if( entity.ID >= (int) m_components.size() )
 		{
 			DD_ASSERT( false, "Entity ID outside of valid range!" );
 			return;
 		}
 
 		m_components[entity.ID].~T();
-
-		SetValid( entity.ID, false );
+		m_valid[entity.ID] = false;
 	}
 
 	template <typename T>
 	bool DenseVectorPool<T>::Exists( EntityHandle entity ) const
 	{
-		if( entity.ID >= (int) m_components.Size() )
+		if( entity.ID >= (int) m_valid.size() )
 			return false;
 
-		return IsValid( entity.ID );
+		return m_valid[entity.ID];
+	}
+
+	template <typename T>
+	DenseVectorPool<T>& DenseVectorPool<T>::operator=( const DenseVectorPool<T>& other )
+	{
+		m_components = other.m_components;
+		m_valid = other.m_valid;
+
+		return *this;
 	}
 
 	template <typename T>
 	DenseVectorPoolIterator<T> DenseVectorPool<T>::begin() const
 	{
-		for( int i = 0; i < m_components.Size(); ++i )
+		for( int i = 0; i < m_components.size(); ++i )
 		{
-			if( IsValid( i ) )
+			if( m_valid[entity.ID] )
 				return DenseVectorPoolIterator<T>( i, *this );
 		}
 
@@ -216,6 +216,6 @@ namespace dd
 	template <typename T>
 	DenseVectorPoolIterator<T> DenseVectorPool<T>::end() const
 	{
-		return DenseVectorPoolIterator<T>( m_components.Size(), *this );
+		return DenseVectorPoolIterator<T>( m_components.size(), *this );
 	}
 }

@@ -44,7 +44,6 @@ namespace dd
 	void DrawAssertDialog( glm::ivec2 window_size, Assert& assert )
 	{
 		ImGui::SetNextWindowPos( ImVec2( window_size.x / 2.0f - window_size.x / 6.5f, window_size.y / 2.0f - window_size.y / 6.5f ), ImGuiSetCond_FirstUseEver );
-		ImGui::SetNextWindowSize( ImVec2( window_size.x / 3.0f, window_size.y / 3.0f ), ImGuiSetCond_FirstUseEver );
 
 		if( ImGui::Begin( "Assert", &assert.Open ) )
 		{

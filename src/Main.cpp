@@ -140,7 +140,6 @@ void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& script
 	REGISTER_TYPE( EntityHandle );
 	REGISTER_TYPE( IComponent );
 	REGISTER_TYPE( Message );
-	REGISTER_TYPE( JobSystem );
 	REGISTER_TYPE( MeshHandle );
 
 	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
@@ -278,12 +277,17 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 
 void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems )
 {
+	std::vector<std::future<void>> futures;
+
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system]() { system->Initialize( entity_manager ); }, "ISystem::Initialize" );
+		futures.push_back( jobsystem.Schedule( [&entity_manager, system]() { system->Initialize( entity_manager ); } ) );
 	}
 
-	jobsystem.WaitForCategory( "ISystem::Initialize" );
+	for( std::future<void>& f : futures )
+	{
+		f.wait();
+	}
 }
 
 void InitializeRenderers( Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
@@ -298,32 +302,44 @@ void InitializeRenderers( Renderer& renderer, const EntityManager& entity_manage
 
 void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
 {
+	std::vector<std::future<void>> futures;
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); }, "ISystem::PreUpdate" );
+		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); } ) );
 	}
 
-	jobsystem.WaitForCategory( "ISystem::PreUpdate" );
+	for( std::future<void>& f : futures )
+	{
+		f.wait();
+	}
 }
 
 void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
 {
+	std::vector<std::future<void>> futures;
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); }, "ISystem::Update" );
+		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); } ) );
 	}
 
-	jobsystem.WaitForCategory( "ISystem::Update" );
+	for( std::future<void>& f : futures )
+	{
+		f.wait();
+	}
 }
 
 void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
 {
+	std::vector<std::future<void>> futures;
 	for( ISystem* system : systems )
 	{
-		jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); }, "ISystem::PostRender" );
+		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); } ) );
 	}
 
-	jobsystem.WaitForCategory( "ISystem::PostRender" );
+	for( std::future<void>& f : futures )
+	{
+		f.wait();
+	}
 }
 
 void ShutdownSystems( EntityManager& entity_manager, const Vector<ISystem*>& systems )
@@ -421,7 +437,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 	//::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 	{
-		JobSystem jobSystem( 2u );
+		JobSystem jobSystem( 4u );
 		SwarmSystem swarm_system;
 
 		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );

@@ -83,14 +83,14 @@ namespace dd
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
 
-		ImGui::Text( "Yaw: %.2f", m_camera.GetYaw() );
-		ImGui::Text( "Pitch: %.2f", m_camera.GetPitch() );
+		ImGui::Value( "Yaw", m_camera.GetYaw(), "%.2f" );
+		ImGui::Value( "Pitch", m_camera.GetPitch(), "%.2f" );
 		
 		glm::vec3 position = m_camera.GetPosition();
-		ImGui::Text( "Position: %.1f, %.1f, %.1f", position.x, position.y, position.z );
+		ImGui::Value( "Position", position, "%.1f" );
 
 		glm::vec3 direction = m_camera.GetDirection();
-		ImGui::Text( "Direction: %.2f, %.2f, %.2f", direction.x, direction.y, direction.z );
+		ImGui::Value( "Direction", direction, "%.2f" );
 
 		float vfov = glm::degrees( m_camera.GetVerticalFOV() * 2.0f );
 		if( ImGui::SliderFloat( "VFOV", &vfov, 0.1f, 178.0f, "%.2f" ) )

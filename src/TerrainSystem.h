@@ -107,6 +107,8 @@ namespace dd
 		void GenerateTerrain( EntityManager& entityManager );
 		void GenerateLODLevel( EntityManager& entityManager, int lodLevel );
 
+		void CreateChunk( EntityManager& entity_manager, TerrainChunkKey key );
+
 		EntityHandle CreateChunkEntity( EntityManager& entityManager, const TerrainChunkKey& key, TerrainChunk* chunk );
 		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp );
 		void RenderUpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );

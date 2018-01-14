@@ -18,7 +18,7 @@ namespace dd
 	// Uses much more space than a sparse component pool for large numbers of entities.
 	//
 	template <typename T>
-	class DenseVectorPool 
+	class DenseVectorPool
 		: public ComponentPoolBase
 	{
 		static_assert(std::is_base_of<IComponent, T>::value, "Not derived from Component.");
@@ -68,6 +68,8 @@ namespace dd
 		// 
 		virtual void Remove( EntityHandle entity ) override;
 
+		DenseVectorPool<T>& operator=( const DenseVectorPool<T>& other );
+
 		iterator begin() const;
 		iterator end() const;
 
@@ -78,11 +80,9 @@ namespace dd
 		template <typename T>
 		friend class DenseVectorPoolIterator;
 
-		Vector<T> m_components;
-		Vector<char> m_valid; // this is actually a bitmap
-
-		bool IsValid( int id ) const;
-		void SetValid( int id, bool value );
+		std::mutex m_mutex;
+		std::vector<T> m_components;
+		std::vector<bool> m_valid;
 	};
 }
 

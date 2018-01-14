@@ -1,103 +1,61 @@
-//
-// JobSystem.h - A manager for creating job threads which will process tasks in parallel over a number of threads.
-// Copyright (C) Sebastian Nordgren 
-// October 29th 2015
-//
+// JobSystem.h - Modified from https://github.com/progschj/ThreadPool/blob/master/ThreadPool.h
 
 #pragma once
 
+#include <vector>
+#include <queue>
+#include <memory>
+#include <thread>
 #include <mutex>
+#include <condition_variable>
+#include <future>
 #include <functional>
-
-namespace std
-{
-	class thread;
-}
+#include <stdexcept>
 
 namespace dd
 {
-	class JobHandle;
-
-	class JobSystem
-	{
+	class JobSystem {
 	public:
-
-		explicit JobSystem( int thread_count );
+		JobSystem( size_t threads );
 		~JobSystem();
 
-		JobSystem() = delete;
-		JobSystem( const JobSystem& ) = delete;
-		JobSystem& operator=( const JobSystem& ) = delete;
-
-		//
-		// Schedule a function to be run at some point.
-		// Category allows jobs to be grouped and waited on as logical units.
-		//
-		void Schedule( const Function& fn, const char* category );
-		void Schedule( const std::function<void()>& fn, const char* category );
-		void WaitForCategory( const char* category, int timeout_ms = 0 );
-
-		BASIC_TYPE( JobSystem )
-
+		template<class F, class... Args>
+		auto Schedule( F&& f, Args&&... args )
+			-> std::future<typename std::result_of<F( Args... )>::type>;
 	private:
+		
+		std::vector<std::thread> m_workers;
+		std::queue<std::function<void()>> m_tasks;
 
-		static const int MAX_THREADS = 8;
-		static const int JOB_QUEUE_SIZE = 1024;
+		std::mutex m_queueMutex;
+		std::condition_variable m_condition;
+		bool m_stop;
 
-		enum class JobStatus
-		{
-			Pending,
-			Assigned,
-			Done,
-			Free
-		};
-
-		struct Category
-		{
-			Category();
-			Category( const char* name );
-			Category( const Category& ) = delete;
-
-			String128 Name;
-			int Pending;
-			std::condition_variable Condition;
-			std::mutex Mutex;
-		};
-
-		//
-		// A job structure.
-		//
-		struct Job
-		{
-			Job( const Job& other );
-			Job( const std::function<void()>& fn, Category* category, int id );
-			~Job();
-
-			JobStatus Status;
-			Category* Category;
-			int ID;
-			std::function<void()> Func;
-		};
-
-		friend class JobThread;
-
-		std::thread m_threads[MAX_THREADS];
-
-		Array<Category, 32> m_categories;
-		Vector<JobThread*> m_workers;
-		Vector<Job> m_jobs;
-		Vector<int> m_pendingJobs;
-
-		std::mutex m_jobsMutex;
-		std::condition_variable m_jobsPending;
-
-		void CreateWorkers( int thread_count );
-		JobThread* FindCurrentWorker() const;
-
-		Category* FindCategory( const char* category_name ) const;
-
-		// JobThread interface
-		bool WaitForJob( Job*& out_job );
-		void MarkDone( const Job& job );
+		void WorkerFunction();
 	};
+
+	// add new work item to the pool
+	template<class F, class... Args>
+	auto JobSystem::Schedule( F&& f, Args&&... args )
+		-> std::future<typename std::result_of<F( Args... )>::type>
+	{
+		using return_type = typename std::result_of<F( Args... )>::type;
+
+		auto task = std::make_shared< std::packaged_task<return_type()> >(
+			std::bind( std::forward<F>( f ), std::forward<Args>( args )... )
+			);
+
+		std::future<return_type> res = task->get_future();
+		{
+			std::unique_lock<std::mutex> lock( m_queueMutex );
+
+			// don't allow enqueueing after stopping the pool
+			if( m_stop )
+				DD_ASSERT( "Scheduled job on stopped JobSystem" );
+
+			m_tasks.emplace( [task]() { (*task)(); } );
+		}
+		m_condition.notify_one();
+		return res;
+	}
 }

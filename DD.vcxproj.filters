@@ -297,9 +297,6 @@
     <ClInclude Include="src\JobSystem.h">
       <Filter>Jobs</Filter>
     </ClInclude>
-    <ClInclude Include="src\JobThread.h">
-      <Filter>Jobs</Filter>
-    </ClInclude>
     <ClInclude Include="src\Profiler.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -658,9 +655,6 @@
       <Filter>Includes\Remotery</Filter>
     </ClCompile>
     <ClCompile Include="src\JobSystem.cpp">
-      <Filter>Jobs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JobThread.cpp">
       <Filter>Jobs</Filter>
     </ClCompile>
     <ClCompile Include="src\AABB.cpp">

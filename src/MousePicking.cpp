@@ -168,23 +168,23 @@ namespace dd
 		ImGui::Checkbox( "Enabled", &m_enabled );
 		ImGui::Checkbox( "Render Debug", &m_renderDebug );
 
-		ImGui::Text( "Handle: %d", m_handle );
-		ImGui::Text( "Position: %.1f %.1f", m_position.x, m_position.y );
+		ImGui::Value( "Handle", m_handle );
+		ImGui::Value( "Position", m_position, "%.1f" );
 
 		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
 			if( m_focusedMesh.IsValid() )
 			{
 				const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-				ImGui::Text( "Name: %s", name.c_str() );
+				ImGui::Value( "Name", name.c_str() );
 
 				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Text( "Position: %.2f %.2f %.2f", focused_mesh_pos.x, focused_mesh_pos.y, focused_mesh_pos.z );
+				ImGui::Value( "Position", focused_mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Text( "Name: <none>" );
-				ImGui::Text( "Position: <none>" );
+				ImGui::Value( "Name", "<none>" );
+				ImGui::Value( "Position", "<none>" );
 			}
 
 			ImGui::TreePop();
@@ -195,15 +195,15 @@ namespace dd
 			if( m_selectedMesh.IsValid() )
 			{
 				const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-				ImGui::Text( "Name: %s", name.c_str() );
+				ImGui::Value( "Name", name.c_str() );
 
 				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Text( "Position: %.2f %.2f %.2f", selected_mesh_pos.x, selected_mesh_pos.y, selected_mesh_pos.z );
+				ImGui::Value( "Position", selected_mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Text( "Name: <none>" );
-				ImGui::Text( "Position: <none>" );
+				ImGui::Value( "Name", "<none>" );
+				ImGui::Value( "Position", "<none>" );
 			}
 
 			ImGui::TreePop();
