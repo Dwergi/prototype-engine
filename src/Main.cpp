@@ -15,11 +15,13 @@
 #endif
 
 #include "DebugUI.h"
+#include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
 #include "EntityManager.h"
 #include "File.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
+#include "FSM.h"
 #include "FPSCamera.h"
 #include "IDebugDraw.h"
 #include "Input.h"
@@ -78,6 +80,20 @@ ShipSystem* s_shipSystem = nullptr;
 Window* s_window = nullptr;
 EntityManager* s_entityManager = nullptr;
 FrameTimer* s_frameTimer = nullptr;
+FSM* s_fsm = nullptr;
+
+enum FSMStates
+{
+	INITIALIZED,
+	UPDATE_TIMER,
+	PREUPDATE,
+	UPDATE,
+	RENDER,
+	RENDER_END_FRAME,
+	POSTRENDER,
+	OPEN_ASSERT,
+	ASSERT_DIALOG
+};
 
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
@@ -102,7 +118,7 @@ void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
 
 void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
-	dd::RegisterString( scriptEngine );
+	RegisterString( scriptEngine );
 
 	REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
@@ -177,6 +193,14 @@ void ToggleDebugUI( InputAction action, InputType type )
 	}
 }
 
+void TriggerAssert( InputAction action, InputType type )
+{
+	if( action == InputAction::BREAK && type == InputType::RELEASED )
+	{
+		DD_ASSERT( false );
+	}
+}
+
 void Exit( InputAction action, InputType type )
 {
 	if( action == InputAction::EXIT && type == InputType::RELEASED )
@@ -185,124 +209,34 @@ void Exit( InputAction action, InputType type )
 	}
 }
 
-struct Assert
-{
-	String256 Info;
-	String256 Message;
-	bool Open;
-};
-
-static Assert s_assert;
-
-String256 FormatAssert( int level, const char* file, int line, const char* function, const char* expression )
-{
-	String256 out;
-	switch( level )
-	{
-	case AssertLevel::Debug:
-		out += "DEBUG";
-		break;
-
-	case AssertLevel::Warning:
-		out += "WARNING";
-		break;
-
-	case AssertLevel::Error:
-		out += "ERROR";
-		break;
-
-	case AssertLevel::Fatal:
-		out += "FATAL";
-		break;
-	}
-
-	char buffer[ 1024 ];
-	snprintf( buffer, 1024, ": \"%s\" in %s() (%s:%d)", expression, function, file, line );
-
-	out += buffer;
-
-	return out;
-}
-
-AssertAction ShowAssertDialog()
-{
-	s_input->CaptureMouse( false );
-	glm::ivec2 size = s_window->GetSize();
-	ImGui::SetNextWindowPos( ImVec2( size.x / 2.0f - size.x / 6.5f, size.y / 2.0f - size.y / 6.5f ), ImGuiSetCond_FirstUseEver );
-	ImGui::SetNextWindowSize( ImVec2( size.x / 3.0f, size.y / 3.0f ), ImGuiSetCond_FirstUseEver );
-
-	AssertAction action = AssertAction::None;
-
-	float delta_t = 0.0f;
-
-	do
-	{
-		if( ImGui::Begin( "Assert", &s_assert.Open ) )
-		{
-			ImGui::TextWrapped( s_assert.Info.c_str() );
-			ImGui::TextWrapped( s_assert.Message.c_str() );
-			ImGui::NewLine();
-
-			if( ImGui::Button( "Break" ) )
-			{
-				action = AssertAction::Break;
-			}
-
-			ImGui::SameLine();
-
-			if( ImGui::Button( "Ignore" ) )
-			{
-				action = AssertAction::Ignore;
-			}
-
-			ImGui::SameLine();
-
-			if( ImGui::Button( "Ignore This" ) )
-			{
-				action = AssertAction::IgnoreLine;
-			}
-
-			ImGui::SameLine();
-
-			if( ImGui::Button( "Abort" ) )
-			{
-				action = AssertAction::Abort;
-			}
-
-			ImGui::End();
-		}
-		else
-		{
-			action = AssertAction::Ignore;
-		}
-
-		ImGui::Render();
-
-		s_window->Swap();
-
-		s_frameTimer->Update();
-		delta_t = s_frameTimer->Delta();
-		
-		s_input->Update( delta_t );
-		s_debugUI->Update( delta_t );
-	} 
-	while( action == AssertAction::None );
-
-	return action;
-}
+Assert s_assert;
 
 pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
 	int level, const char* message )
 {
 	s_assert.Open = true;
 	s_assert.Info = FormatAssert( level, file, line, function, expression );
-	s_assert.Message = String256( "Message: " );
+	s_assert.Message = String256();
+	s_assert.Action = AssertAction::None;
 	if( message != nullptr )
 	{
+		s_assert.Message += "Message: ";
 		s_assert.Message += message;
 	}
 
-	return (pempek::assert::implementation::AssertAction::AssertAction) ShowAssertDialog();
+	s_input->CaptureMouse( false );
+
+	s_fsm->TransitionTo( OPEN_ASSERT );
+
+	do
+	{
+		s_fsm->TransitionTo( UPDATE_TIMER );
+		s_fsm->TransitionTo( ASSERT_DIALOG );
+		s_fsm->TransitionTo( RENDER_END_FRAME );
+	} 
+	while( s_assert.Action == AssertAction::None );
+
+	return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 }
 
 void BindKeys( Input& input )
@@ -321,6 +255,7 @@ void BindKeys( Input& input )
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
+	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
 }
 
 void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
@@ -434,7 +369,7 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	}
 }
 
-void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console, FrameTimer& frame_timer )
+void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )
 {
 	renderer.BeginRender( camera );
 
@@ -450,20 +385,14 @@ void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityMana
 	}
 
 	renderer.Render( entity_manager, camera );
-
-	renderer.EndRender( camera );
-
-	ImGui::Render();
-
-	s_window->Swap();
 }
 
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 {
-	Array<InputEvent, 64> events;
 	input.Update( delta_t );
 
 	// update input
+	Array<InputEvent, 64> events;
 	input.GetKeyEvents( events );
 	bindings.Dispatch( events );
 }
@@ -502,6 +431,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
 		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
 		bindings.RegisterHandler( InputAction::EXIT, &Exit );
+		bindings.RegisterHandler( InputAction::BREAK, &TriggerAssert );
 
 		FPSCamera camera( *s_window );
 		camera.SetPosition( glm::vec3( 0, 10, 0 ) );
@@ -529,6 +459,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 		MousePicking mouse_picking( *s_window, camera, *s_input );
 		mouse_picking.BindActions( bindings );
+
 		renderer.SetMousePicking( &mouse_picking );
 
 		Vector<ISystem*> systems;
@@ -562,53 +493,117 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		InitializeSystems( jobSystem, entity_manager, systems );
 		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
 
-		glm::ivec2 picking_size( s_window->GetWidth() / MousePicking::DownScalingFactor, 
-			s_window->GetHeight() / MousePicking::DownScalingFactor );
+		s_fsm = new FSM();
+		s_fsm->AddState( INITIALIZED );
+
+		{
+			FSMState& updateTimerState = s_fsm->AddState( UPDATE_TIMER );
+			updateTimerState.SetOnEnter( [&]()
+			{
+				s_frameTimer->SetMaxFPS( s_maxFPS );
+				s_frameTimer->Update();
+
+				float delta_t = s_frameTimer->Delta();
+				UpdateInput( *s_input, bindings, delta_t );
+				s_debugUI->Update( delta_t );
+			} );
+		}
+
+		{
+			FSMState& preupdateState = s_fsm->AddState( PREUPDATE );
+			preupdateState.SetOnEnter( [&]()
+			{
+				float delta_t = s_frameTimer->Delta();
+				entity_manager.Update( delta_t );
+				PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
+			} );
+		}
+
+		{
+			FSMState& updateState = s_fsm->AddState( UPDATE );
+			updateState.SetOnEnter( [&]()
+			{
+				float delta_t = s_frameTimer->Delta();
+				UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
+				UpdateSystems( jobSystem, entity_manager, systems, delta_t );
+			} );
+		}
+
+		{
+			FSMState& renderState = s_fsm->AddState( RENDER );
+			renderState.SetOnEnter( [&]()
+			{
+				DrawDebugUI( debug_views );
+				Render( renderer, renderers, entity_manager, shakyCam, console );
+			} );
+		}
+
+		{
+			FSMState& endFrameState = s_fsm->AddState( RENDER_END_FRAME );
+			endFrameState.SetOnEnter( [&]()
+			{
+				renderer.EndRender( camera );
+
+				ImGui::Render();
+				s_window->Swap();
+			} );
+		}
+
+		{
+			FSMState& postRenderState = s_fsm->AddState( POSTRENDER );
+			postRenderState.SetOnEnter( [&]()
+			{
+				PostRenderSystems( jobSystem, entity_manager, systems, s_frameTimer->Delta() );
+				camera.SetClean();
+				s_frameTimer->DelayFrame();
+			} );
+		}
+
+		{
+			FSMState& openAssertState = s_fsm->AddState( OPEN_ASSERT );
+		}
+
+		{
+			FSMState& assertDialogState = s_fsm->AddState( ASSERT_DIALOG );
+			assertDialogState.SetOnEnter( [&]()
+			{
+				DrawAssertDialog( s_window->GetSize(), s_assert );
+			} );
+		}
+
+		s_fsm->AddTransition( INITIALIZED, UPDATE_TIMER );
+		s_fsm->AddTransition( UPDATE_TIMER, PREUPDATE );
+		s_fsm->AddTransition( PREUPDATE, UPDATE );
+		s_fsm->AddTransition( UPDATE, RENDER );
+		s_fsm->AddTransition( RENDER, RENDER_END_FRAME );
+		s_fsm->AddTransition( RENDER_END_FRAME, POSTRENDER );
+		s_fsm->AddTransition( POSTRENDER, UPDATE_TIMER );
+
+		s_fsm->AddTransition( INITIALIZED, OPEN_ASSERT );
+		s_fsm->AddTransition( UPDATE_TIMER, OPEN_ASSERT );
+		s_fsm->AddTransition( PREUPDATE, OPEN_ASSERT );
+		s_fsm->AddTransition( UPDATE, OPEN_ASSERT );
+		s_fsm->AddTransition( RENDER, OPEN_ASSERT );
+		s_fsm->AddTransition( POSTRENDER, OPEN_ASSERT );
+		s_fsm->AddTransition( RENDER_END_FRAME, OPEN_ASSERT );
+
+		s_fsm->AddTransition( OPEN_ASSERT, UPDATE_TIMER );
+		s_fsm->AddTransition( UPDATE_TIMER, ASSERT_DIALOG );
+		s_fsm->AddTransition( ASSERT_DIALOG, RENDER_END_FRAME );
+		s_fsm->AddTransition( RENDER_END_FRAME, UPDATE_TIMER );
+
+		s_fsm->Initialize( INITIALIZED );
 
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_SCOPED( Frame );
-
-			// frame timer
-			s_frameTimer->SetMaxFPS( s_maxFPS );
-			s_frameTimer->Update();
-			float delta_t = s_frameTimer->Delta();
-
-			// entity manager
-			entity_manager.Update( delta_t );
-
-			// systems pre-update
-			PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
-
-			// input
-			UpdateInput( *s_input, bindings, delta_t );
-
-			// debug UI
-			s_debugUI->Update( delta_t );
-
-			// camera
-			UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
-
-			// systems update
-			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
-
-			// debug UI
-			DrawDebugUI( debug_views );
-
-			DD_ASSERT( false, "TEST" );
-
-			// render
-			Render( renderer, renderers, entity_manager, shakyCam, console, *s_frameTimer );
-
-			// systems post-render
-			PostRenderSystems( jobSystem, entity_manager, systems, delta_t );
-
-			camera.SetClean();
-
-			// wait for frame delta
-			s_frameTimer->DelayFrame();
-
-			DD_PROFILE_LOG( "End Frame" );
+			
+			s_fsm->TransitionTo( UPDATE_TIMER );
+			s_fsm->TransitionTo( PREUPDATE );
+			s_fsm->TransitionTo( UPDATE );
+			s_fsm->TransitionTo( RENDER );
+			s_fsm->TransitionTo( RENDER_END_FRAME );
+			s_fsm->TransitionTo( POSTRENDER );
 		}
 
 		ShutdownSystems( entity_manager, systems );
@@ -647,11 +642,11 @@ int main( int argc, char* argv[] )
 
 	if( cmdLine.Exists( "dataroot" ) )
 	{
-		dd::File::SetDataRoot( cmdLine.GetValue( "dataroot" ).c_str() );
+		File::SetDataRoot( cmdLine.GetValue( "dataroot" ).c_str() );
 	}
 	else
 	{
-		dd::File::SetDataRoot( "../../../data" );
+		File::SetDataRoot( "../../../data" );
 	}
 
 	REGISTER_TYPE( CommandLine );

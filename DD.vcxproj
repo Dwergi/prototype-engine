@@ -316,6 +316,7 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
+    <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -524,6 +525,7 @@
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />

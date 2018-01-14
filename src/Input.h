@@ -45,6 +45,7 @@ namespace dd
 			ENTER = 257,
 			TAB = 258,
 			CAPS_LOCK = 280,
+			PAUSE = 284,
 			F1 = 290,
 			F2 = 291,
 			LSHIFT = 340,

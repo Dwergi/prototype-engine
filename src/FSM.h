@@ -13,14 +13,19 @@ namespace dd
 		FSMState( const FSMState& other );
 		~FSMState();
 
-		void AddTransition( FSMState to, FunctionView<void()> transition );
+		void SetOnEnter( FunctionView<void()> on_enter );
+		void SetOnExit( FunctionView<void()> on_exit );
 
 		int ID() const { return m_id; }
+
+		void Enter() const;
+		void Exit() const;
 
 	private:
 
 		int m_id { -1 };
-		std::unordered_map<int, FunctionView<void()>> m_transitions;
+		FunctionView<void()> m_onEnter;
+		FunctionView<void()> m_onExit;
 
 		friend class FSM;
 
@@ -37,11 +42,14 @@ namespace dd
 		void Initialize( int initial_state );
 
 		FSMState& AddState( int id );
+		void AddTransition( int from, int to );
+
 		bool TransitionTo( int id );
 
 	private:
 
-		FSMState* m_current;
+		FSMState* m_current { nullptr };
 		std::unordered_map<int, FSMState> m_states;
+		Vector<std::pair<int, int>> m_transitions;
 	};
 }

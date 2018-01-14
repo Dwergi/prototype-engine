@@ -50,24 +50,48 @@ class FunctionView<TReturn( TArgs... )> final
 private:
 	using signature_type = TReturn( void*, TArgs... );
 
-	void* _ptr;
-	TReturn( *_erased_fn )(void*, TArgs...);
+	void* m_ptr { nullptr };
+	TReturn( *m_erasedFn )(void*, TArgs...);
 
 public:
-	template <typename T, typename = std::enable_if_t <
-		std::is_callable<T&(TArgs...)>{} &&
-		!std::is_same<std::decay_t<T>, function_view>{} >>
-		FunctionView( T&& x ) noexcept : _ptr { (void*) std::addressof( x ) }
+	template <typename T, typename = std::enable_if_t<
+		is_callable<T&(TArgs...)>::value &&
+		!std::is_same_v<std::decay_t<T>, FunctionView>>>
+	FunctionView( T&& x ) noexcept 
+		: m_ptr { (void*) std::addressof( x ) }
 	{
-		_erased_fn = []( void* ptr, TArgs... xs ) -> TReturn {
+		m_erasedFn = []( void* ptr, TArgs... xs ) -> TReturn
+		{
+			return (*reinterpret_cast<std::add_pointer_t<T>>(ptr))(
+				std::forward<TArgs>( xs )...);
+		};
+	}
+
+	FunctionView()
+	{
+	}
+
+	template <typename T, typename = std::enable_if_t<
+		is_callable<T&(TArgs...)>::value &&
+		!std::is_same_v<std::decay_t<T>, FunctionView>>>
+	FunctionView& operator=( T&& x ) noexcept
+	{
+		m_ptr = (void*) std::addressof( x );
+		m_erasedFn = []( void* ptr, TArgs... xs ) -> TReturn 
+		{
 			return (*reinterpret_cast<std::add_pointer_t<T>>(ptr))(
 				std::forward<TArgs>( xs )...);
 		};
 	}
 
 	decltype(auto) operator()( TArgs... xs ) const
-		noexcept(noexcept(_erased_fn( _ptr, std::forward<TArgs>( xs )... )))
+		noexcept(noexcept(m_erasedFn( m_ptr, std::forward<TArgs>( xs )... )))
 	{
-		return _erased_fn( _ptr, std::forward<TArgs>( xs )... );
+		return m_erasedFn( m_ptr, std::forward<TArgs>( xs )... );
+	}
+
+	bool valid() const
+	{
+		return m_ptr != nullptr;
 	}
 };

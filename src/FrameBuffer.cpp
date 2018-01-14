@@ -185,6 +185,7 @@ namespace dd
 	{
 		GLint viewport[ 4 ];
 		glGetIntegerv( GL_VIEWPORT, viewport );
+
 		glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &m_previousRead );
 		CheckGLError();
 
@@ -198,9 +199,6 @@ namespace dd
 		CheckGLError();
 
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_previousRead );
-		CheckGLError();
-
-		glViewport( 0, 0, m_previousSize.x, m_previousSize.y );
 		CheckGLError();
 	}
 

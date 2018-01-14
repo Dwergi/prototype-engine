@@ -510,6 +510,9 @@
     <ClInclude Include="src\FunctionView.h">
       <Filter>Types</Filter>
     </ClInclude>
+    <ClInclude Include="src\DDAssertHelpers.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -860,6 +863,9 @@
     </ClCompile>
     <ClCompile Include="src\FSM.cpp">
       <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DDAssertHelpers.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
