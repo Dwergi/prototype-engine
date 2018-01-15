@@ -22,8 +22,6 @@ namespace dd
 
 		void Update( float delta_t );
 
-		// Use if you want to reset your rendering device without losing ImGui state.
-		void InvalidateDeviceObjects();
 		bool CreateDeviceObjects();
 
 		void SetFocused( bool focused );

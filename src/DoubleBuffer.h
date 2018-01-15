@@ -28,12 +28,9 @@ namespace dd
 		void Swap();
 
 		virtual void Clear() const = 0;
-
 		virtual void Duplicate() const = 0;
 
-		void* GetWrite() const { return m_write; }
-
-		void* GetRead() const { return m_read; }
+		void* GetWriteVoid() const { return m_write; }
 
 	protected:
 

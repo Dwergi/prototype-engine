@@ -12,6 +12,8 @@
 #include <functional>
 #include <stdexcept>
 
+#define JOBSYSTEM_NO_THREADS
+
 namespace dd
 {
 	class JobSystem {
@@ -29,7 +31,7 @@ namespace dd
 
 		std::mutex m_queueMutex;
 		std::condition_variable m_condition;
-		bool m_stop;
+		bool m_stop { false };
 
 		void WorkerFunction();
 	};
@@ -46,6 +48,7 @@ namespace dd
 			);
 
 		std::future<return_type> res = task->get_future();
+#ifndef JOBSYSTEM_NO_THREADS
 		{
 			std::unique_lock<std::mutex> lock( m_queueMutex );
 
@@ -56,6 +59,9 @@ namespace dd
 			m_tasks.emplace( [task]() { (*task)(); } );
 		}
 		m_condition.notify_one();
+#else
+		(*task)();
+#endif
 		return res;
 	}
 }

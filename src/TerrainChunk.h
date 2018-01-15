@@ -54,7 +54,7 @@ namespace dd
 	private:
 
 		static const int MeshIndexCount = Vertices * Vertices * 6;
-		static const int FlapIndexCount = Vertices * 6 * 2;
+		static const int FlapIndexCount = Vertices * 6 * 4;
 		static const int IndexCount = MeshIndexCount + FlapIndexCount;
 
 		static const int MeshVertexCount = (Vertices + 1) * (Vertices + 1);

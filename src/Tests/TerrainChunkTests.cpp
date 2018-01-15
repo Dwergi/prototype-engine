@@ -9,15 +9,18 @@
 
 #include "TerrainChunk.h"
 #include "TerrainChunkKey.h"
+#include "TerrainParameters.h"
 
 TEST_CASE( "[TerrainChunk] Generate" )
 {
 	dd::TerrainChunkKey key;
 	key.X = 0;
 	key.Y = 0;
-	key.Size = 16;
+	key.LOD = 0;
 
-	dd::TerrainChunk chunk;
+	dd::TerrainParameters params;
+
+	dd::TerrainChunk chunk( params );
 	chunk.Generate( key );
 
 	//chunk.Write( "terrain_chunk.tga" );

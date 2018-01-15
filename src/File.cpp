@@ -31,6 +31,11 @@ namespace dd
 		s_dataRoot = root;
 	}
 
+	const char* File::GetDataRoot()
+	{
+		return s_dataRoot.c_str();
+	}
+
 	std::unique_ptr<File> File::OpenDataFile( const char* path, Mode mode )
 	{
 		return OpenDataFile( String256( path ), mode );
@@ -48,6 +53,14 @@ namespace dd
 			return nullptr;
 
 		return std::unique_ptr<File>( new File( file_handle ) );
+	}
+
+	int File::Size() const
+	{
+		std::fseek( m_fileHandle, 0L, SEEK_END );
+		int size = std::ftell( m_fileHandle );
+		std::rewind( m_fileHandle );
+		return size;
 	}
 
 	int File::Read( byte* buffer, uint size )

@@ -68,8 +68,8 @@ namespace dd
 		// 
 		virtual bool Exists( EntityHandle entity ) const override;
 
-		iterator begin() const;
-		iterator end() const;
+		iterator begin();
+		iterator end();
 
 		BASIC_TYPE( DenseMapPool<T> )
 

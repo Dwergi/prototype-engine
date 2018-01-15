@@ -19,6 +19,7 @@
 
 #include "imgui/imgui.h"
 
+#include "File.h"
 #include "Input.h"
 #include "Window.h"
 
@@ -299,6 +300,14 @@ namespace dd
 		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
+
+		std::unique_ptr<File> file = File::OpenDataFile( "Consola.ttf", File::Mode::Read );
+		int size = file->Size();
+		byte* buffer = new byte[ size ];
+		file->Read( buffer, size );
+
+		io.Fonts->AddFontFromMemoryTTF( buffer, size, 18.0f );
+
 		io.RenderDrawListsFn = &DebugUI::RenderDrawLists;       // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 		io.SetClipboardTextFn = SetClipboardText;
 		io.GetClipboardTextFn = GetClipboardText;
@@ -306,6 +315,8 @@ namespace dd
 #ifdef _WIN32
 		io.ImeWindowHandle = glfwGetWin32Window( s_window );
 #endif
+
+		CreateDeviceObjects();
 	}
 
 	DebugUI::~DebugUI()
@@ -363,9 +374,6 @@ namespace dd
 	void DebugUI::Update( float delta_t )
 	{
 		DD_PROFILE_START( DebugUI_Update );
-
-		if( !g_FontTexture )
-			DebugUI::CreateDeviceObjects();
 
 		ImGuiIO& io = ImGui::GetIO();
 

@@ -705,9 +705,6 @@
     <ClCompile Include="src\tests\FunctionTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\WrenTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\JobSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>

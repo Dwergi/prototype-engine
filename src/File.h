@@ -26,7 +26,10 @@ namespace dd
 		int Read( byte* buffer, uint size );
 		int Write( const byte* buffer, uint size );
 
+		int Size() const;
+
 		static void SetDataRoot( const char* root );
+		static const char* GetDataRoot();
 
 		~File();
 

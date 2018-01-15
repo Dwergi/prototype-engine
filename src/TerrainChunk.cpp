@@ -79,14 +79,16 @@ namespace dd
 			}
 		}
 
+		DD_ASSERT( index == MeshIndexCount );
+
 		int flap_vertex_start = MeshVertexCount;
 
-		// 1st
+		// 1st (top, x = varying, z = 0)
 		for( uint x = 0; x < Vertices; ++x )
 		{
 			s_indices[index + 0] = x;
 			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = flap_vertex_start + x - 1;
+			s_indices[index + 2] = flap_vertex_start + x + 1;
 
 			index += 3;
 
@@ -99,58 +101,61 @@ namespace dd
 
 		flap_vertex_start += actual_vertices;
 
-		for( uint x = 0; x < Vertices; ++x )
-		{
-			s_indices[index + 0] = x * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + x - 1;
-			s_indices[index + 2] = flap_vertex_start + x;
-
-			index += 3;
-
-			s_indices[index + 0] = x * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = (x + 1) * actual_vertices;
-
-			index += 3;
-		}
-
-		flap_vertex_start += actual_vertices;
-
-		// 3rd
-		for( uint x = 0; x < Vertices; ++x )
-		{
-			const uint row_start = MeshVertexCount - actual_vertices;
-
-			s_indices[index + 0] = row_start + x;
-			s_indices[index + 1] = flap_vertex_start + x - 1;
-			s_indices[index + 2] = flap_vertex_start + x;
-
-			index += 3;
-
-			s_indices[index + 0] = row_start + x;
-			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = row_start + x + 1;
-
-			index += 3;
-		}
-
-		flap_vertex_start += actual_vertices;
-
-		// 4th
+		// (left, x = 0, z = chunk size)
 		for( uint y = 0; y < Vertices; ++y )
 		{
-			s_indices[index + 0] = flap_vertex_start + y;
-			s_indices[index + 1] = y * actual_vertices + actual_vertices;
-			s_indices[index + 2] = (y - 1) * actual_vertices + actual_vertices;
-
-			index += 3;
-
-			s_indices[index + 0] = y * actual_vertices + actual_vertices;
+			s_indices[index + 0] = y * actual_vertices;
 			s_indices[index + 1] = flap_vertex_start + y;
 			s_indices[index + 2] = flap_vertex_start + y + 1;
 
 			index += 3;
+
+			s_indices[index + 0] = y * actual_vertices;
+			s_indices[index + 1] = flap_vertex_start + y;
+			s_indices[index + 2] = (y + 1) * actual_vertices;
+
+			index += 3;
 		}
+
+		flap_vertex_start += actual_vertices;
+
+		// 3rd (bottom, x = varying, z = chunk size)
+		for( uint x = 0; x < Vertices; ++x )
+		{
+			const uint last_row = MeshVertexCount - actual_vertices;
+
+			s_indices[index + 0] = last_row + x;
+			s_indices[index + 1] = flap_vertex_start + x;
+			s_indices[index + 2] = flap_vertex_start + x + 1;
+
+			index += 3;
+
+			s_indices[index + 0] = last_row + x;
+			s_indices[index + 1] = flap_vertex_start + x;
+			s_indices[index + 2] = last_row + x + 1;
+
+			index += 3;
+		}
+
+		flap_vertex_start += actual_vertices;
+
+		// 4th (right, x = chunk size, z = varying)
+		for( uint y = 0; y < Vertices; ++y )
+		{
+			s_indices[ index + 0 ] = (y + 1) * actual_vertices - 1;
+			s_indices[ index + 1 ] = flap_vertex_start + y;
+			s_indices[ index + 2 ] = flap_vertex_start + y + 1;
+
+			index += 3;
+
+			s_indices[index + 0] = flap_vertex_start + y;
+			s_indices[index + 1] = (y + 1) * actual_vertices - 1;
+			s_indices[index + 2] = (y + 2) * actual_vertices - 1;
+
+			index += 3;
+		}
+
+		DD_ASSERT( index == IndexCount );
 	}
 
 	void TerrainChunk::CreateRenderResources()
@@ -193,13 +198,11 @@ namespace dd
 				const int current = z * actual_vertices + x;
 
 				// height is y
-				m_vertices[current].y = 0;
-				m_vertices[current].x = x * actual_distance;
-				m_vertices[current].z = z * actual_distance;
+				m_vertices[ current ] = glm::vec3( x * actual_distance, 0, z * actual_distance );
 			}
 		}
 
-		const float chunk_size = actual_vertices * actual_distance;
+		const float chunk_size = Vertices * actual_distance;
 		int flap_vertex_start = MeshVertexCount;
 		for( int x = 0; x < actual_vertices; ++x )
 		{
@@ -310,6 +313,30 @@ namespace dd
 		for( int i = 0; i < FlapVertexCount; ++i )
 		{
 			m_vertices[MeshVertexCount + i].y = 0.0f;
+		}
+
+		int flap_vertex_start = MeshVertexCount;
+		for( int i = 0; i < actual_vertices; ++i )
+		{
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == 0.0f );
+		}
+
+		flap_vertex_start += actual_vertices;
+		for( int i = 0; i < actual_vertices; ++i )
+		{
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == Vertices * actual_distance );
+		}
+
+		flap_vertex_start += actual_vertices;
+		for( int i = 0; i < actual_vertices; ++i )
+		{
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == Vertices * actual_distance );
+		}
+
+		flap_vertex_start += actual_vertices;
+		for( int i = 0; i < actual_vertices; ++i )
+		{
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == 0.0f );
 		}
 	}
 

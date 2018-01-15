@@ -84,15 +84,15 @@ TEST_CASE( "[JobSystem]" )
 	{
 		SECTION( "- Function" )
 		{
-			system.Schedule( FUNCTION( FreeFunctionVoid ), "Test" );
+			auto f = system.Schedule( FUNCTION( FreeFunctionVoid ) );
+			f.wait();
 		}
 
 		SECTION( "- std::function" )
 		{
-			system.Schedule( &FreeFunctionVoid, "Test" );
+			auto f = system.Schedule( &FreeFunctionVoid );
+			f.wait();
 		}
-
-		system.WaitForCategory( "Test" );
 
 		REQUIRE( FreeExecuted == true );
 	} 
@@ -101,10 +101,9 @@ TEST_CASE( "[JobSystem]" )
 	{
 		FreeResult = 0;
 
-		system.Schedule( std::bind( &FreeFunctionWithDifferentArgs, -7, (char) 10 ), "Test" );
+		auto f = system.Schedule( std::bind( &FreeFunctionWithDifferentArgs, -7, (char) 10 ) );
+		f.wait();
 		
-		system.WaitForCategory( "Test" );
-
 		REQUIRE( FreeExecuted == true );
 		REQUIRE( FreeResult == 3 );
 	}
@@ -120,15 +119,15 @@ TEST_CASE( "[JobSystem]" )
 			{
 				dd::Function fn = FUNCTION( TestStruct::TestFunctionVoid );
 				fn.Bind( test_struct );
-				system.Schedule( fn, "Test" );
+				auto f = system.Schedule( fn );
+				f.wait();
 			}
 
 			SECTION( "- std::function" )
 			{
-				system.Schedule( std::bind( &TestStruct::TestFunctionVoid, &test_struct ), "Test" );
+				auto f = system.Schedule( std::bind( &TestStruct::TestFunctionVoid, &test_struct ) );
+				f.wait();
 			}
-
-			system.WaitForCategory( "Test" );
 
 			REQUIRE( test_struct.Executed == true );
 		}
@@ -137,42 +136,11 @@ TEST_CASE( "[JobSystem]" )
 		{
 			test_struct.Result = 0;
 
-			system.Schedule( std::bind( &TestStruct::TestFunctionArgs, &test_struct, 1, 2 ), "Test" );
-
-			system.WaitForCategory( "Test" );
+			auto f = system.Schedule( std::bind( &TestStruct::TestFunctionArgs, &test_struct, 1, 2 ), "Test" );
+			f.wait();
 
 			REQUIRE( test_struct.Executed == true );
 			REQUIRE( test_struct.Result == 3 );
 		}
 	}
-
-	/*SECTION( "Waiting" )
-	{
-		REGISTER_TYPE( dd::JobSystem );
-
-		ContinueWaiting = true;
-		ScheduledB = false;
-		FinishedWaitingA = false;
-		CalledB = false;
-		ExitedB = false;
-
-		system.Schedule( std::bind( &TestWaitA, &system ), "A" );
-
-		// this should only take some arbitrarily short amount of time, let's say 0.1 seconds
-		dd::Timer t;
-		t.Start();
-		while( !ScheduledB && t.Time() < 0.1f ) { ::Sleep( 5 ); }
-
-		REQUIRE( ScheduledB );
-		REQUIRE( CalledB );
-		REQUIRE_FALSE( ExitedB );
-
-		ContinueWaiting = false;
-
-		system.WaitForCategory( "A" );
-		REQUIRE( FinishedWaitingA );
-
-		system.WaitForCategory( "B" );
-		REQUIRE( ExitedB );
-	}*/
 }
