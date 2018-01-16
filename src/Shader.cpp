@@ -13,7 +13,7 @@
 
 namespace dd
 {
-	DenseMap<String128, String256> Shader::sm_shaderCache;
+	std::unordered_map<String128, Shader*> Shader::sm_shaderCache;
 
 	GLenum GetOpenGLShaderType( Shader::Type type )
 	{
@@ -32,7 +32,7 @@ namespace dd
 		return GL_INVALID_INDEX;
 	}
 
-	Shader::Shader( Type type ) :
+	Shader::Shader( const String& path, Type type ) :
 		m_refCount( nullptr ),
 		m_valid( false )
 	{
@@ -41,14 +41,16 @@ namespace dd
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
 
 		m_valid = m_id != OpenGL::InvalidID;
-		
 		m_refCount = new std::atomic<int>( 1 );
+		m_type = type;
 	}
 
 	Shader::Shader( const Shader& other ) :
 		m_id( other.m_id ),
 		m_refCount( other.m_refCount ),
-		m_valid( other.m_valid )
+		m_valid( other.m_valid ),
+		m_path( other.m_path ),
+		m_type( other.m_type )
 	{
 		Retain();
 	}
@@ -62,12 +64,42 @@ namespace dd
 	{
 		Release();
 
+		m_valid = other.m_valid;
 		m_id = other.m_id;
 		m_refCount = other.m_refCount;
+		m_path = other.m_path;
+		m_type = other.m_type;
+		m_source = other.m_source;
 
 		Retain();
 
 		return *this;
+	}
+
+	bool Shader::Reload()
+	{
+		String256 oldSource = m_source;
+
+		String256 source;
+		if( !LoadFile( m_path, source ) )
+		{
+			DD_ASSERT_ERROR( false, "Failed to load shader from path!" );
+			return false;
+		}
+
+		String256 message = Compile( source );
+		if( !message.IsEmpty() )
+		{
+			DD_ASSERT_ERROR( false, "Compiling shader failed, message: %s", message.c_str() );
+
+			m_source = oldSource;
+			Compile( m_source );
+
+			return false;
+		}
+
+		m_source = source;
+		return true;
 	}
 
 	String256 Shader::Compile( const String& source )
@@ -103,13 +135,6 @@ namespace dd
 
 	bool Shader::LoadFile( const String& path, String& outSource )
 	{
-		String256* ptr = sm_shaderCache.Find( path );
-		if( ptr != nullptr )
-		{
-			outSource = *ptr;
-			return true;
-		}
-
 		std::unique_ptr<File> file = File::OpenDataFile( path, File::Mode::Read );
 		if( file == nullptr )
 		{
@@ -125,33 +150,28 @@ namespace dd
 
 		outSource.Append( buffer, (uint) read );
 
-		sm_shaderCache.Add( path, outSource );
-
 		return true;
 	}
 
-	Shader Shader::Create( const String& path, Shader::Type type )
+	Shader* Shader::Create( const String& path, Shader::Type type )
 	{
 		DD_PROFILE_SCOPED( Shader_Create );
 
-		String256 source;
-		if( !LoadFile( path, source ) )
+		auto it = sm_shaderCache.find( path );
+		if( it != sm_shaderCache.end() )
 		{
-			DD_ASSERT_ERROR( false, "Failed to load shader from path!" );
+			it->second->Retain();
+			return it->second;
+		}
+		
+		Shader* shader = new Shader( path, type );
+		if( !shader->Reload() )
+		{
+			delete shader;
+			return nullptr;
 		}
 
-		Shader shader( type );
-		if( shader.m_id == OpenGL::InvalidID )
-		{
-			DD_ASSERT_ERROR( false, "Shader creation failed!" );
-		}
-
-		String256 message = shader.Compile( source );
-		if( !message.IsEmpty() )
-		{
-			DD_ASSERT_ERROR( false, "Compiling shader failed, message: %s", message.c_str() );
-		}
-
+		sm_shaderCache.insert( std::make_pair( path, shader ) );
 		return shader;
 	}
 
