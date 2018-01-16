@@ -195,12 +195,7 @@ namespace dd
 			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
 			
 			chunk.second->Write( chunk_file.c_str() );
-
-			String64 chunk_normals_file;
-			snprintf( chunk_normals_file.data(), 64, "terrain_%d_n.tga", chunk_index );
-
-			chunk.second->WriteNormals( chunk_normals_file.c_str() );
-
+			
 			++chunk_index;
 		}
 	}

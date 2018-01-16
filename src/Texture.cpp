@@ -60,7 +60,7 @@ namespace dd
 		DD_ASSERT( data.SizeBytes() == expectedSize );
 		DD_ASSERT( mip >= 0 );
 
-		glTexImage2D( GL_TEXTURE_2D, mip, m_format, m_size.x, m_size.y, 0, dataFormat, dataType, data.GetVoid() );
+		glTextureSubImage2D( m_id, mip, 0, 0, m_size.x, m_size.y, dataFormat, dataType, data.GetVoid() );
 		CheckGLError();
 	}
 
@@ -94,8 +94,7 @@ namespace dd
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( index >= 0 );
 
-		glActiveTexture( GL_TEXTURE0 + index );
-		glBindTexture( GL_TEXTURE_2D, m_id );
+		glBindTextureUnit( index, m_id );
 		CheckGLError();
 
 		m_textureUnit = index;

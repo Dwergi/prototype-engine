@@ -10,6 +10,7 @@
 #include "ICamera.h"
 #include "GLError.h"
 #include "Shader.h"
+#include "Renderer.h"
 
 #include "GL/gl3w.h"
 
@@ -408,6 +409,14 @@ namespace dd
 		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 		shader.SetUniform( "ObjectColour", m_colourMultiplier );
+
+		if( Fog::Get() != nullptr )
+		{
+			Fog* fog = Fog::Get();
+			shader.SetUniform( "Fog.Enabled", fog->Enabled );
+			shader.SetUniform( "Fog.Distance", fog->Distance );
+			shader.SetUniform( "Fog.Colour", fog->Colour );
+		}
 
 		if( m_useHeightColours )
 		{

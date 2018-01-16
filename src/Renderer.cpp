@@ -30,6 +30,18 @@
 
 namespace dd
 {
+	static Fog s_fog;
+
+	Fog* Fog::Get()
+	{
+		if( s_fog.Enabled )
+		{
+			return &s_fog;
+		}
+
+		return nullptr;
+	}
+
 	Renderer::Renderer( const Window& window ) :
 		m_meshCount( 0 ),
 		m_window( window ),
@@ -106,7 +118,7 @@ namespace dd
 		m_colourTexture.Create( size, GL_SRGB8_ALPHA8, 1 );
 		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
 
-		m_framebuffer.SetClearColour( glm::vec4( 1 ) );
+		m_framebuffer.SetClearColour( glm::vec4( 0.6, 0.7, 0.8, 0.0 ) );
 		m_framebuffer.SetClearDepth( 0.0f );
 		m_framebuffer.Create( m_colourTexture, &m_depthTexture );
 		m_framebuffer.RenderInit();
@@ -142,6 +154,7 @@ namespace dd
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_frustumMeshCount );
 
+		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
@@ -189,13 +202,11 @@ namespace dd
 					{
 						light.Write()->IsDirectional = directional;
 					}
-
-					glm::vec3 colour = light.Read()->Colour;
-					float fltColour[3];
-					fltColour[0] = colour.r; fltColour[1] = colour.g; fltColour[2] = colour.b;
-					if( ImGui::ColorEdit3( "Colour", fltColour ) )
+					
+					glm::vec3 light_colour = light.Read()->Colour;
+					if( ImGui::ColorEdit3( "Colour", glm::value_ptr( light_colour ) ) )
 					{
-						light.Write()->Colour = glm::vec3( fltColour[0], fltColour[1], fltColour[2] );
+						light.Write()->Colour = light_colour;
 					}
 
 					float intensity = light.Read()->Intensity;
@@ -210,14 +221,12 @@ namespace dd
 						light.Write()->Attenuation = attenuation;
 					}
 
-					glm::vec3 position = transform.Read()->GetLocalPosition();
-					float fltPosition[3];
-					fltPosition[0] = position.x; fltPosition[1] = position.y; fltPosition[2] = position.z;
+					glm::vec3 light_position = transform.Read()->GetLocalPosition();
 
 					const char* positionLabel = light.Read()->IsDirectional ? "Direction" : "Position";
-					if( ImGui::DragFloat3( positionLabel, fltPosition ) )
+					if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
 					{
-						transform.Write()->SetLocalPosition( glm::vec3( fltPosition[0], fltPosition[1], fltPosition[2] ) );
+						transform.Write()->SetLocalPosition( light_position );
 					}
 
 					float ambient = light.Read()->Ambient;
@@ -265,9 +274,16 @@ namespace dd
 
 			ImGui::TreePop();
 		}
-		
-		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 
+		if( ImGui::TreeNodeEx( "Fog", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			ImGui::Checkbox( "Enabled", &s_fog.Enabled );
+			ImGui::SliderFloat( "Distance", &s_fog.Distance, 0, 10000, "%.1f" );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( s_fog.Colour ) );
+
+			ImGui::TreePop();
+		}
+		
 		if( ImGui::Button( "Reload Shaders" ) )
 		{
 			m_reloadShaders = true;
@@ -286,6 +302,7 @@ namespace dd
 			// depth test
 			glEnable( GL_DEPTH_TEST );
 			glDepthFunc( GL_GREATER );
+			glClipControl( GL_LOWER_LEFT, GL_ZERO_TO_ONE );
 
 			// backface culling
 			glEnable( GL_CULL_FACE );
@@ -461,6 +478,15 @@ namespace dd
 		m_debugLights = entity_manager.FindAllWithWritable<LightComponent, TransformComponent>();
 	}
 
+	void Renderer::RenderDebug( IRenderer& debug_render )
+	{
+		m_framebuffer.BindDraw();
+
+		debug_render.RenderDebug();
+
+		m_framebuffer.UnbindDraw();
+	}
+
 	void Renderer::BeginRender( const ICamera& camera )
 	{
 		if( m_reloadShaders )
@@ -469,12 +495,16 @@ namespace dd
 			m_reloadShaders = false;
 		}
 
-		m_framebuffer.Bind();
+		m_framebuffer.BindRead();
+		m_framebuffer.BindDraw();
+		m_framebuffer.Clear();
 	}
 
 	void Renderer::Render( const EntityManager& entity_manager, const ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
+
+		m_framebuffer.BindDraw();
 
 		m_frustumMeshCount = 0;
 		m_meshCount = 0;
@@ -499,20 +529,27 @@ namespace dd
 		{
 			m_frustum->Render( camera );
 		}
+
+		m_framebuffer.UnbindDraw();
 	}
 
 	void Renderer::EndRender( const ICamera& camera )
 	{
+		m_framebuffer.BindRead();
+
+		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glViewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
 
 		if( m_debugDrawDepth )
 		{
-			m_framebuffer.RenderDepth();
+			m_framebuffer.RenderDepth( camera );
 		}
 		else
 		{
 			m_framebuffer.Blit();
 		}
+
+		m_framebuffer.UnbindRead();
 	}
 }

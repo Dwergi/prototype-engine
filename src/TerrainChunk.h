@@ -47,7 +47,6 @@ namespace dd
 		void Destroy();
 
 		void Write( const char* filename );
-		void WriteNormals( const char* filename );
 
 		MeshHandle GetMesh() const { return m_mesh; }
 
@@ -71,13 +70,11 @@ namespace dd
 		bool m_dirty { false };
 		MeshHandle m_mesh;
 		Buffer<glm::vec3> m_vertices;
-		Buffer<glm::vec3> m_normals;
 		Buffer<uint> m_indices;
 		
 		float GetHeight( float x, float y );
 
 		void UpdateVertices( const TerrainChunkKey& key, const glm::vec2& chunkPos );
-		void UpdateNormals();
 
 		void CreateMesh( const TerrainChunkKey& key );
 	};

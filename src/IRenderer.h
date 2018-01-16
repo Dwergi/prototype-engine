@@ -14,7 +14,7 @@ namespace dd
 		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) {}
 		virtual void RenderShutdown() {}
 
-		virtual FrameBuffer* GetFrameBuffer() { return nullptr; }
-		virtual bool ShouldRenderFrameBuffer() const { return false; }
+		virtual bool ShouldRenderDebug() const { return false; }
+		virtual void RenderDebug() {}
 	};
 }

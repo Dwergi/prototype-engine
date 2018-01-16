@@ -412,20 +412,29 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 
 void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )
 {
+	IRenderer* debug_render = nullptr;
+
 	renderer.BeginRender( camera );
 
 	for( IRenderer* current : renderers )
 	{
 		current->Render( entity_manager, camera );
 
-		if( current->ShouldRenderFrameBuffer() )
+		if( current->ShouldRenderDebug() )
 		{
-			FrameBuffer* current_fbo = current->GetFrameBuffer();
-			current_fbo->Blit();
+			debug_render = current;
+			break;
 		}
 	}
 
-	renderer.Render( entity_manager, camera );
+	if( debug_render != nullptr )
+	{
+		renderer.RenderDebug( *debug_render );
+	}
+	else
+	{
+		renderer.Render( entity_manager, camera );
+	}
 }
 
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )

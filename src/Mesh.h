@@ -18,9 +18,8 @@
 namespace dd
 {
 	class ICamera;
-	class ShaderProgram;
-
 	class MeshHandle;
+	class ShaderProgram;
 
 	//
 	// A ref-counted mesh asset.

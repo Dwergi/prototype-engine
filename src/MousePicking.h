@@ -44,6 +44,7 @@ namespace dd
 		EntityHandle GetSelectedMesh() const { return m_selectedMesh; }
 
 		int GetEntityHandleAt( glm::vec2 mouse_pos ) const;
+		float GetDepthAt( glm::vec2 mouse_pos ) const;
 
 		void BindActions( InputBindings& bindings );
 
@@ -52,8 +53,8 @@ namespace dd
 		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
 		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
 
-		virtual FrameBuffer* GetFrameBuffer() override { return &m_framebuffer; }
-		virtual bool ShouldRenderFrameBuffer() const override { return m_renderDebug; }
+		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
+		virtual void RenderDebug() override;
 
 	private:
 
@@ -69,13 +70,17 @@ namespace dd
 		EntityHandle m_focusedMesh;
 
 		ShaderHandle m_shader;
-		Texture m_texture;
-		Texture m_depth;
+		Texture m_idTexture;
+		Texture m_depthTexture;
+		
 		FrameBuffer m_framebuffer;
-		Buffer<byte> m_lastFrameBuffer;
+
+		Buffer<byte> m_lastIDBuffer;
+		Buffer<byte> m_lastDepthBuffer;
 
 		glm::vec2 m_position;
 		int m_handle { 0 };
+		float m_depth { 0.0f };
 
 		virtual void DrawDebugInternal() override;
 

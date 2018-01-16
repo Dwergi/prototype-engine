@@ -36,8 +36,13 @@ namespace dd
 		//
 		void Destroy();
 		
-		void Bind();
-		void Unbind();
+		void BindRead();
+		void UnbindRead();
+
+		void BindDraw();
+		void UnbindDraw();
+
+		void Clear();
 
 		bool IsValid() const { return m_valid; }
 
@@ -49,7 +54,7 @@ namespace dd
 		void RenderInit();
 
 		void Render();
-		void RenderDepth();
+		void RenderDepth( const ICamera& camera );
 
 		void Blit();
 

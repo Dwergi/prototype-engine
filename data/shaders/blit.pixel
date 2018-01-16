@@ -1,5 +1,8 @@
 #version 330 core
 
+const float Near = 0.01;
+const float Far = 2000;
+
 in vec2 UV;
 
 out vec4 Colour;
@@ -12,7 +15,9 @@ void main()
 	if( DrawDepth )
 	{
 		float depth = texture( Texture, UV ).r;
-    	Colour = vec4(depth);
+		float inverse = (2 * Near) / depth;
+		float linear = clamp( inverse / Far, 0, 1 );
+    	Colour = vec4( vec3( linear ), 1 );
 	}
 	else
 	{

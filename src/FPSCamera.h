@@ -78,8 +78,8 @@ namespace dd
 
 		// half vertical FOV in radians
 		float m_vfov { 0 };
-		float m_near { 0 };
-		float m_far { 0 };
+		float m_near { 0.01 };
+		float m_far { 5000 };
 		float m_aspectRatio { 0 };
 		float m_yaw { 0 };
 		float m_pitch { 0 };

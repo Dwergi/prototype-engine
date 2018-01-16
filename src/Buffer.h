@@ -59,6 +59,8 @@ namespace dd
 
 		int Size() const;
 
+		void Delete();
+
 		bool operator==( const ConstBuffer<T>& other ) const;
 		bool operator!=( const ConstBuffer<T>& other ) const;
 	};

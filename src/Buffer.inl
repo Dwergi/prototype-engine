@@ -88,6 +88,17 @@ const T* ConstBuffer<T>::ReleaseConst()
 }
 
 template <typename T>
+void ConstBuffer<T>::Delete()
+{
+	const T* ptr = ReleaseConst();
+
+	if( ptr != nullptr )
+	{
+		delete[] ptr;
+	}
+}
+
+template <typename T>
 int ConstBuffer<T>::Size() const
 {
 	return m_count;

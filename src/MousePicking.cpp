@@ -61,9 +61,22 @@ namespace dd
 		glm::ivec2 clamped = glm::clamp( flipped, glm::ivec2( 0, 0 ), glm::ivec2( m_window.GetWidth() - 1, m_window.GetHeight() - 1 ) );
 		int index = (clamped.y / DownScalingFactor) * (m_window.GetWidth() / DownScalingFactor) + (clamped.x / DownScalingFactor);
 
-		DD_ASSERT( (index * 4) < m_lastFrameBuffer.SizeBytes(), "Index out of range!" );
+		DD_ASSERT( (index * DownScalingFactor * DownScalingFactor) < m_lastIDBuffer.SizeBytes(), "Index out of range!" );
 
-		const int* base = (const int*) m_lastFrameBuffer.GetVoid();
+		const int* base = reinterpret_cast<const int*>( m_lastIDBuffer.GetVoid() );
+		return base[index];
+	}
+
+	float MousePicking::GetDepthAt( glm::vec2 mouse_pos ) const
+	{
+		glm::ivec2 flipped = glm::ivec2( (int) mouse_pos.x, m_window.GetHeight() - (int) mouse_pos.y );
+
+		glm::ivec2 clamped = glm::clamp( flipped, glm::ivec2( 0, 0 ), glm::ivec2( m_window.GetWidth() - 1, m_window.GetHeight() - 1 ) );
+		int index = (clamped.y / DownScalingFactor) * (m_window.GetWidth() / DownScalingFactor) + (clamped.x / DownScalingFactor);
+
+		DD_ASSERT( (index * DownScalingFactor * DownScalingFactor) < m_lastDepthBuffer.SizeBytes(), "Index out of range!" );
+
+		const float* base = reinterpret_cast<const float*>( m_lastDepthBuffer.GetVoid() );
 		return base[index];
 	}
 
@@ -75,6 +88,7 @@ namespace dd
 
 			m_position = m_input.GetMousePosition().Absolute;
 			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
+			m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
 
 			EntityHandle entity = EntityHandle( m_handle, entity_manager );
 			if( entity.IsValid() )
@@ -120,13 +134,15 @@ namespace dd
 		glm::ivec2 size = glm::ivec2( m_window.GetWidth() / DownScalingFactor, m_window.GetHeight() / DownScalingFactor );
 		int buffer_size = size.x * size.y * 4;
 
-		m_lastFrameBuffer.Set( new byte[buffer_size], buffer_size );
-		
-		m_texture.Create( size, GL_R32I, 1 );
-		m_depth.Create( size, GL_DEPTH_COMPONENT32F, 1 );
+		m_lastIDBuffer.Set( new byte[buffer_size], buffer_size );
+		m_idTexture.Create( size, GL_R32UI, 1 );
 
+		m_lastDepthBuffer.Set( new byte[buffer_size], buffer_size );
+		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
+
+		m_framebuffer.SetClearDepth( 0.0f );
 		m_framebuffer.SetClearColour( glm::vec4( 1 ) );
-		m_framebuffer.Create( m_texture, &m_depth );
+		m_framebuffer.Create( m_idTexture, &m_depthTexture );
 		m_framebuffer.RenderInit();
 	}
 
@@ -134,10 +150,12 @@ namespace dd
 	{
 		if( m_enabled )
 		{
+			m_framebuffer.BindDraw();
+			m_framebuffer.BindRead();
+
+			m_framebuffer.Clear();
+
 			ShaderProgram& shader = *m_shader.Get();
-
-			m_framebuffer.Bind();
-
 			shader.Use( true );
 
 			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, &shader]( auto entity, auto mesh, auto transform )
@@ -147,10 +165,21 @@ namespace dd
 
 			shader.Use( false );
 
-			m_framebuffer.Unbind();
+			m_framebuffer.UnbindRead();
+			m_framebuffer.UnbindDraw();
 
-			m_texture.GetData( m_lastFrameBuffer, 0, GL_RED_INTEGER, GL_INT );
+			m_idTexture.GetData( m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT );
+			m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
 		}
+	}
+
+	void MousePicking::RenderDebug()
+	{
+		m_framebuffer.BindRead();
+
+		m_framebuffer.Render();
+
+		m_framebuffer.UnbindRead();
 	}
 
 	void MousePicking::RenderMesh( const ICamera& camera, ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
@@ -170,21 +199,22 @@ namespace dd
 
 		ImGui::Value( "Handle", m_handle );
 		ImGui::Value( "Position", m_position, "%.1f" );
+		ImGui::Value( "Depth", 1.0f / m_depth, "%.3f" );
 
 		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
 			if( m_focusedMesh.IsValid() )
 			{
 				const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-				ImGui::Value( "Name", name.c_str() );
+				ImGui::Text( "Name: %s", name.c_str() );
 
 				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
 				ImGui::Value( "Position", focused_mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Value( "Name", "<none>" );
-				ImGui::Value( "Position", "<none>" );
+				ImGui::Text( "Name: <none>" );
+				ImGui::Text( "Position: <none>" );
 			}
 
 			ImGui::TreePop();
@@ -195,15 +225,15 @@ namespace dd
 			if( m_selectedMesh.IsValid() )
 			{
 				const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
-				ImGui::Value( "Name", name.c_str() );
+				ImGui::Text( "Name: %s", name.c_str() );
 
 				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
 				ImGui::Value( "Position", selected_mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Value( "Name", "<none>" );
-				ImGui::Value( "Position", "<none>" );
+				ImGui::Text( "Name: <none>" );
+				ImGui::Text( "Position: <none>" );
 			}
 
 			ImGui::TreePop();

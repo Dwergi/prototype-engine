@@ -18,18 +18,24 @@
 namespace dd
 {
 	class ICamera;
-	class DirectionalLightComponent;
 	class EntityManager;
 	class Frustum;
 	class MeshComponent;
 	class MousePicking;
-	class PointLightComponent;
-	class Ray;
 	class ShaderProgram;
 	class TransformComponent;
 	class Window;
 
-	class Renderer : public IDebugDraw, public IRenderer, public ISystem
+	struct Fog
+	{
+		bool Enabled { true };
+		float Distance { 1000.0f };
+		glm::vec3 Colour { 0.6, 0.7, 0.8 };
+
+		static Fog* Get();
+	};
+
+	class Renderer : public IDebugDraw, public ISystem
 	{
 	public:
 
@@ -40,6 +46,8 @@ namespace dd
 
 		virtual void Initialize( EntityManager& entity_manager ) override;
 
+		virtual void Update( EntityManager& entity_manager, float delta_t ) override;
+
 		void BeginRender( const ICamera& camera );
 		void EndRender( const ICamera& camera );
 
@@ -47,13 +55,17 @@ namespace dd
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		virtual void Render( const EntityManager& entityManager, const ICamera& camera ) override;
+		void Render( const EntityManager& entityManager, const ICamera& camera );
 
-		virtual void Update( EntityManager& entity_manager, float delta_t ) override;
+		//
+		// Initialize the renderer.
+		//
+		void RenderInit( const EntityManager& entityManager, const ICamera& camera );
 
-		virtual void RenderInit( const EntityManager& entityManager, const ICamera& camera ) override;
-
-		virtual FrameBuffer* GetFrameBuffer() override { return &m_framebuffer; }
+		//
+		// Allow the renderer to render debug.
+		//
+		void RenderDebug( IRenderer& debug_render );
 
 		//
 		// Set the mouse picking helper to use.
@@ -72,13 +84,13 @@ namespace dd
 	private:
 
 		const Window& m_window;
+		Frustum* m_frustum;
+		MousePicking* m_mousePicking;
+		
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;
 		Texture m_depthTexture;
 		
-		Frustum* m_frustum;
-		MousePicking* m_mousePicking;
-
 		Vector<ShaderHandle> m_shaders;
 
 		EntityHandle m_xAxis;

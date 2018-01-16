@@ -32,7 +32,6 @@ namespace dd
 		m_params( params )
 	{
 		m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
-		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
 		m_indices.Set( s_indices, IndexCount );
 	}
 
@@ -40,9 +39,6 @@ namespace dd
 	{
 		glm::vec3* vertices = m_vertices.Release();
 		delete[] vertices;
-
-		glm::vec3* normals = m_normals.Release();
-		delete[] normals;
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -229,40 +225,6 @@ namespace dd
 		}
 	}
 
-	void TerrainChunk::UpdateNormals()
-	{
-		DD_PROFILE_SCOPED( TerrainChunk_InitializeNormals );
-
-		for( int i = 0; i < MeshIndexCount; i += 3 )
-		{
-			uint indexA = s_indices[i];
-			uint indexB = s_indices[i + 1];
-			uint indexC = s_indices[i + 2];
-
-			glm::vec3 a = m_vertices[indexA];
-			glm::vec3 b = m_vertices[indexB];
-			glm::vec3 c = m_vertices[indexC];
-
-			glm::vec3 normal = glm::normalize( glm::cross( b - a, c - a ) );
-			if( normal.y < 0 )
-			{
-				normal = glm::normalize( glm::cross( c - a, b - a ) );
-
-				// should always be pointing at least a little bit up
-				DD_ASSERT( normal.y >= 0 );
-			}
-
-			m_normals[indexA] = normal;
-			m_normals[indexB] = normal;
-			m_normals[indexC] = normal;
-		}
-
-		for( int i = 0; i < FlapVertexCount; ++i )
-		{
-			m_normals[MeshVertexCount + i] = glm::vec3( 0, 1, 0 );
-		}
-	}
-
 	float TerrainChunk::GetHeight( float x, float y )
 	{
 		float height = 0;
@@ -344,7 +306,6 @@ namespace dd
 	void TerrainChunk::SetOrigin( const TerrainChunkKey& key, glm::vec2 origin )
 	{
 		UpdateVertices( key, origin );
-		UpdateNormals();
 
 		m_dirty = true;
 	}
@@ -362,9 +323,6 @@ namespace dd
 		mesh->UseShader( true );
 
 		mesh->SetPositions( m_vertices );
-
-		mesh->EnableNormals( true );
-		mesh->SetNormals( m_normals );
 
 		mesh->EnableIndices( true );
 		mesh->SetIndices( m_indices );
@@ -421,31 +379,5 @@ namespace dd
 		}
 
 		stbi_write_tga( filename, actualVertices, actualVertices, 1, pixels );
-	}
-
-	static byte NormalToColour( float f )
-	{
-		return (byte) (((f + 1.0f) / 2.0f) * 255.f);
-	}
-
-	void TerrainChunk::WriteNormals( const char* filename )
-	{
-		const int actualVertices = Vertices + 1;
-		byte pixels[actualVertices * actualVertices * 3];
-
-		for( int y = 0; y < actualVertices; ++y )
-		{
-			for( int x = 0; x < actualVertices; ++x )
-			{
-				int index = y * actualVertices + x;
-
-				glm::vec3 normal = m_normals[index];
-				pixels[3 * index] = NormalToColour( normal.x );
-				pixels[3 * index + 1] = NormalToColour( normal.y );
-				pixels[3 * index + 2] = NormalToColour( normal.z );
-			}
-		}
-
-		stbi_write_tga( filename, actualVertices, actualVertices, 3, pixels );
 	}
 }

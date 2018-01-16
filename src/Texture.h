@@ -30,6 +30,7 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 		GLuint ID() const { return m_id; }
+		GLenum Format() const { return m_format; }
 
 		int GetTextureUnit() const { return m_textureUnit; }
 

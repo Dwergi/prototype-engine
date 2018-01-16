@@ -12,6 +12,8 @@ in struct FragmentData
 
 flat in vec3 FragmentNormal;
 
+uniform bool DrawStandard;
+
 uniform bool DrawWireframe;
 uniform vec3 WireframeColour;
 uniform float WireframeWidth;
@@ -19,8 +21,6 @@ uniform float WireframeWidth;
 uniform vec3 WireframeEdgeColour;
 uniform float WireframeEdgeWidth;
 uniform float WireframeMaxDistance;
-
-uniform bool DrawStandard;
 
 uniform vec3 ViewPosition;
 
@@ -46,6 +46,13 @@ uniform struct HeightLevel {
 
 uniform float MaxHeight;
 uniform int HeightCount;
+
+uniform struct FogParameters
+{
+	vec3 Colour;
+	float Distance;
+	bool Enabled;
+} Fog;
 
 //
 // Gets the height colour based on HeightLevels.
@@ -148,9 +155,19 @@ vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth, vec3 e
 void main()
 {
 	vec3 toView = ViewPosition - Fragment.Position;
+	float viewDistance = length( toView );
+
+	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
+	fogAmount = fogAmount * fogAmount;
+
+	if( fogAmount >= 1 )
+	{
+		Colour = vec4( Fog.Colour, 1 );
+		return;
+	}
 
 	vec4 finalColour = vec4( 0 );
-	
+
 	if( DrawStandard )
 	{
 		vec3 fragmentColour = Fragment.Colour.rgb;
@@ -173,10 +190,13 @@ void main()
 
 	if( DrawWireframe )
 	{
-		float viewDistance = length( toView );
-
 		vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth, viewDistance, WireframeMaxDistance );
 		finalColour = mix( finalColour, wireColour, wireColour.a );
+	}
+
+	if( Fog.Enabled )
+	{
+		finalColour = mix( finalColour, vec4( Fog.Colour, 1 ), fogAmount );
 	}
 
 	Colour = finalColour;

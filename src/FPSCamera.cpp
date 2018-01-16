@@ -22,9 +22,7 @@ namespace dd
 	{
 	}
 
-	FPSCamera::FPSCamera( Window& window ) :
-		m_far( 1000.f ),
-		m_near( 0.1f )
+	FPSCamera::FPSCamera( Window& window )
 	{
 		m_aspectRatio = (float) window.GetWidth() / (float) window.GetHeight();
 		m_vfov = glm::radians( 45.f );

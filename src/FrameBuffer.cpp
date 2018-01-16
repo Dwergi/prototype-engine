@@ -32,7 +32,7 @@ namespace dd
 	};
 
 	static const ConstBuffer<glm::vec3> s_fullScreenQuadBuffer( s_fullScreenQuadVertices, 6 );
-	
+		
 	FrameBuffer::FrameBuffer()
 	{
 
@@ -129,7 +129,7 @@ namespace dd
 		}
 	}
 
-	void FrameBuffer::RenderDepth()
+	void FrameBuffer::RenderDepth( const ICamera& camera )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_depth != nullptr );
@@ -137,21 +137,22 @@ namespace dd
 		ShaderProgram& shader = *m_blitShader.Get();
 		shader.Use( true );
 
+		m_fullScreenVAO.Bind();
 		m_depth->Bind( 0 );
 
-		shader.SetUniform( "Texture", *m_depth );
-		shader.SetUniform( "DrawDepth", true );
-		
-		m_fullScreenVAO.Bind();
+		glDisable( GL_DEPTH_TEST );
 
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		shader.SetUniform( "Texture", *m_depth );
+		shader.SetUniform( "Near", camera.GetNear() );
+		shader.SetUniform( "DrawDepth", true );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckGLError();
 
-		m_fullScreenVAO.Unbind();
+		glEnable( GL_DEPTH_TEST );
 
 		m_depth->Unbind();
+		m_fullScreenVAO.Unbind();
 
 		shader.Use( false );
 	}
@@ -167,12 +168,16 @@ namespace dd
 		m_fullScreenVAO.Bind();
 		
 		m_colour->Bind( 0 );
+
+		glDisable( GL_DEPTH_TEST );
 		
 		shader.SetUniform( "Texture", *m_colour );
 		shader.SetUniform( "DrawDepth", false );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckGLError();
+
+		glEnable( GL_DEPTH_TEST );
 
 		m_colour->Unbind();
 
@@ -217,34 +222,50 @@ namespace dd
 		m_valid = false;
 	}
 
-	void FrameBuffer::Bind()
+	void FrameBuffer::Clear()
 	{
-		DD_ASSERT( IsValid() );
-
-		glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &m_previousRead );
-		glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &m_previousDraw );
-
-		GLint viewport[ 4 ];
-		glGetIntegerv( GL_VIEWPORT, viewport );
-		m_previousSize = glm::vec2( viewport[ 2 ], viewport[ 3 ] );
-		CheckGLError();
-
-		glBindFramebuffer( GL_FRAMEBUFFER, m_fbo );
-		glViewport( 0, 0, m_colour->GetSize().x, m_colour->GetSize().y );
-		CheckGLError();
-
 		glClearDepthf( m_clearDepth );
 		glClearColor( m_clearColour.r, m_clearColour.g, m_clearColour.b, m_clearColour.a );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		CheckGLError();
 	}
-	
-	void FrameBuffer::Unbind()
+
+	void FrameBuffer::BindRead()
 	{
-		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_previousRead );
-		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_previousDraw );
+		DD_ASSERT( IsValid() );
+
+		glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &m_previousRead );
+
+		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_fbo );
+		CheckGLError();
+	}
+
+	void FrameBuffer::BindDraw()
+	{
+		DD_ASSERT( IsValid() );
+
+		glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &m_previousDraw );
+
+		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_fbo );
+
+		GLint viewport[4];
+		glGetIntegerv( GL_VIEWPORT, viewport );
+		m_previousSize = glm::vec2( viewport[2], viewport[3] );
 		CheckGLError();
 
+		glViewport( 0, 0, m_colour->GetSize().x, m_colour->GetSize().y );
+		CheckGLError();
+	}
+	
+	void FrameBuffer::UnbindRead()
+	{
+		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_previousRead );
+		CheckGLError();
+	}
+
+	void FrameBuffer::UnbindDraw()
+	{
+		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_previousDraw );
 		glViewport( 0, 0, m_previousSize.x, m_previousSize.y );
 		CheckGLError();
 	}
