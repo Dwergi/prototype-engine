@@ -301,14 +301,14 @@ namespace dd
 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
 
-		/*std::unique_ptr<File> file = File::OpenDataFile( "Consola.ttf", File::Mode::Read );
+		std::unique_ptr<File> file = File::OpenDataFile( "fonts\\Roboto-Medium.ttf", File::Mode::Read );
 		int size = file->Size();
 		byte* buffer = new byte[ size ];
 		file->Read( buffer, size );
 
-		io.Fonts->AddFontFromMemoryTTF( buffer, size, 12.0f );*/
+		io.Fonts->AddFontFromMemoryTTF( buffer, size, 16.0f );
 
-		io.Fonts->AddFontDefault();
+		//io.Fonts->AddFontDefault();
 
 		io.RenderDrawListsFn = &DebugUI::RenderDrawLists; // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 		io.SetClipboardTextFn = SetClipboardText;

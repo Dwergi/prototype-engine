@@ -74,16 +74,38 @@ namespace dd
 	void FrameTimer::DrawDebugInternal()
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
-		ImGui::SetWindowSize( ImVec2( 250.0f, 100.0f ), ImGuiSetCond_FirstUseEver );
+
+		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
 
 		ImGui::Value( "FPS: ", 1.0f / m_slidingDelta, "%.1f" );
-		ImGui::Value( "Frame Time: ", m_deltaWithoutDelay * 1000.f, "%.1f" );
-		ImGui::Value( "Sliding: ", m_slidingDelta, "%.1f" );
+		ImGui::Text( "Frame Time: %.1fms", m_deltaWithoutDelay * 1000.f );
+		ImGui::Text( "Sliding Time: %.1fms", m_slidingDelta * 1000.0f );
 		
 		if( ImGui::TreeNodeEx( "Frame Times", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			ImGui::PlotLines( "", m_frameTimes, SLIDING_WINDOW_SIZE, 0, nullptr, 0, 50, ImVec2( 200, 50 ) );
 			ImGui::TreePop();
+		}
+	}
+
+	void FrameTimer::DrawFPSCounter()
+	{
+		if( m_drawCompact )
+		{
+			ImGui::SetNextWindowPos( ImVec2( 0.0f, 0.0f ), ImGuiSetCond_Always );
+			ImGui::SetNextWindowSize( ImVec2( 45, 20 ), ImGuiSetCond_Always );
+
+			ImGui::PushStyleColor( ImGuiCol_WindowBg, ImVec4( 0, 0, 0, 0.5 ) );
+			ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+			ImGui::PushStyleVar( ImGuiStyleVar_ItemInnerSpacing, ImVec2( 0, 0 ) );
+
+			ImGui::Begin( "CompactFPS", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs );
+			ImGui::Text( "%.1f", 1.0f / m_slidingDelta );
+			ImGui::SameLine();
+			ImGui::End();
+
+			ImGui::PopStyleVar( 2 );
+			ImGui::PopStyleColor();
 		}
 	}
 }

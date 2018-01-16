@@ -49,7 +49,7 @@ namespace dd
 		{
 			ImGui::Text( assert.Info.c_str() );
 			ImGui::Text( assert.Message.c_str() );
-			ImGui::NewLine();
+			ImGui::Spacing();
 
 			if( ImGui::Button( "Break" ) )
 			{

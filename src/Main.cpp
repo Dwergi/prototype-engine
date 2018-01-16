@@ -406,6 +406,8 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 		if( debug_view->IsDebugOpen() )
 			debug_view->DrawDebug();
 	}
+
+	s_frameTimer->DrawFPSCounter();
 }
 
 void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )

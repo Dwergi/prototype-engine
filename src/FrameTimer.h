@@ -45,6 +45,8 @@ namespace dd
 			return "FPS";
 		}
 
+		void DrawFPSCounter();
+
 	protected:
 
 		virtual void DrawDebugInternal() override;
@@ -59,6 +61,7 @@ namespace dd
 		float m_deltaWithoutDelay;
 		float m_slidingDelta;
 		uint m_maxFPS;
+		bool m_drawCompact { true };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE];
