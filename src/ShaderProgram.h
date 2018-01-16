@@ -25,7 +25,16 @@ namespace dd
 		// Create a shader with the given name and shaders.
 		//
 		static ShaderHandle Create( const String& name, const Vector<Shader*>& shaders );
+
+		//
+		// Destroy the given shader entirely.
+		//
 		static void Destroy( ShaderHandle handle );
+
+		//
+		// Reload all shaders.
+		//
+		static void ReloadAllShaders();
 
 		ShaderProgram( const ShaderProgram& other );
 		~ShaderProgram();
@@ -70,8 +79,7 @@ namespace dd
 
 		friend class ShaderHandle;
 
-		static std::mutex m_instanceMutex;
-		static std::unordered_map<uint64, ShaderProgram> m_instances;
+		static std::unordered_map<uint64, ShaderProgram> s_instances;
 
 		static ShaderProgram CreateInstance( const String& name, const Vector<Shader*>& shaders );
 

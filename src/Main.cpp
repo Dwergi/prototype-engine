@@ -494,9 +494,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_freeCam = new FreeCameraController( camera );
 		s_freeCam->BindActions( bindings );
 
-		s_shipSystem = new ShipSystem( camera );
-		s_shipSystem->BindActions( bindings );
-		s_shipSystem->CreateShip( entity_manager );
+		//s_shipSystem = new ShipSystem( camera );
+		//s_shipSystem->BindActions( bindings );
+		//s_shipSystem->CreateShip( entity_manager );
 
 		MousePicking mouse_picking( *s_window, camera, *s_input );
 		mouse_picking.BindActions( bindings );
@@ -509,7 +509,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		systems.Add( &swarm_system );
 		//systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
-		systems.Add( s_shipSystem );
+		//systems.Add( s_shipSystem );
 		systems.Add( &terrain_system );
 
 		Vector<IRenderer*> renderers;
@@ -527,12 +527,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( &renderer );
 		debug_views.Add( &mouse_picking );
 		debug_views.Add( s_freeCam );
-		debug_views.Add( s_shipSystem );
+		//debug_views.Add( s_shipSystem );
 		debug_views.Add( &terrain_system );
 		debug_views.Add( &shakyCam );
-
-		InitializeSystems( jobSystem, entity_manager, systems );
-		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
 
 		s_fsm = new FSM();
 		s_fsm->AddState( INITIALIZED );
@@ -634,6 +631,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_fsm->AddTransition( RENDER_END_FRAME, UPDATE_TIMER );
 
 		s_fsm->Initialize( INITIALIZED );
+
+		InitializeSystems( jobSystem, entity_manager, systems );
+		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
 
 		while( !s_window->ShouldClose() )
 		{

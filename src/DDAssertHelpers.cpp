@@ -47,8 +47,8 @@ namespace dd
 
 		if( ImGui::Begin( "Assert", &assert.Open ) )
 		{
-			ImGui::TextWrapped( assert.Info.c_str() );
-			ImGui::TextWrapped( assert.Message.c_str() );
+			ImGui::Text( assert.Info.c_str() );
+			ImGui::Text( assert.Message.c_str() );
 			ImGui::NewLine();
 
 			if( ImGui::Button( "Break" ) )

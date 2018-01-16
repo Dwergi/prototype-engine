@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Iteration.h"
+#include "Hash.h"
 
 namespace dd
 {
@@ -196,4 +197,21 @@ namespace dd
 
 		return substring;
 	}
+}
+
+namespace std
+{
+	
+	template <typename T>
+	struct string_hash
+	{
+		std::size_t operator()( const T& str ) const { return dd::HashString( str.c_str(), str.Length() ); }
+	};
+	
+	template<> struct hash<dd::String8> : string_hash<dd::String8> {};
+	template<> struct hash<dd::String16> : string_hash<dd::String16> {};
+	template<> struct hash<dd::String32> : string_hash<dd::String32> {};
+	template<> struct hash<dd::String64> : string_hash<dd::String64> {};
+	template<> struct hash<dd::String128> : string_hash<dd::String128> {};
+	template<> struct hash<dd::String256> : string_hash<dd::String256> {};
 }

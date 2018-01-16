@@ -33,15 +33,15 @@ namespace dd
 	}
 
 	Shader::Shader( const String& path, Type type ) :
-		m_refCount( nullptr )
+		m_refCount( nullptr ),
+		m_path( path ),
+		m_type( type )
 	{
 		m_id = glCreateShader( GetOpenGLShaderType( type ) );
 
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
 
-		m_valid = m_id != OpenGL::InvalidID;
 		m_refCount = new std::atomic<int>( 1 );
-		m_type = type;
 	}
 
 	Shader::Shader( const Shader& other ) :
@@ -160,13 +160,14 @@ namespace dd
 		}
 		
 		Shader* shader = new Shader( path, type );
-		if( !shader->Reload() )
+		if( shader->m_id == OpenGL::InvalidID || 
+			!shader->Reload() )
 		{
 			delete shader;
 			return nullptr;
 		}
 
-		sm_shaderCache.insert( std::make_pair( path, shader ) );
+		sm_shaderCache.insert( std::make_pair( dd::String128( path ), shader ) );
 		return shader;
 	}
 

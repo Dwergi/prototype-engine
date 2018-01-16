@@ -103,7 +103,7 @@ namespace dd
 	{
 		if( !m_blitShader.IsValid() )
 		{
-			Vector<Shader> shaders;
+			Vector<Shader*> shaders;
 			shaders.Add( Shader::Create( String32( "shaders\\blit.vertex" ), Shader::Type::Vertex ) );
 			shaders.Add( Shader::Create( String32( "shaders\\blit.pixel" ), Shader::Type::Pixel ) );
 			

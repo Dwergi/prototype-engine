@@ -70,3 +70,4 @@ AS_DEBUG/
 *.srctrldb
 *.srctrlbm
 *.srctrlprj
+*.lib

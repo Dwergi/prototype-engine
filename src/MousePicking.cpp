@@ -104,7 +104,7 @@ namespace dd
 
 	void MousePicking::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
 	{
-		Vector<Shader> shaders;
+		Vector<Shader*> shaders;
 		shaders.Add( Shader::Create( String8( "shaders\\picking.vertex" ), Shader::Type::Vertex ) );
 		shaders.Add( Shader::Create( String8( "shaders\\picking.pixel" ), Shader::Type::Pixel ) );
 

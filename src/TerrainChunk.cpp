@@ -83,48 +83,48 @@ namespace dd
 
 		int flap_vertex_start = MeshVertexCount;
 
-		// 1st (top, x = varying, z = 0)
+		// (top, x = varying, z = 0)
 		for( uint x = 0; x < Vertices; ++x )
 		{
 			s_indices[index + 0] = x;
-			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = flap_vertex_start + x + 1;
+			s_indices[index + 1] = flap_vertex_start + x + 1;
+			s_indices[index + 2] = flap_vertex_start + x;
 
 			index += 3;
 
 			s_indices[index + 0] = x;
 			s_indices[index + 1] = x + 1;
-			s_indices[index + 2] = flap_vertex_start + x;
+			s_indices[index + 2] = flap_vertex_start + x + 1;
 
 			index += 3;
 		}
 
 		flap_vertex_start += actual_vertices;
 
-		// (left, x = 0, z = chunk size)
-		for( uint y = 0; y < Vertices; ++y )
+		// 4th (right, x = chunk size, z = varying)
+		for( uint z = 0; z < Vertices; ++z )
 		{
-			s_indices[index + 0] = y * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + y;
-			s_indices[index + 2] = flap_vertex_start + y + 1;
+			s_indices[ index + 0 ] = (z + 2) * actual_vertices - 1;
+			s_indices[ index + 1 ] = flap_vertex_start + z + 1;
+			s_indices[ index + 2 ] = flap_vertex_start + z;
 
 			index += 3;
 
-			s_indices[index + 0] = y * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + y;
-			s_indices[index + 2] = (y + 1) * actual_vertices;
+			s_indices[ index + 0 ] = flap_vertex_start + z;
+			s_indices[ index + 1 ] = (z + 1) * actual_vertices - 1;
+			s_indices[ index + 2 ] = (z + 2) * actual_vertices - 1;
 
 			index += 3;
 		}
-
+		
 		flap_vertex_start += actual_vertices;
 
-		// 3rd (bottom, x = varying, z = chunk size)
+		// (bottom, x = varying, z = chunk size)
 		for( uint x = 0; x < Vertices; ++x )
 		{
 			const uint last_row = MeshVertexCount - actual_vertices;
 
-			s_indices[index + 0] = last_row + x;
+			s_indices[index + 0] = last_row + x + 1;
 			s_indices[index + 1] = flap_vertex_start + x;
 			s_indices[index + 2] = flap_vertex_start + x + 1;
 
@@ -139,21 +139,22 @@ namespace dd
 
 		flap_vertex_start += actual_vertices;
 
-		// 4th (right, x = chunk size, z = varying)
-		for( uint y = 0; y < Vertices; ++y )
+		// (left, x = 0, z = varying)
+		for( uint z = 0; z < Vertices; ++z )
 		{
-			s_indices[ index + 0 ] = (y + 1) * actual_vertices - 1;
-			s_indices[ index + 1 ] = flap_vertex_start + y;
-			s_indices[ index + 2 ] = flap_vertex_start + y + 1;
+			s_indices[index + 0] = (z + 1) * actual_vertices;
+			s_indices[index + 1] = flap_vertex_start + z;
+			s_indices[index + 2] = flap_vertex_start + z + 1;
 
 			index += 3;
 
-			s_indices[index + 0] = flap_vertex_start + y;
-			s_indices[index + 1] = (y + 1) * actual_vertices - 1;
-			s_indices[index + 2] = (y + 2) * actual_vertices - 1;
+			s_indices[index + 0] = z * actual_vertices;
+			s_indices[index + 1] = flap_vertex_start + z;
+			s_indices[index + 2] = (z + 1) * actual_vertices;
 
 			index += 3;
 		}
+
 
 		DD_ASSERT( index == IndexCount );
 	}

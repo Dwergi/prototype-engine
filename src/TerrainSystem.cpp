@@ -207,19 +207,21 @@ namespace dd
 	
 	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager )
 	{
+#ifndef GENERATE_SINGLE_CHUNK
 		// start with a 4x4 grid of the lowest LOD level, 
 		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
 		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
-			//GenerateLODLevel( entity_manager, lod );
+			GenerateLODLevel( entity_manager, lod );
 		}
-
+#else
 		TerrainChunkKey key;
 		key.X = 0;
 		key.Y = 0;
 		key.LOD = 0;
 
 		CreateChunk( entity_manager, key );
+#endif
 	}
 
 	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod )

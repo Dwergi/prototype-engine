@@ -105,7 +105,7 @@ namespace dd
 
 			for( auto& it : m_pools )
 			{
-				ComponentPoolBase* pool = reinterpret_cast<ComponentPoolBase*>(it.Value->GetWrite());
+				ComponentPoolBase* pool = reinterpret_cast<ComponentPoolBase*>(it.Value->GetWriteVoid());
 				if( pool->Exists( handle ) )
 				{
 					pool->Remove( handle );

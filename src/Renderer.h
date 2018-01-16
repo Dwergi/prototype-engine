@@ -100,6 +100,7 @@ namespace dd
 		bool m_debugWireframe { false };
 		bool m_debugFreezeFrustum { false };
 		bool m_forceUpdateFrustum { false };
+		bool m_reloadShaders { false };
 		float m_debugWireframeMaxDistance { 250.0f };
 
 		bool m_debugDrawDepth { false };
