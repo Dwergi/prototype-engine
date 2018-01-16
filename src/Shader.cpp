@@ -33,8 +33,7 @@ namespace dd
 	}
 
 	Shader::Shader( const String& path, Type type ) :
-		m_refCount( nullptr ),
-		m_valid( false )
+		m_refCount( nullptr )
 	{
 		m_id = glCreateShader( GetOpenGLShaderType( type ) );
 
@@ -48,7 +47,6 @@ namespace dd
 	Shader::Shader( const Shader& other ) :
 		m_id( other.m_id ),
 		m_refCount( other.m_refCount ),
-		m_valid( other.m_valid ),
 		m_path( other.m_path ),
 		m_type( other.m_type )
 	{
@@ -64,7 +62,6 @@ namespace dd
 	{
 		Release();
 
-		m_valid = other.m_valid;
 		m_id = other.m_id;
 		m_refCount = other.m_refCount;
 		m_path = other.m_path;
@@ -126,8 +123,6 @@ namespace dd
 
 			msg += strInfoLog;
 			delete[] strInfoLog;
-
-			m_valid = false;
 		}
 
 		return msg;

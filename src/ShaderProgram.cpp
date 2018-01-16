@@ -21,7 +21,7 @@ namespace dd
 	std::mutex ShaderProgram::m_instanceMutex;
 	std::unordered_map<uint64, ShaderProgram> ShaderProgram::m_instances;
 
-	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader>& shaders )
+	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader*>& shaders )
 	{
 		DD_PROFILE_SCOPED( ShaderProgram_Create );
 
@@ -122,9 +122,10 @@ namespace dd
 		return *this;
 	}
 
-	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader>& shaders )
+	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader*>& shaders )
 	{
 		ShaderProgram program( name );
+		program.m_valid = true;
 
 		if( shaders.Size() == 0 )
 		{
@@ -133,28 +134,29 @@ namespace dd
 			program.m_valid = false;
 		}
 
-		for( Shader& shader : shaders )
+		for( const Shader* shader : shaders )
 		{
-			DD_ASSERT_ERROR( shader.IsValid(), "Invalid shader given to program!" );
+			DD_ASSERT_ERROR( shader != nullptr, "Invalid shader given to program!" );
 
-			glAttachShader( program.m_id, shader.m_id );
+			glAttachShader( program.m_id, shader->m_id );
 			CheckGLError();
 		}
 
 		String256 msg = program.Link();
-
 		if( !msg.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed!" );
+
+			program.m_valid = false;
 		}
 
-		for( Shader& shader : shaders )
+		for( const Shader* shader : shaders )
 		{
-			glDetachShader( program.m_id, shader.m_id );
+			glDetachShader( program.m_id, shader->m_id );
 			CheckGLError();
 		}
 
-		program.m_valid = true;
+		program.m_shaders = shaders;
 		return program;
 	}
 
@@ -189,6 +191,38 @@ namespace dd
 		}
 
 		return msg;
+	}
+
+	bool ShaderProgram::Reload()
+	{
+		for( Shader* shader : m_shaders )
+		{
+			if( !shader->Reload() )
+			{
+				break;
+			}
+		}
+
+		for( Shader* shader : m_shaders )
+		{
+			glAttachShader( m_id, shader->m_id );
+			CheckGLError();
+		}
+
+		String256 msg = Link();
+		if( !msg.IsEmpty() )
+		{
+			DD_ASSERT_ERROR( false, "Linking program failed!" );
+			return false;
+		}
+
+		for( Shader* shader : m_shaders )
+		{
+			glDetachShader( m_id, shader->m_id );
+			CheckGLError();
+		}
+
+		return true;
 	}
 
 	bool ShaderProgram::InUse() const

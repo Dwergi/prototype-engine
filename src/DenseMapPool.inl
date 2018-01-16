@@ -152,13 +152,13 @@ namespace dd
 	}
 
 	template <typename T>
-	typename DenseMapPoolIterator<T> DenseMapPool<T>::begin() const
+	typename DenseMapPoolIterator<T> DenseMapPool<T>::begin()
 	{
 		return DenseMapPoolIterator<T>( m_components.begin() );
 	}
 
 	template <typename T>
-	typename DenseMapPoolIterator<T> DenseMapPool<T>::end() const
+	typename DenseMapPoolIterator<T> DenseMapPool<T>::end()
 	{
 		return DenseMapPoolIterator<T>( m_components.end() );
 	}

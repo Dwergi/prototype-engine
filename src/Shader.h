@@ -35,11 +35,6 @@ namespace dd
 		Shader& operator=( const Shader& other );
 
 		//
-		// Is this shader valid?
-		//
-		bool IsValid() const { return m_valid; }
-
-		//
 		// Reload the shader from file.
 		//
 		bool Reload();
@@ -51,7 +46,6 @@ namespace dd
 		Type m_type;
 		GLuint m_id;
 
-		bool m_valid;
 		String128 m_path;
 		String256 m_source;
 		

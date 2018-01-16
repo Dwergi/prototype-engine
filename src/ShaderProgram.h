@@ -24,7 +24,7 @@ namespace dd
 		//
 		// Create a shader with the given name and shaders.
 		//
-		static ShaderHandle Create( const String& name, const Vector<Shader>& shaders );
+		static ShaderHandle Create( const String& name, const Vector<Shader*>& shaders );
 		static void Destroy( ShaderHandle handle );
 
 		ShaderProgram( const ShaderProgram& other );
@@ -33,6 +33,8 @@ namespace dd
 		ShaderProgram& operator=( const ShaderProgram& other );
 
 		const String& Name() const { return m_name; }
+
+		bool Reload();
 
 		void Use( bool use );
 		bool InUse() const;
@@ -71,17 +73,19 @@ namespace dd
 		static std::mutex m_instanceMutex;
 		static std::unordered_map<uint64, ShaderProgram> m_instances;
 
-		static ShaderProgram CreateInstance( const String& name, const Vector<Shader>& shaders );
+		static ShaderProgram CreateInstance( const String& name, const Vector<Shader*>& shaders );
 
-		bool m_valid { false };
-		uint m_id { OpenGL::InvalidID };
 		String64 m_name;
+		bool m_valid { false };
 		bool m_inUse { false };
+		uint m_id { OpenGL::InvalidID };
 
 		String64 m_positionsName;
 		String64 m_normalsName;
 		String64 m_uvsName;
 		String64 m_vertexColoursName;
+
+		Vector<Shader*> m_shaders;
 
 		std::atomic<int>* m_refCount;
 
