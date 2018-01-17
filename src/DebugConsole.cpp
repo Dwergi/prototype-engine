@@ -174,7 +174,7 @@ namespace dd
 		// Display every line as a separate entry so we can change their color or add custom widgets. If you only want raw text you can use ImGui::TextUnformatted(log.begin(), log.end());
 		// NB- if you have thousands of entries this approach may be too inefficient. You can seek and display only the lines that are visible - CalcListClipping() is a helper to compute this information.
 		// If your items are of variable size you may want to implement code similar to what CalcListClipping() does. Or split your data into fixed height items to allow random-seeking into your list.
-		ImGui::BeginChild( "ScrollingRegion", ImVec2( 0, -ImGui::GetItemsLineHeightWithSpacing() ), false, ImGuiWindowFlags_HorizontalScrollbar );
+		ImGui::BeginChild( "ScrollingRegion", ImVec2( 0, -ImGui::GetTextLineHeightWithSpacing() ), false, ImGuiWindowFlags_HorizontalScrollbar );
 		if( ImGui::BeginPopupContextWindow() )
 		{
 			if( ImGui::Selectable( "Clear" ) )

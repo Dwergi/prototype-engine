@@ -61,7 +61,7 @@ namespace dd
 		float m_deltaWithoutDelay;
 		float m_slidingDelta;
 		uint m_maxFPS;
-		bool m_drawCompact { true };
+		bool m_drawCompact { false };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE];

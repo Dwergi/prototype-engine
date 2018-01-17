@@ -44,34 +44,34 @@ namespace dd
 		glfwSwapInterval( 0 );
 		glfwSetFramebufferSizeCallback( m_glfwWindow, OnFramebufferResize );
 		glfwSetWindowSizeCallback( m_glfwWindow, OnWindowResize );
+		glfwSetErrorCallback( OnError );
 
 		Swap();
-
-		//DD_PROFILE_OGL_INIT();
 	}
 
 	Window::~Window()
 	{
-		//DD_PROFILE_OGL_DEINIT();
-
 		glfwTerminate();
 	}
 
 	void Window::OnWindowResize( GLFWwindow* window, int width, int height )
 	{
-		m_pInstance->m_size = glm::ivec2( width, height );
+		m_pInstance->Resize( width, height );
 	}
 
 	void Window::OnFramebufferResize( GLFWwindow* window, int width, int height )
 	{
+		m_pInstance->m_size = glm::ivec2( width, height );
+	}
 
+	void Window::OnError( int error, const char* description )
+	{
+		DD_ASSERT( false, description );
 	}
 
 	void Window::Resize( int resX, int resY )
 	{
-		m_size = glm::ivec2( resX, resY );
-
-		glfwSetWindowSize( m_glfwWindow, m_size.x, m_size.y );
+		glfwSetWindowSize( m_glfwWindow, resX, resY );
 	}
 
 	void Window::MakeBorderless()
@@ -120,7 +120,9 @@ namespace dd
 
 	void Window::Swap()
 	{
+		glfwPollEvents();
 		glfwSwapBuffers( m_glfwWindow );
+		CheckGLError();
 
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
@@ -131,8 +133,6 @@ namespace dd
 		CheckGLError();
 
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-		glfwPollEvents();
 
 		m_focused = glfwGetWindowAttrib( m_glfwWindow, GLFW_FOCUSED ) != 0;
 	}

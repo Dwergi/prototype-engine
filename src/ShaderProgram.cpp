@@ -142,7 +142,7 @@ namespace dd
 		String256 msg = program.Link();
 		if( !msg.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "Linking program failed!" );
+			DD_ASSERT_ERROR( false, "Linking program failed: %s", msg.c_str() );
 
 			program.m_valid = false;
 		}

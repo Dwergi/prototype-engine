@@ -3,11 +3,9 @@
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-in struct VertexData
-{
-	vec3 Position;
-	vec4 Colour;
-} Vertex[];
+in vec3 VertexPosition[];
+in vec4 VertexColour[];
+flat in vec3 VertexNormal[];
 
 out struct FragmentData
 {
@@ -18,29 +16,26 @@ out struct FragmentData
 
 flat out vec3 FragmentNormal;
 
-
 void main()
 {
-	vec3 normal = cross( Vertex[1].Position - Vertex[0].Position, Vertex[2].Position - Vertex[1].Position );
-
 	gl_Position = gl_in[0].gl_Position;
-	Fragment.Position = Vertex[0].Position;
-	FragmentNormal = normal;
-	Fragment.Colour = Vertex[0].Colour;
+	Fragment.Position = VertexPosition[0];
+	FragmentNormal = VertexNormal[0];
+	Fragment.Colour = VertexColour[0];
 	Fragment.WireframeDistance = vec3( 1, 0, 0 );
 	EmitVertex();
 
 	gl_Position = gl_in[1].gl_Position;
-	Fragment.Position = Vertex[1].Position;
-	FragmentNormal = normal;
-	Fragment.Colour = Vertex[1].Colour;
+	Fragment.Position = VertexPosition[1];
+	FragmentNormal = VertexNormal[1];
+	Fragment.Colour = VertexColour[1];
 	Fragment.WireframeDistance = vec3( 0, 1, 0 );
 	EmitVertex();
 
 	gl_Position = gl_in[2].gl_Position;
-	Fragment.Position = Vertex[2].Position;
-	FragmentNormal = normal;
-	Fragment.Colour = Vertex[2].Colour;
+	Fragment.Position = VertexPosition[2];
+	FragmentNormal = VertexNormal[2];
+	Fragment.Colour = VertexColour[2];
 	Fragment.WireframeDistance = vec3( 0, 0, 1 );
 	EmitVertex();
 

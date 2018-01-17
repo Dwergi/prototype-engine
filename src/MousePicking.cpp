@@ -131,6 +131,12 @@ namespace dd
 
 		shader.Use( false );
 
+		CreateFrameBuffer( m_window.GetSize() );
+		m_previousSize = m_window.GetSize();
+	}
+
+	void MousePicking::CreateFrameBuffer( glm::ivec2 window_size )
+	{
 		glm::ivec2 size = glm::ivec2( m_window.GetWidth() / DownScalingFactor, m_window.GetHeight() / DownScalingFactor );
 		int buffer_size = size.x * size.y * 4;
 
@@ -150,6 +156,19 @@ namespace dd
 	{
 		if( m_enabled )
 		{
+			if( m_previousSize != m_window.GetSize() )
+			{
+				m_framebuffer.Destroy();
+
+				m_lastIDBuffer.Delete();
+				m_idTexture.Destroy();
+
+				m_depthTexture.Destroy();
+				m_lastDepthBuffer.Delete();
+
+				CreateFrameBuffer( m_window.GetSize() );
+			}
+
 			m_framebuffer.BindDraw();
 			m_framebuffer.BindRead();
 

@@ -14,13 +14,15 @@ flat in vec3 FragmentNormal;
 
 uniform bool DrawStandard;
 
-uniform bool DrawWireframe;
-uniform vec3 WireframeColour;
-uniform float WireframeWidth;
-
-uniform vec3 WireframeEdgeColour;
-uniform float WireframeEdgeWidth;
-uniform float WireframeMaxDistance;
+uniform struct WireframeData
+{
+	bool Enabled;
+	vec3 Colour;
+	float Width;
+	vec3 EdgeColour;
+	float EdgeWidth;
+	float MaxDistance;
+} Wireframe;
 
 uniform vec3 ViewPosition;
 
@@ -188,9 +190,11 @@ void main()
 		finalColour.a = Fragment.Colour.a;
 	}
 
-	if( DrawWireframe )
+	if( Wireframe.Enabled )
 	{
-		vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, WireframeColour, WireframeWidth, WireframeEdgeColour, WireframeEdgeWidth, viewDistance, WireframeMaxDistance );
+		vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, Wireframe.Colour, Wireframe.Width, 
+			Wireframe.EdgeColour, Wireframe.EdgeWidth, viewDistance, Wireframe.MaxDistance );
+
 		finalColour = mix( finalColour, wireColour, wireColour.a );
 	}
 

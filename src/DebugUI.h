@@ -26,7 +26,7 @@ namespace dd
 
 		void SetFocused( bool focused );
 		void SetMousePosition( glm::vec2 pos );
-		void SetDisplaySize( int window_width, int window_height );
+		void UpdateDisplaySize();
 
 		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
 		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );

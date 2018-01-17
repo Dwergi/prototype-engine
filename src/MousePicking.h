@@ -82,7 +82,11 @@ namespace dd
 		int m_handle { 0 };
 		float m_depth { 0.0f };
 
+		glm::ivec2 m_previousSize;
+
 		virtual void DrawDebugInternal() override;
+
+		void CreateFrameBuffer( glm::ivec2 window_size );
 
 		Ray GetScreenRay( const MousePosition& pos ) const;
 		void HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance );

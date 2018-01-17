@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include "ShaderProgram.h"
 #include "Mesh.h"
+#include "ShaderProgram.h"
+#include "TerrainChunkKey.h"
 
 namespace dd
 {
 	class ICamera;
 	class ShaderProgram;
 
-	struct TerrainChunkKey;
 	struct TerrainParameters;
 
 	class TerrainChunk
@@ -36,18 +36,22 @@ namespace dd
 		//
 		static void CreateRenderResources();
 
-		TerrainChunk( const TerrainParameters& params );
+		TerrainChunk( const TerrainParameters& params, const TerrainChunkKey& key );
 		~TerrainChunk();
 		
-		void Generate( const TerrainChunkKey& key );
-		void SetOrigin( const TerrainChunkKey& key, glm::vec2 origin );
+		void Generate();
+		void SetTerrainOrigin( glm::vec2 origin );
 
-		void RenderUpdate( const TerrainChunkKey& key );
+		void Update( float delta_t );
+		void RenderUpdate();
 
 		void Destroy();
 
-		void Write( const char* filename );
+		void WriteHeightImage( const char* filename ) const;
+		void WriteNormalImage( const char* filename ) const;
 
+		const TerrainChunkKey& GetKey() const { return m_key; }
+		
 		MeshHandle GetMesh() const { return m_mesh; }
 
 	private:
@@ -65,16 +69,20 @@ namespace dd
 		static ShaderHandle s_shader;
 
 		const TerrainParameters& m_params;
+		TerrainChunkKey m_key;
 		
 		bool m_destroy { false };
 		bool m_dirty { false };
 		MeshHandle m_mesh;
+
 		Buffer<glm::vec3> m_vertices;
+		Buffer<glm::vec3> m_normals;
 		Buffer<uint> m_indices;
 		
 		float GetHeight( float x, float y );
 
-		void UpdateVertices( const TerrainChunkKey& key, const glm::vec2& chunkPos );
+		void UpdateVertices( glm::vec2 chunkPos );
+		void UpdateNormals();
 
 		void CreateMesh( const TerrainChunkKey& key );
 	};

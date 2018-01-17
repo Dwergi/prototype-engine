@@ -20,13 +20,14 @@
 #include "imgui/imgui.h"
 
 #include "File.h"
+#include "GLError.h"
 #include "Input.h"
 #include "Window.h"
 
 // Data
-static GLFWwindow*  s_window = NULL;
+static GLFWwindow*  g_Window = NULL;
 static double       g_Time = 0.0f;
-static bool         g_MousePressed[3] = { false, false, false };
+static bool         g_MouseJustPressed[3] = { false, false, false };
 static float        g_MouseWheel = 0.0f;
 static GLuint       g_FontTexture = 0;
 static int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
@@ -41,36 +42,48 @@ namespace dd
 	// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
 	void DebugUI::RenderDrawLists( ImDrawData* draw_data )
 	{
+		// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+		ImGuiIO& io = ImGui::GetIO();
+		int fb_width = (int) (io.DisplaySize.x * io.DisplayFramebufferScale.x);
+		int fb_height = (int) (io.DisplaySize.y * io.DisplayFramebufferScale.y);
+		if( fb_width == 0 || fb_height == 0 )
+			return;
+		draw_data->ScaleClipRects( io.DisplayFramebufferScale );
+
 		// Backup GL state
+		GLenum last_active_texture; glGetIntegerv( GL_ACTIVE_TEXTURE, (GLint*) &last_active_texture );
+		glActiveTexture( GL_TEXTURE0 );
 		GLint last_program; glGetIntegerv( GL_CURRENT_PROGRAM, &last_program );
 		GLint last_texture; glGetIntegerv( GL_TEXTURE_BINDING_2D, &last_texture );
+		GLint last_sampler; glGetIntegerv( GL_SAMPLER_BINDING, &last_sampler );
 		GLint last_array_buffer; glGetIntegerv( GL_ARRAY_BUFFER_BINDING, &last_array_buffer );
 		GLint last_element_array_buffer; glGetIntegerv( GL_ELEMENT_ARRAY_BUFFER_BINDING, &last_element_array_buffer );
 		GLint last_vertex_array; glGetIntegerv( GL_VERTEX_ARRAY_BINDING, &last_vertex_array );
-		GLint last_blend_src; glGetIntegerv( GL_BLEND_SRC, &last_blend_src );
-		GLint last_blend_dst; glGetIntegerv( GL_BLEND_DST, &last_blend_dst );
-		GLint last_blend_equation_rgb; glGetIntegerv( GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb );
-		GLint last_blend_equation_alpha; glGetIntegerv( GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha );
+		GLint last_polygon_mode[2]; glGetIntegerv( GL_POLYGON_MODE, last_polygon_mode );
+		GLint last_viewport[4]; glGetIntegerv( GL_VIEWPORT, last_viewport );
+		GLint last_scissor_box[4]; glGetIntegerv( GL_SCISSOR_BOX, last_scissor_box );
+		GLenum last_blend_src_rgb; glGetIntegerv( GL_BLEND_SRC_RGB, (GLint*) &last_blend_src_rgb );
+		GLenum last_blend_dst_rgb; glGetIntegerv( GL_BLEND_DST_RGB, (GLint*) &last_blend_dst_rgb );
+		GLenum last_blend_src_alpha; glGetIntegerv( GL_BLEND_SRC_ALPHA, (GLint*) &last_blend_src_alpha );
+		GLenum last_blend_dst_alpha; glGetIntegerv( GL_BLEND_DST_ALPHA, (GLint*) &last_blend_dst_alpha );
+		GLenum last_blend_equation_rgb; glGetIntegerv( GL_BLEND_EQUATION_RGB, (GLint*) &last_blend_equation_rgb );
+		GLenum last_blend_equation_alpha; glGetIntegerv( GL_BLEND_EQUATION_ALPHA, (GLint*) &last_blend_equation_alpha );
 		GLboolean last_enable_blend = glIsEnabled( GL_BLEND );
 		GLboolean last_enable_cull_face = glIsEnabled( GL_CULL_FACE );
 		GLboolean last_enable_depth_test = glIsEnabled( GL_DEPTH_TEST );
 		GLboolean last_enable_scissor_test = glIsEnabled( GL_SCISSOR_TEST );
 
-		// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled
+		// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
 		glEnable( GL_BLEND );
 		glBlendEquation( GL_FUNC_ADD );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		glDisable( GL_CULL_FACE );
 		glDisable( GL_DEPTH_TEST );
 		glEnable( GL_SCISSOR_TEST );
-		glActiveTexture( GL_TEXTURE0 );
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-		// Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
-		ImGuiIO& io = ImGui::GetIO();
-		float fb_height = io.DisplaySize.y * io.DisplayFramebufferScale.y;
-		draw_data->ScaleClipRects( io.DisplayFramebufferScale );
-
-		// Setup orthographic projection matrix
+		// Setup viewport, orthographic projection matrix
+		glViewport( 0, 0, (GLsizei) fb_width, (GLsizei) fb_height );
 		const float ortho_projection[4][4] =
 		{
 			{ 2.0f / io.DisplaySize.x, 0.0f,                   0.0f, 0.0f },
@@ -82,6 +95,7 @@ namespace dd
 		glUniform1i( g_AttribLocationTex, 0 );
 		glUniformMatrix4fv( g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0] );
 		glBindVertexArray( g_VaoHandle );
+		glBindSampler( 0, 0 ); // Rely on combined texture/sampler state.
 
 		for( int n = 0; n < draw_data->CmdListsCount; n++ )
 		{
@@ -89,13 +103,14 @@ namespace dd
 			const ImDrawIdx* idx_buffer_offset = 0;
 
 			glBindBuffer( GL_ARRAY_BUFFER, g_VboHandle );
-			glBufferData( GL_ARRAY_BUFFER, (GLsizeiptr) cmd_list->VtxBuffer.size() * sizeof( ImDrawVert ), (GLvoid*) &cmd_list->VtxBuffer.front(), GL_STREAM_DRAW );
+			glBufferData( GL_ARRAY_BUFFER, (GLsizeiptr) cmd_list->VtxBuffer.Size * sizeof( ImDrawVert ), (const GLvoid*) cmd_list->VtxBuffer.Data, GL_STREAM_DRAW );
 
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle );
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr) cmd_list->IdxBuffer.size() * sizeof( ImDrawIdx ), (GLvoid*) &cmd_list->IdxBuffer.front(), GL_STREAM_DRAW );
+			glBufferData( GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr) cmd_list->IdxBuffer.Size * sizeof( ImDrawIdx ), (const GLvoid*) cmd_list->IdxBuffer.Data, GL_STREAM_DRAW );
 
-			for( const ImDrawCmd* pcmd = cmd_list->CmdBuffer.begin(); pcmd != cmd_list->CmdBuffer.end(); pcmd++ )
+			for( int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++ )
 			{
+				const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
 				if( pcmd->UserCallback )
 				{
 					pcmd->UserCallback( cmd_list, pcmd );
@@ -104,7 +119,7 @@ namespace dd
 				{
 					glBindTexture( GL_TEXTURE_2D, (GLuint) (intptr_t) pcmd->TextureId );
 					glScissor( (int) pcmd->ClipRect.x, (int) (fb_height - pcmd->ClipRect.w), (int) (pcmd->ClipRect.z - pcmd->ClipRect.x), (int) (pcmd->ClipRect.w - pcmd->ClipRect.y) );
-					glDrawElements( GL_TRIANGLES, (GLsizei) pcmd->ElemCount, GL_UNSIGNED_SHORT, idx_buffer_offset );
+					glDrawElements( GL_TRIANGLES, (GLsizei) pcmd->ElemCount, sizeof( ImDrawIdx ) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset );
 				}
 				idx_buffer_offset += pcmd->ElemCount;
 			}
@@ -113,31 +128,38 @@ namespace dd
 		// Restore modified GL state
 		glUseProgram( last_program );
 		glBindTexture( GL_TEXTURE_2D, last_texture );
+		glBindSampler( 0, last_sampler );
+		glActiveTexture( last_active_texture );
+		glBindVertexArray( last_vertex_array );
 		glBindBuffer( GL_ARRAY_BUFFER, last_array_buffer );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, last_element_array_buffer );
-		glBindVertexArray( last_vertex_array );
 		glBlendEquationSeparate( last_blend_equation_rgb, last_blend_equation_alpha );
-		glBlendFunc( last_blend_src, last_blend_dst );
+		glBlendFuncSeparate( last_blend_src_rgb, last_blend_dst_rgb, last_blend_src_alpha, last_blend_dst_alpha );
 		if( last_enable_blend ) glEnable( GL_BLEND ); else glDisable( GL_BLEND );
 		if( last_enable_cull_face ) glEnable( GL_CULL_FACE ); else glDisable( GL_CULL_FACE );
 		if( last_enable_depth_test ) glEnable( GL_DEPTH_TEST ); else glDisable( GL_DEPTH_TEST );
 		if( last_enable_scissor_test ) glEnable( GL_SCISSOR_TEST ); else glDisable( GL_SCISSOR_TEST );
+		glPolygonMode( GL_FRONT_AND_BACK, last_polygon_mode[0] );
+		glViewport( last_viewport[0], last_viewport[1], (GLsizei) last_viewport[2], (GLsizei) last_viewport[3] );
+		glScissor( last_scissor_box[0], last_scissor_box[1], (GLsizei) last_scissor_box[2], (GLsizei) last_scissor_box[3] );
+
+		DiscardGLError();
 	}
 
 	static const char* GetClipboardText( void* data )
 	{
-		return glfwGetClipboardString( s_window );
+		return glfwGetClipboardString( g_Window );
 	}
 
 	static void SetClipboardText( void* data, const char* text )
 	{
-		glfwSetClipboardString( s_window, text );
+		glfwSetClipboardString( g_Window, text );
 	}
 
 	void DebugUI::MouseButtonCallback( GLFWwindow*, int button, int action, int /*mods*/ )
 	{
 		if( action == GLFW_PRESS && button >= 0 && button < 3 )
-			g_MousePressed[button] = true;
+			g_MouseJustPressed[button] = true;
 	}
 
 	void DebugUI::ScrollCallback( GLFWwindow*, double /*xoffset*/, double yoffset )
@@ -168,14 +190,15 @@ namespace dd
 
 	void DebugUI::CreateFontsTexture()
 	{
-		ImGuiIO& io = ImGui::GetIO();
-
 		// Build texture atlas
+		ImGuiIO& io = ImGui::GetIO();
 		unsigned char* pixels;
 		int width, height;
-		io.Fonts->GetTexDataAsRGBA32( &pixels, &width, &height );   // Load as RGBA 32-bits for OpenGL3 demo because it is more likely to be compatible with user's existing shader.
+		io.Fonts->GetTexDataAsRGBA32( &pixels, &width, &height );   // Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 
-		// Create OpenGL texture
+																	// Upload texture to graphics system
+		GLint last_texture;
+		glGetIntegerv( GL_TEXTURE_BINDING_2D, &last_texture );
 		glGenTextures( 1, &g_FontTexture );
 		glBindTexture( GL_TEXTURE_2D, g_FontTexture );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -185,9 +208,8 @@ namespace dd
 		// Store our identifier
 		io.Fonts->TexID = (void *) (intptr_t) g_FontTexture;
 
-		// Cleanup (don't clear the input data if you want to append new fonts later)
-		io.Fonts->ClearInputData();
-		io.Fonts->ClearTexData();
+		// Restore state
+		glBindTexture( GL_TEXTURE_2D, last_texture );
 	}
 
 	bool DebugUI::CreateDeviceObjects()
@@ -199,7 +221,7 @@ namespace dd
 		glGetIntegerv( GL_VERTEX_ARRAY_BINDING, &last_vertex_array );
 
 		const GLchar *vertex_shader =
-			"#version 330\n"
+			"#version 150\n"
 			"uniform mat4 ProjMtx;\n"
 			"in vec2 Position;\n"
 			"in vec2 UV;\n"
@@ -214,7 +236,7 @@ namespace dd
 			"}\n";
 
 		const GLchar* fragment_shader =
-			"#version 330\n"
+			"#version 150\n"
 			"uniform sampler2D Texture;\n"
 			"in vec2 Frag_UV;\n"
 			"in vec4 Frag_Color;\n"
@@ -251,13 +273,11 @@ namespace dd
 		glEnableVertexAttribArray( g_AttribLocationUV );
 		glEnableVertexAttribArray( g_AttribLocationColor );
 
-#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-		glVertexAttribPointer( g_AttribLocationPosition, 2, GL_FLOAT, GL_FALSE, sizeof( ImDrawVert ), (GLvoid*) OFFSETOF( ImDrawVert, pos ) );
-		glVertexAttribPointer( g_AttribLocationUV, 2, GL_FLOAT, GL_FALSE, sizeof( ImDrawVert ), (GLvoid*) OFFSETOF( ImDrawVert, uv ) );
-		glVertexAttribPointer( g_AttribLocationColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof( ImDrawVert ), (GLvoid*) OFFSETOF( ImDrawVert, col ) );
-#undef OFFSETOF
+		glVertexAttribPointer( g_AttribLocationPosition, 2, GL_FLOAT, GL_FALSE, sizeof( ImDrawVert ), (GLvoid*) IM_OFFSETOF( ImDrawVert, pos ) );
+		glVertexAttribPointer( g_AttribLocationUV, 2, GL_FLOAT, GL_FALSE, sizeof( ImDrawVert ), (GLvoid*) IM_OFFSETOF( ImDrawVert, uv ) );
+		glVertexAttribPointer( g_AttribLocationColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof( ImDrawVert ), (GLvoid*) IM_OFFSETOF( ImDrawVert, col ) );
 
-		DebugUI::CreateFontsTexture();
+		CreateFontsTexture();
 
 		// Restore modified GL state
 		glBindTexture( GL_TEXTURE_2D, last_texture );
@@ -277,7 +297,7 @@ namespace dd
 		m_input->AddMouseCallback( &DebugUI::MouseButtonCallback );
 		m_input->AddCharCallback( &DebugUI::CharCallback );
 
-		s_window = window.GetInternalWindow();
+		g_Window = window.GetInternalWindow();
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                         // Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
@@ -315,7 +335,7 @@ namespace dd
 		io.GetClipboardTextFn = GetClipboardText;
 
 #ifdef _WIN32
-		io.ImeWindowHandle = glfwGetWin32Window( s_window );
+		io.ImeWindowHandle = glfwGetWin32Window( g_Window );
 #endif
 
 		CreateDeviceObjects();
@@ -335,14 +355,14 @@ namespace dd
 		g_VaoHandle = g_VboHandle = g_ElementsHandle = 0;
 
 		glDetachShader( g_ShaderHandle, g_VertHandle );
-		glDeleteShader( g_VertHandle );
+		if( g_VertHandle != 0 ) glDeleteShader( g_VertHandle );
 		g_VertHandle = 0;
 
 		glDetachShader( g_ShaderHandle, g_FragHandle );
-		glDeleteShader( g_FragHandle );
+		if( g_FragHandle != 0 ) glDeleteShader( g_FragHandle );
 		g_FragHandle = 0;
 
-		glDeleteProgram( g_ShaderHandle );
+		if( g_ShaderHandle != 0 ) glDeleteProgram( g_ShaderHandle );
 		g_ShaderHandle = 0;
 
 		if( g_FontTexture )
@@ -367,10 +387,14 @@ namespace dd
 			ImGui::GetIO().MousePos = ImVec2( -1, -1 );
 	}
 
-	void DebugUI::SetDisplaySize( int window_width, int window_height )
+	void DebugUI::UpdateDisplaySize()
 	{
-		ImGui::GetIO().DisplaySize = ImVec2( (float) window_width, (float) window_height );
-		ImGui::GetIO().DisplayFramebufferScale = ImVec2( 1, 1 );
+		int w, h;
+		int display_w, display_h;
+		glfwGetWindowSize( g_Window, &w, &h );
+		glfwGetFramebufferSize( g_Window, &display_w, &display_h );
+		ImGui::GetIO().DisplaySize = ImVec2( (float) w, (float) h );
+		ImGui::GetIO().DisplayFramebufferScale = ImVec2( w > 0 ? ((float) display_w / w) : 0, h > 0 ? ((float) display_h / h) : 0 );
 	}
 
 	void DebugUI::Update( float delta_t )
@@ -381,7 +405,7 @@ namespace dd
 
 		SetMousePosition( m_input->GetMousePosition().Absolute );
 		SetFocused( m_window->IsFocused() );
-		SetDisplaySize( m_window->GetWidth(), m_window->GetHeight() );
+		UpdateDisplaySize();
 
 		// Setup time step
 		io.DeltaTime = g_Time > 0.0 ? (float) delta_t : (float) (1.0f / 60.0f);
@@ -389,8 +413,8 @@ namespace dd
 
 		for( int i = 0; i < 3; i++ )
 		{
-			io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton( s_window, i ) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-			g_MousePressed[i] = false;
+			io.MouseDown[i] = g_MouseJustPressed[i] || glfwGetMouseButton( g_Window, i ) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+			g_MouseJustPressed[i] = false;
 		}
 
 		io.MouseWheel = g_MouseWheel;

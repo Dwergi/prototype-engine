@@ -102,6 +102,10 @@ namespace dd
 		int m_meshCount;
 		int m_frustumMeshCount;
 
+		glm::ivec2 m_previousSize;
+
+		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
+
 		bool m_frustumCulling { true };
 		bool m_debugDrawStandard { true };
 		bool m_debugDrawAxes { true };
@@ -127,6 +131,8 @@ namespace dd
 		bool m_createLight { false };
 
 		MeshHandle m_unitCube;
+
+		void CreateFrameBuffer( glm::ivec2 size );
 
 		void CreateDebugMeshGrid( EntityManager& entityManager );
 		EntityHandle CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform );

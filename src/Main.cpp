@@ -23,6 +23,7 @@
 #include "FreeCameraController.h"
 #include "FSM.h"
 #include "FPSCamera.h"
+#include "GLError.h"
 #include "IDebugDraw.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -468,8 +469,6 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
-	::ShowWindow( GetConsoleWindow(), SW_HIDE );
-
 	s_mainThread = std::this_thread::get_id();
 
 	{
@@ -573,6 +572,8 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			updateState.SetOnEnter( [&]()
 			{
 				float delta_t = s_frameTimer->Delta();
+				camera.SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+
 				UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
 				UpdateSystems( jobSystem, entity_manager, systems, delta_t );
 			} );
@@ -594,6 +595,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 				renderer.EndRender( camera );
 
 				ImGui::Render();
+
 				s_window->Swap();
 			} );
 		}
@@ -646,6 +648,10 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		InitializeSystems( jobSystem, entity_manager, systems );
 		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
 
+		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
+		pempek::assert::implementation::setAssertHandler( OnAssert ); 
+		::ShowWindow( GetConsoleWindow(), SW_HIDE );
+
 		while( !s_window->ShouldClose() )
 		{
 			DD_PROFILE_SCOPED( Frame );
@@ -685,8 +691,6 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 int main( int argc, char* argv[] )
 {
 	TypeInfo::RegisterDefaultTypes();
-
-	pempek::assert::implementation::setAssertHandler( OnAssert );
 
 	CommandLine cmdLine( argv, argc );
 	if( cmdLine.Exists( "noassert" ) )

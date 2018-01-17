@@ -141,6 +141,7 @@ namespace dd
 		m_depth->Bind( 0 );
 
 		glDisable( GL_DEPTH_TEST );
+		CheckGLError();
 
 		shader.SetUniform( "Texture", *m_depth );
 		shader.SetUniform( "Near", camera.GetNear() );
@@ -155,6 +156,7 @@ namespace dd
 		m_fullScreenVAO.Unbind();
 
 		shader.Use( false );
+		CheckGLError();
 	}
 
 	void FrameBuffer::Render()
@@ -209,6 +211,9 @@ namespace dd
 
 	void FrameBuffer::Destroy()
 	{
+		UnbindRead();
+		UnbindDraw();
+
 		if( m_fbo != OpenGL::InvalidID )
 		{
 			glDeleteBuffers( 1, &m_fbo );

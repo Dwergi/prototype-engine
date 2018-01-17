@@ -9,8 +9,6 @@
 
 #include "ComponentPoolBase.h"
 
-#pragma optimize( "", off )
-
 namespace
 {
 	const unsigned int Maximum = ((unsigned int) -1) - 1;

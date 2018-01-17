@@ -92,9 +92,12 @@ namespace dd
 
 	void FPSCamera::SetNear( float dist_near )
 	{
-		m_dirty = true;
+		if( dist_near != m_near )
+		{
+			m_near = dist_near;
 
-		m_near = dist_near;
+			m_dirty = true;
+		}
 	}
 
 	float FPSCamera::GetFar() const
@@ -104,9 +107,12 @@ namespace dd
 
 	void FPSCamera::SetFar( float dist_far )
 	{
-		m_dirty = true;
+		if( dist_far != m_far )
+		{
+			m_far = dist_far;
 
-		m_far = dist_far;
+			m_dirty = true;
+		}
 	}
 
 	float FPSCamera::GetVerticalFOV() const
@@ -116,9 +122,12 @@ namespace dd
 
 	void FPSCamera::SetVerticalFOV( float vfov )
 	{
-		m_dirty = true;
-
-		m_vfov = vfov;
+		if( m_vfov != vfov )
+		{
+			m_vfov = vfov;
+		
+			m_dirty = true;
+		}
 	}
 
 	float FPSCamera::GetAspectRatio() const
@@ -128,9 +137,13 @@ namespace dd
 
 	void FPSCamera::SetAspectRatio( int w, int h )
 	{
-		m_dirty = true;
+		float aspectRatio = float( w ) / float( h );
+		if( aspectRatio != m_aspectRatio )
+		{
+			m_aspectRatio = aspectRatio;
 
-		m_aspectRatio = float( w ) / float( h );
+			m_dirty = true;
+		}
 	}
 
 	glm::mat4 FPSCamera::GetProjectionMatrix() const

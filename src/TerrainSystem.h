@@ -86,7 +86,7 @@ namespace dd
 		//
 		// Save the heightmaps of the terrain chunks generated.
 		//
-		void SaveChunkImages() const;
+		void SaveChunkImages( const EntityManager& entity_manager ) const;
 
 		//
 		// The name to display in the debug view list.
@@ -95,26 +95,24 @@ namespace dd
 
 	private:
 		
-		bool m_requiresRegeneration;
-		int m_lodLevels;
+		bool m_requiresRegeneration { true };
+		bool m_saveChunkImages { false };
+		int m_lodLevels { DefaultLODLevels };
 
 		TerrainParameters m_params;
 		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
-		std::unordered_map<TerrainChunkKey, TerrainChunk*> m_chunks;
-		std::unordered_map<TerrainChunkKey, EntityHandle> m_entities;
 
 		virtual void DrawDebugInternal() override;
-
-		TerrainChunk* GetChunk( const TerrainChunkKey& key );
 
 		void GenerateTerrain( EntityManager& entity_manager );
 		void GenerateLODLevel( EntityManager& entity_manager, int lodLevel );
 
-		void CreateChunk( EntityManager& entity_manager, TerrainChunkKey key );
-		EntityHandle CreateChunkEntity( EntityManager& entity_manager, const TerrainChunkKey& key, TerrainChunk* chunk );
+		void CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key );
 
-		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp );
+		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );
+
+		void DestroyChunks( EntityManager& entity_manager );
 
 		void SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 pos );
 	};

@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "TerrainChunkComponent.h"
 
+#include "TerrainChunk.h"
+
 namespace dd
 {
 	TerrainChunkComponent::TerrainChunkComponent()

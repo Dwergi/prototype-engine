@@ -16,7 +16,7 @@ project.
 Requirements
 ------------
 
-gl3w_gen.py_ requires Python version 2.6 or newer, with SSL support.
+gl3w_gen.py_ requires Python version 2.7 or newer.
 It is also compatible with Python 3.x.
 
 Example
@@ -71,7 +71,7 @@ The gl3w_ API consists of just three functions:
 
     Initializes the library. Should be called once after an OpenGL context has
     been created. Returns ``0`` when gl3w_ was initialized successfully,
-    ``-1`` if there was an error.
+    ``non-zero`` if there was an error.
 
 ``int gl3wIsSupported(int major, int minor)``
 
@@ -87,6 +87,8 @@ The gl3w_ API consists of just three functions:
 
 License
 -------
+
+.. image:: public-domain-mark.png
 
 gl3w_ is in the public domain. See the file UNLICENSE for more information.
 
@@ -108,7 +110,7 @@ Travis Gesslein
 Arthur Tombs
     Port to Python 3
 
-Rommel160 [github.com/Rommel160]
+Daniel Cousens [https://github.com/dcousens]
     Code contributions
 
 Copyright

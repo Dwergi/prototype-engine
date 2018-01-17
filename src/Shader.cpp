@@ -80,14 +80,14 @@ namespace dd
 		String256 source;
 		if( !LoadFile( m_path, source ) )
 		{
-			DD_ASSERT_ERROR( false, "Failed to load shader from path!" );
+			DD_ASSERT_ERROR( false, "'%s': Failed to load from path!", m_path.c_str() );
 			return false;
 		}
 
 		String256 message = Compile( source );
 		if( !message.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "Compiling shader failed, message: %s", message.c_str() );
+			DD_ASSERT_ERROR( false, "'%s': Compiling failed, message:\n %s", m_path.c_str(), message.c_str() );
 
 			m_source = oldSource;
 			Compile( m_source );

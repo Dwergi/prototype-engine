@@ -28,17 +28,21 @@ namespace dd
 	uint TerrainChunk::s_indices[IndexCount];
 	ShaderHandle TerrainChunk::s_shader;
 
-	TerrainChunk::TerrainChunk( const TerrainParameters& params ) :
-		m_params( params )
+	TerrainChunk::TerrainChunk( const TerrainParameters& params, const TerrainChunkKey& key ) :
+		m_params( params ),
+		m_key( key )
 	{
 		m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
+		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
 		m_indices.Set( s_indices, IndexCount );
 	}
 
 	TerrainChunk::~TerrainChunk()
 	{
-		glm::vec3* vertices = m_vertices.Release();
-		delete[] vertices;
+		Mesh::Destroy( m_mesh );
+
+		m_vertices.Delete();
+		m_normals.Delete();
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -182,11 +186,11 @@ namespace dd
 		shader->Use( false );
 	}
 
-	void TerrainChunk::Generate( const TerrainChunkKey& key )
+	void TerrainChunk::Generate()
 	{
 		DD_PROFILE_SCOPED( TerrainChunk_InitializeVerts );
 
-		const float actual_distance = m_params.VertexDistance * (1 << key.LOD);
+		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 		const int actual_vertices = Vertices + 1;
 		for( int z = 0; z < actual_vertices; ++z )
 		{
@@ -225,6 +229,46 @@ namespace dd
 		}
 	}
 
+	void TerrainChunk::Update( float delta_t )
+	{
+
+	}
+
+	void TerrainChunk::RenderUpdate()
+	{
+		if( m_destroy )
+		{
+			Mesh::Destroy( m_mesh );
+		}
+
+		if( m_dirty )
+		{
+			if( !m_mesh.IsValid() )
+			{
+				CreateMesh( m_key );
+			}
+
+			Mesh* mesh = m_mesh.Get();
+			mesh->UpdateBuffers();
+
+			float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
+			float total_size = actual_distance * Vertices;
+
+			AABB bounds;
+			bounds.Expand( glm::vec3( 0 ) );
+			bounds.Expand( glm::vec3( total_size, m_params.HeightRange + (1 - (m_key.LOD / 10.0f)), total_size ) );
+
+			mesh->SetBounds( bounds );
+
+			m_dirty = false;
+		}
+	}
+
+	void TerrainChunk::Destroy()
+	{
+		m_destroy = true;
+	}
+
 	float TerrainChunk::GetHeight( float x, float y )
 	{
 		float height = 0;
@@ -248,11 +292,11 @@ namespace dd
 		return normalized;
 	}
 
-	void TerrainChunk::UpdateVertices( const TerrainChunkKey& key, const glm::vec2& origin )
+	void TerrainChunk::UpdateVertices( glm::vec2 origin )
 	{
-		glm::vec2 chunk_pos = origin + glm::vec2( key.X, key.Y );
+		glm::vec2 chunk_pos = origin + glm::vec2( m_key.X, m_key.Y );
 		const int actual_vertices = Vertices + 1;
-		const float actual_distance = m_params.VertexDistance * (1 << key.LOD);
+		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 
 		for( int z = 0; z < actual_vertices; ++z )
 		{
@@ -303,9 +347,45 @@ namespace dd
 		}
 	}
 
-	void TerrainChunk::SetOrigin( const TerrainChunkKey& key, glm::vec2 origin )
+	void TerrainChunk::UpdateNormals()
 	{
-		UpdateVertices( key, origin );
+		DD_PROFILE_SCOPED( TerrainChunk_InitializeNormals );
+
+		for( int i = 0; i < MeshIndexCount; i += 3 )
+		{
+			uint indexA = s_indices[i];
+			uint indexB = s_indices[i + 1];
+			uint indexC = s_indices[i + 2];
+
+			glm::vec3 a = m_vertices[indexA];
+			glm::vec3 b = m_vertices[indexB];
+			glm::vec3 c = m_vertices[indexC];
+
+			glm::vec3 normal = glm::normalize( glm::cross( b - a, c - a ) );
+			if( normal.y < 0 )
+			{
+				normal = glm::normalize( glm::cross( c - a, b - a ) );
+
+				// should always be pointing at least a little bit up
+				DD_ASSERT( normal.y >= 0 );
+			}
+
+			m_normals[indexA] = normal;
+			m_normals[indexB] = normal;
+			m_normals[indexC] = normal;
+		}
+
+		for( int i = 0; i < FlapVertexCount; ++i )
+		{
+			m_normals[MeshVertexCount + i] = glm::vec3( 0, 1, 0 );
+		}
+	}
+
+
+	void TerrainChunk::SetTerrainOrigin( glm::vec2 origin )
+	{
+		UpdateVertices( origin );
+		UpdateNormals();
 
 		m_dirty = true;
 	}
@@ -324,6 +404,9 @@ namespace dd
 
 		mesh->SetPositions( m_vertices );
 
+		mesh->EnableNormals( true );
+		mesh->SetNormals( m_normals );
+
 		mesh->EnableIndices( true );
 		mesh->SetIndices( m_indices );
 
@@ -335,37 +418,7 @@ namespace dd
 		DD_PROFILE_END();
 	}
 
-	void TerrainChunk::RenderUpdate( const TerrainChunkKey& key )
-	{
-		if( m_dirty )
-		{
-			if( !m_mesh.IsValid() )
-			{
-				CreateMesh( key );
-			}
-
-			Mesh* mesh = m_mesh.Get();
-			mesh->UpdateBuffers();
-
-			float actual_distance = m_params.VertexDistance * (1 << key.LOD);
-			float total_size = actual_distance * Vertices;
-
-			AABB bounds;
-			bounds.Expand( glm::vec3( 0 ) );
-			bounds.Expand( glm::vec3( total_size, m_params.HeightRange + (1 - (key.LOD / 10.0f)), total_size ) );
-
-			mesh->SetBounds( bounds );
-
-			m_dirty = false;
-		}
-	}
-
-	void TerrainChunk::Destroy()
-	{
-		m_destroy = true;
-	}
-
-	void TerrainChunk::Write( const char* filename )
+	void TerrainChunk::WriteHeightImage( const char* filename ) const
 	{
 		const int actualVertices = Vertices + 1;
 		byte pixels[actualVertices * actualVertices];
@@ -379,5 +432,31 @@ namespace dd
 		}
 
 		stbi_write_tga( filename, actualVertices, actualVertices, 1, pixels );
+	}
+
+	static byte NormalToColour( float f )
+	{
+		return (byte) (((f + 1.0f) / 2.0f) * 255.f);
+	}
+
+	void TerrainChunk::WriteNormalImage( const char* filename ) const
+	{
+		const int actualVertices = Vertices + 1;
+		byte pixels[actualVertices * actualVertices * 3];
+
+		for( int y = 0; y < actualVertices; ++y )
+		{
+			for( int x = 0; x < actualVertices; ++x )
+			{
+				int index = y * actualVertices + x;
+
+				glm::vec3 normal = m_normals[index];
+				pixels[3 * index] = NormalToColour( normal.x );
+				pixels[3 * index + 1] = NormalToColour( normal.y );
+				pixels[3 * index + 2] = NormalToColour( normal.z );
+			}
+		}
+
+		stbi_write_tga( filename, actualVertices, actualVertices, 3, pixels );
 	}
 }

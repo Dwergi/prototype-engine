@@ -28,8 +28,9 @@
 # Allow Python 2.6+ to use the print() function
 from __future__ import print_function
 
-import re
+import argparse
 import os
+import re
 
 # Try to import Python 3 library urllib.request
 # and if it fails, fall back to Python 2 urllib2
@@ -39,7 +40,7 @@ except ImportError:
     import urllib2
 
 # UNLICENSE copyright header
-UNLICENSE = br'''/*
+UNLICENSE = r'''/*
 
     This file was generated with gl3w_gen.py, part of gl3w
     (hosted at https://github.com/skaslev/gl3w)
@@ -71,42 +72,60 @@ UNLICENSE = br'''/*
 
 '''
 
+EXT_SUFFIX = ['ARB', 'EXT', 'KHR', 'OVR', 'NV', 'AMD', 'INTEL']
+
+def is_ext(proc):
+    return any(proc.endswith(suffix) for suffix in EXT_SUFFIX)
+
+def proc_t(proc):
+    return {
+        'p': proc,
+        'p_s': proc[2:],
+        'p_t': 'PFN{0}PROC'.format(proc.upper())
+    }
+
+def write(f, s):
+    f.write(s.encode('utf-8'))
+
+parser = argparse.ArgumentParser(description='gl3w generator script')
+parser.add_argument('--ext', action='store_true', help='Load extensions')
+parser.add_argument('--root', type=str, default='', help='Root directory')
+args = parser.parse_args()
+
 # Create directories
-if not os.path.exists('include/GL'):
-    os.makedirs('include/GL')
-if not os.path.exists('src'):
-    os.makedirs('src')
+if not os.path.exists(os.path.join(args.root, 'include/GL')):
+    os.makedirs(os.path.join(args.root, 'include/GL'))
+if not os.path.exists(os.path.join(args.root, 'src')):
+    os.makedirs(os.path.join(args.root, 'src'))
 
 # Download glcorearb.h
-if not os.path.exists('include/GL/glcorearb.h'):
-    print('Downloading glcorearb.h to include/GL...')
-    web = urllib2.urlopen('https://www.opengl.org/registry/api/GL/glcorearb.h')
-    with open('include/GL/glcorearb.h', 'wb') as f:
+if not os.path.exists(os.path.join(args.root, 'include/GL/glcorearb.h')):
+    print('Downloading glcorearb.h to {0}...'.format(os.path.join(args.root, 'include/GL/glcorearb.h')))
+    web = urllib2.urlopen('http://www.opengl.org/registry/api/GL/glcorearb.h')
+    with open(os.path.join(args.root, 'include/GL/glcorearb.h'), 'wb') as f:
         f.writelines(web.readlines())
 else:
-    print('Reusing glcorearb.h from include/GL...')
+    print('Reusing glcorearb.h from {0}...'.format(os.path.join(args.root, 'include/GL')))
 
 # Parse function names from glcorearb.h
 print('Parsing glcorearb.h header...')
 procs = []
 p = re.compile(r'GLAPI.*APIENTRY\s+(\w+)')
-with open('include/GL/glcorearb.h', 'r') as f:
+with open(os.path.join(args.root, 'include/GL/glcorearb.h'), 'r') as f:
     for line in f:
         m = p.match(line)
-        if m:
-            procs.append(m.group(1))
+        if not m:
+            continue
+        proc = m.group(1)
+        if args.ext or not is_ext(proc):
+            procs.append(proc)
 procs.sort()
 
-def proc_t(proc):
-    return { 'p': proc,
-             'p_s': 'gl3w' + proc[2:],
-             'p_t': 'PFN' + proc.upper() + 'PROC' }
-
 # Generate gl3w.h
-print('Generating gl3w.h in include/GL...')
-with open('include/GL/gl3w.h', 'wb') as f:
-    f.write(UNLICENSE)
-    f.write(br'''#ifndef __gl3w_h_
+print('Generating gl3w.h in {0}...'.format(os.path.join(args.root, 'include/GL')))
+with open(os.path.join(args.root, 'include/GL/gl3w.h'), 'wb') as f:
+    write(f, UNLICENSE)
+    write(f, r'''#ifndef __gl3w_h_
 #define __gl3w_h_
 
 #include <GL/glcorearb.h>
@@ -119,21 +138,37 @@ with open('include/GL/gl3w.h', 'wb') as f:
 extern "C" {
 #endif
 
+#define GL3W_OK 0
+#define GL3W_ERROR_INIT -1
+#define GL3W_ERROR_LIBRARY_OPEN -2
+#define GL3W_ERROR_OPENGL_VERSION -3
+
 typedef void (*GL3WglProc)(void);
+typedef GL3WglProc (*GL3WGetProcAddressProc)(const char *proc);
 
 /* gl3w api */
 int gl3wInit(void);
+int gl3wInit2(GL3WGetProcAddressProc proc);
 int gl3wIsSupported(int major, int minor);
 GL3WglProc gl3wGetProcAddress(const char *proc);
+
+/* gl3w internal state */
+''')
+    write(f, 'union GL3WProcs {\n')
+    write(f, '\tGL3WglProc ptr[{0}];\n'.format(len(procs)))
+    write(f, '\tstruct {\n')
+    for proc in procs:
+        write(f, '\t\t{0[p_t]: <55} {0[p_s]};\n'.format(proc_t(proc)))
+    write(f, r'''	} gl;
+};
+
+extern union GL3WProcs gl3wProcs;
 
 /* OpenGL functions */
 ''')
     for proc in procs:
-        f.write('extern {0[p_t]: <52} {0[p_s]};\n'.format(proc_t(proc)).encode("utf-8"))
-    f.write(b'\n')
-    for proc in procs:
-        f.write('#define {0[p]: <45} {0[p_s]}\n'.format(proc_t(proc)).encode("utf-8"))
-    f.write(br'''
+        write(f, '#define {0[p]: <48} gl3wProcs.gl.{0[p_s]}\n'.format(proc_t(proc)))
+    write(f, r'''
 #ifdef __cplusplus
 }
 #endif
@@ -142,20 +177,29 @@ GL3WglProc gl3wGetProcAddress(const char *proc);
 ''')
 
 # Generate gl3w.c
-print('Generating gl3w.c in src...')
-with open('src/gl3w.c', 'wb') as f:
-    f.write(UNLICENSE)
-    f.write(br'''#include <GL/gl3w.h>
+print('Generating gl3w.c in {0}...'.format(os.path.join(args.root, 'src')))
+with open(os.path.join(args.root, 'src/gl3w.c'), 'wb') as f:
+    write(f, UNLICENSE)
+    write(f, r'''#include <GL/gl3w.h>
+#include <stdlib.h>
 
-#ifdef _WIN32
+#define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
+
+#if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 
 static HMODULE libgl;
+static PROC (__stdcall *wgl_get_proc_address)(LPCSTR);
 
-static void open_libgl(void)
+static int open_libgl(void)
 {
 	libgl = LoadLibraryA("opengl32.dll");
+	if (!libgl)
+		return GL3W_ERROR_LIBRARY_OPEN;
+
+	*(void **)(&wgl_get_proc_address) = GetProcAddress(libgl, "wglGetProcAddress");
+	return GL3W_OK;
 }
 
 static void close_libgl(void)
@@ -167,52 +211,23 @@ static GL3WglProc get_proc(const char *proc)
 {
 	GL3WglProc res;
 
-	res = (GL3WglProc) wglGetProcAddress(proc);
+	res = (GL3WglProc)wgl_get_proc_address(proc);
 	if (!res)
-		res = (GL3WglProc) GetProcAddress(libgl, proc);
+		res = (GL3WglProc)GetProcAddress(libgl, proc);
 	return res;
 }
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#include <Carbon/Carbon.h>
-
-CFBundleRef bundle;
-CFURLRef bundleURL;
-
-static void open_libgl(void)
-{
-	bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-		CFSTR("/System/Library/Frameworks/OpenGL.framework"),
-		kCFURLPOSIXPathStyle, true);
-
-	bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
-	assert(bundle != NULL);
-}
-
-static void close_libgl(void)
-{
-	CFRelease(bundle);
-	CFRelease(bundleURL);
-}
-
-static GL3WglProc get_proc(const char *proc)
-{
-	GL3WglProc res;
-
-	CFStringRef procname = CFStringCreateWithCString(kCFAllocatorDefault, proc,
-		kCFStringEncodingASCII);
-	res = (GL3WglProc) CFBundleGetFunctionPointerForName(bundle, procname);
-	CFRelease(procname);
-	return res;
-}
-#else
+#elif defined(__APPLE__)
 #include <dlfcn.h>
-#include <GL/glx.h>
 
 static void *libgl;
 
-static void open_libgl(void)
+static int open_libgl(void)
 {
-	libgl = dlopen("libGL.so.1", RTLD_LAZY | RTLD_GLOBAL);
+	libgl = dlopen("/System/Library/Frameworks/OpenGL.framework/OpenGL", RTLD_LAZY | RTLD_LOCAL);
+	if (!libgl)
+		return GL3W_ERROR_LIBRARY_OPEN;
+
+	return GL3W_OK;
 }
 
 static void close_libgl(void)
@@ -224,9 +239,37 @@ static GL3WglProc get_proc(const char *proc)
 {
 	GL3WglProc res;
 
-	res = (GL3WglProc) glXGetProcAddress((const GLubyte *) proc);
+	*(void **)(&res) = dlsym(libgl, proc);
+	return res;
+}
+#else
+#include <dlfcn.h>
+
+static void *libgl;
+static GL3WglProc (*glx_get_proc_address)(const GLubyte *);
+
+static int open_libgl(void)
+{
+	libgl = dlopen("libGL.so.1", RTLD_LAZY | RTLD_LOCAL);
+	if (!libgl)
+		return GL3W_ERROR_LIBRARY_OPEN;
+
+	*(void **)(&glx_get_proc_address) = dlsym(libgl, "glXGetProcAddressARB");
+	return GL3W_OK;
+}
+
+static void close_libgl(void)
+{
+	dlclose(libgl);
+}
+
+static GL3WglProc get_proc(const char *proc)
+{
+	GL3WglProc res;
+
+	res = glx_get_proc_address((const GLubyte *)proc);
 	if (!res)
-		res = (GL3WglProc) dlsym(libgl, proc);
+		*(void **)(&res) = dlsym(libgl, proc);
 	return res;
 }
 #endif
@@ -238,23 +281,31 @@ static struct {
 static int parse_version(void)
 {
 	if (!glGetIntegerv)
-		return -1;
+		return GL3W_ERROR_INIT;
 
 	glGetIntegerv(GL_MAJOR_VERSION, &version.major);
 	glGetIntegerv(GL_MINOR_VERSION, &version.minor);
 
 	if (version.major < 3)
-		return -1;
-	return 0;
+		return GL3W_ERROR_OPENGL_VERSION;
+	return GL3W_OK;
 }
 
-static void load_procs(void);
+static void load_procs(GL3WGetProcAddressProc proc);
 
 int gl3wInit(void)
 {
-	open_libgl();
-	load_procs();
-	close_libgl();
+	return gl3wInit2(get_proc);
+}
+
+int gl3wInit2(GL3WGetProcAddressProc proc)
+{
+	int res = open_libgl();
+	if (res)
+		return res;
+
+	atexit(close_libgl);
+	load_procs(proc);
 	return parse_version();
 }
 
@@ -272,13 +323,18 @@ GL3WglProc gl3wGetProcAddress(const char *proc)
 	return get_proc(proc);
 }
 
+static const char *proc_names[] = {
 ''')
     for proc in procs:
-        f.write('{0[p_t]: <52} {0[p_s]};\n'.format(proc_t(proc)).encode("utf-8"))
-    f.write(br'''
-static void load_procs(void)
+        write(f, '\t"{0}",\n'.format(proc))
+    write(f, r'''};
+
+union GL3WProcs gl3wProcs;
+
+static void load_procs(GL3WGetProcAddressProc proc)
 {
+	size_t i;
+	for (i = 0; i < ARRAY_SIZE(proc_names); i++)
+		gl3wProcs.ptr[i] = proc(proc_names[i]);
+}
 ''')
-    for proc in procs:
-        f.write('\t{0[p_s]} = ({0[p_t]}) get_proc("{0[p]}");\n'.format(proc_t(proc)).encode("utf-8"))
-    f.write(b'}\n')

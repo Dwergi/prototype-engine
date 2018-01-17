@@ -6,9 +6,10 @@
 
 #pragma once
 
-#define CheckGLError() dd::_CheckGLError(__FILE__, __LINE__)
+#define CheckGLError() dd::_CheckGLError(__FILE__, __LINE__, false )
+#define DiscardGLError() dd::_CheckGLError(__FILE__, __LINE__, true )
 
 namespace dd
 {
-	void _CheckGLError( const char* file, int line );
+	void _CheckGLError( const char* file, int line, bool ignore );
 }

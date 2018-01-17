@@ -36,18 +36,20 @@ namespace dd
 		int GetWidth() const { return m_size.x; }
 		int GetHeight() const { return m_size.y; }
 
-		GLFWwindow* GetInternalWindow() const { return m_glfwWindow; }
-
-		static void OnFramebufferResize( GLFWwindow* window, int width, int height );
-		static void OnWindowResize( GLFWwindow* window, int width, int height );
+		GLFWwindow* GetInternalWindow() const { return m_glfwWindow; }	
 
 	private:
 		static Window* m_pInstance;
 
-		GLFWwindow* m_glfwWindow;
+		GLFWwindow* m_glfwWindow { nullptr };
 		String32  m_title;
 
+		bool m_focused { false };
+
 		glm::ivec2 m_size;
-		bool m_focused;
+
+		static void OnFramebufferResize( GLFWwindow* window, int width, int height );
+		static void OnWindowResize( GLFWwindow* window, int width, int height );
+		static void OnError( int error, const char* message );
 	};
 }

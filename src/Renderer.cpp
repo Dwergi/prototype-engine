@@ -8,6 +8,7 @@
 #include "Renderer.h"
 
 #include "AABB.h"
+#include "GLError.h"
 #include "EntityManager.h"
 #include "Frustum.h"
 #include "ICamera.h"
@@ -114,11 +115,17 @@ namespace dd
 		m_unitCube = Mesh::Create( "cube", m_shaders[ 0 ] );
 		m_unitCube.Get()->MakeUnitCube();
 
-		glm::ivec2 size( m_window.GetWidth(), m_window.GetHeight() );
+		CreateFrameBuffer( m_window.GetSize() );
+
+		m_previousSize = m_window.GetSize();
+	}
+
+	void Renderer::CreateFrameBuffer( glm::ivec2 size )
+	{
 		m_colourTexture.Create( size, GL_SRGB8_ALPHA8, 1 );
 		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
 
-		m_framebuffer.SetClearColour( glm::vec4( 0.6, 0.7, 0.8, 0.0 ) );
+		m_framebuffer.SetClearColour( glm::vec4( m_skyColour.xyz, 0.0 ) );
 		m_framebuffer.SetClearDepth( 0.0f );
 		m_framebuffer.Create( m_colourTexture, &m_depthTexture );
 		m_framebuffer.RenderInit();
@@ -390,13 +397,13 @@ namespace dd
 				}
 
 				shader->SetUniform( "DrawStandard", m_debugDrawStandard );
-				shader->SetUniform( "DrawWireframe", m_debugWireframe );
-				shader->SetUniform( "WireframeColour", m_debugWireframeColour );
-				shader->SetUniform( "WireframeWidth", m_debugWireframeWidth );
+				shader->SetUniform( "Wireframe.Enabled", m_debugWireframe );
+				shader->SetUniform( "Wireframe.Colour", m_debugWireframeColour );
+				shader->SetUniform( "Wireframe.Width", m_debugWireframeWidth );
 
-				shader->SetUniform( "WireframeEdgeColour", m_debugWireframeEdgeColour );
-				shader->SetUniform( "WireframeEdgeWidth", m_debugWireframeEdgeWidth );
-				shader->SetUniform( "WireframeMaxDistance", m_debugWireframeMaxDistance );			
+				shader->SetUniform( "Wireframe.EdgeColour", m_debugWireframeEdgeColour );
+				shader->SetUniform( "Wireframe.EdgeWidth", m_debugWireframeEdgeWidth );
+				shader->SetUniform( "Wireframe.MaxDistance", m_debugWireframeMaxDistance );			
 
 				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 				mesh->SetColourMultiplier( colour );
@@ -495,6 +502,17 @@ namespace dd
 			m_reloadShaders = false;
 		}
 
+		if( m_window.GetSize() != m_previousSize )
+		{
+			m_framebuffer.Destroy();
+			m_colourTexture.Destroy();
+			m_depthTexture.Destroy();
+
+			CreateFrameBuffer( m_window.GetSize() );
+
+			m_previousSize = m_window.GetSize();
+		}
+
 		m_framebuffer.BindRead();
 		m_framebuffer.BindDraw();
 		m_framebuffer.Clear();
@@ -540,6 +558,7 @@ namespace dd
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glViewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
+		CheckGLError();
 
 		if( m_debugDrawDepth )
 		{

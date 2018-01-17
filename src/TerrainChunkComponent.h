@@ -8,10 +8,11 @@
 
 #include "IComponent.h"
 #include "DenseMapPool.h"
-#include "TerrainChunkKey.h"
 
 namespace dd
 {
+	class TerrainChunk;
+
 	class TerrainChunkComponent : public IComponent
 	{
 	public:
@@ -20,7 +21,7 @@ namespace dd
 
 		TerrainChunkComponent();
 
-		TerrainChunkKey Key;
+		TerrainChunk* Chunk { nullptr };
 		bool IsActive { false };
 
 		BASIC_TYPE( TerrainChunkComponent )
