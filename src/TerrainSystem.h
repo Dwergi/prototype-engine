@@ -106,11 +106,12 @@ namespace dd
 		virtual void DrawDebugInternal() override;
 
 		void GenerateTerrain( EntityManager& entity_manager );
-		void GenerateLODLevel( EntityManager& entity_manager, int lodLevel );
+		void GenerateLODLevel( EntityManager& entity_manager, int lodLevel, Vector<TerrainChunkKey>& toGenerate );
 
 		void CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key );
 
 		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp );
+		void UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required );
 
 		void DestroyChunks( EntityManager& entity_manager );
 

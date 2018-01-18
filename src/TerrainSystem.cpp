@@ -160,36 +160,25 @@ namespace dd
 
 		transform_cmp->SetLocalPosition( glm::vec3( rounded_x, 0, rounded_z ) );
 	}
-
-	void TerrainSystem::SaveChunkImages( const EntityManager& entity_manager ) const
-	{
-		int chunk_index = 0;
-
-		entity_manager.ForAllWithReadable<TerrainChunkComponent>( [&chunk_index]( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_h )
-		{
-			String64 chunk_file;
-			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
-
-			chunk_h.Read()->Chunk->WriteHeightImage( chunk_file.c_str() );
-
-			String64 chunk_normal_file;
-			snprintf( chunk_file.data(), 64, "terrain_%d_n.tga", chunk_index );
-
-			chunk_h.Read()->Chunk->WriteNormalImage( chunk_normal_file.c_str() );
-
-			++chunk_index;
-		} );
-	}
 	
 	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager )
 	{
 #ifndef GENERATE_SINGLE_CHUNK
+
+		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
+			m_lodLevels * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
+
+		Vector<TerrainChunkKey> toGenerate;
+		toGenerate.Reserve( expected );
+
 		// start with a 4x4 grid of the lowest LOD level, 
 		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
 		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
-			GenerateLODLevel( entity_manager, lod );
+			GenerateLODLevel( entity_manager, lod, toGenerate );
 		}
+
+		UpdateTerrainChunks( entity_manager, toGenerate );
 #else
 		TerrainChunkKey key;
 		key.X = 0;
@@ -200,7 +189,34 @@ namespace dd
 #endif
 	}
 
-	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod )
+	void TerrainSystem::UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required_chunks )
+	{
+		Vector<EntityHandle>& existing_chunks = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
+		Vector<EntityHandle> still_active;
+		still_active.Reserve( existing_chunks.Size() );
+
+		Vector<TerrainChunkKey> need_creating;
+		need_creating.Reserve( required_chunks.Size() );
+
+		for( const TerrainChunkKey& required_key : required_chunks )
+		{
+			bool is_required = false;
+
+			for( EntityHandle& entity : existing_chunks )
+			{
+				TerrainChunkComponent* terrain_chunk = entity.Get<TerrainChunkComponent>().Write();
+				const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();
+
+				if( required_key == existing_key )
+				{
+					is_required = true;
+					break;
+				}
+			}
+		}
+	}
+
+	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod, Vector<TerrainChunkKey>& toGenerate )
 	{
 		const float vertex_distance = m_params.VertexDistance * (1 << lod);
 		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
@@ -217,7 +233,7 @@ namespace dd
 			for( int x = -halfChunks; x < halfChunks; ++x )
 			{
 				// don't generate chunks for the middle-most grid unless we're at LOD 0
-				if( lod != 0 && 
+				if( lod != 0 &&
 					(x >= -quarterChunks && x < quarterChunks) &&
 					(y >= -quarterChunks && y < quarterChunks) )
 				{
@@ -229,7 +245,7 @@ namespace dd
 				key.Y = y * chunk_size;
 				key.LOD = lod;
 
-				CreateChunk( entity_manager, key );
+				toGenerate.Add( key );
 
 				++generated;
 			}
@@ -238,7 +254,7 @@ namespace dd
 		const int expected = lod == 0 ? ChunksPerDimension * ChunksPerDimension : // lod 0
 			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
 
-		DD_ASSERT( generated == expected, "Wrong number of chunks generated for LOD!" );
+		DD_ASSERT( generated != expected, "Wrong amount of chunks have been generated!" );
 	}
 
 	void TerrainSystem::CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key )
@@ -271,6 +287,26 @@ namespace dd
 			chunk_cmp->Chunk = nullptr;
 			chunk_cmp->IsActive = false;
 			entity.Destroy();
+		} );
+	}
+
+	void TerrainSystem::SaveChunkImages( const EntityManager& entity_manager ) const
+	{
+		int chunk_index = 0;
+
+		entity_manager.ForAllWithReadable<TerrainChunkComponent>( [&chunk_index]( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_h )
+		{
+			String64 chunk_file;
+			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
+
+			chunk_h.Read()->Chunk->WriteHeightImage( chunk_file.c_str() );
+
+			String64 chunk_normal_file;
+			snprintf( chunk_file.data(), 64, "terrain_%d_n.tga", chunk_index );
+
+			chunk_h.Read()->Chunk->WriteNormalImage( chunk_normal_file.c_str() );
+
+			++chunk_index;
 		} );
 	}
 
