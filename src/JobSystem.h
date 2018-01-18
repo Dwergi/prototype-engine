@@ -12,7 +12,7 @@
 #include <functional>
 #include <stdexcept>
 
-#define JOBSYSTEM_NO_THREADS
+//#define JOBSYSTEM_NO_THREADS
 
 namespace dd
 {

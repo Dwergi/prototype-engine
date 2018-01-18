@@ -20,25 +20,11 @@ namespace dd
 		void Update();
 		void DelayFrame();
 
-		void SetMaxFPS( uint max_fps )
-		{
-			m_maxFPS = max_fps;
-		}
+		void SetMaxFPS( uint max_fps ) { m_maxFPS = max_fps; }
 
-		float Delta() const
-		{
-			return m_delta;
-		}
-
-		float SlidingDelta() const
-		{
-			return m_slidingDelta;
-		}
-
-		float DeltaWithoutDelay() const
-		{
-			return m_deltaWithoutDelay;
-		}
+		float Delta() const { return m_delta; }
+		float SlidingDelta() const { return m_slidingDelta; }
+		float DeltaWithoutDelay() const { return m_deltaWithoutDelay; }
 
 		virtual const char* GetDebugTitle() const override
 		{
@@ -61,7 +47,7 @@ namespace dd
 		float m_deltaWithoutDelay;
 		float m_slidingDelta;
 		uint m_maxFPS;
-		bool m_drawCompact { false };
+		bool m_drawCompact { true };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE];

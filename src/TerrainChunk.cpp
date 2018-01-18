@@ -10,6 +10,7 @@
 #include "ICamera.h"
 #include "EntityManager.h"
 #include "GLError.h"
+#include "JobSystem.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -32,8 +33,8 @@ namespace dd
 		m_params( params ),
 		m_key( key )
 	{
-		m_vertices.Set( new glm::vec3[VertexCount], VertexCount );
-		m_normals.Set( new glm::vec3[VertexCount], VertexCount );
+		m_verticesBuffer.Set( m_vertices, VertexCount );
+		m_normalsBuffer.Set( m_normals, VertexCount );
 		m_indices.Set( s_indices, IndexCount );
 	}
 
@@ -41,8 +42,8 @@ namespace dd
 	{
 		Mesh::Destroy( m_mesh );
 
-		m_vertices.Delete();
-		m_normals.Delete();
+		m_verticesBuffer.Release();
+		m_normalsBuffer.Release();
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -188,7 +189,7 @@ namespace dd
 
 	void TerrainChunk::Generate()
 	{
-		DD_PROFILE_SCOPED( TerrainChunk_InitializeVerts );
+		DD_PROFILE_SCOPED( TerrainChunk_Generate );
 
 		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 		const int actual_vertices = Vertices + 1;
@@ -227,11 +228,24 @@ namespace dd
 		{
 			m_vertices[flap_vertex_start + x] = glm::vec3( 0, 0, x * actual_distance );
 		}
+
+		m_dataDirty = true;
 	}
 
-	void TerrainChunk::Update( float delta_t )
+	void TerrainChunk::Update( JobSystem& job_system, float delta_t )
 	{
+		if( m_dataDirty )
+		{
+			job_system.Schedule(
+				[this]()
+			{
+				UpdateVertices( m_noiseOffset ); 
+				UpdateNormals();
 
+				m_dataDirty = false;
+				m_renderDirty = true;
+			} );
+		}
 	}
 
 	void TerrainChunk::RenderUpdate()
@@ -241,7 +255,7 @@ namespace dd
 			Mesh::Destroy( m_mesh );
 		}
 
-		if( m_dirty )
+		if( m_renderDirty )
 		{
 			if( !m_mesh.IsValid() )
 			{
@@ -260,7 +274,7 @@ namespace dd
 
 			mesh->SetBounds( bounds );
 
-			m_dirty = false;
+			m_renderDirty = false;
 		}
 	}
 
@@ -382,12 +396,10 @@ namespace dd
 	}
 
 
-	void TerrainChunk::SetTerrainOrigin( glm::vec2 origin )
+	void TerrainChunk::SetNoiseOffset( glm::vec2 noise_offset )
 	{
-		UpdateVertices( origin );
-		UpdateNormals();
-
-		m_dirty = true;
+		m_noiseOffset = noise_offset;
+		m_dataDirty = true;
 	}
 
 	void TerrainChunk::CreateMesh( const TerrainChunkKey& key )
@@ -402,10 +414,10 @@ namespace dd
 		Mesh* mesh = m_mesh.Get();
 		mesh->UseShader( true );
 
-		mesh->SetPositions( m_vertices );
+		mesh->SetPositions( m_verticesBuffer );
 
 		mesh->EnableNormals( true );
-		mesh->SetNormals( m_normals );
+		mesh->SetNormals( m_normalsBuffer );
 
 		mesh->EnableIndices( true );
 		mesh->SetIndices( m_indices );

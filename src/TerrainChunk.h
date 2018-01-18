@@ -14,6 +14,7 @@ namespace dd
 {
 	class ICamera;
 	class ShaderProgram;
+	class JobSystem;
 
 	struct TerrainParameters;
 
@@ -40,9 +41,9 @@ namespace dd
 		~TerrainChunk();
 		
 		void Generate();
-		void SetTerrainOrigin( glm::vec2 origin );
+		void SetNoiseOffset( glm::vec2 origin );
 
-		void Update( float delta_t );
+		void Update( JobSystem& job_system, float delta_t );
 		void RenderUpdate();
 
 		void Destroy();
@@ -72,12 +73,18 @@ namespace dd
 		TerrainChunkKey m_key;
 		
 		bool m_destroy { false };
-		bool m_dirty { false };
+		bool m_renderDirty { false };
+		bool m_dataDirty { false };
 		MeshHandle m_mesh;
 
-		Buffer<glm::vec3> m_vertices;
-		Buffer<glm::vec3> m_normals;
+		glm::vec3 m_vertices[VertexCount];
+		Buffer<glm::vec3> m_verticesBuffer;
+
+		glm::vec3 m_normals[VertexCount];
+		Buffer<glm::vec3> m_normalsBuffer;
 		Buffer<uint> m_indices;
+
+		glm::vec2 m_noiseOffset;
 		
 		float GetHeight( float x, float y );
 

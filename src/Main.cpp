@@ -472,7 +472,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 	s_mainThread = std::this_thread::get_id();
 
 	{
-		JobSystem jobSystem( 4u );
+		JobSystem jobSystem( 7u );
 		SwarmSystem swarm_system;
 
 		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );

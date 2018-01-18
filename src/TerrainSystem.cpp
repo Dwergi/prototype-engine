@@ -111,7 +111,6 @@ namespace dd
 		if( m_requiresRegeneration )
 		{
 			DestroyChunks( entity_manager );
-			GenerateTerrain( entity_manager );
 
 			m_requiresRegeneration = false;
 		}
@@ -123,14 +122,25 @@ namespace dd
 			m_saveChunkImages = false;
 		}
 
+		glm::vec3 pos = m_camera.GetPosition();
+		float chunk_size = TerrainChunk::Vertices * m_params.VertexDistance;
+
+		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );
+		if( m_previousOffset != origin )
+		{
+			GenerateTerrain( entity_manager, origin );
+
+			m_previousOffset = origin;
+		}
+
 		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
-			[&entity_manager, this]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp )
+			[&entity_manager, this, delta_t]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp )
 			{
-				UpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write() );
+				UpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write(), delta_t );
 			} );
 	}
 
-	void TerrainSystem::UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp )
+	void TerrainSystem::UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, float delta_t )
 	{
 		if( m_params.UseDebugColours )
 		{
@@ -140,33 +150,14 @@ namespace dd
 		{
 			mesh_cmp->Colour = glm::vec4( 1, 1, 1, 1 );
 		}
+
+		chunk_cmp->Chunk->Update( m_jobSystem, delta_t );
 	}
 
-	void TerrainSystem::SetOrigin( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, TransformComponent* transform_cmp, glm::vec3 origin )
+	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager, const glm::ivec2 offset )
 	{
-		TerrainChunk* chunk = chunk_cmp->Chunk;
-		if( chunk == nullptr )
-		{
-			return;
-		}
-
-		TerrainChunkKey chunk_key = chunk->GetKey();
-
-		float rounded_x = ((int) origin.x / m_params.VertexDistance) * m_params.VertexDistance;
-		float rounded_z = ((int) origin.z / m_params.VertexDistance) * m_params.VertexDistance;
-		glm::vec2 chunk_pos = glm::vec2( chunk_key.X + rounded_x, chunk_key.Y + rounded_z );
-
-		chunk->SetTerrainOrigin( chunk_pos );
-
-		transform_cmp->SetLocalPosition( glm::vec3( rounded_x, 0, rounded_z ) );
-	}
-	
-	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager )
-	{
-#ifndef GENERATE_SINGLE_CHUNK
-
 		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
-			m_lodLevels * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
+			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
 
 		Vector<TerrainChunkKey> toGenerate;
 		toGenerate.Reserve( expected );
@@ -175,74 +166,63 @@ namespace dd
 		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
 		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
-			GenerateLODLevel( entity_manager, lod, toGenerate );
+			GenerateLODLevel( entity_manager, lod, toGenerate, offset );
 		}
 
 		UpdateTerrainChunks( entity_manager, toGenerate );
-#else
-		TerrainChunkKey key;
-		key.X = 0;
-		key.Y = 0;
-		key.LOD = 0;
-
-		CreateChunk( entity_manager, key );
-#endif
 	}
 
 	void TerrainSystem::UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required_chunks )
 	{
-		Vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
+		const Vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
 
-		std::unordered_map<TerrainChunkKey, EntityHandle> existing_chunks;
-		existing_chunks.reserve( existing_entities.Size() );
+		m_existing.clear();
 
-		for( EntityHandle& existing_entity : existing_entities )
+		for( EntityHandle& entity : existing_entities )
 		{
-			TerrainChunkComponent* terrain_chunk = existing_entity.Get<TerrainChunkComponent>().Write();
+			TerrainChunkComponent* terrain_chunk = entity.Get<TerrainChunkComponent>().Write();
 			const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();
 
-			existing_chunks.insert( std::make_pair( existing_key, existing_entity ) );
+			terrain_chunk->IsActive = false;
+			entity.Get<MeshComponent>().Write()->Hidden = true;
+
+			m_existing.insert( std::make_pair( existing_key, entity ) );
 		}
 
 		Vector<TerrainChunkKey> missing_chunks;
 		missing_chunks.Reserve( required_chunks.Size() );
 
-		Vector<EntityHandle> inactive_entities;
-		inactive_entities.Reserve( existing_entities.Size() );
-
-		Vector<EntityHandle> active_entities;
-		active_entities.Reserve( existing_entities.Size() );
+		m_active.Clear();
 
 		for( const TerrainChunkKey& required : required_chunks )
 		{
-			auto it = existing_chunks.find( required );
-			if( it != existing_chunks.end() )
+			auto it = m_existing.find( required );
+			if( it != m_existing.end() )
 			{
-				active_entities.Add( it->second );
+				m_active.Add( it->second );
 			}
 			else
 			{
 				missing_chunks.Add( required );
 			}
 		}
-
-		// find entities that should be inactive
-
-		for( EntityHandle& entity : inactive_entities )
+		
+		for( EntityHandle& entity : m_active )
 		{
-			entity.Get<TerrainChunkComponent>().Write()->IsActive = false;
-			entity.Get<MeshComponent>().Write()->Hidden = true;
+			entity.Get<TerrainChunkComponent>().Write()->IsActive = true;
+			entity.Get<MeshComponent>().Write()->Hidden = false;
 		}
 
-		for( EntityHandle& entity : active_entities )
+		for( const TerrainChunkKey& key : missing_chunks )
 		{
-			entity.Get<TerrainChunkComponent>().Write()->IsActive = false;
-			entity.Get<MeshComponent>().Write()->Hidden = true;
+			CreateChunk( entity_manager, key );
 		}
 	}
 
-	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod, Vector<TerrainChunkKey>& toGenerate )
+	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod, Vector<TerrainChunkKey>& toGenerate, const glm::ivec2 offset )
 	{
+		glm::ivec2 lod_offset( offset.x >> lod, offset.y >> lod );
+
 		const float vertex_distance = m_params.VertexDistance * (1 << lod);
 		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
 
@@ -266,8 +246,8 @@ namespace dd
 				}
 
 				TerrainChunkKey key;
-				key.X = x * chunk_size;
-				key.Y = y * chunk_size;
+				key.X = lod_offset.x * chunk_size + x * chunk_size;
+				key.Y = lod_offset.y * chunk_size + y * chunk_size;
 				key.LOD = lod;
 
 				toGenerate.Add( key );
@@ -279,7 +259,7 @@ namespace dd
 		const int expected = lod == 0 ? ChunksPerDimension * ChunksPerDimension : // lod 0
 			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
 
-		DD_ASSERT( generated != expected, "Wrong amount of chunks have been generated!" );
+		DD_ASSERT( expected == generated, "Wrong amount of chunks have been generated!\nExpected: %d\tActual: %d", expected, generated );
 	}
 
 	void TerrainSystem::CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key )
@@ -288,19 +268,16 @@ namespace dd
 
 		EntityHandle entity = entity_manager.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent>();
 
+		TransformComponent* transform_cmp = entity.Get<TransformComponent>().Write();
+		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
+		transform_cmp->UpdateWorldTransform();
+
 		TerrainChunkComponent* chunk_cmp = entity.Get<TerrainChunkComponent>().Write();
 		TerrainChunk* chunk = new TerrainChunk( m_params, key );
 		chunk_cmp->Chunk = chunk;
 		chunk_cmp->IsActive = true;
 
-		TransformComponent* transform_cmp = entity.Get<TransformComponent>().Write();
-		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
-
-		m_jobSystem.Schedule( [this, chunk]()
-		{
-			chunk->Generate();
-			chunk->SetTerrainOrigin( glm::vec2( 0, 0 ) );
-		} );
+		chunk->Generate();
 	}
 
 	void TerrainSystem::DestroyChunks( EntityManager& entity_manager )
@@ -337,6 +314,9 @@ namespace dd
 
 	void TerrainSystem::DrawDebugInternal()
 	{
+		ImGui::Value( "Chunks", (int) m_existing.size() );
+		ImGui::Value( "Active", m_active.Size() );
+
 		ImGui::Checkbox( "Debug Colours", &m_params.UseDebugColours );
 
 		if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
