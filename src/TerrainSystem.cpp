@@ -191,28 +191,53 @@ namespace dd
 
 	void TerrainSystem::UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required_chunks )
 	{
-		Vector<EntityHandle>& existing_chunks = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
-		Vector<EntityHandle> still_active;
-		still_active.Reserve( existing_chunks.Size() );
+		Vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
 
-		Vector<TerrainChunkKey> need_creating;
-		need_creating.Reserve( required_chunks.Size() );
+		std::unordered_map<TerrainChunkKey, EntityHandle> existing_chunks;
+		existing_chunks.reserve( existing_entities.Size() );
 
-		for( const TerrainChunkKey& required_key : required_chunks )
+		for( EntityHandle& existing_entity : existing_entities )
 		{
-			bool is_required = false;
+			TerrainChunkComponent* terrain_chunk = existing_entity.Get<TerrainChunkComponent>().Write();
+			const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();
 
-			for( EntityHandle& entity : existing_chunks )
+			existing_chunks.insert( std::make_pair( existing_key, existing_entity ) );
+		}
+
+		Vector<TerrainChunkKey> missing_chunks;
+		missing_chunks.Reserve( required_chunks.Size() );
+
+		Vector<EntityHandle> inactive_entities;
+		inactive_entities.Reserve( existing_entities.Size() );
+
+		Vector<EntityHandle> active_entities;
+		active_entities.Reserve( existing_entities.Size() );
+
+		for( const TerrainChunkKey& required : required_chunks )
+		{
+			auto it = existing_chunks.find( required );
+			if( it != existing_chunks.end() )
 			{
-				TerrainChunkComponent* terrain_chunk = entity.Get<TerrainChunkComponent>().Write();
-				const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();
-
-				if( required_key == existing_key )
-				{
-					is_required = true;
-					break;
-				}
+				active_entities.Add( it->second );
 			}
+			else
+			{
+				missing_chunks.Add( required );
+			}
+		}
+
+		// find entities that should be inactive
+
+		for( EntityHandle& entity : inactive_entities )
+		{
+			entity.Get<TerrainChunkComponent>().Write()->IsActive = false;
+			entity.Get<MeshComponent>().Write()->Hidden = true;
+		}
+
+		for( EntityHandle& entity : active_entities )
+		{
+			entity.Get<TerrainChunkComponent>().Write()->IsActive = false;
+			entity.Get<MeshComponent>().Write()->Hidden = true;
 		}
 	}
 
