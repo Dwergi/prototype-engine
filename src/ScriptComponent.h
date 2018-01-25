@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
@@ -16,7 +16,7 @@ namespace dd
 	class ScriptComponent : public IComponent
 	{
 	public:
-		using Pool = DenseMapPool<ScriptComponent>;
+		using Pool = PackedPool<ScriptComponent>;
 
 		ScriptComponent();
 

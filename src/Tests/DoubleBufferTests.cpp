@@ -10,7 +10,7 @@
 #include "DoubleBuffer.h"
 
 #include "IComponent.h"
-#include "DenseVectorPool.h"
+#include "PackedPool.h"
 #include "EntityManager.h"
 
 using namespace dd;

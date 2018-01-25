@@ -25,31 +25,12 @@ struct is_callable<T, R, void_t<std::result_of_t<T>>>
 };
 
 template <typename TSignature>
-struct signature_helper;
-
-template <typename TReturn, typename... TArgs>
-struct signature_helper<TReturn( TArgs... )>
-{
-	using fn_ptr_type = TReturn( *)(TArgs...);
-};
-
-template <typename TSignature>
-using fn_ptr = typename signature_helper<TSignature>::fn_ptr_type;
-
-template <typename T>
-struct dependent_false : std::false_type
-{
-};
-
-template <typename TSignature>
 class FunctionView;
 
 template <typename TReturn, typename... TArgs>
 class FunctionView<TReturn( TArgs... )> final
 {
 private:
-	using signature_type = TReturn( void*, TArgs... );
-
 	void* m_ptr { nullptr };
 	TReturn( *m_erasedFn )(void*, TArgs...);
 

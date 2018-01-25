@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
@@ -15,7 +15,7 @@ namespace dd
 	{
 	public:
 
-		typedef DenseMapPool<PlayerComponent> Pool;
+		typedef PackedPool<PlayerComponent> Pool;
 
 		PlayerComponent() {}
 		virtual ~PlayerComponent() {}

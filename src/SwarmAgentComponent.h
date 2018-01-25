@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 #include "Vector4.h"
 #include "AABBOctree.h"
 
@@ -17,7 +17,7 @@ namespace dd
 	{
 	public:
 
-		typedef DenseMapPool<SwarmAgentComponent> Pool;
+		typedef PackedPool<SwarmAgentComponent> Pool;
 
 		glm::vec3 Velocity;
 		OctreeEntry OctreeHandle;

@@ -7,8 +7,8 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
 #include "Mesh.h"
+#include "PackedPool.h"
 #include "AABB.h"
 
 namespace dd
@@ -19,7 +19,7 @@ namespace dd
 	{
 	public: 
 
-		using Pool = DenseMapPool<MeshComponent>;
+		using Pool = PackedPool<MeshComponent>;
 
 		MeshComponent();
 		MeshComponent( MeshHandle mesh );

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
@@ -17,7 +17,7 @@ namespace dd
 
 		glm::vec3 Direction;
 
-		typedef DenseMapPool<TrenchComponent> Pool;
+		typedef PackedPool<TrenchComponent> Pool;
 
 		TrenchComponent() { }
 

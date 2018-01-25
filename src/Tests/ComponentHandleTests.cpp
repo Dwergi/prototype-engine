@@ -4,7 +4,7 @@
 
 #include "IComponent.h"
 #include "ComponentHandle.h"
-#include "DenseVectorPool.h"
+#include "PackedPool.h"
 #include "EntityHandle.h"
 #include "EntityManager.h"
 
@@ -12,13 +12,13 @@ namespace
 {
 	struct FooComponent : dd::IComponent
 	{
-		using Pool = dd::DenseVectorPool<FooComponent>;
+		using Pool = dd::PackedPool<FooComponent>;
 		int ID;
 	};
 
 	struct BarComponent : dd::IComponent
 	{
-		using Pool = dd::DenseVectorPool<BarComponent>;
+		using Pool = dd::PackedPool<BarComponent>;
 		bool Valid;
 	};
 }

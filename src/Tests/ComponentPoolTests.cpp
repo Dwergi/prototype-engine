@@ -2,10 +2,7 @@
 
 #include "catch/catch.hpp"
 
-#include "ComponentPoolTestComponent.h"
-#include "SortedVectorPool.h"
-#include "DenseMapPool.h"
-#include "DenseVectorPool.h"
+#include "PackedPool.h"
 
 struct FooComponent
 	: public dd::IComponent
@@ -14,14 +11,14 @@ struct FooComponent
 };
 
 template <typename PoolType>
-void CreateEntities( dd::Vector<dd::EntityHandle>& handles, PoolType& pool, int count )
+void CreateEntities( dd::Vector<dd::EntityHandle>& handles, PoolType& pool, int start, int end )
 {
-	for( int i = 0; i < count; ++i )
+	for( int i = start; i < end; ++i )
 	{
 		dd::EntityHandle handle;
 		memset( &handle, 0, sizeof( dd::EntityHandle ) );
 
-		*(int*) (&handle) = i;
+		*(int*) (&handle.Handle) = i;
 		handles.Add( handle );
 
 		FooComponent* cmp = pool.Create( handle );
@@ -31,6 +28,8 @@ void CreateEntities( dd::Vector<dd::EntityHandle>& handles, PoolType& pool, int 
 	}
 }
 
+const int ComponentCount = 100;
+
 template <typename PoolType>
 void TestPool()
 {
@@ -38,11 +37,11 @@ void TestPool()
 
 	dd::Vector<dd::EntityHandle> handles;
 
-	CreateEntities( handles, pool, 10 );
+	CreateEntities( handles, pool, 0, ComponentCount );
 
-	REQUIRE( pool.Size() == 10 );
+	REQUIRE( pool.Size() == ComponentCount );
 
-	for( int i = 0; i < 10; ++i )
+	for( int i = 0; i < ComponentCount; ++i )
 	{
 		bool exists = pool.Exists( handles[i] );
 		REQUIRE( exists );
@@ -58,9 +57,9 @@ void TestPool()
 		++count;
 	}
 
-	REQUIRE( count == 10 );
+	REQUIRE( count == ComponentCount );
 
-	for( int i = 0; i < 10; ++i )
+	for( int i = 0; i < ComponentCount; ++i )
 	{
 		pool.Remove( handles[i] );
 
@@ -69,29 +68,29 @@ void TestPool()
 
 	REQUIRE( pool.Size() == 0 );
 
-	CreateEntities( handles, pool, 10 );
+	CreateEntities( handles, pool, 0, ComponentCount );
 
-	pool.Remove( handles[5] );
-
-	REQUIRE( !pool.Exists( handles[5] ) );
-
-	for( FooComponent& cmp : pool )
+	const int start = ComponentCount / 4;
+	const int end = start + ComponentCount / 2;
+	for( int i = start; i < end; ++i )
 	{
-		REQUIRE( cmp.Entity != handles[5] );
+		pool.Remove( handles[i] );
+		REQUIRE( !pool.Exists( handles[i] ) );
+	}
+
+	CreateEntities( handles, pool, start, end );
+
+	for( int i = 0; i < ComponentCount; ++i )
+	{
+		REQUIRE( pool.Exists( handles[ i ] ) );
+
+		FooComponent* cmp = pool.Find( handles[ i ] );
+		REQUIRE( cmp != nullptr );
+		REQUIRE( cmp->ID == i );
 	}
 }
 
-TEST_CASE( "Dense Vector Pool" )
+TEST_CASE( "[ComponentPool] Packed Pool" )
 {
-	TestPool<dd::DenseVectorPool<FooComponent>>();
-}
-
-TEST_CASE( "Unordered Map Pool" )
-{
-	TestPool<dd::DenseMapPool<FooComponent>>();
-}
-
-TEST_CASE( "Sorted Vector Pool" )
-{
-	TestPool<dd::SortedVectorPool<FooComponent>>();
+	TestPool<dd::PackedPool<FooComponent>>();
 }

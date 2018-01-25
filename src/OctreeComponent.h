@@ -8,14 +8,14 @@
 
 #include "IComponent.h"
 #include "AABBOctree.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
 	class OctreeComponent : public IComponent
 	{
 	public:
-		using Pool = DenseMapPool<OctreeComponent>;
+		using Pool = PackedPool<OctreeComponent>;
 
 		OctreeEntry Entry;
 

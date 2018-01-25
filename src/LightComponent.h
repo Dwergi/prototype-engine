@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
@@ -15,7 +15,7 @@ namespace dd
 	{
 	public:
 
-		using Pool = DenseMapPool<LightComponent>;
+		using Pool = PackedPool<LightComponent>;
 
 		LightComponent();
 		LightComponent( const LightComponent& other );

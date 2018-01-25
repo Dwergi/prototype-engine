@@ -91,13 +91,13 @@ namespace dd
 		Texture m_colourTexture;
 		Texture m_depthTexture;
 		
-		Vector<ShaderHandle> m_shaders;
+		std::vector<ShaderHandle> m_shaders;
 
 		EntityHandle m_xAxis;
 		EntityHandle m_yAxis;
 		EntityHandle m_zAxis;
 
-		Vector<EntityHandle> m_debugLights;
+		std::vector<EntityHandle> m_debugLights;
 
 		int m_meshCount;
 		int m_frustumMeshCount;
@@ -141,6 +141,7 @@ namespace dd
 
 		void SetRenderState();
 
-		void RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, const Vector<EntityHandle>& pointLights, const ICamera& camera, const MousePicking* mouse_picking );
+		void RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, const std::vector<EntityHandle>& lights, 
+			const ICamera& camera, const MousePicking* mouse_picking );
 	};
 }

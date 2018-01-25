@@ -62,7 +62,8 @@ namespace dd
 
 	TerrainSystem::TerrainSystem( const ICamera& camera, JobSystem& jobSystem ) :
 		m_camera( camera ),
-		m_jobSystem( jobSystem )
+		m_jobSystem( jobSystem ),
+		m_previousOffset( INT_MAX, INT_MAX )
 	{
 	}
 
@@ -174,11 +175,11 @@ namespace dd
 
 	void TerrainSystem::UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required_chunks )
 	{
-		const Vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
+		const std::vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
 
 		m_existing.clear();
 
-		for( EntityHandle& entity : existing_entities )
+		for( const EntityHandle& entity : existing_entities )
 		{
 			TerrainChunkComponent* terrain_chunk = entity.Get<TerrainChunkComponent>().Write();
 			const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();

@@ -10,24 +10,23 @@
 
 namespace dd
 {
-	class DoubleBufferBase
+	class IDoubleBuffer
 	{
 	public:
 
-		virtual ~DoubleBufferBase();
+		virtual ~IDoubleBuffer();
 
-		DoubleBufferBase( const DoubleBufferBase& ) = delete;
-		DoubleBufferBase( DoubleBufferBase&& ) = delete;
+		IDoubleBuffer( const IDoubleBuffer& ) = delete;
+		IDoubleBuffer( IDoubleBuffer&& ) = delete;
 
-		DoubleBufferBase& operator=( const DoubleBufferBase& ) = delete;
-		DoubleBufferBase& operator=( DoubleBufferBase&& ) = delete;
+		IDoubleBuffer& operator=( const IDoubleBuffer& ) = delete;
+		IDoubleBuffer& operator=( IDoubleBuffer&& ) = delete;
 
 		//
 		// Swap the read and write buffers.
 		//
 		void Swap();
 
-		virtual void Clear() const = 0;
 		virtual void Duplicate() const = 0;
 
 		void* GetWriteVoid() const { return m_write; }
@@ -39,11 +38,11 @@ namespace dd
 
 		bool m_isOwner;
 
-		DoubleBufferBase( void* read, void* write, bool is_owner );
+		IDoubleBuffer( void* read, void* write, bool is_owner );
 	};
 
 	template <typename T>
-	class DoubleBuffer : public DoubleBufferBase
+	class DoubleBuffer : public IDoubleBuffer
 	{
 	public:
 
@@ -60,11 +59,6 @@ namespace dd
 		// Duplicate the read buffer into the write buffer.
 		//
 		virtual void Duplicate() const override;
-
-		//
-		// Clear the contents of both the read and write buffers.
-		//
-		virtual void Clear() const override;
 
 		//
 		// Get the read buffer.

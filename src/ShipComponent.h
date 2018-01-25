@@ -7,14 +7,14 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
 
 namespace dd
 {
 	class ShipComponent : public IComponent
 	{
 	public:
-		typedef DenseMapPool<ShipComponent> Pool;
+		typedef PackedPool<ShipComponent> Pool;
 
 		glm::vec3 Velocity;
 		float MaximumSpeed;

@@ -7,7 +7,8 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseMapPool.h"
+#include "PackedPool.h"
+#include "TerrainChunkKey.h"
 
 namespace dd
 {
@@ -17,7 +18,7 @@ namespace dd
 	{
 	public:
 
-		using Pool = DenseMapPool<TerrainChunkComponent>;
+		using Pool = PackedPool<TerrainChunkComponent>;
 
 		TerrainChunkComponent();
 

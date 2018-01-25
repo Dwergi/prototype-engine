@@ -110,13 +110,13 @@ namespace dd
 		// Find all entities that have all the readable components given.
 		//
 		template <typename... Components>
-		Vector<EntityHandle> FindAllWithReadable() const;
+		std::vector<EntityHandle> FindAllWithReadable() const;
 
 		//
 		// Find all entities that have all the writable components given.
 		//
 		template <typename... Components>
-		Vector<EntityHandle> FindAllWithWritable() const;
+		std::vector<EntityHandle> FindAllWithWritable() const;
 
 		//
 		// Run the given function for all the entities that have the given readable component types.
@@ -157,10 +157,10 @@ namespace dd
 		std::recursive_mutex m_mutex;
 		bool m_initialized { false };
 
-		DoubleBuffer<Vector<int>> m_free;
-		DoubleBuffer<Vector<EntityHandle>> m_entities;
+		DoubleBuffer<std::vector<int>> m_free;
+		DoubleBuffer<std::vector<EntityHandle>> m_entities;
 
-		DenseMap<uint64, DoubleBufferBase*> m_pools;
+		DenseMap<uint64, IDoubleBuffer*> m_pools;
 
 		template <typename... Components, std::size_t... Index>
 		void CreateComponents( EntityHandle handle, std::index_sequence<Index...> );

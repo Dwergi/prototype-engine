@@ -9,9 +9,7 @@
 
 #include "EntityManager.h"
 #include "IComponent.h"
-#include "DenseMapPool.h"
-#include "DenseVectorPool.h"
-#include "SortedVectorPool.h"
+#include "PackedPool.h"
 
 using namespace dd;
 
@@ -20,7 +18,7 @@ class FooComponent : public IComponent
 public:
 	int A;
 
-	typedef DenseVectorPool<FooComponent> Pool;
+	typedef PackedPool<FooComponent> Pool;
 
 	BEGIN_TYPE( FooComponent )
 		MEMBER( FooComponent, A )
@@ -32,7 +30,7 @@ class BarComponent : public IComponent
 public:
 	float B;
 
-	typedef DenseVectorPool<BarComponent> Pool;
+	typedef PackedPool<BarComponent> Pool;
 
 	BEGIN_TYPE( BarComponent )
 		MEMBER( BarComponent, B )
@@ -44,7 +42,7 @@ class DenseVectorComponent : public IComponent
 public: 
 	int Integer;
 
-	using Pool = DenseVectorPool<DenseVectorComponent>;
+	using Pool = PackedPool<DenseVectorComponent>;
 
 	BEGIN_TYPE( DenseVectorComponent )
 		MEMBER( DenseVectorComponent, Integer )
@@ -56,7 +54,7 @@ class SortedVectorComponent : public IComponent
 public:
 	int Integer;
 
-	using Pool = SortedVectorPool<SortedVectorComponent>;
+	using Pool = PackedPool<SortedVectorComponent>;
 
 	BEGIN_TYPE( SortedVectorComponent )
 		MEMBER( SortedVectorComponent, Integer )
@@ -68,7 +66,7 @@ class DenseMapComponent : public IComponent
 public:
 	int Integer;
 
-	using Pool = DenseMapPool<DenseMapComponent>;
+	using Pool = PackedPool<DenseMapComponent>;
 
 	BEGIN_TYPE( DenseMapComponent )
 		MEMBER( DenseMapComponent, Integer )

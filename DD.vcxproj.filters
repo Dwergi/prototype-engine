@@ -43,9 +43,6 @@
     <Filter Include="Components\Pools">
       <UniqueIdentifier>{8d309a51-ff54-4264-b346-5a708869a8b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Components\Pools\Test Components">
-      <UniqueIdentifier>{fe77aabc-75a8-4829-a000-a8d493294d6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes">
       <UniqueIdentifier>{6f7b570c-e8a9-463e-a549-5bb17d2ab414}</UniqueIdentifier>
     </Filter>
@@ -261,20 +258,8 @@
     <ClInclude Include="src\Globals.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComponentPoolBase.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SortedVectorPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
     <ClInclude Include="src\ComponentPairIterator.h">
       <Filter>Components\Pools</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DenseVectorPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentPoolTestComponent.h">
-      <Filter>Components\Pools\Test Components</Filter>
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_extras.hpp">
       <Filter>Includes\PCG</Filter>
@@ -323,9 +308,6 @@
     </ClInclude>
     <ClInclude Include="src\DLL.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DenseMapPool.h">
-      <Filter>Components\Pools</Filter>
     </ClInclude>
     <ClInclude Include="src\ISystem.h">
       <Filter>Systems</Filter>
@@ -515,6 +497,12 @@
     </ClInclude>
     <ClInclude Include="src\TerrainParameters.h">
       <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PackedPool.h">
+      <Filter>Components\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IComponentPool.h">
+      <Filter>Components\Pools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -881,17 +869,8 @@
     <None Include="src\Recorder.inl">
       <Filter>Properties</Filter>
     </None>
-    <None Include="src\DenseVectorPool.inl">
-      <Filter>Components\Pools</Filter>
-    </None>
-    <None Include="src\SortedVectorPool.inl">
-      <Filter>Components\Pools</Filter>
-    </None>
     <None Include="src\DenseMap.inl">
       <Filter>Containers</Filter>
-    </None>
-    <None Include="src\DenseMapPool.inl">
-      <Filter>Components\Pools</Filter>
     </None>
     <None Include="src\RingBuffer.inl">
       <Filter>Containers</Filter>
@@ -904,6 +883,9 @@
     </None>
     <None Include="src\DoubleBuffer.inl">
       <Filter>Containers</Filter>
+    </None>
+    <None Include="src\PackedPool.inl">
+      <Filter>Components\Pools</Filter>
     </None>
   </ItemGroup>
 </Project>

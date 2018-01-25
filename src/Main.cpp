@@ -544,83 +544,74 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_fsm = new FSM();
 		s_fsm->AddState( INITIALIZED );
 
+		FSMState& updateTimerState = s_fsm->AddState( UPDATE_TIMER );
+		auto onUpdateTimer = [&]()
 		{
-			FSMState& updateTimerState = s_fsm->AddState( UPDATE_TIMER );
-			updateTimerState.SetOnEnter( [&]()
-			{
-				s_frameTimer->SetMaxFPS( s_maxFPS );
-				s_frameTimer->Update();
+			s_frameTimer->SetMaxFPS( s_maxFPS );
+			s_frameTimer->Update();
 
-				float delta_t = s_frameTimer->Delta();
-				UpdateInput( *s_input, bindings, delta_t );
-				s_debugUI->Update( delta_t );
-			} );
-		}
+			float delta_t = s_frameTimer->Delta();
+			UpdateInput( *s_input, bindings, delta_t );
+			s_debugUI->Update( delta_t );
+		};
+		updateTimerState.SetOnEnter( onUpdateTimer );
 
+		FSMState& preupdateState = s_fsm->AddState( PREUPDATE );
+		auto onPreupdate = [&]()
 		{
-			FSMState& preupdateState = s_fsm->AddState( PREUPDATE );
-			preupdateState.SetOnEnter( [&]()
-			{
-				float delta_t = s_frameTimer->Delta();
-				entity_manager.Update( delta_t );
-				PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
-			} );
-		}
+			float delta_t = s_frameTimer->Delta();
+			entity_manager.Update( delta_t );
+			PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
+		};
+		preupdateState.SetOnEnter( onPreupdate );
 
+		FSMState& updateState = s_fsm->AddState( UPDATE );
+		auto onUpdate = [&]()
 		{
-			FSMState& updateState = s_fsm->AddState( UPDATE );
-			updateState.SetOnEnter( [&]()
-			{
-				float delta_t = s_frameTimer->Delta();
-				camera.SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+			float delta_t = s_frameTimer->Delta();
+			camera.SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 
-				UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
-				UpdateSystems( jobSystem, entity_manager, systems, delta_t );
-			} );
-		}
+			UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
+			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
+		};
+		updateState.SetOnEnter( onUpdate );
 
+		FSMState& renderState = s_fsm->AddState( RENDER );
+		auto onRender = [&]()
 		{
-			FSMState& renderState = s_fsm->AddState( RENDER );
-			renderState.SetOnEnter( [&]()
-			{
-				DrawDebugUI( debug_views );
-				Render( renderer, renderers, entity_manager, shakyCam, console );
-			} );
-		}
+			DrawDebugUI( debug_views );
+			Render( renderer, renderers, entity_manager, shakyCam, console );
+		};
+		renderState.SetOnEnter( onRender );
 
+		FSMState& endFrameState = s_fsm->AddState( RENDER_END_FRAME );
+		auto onEndFrame = [&]()
 		{
-			FSMState& endFrameState = s_fsm->AddState( RENDER_END_FRAME );
-			endFrameState.SetOnEnter( [&]()
-			{
-				renderer.EndRender( camera );
+			renderer.EndRender( camera );
 
-				ImGui::Render();
+			ImGui::Render();
 
-				s_window->Swap();
-			} );
-		}
+			s_window->Swap();
+		};
+		endFrameState.SetOnEnter( onEndFrame );
 
+		FSMState& postRenderState = s_fsm->AddState( POSTRENDER );
+		auto onPostRender = [&]()
 		{
-			FSMState& postRenderState = s_fsm->AddState( POSTRENDER );
-			postRenderState.SetOnEnter( [&]()
-			{
-				PostRenderSystems( jobSystem, entity_manager, systems, s_frameTimer->Delta() );
-				camera.SetClean();
-				s_frameTimer->DelayFrame();
-			} );
-		}
+			PostRenderSystems( jobSystem, entity_manager, systems, s_frameTimer->Delta() );
+			camera.SetClean();
+			s_frameTimer->DelayFrame();
+		};
+		postRenderState.SetOnEnter( onPostRender );
 
-		{
-			FSMState& openAssertState = s_fsm->AddState( OPEN_ASSERT );
-		}
+		FSMState& openAssertState = s_fsm->AddState( OPEN_ASSERT );
 
+		FSMState& assertDialogState = s_fsm->AddState( ASSERT_DIALOG );
+		auto onAssertDialog = [&]()
 		{
-			FSMState& assertDialogState = s_fsm->AddState( ASSERT_DIALOG );
-			assertDialogState.SetOnEnter( [&]()
-			{
-				DrawAssertDialog( s_window->GetSize(), s_assert );
-			} );
-		}
+			DrawAssertDialog( s_window->GetSize(), s_assert );
+		};
+		assertDialogState.SetOnEnter( onAssertDialog );
 
 		s_fsm->AddTransition( INITIALIZED, UPDATE_TIMER );
 		s_fsm->AddTransition( UPDATE_TIMER, PREUPDATE );

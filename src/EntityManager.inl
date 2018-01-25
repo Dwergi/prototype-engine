@@ -144,14 +144,14 @@ namespace dd
 	}
 
 	template <typename... Components>
-	Vector<EntityHandle> EntityManager::FindAllWithReadable() const
+	std::vector<EntityHandle> EntityManager::FindAllWithReadable() const
 	{
-		Vector<EntityHandle> result;
+		std::vector<EntityHandle> result;
 		for( EntityHandle e : m_entities.GetRead() )
 		{
 			if( HasAllReadable<Components...>( e ) )
 			{
-				result.Add( e );
+				result.push_back( e );
 			}
 		}
 
@@ -159,14 +159,14 @@ namespace dd
 	}
 
 	template <typename... Components>
-	Vector<EntityHandle> EntityManager::FindAllWithWritable() const
+	std::vector<EntityHandle> EntityManager::FindAllWithWritable() const
 	{
-		Vector<EntityHandle> result;
+		std::vector<EntityHandle> result;
 		for( EntityHandle e : m_entities.GetWrite() )
 		{
 			if( HasAllWritable<Components...>( e ) )
 			{
-				result.Add( e );
+				result.push_back( e );
 			}
 		}
 

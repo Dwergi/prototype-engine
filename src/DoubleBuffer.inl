@@ -10,20 +10,13 @@ namespace dd
 
 	template <typename T>
 	DoubleBuffer<T>::DoubleBuffer( T* read, T* write, bool is_owner )
-		: DoubleBufferBase( read, write, is_owner )
+		: IDoubleBuffer( read, write, is_owner )
 	{
 	}
 
 	template <typename T>
 	DoubleBuffer<T>::~DoubleBuffer()
 	{
-	}
-
-	template <typename T>
-	void DoubleBuffer<T>::Clear() const
-	{
-		reinterpret_cast<T*>(m_read)->Clear();
-		reinterpret_cast<T*>(m_write)->Clear();
 	}
 
 	template <typename T>

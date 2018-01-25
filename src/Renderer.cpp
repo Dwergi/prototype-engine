@@ -106,7 +106,7 @@ namespace dd
 
 	void Renderer::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
 	{
-		m_shaders.Add( CreateShaders( "mesh" ) );
+		m_shaders.emplace_back( CreateShaders( "mesh" ) );
 
 		m_frustum = new Frustum();
 		m_frustum->CreateRenderData( m_shaders[0] );
@@ -138,7 +138,7 @@ namespace dd
 		delete m_frustum;
 		m_frustum = nullptr;
 
-		m_shaders.Clear();
+		m_shaders.clear();
 	}
 
 	EntityHandle Renderer::CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform )
@@ -191,7 +191,7 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_debugLights.Size(); ++i )
+			for( int i = 0; i < m_debugLights.size(); ++i )
 			{
 				String64 lightLabel( "Light " );
 				char buffer[16];
@@ -258,7 +258,7 @@ namespace dd
 			}
 
 
-			if( m_debugLights.Size() < 10 )
+			if( m_debugLights.size() < 10 )
 			{
 				if( ImGui::Button( "Create Light" ) )
 				{
@@ -329,7 +329,7 @@ namespace dd
 	}
 
 	void Renderer::RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, 
-		const Vector<EntityHandle>& lights, const ICamera& camera, const MousePicking* mousePicking )
+		const std::vector<EntityHandle>& lights, const ICamera& camera, const MousePicking* mousePicking )
 	{
 		glm::mat4 transform = transform_cmp->GetWorldTransform();
 
@@ -370,30 +370,27 @@ namespace dd
 				ShaderProgram* shader = mesh->GetShader();
 				shader->Use( true );
 
-				int lightCount = lights.Size();
+				size_t lightCount = lights.size();
 				DD_ASSERT( lightCount <= 10 );
-				shader->SetUniform( "LightCount", lightCount );
-
-				int index = 0;
-				for( EntityHandle light : lights )
+				shader->SetUniform( "LightCount", (int) lightCount );
+				
+				for( int i = 0; i < lights.size(); ++i )
 				{
-					ComponentHandle<TransformComponent> transformCmp = light.Get<TransformComponent>();
-					ComponentHandle<LightComponent> lightCmp = light.Get<LightComponent>();
+					const TransformComponent* transformCmp = lights[i].Get<TransformComponent>().Read();
+					const LightComponent* lightCmp = lights[i].Get<LightComponent>().Read();
 
-					glm::vec4 position( transformCmp.Read()->GetWorldPosition(), 1 );
-					if( lightCmp.Read()->IsDirectional )
+					glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
+					if( lightCmp->IsDirectional )
 					{
 						position.w = 0;
 					}
 
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "Position" ).c_str(), position );
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "Colour" ).c_str(), lightCmp.Read()->Colour );
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "Intensity" ).c_str(), lightCmp.Read()->Intensity );
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "Attenuation" ).c_str(), lightCmp.Read()->Attenuation );
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "AmbientStrength" ).c_str(), lightCmp.Read()->Ambient );
-					shader->SetUniform( GetArrayUniformName( "Lights", index, "SpecularStrength" ).c_str(), lightCmp.Read()->Specular );
-
-					++index;
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
+					shader->SetUniform( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
 				}
 
 				shader->SetUniform( "DrawStandard", m_debugDrawStandard );
@@ -536,7 +533,7 @@ namespace dd
 			m_forceUpdateFrustum = false;
 		}
 
-		Vector<EntityHandle> lights = entity_manager.FindAllWithReadable<LightComponent, TransformComponent>();
+		std::vector<EntityHandle> lights = entity_manager.FindAllWithReadable<LightComponent, TransformComponent>();
 
 		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &lights, &camera]( auto entity, auto mesh, auto transform )
 		{ 

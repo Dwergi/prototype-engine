@@ -95,7 +95,7 @@ namespace dd
 
 	private:
 		
-		bool m_requiresRegeneration { true };
+		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 		int m_lodLevels { DefaultLODLevels };
 

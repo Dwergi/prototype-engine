@@ -9,7 +9,7 @@
 
 namespace dd
 {
-	DoubleBufferBase::DoubleBufferBase( void* read, void* write, bool is_owner )
+	IDoubleBuffer::IDoubleBuffer( void* read, void* write, bool is_owner )
 		: m_read( read ),
 		m_write( write ),
 		m_isOwner( is_owner )
@@ -17,7 +17,7 @@ namespace dd
 
 	}
 
-	DoubleBufferBase::~DoubleBufferBase()
+	IDoubleBuffer::~IDoubleBuffer()
 	{
 		if( m_isOwner )
 		{
@@ -26,7 +26,7 @@ namespace dd
 		}
 	}
 
-	void DoubleBufferBase::Swap()
+	void IDoubleBuffer::Swap()
 	{
 		std::swap( m_read, m_write );
 	}

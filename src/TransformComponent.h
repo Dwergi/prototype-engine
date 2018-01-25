@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "DenseVectorPool.h"
+#include "PackedPool.h"
 #include "Vector4.h"
 
 namespace dd
@@ -16,7 +16,7 @@ namespace dd
 	{
 	public:
 
-		typedef DenseVectorPool<TransformComponent> Pool;
+		typedef PackedPool<TransformComponent> Pool;
 
 		TransformComponent();
 		TransformComponent( const TransformComponent& other );
