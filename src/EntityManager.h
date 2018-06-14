@@ -155,7 +155,6 @@ namespace dd
 		friend class EntityHandle;
 
 		std::recursive_mutex m_mutex;
-		bool m_initialized { false };
 
 		DoubleBuffer<std::vector<int>> m_free;
 		DoubleBuffer<std::vector<EntityHandle>> m_entities;

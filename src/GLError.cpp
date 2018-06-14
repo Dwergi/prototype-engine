@@ -19,7 +19,7 @@ namespace dd
 		{
 			if( !ignore )
 			{
-				const char* error;
+				const char* error = "";
 				switch( err )
 				{
 				case GL_INVALID_OPERATION:

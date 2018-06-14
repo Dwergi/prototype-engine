@@ -31,7 +31,7 @@ namespace dd
 		handlers->Add( handler );
 	}
 
-	void InputBindings::Dispatch( const ArrayBase<InputEvent>& actions ) const
+	void InputBindings::Dispatch( const IArray<InputEvent>& actions ) const
 	{
 		for( const InputEvent& evt : actions )
 		{

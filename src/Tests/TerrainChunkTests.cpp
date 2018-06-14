@@ -20,8 +20,8 @@ TEST_CASE( "[TerrainChunk] Generate" )
 
 	dd::TerrainParameters params;
 
-	dd::TerrainChunk chunk( params );
-	chunk.Generate( key );
+	dd::TerrainChunk chunk( params, key );
+	chunk.Generate();
 
 	//chunk.Write( "terrain_chunk.tga" );
 }

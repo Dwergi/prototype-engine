@@ -9,18 +9,18 @@
 namespace dd
 {
 	template <typename T>
-	class ArrayBase
+	class IArray
 	{
 	public:
 		uint Capacity() const { return m_capacity; }
 		uint Size() const { return m_size; }
 
-		virtual ~ArrayBase();
-		ArrayBase<T>& operator=( const ArrayBase<T>& other );
+		virtual ~IArray();
+		IArray<T>& operator=( const IArray<T>& other );
 
 		void Push( const T& value );
 		void Add( const T& value );
-		void PushAll( const ArrayBase<T>& other );
+		void PushAll( const IArray<T>& other );
 
 		void RemoveAt( uint index );
 		void Remove( const T& value );
@@ -46,7 +46,7 @@ namespace dd
 		uint m_size;
 		T* m_data;
 
-		ArrayBase( T* buffer, uint capacity );
+		IArray( T* buffer, uint capacity );
 	};
 
 	//
@@ -54,7 +54,7 @@ namespace dd
 	//
 	template <typename T, uint MaxCapacity>
 	class Array 
-		: public ArrayBase<T>
+		: public IArray<T>
 	{
 	public:
 

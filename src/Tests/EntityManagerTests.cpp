@@ -129,9 +129,9 @@ TEST_CASE( "[EntityManager] FindAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
+		std::vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
-		REQUIRE( handles.Size() == 1 );
+		REQUIRE( handles.size() == 1 );
 		REQUIRE( handles[ 0 ] == handle );
 	}
 
@@ -145,9 +145,9 @@ TEST_CASE( "[EntityManager] FindAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
+		std::vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
-		REQUIRE( handles.Size() == 1 );
+		REQUIRE( handles.size() == 1 );
 		REQUIRE( handles[ 0 ] == foo );
 	}
 
@@ -161,9 +161,9 @@ TEST_CASE( "[EntityManager] FindAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
+		std::vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
-		REQUIRE( handles.Size() == 2 );
+		REQUIRE( handles.size() == 2 );
 	}
 
 	SECTION( "Multiple Valid Entities" )
@@ -179,10 +179,10 @@ TEST_CASE( "[EntityManager] FindAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
+		std::vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
-		REQUIRE( handles.Size() == 2 );
-		REQUIRE( !handles.Contains( bar ) );
+		REQUIRE( handles.size() == 2 );
+		REQUIRE( std::find( handles.begin(), handles.end(), bar ) == handles.end() );
 	}
 }
 
@@ -204,7 +204,7 @@ TEST_CASE( "[EntityManager] Single Instance of Component" )
 	foo.Write()->A = 1;
 	REQUIRE( foo1.Write()->A == foo.Write()->A );
 
-	Vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
+	std::vector<EntityHandle> handles = s_manager->FindAllWithReadable<FooComponent>();
 
 	foo1.Write()->A = 2;
 
@@ -230,10 +230,10 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles;
-		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
+		std::vector<EntityHandle> handles;
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.push_back( h ); } );
 
-		REQUIRE( handles.Size() == 1 );
+		REQUIRE( handles.size() == 1 );
 		REQUIRE( handles[ 0 ] == handle );
 	}
 
@@ -247,10 +247,10 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles;
-		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
+		std::vector<EntityHandle> handles;
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.push_back( h ); } );
 
-		REQUIRE( handles.Size() == 1 );
+		REQUIRE( handles.size() == 1 );
 		REQUIRE( handles[ 0 ] == foo );
 	}
 
@@ -264,10 +264,10 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles;
-		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
+		std::vector<EntityHandle> handles;
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.push_back( h ); } );
 
-		REQUIRE( handles.Size() == 2 );
+		REQUIRE( handles.size() == 2 );
 	}
 
 	SECTION( "Multiple Valid Entities" )
@@ -283,11 +283,11 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles;
-		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.Add( h ); } );
+		std::vector<EntityHandle> handles;
+		s_manager->ForAllWithReadable<FooComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f ) { handles.push_back( h ); } );
 
-		REQUIRE( handles.Size() == 2 );
-		REQUIRE( !handles.Contains( bar ) );
+		REQUIRE( handles.size() == 2 );
+		REQUIRE( std::find( handles.begin(), handles.end(), bar ) == handles.end() );
 	}
 
 	SECTION( "Multiple Components" )
@@ -298,10 +298,10 @@ TEST_CASE( "[EntityManager] ForAllWithReadable" )
 
 		Swap();
 
-		Vector<EntityHandle> handles;
-		s_manager->ForAllWithReadable<FooComponent, BarComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f, ComponentHandle<BarComponent> b ) { handles.Add( h ); } );
+		std::vector<EntityHandle> handles;
+		s_manager->ForAllWithReadable<FooComponent, BarComponent>( [&handles]( EntityHandle h, ComponentHandle<FooComponent> f, ComponentHandle<BarComponent> b ) { handles.push_back( h ); } );
 
-		REQUIRE( handles.Size() == 1 );
+		REQUIRE( handles.size() == 1 );
 	}
 }
 
@@ -359,8 +359,8 @@ TEST_CASE( "[EntityManager] Stress Test" )
 	TypeInfo::RegisterComponent<SortedVectorComponent>( "SortedVectorComponent" );
 	s_manager->RegisterComponent<SortedVectorComponent>();
 
-	Vector<EntityHandle> entities;
-	entities.Reserve( MaxItems );
+	std::vector<EntityHandle> entities;
+	entities.reserve( MaxItems );
 
 	for( int iteration = 0; iteration < Iterations; ++iteration )
 	{
@@ -369,7 +369,7 @@ TEST_CASE( "[EntityManager] Stress Test" )
 			for( int i = 0; i < MaxItems; ++i )
 			{
 				EntityHandle entity = s_manager->Create();
-				entities.Add( entity );
+				entities.push_back( entity );
 			}
 		}
 
@@ -466,6 +466,6 @@ TEST_CASE( "[EntityManager] Stress Test" )
 
 		s_manager->Update( 1.0f );
 
-		entities.Clear();
+		entities.clear();
 	}
 }

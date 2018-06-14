@@ -8,13 +8,13 @@ namespace dd
 {
 	template <typename T, uint MaxCapacity>
 	Array<T, MaxCapacity>::Array()
-		: ArrayBase( m_buffer, MaxCapacity )
+		: IArray( m_buffer, MaxCapacity )
 	{
 	}
 
 	template <typename T, uint MaxCapacity>
 	Array<T, MaxCapacity>::Array( const Array<T, MaxCapacity>& other )
-		: ArrayBase( m_buffer, MaxCapacity )
+		: IArray( m_buffer, MaxCapacity )
 	{
 		CopyRange( other.m_buffer, m_buffer, other.m_size );
 
@@ -28,7 +28,7 @@ namespace dd
 	}
 
 	template <typename T>
-	ArrayBase<T>::~ArrayBase()
+	IArray<T>::~IArray()
 	{
 		m_data = nullptr;
 		m_capacity = 0;
@@ -36,7 +36,7 @@ namespace dd
 	}
 
 	template <typename T>
-	ArrayBase<T>::ArrayBase( T* buffer, uint capacity )
+	IArray<T>::IArray( T* buffer, uint capacity )
 		: m_data( buffer ),
 		m_capacity( capacity ),
 		m_size( 0 )
@@ -44,7 +44,7 @@ namespace dd
 	}
 
 	template <typename T>
-	ArrayBase<T>& ArrayBase<T>::operator=( const ArrayBase<T>& other )
+	IArray<T>& IArray<T>::operator=( const IArray<T>& other )
 	{
 		DD_ASSERT( other.Size() <= m_capacity );
 
@@ -56,7 +56,7 @@ namespace dd
 	}
 
 	template <typename T>
-	const T& ArrayBase<T>::operator[]( uint index ) const
+	const T& IArray<T>::operator[]( uint index ) const
 	{
 		DD_ASSERT( index < m_size, "Indexing unallocated memory!" );
 
@@ -64,7 +64,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void ArrayBase<T>::Push( const T& value )
+	void IArray<T>::Push( const T& value )
 	{
 		DD_ASSERT( m_size < m_capacity );
 
@@ -73,13 +73,13 @@ namespace dd
 	}
 
 	template <typename T>
-	void ArrayBase<T>::Add( const T& value )
+	void IArray<T>::Add( const T& value )
 	{
 		Push( value );
 	}
 
 	template <typename T>
-	void ArrayBase<T>::PushAll( const ArrayBase<T>& other )
+	void IArray<T>::PushAll( const IArray<T>& other )
 	{
 		DD_ASSERT( m_capacity - m_size >= other.Size() );
 
@@ -90,7 +90,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T ArrayBase<T>::Pop()
+	T IArray<T>::Pop()
 	{
 		DD_ASSERT( m_size > 0 );
 
@@ -100,7 +100,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void ArrayBase<T>::RemoveAt( uint index )
+	void IArray<T>::RemoveAt( uint index )
 	{
 		DD_ASSERT( index < m_size );
 
@@ -110,7 +110,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void ArrayBase<T>::Remove( const T& value )
+	void IArray<T>::Remove( const T& value )
 	{
 		int index = IndexOf( value );
 		if( index < 0 )
@@ -120,7 +120,7 @@ namespace dd
 	}
 
 	template <typename T>
-	void ArrayBase<T>::Clear()
+	void IArray<T>::Clear()
 	{
 		for( uint i = 0; i < m_size; ++i )
 		{
@@ -130,13 +130,13 @@ namespace dd
 	}
 
 	template <typename T>
-	bool ArrayBase<T>::Contains( const T& val )
+	bool IArray<T>::Contains( const T& val )
 	{
 		return IndexOf( val ) != -1;
 	}
 
 	template <typename T>
-	int ArrayBase<T>::IndexOf( const T& val )
+	int IArray<T>::IndexOf( const T& val )
 	{
 		for( uint i = 0; i < m_size; ++i )
 		{
@@ -148,13 +148,13 @@ namespace dd
 	}
 
 	template <typename T>
-	T& ArrayBase<T>::Last() const
+	T& IArray<T>::Last() const
 	{
 		return m_data[m_size - 1];
 	}
 
 	template <typename T>
-	T& ArrayBase<T>::First() const
+	T& IArray<T>::First() const
 	{
 		return m_data[0];
 	}

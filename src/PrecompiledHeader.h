@@ -65,3 +65,5 @@ namespace ImGui
 	void Value( const char* prefix, const glm::vec3& value, const char* float_format = nullptr );
 	void Value( const char* prefix, const glm::vec4& value, const char* float_format = nullptr );
 }
+
+#define DD_TODO( Message ) __pragma( message( __FILE__ "(" __LINE__ "): TODO: " Message ) )

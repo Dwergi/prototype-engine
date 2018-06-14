@@ -317,6 +317,7 @@
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
+    <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -396,6 +397,7 @@
     <ClInclude Include="src\ShipSystem.h" />
     <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\Array.h" />
+    <ClInclude Include="src\Span.h" />
     <ClInclude Include="src\Stream.h" />
     <ClInclude Include="src\StringBinding.h" />
     <ClInclude Include="src\String_dd.h" />
@@ -523,6 +525,7 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
@@ -584,6 +587,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Tests\EntityTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
     </ClCompile>

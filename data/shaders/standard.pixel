@@ -162,18 +162,21 @@ void main()
 	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
 	fogAmount = fogAmount * fogAmount;
 
-	if( fogAmount >= 1 )
+	Colour = vec4( vec3( 0.5 ), 1 );
+	return;
+
+	/*if( fogAmount >= 1 )
 	{
 		Colour = vec4( Fog.Colour, 1 );
 		return;
-	}
+	}*/
 
 	vec4 finalColour = vec4( 0 );
 
 	if( DrawStandard )
 	{
 		vec3 fragmentColour = Fragment.Colour.rgb;
-		if( HeightCount > 0 )
+		/*if( HeightCount > 0 )
 		{
 			fragmentColour *= GetHeightColour( Fragment.Position.y / MaxHeight );
 		}
@@ -183,10 +186,11 @@ void main()
 		for( int i = 0; i < LightCount; ++i )
 		{
 			finalColour.rgb += ApplyLight( Lights[ i ], fragmentColour, normal, Fragment.Position, viewDir );
-		}
+		}*/
 		
-		vec3 gamma = vec3( 1.0 / 2.2 );
-    	finalColour.rgb = pow( finalColour.rgb, gamma );
+		//vec3 gamma = vec3( 1.0 / 2.2 );
+    	//finalColour.rgb = pow( finalColour.rgb, gamma );
+    	finalColour.rgb = fragmentColour;
 		finalColour.a = Fragment.Colour.a;
 	}
 

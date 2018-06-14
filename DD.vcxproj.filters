@@ -504,6 +504,10 @@
     <ClInclude Include="src\IComponentPool.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Span.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -851,6 +855,10 @@
     </ClCompile>
     <ClCompile Include="src\DDAssertHelpers.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\Tests\EntityTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

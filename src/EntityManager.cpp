@@ -22,7 +22,6 @@ namespace dd
 		m_free( new std::vector<int>(), new std::vector<int>() ),
 		m_entities( new std::vector<EntityHandle>(), new std::vector<EntityHandle>() )
 	{
-		m_initialized = true;
 	}
 
 	EntityManager::~EntityManager()
@@ -63,7 +62,7 @@ namespace dd
 		std::vector<int>& free = m_free.GetWrite();
 		std::vector<EntityHandle>& entities = m_entities.GetWrite();
 
-		if( free.size() == 0 )
+		if( free.empty() )
 		{
 			EntityHandle handle;
 			handle.ID = entities.size();
@@ -74,7 +73,7 @@ namespace dd
 			free.push_back( handle.ID );
 		}
 
-		EntityHandle& handle = entities[ free[ 0 ] ];
+		EntityHandle& handle = entities[ free.front() ];
 		free.erase( free.begin() );
 
 		return handle;

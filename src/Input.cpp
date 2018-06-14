@@ -69,7 +69,7 @@ namespace dd
 		m_pendingEvents.Clear();
 	}
 
-	bool Input::GetKeyEvents( ArrayBase<InputEvent>& events ) const
+	bool Input::GetKeyEvents( IArray<InputEvent>& events ) const
 	{
 		for( int i = 0; i < m_currentEvents.Size(); ++i )
 		{

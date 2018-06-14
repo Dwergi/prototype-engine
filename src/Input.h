@@ -80,7 +80,7 @@ namespace dd
 		// get all key events received in the last update
 		// returns true if the output array successfully contained all of them
 		// otherwise fills the array with Capacity() events and returns false
-		bool GetKeyEvents( ArrayBase<InputEvent>& out ) const;
+		bool GetKeyEvents( IArray<InputEvent>& out ) const;
 
 		void BindKey( char c, InputAction action );
 		void BindKey( Key k, InputAction action );
