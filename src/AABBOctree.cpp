@@ -10,8 +10,6 @@
 
 #include <algorithm> // sort
 
-#include "AABB.h"
-
 namespace dd
 {
 	const int MAX_DEPTH = 5;
@@ -173,13 +171,10 @@ namespace dd
 	//
 	// Get the bounds of the child at the given index from a parent with the given bounds.
 	//
-	AABB GetChildBounds( const AABB& parent_bounds, int index )
+	static AABB GetChildBounds( glm::vec3 parent_center, glm::vec3 half_extents, int index )
 	{
-		glm::vec3 parent_center = parent_bounds.Center();
-		glm::vec3 child_extents = parent_bounds.Extents() * 0.5f;
-
 		AABB child_bounds;
-		child_bounds.Min = parent_bounds.Min;
+		child_bounds.Min = parent_center - half_extents;
 
 		if( index & 0x4 )
 			child_bounds.Min.x = parent_center.x;
@@ -190,7 +185,7 @@ namespace dd
 		if( index & 0x1 )
 			child_bounds.Min.z = parent_center.z;
 
-		child_bounds.Max = child_bounds.Min + child_extents;
+		child_bounds.Max = child_bounds.Min + half_extents;
 
 		return child_bounds;
 	}
@@ -264,9 +259,12 @@ namespace dd
 		DD_ASSERT( HasChildren( parent_handle ) );
 		DD_ASSERT( entry_bounds.Intersects( parent_bounds ) );
 
+		glm::vec3 parent_center = parent_bounds.Center();
+		glm::vec3 half_extents = parent_bounds.Extents() * 0.5f;
+
 		for( int i = 0; i < 8; ++i )
 		{
-			AABB child_bounds = GetChildBounds( parent_bounds, i );
+			AABB child_bounds = GetChildBounds( parent_center, half_extents, i );
 			if( child_bounds.Intersects( entry_bounds ) )
 			{
 				// found our child
@@ -325,9 +323,12 @@ namespace dd
 		}
 		else
 		{
+			glm::vec3 parent_center = node_bounds.Center();
+			glm::vec3 half_extents = node_bounds.Extents() * 0.5f;
+
 			for( int i = 0; i < 8; ++i )
 			{
-				AABB child_bounds = GetChildBounds( node_bounds, i );
+				AABB child_bounds = GetChildBounds( parent_center, half_extents, i );
 				if( child_bounds.Contains( pt ) )
 				{
 					GetContaining( pt, GetChild( node_handle, i ), child_bounds, outResults );
@@ -386,9 +387,12 @@ namespace dd
 		}
 		else
 		{
+			glm::vec3 parent_center = node_bounds.Center();
+			glm::vec3 half_extents = node_bounds.Extents() * 0.5f;
+
 			for( int i = 0; i < 8; ++i )
 			{
-				AABB child_bounds = GetChildBounds( node_bounds, i );
+				AABB child_bounds = GetChildBounds( parent_center, half_extents, i );
 				if( child_bounds.Intersects( bounds ) )
 				{
 					GetIntersecting( bounds, GetChild( node_handle, i ), child_bounds, outResults );

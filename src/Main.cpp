@@ -448,22 +448,6 @@ void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 	bindings.Dispatch( events );
 }
 
-#ifdef _TEST
-
-int TestMain( int argc, char* argv[] )
-{
-	int iError = tests::RunTests( argc, argv );
-
-	if( iError != 0 )
-		DD_ASSERT( false, "Tests failed!" );
-	else
-		printf( "Tests passed!" );
-
-	return iError;
-}
-
-#endif
-
 int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
 	DD_PROFILE_INIT();
@@ -675,6 +659,22 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 	return 0;
 }
+
+#ifdef _TEST
+
+int TestMain( int argc, char* argv[] )
+{
+	int iError = tests::RunTests( argc, argv );
+
+	if( iError != 0 )
+		DD_ASSERT( false, "Tests failed!" );
+	else
+		printf( "Tests passed!" );
+
+	return iError;
+}
+
+#endif
 
 //
 // ENTRY POINT

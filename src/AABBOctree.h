@@ -10,8 +10,6 @@
 
 namespace dd
 {
-	struct AABB;
-
 	// an octree entry is a handle that defines the entry, which is used to remove data from the tree
 	typedef int OctreeEntry;
 

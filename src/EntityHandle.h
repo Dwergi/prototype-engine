@@ -87,7 +87,7 @@ namespace dd
 		}
 
 		template <>
-		bool HasAllHelper<>() const
+		bool HasAllHelper() const
 		{
 			return true;
 		}

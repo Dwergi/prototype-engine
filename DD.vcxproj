@@ -316,6 +316,7 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
+    <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\FPSCamera.h" />
@@ -524,6 +525,7 @@
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
@@ -574,6 +576,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Tests\BVHTreeTests.cpp" />
     <ClCompile Include="src\Tests\ComponentHandleTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>

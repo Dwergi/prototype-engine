@@ -106,7 +106,7 @@ namespace dd
 
 		m_data[index].~T();
 
-		MoveRange( &m_data[index] + 1, m_data[index], (m_size - index) - 1 );
+		MoveRange( m_data + index + 1, m_data + index, (m_size - index) - 1 );
 	}
 
 	template <typename T>

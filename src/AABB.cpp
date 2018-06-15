@@ -22,6 +22,13 @@ namespace dd
 
 	}
 
+	AABB::AABB( glm::vec3 min, glm::vec3 max )
+		: Min( min ),
+		Max( max )
+	{
+
+	}
+
 	AABB::~AABB()
 	{
 
@@ -31,6 +38,18 @@ namespace dd
 	{
 		Min = glm::min( Min, pt );
 		Max = glm::max( Max, pt );
+	}
+
+	void AABB::Expand( const AABB& bounds )
+	{
+		Min = glm::min( Min, bounds.Min );
+		Max = glm::max( Max, bounds.Max );
+	}
+
+	float AABB::Volume() const
+	{
+		glm::vec3 extents = Extents();
+		return extents.x * extents.y * extents.z;
 	}
 
 	bool AABB::Contains( const glm::vec3& pt ) const

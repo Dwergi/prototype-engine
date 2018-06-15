@@ -508,6 +508,9 @@
     <ClInclude Include="src\Span.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\BVHTree.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -858,6 +861,12 @@
     </ClCompile>
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Tests\EntityTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BVHTree.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\BVHTreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
