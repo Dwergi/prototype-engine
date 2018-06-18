@@ -56,7 +56,7 @@ namespace dd
 	}
 
 	template <typename T>
-	const T& IArray<T>::operator[]( uint index ) const
+	const T& IArray<T>::operator[]( size_t index ) const
 	{
 		DD_ASSERT( index < m_size, "Indexing unallocated memory!" );
 
@@ -96,7 +96,11 @@ namespace dd
 
 		--m_size;
 
-		return m_data[m_size];
+		T value = m_data[m_size];
+
+		m_data[ m_size ].~T();
+
+		return value;
 	}
 
 	template <typename T>
@@ -107,6 +111,8 @@ namespace dd
 		m_data[index].~T();
 
 		MoveRange( m_data + index + 1, m_data + index, (m_size - index) - 1 );
+
+		--m_size;
 	}
 
 	template <typename T>
@@ -116,7 +122,7 @@ namespace dd
 		if( index < 0 )
 			return;
 
-		Remove( (uint) index );
+		RemoveAt( (uint) index );
 	}
 
 	template <typename T>

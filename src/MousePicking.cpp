@@ -267,7 +267,7 @@ namespace dd
 			const AABB& bounds = mesh_cmp->Bounds;
 
 			float distance;
-			if( bounds.IntersectsRay( mouse_ray.GetOrigin(), mouse_ray.GetDirection(), distance ) )
+			if( bounds.IntersectsRay( mouse_ray, distance ) )
 			{
 				if( distance < nearest_distance )
 				{

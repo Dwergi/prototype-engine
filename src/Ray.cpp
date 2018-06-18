@@ -18,11 +18,12 @@ namespace dd
 		m_origin( origin ),
 		m_direction( direction )
 	{
-
+		m_invDir = glm::vec3( 1.0f ) / m_direction;
 	}
 
 	void Ray::SetDirection( const glm::vec3& direction )
 	{
 		m_direction = glm::normalize( direction );
+		m_invDir = glm::vec3( 1.0f ) / m_direction;
 	}
 }

@@ -24,6 +24,8 @@
 #define DD_ASSERT_USED_FATAL PPK_ASSERT_USED_FATAL
 #define DD_ASSERT_USED_CUSTOM PPK_ASSERT_USED_CUSTOM
 
+#define DD_DIAGNOSTIC( ... ) fprintf( stdout, __VA_ARGS__ );
+
 #define DD_STATIC_ASSERT PPK_STATIC_ASSERT
 
 namespace dd

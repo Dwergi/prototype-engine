@@ -13,8 +13,10 @@ namespace dd
 {
 	struct Intersection
 	{
-		int Handle;
+		size_t Handle;
 		float Distance;
+
+		bool IsValid() const { return Handle != -1; }
 	};
 
 	struct BVHTree
@@ -26,13 +28,20 @@ namespace dd
 
 		void Remove( int handle );
 
-		bool IntersectsRay( const Ray& ray, std::vector<Intersection>& outResults ) const;
+		Intersection IntersectsRay( const Ray& ray ) const;
 
 		AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
 
+		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
+
 		size_t GetEntryCount() const { return m_entries.size() - m_freeEntries.size(); }
 
-		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
+		size_t GetBucketCount() const { return m_buckets.size() - m_freeBuckets.size(); }
+
+		// diagnostics
+		void CountBucketSplits( int& x, int& y, int& z ) const;
+		void EnsureAllBucketsEmpty() const;
+		int GetRebuildCount() const { return m_rebuildCount; }
 
 	private:
 
@@ -45,6 +54,13 @@ namespace dd
 			AABB Bounds;
 		};
 
+		enum class Axis
+		{
+			X,
+			Y,
+			Z
+		};
+
 		struct BVHBucket
 		{
 			// The region to use for comparisons.
@@ -53,11 +69,15 @@ namespace dd
 			// The actual bounds of the entries in the region.
 			AABB Bounds;
 
+			Axis SplitAxis;
+
+			size_t Parent { INVALID };
 			size_t Left { INVALID };
 			size_t Right { INVALID };
 			dd::Array<size_t, MAX_ENTRIES> Entries;
 
 			bool IsLeaf() const { return Left == INVALID && Right == INVALID; }
+			bool IsEmpty() const { return IsLeaf() && Entries.Size() == 0; }
 		};
 
 		std::vector<BVHEntry> m_entries;
@@ -65,11 +85,15 @@ namespace dd
 		std::vector<size_t> m_freeEntries;
 		std::vector<size_t> m_freeBuckets;
 
+		int m_rebuildCount { 0 };
+
 		void RebuildTree();
 		void SplitBucket( size_t parent_index );
 		void InsertEntry( size_t entry_index );
 		AABB CalculateBucketBounds( const BVHBucket& bucket ) const;
+		void MergeEmptyBuckets( size_t parent_index );
 
 		bool IsFreeEntry( size_t entry_index ) const;
+		bool IsFreeBucket( size_t bucket_index ) const;
 	};
 }

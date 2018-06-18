@@ -28,7 +28,7 @@ namespace dd
 		T Pop();
 		void Clear();
 
-		const T& operator[]( uint index ) const;
+		const T& operator[]( size_t index ) const;
 		bool Contains( const T& val );
 		int IndexOf( const T& val );
 

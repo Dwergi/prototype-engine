@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "AABB.h"
 
+#include "Ray.h"
+
 namespace dd
 {
 	AABB::AABB()
@@ -81,43 +83,46 @@ namespace dd
 
 	bool AABB::Intersects( const AABB& other ) const
 	{
-		return glm::all( glm::lessThan( Min, other.Max ) ) && glm::all( glm::greaterThan( Max, other.Min ) );
+		return glm::all( glm::lessThan( Min, other.Max ) ) && 
+			glm::all( glm::greaterThan( Max, other.Min ) );
 	}
 
 	bool AABB::IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const
 	{
-		glm::vec3 invDir( 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z );
+		Ray ray( start, dir );
 
-		float tMin;
-		float tMax;
+		return IntersectsRay( ray, distance );
+	}
 
+	bool AABB::IntersectsRay( const Ray& ray, float& distance ) const
+	{
+		glm::vec3 vMin = (Min - ray.Origin()) * ray.InverseDir();
+		glm::vec3 vMax = (Max - ray.Origin()) * ray.InverseDir();
+
+		float tMin = 0.0f;
+		float tMax = INFINITE;
+
+		if( ray.Direction().x != 0.0f )
 		{
-			float xMin = (Min.x - start.x) * invDir.x;
-			float xMax = (Max.x - start.x) * invDir.x;
-
-			tMin = dd::min( xMin, xMax );
-			tMax = dd::max( xMin, xMax );
+			tMin = dd::min( vMin.x, vMax.x );
+			tMax = dd::max( vMin.x, vMax.x );
 		}
 
+		if( ray.Direction().y != 0.0f )
 		{
-			float yMin = (Min.y - start.y) * invDir.y;
-			float yMax = (Max.y - start.y) * invDir.y;
-
-			tMin = dd::max( tMin, dd::min( yMin, yMax ) );
-			tMax = dd::min( tMax, dd::max( yMin, yMax ) );
+			tMin = dd::max( tMin, dd::min( vMin.y, vMax.y ) );
+			tMax = dd::min( tMax, dd::max( vMin.y, vMax.y ) );
 		}
 
+		if( ray.Direction().z != 0.0f )
 		{
-			float zMin = (Min.z - start.z) * invDir.z;
-			float zMax = (Max.z - start.z) * invDir.z;
-
-			tMin = dd::max( tMin, dd::min( zMin, zMax ) );
-			tMax = dd::min( tMax, dd::max( zMin, zMax ) );
+			tMin = dd::max( tMin, dd::min( vMin.z, vMax.z ) );
+			tMax = dd::min( tMax, dd::max( vMin.z, vMax.z ) );
 		}
 
-		if( tMax >= dd::max( 0.0f, tMin ) )
+		if( tMax > max( tMin, 0.0f ) )
 		{
-			distance = tMax;
+			distance = tMin;
 			return true;
 		}
 

@@ -47,7 +47,6 @@ void DestroyRange( T* src, uint count )
 template <typename T>
 void MoveRange( const T* src, T* dest, uint count )
 {
-	DD_ASSERT( count > 0 );
 	DD_ASSERT( src != nullptr && dest != nullptr );
 	DD_ASSERT( src != dest );
 

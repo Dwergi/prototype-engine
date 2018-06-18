@@ -8,6 +8,8 @@
 
 namespace dd
 {
+	struct Ray;
+
 	struct AABB
 	{
 		AABB();
@@ -26,6 +28,7 @@ namespace dd
 
 		bool Intersects( const AABB& other ) const;
 		bool IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const;
+		bool IntersectsRay( const Ray& ray, float& distance ) const;
 
 		glm::vec3 Center() const { return (Min + Max) * 0.5f; }
 		glm::vec3 Extents() const { return Max - Min; }
