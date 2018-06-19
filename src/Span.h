@@ -32,6 +32,16 @@ namespace dd
 			m_offset = offset;
 		}
 
+		template <size_t Size>
+		Span( T( &arr )[ Size ], size_t count = Size, size_t offset = 0 )
+		{
+			m_begin = arr + offset;
+			m_end = arr + offset + count;
+
+			m_size = count;
+			m_offset = offset;
+		}
+
 		size_t Offset() const
 		{
 			return m_offset;

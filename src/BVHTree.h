@@ -30,6 +30,8 @@ namespace dd
 
 		Intersection IntersectsRay( const Ray& ray ) const;
 
+		bool WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const;
+
 		AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
 
 		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
@@ -50,7 +52,6 @@ namespace dd
 
 		struct BVHEntry
 		{
-			size_t Handle;
 			AABB Bounds;
 		};
 
@@ -69,12 +70,13 @@ namespace dd
 			// The actual bounds of the entries in the region.
 			AABB Bounds;
 
-			Axis SplitAxis;
-
 			size_t Parent { INVALID };
 			size_t Left { INVALID };
 			size_t Right { INVALID };
 			dd::Array<size_t, MAX_ENTRIES> Entries;
+
+			// The axis along which this node was split. (Diagnostic)
+			Axis SplitAxis;
 
 			bool IsLeaf() const { return Left == INVALID && Right == INVALID; }
 			bool IsEmpty() const { return IsLeaf() && Entries.Size() == 0; }

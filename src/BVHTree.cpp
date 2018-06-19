@@ -46,7 +46,6 @@ namespace dd
 		size_t index = std::pop_front( m_freeEntries );
 
 		BVHEntry& entry = m_entries[ index ];
-		entry.Handle = index;
 		entry.Bounds = bounds;
 
 		DD_ASSERT( m_buckets[ 0 ].Region == m_buckets[ 0 ].Bounds );
@@ -61,7 +60,7 @@ namespace dd
 			InsertEntry( index );
 		}
 
-		return entry.Handle;
+		return index;
 	}
 
 	void BVHTree::MergeEmptyBuckets( size_t bucket_index )
@@ -173,14 +172,14 @@ namespace dd
 			{
 				if( bucket.IsLeaf() )
 				{
-					for( size_t e = 0; e < bucket.Entries.Size(); ++e )
+					for( size_t e : bucket.Entries )
 					{
 						float distance;
-						const BVHEntry& entry = m_entries[ bucket.Entries[ e ] ];
+						const BVHEntry& entry = m_entries[ e ];
 						if( entry.Bounds.IntersectsRay( ray, distance ) &&
 							distance < nearest.Distance )
 						{
-							nearest.Handle = entry.Handle;
+							nearest.Handle = e;
 							nearest.Distance = distance;
 						}
 					}
@@ -196,6 +195,47 @@ namespace dd
 		DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%llu\n", buckets_tested, m_buckets.size() );
 
 		return nearest;
+	}
+
+	bool BVHTree::WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const
+	{
+		int buckets_tested = 0;
+
+		dd::Array<size_t, 64> stack;
+		stack.Add( 0 );
+
+		bool hit = false;
+
+		while( stack.Size() > 0 )
+		{
+			++buckets_tested;
+
+			const BVHBucket& bucket = m_buckets[ stack.Pop() ];
+
+			if( bucket.Bounds.Intersects( bounds ) )
+			{
+				if( bucket.IsLeaf() )
+				{
+					for( size_t e : bucket.Entries )
+					{
+						if( m_entries[ e ].Bounds.Intersects( bounds ) )
+						{
+							outHits.push_back( e );
+							hit = true;
+						}
+					}
+				}
+				else
+				{
+					stack.Add( bucket.Left );
+					stack.Add( bucket.Right );
+				}
+			}
+		}
+
+		DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%llu\n", buckets_tested, m_buckets.size() );
+
+		return hit;
 	}
 
 	void BVHTree::SplitBucket( size_t parent_index )
@@ -273,12 +313,12 @@ namespace dd
 
 			if( left.Region.Contains( center ) )
 			{
-				left.Entries.Add( entry.Handle );
+				left.Entries.Add( entry_index );
 				left.Bounds.Expand( entry.Bounds );
 			}
 			else
 			{
-				right.Entries.Add( entry.Handle );
+				right.Entries.Add( entry_index );
 				right.Bounds.Expand( entry.Bounds );
 			}
 		}

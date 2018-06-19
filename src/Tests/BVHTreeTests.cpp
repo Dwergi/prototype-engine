@@ -171,4 +171,34 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 	int least = dd::min( x, dd::min( y, z ) );
 
 	REQUIRE( (most - least) < (tree.GetBucketCount() / 10) );
+
+	for( int i = 0; i < 256; ++i )
+	{
+		dd::Ray ray( glm::vec3( rng.Next(), rng.Next(), rng.Next() ), glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
+
+		tree.IntersectsRay( ray );
+	}
+}
+
+TEST_CASE( "[BVHTree] Within Bounds" )
+{
+	dd::BVHTree tree;
+
+	dd::RandomInt rng( -500, 500, 1 );
+	dd::RandomInt rng_size( 1, 10, 1 );
+
+	for( int i = 0; i < 256; ++i )
+	{
+		dd::AABB new_entry;
+		glm::vec3 pos( rng.Next(), rng.Next(), rng.Next() );
+		new_entry.Expand( pos );
+		new_entry.Expand( pos + glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
+
+		tree.Add( new_entry );
+	}
+
+	dd::AABB test( glm::vec3( -10 ), glm::vec3( 10 ) );
+	std::vector<size_t> hits;
+
+	REQUIRE( tree.WithinBounds( test, hits ) );
 }

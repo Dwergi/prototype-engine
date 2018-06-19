@@ -31,6 +31,7 @@ COMPONENT_CPP( SecondComponent );
 struct TestSystem : ddc::System
 {
 	TestSystem() :
+		System( "TestSystem" ),
 		s_firstRead( *this ),
 		s_secondWrite( *this )
 	{
@@ -58,6 +59,7 @@ struct TestSystem : ddc::System
 struct DependentSystem : ddc::System
 {
 	DependentSystem() :
+		System( "DependentSystem" ),
 		s_secondRead( *this ),
 		s_thirdWrite( *this )
 	{
@@ -72,6 +74,7 @@ struct DependentSystem : ddc::System
 struct ReaderSystem : ddc::System
 {
 	ReaderSystem() :
+		System( "ReaderSystem" ),
 		s_thirdRead( *this )
 	{
 	}
@@ -84,6 +87,7 @@ struct ReaderSystem : ddc::System
 struct OnlyReaderSystem : ddc::System
 {
 	OnlyReaderSystem() :
+		System( "OnlyReaderSystem" ),
 		s_firstRead( *this ),
 		s_secondRead( *this )
 	{
@@ -98,6 +102,7 @@ struct OnlyReaderSystem : ddc::System
 struct OnlyWriterSystem : ddc::System
 {
 	OnlyWriterSystem() :
+		System( "OnlyWriterSystem" ),
 		s_secondWrite( *this ),
 		s_thirdWrite( *this )
 	{
@@ -185,7 +190,7 @@ TEST_CASE( "Update System" )
 	}
 }
 
-TEST_CASE( "Schedule Systems" )
+TEST_CASE( "Schedule Systems By Component" )
 {
 	SECTION( "Simple" )
 	{
@@ -194,10 +199,10 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &dependent_system, &test_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 2 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &test_system );
 		REQUIRE( ordered[ 1 ] == &dependent_system );
@@ -210,10 +215,10 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &test_system, &reader_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 2 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &test_system );
 		REQUIRE( ordered[ 1 ] == &reader_system );
@@ -227,10 +232,10 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &dependent_system, &test_system, &reader_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 3 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &test_system );
 		REQUIRE( ordered[ 1 ] == &dependent_system );
@@ -245,10 +250,10 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &dependent_system, &test_system, &duplicate_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 3 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &test_system );
 	}
@@ -261,10 +266,10 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &only_writer_system, &dependent_system, &reader_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 3 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &only_writer_system );
 		REQUIRE( ordered[ 1 ] == &dependent_system );
@@ -278,12 +283,82 @@ TEST_CASE( "Schedule Systems" )
 
 		ddc::System* systems[] = { &test_system, &only_reader_system };
 
-		dd::Span<ddc::System*> span_systems( systems, 2 );
+		dd::Span<ddc::System*> span_systems( systems );
 
 		std::vector<ddc::System*> ordered;
-		ScheduleSystems( span_systems, ordered );
+		ddc::ScheduleSystemsByComponent( span_systems, ordered );
 
 		REQUIRE( ordered[ 0 ] == &test_system );
 		REQUIRE( ordered[ 1 ] == &only_reader_system );
+	}
+}
+
+TEST_CASE( "Schedule Systems By Dependency" )
+{
+	SECTION( "Simple" )
+	{
+		TestSystem a;
+
+		TestSystem b;
+		b.RegisterDependency( a );
+
+		ddc::System* systems[] = { &a, &b };
+
+		dd::Span<ddc::System*> span_systems( systems );
+
+		std::vector<ddc::System*> ordered;
+		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ] == &a );
+		REQUIRE( ordered[ 1 ] == &b );
+	}
+
+	SECTION( "Chain" )
+	{
+		TestSystem a;
+
+		TestSystem b;
+		b.RegisterDependency( a );
+
+		TestSystem c;
+		c.RegisterDependency( b );
+
+		ddc::System* systems[] = { &a, &b, &c };
+
+		dd::Span<ddc::System*> span_systems( systems );
+
+		std::vector<ddc::System*> ordered;
+		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ] == &a );
+		REQUIRE( ordered[ 1 ] == &b );
+		REQUIRE( ordered[ 2 ] == &c );
+	}
+
+	SECTION( "Diamond" )
+	{
+		TestSystem a;
+
+		TestSystem b;
+		b.RegisterDependency( a );
+
+		TestSystem c;
+		c.RegisterDependency( a );
+
+		TestSystem d;
+		d.RegisterDependency( b );
+		d.RegisterDependency( c );
+
+		ddc::System* systems[] = { &a, &b, &c, &d };
+
+		dd::Span<ddc::System*> span_systems( systems, 4 );
+
+		std::vector<ddc::System*> ordered;
+		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ] == &a );
+		REQUIRE( ordered[ 1 ] == &b );
+		REQUIRE( ordered[ 2 ] == &c );
+		REQUIRE( ordered[ 3 ] == &d );
 	}
 }
