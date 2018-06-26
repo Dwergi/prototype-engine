@@ -29,12 +29,12 @@ namespace dd
 		typedef std::conditional<std::is_copy_assignable<T>::value, T, EmptyType<T>>::type CopyAssignType;
 
 		New = SetFunc<std::is_default_constructible<T>::value, void* (*)(), &dd::New<DefaultCtorType>>::Get();
-		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void( *)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
-		Copy = SetFunc<std::is_copy_assignable<T>::value, void( *)(void*, const void*), &dd::Copy<CopyAssignType>>::Get();
+		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void (*)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
+		Copy = SetFunc<std::is_copy_assignable<T>::value, void (*)(void*, const void*), &dd::Copy<CopyAssignType>>::Get();
 		Delete = dd::Delete<T>;
-		PlacementCopy = SetFunc<std::is_copy_constructible<T>::value, void( *)(void*, const void*), &dd::PlacementCopy<CopyCtorType>>::Get();
+		PlacementCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void*, const void*), &dd::PlacementCopy<CopyCtorType>>::Get();
 		PlacementDelete = dd::PlacementDelete<T>;
-		NewCopy = SetFunc<std::is_copy_constructible<T>::value, void( *)(void**, const void*), &dd::NewCopy<CopyCtorType>>::Get();
+		NewCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void**, const void*), &dd::NewCopy<CopyCtorType>>::Get();
 	}
 
 	template <typename T>

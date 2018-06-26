@@ -11,10 +11,12 @@
 namespace ddc
 {
 #define DD_COMPONENT const ddc::ComponentType& GetType() const { return Type; } \
-	static const ddc::ComponentType Type;
+	static void Construct( void* ptr ); \
+	static const ddc::ComponentType Type
 
-#define DD_COMPONENT_CPP( TypeName ) DD_STATIC_ASSERT( std::is_trivial_v<TypeName> ); \
-	const ddc::ComponentType TypeName::Type( #TypeName, sizeof( TypeName ) )
+#define DD_COMPONENT_CPP( TypeName ) DD_STATIC_ASSERT( std::is_trivially_copyable_v<TypeName> && std::is_default_constructible_v<TypeName> ); \
+	void TypeName::Construct( void* ptr ) { new (ptr) TypeName; } \
+	const ddc::ComponentType TypeName::Type( #TypeName, sizeof( TypeName ), &TypeName::Construct )
 
 	static const int MAX_ENTITIES = 32 * 1024;
 	static const int MAX_COMPONENTS = 32;
@@ -33,25 +35,17 @@ namespace ddc
 		TypeID ID;
 		const char* Name;
 		size_t Size;
+		void (*Construct)( void* );
 
-		ComponentType( const char* name, size_t size )
+		ComponentType( const char* name, size_t size, void (*ctor)( void* ) )
 		{
 			Name = name;
 			ID = Count;
 			Size = size;
+			Construct = ctor;
 
 			Types[ ID ] = this;
 			++Count;
-		}
-
-		void* Construct()
-		{
-			return new byte[ Size ];
-		}
-
-		void Destruct( void* memory )
-		{
-			delete[] memory;
 		}
 	};
 

@@ -56,7 +56,9 @@ namespace ddc
 			m_ownership[ entity ].set( id, true );
 		}
 
-		return AccessComponent( entity, id );
+		void* ptr = AccessComponent( entity, id );
+		ComponentType::Types[ id ]->Construct( ptr );
+		return ptr;
 	}
 
 	void* EntityLayer::AccessComponent( Entity entity, TypeID id )

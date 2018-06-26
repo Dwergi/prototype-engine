@@ -5,23 +5,23 @@
 
 struct FirstComponent
 {
-	DD_COMPONENT
+	DD_COMPONENT;
 
-	int Value;
+	int Value { -100 };
 };
 
 struct SecondComponent
 {
-	DD_COMPONENT
+	DD_COMPONENT;
 
-	int OtherValue;
+	int OtherValue { 0 };
 };
 
 struct ThirdComponent
 {
-	DD_COMPONENT
+	DD_COMPONENT;
 
-	int OtherValue;
+	int OtherValue { 0 };
 };
 
 DD_COMPONENT_CPP( FirstComponent );
@@ -147,7 +147,7 @@ TEST_CASE( "Component" )
 	REQUIRE( found == false );
 
 	FirstComponent& cmp = layer.AddComponent<FirstComponent>( a );
-	REQUIRE( cmp.Value == 0 );
+	REQUIRE( cmp.Value == -100 );
 
 	REQUIRE( &cmp.GetType() == &FirstComponent::Type );
 
