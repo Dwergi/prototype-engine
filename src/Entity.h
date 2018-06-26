@@ -8,18 +8,18 @@
 #include <bitset>
 #include <unordered_map>
 
-#pragma optimize( "", off )
-
 namespace ddc
 {
-#define COMPONENT_H() static const ddc::ComponentType Type;
-#define COMPONENT_CPP( TypeName ) DD_STATIC_ASSERT( std::is_trivial_v<TypeName> ); \
+#define DD_COMPONENT const ddc::ComponentType& GetType() const { return Type; } \
+	static const ddc::ComponentType Type;
+
+#define DD_COMPONENT_CPP( TypeName ) DD_STATIC_ASSERT( std::is_trivial_v<TypeName> ); \
 	const ddc::ComponentType TypeName::Type( #TypeName, sizeof( TypeName ) )
 
 	static const int MAX_ENTITIES = 32 * 1024;
 	static const int MAX_COMPONENTS = 32;
 
-	struct EntitySpace;
+	struct EntityLayer;
 
 	typedef int TypeID;
 
@@ -57,9 +57,9 @@ namespace ddc
 
 	typedef int Entity;
 
-	struct EntitySpace
+	struct EntityLayer
 	{
-		EntitySpace();
+		EntityLayer();
 
 		Entity Create();
 		void Destroy( Entity entity );
@@ -92,9 +92,9 @@ namespace ddc
 		void* AddComponent( Entity entity, TypeID id );
 
 		template <typename T>
-		T* AddComponent( Entity entity )
+		T& AddComponent( Entity entity )
 		{
-			return reinterpret_cast<T*>( AddComponent( entity, T::Type.ID ) );
+			return *reinterpret_cast<T*>( AddComponent( entity, T::Type.ID ) );
 		}
 
 		void RemoveComponent( Entity entity, TypeID id );
@@ -202,7 +202,7 @@ namespace ddc
 
 	struct ComponentDataBuffer
 	{
-		ComponentDataBuffer( dd::Span<Entity> entities, EntitySpace& space, TypeID component, DataUsage usage, byte* storage ) :
+		ComponentDataBuffer( dd::Span<Entity> entities, EntityLayer& space, TypeID component, DataUsage usage, byte* storage ) :
 			m_component( component ),
 			m_usage( usage ),
 			m_storage( storage )
@@ -319,7 +319,7 @@ namespace ddc
 
 	struct UpdateData
 	{
-		UpdateData( EntitySpace& space, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
+		UpdateData( EntityLayer& space, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
 			m_space( space ),
 			m_entities( entities )
 		{
@@ -387,7 +387,7 @@ namespace ddc
 
 		size_t m_entityCount { 0 };
 
-		EntitySpace& m_space;
+		EntityLayer& m_space;
 		dd::Span<Entity> m_entities;
 		std::vector<ComponentDataBuffer> m_buffers;
 
@@ -406,7 +406,7 @@ namespace ddc
 
 	const int PARTITION_COUNT = 4;
 
-	void UpdateSystem( EntitySpace& space, System& system );
+	void UpdateSystem( EntityLayer& space, System& system );
 
 	void ScheduleSystemsByComponent( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems );
 

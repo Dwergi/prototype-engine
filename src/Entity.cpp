@@ -6,7 +6,7 @@ namespace ddc
 	ComponentType* ComponentType::Types[ MAX_COMPONENTS ] = { nullptr };
 	int ComponentType::Count = 0;
 
-	EntitySpace::EntitySpace()
+	EntityLayer::EntityLayer()
 	{
 		m_alive.reset();
 
@@ -19,7 +19,7 @@ namespace ddc
 		}
 	}
 	
-	Entity EntitySpace::Create()
+	Entity EntityLayer::Create()
 	{
 		if( m_free.empty() )
 		{
@@ -36,7 +36,7 @@ namespace ddc
 		return entity;
 	}
 
-	void EntitySpace::Destroy( Entity entity )
+	void EntityLayer::Destroy( Entity entity )
 	{
 		DD_ASSERT( m_alive.test( entity ) );
 
@@ -44,12 +44,12 @@ namespace ddc
 		m_alive.set( entity, false );
 	}
 
-	bool EntitySpace::IsAlive( Entity entity )
+	bool EntityLayer::IsAlive( Entity entity )
 	{
 		return m_alive.test( entity );
 	}
 
-	void* EntitySpace::AddComponent( Entity entity, TypeID id )
+	void* EntityLayer::AddComponent( Entity entity, TypeID id )
 	{
 		if( !HasComponent( entity, id ) )
 		{
@@ -59,7 +59,7 @@ namespace ddc
 		return AccessComponent( entity, id );
 	}
 
-	void* EntitySpace::AccessComponent( Entity entity, TypeID id )
+	void* EntityLayer::AccessComponent( Entity entity, TypeID id )
 	{
 		if( !HasComponent( entity, id ) )
 		{
@@ -69,7 +69,7 @@ namespace ddc
 		return static_cast<byte*>(m_components[ id ]) + (entity * ComponentType::Types[ id ]->Size);
 	}
 
-	void EntitySpace::RemoveComponent( Entity entity, TypeID id )
+	void EntityLayer::RemoveComponent( Entity entity, TypeID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
@@ -77,7 +77,7 @@ namespace ddc
 		}
 	}
 
-	void EntitySpace::FindAllWith( const dd::IArray<int>& components, std::vector<int>& outEntities )
+	void EntityLayer::FindAllWith( const dd::IArray<int>& components, std::vector<int>& outEntities )
 	{
 		std::bitset<MAX_COMPONENTS> mask;
 		for( int id : components )
@@ -97,7 +97,7 @@ namespace ddc
 		}
 	}
 
-	void UpdateSystem( EntitySpace& space, System& system )
+	void UpdateSystem( EntityLayer& space, System& system )
 	{
 		dd::Array<TypeID, MAX_COMPONENTS> nodes;
 		for( const DataRequirement* read : system.GetRequirements() )

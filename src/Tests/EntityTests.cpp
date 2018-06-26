@@ -3,30 +3,30 @@
 
 #include "catch/catch.hpp"
 
-struct ThirdComponent
-{
-	COMPONENT_H();
-
-	int OtherValue;
-};
-
 struct FirstComponent
 {
-	COMPONENT_H();
+	DD_COMPONENT
 
 	int Value;
 };
 
 struct SecondComponent
 {
-	COMPONENT_H();
+	DD_COMPONENT
 
 	int OtherValue;
 };
 
-COMPONENT_CPP( ThirdComponent );
-COMPONENT_CPP( FirstComponent );
-COMPONENT_CPP( SecondComponent );
+struct ThirdComponent
+{
+	DD_COMPONENT
+
+	int OtherValue;
+};
+
+DD_COMPONENT_CPP( FirstComponent );
+DD_COMPONENT_CPP( SecondComponent );
+DD_COMPONENT_CPP( ThirdComponent );
 
 struct TestSystem : ddc::System
 {
@@ -116,77 +116,88 @@ struct OnlyWriterSystem : ddc::System
 
 TEST_CASE( "EntityManager" )
 {
-	ddc::EntitySpace mgr;
+	ddc::EntityLayer layer;
 
-	ddc::Entity a = mgr.Create();
+	ddc::Entity a = layer.Create();
 	REQUIRE( a == 0 );
 
-	ddc::Entity b = mgr.Create();
+	ddc::Entity b = layer.Create();
 	REQUIRE( b == 1 );
 
-	ddc::Entity c = mgr.Create();
+	ddc::Entity c = layer.Create();
 	REQUIRE( c == 2 );
 
-	mgr.Destroy( a );
+	layer.Destroy( a );
 	
-	ddc::Entity a2 = mgr.Create();
+	ddc::Entity a2 = layer.Create();
 	REQUIRE( a2 == a );
 
-	mgr.Destroy( b );
+	layer.Destroy( b );
 
-	ddc::Entity b2 = mgr.Create();
+	ddc::Entity b2 = layer.Create();
 	REQUIRE( b2 == b );
 }
 
 TEST_CASE( "Component" )
 {
-	ddc::EntitySpace mgr;
-	ddc::Entity a = mgr.Create();
+	ddc::EntityLayer layer;
+	ddc::Entity a = layer.Create();
 
-	bool found = mgr.HasComponent<FirstComponent>( a );
+	bool found = layer.HasComponent<FirstComponent>( a );
 	REQUIRE( found == false );
 
-	FirstComponent& cmp = *mgr.AddComponent<FirstComponent>( a );
+	FirstComponent& cmp = layer.AddComponent<FirstComponent>( a );
 	REQUIRE( cmp.Value == 0 );
+
+	REQUIRE( &cmp.GetType() == &FirstComponent::Type );
 
 	cmp.Value = 5;
 
-	const FirstComponent& cmp2 = *mgr.AccessComponent<FirstComponent>( a );
+	const FirstComponent& cmp2 = *layer.AccessComponent<FirstComponent>( a );
 	REQUIRE( cmp2.Value == 5 );
 	REQUIRE( cmp.Value == cmp2.Value );
 
-	REQUIRE( mgr.HasComponent<FirstComponent>( a ) == true );
+	REQUIRE( layer.HasComponent<FirstComponent>( a ) == true );
 
-	mgr.RemoveComponent<FirstComponent>( a );
-	REQUIRE( mgr.HasComponent<FirstComponent>( a ) == false );
+	layer.RemoveComponent<FirstComponent>( a );
+	REQUIRE( layer.HasComponent<FirstComponent>( a ) == false );
 }
 
 TEST_CASE( "Update System" )
 {
 	TestSystem system;
 
-	ddc::EntitySpace space;
+	ddc::EntityLayer layer;
 
 	for( int i = 0; i < 4; ++i )
 	{
-		ddc::Entity entity = space.Create();
+		ddc::Entity entity = layer.Create();
 
-		FirstComponent& simple = *space.AddComponent<FirstComponent>( entity );
+		FirstComponent& simple = layer.AddComponent<FirstComponent>( entity );
 		simple.Value = i;
 
-		SecondComponent& other = *space.AddComponent<SecondComponent>( entity );
+		SecondComponent& other = layer.AddComponent<SecondComponent>( entity );
 		other.OtherValue = -1;
 	}
 
-	ddc::UpdateSystem( space, system );
+	ddc::UpdateSystem( layer, system );
 
 	for( int i = 0; i < 4; ++i )
 	{
-		FirstComponent& simple = *space.AccessComponent<FirstComponent>( i );
+		FirstComponent& simple = *layer.AccessComponent<FirstComponent>( i );
 		REQUIRE( simple.Value == i );
 
-		SecondComponent& other = *space.AccessComponent<SecondComponent>( i );
+		SecondComponent& other = *layer.AccessComponent<SecondComponent>( i );
 		REQUIRE( other.OtherValue == i );
+	}
+
+	for( int i = 0; i < 4; ++i )
+	{
+		layer.RemoveComponent<FirstComponent>( i );
+		REQUIRE_FALSE( layer.HasComponent<FirstComponent>( i ) );
+
+		layer.RemoveComponent<SecondComponent>( i );
+		REQUIRE_FALSE( layer.HasComponent<SecondComponent>( i ) );
 	}
 }
 
