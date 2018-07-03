@@ -23,7 +23,7 @@ namespace dd
 
 		template<class F, class... Args>
 		auto Schedule( F&& f, Args&&... args )
-			-> std::future<typename std::result_of<F( Args... )>::type>;
+			-> std::future<std::invoke_result_t<F, Args...>>;
 	private:
 		
 		std::vector<std::thread> m_workers;
@@ -39,9 +39,9 @@ namespace dd
 	// add new work item to the pool
 	template<class F, class... Args>
 	auto JobSystem::Schedule( F&& f, Args&&... args )
-		-> std::future<typename std::result_of<F( Args... )>::type>
+		-> std::future<std::invoke_result_t<F, Args...>>
 	{
-		using return_type = typename std::result_of<F( Args... )>::type;
+		using return_type = std::invoke_result_t<F, Args...>;
 
 		auto task = std::make_shared< std::packaged_task<return_type()> >(
 			std::bind( std::forward<F>( f ), std::forward<Args>( args )... )
@@ -52,7 +52,7 @@ namespace dd
 		{
 			std::unique_lock<std::mutex> lock( m_queueMutex );
 
-			// don't allow enqueueing after stopping the pool
+			// don't allow enqueuing after stopping the pool
 			if( m_stop )
 				DD_ASSERT( "Scheduled job on stopped JobSystem" );
 

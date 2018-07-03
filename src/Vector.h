@@ -161,7 +161,7 @@ namespace dd
 			AddAll( other );
 		}
 
-		bool IsOnStack() const { return Data() == (T*) m_stack;  }
+		bool IsOnStack() const { return Vector<T>::Data() == (T*) m_stack;  }
 	};
 }
 

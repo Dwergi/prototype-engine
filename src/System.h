@@ -16,7 +16,9 @@ namespace ddc
 		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 
+		virtual void Initialize() {}
 		virtual void Update( const UpdateData& data ) = 0;
+		virtual void Shutdown() {}
 
 	private:
 		dd::Array<const DataRequirement*, MAX_COMPONENTS> m_requirements;
