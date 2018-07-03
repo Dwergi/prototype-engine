@@ -203,11 +203,9 @@ TEST_CASE( "Component" )
 
 TEST_CASE( "Update System" )
 {
-	TestSystem system;
-
 	ddc::EntityLayer layer;
 
-	for( int i = 0; i < 4; ++i )
+	for( int i = 0; i < 8; ++i )
 	{
 		ddc::Entity e = layer.Create();
 
@@ -218,10 +216,49 @@ TEST_CASE( "Update System" )
 		other.SecondValue = -1;
 	}
 
+	TestSystem system;
 	ddc::UpdateSystem( system, layer );
 
-	for( int i = 0; i < 4; ++i )
+	for( int i = 0; i < 8; ++i )
 	{
+		ddc::Entity e;
+		e.ID = i;
+		e.Version = 0;
+
+		FirstComponent& simple = *layer.AccessComponent<FirstComponent>( e );
+		REQUIRE( simple.FirstValue == e.ID );
+
+		SecondComponent& other = *layer.AccessComponent<SecondComponent>( e );
+		REQUIRE( other.SecondValue == e.ID );
+	}
+}
+
+TEST_CASE( "Update With Discontinuity" )
+{
+	ddc::EntityLayer layer;
+
+	for( int i = 0; i < 5; ++i )
+	{
+		ddc::Entity e = layer.Create();
+
+		if( i == 2 )
+			continue;
+		
+		FirstComponent& simple = layer.AddComponent<FirstComponent>( e );
+		simple.FirstValue = i;
+
+		SecondComponent& other = layer.AddComponent<SecondComponent>( e );
+		other.SecondValue = -1;
+	}
+
+	TestSystem system;
+	ddc::UpdateSystem( system, layer, 1 );
+
+	for( int i = 0; i < 5; ++i )
+	{
+		if( i == 2 )
+			continue;
+
 		ddc::Entity e;
 		e.ID = i;
 		e.Version = 0;
@@ -480,7 +517,7 @@ TEST_CASE( "Full Update Loop" )
 
 	BENCHMARK( "Update" )
 	{
-		for( int i = 0; i < 100; ++i )
+		for( int i = 0; i < 1000; ++i )
 		{
 			ddc::UpdateSystem( a, layer );
 			ddc::UpdateSystem( b, layer );

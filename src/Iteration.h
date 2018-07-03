@@ -8,9 +8,16 @@
 namespace dd
 {
 	template <typename T>
-	class Iterator : public std::iterator<std::random_access_iterator_tag, T>
+	class Iterator
 	{
 	public:
+
+		typedef std::random_access_iterator_tag iterator_category;
+		typedef T value_type;
+		typedef size_t difference_type;
+		typedef T* pointer;
+		typedef T& reference;
+
 		Iterator();
 		explicit Iterator( T* data );
 

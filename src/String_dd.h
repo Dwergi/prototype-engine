@@ -15,17 +15,13 @@ namespace dd
 
 	class String
 	{
-	private:
-
-		// disable
-		String( const String& other ) {}
-
 	protected:
 
 		String( char* stackBuffer, int stackCapacity );
 
 	public:
 
+		String( const String& other ) = delete;
 		virtual ~String();
 
 		String& operator=( const char* other );

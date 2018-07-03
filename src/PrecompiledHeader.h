@@ -13,6 +13,8 @@
 
 #define GLM_SWIZZLE 1
 
+#pragma warning( disable : 4723 )
+
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 

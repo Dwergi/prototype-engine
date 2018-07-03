@@ -125,18 +125,16 @@ namespace ddc
 		for( int i = 0; i < m_count; ++i )
 		{
 			std::bitset<MAX_COMPONENTS> entity_mask = mask;
-			mask &= m_ownership[ i ];
+			entity_mask &= m_ownership[ i ];
 
-			if( m_entities[ i ].Alive && mask.any() )
+			if( m_entities[ i ].Alive && entity_mask.any() )
 			{
 				outEntities.push_back( m_entities[ i ] );
 			}
 		}
 	}
 
-	const int PARTITION_COUNT = 4;
-
-	void UpdateSystem( System& system, EntityLayer& layer )
+	void UpdateSystem( System& system, EntityLayer& layer, int partition_count )
 	{
 		// filter entities that have the requirements
 		dd::Array<TypeID, MAX_COMPONENTS> components;
@@ -150,16 +148,16 @@ namespace ddc
 		std::vector<Entity> entities;
 		layer.FindAllWith( components, entities );
 
-		size_t partition_size = entities.size() / PARTITION_COUNT;
+		size_t partition_size = entities.size() / partition_count;
 
 		size_t entity_start = 0;
-		for( int partition = 0; partition < PARTITION_COUNT; ++partition )
+		for( int partition = 0; partition < partition_count; ++partition )
 		{
 			size_t entity_count = partition_size;
 
 			if( partition == 0 )
 			{
-				size_t remainder = entities.size() - partition_size * PARTITION_COUNT;
+				size_t remainder = entities.size() - partition_size * partition_count;
 				entity_count = partition_size + remainder;
 			}
 

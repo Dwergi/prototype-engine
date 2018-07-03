@@ -120,7 +120,7 @@ namespace dd
 		std::lock_guard<std::mutex> lock( s_mutex );
 
 		std::shared_ptr<const char>* existing = s_instances.Find( m_hash );
-		if( existing != nullptr && existing->unique() )
+		if( existing != nullptr && existing->use_count() == 1 )
 		{
 			// only instance remaining
 			s_instances.Remove( m_hash );

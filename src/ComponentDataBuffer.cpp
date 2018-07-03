@@ -32,13 +32,34 @@ namespace ddc
 		}
 
 		const byte* src = m_storage;
+		size_t copy_size = 0;
+		byte* dest_start = nullptr;
 
 		for( Entity entity : entities )
 		{
 			void* dest = layer.AccessComponent( entity, m_component.ID );
-			memcpy( dest, src, m_component.Size );
 
-			src += m_component.Size;
+			if( dest_start == nullptr )
+			{
+				dest_start = (byte*) dest;
+			}
+			else if( dest != (dest_start + copy_size) )
+			{
+				// discontinuity, commit the copy
+				memcpy( dest_start, src, copy_size );
+
+				src += copy_size;
+				dest_start = (byte*) dest;
+				copy_size = 0;
+			}
+			
+			copy_size += m_component.Size;
+		}
+
+		// final copy
+		if( copy_size > 0 )
+		{
+			memcpy( dest_start, src, copy_size );
 		}
 	}
 }

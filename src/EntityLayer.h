@@ -11,7 +11,7 @@ namespace ddc
 
 	struct Entity
 	{
-		int Alive : 1;
+		uint Alive : 1;
 		int ID : 21;
 		int Version : 10;
 	};
@@ -77,7 +77,9 @@ namespace ddc
 		std::vector<byte*> m_components;
 	};
 
-	void UpdateSystem( System& system, EntityLayer& space );
+	const int PARTITION_COUNT = 4;
+
+	void UpdateSystem( System& system, EntityLayer& space, int partitions = PARTITION_COUNT );
 
 	void ScheduleSystemsByComponent( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems );
 
