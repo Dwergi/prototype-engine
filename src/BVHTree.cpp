@@ -11,18 +11,6 @@
 
 #include <algorithm>
 
-namespace std
-{
-	template <typename T>
-	T pop_front( std::vector<T>& vec )
-	{
-		T value = vec.front();
-		vec.erase( vec.begin() );
-
-		return value;
-	}
-}
-
 namespace dd
 {
 	BVHTree::BVHTree()
@@ -43,7 +31,7 @@ namespace dd
 			m_entries.emplace_back( BVHEntry() );
 		}
 
-		size_t index = std::pop_front( m_freeEntries );
+		size_t index = dd::pop_front( m_freeEntries );
 
 		BVHEntry& entry = m_entries[ index ];
 		entry.Bounds = bounds;
@@ -284,14 +272,14 @@ namespace dd
 			split_axis = Axis::X;
 		}
 
-		size_t left_index = std::pop_front( m_freeBuckets );
+		size_t left_index = dd::pop_front( m_freeBuckets );
 		BVHBucket& left = m_buckets[ left_index ];
 		left.Region.Min = parent_bucket.Region.Min;
 		left.Region.Max = parent_bucket.Region.Max - split_offset;
 		left.SplitAxis = split_axis;
 		left.Parent = parent_index;
 
-		size_t right_index = std::pop_front( m_freeBuckets );
+		size_t right_index = dd::pop_front( m_freeBuckets );
 		BVHBucket& right = m_buckets[ right_index ];
 		right.Region.Min = parent_bucket.Region.Min + split_offset;
 		right.Region.Max = parent_bucket.Region.Max;

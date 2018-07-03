@@ -1,15 +1,18 @@
 #include "PrecompiledHeader.h"
-#include "Entity.h"
+#include "EntityLayer.h"
+
+#include "UpdateData.h"
+#include "System.h"
 
 namespace ddc
 {
 	ComponentType* ComponentType::Types[ MAX_COMPONENTS ] = { nullptr };
 	int ComponentType::Count = 0;
 
+	DD_STATIC_ASSERT( sizeof( Entity ) == sizeof( int ) );
+
 	EntityLayer::EntityLayer()
 	{
-		m_alive.reset();
-
 		m_components.resize( ComponentType::Count );
 		for( int i = 0; i < ComponentType::Count; ++i )
 		{
@@ -24,36 +27,54 @@ namespace ddc
 		if( m_free.empty() )
 		{
 			m_free.push_back( m_count );
+
+			Entity new_entity;
+			new_entity.ID = m_count;
+			new_entity.Version = -1;
+
+			m_entities.push_back( new_entity );
 			m_ownership.push_back( 0 );
+
 			++m_count;
 		}
 
-		Entity entity = m_free.front();
+		int idx = dd::pop_front( m_free );
 		
-		m_free.erase( m_free.begin() );
-		m_alive.set( entity, true );
-
+		Entity& entity = m_entities[ idx ];
+		entity.Version++;
+		entity.Alive = true;
 		return entity;
 	}
 
 	void EntityLayer::Destroy( Entity entity )
 	{
-		DD_ASSERT( m_alive.test( entity ) );
+		DD_ASSERT( IsAlive( entity ) );
 
-		m_free.push_back( entity );
-		m_alive.set( entity, false );
+		m_free.push_back( entity.ID );
+		m_entities[ entity.ID ].Alive = false;
 	}
 
-	bool EntityLayer::IsAlive( Entity entity )
+	bool EntityLayer::IsAlive( Entity entity ) const
 	{
-		return m_alive.test( entity );
+		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
+		return m_entities[ entity.ID ].Version == entity.Version && m_entities[ entity.ID ].Alive;
+	}
+
+	bool EntityLayer::HasComponent( Entity entity, TypeID id ) const
+	{
+		if( !IsAlive( entity ) )
+		{
+			return false;
+		}
+
+		return m_ownership[ entity.ID ].test( id );
 	}
 
 	void* EntityLayer::AddComponent( Entity entity, TypeID id )
 	{
 		if( !HasComponent( entity, id ) )
 		{
-			m_ownership[ entity ].set( id, true );
+			m_ownership[ entity.ID ].set( id, true );
 		}
 
 		void* ptr = AccessComponent( entity, id );
@@ -61,25 +82,39 @@ namespace ddc
 		return ptr;
 	}
 
-	void* EntityLayer::AccessComponent( Entity entity, TypeID id )
+	void* EntityLayer::AccessComponent( Entity entity, TypeID id ) const
 	{
 		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
 		}
 
-		return static_cast<byte*>(m_components[ id ]) + (entity * ComponentType::Types[ id ]->Size);
+		return m_components[ id ] + (entity.ID * ComponentType::Types[ id ]->Size);
+	}
+
+	const void* EntityLayer::GetComponent( Entity entity, TypeID id ) const
+	{
+		if( !HasComponent( entity, id ) )
+		{
+			return nullptr;
+		}
+
+		return m_components[ id ] + (entity.ID * ComponentType::Types[ id ]->Size);
 	}
 
 	void EntityLayer::RemoveComponent( Entity entity, TypeID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
-			m_ownership[ entity ].set( id, false );
+			m_ownership[ entity.ID ].set( id, false );
+		}
+		else
+		{
+			DD_ASSERT( false, "Entity does not have have component being removed!" );
 		}
 	}
 
-	void EntityLayer::FindAllWith( const dd::IArray<int>& components, std::vector<int>& outEntities )
+	void EntityLayer::FindAllWith( const dd::IArray<int>& components, std::vector<Entity>& outEntities ) const 
 	{
 		std::bitset<MAX_COMPONENTS> mask;
 		for( int id : components )
@@ -92,25 +127,28 @@ namespace ddc
 			std::bitset<MAX_COMPONENTS> entity_mask = mask;
 			mask &= m_ownership[ i ];
 
-			if( IsAlive( i ) &&	mask.any() )
+			if( m_entities[ i ].Alive && mask.any() )
 			{
-				outEntities.push_back( i );
+				outEntities.push_back( m_entities[ i ] );
 			}
 		}
 	}
 
-	void UpdateSystem( EntityLayer& space, System& system )
+	const int PARTITION_COUNT = 4;
+
+	void UpdateSystem( System& system, EntityLayer& layer )
 	{
-		dd::Array<TypeID, MAX_COMPONENTS> nodes;
-		for( const DataRequirement* read : system.GetRequirements() )
+		// filter entities that have the requirements
+		dd::Array<TypeID, MAX_COMPONENTS> components;
+		for( const DataRequirement* req : system.GetRequirements() )
 		{
-			nodes.Add( read->Component() );
+			components.Add( req->Component().ID );
 		}
 
-		dd::Span<TypeID> cmp_span( nodes.Data(), nodes.Size() );
+		dd::Span<TypeID> cmp_span( components.Data(), components.Size() );
 
 		std::vector<Entity> entities;
-		space.FindAllWith( nodes, entities );
+		layer.FindAllWith( components, entities );
 
 		size_t partition_size = entities.size() / PARTITION_COUNT;
 
@@ -127,7 +165,7 @@ namespace ddc
 
 			dd::Span<Entity> entity_span( entities, entity_count, entity_start );
 
-			UpdateData data( space, entity_span, system.GetRequirements() );
+			UpdateData data( layer, entity_span, system.GetRequirements() );
 
 			system.Update( data );
 
@@ -203,7 +241,7 @@ namespace ddc
 
 						for( const DataRequirement* other_req : other_system->GetRequirements() )
 						{
-							if( other_req->Component() == req->Component() &&
+							if( other_req->Component().ID == req->Component().ID &&
 								other_req->Usage() == DataUsage::Read )
 							{
 								SystemNode::Edge edge;

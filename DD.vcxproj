@@ -317,8 +317,11 @@
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\BVHTree.h" />
+    <ClInclude Include="src\ComponentDataBuffer.h" />
+    <ClInclude Include="src\ComponentType.h" />
+    <ClInclude Include="src\DataRequirement.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
-    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\EntityLayer.h" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -404,6 +407,7 @@
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
+    <ClInclude Include="src\System.h" />
     <ClInclude Include="src\TerrainChunk.h" />
     <ClInclude Include="src\TerrainChunkComponent.h" />
     <ClInclude Include="src\TerrainChunkKey.h" />
@@ -439,6 +443,7 @@
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
+    <ClInclude Include="src\UpdateData.h" />
     <ClInclude Include="src\VAO.h" />
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\VBO.h" />
@@ -526,8 +531,10 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
+    <ClCompile Include="src\ComponentDataBuffer.cpp" />
+    <ClCompile Include="src\DataRequirement.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
-    <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\EntityLayer.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
@@ -657,6 +664,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TransformComponent.cpp" />
     <ClCompile Include="src\TrenchSystem.cpp" />
+    <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
     <None Include="src\Array.inl" />

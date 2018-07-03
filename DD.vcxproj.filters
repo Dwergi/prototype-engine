@@ -504,12 +504,29 @@
     <ClInclude Include="src\IComponentPool.h">
       <Filter>Components\Pools</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Span.h">
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="src\BVHTree.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataRequirement.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentType.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\System.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UpdateData.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentDataBuffer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityLayer.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -859,7 +876,6 @@
     <ClCompile Include="src\DDAssertHelpers.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Tests\EntityTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -868,6 +884,18 @@
     </ClCompile>
     <ClCompile Include="src\Tests\BVHTreeTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UpdateData.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityLayer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComponentDataBuffer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataRequirement.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

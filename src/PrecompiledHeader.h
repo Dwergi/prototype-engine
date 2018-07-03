@@ -31,6 +31,7 @@
 #include "SharedString.h"
 #include "Array.h"
 #include "Vector.h"
+#include "Span.h"
 
 #include "Variable.h"
 #include "Member.h"
@@ -56,6 +57,15 @@ namespace dd
 
 	void* PointerAdd( void* base, uint64 offset );
 	const void* PointerAdd( const void* base, uint64 offset );
+
+	template <typename T>
+	T pop_front( std::vector<T>& vec )
+	{
+		T value = vec.front();
+		vec.erase( vec.begin() );
+
+		return value;
+	}
 }
 
 namespace ImGui
