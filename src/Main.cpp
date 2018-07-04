@@ -299,6 +299,24 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
+void WaitForAll( std::vector<std::future<void>>& futures )
+{
+	size_t ready = 0;
+
+	while( ready < futures.size() )
+	{
+		for( std::future<void>& f : futures )
+		{
+			std::future_status s = f.wait_for( std::chrono::microseconds( 1 ) );
+
+			if( s == std::future_status::ready )
+			{
+				++ready;
+			}
+		}
+	}
+}
+
 void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems )
 {
 	std::vector<std::future<void>> futures;
@@ -308,10 +326,7 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 		futures.push_back( jobsystem.Schedule( [&entity_manager, system]() { system->Initialize( entity_manager ); } ) );
 	}
 
-	for( std::future<void>& f : futures )
-	{
-		f.wait_for( std::chrono::milliseconds( 1 ) );
-	}
+	WaitForAll( futures );
 }
 
 void InitializeRenderers( Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
@@ -332,10 +347,7 @@ void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, cons
 		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); } ) );
 	}
 
-	for( std::future<void>& f : futures )
-	{
-		f.wait_for( std::chrono::milliseconds( 1 ) );
-	}
+	WaitForAll( futures );
 }
 
 void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
@@ -346,10 +358,7 @@ void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const V
 		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); } ) );
 	}
 
-	for( std::future<void>& f : futures )
-	{
-		f.wait_for( std::chrono::milliseconds( 1 ) );
-	}
+	WaitForAll( futures );
 }
 
 void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
@@ -360,10 +369,7 @@ void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); } ) );
 	}
 
-	for( std::future<void>& f : futures )
-	{
-		f.wait_for( std::chrono::milliseconds( 1 ) );
-	}
+	WaitForAll( futures );
 }
 
 void ShutdownSystems( EntityManager& entity_manager, const Vector<ISystem*>& systems )

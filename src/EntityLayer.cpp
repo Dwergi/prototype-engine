@@ -1,6 +1,7 @@
 #include "PrecompiledHeader.h"
 #include "EntityLayer.h"
 
+#include "JobSystem.h"
 #include "UpdateData.h"
 #include "System.h"
 
@@ -148,6 +149,11 @@ namespace ddc
 		std::vector<Entity> entities;
 		layer.FindAllWith( components, entities );
 
+		if( entities.size() == 0 )
+		{
+			return;
+		}
+
 		size_t partition_size = entities.size() / partition_count;
 
 		size_t entity_start = 0;
@@ -159,6 +165,11 @@ namespace ddc
 			{
 				size_t remainder = entities.size() - partition_size * partition_count;
 				entity_count = partition_size + remainder;
+			}
+
+			if( entity_count == 0 )
+			{
+				continue;
 			}
 
 			dd::Span<Entity> entity_span( entities, entity_count, entity_start );
@@ -173,44 +184,47 @@ namespace ddc
 		}
 	}
 
-	struct SystemNode
+	static void SortSystemsTopologically( const std::vector<SystemNode>& nodes, std::vector<SystemNode>& out_sorted )
 	{
-		struct Edge
-		{
-			SystemNode* m_node;
-		};
+		std::vector<SystemNode> scratch = nodes;
 
-		// nodes that are written to by systems that read this component
-		int m_in { 0 };
-		System* m_system { nullptr };
-		std::vector<Edge> m_edges;
-	};
-
-	static void SortSystemsTopologically( std::vector<SystemNode>& nodes, std::vector<System*>& out_sorted )
-	{
 		out_sorted.clear();
 
 		while( out_sorted.size() < nodes.size() )
 		{
-			for( SystemNode& node : nodes )
+			for( size_t n = 0; n < scratch.size(); ++n )
 			{
-				if( node.m_system != nullptr && node.m_in == 0 )
-				{
-					out_sorted.push_back( node.m_system );
+				SystemNode& node = scratch[ n ];
 
-					for( SystemNode::Edge& edge : node.m_edges )
+				if( node.m_system != nullptr && node.m_in.size() == 0 )
+				{
+					out_sorted.push_back( nodes[ n ] );
+
+					for( SystemNode::Edge& outEdge : node.m_out )
 					{
-						edge.m_node->m_in--;
+						SystemNode& destNode = scratch[ outEdge.m_to ];
+
+						size_t i = 0;
+						for( ; i < destNode.m_in.size(); ++i )
+						{
+							SystemNode::Edge& inEdge = destNode.m_in[ i ];
+							if( inEdge.m_from == n )
+							{
+								break;
+							}
+						}
+
+						destNode.m_in.erase( destNode.m_in.begin() + i );
 					}
 
-					node.m_edges.clear();
+					node.m_out.clear();
 					node.m_system = nullptr;
 				}
 			}
 		}
 	}
 
-	void ScheduleSystemsByComponent( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems )
+	void OrderSystemsByComponent( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems )
 	{
 		std::vector<SystemNode> nodes;
 		nodes.reserve( systems.Size() );
@@ -243,10 +257,11 @@ namespace ddc
 								other_req->Usage() == DataUsage::Read )
 							{
 								SystemNode::Edge edge;
-								edge.m_node = &nodes[ other ];
-								nodes[ sys ].m_edges.push_back( edge );
+								edge.m_from = sys;
+								edge.m_to = other;
 
-								nodes[ other ].m_in++;
+								nodes[ sys ].m_out.push_back( edge );
+								nodes[ other ].m_in.push_back( edge );
 							}
 						}
 					}
@@ -257,7 +272,7 @@ namespace ddc
 		SortSystemsTopologically( nodes, out_ordered_systems );
 	}
 
-	void ScheduleSystemsByDependencies( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems )
+	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems )
 	{
 		std::vector<SystemNode> nodes;
 		nodes.reserve( systems.Size() );
@@ -274,20 +289,55 @@ namespace ddc
 			const System* system = systems[ sys ];
 
 			const dd::IArray<const System*>& deps = system->GetDependencies();
-			for( size_t other = 0; other < deps.Size(); ++other )
+			for( size_t dep = 0; dep < deps.Size(); ++dep )
 			{
-				const System* other_sys = systems[ other ];
-
-				DD_ASSERT( system != other_sys, "Can't depend on the same system!" );
+				DD_ASSERT( system != systems[ dep ], "Can't depend on the same system!" );
 
 				SystemNode::Edge edge;
-				edge.m_node = &nodes[ sys ];
-				nodes[ other ].m_edges.push_back( edge );
-
-				nodes[ sys ].m_in++;
+				edge.m_from = dep;
+				edge.m_to = sys;
+				
+				nodes[ dep ].m_out.push_back( edge );
+				nodes[ sys ].m_in.push_back( edge );
 			}
 		}
 
 		SortSystemsTopologically( nodes, out_ordered_systems );
+	}
+
+	void WaitForAllDependencies( SystemNode& s, std::vector<SystemNode>& systems )
+	{
+		size_t ready = 0;
+
+		while( ready < s.m_in.size() )
+		{
+			for( SystemNode::Edge& e : s.m_in )
+			{
+				SystemNode& dep = systems[ e.m_from ];
+				std::future_status s = dep.m_update.wait_for( std::chrono::microseconds( 1 ) );
+
+				if( s == std::future_status::ready )
+				{
+					++ready;
+				}
+			}
+		}
+	}
+
+	void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, EntityLayer& layer )
+	{
+		for( SystemNode& s : systems )
+		{
+			if( s.m_system == nullptr )
+				continue;
+
+			std::future<void> f = jobsystem.Schedule( [&layer, &s, &systems]()
+			{
+				WaitForAllDependencies( s, systems );
+				UpdateSystem( *(s.m_system), layer, 1 );
+			} );
+
+			s.m_update = f.share();
+		}
 	}
 }

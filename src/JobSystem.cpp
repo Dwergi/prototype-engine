@@ -5,35 +5,39 @@
 
 namespace dd
 {
-
 	// the constructor just launches some amount of workers
 	JobSystem::JobSystem( size_t threads )
 	{
-#ifndef JOBSYSTEM_NO_THREADS
+		if( threads == 0 )
+		{
+			m_useThreads = false;
+			return;
+		}
+
 		for( size_t i = 0; i < threads; ++i )
 		{
 			m_workers.emplace_back( [this]() { WorkerFunction(); } ); 
 		}
-#endif
 	}
 
 
 	// the destructor joins all threads
 	JobSystem::~JobSystem()
 	{
-#ifndef JOBSYSTEM_NO_THREADS
+		if( m_useThreads )
 		{
-			std::unique_lock<std::mutex> lock( m_queueMutex );
-			m_stop = true;
-		}
+			{
+				std::unique_lock<std::mutex> lock( m_queueMutex );
+				m_stop = true;
+			}
 
-		m_condition.notify_all();
+			m_condition.notify_all();
 
-		for( std::thread& worker : m_workers )
-		{
-			worker.join();
+			for( std::thread& worker : m_workers )
+			{
+				worker.join();
+			}
 		}
-#endif
 	}
 
 	void JobSystem::WorkerFunction()

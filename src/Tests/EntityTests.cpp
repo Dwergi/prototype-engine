@@ -2,6 +2,7 @@
 #include "EntityLayer.h"
 
 #include "ComponentDataBuffer.h"
+#include "JobSystem.h"
 #include "UpdateData.h"
 #include "System.h"
 
@@ -36,8 +37,8 @@ struct TestSystem : ddc::System
 {
 	TestSystem() :
 		System( "TestSystem" ),
-		s_firstRead( *this ),
-		s_secondWrite( *this )
+		m_firstRead( *this ),
+		m_secondWrite( *this )
 	{
 
 	}
@@ -56,16 +57,16 @@ struct TestSystem : ddc::System
 		}
 	}
 
-	ddc::ReadRequirement<FirstComponent> s_firstRead;
-	ddc::WriteRequirement<SecondComponent> s_secondWrite;
+	ddc::ReadRequirement<FirstComponent> m_firstRead;
+	ddc::WriteRequirement<SecondComponent> m_secondWrite;
 };
 
 struct DependentSystem : ddc::System
 {
 	DependentSystem() :
 		System( "DependentSystem" ),
-		s_secondRead( *this ),
-		s_thirdWrite( *this )
+		m_secondRead( *this ),
+		m_thirdWrite( *this )
 	{
 	}
 
@@ -83,15 +84,15 @@ struct DependentSystem : ddc::System
 		}
 	}
 
-	ddc::ReadRequirement<SecondComponent> s_secondRead;
-	ddc::WriteRequirement<ThirdComponent> s_thirdWrite;
+	ddc::ReadRequirement<SecondComponent> m_secondRead;
+	ddc::WriteRequirement<ThirdComponent> m_thirdWrite;
 };
 
 struct ReaderSystem : ddc::System
 {
 	ReaderSystem() :
 		System( "ReaderSystem" ),
-		s_thirdRead( *this )
+		m_thirdRead( *this )
 	{
 	}
 
@@ -106,15 +107,15 @@ struct ReaderSystem : ddc::System
 		}
 	}
 
-	ddc::ReadRequirement<ThirdComponent> s_thirdRead;
+	ddc::ReadRequirement<ThirdComponent> m_thirdRead;
 };
 
 struct OnlyReaderSystem : ddc::System
 {
 	OnlyReaderSystem() :
 		System( "OnlyReaderSystem" ),
-		s_firstRead( *this ),
-		s_secondRead( *this )
+		m_firstRead( *this ),
+		m_secondRead( *this )
 	{
 	}
 
@@ -131,23 +132,23 @@ struct OnlyReaderSystem : ddc::System
 		}
 	}
 
-	ddc::ReadRequirement<FirstComponent> s_firstRead;
-	ddc::ReadRequirement<SecondComponent> s_secondRead;
+	ddc::ReadRequirement<FirstComponent> m_firstRead;
+	ddc::ReadRequirement<SecondComponent> m_secondRead;
 };
 
 struct OnlyWriterSystem : ddc::System
 {
 	OnlyWriterSystem() :
 		System( "OnlyWriterSystem" ),
-		s_secondWrite( *this ),
-		s_thirdWrite( *this )
+		m_secondWrite( *this ),
+		m_thirdWrite( *this )
 	{
 	}
 
 	virtual void Update( const ddc::UpdateData& data ) override {}
 
-	ddc::WriteRequirement<SecondComponent> s_secondWrite;
-	ddc::WriteRequirement<ThirdComponent> s_thirdWrite;
+	ddc::WriteRequirement<SecondComponent> m_secondWrite;
+	ddc::WriteRequirement<ThirdComponent> m_thirdWrite;
 };
 
 TEST_CASE( "EntityManager" )
@@ -328,11 +329,11 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &test_system );
-		REQUIRE( ordered[ 1 ] == &dependent_system );
+		REQUIRE( ordered[ 0 ].m_system == &test_system );
+		REQUIRE( ordered[ 1 ].m_system == &dependent_system );
 	}
 
 	SECTION( "Independent" )
@@ -344,11 +345,11 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &test_system );
-		REQUIRE( ordered[ 1 ] == &reader_system );
+		REQUIRE( ordered[ 0 ].m_system == &test_system );
+		REQUIRE( ordered[ 1 ].m_system == &reader_system );
 	}
 
 	SECTION( "Dependency Chain" )
@@ -361,12 +362,12 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &test_system );
-		REQUIRE( ordered[ 1 ] == &dependent_system );
-		REQUIRE( ordered[ 2 ] == &reader_system );
+		REQUIRE( ordered[ 0 ].m_system == &test_system );
+		REQUIRE( ordered[ 1 ].m_system == &dependent_system );
+		REQUIRE( ordered[ 2 ].m_system == &reader_system );
 	}
 
 	SECTION( "Duplicate Requirements" )
@@ -379,10 +380,10 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &test_system );
+		REQUIRE( ordered[ 0 ].m_system == &test_system );
 	}
 
 	SECTION( "Only Writer" )
@@ -395,12 +396,12 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &only_writer_system );
-		REQUIRE( ordered[ 1 ] == &dependent_system );
-		REQUIRE( ordered[ 2 ] == &reader_system );
+		REQUIRE( ordered[ 0 ].m_system == &only_writer_system );
+		REQUIRE( ordered[ 1 ].m_system == &dependent_system );
+		REQUIRE( ordered[ 2 ].m_system == &reader_system );
 	}
 
 	SECTION( "Only Reader" )
@@ -412,11 +413,11 @@ TEST_CASE( "Schedule Systems By Component" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByComponent( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByComponent( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &test_system );
-		REQUIRE( ordered[ 1 ] == &only_reader_system );
+		REQUIRE( ordered[ 0 ].m_system == &test_system );
+		REQUIRE( ordered[ 1 ].m_system == &only_reader_system );
 	}
 }
 
@@ -433,11 +434,11 @@ TEST_CASE( "Schedule Systems By Dependency" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &a );
-		REQUIRE( ordered[ 1 ] == &b );
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
 	}
 
 	SECTION( "Chain" )
@@ -454,12 +455,12 @@ TEST_CASE( "Schedule Systems By Dependency" )
 
 		dd::Span<ddc::System*> span_systems( systems );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &a );
-		REQUIRE( ordered[ 1 ] == &b );
-		REQUIRE( ordered[ 2 ] == &c );
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
+		REQUIRE( ordered[ 2 ].m_system == &c );
 	}
 
 	SECTION( "Diamond" )
@@ -480,13 +481,95 @@ TEST_CASE( "Schedule Systems By Dependency" )
 
 		dd::Span<ddc::System*> span_systems( systems, 4 );
 
-		std::vector<ddc::System*> ordered;
-		ddc::ScheduleSystemsByDependencies( span_systems, ordered );
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
 
-		REQUIRE( ordered[ 0 ] == &a );
-		REQUIRE( ordered[ 1 ] == &b );
-		REQUIRE( ordered[ 2 ] == &c );
-		REQUIRE( ordered[ 3 ] == &d );
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
+		REQUIRE( ordered[ 2 ].m_system == &c );
+		REQUIRE( ordered[ 3 ].m_system == &d );
+	}
+}
+
+TEST_CASE( "Update With Tree Scheduling" )
+{
+	SECTION( "Simple" )
+	{
+		TestSystem a;
+
+		TestSystem b;
+		b.RegisterDependency( a );
+
+		ddc::System* systems[] = { &a, &b };
+
+		dd::Span<ddc::System*> span_systems( systems );
+
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
+
+		dd::JobSystem jobsystem( 0u );
+		ddc::EntityLayer layer;
+
+		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
+	}
+
+	SECTION( "Multiple Roots" )
+	{
+		TestSystem a;
+		TestSystem b;
+
+		TestSystem c;
+		c.RegisterDependency( a );
+		c.RegisterDependency( b );
+
+		ddc::System* systems[] = { &a, &b, &c };
+
+		dd::Span<ddc::System*> span_systems( systems );
+
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
+		REQUIRE( ordered[ 2 ].m_system == &c );
+
+		dd::JobSystem jobsystem( 0u );
+		ddc::EntityLayer layer;
+
+		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
+	}
+
+	SECTION( "Diamond" )
+	{
+		TestSystem a;
+
+		TestSystem b;
+		TestSystem c;
+		c.RegisterDependency( a );
+		c.RegisterDependency( b );
+
+		TestSystem d;
+		d.RegisterDependency( c );
+
+		ddc::System* systems[] = { &a, &b, &c, &d };
+
+		dd::Span<ddc::System*> span_systems( systems );
+
+		std::vector<ddc::SystemNode> ordered;
+		ddc::OrderSystemsByDependencies( span_systems, ordered );
+
+		REQUIRE( ordered[ 0 ].m_system == &a );
+		REQUIRE( ordered[ 1 ].m_system == &b );
+		REQUIRE( ordered[ 2 ].m_system == &c );
+		REQUIRE( ordered[ 3 ].m_system == &d );
+
+		dd::JobSystem jobsystem( 0u );
+		ddc::EntityLayer layer;
+
+		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
 	}
 }
 

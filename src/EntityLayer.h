@@ -4,6 +4,12 @@
 
 #include <bitset>
 #include <unordered_map>
+#include <future>
+
+namespace dd
+{
+	class JobSystem;
+}
 
 namespace ddc
 {
@@ -77,11 +83,29 @@ namespace ddc
 		std::vector<byte*> m_components;
 	};
 
+	struct SystemNode
+	{
+		struct Edge
+		{
+			size_t m_from;
+			size_t m_to;
+		};
+
+		System* m_system { nullptr };
+
+		std::vector<Edge> m_out;
+		std::vector<Edge> m_in;
+
+		std::shared_future<void> m_update;
+	};
+
 	const int PARTITION_COUNT = 4;
 
 	void UpdateSystem( System& system, EntityLayer& space, int partitions = PARTITION_COUNT );
 
-	void ScheduleSystemsByComponent( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems );
+	void OrderSystemsByComponent( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
 
-	void ScheduleSystemsByDependencies( dd::Span<System*> systems, std::vector<System*>& out_ordered_systems );
+	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
+
+	void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, EntityLayer& layer );
 }

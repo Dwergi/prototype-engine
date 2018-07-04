@@ -32,6 +32,7 @@ namespace dd
 		std::mutex m_queueMutex;
 		std::condition_variable m_condition;
 		bool m_stop { false };
+		bool m_useThreads { true };
 
 		void WorkerFunction();
 	};
@@ -43,25 +44,30 @@ namespace dd
 	{
 		using return_type = std::invoke_result_t<F, Args...>;
 
+		// don't allow enqueuing after stopping the pool
+		if( m_stop )
+			DD_ASSERT( "Scheduled job on stopped JobSystem" );
+
 		auto task = std::make_shared< std::packaged_task<return_type()> >(
 			std::bind( std::forward<F>( f ), std::forward<Args>( args )... )
 			);
 
 		std::future<return_type> res = task->get_future();
-#ifndef JOBSYSTEM_NO_THREADS
+
+		if( m_useThreads )
 		{
-			std::unique_lock<std::mutex> lock( m_queueMutex );
+			{
+				std::unique_lock<std::mutex> lock( m_queueMutex );
 
-			// don't allow enqueuing after stopping the pool
-			if( m_stop )
-				DD_ASSERT( "Scheduled job on stopped JobSystem" );
-
-			m_tasks.emplace( [task]() { (*task)(); } );
+				m_tasks.emplace( [task]() { (*task)(); } );
+			}
+			m_condition.notify_one();
 		}
-		m_condition.notify_one();
-#else
-		(*task)();
-#endif
+		else
+		{
+			f( args... );
+		}
+
 		return res;
 	}
 }
