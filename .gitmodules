@@ -1,3 +1,0 @@
-[submodule "include/tinydir"]
-	path = include/tinydir
-	url = https://github.com/cxong/tinydir.git

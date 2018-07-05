@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "File.h"
 
-#include "tinydir/tinydir.h"
+#include <filesystem>
 
 namespace dd
 {
@@ -15,19 +15,14 @@ namespace dd
 
 	void File::SetDataRoot( const char* root )
 	{
-		wchar_t wpath[256];
-		Buffer<wchar_t> buffer( wpath, 256 );
+		std::filesystem::path path( root );
 
-		String256 path( root );
-		path.w_str( buffer );
-
-		tinydir_dir dir;
-		if( tinydir_open( &dir, wpath ) == -1 )
+		if( !std::filesystem::is_directory( path ) || !std::filesystem::exists( path ) )
 		{
 			DD_ASSERT( false, "Invalid data root given!" );
 			return; // don't set an invalid data root
 		}
-		
+
 		s_dataRoot = root;
 	}
 
