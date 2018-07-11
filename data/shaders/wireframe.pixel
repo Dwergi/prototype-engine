@@ -1,0 +1,45 @@
+#version 330 core
+#extension GL_OES_standard_derivatives : enable
+
+out vec4 Colour;
+
+in struct FragmentData
+{
+	vec3 Position;
+	vec4 Colour;
+	vec3 WireframeDistance;
+} Fragment;
+
+uniform struct WireframeData
+{
+	bool Enabled;
+	vec3 Colour;
+	float Width;
+	vec3 EdgeColour;
+	float EdgeWidth;
+	float MaxDistance;
+} Wireframe;
+
+uniform vec3 ViewPosition;
+
+void main()
+{
+	vec3 toView = ViewPosition - Fragment.Position;
+	float viewDistance = length( toView );
+
+	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
+	fogAmount = fogAmount * fogAmount;
+
+	if( fogAmount >= 1 )
+	{
+		Colour = vec4( Fog.Colour, 1 );
+		return;
+	}
+
+	vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, Wireframe.Colour, Wireframe.Width, 
+			Wireframe.EdgeColour, Wireframe.EdgeWidth, viewDistance, Wireframe.MaxDistance );
+
+	finalColour = mix( finalColour, wireColour, wireColour.a );
+
+	Colour = finalColour;
+}

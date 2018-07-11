@@ -193,17 +193,25 @@ namespace dd
 
 		return substring;
 	}
+
+	template<> inline uint64 Hash<String>( const String& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String8>( const String8& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String16>( const String16& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String32>( const String32& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String64>( const String64& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String128>( const String128& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String256>( const String256& value ) { return HashString( value.c_str(), value.Length() ); }
 }
 
 namespace std
 {
-	
 	template <typename T>
 	struct string_hash
 	{
 		std::size_t operator()( const T& str ) const { return dd::HashString( str.c_str(), str.Length() ); }
 	};
 	
+	template<> struct hash<dd::String> : string_hash<dd::String> {};
 	template<> struct hash<dd::String8> : string_hash<dd::String8> {};
 	template<> struct hash<dd::String16> : string_hash<dd::String16> {};
 	template<> struct hash<dd::String32> : string_hash<dd::String32> {};

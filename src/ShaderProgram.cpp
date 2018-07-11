@@ -41,6 +41,10 @@ namespace dd
 				DD_ASSERT_ERROR( false, "ShaderProgram::CreateInstance returned an invalid program!" );
 			}
 		}
+		else
+		{
+			__debugbreak();
+		}
 
 		ShaderHandle handle;
 		handle.m_hash = hash;

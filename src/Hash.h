@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "String_dd.h"
-
 namespace dd
 {
 	uint64 HashBytes( const byte* data, uint64 size );
@@ -26,6 +24,6 @@ namespace dd
 
 	inline uint64 HashString( const char* data, uint64 size )
 	{
-		return HashBytes( (const byte*) data, size );
+		return dd::HashBytes( (const byte*) data, size );
 	}
 }

@@ -28,12 +28,13 @@
 
 #include "Math_dd.h"
 #include "Buffer.h"
-#include "DenseMap.h"
 #include "String_dd.h"
-#include "SharedString.h"
 #include "Array.h"
 #include "Vector.h"
 #include "Span.h"
+
+#include "DenseMap.h"
+#include "SharedString.h"
 
 #include "Variable.h"
 #include "Member.h"

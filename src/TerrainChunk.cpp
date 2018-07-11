@@ -179,12 +179,8 @@ namespace dd
 		s_shader = ShaderProgram::Create( String8( "terrain" ), shaders );
 
 		ShaderProgram* shader = s_shader.Get();
-		shader->Use( true );
-
 		shader->SetPositionsName( "Position" );
 		shader->SetNormalsName( "Normal" );
-
-		shader->Use( false );
 	}
 
 	void TerrainChunk::Generate()
