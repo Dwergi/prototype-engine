@@ -26,9 +26,8 @@
 
 namespace dd
 {
-	MousePicking::MousePicking( const Window& window, const ICamera& camera, const Input& input ) : 
+	MousePicking::MousePicking( const Window& window, const Input& input ) : 
 		m_window( window ),
-		m_camera( camera ),
 		m_input( input )
 	{
 	}
@@ -118,18 +117,13 @@ namespace dd
 
 	void MousePicking::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
 	{
-		Vector<Shader*> shaders;
-		shaders.Add( Shader::Create( String8( "shaders\\picking.vertex" ), Shader::Type::Vertex ) );
-		shaders.Add( Shader::Create( String8( "shaders\\picking.pixel" ), Shader::Type::Pixel ) );
+		Vector<ddr::Shader*> shaders;
+		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.vertex" ), ddr::Shader::Type::Vertex ) );
+		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.pixel" ), ddr::Shader::Type::Pixel ) );
 
-		m_shader = ShaderProgram::Create( String8( "picking" ), shaders );
+		m_camera = &camera;
 
-		ShaderProgram& shader = *m_shader.Get();
-		shader.Use( true );
-
-		shader.SetPositionsName( "Position" );
-
-		shader.Use( false );
+		m_shader = ddr::ShaderProgram::Create( String8( "picking" ), shaders );
 
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
@@ -174,15 +168,15 @@ namespace dd
 
 			m_framebuffer.Clear();
 
-			ShaderProgram& shader = *m_shader.Get();
-			shader.Use( true );
+			ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
+			shader->Use( true );
 
-			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, &shader]( auto entity, auto mesh, auto transform )
+			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, shader]( auto entity, auto mesh, auto transform )
 			{
-				RenderMesh( camera, shader, entity, mesh.Read(), transform.Read() );
+				RenderMesh( camera, *shader, entity, mesh.Read(), transform.Read() );
 			} );
 
-			shader.Use( false );
+			shader->Use( false );
 
 			m_framebuffer.UnbindRead();
 			m_framebuffer.UnbindDraw();
@@ -201,12 +195,13 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::RenderMesh( const ICamera& camera, ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
+	void MousePicking::RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
 	{
+		shader.SetCamera( camera );
 		shader.SetUniform( "ID", entity.Handle );
 
-		Mesh* mesh = mesh_cmp->Mesh.Get();
-		mesh->Render( camera, *m_shader.Get(), transform_cmp->GetWorldTransform() );
+		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
+		mesh->Render( shader, transform_cmp->GetWorldTransform() );
 	}
 
 	void MousePicking::DrawDebugInternal()
@@ -224,7 +219,9 @@ namespace dd
 		{
 			if( m_focusedMesh.IsValid() )
 			{
-				const String& name = m_focusedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+				ddr::MeshHandle mesh_h = m_focusedMesh.Get<MeshComponent>().Read()->Mesh;
+				
+				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
 				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
@@ -243,7 +240,9 @@ namespace dd
 		{
 			if( m_selectedMesh.IsValid() )
 			{
-				const String& name = m_selectedMesh.Get<MeshComponent>().Read()->Mesh.Get()->GetName();
+				ddr::MeshHandle mesh_h = m_selectedMesh.Get<MeshComponent>().Read()->Mesh;
+
+				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
 				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
@@ -261,7 +260,7 @@ namespace dd
 
 	void MousePicking::HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance )
 	{
-		Mesh* mesh = mesh_cmp->Mesh.Get();
+		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
 		if( mesh != nullptr && !mesh_cmp->Hidden )
 		{
 			const AABB& bounds = mesh_cmp->Bounds;
@@ -280,14 +279,14 @@ namespace dd
 
 	Ray MousePicking::GetScreenRay( const MousePosition& pos ) const
 	{
-		glm::vec3 camera_dir( m_camera.GetDirection() );
+		glm::vec3 camera_dir( m_camera->GetDirection() );
 		glm::vec3 dir( camera_dir );
 		glm::vec3 up( 0, 1, 0 );
 
 		{
 			float width = (float) m_window.GetWidth();
 			float x_percent = (pos.Absolute.x - (width / 2)) / width;
-			float hfov = m_camera.GetVerticalFOV() * m_camera.GetAspectRatio();
+			float hfov = m_camera->GetVerticalFOV() * m_camera->GetAspectRatio();
 			float x_angle = hfov * x_percent;
 
 			dir = glm::rotate( camera_dir, -x_angle, up );
@@ -296,14 +295,14 @@ namespace dd
 		{
 			float height = (float) m_window.GetHeight();
 			float y_percent = (pos.Absolute.x - (height / 2)) / height;
-			float vfov = m_camera.GetVerticalFOV();
+			float vfov = m_camera->GetVerticalFOV();
 			float y_angle = vfov * y_percent;
 
-			glm::vec3 right = glm::normalize( glm::cross( m_camera.GetDirection(), up ) );
+			glm::vec3 right = glm::normalize( glm::cross( m_camera->GetDirection(), up ) );
 
 			dir = glm::rotate( dir, -y_angle, right );
 		}
 
-		return Ray( m_camera.GetPosition(), dir );
+		return Ray( m_camera->GetPosition(), dir );
 	}
 }

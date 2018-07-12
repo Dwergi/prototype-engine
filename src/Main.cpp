@@ -147,7 +147,7 @@ void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& script
 	REGISTER_TYPE( EntityHandle );
 	REGISTER_TYPE( IComponent );
 	REGISTER_TYPE( Message );
-	REGISTER_TYPE( MeshHandle );
+	REGISTER_TYPE( ddr::MeshHandle );
 
 	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
 	entity_manager.RegisterComponent<TransformComponent>();
@@ -329,7 +329,7 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 	WaitForAll( futures );
 }
 
-void InitializeRenderers( Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
+void InitializeRenderers( ddr::Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
 {
 	renderer.RenderInit( entity_manager, camera );
 
@@ -417,7 +417,7 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 	s_frameTimer->DrawFPSCounter();
 }
 
-void Render( Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )
+void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )
 {
 	IRenderer* debug_render = nullptr;
 
@@ -482,9 +482,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
-		Renderer renderer( *s_window );
+		ddr::Renderer renderer( *s_window );
 
-		TerrainSystem terrain_system( camera, jobSystem );
+		TerrainSystem terrain_system( jobSystem );
 
 		SceneGraphSystem scene_graph;
 
@@ -498,7 +498,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		//s_shipSystem->BindActions( bindings );
 		//s_shipSystem->CreateShip( entity_manager );
 
-		MousePicking mouse_picking( *s_window, camera, *s_input );
+		MousePicking mouse_picking( *s_window, *s_input );
 		mouse_picking.BindActions( bindings );
 
 		renderer.SetMousePicking( &mouse_picking );

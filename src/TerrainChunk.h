@@ -6,14 +6,19 @@
 
 #pragma once
 
-#include "Mesh.h"
-#include "ShaderProgram.h"
+#include "MaterialHandle.h"
+#include "MeshHandle.h"
+#include "ShaderHandle.h"
 #include "TerrainChunkKey.h"
 
-namespace dd
+namespace ddr
 {
 	class ICamera;
 	class ShaderProgram;
+}
+
+namespace dd
+{
 	class JobSystem;
 
 	struct TerrainParameters;
@@ -53,7 +58,7 @@ namespace dd
 
 		const TerrainChunkKey& GetKey() const { return m_key; }
 		
-		MeshHandle GetMesh() const { return m_mesh; }
+		ddr::MeshHandle GetMesh() const { return m_mesh; }
 
 	private:
 
@@ -67,7 +72,8 @@ namespace dd
 
 		static uint s_indices[IndexCount];
 
-		static ShaderHandle s_shader;
+		static ddr::ShaderHandle s_shader;
+		static ddr::MaterialHandle s_material;
 
 		const TerrainParameters& m_params;
 		TerrainChunkKey m_key;
@@ -75,7 +81,7 @@ namespace dd
 		bool m_destroy { false };
 		bool m_renderDirty { false };
 		bool m_dataDirty { false };
-		MeshHandle m_mesh;
+		ddr::MeshHandle m_mesh;
 
 		glm::vec3 m_vertices[VertexCount];
 		Buffer<glm::vec3> m_verticesBuffer;

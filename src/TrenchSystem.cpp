@@ -9,6 +9,7 @@
 
 #include "EntityManager.h"
 #include "ICamera.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
@@ -99,10 +100,9 @@ namespace dd
 	- Create new chunks ahead of the player if necessary
 	*/
 
-	TrenchSystem::TrenchSystem( const ICamera& camera ) :
+	TrenchSystem::TrenchSystem() :
 		m_trenchDirection( 0.0f, 0.0f, 1.0f ),
-		m_trenchOrigin( 0.0f, 0.0f, 0.0f ),
-		m_camera( camera )
+		m_trenchOrigin( 0.0f, 0.0f, 0.0f )
 	{
 
 	}
@@ -114,23 +114,23 @@ namespace dd
 
 	namespace
 	{
-		ShaderHandle CreateShaders( const char* name )
+		ddr::ShaderHandle CreateShaders( const char* name )
 		{
-			Vector<Shader*> shaders;
+			Vector<ddr::Shader*> shaders;
 
-			Shader* vert = Shader::Create( String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
+			ddr::Shader* vert = ddr::Shader::Create( String8( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
 			DD_ASSERT( vert != nullptr );
 			shaders.Add( vert );
 
-			Shader* geom = Shader::Create( String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
+			ddr::Shader* geom = ddr::Shader::Create( String8( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
 			DD_ASSERT( geom != nullptr );
 			shaders.Add( geom );
 
-			Shader* pixel = Shader::Create( String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
+			ddr::Shader* pixel = ddr::Shader::Create( String8( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
 			DD_ASSERT( pixel != nullptr );
 			shaders.Add( pixel );
 
-			ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
+			ddr::ShaderHandle handle = ddr::ShaderProgram::Create( String8( name ), shaders );
 			return handle;
 		}
 	}
@@ -138,18 +138,26 @@ namespace dd
 	void TrenchSystem::CreateRenderResources()
 	{
 		m_shader = CreateShaders( "trench_chunk" );
-		m_chunkMesh = Mesh::Create( "trench_chunk", m_shader );
+		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
+		DD_ASSERT( shader != nullptr );
 
-		ShaderProgram& shader = *m_shader.Get();
-		shader.Use( true );
-		shader.SetPositionsName( "Position" );
-		shader.SetNormalsName( "Normal" );
+		ddr::MaterialHandle material_h = ddr::Material::Create( "trench_chunk" );
+		ddr::Material* material = ddr::Material::Get( material_h );
+		DD_ASSERT( material != nullptr );
 
-		Mesh* mesh = m_chunkMesh.Get();
+		material->SetShader( m_shader );
+
+		shader->Use( true );
+
+		m_chunkMesh = ddr::Mesh::Create( "trench_chunk" );
+		ddr::Mesh* mesh = ddr::Mesh::Get( m_chunkMesh );
+		DD_ASSERT( mesh != nullptr );
+
+		mesh->SetMaterial( material_h );
 		mesh->SetPositions( s_trenchChunkPositionBuffer );
 		mesh->SetNormals( s_trenchChunkNormalBuffer );
 
-		shader.Use( false );
+		shader->Use( false );
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
@@ -178,7 +186,7 @@ namespace dd
 
 	void TrenchSystem::Update( EntityManager& entity_manager, float delta_t )
 	{
-		// cache these here to avoid recalculating for all components
+		/*// cache these here to avoid recalculating for all components
 		glm::vec3 player_pos = m_camera.GetPosition();
 
 		int chunk_index = (int) (player_pos / (m_trenchDirection * TRENCH_CHUNK_LENGTH)).z;
@@ -193,6 +201,6 @@ namespace dd
 			{
 				m_chunks.Add( position, CreateTrenchChunk( position, entity_manager ) );
 			}
-		}
+		}*/
 	}
 }

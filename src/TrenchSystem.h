@@ -8,20 +8,25 @@
 
 #include "ISystem.h"
 #include "EntityHandle.h"
-#include "Mesh.h"
+#include "MeshHandle.h"
+#include "ShaderHandle.h"
 #include "TransformComponent.h"
 #include "TrenchComponent.h"
 
-namespace dd
+namespace ddr
 {
 	class ICamera;
+}
+
+namespace dd
+{
 	class Mesh;
 
 	class TrenchSystem : public ISystem
 	{
 	public: 
 
-		TrenchSystem( const ICamera& camera );
+		TrenchSystem();
 		TrenchSystem( const TrenchSystem& other ) = delete;
 		~TrenchSystem();
 
@@ -30,13 +35,12 @@ namespace dd
 
 	private:
 
-		MeshHandle m_chunkMesh;
-		ShaderHandle m_shader;
+		ddr::MeshHandle m_chunkMesh;
+		ddr::ShaderHandle m_shader;
 
-		const ICamera& m_camera;
 		glm::vec3 m_trenchDirection;
 		glm::vec3 m_trenchOrigin;
-		dd::DenseMap<glm::vec3, EntityHandle> m_chunks;
+		DenseMap<glm::vec3, EntityHandle> m_chunks;
 
 		EntityHandle CreateTrenchChunk( glm::vec3 position, EntityManager& entity_manager );
 	};

@@ -8,6 +8,7 @@
 #include "ShaderProgram.h"
 
 #include "GLError.h"
+#include "ICamera.h"
 #include "Shader.h"
 #include "ShaderHandle.h"
 #include "Texture.h"
@@ -16,11 +17,11 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-namespace dd
+namespace ddr
 {
-	std::unordered_map<uint64, ShaderProgram> ShaderProgram::s_instances;
+	std::unordered_map<uint64, ShaderProgram*> ShaderProgram::s_instances;
 
-	ShaderHandle ShaderProgram::Create( const String& name, const Vector<Shader*>& shaders )
+	ShaderHandle ShaderProgram::Create( const dd::String& name, const dd::Vector<Shader*>& shaders )
 	{
 		DD_PROFILE_SCOPED( ShaderProgram_Create );
 
@@ -29,21 +30,18 @@ namespace dd
 		auto it = s_instances.find( hash );
 		if( it == s_instances.end() )
 		{
-			ShaderProgram program = CreateInstance( name, shaders );
-			if( program.IsValid() )
+			ShaderProgram* program = CreateInstance( name, shaders );
+			if( program->IsValid() )
 			{
 				s_instances.insert( std::make_pair( hash, program ) );
 			}
 			else
 			{
+				delete program;
 				hash = 0;
 
 				DD_ASSERT_ERROR( false, "ShaderProgram::CreateInstance returned an invalid program!" );
 			}
-		}
-		else
-		{
-			__debugbreak();
 		}
 
 		ShaderHandle handle;
@@ -60,116 +58,90 @@ namespace dd
 			return nullptr;
 		}
 
-		return &it->second;
+		return it->second;
 	}
 
 	void ShaderProgram::Destroy( ShaderHandle handle )
 	{
-		s_instances.erase( handle.m_hash );
+		auto it = s_instances.find( handle.m_hash );
+		if( it != s_instances.end() )
+		{
+			delete it->second;
+			s_instances.erase( it );
+		}
 	}
 
-	ShaderProgram::ShaderProgram( const String& name )
+	ShaderProgram::ShaderProgram( const dd::String& name )
 		: m_name( name ),
-		m_refCount( nullptr ),
 		m_inUse( false )
 	{
 		m_id = glCreateProgram();
 		CheckGLError();
 
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "glCreateProgram failed!" );
-
-		m_refCount = new std::atomic<int>( 1 );
-	}
-
-	ShaderProgram::ShaderProgram( const ShaderProgram& other ) :
-		m_id( other.m_id ),
-		m_valid( other.m_valid ),
-		m_name( other.m_name ),
-		m_refCount( other.m_refCount ),
-		m_inUse( other.m_inUse ),
-		m_positionsName( m_positionsName ),
-		m_normalsName( m_normalsName ),
-		m_uvsName( m_uvsName ),
-		m_vertexColoursName( m_vertexColoursName ),
-		m_shaders( other.m_shaders )
-	{
-		Retain();
 	}
 
 	ShaderProgram::~ShaderProgram()
 	{
-		Release();
+		for( const Shader* shader : m_shaders )
+		{
+			glDetachShader( m_id, shader->m_id );
+		}
+
+		if( m_id != OpenGL::InvalidID )
+		{
+			glDeleteProgram( m_id );
+			m_id = OpenGL::InvalidID;
+		}
 	}
 
-	ShaderProgram& ShaderProgram::operator=( const ShaderProgram& other )
+	ShaderProgram* ShaderProgram::CreateInstance( const dd::String& name, const dd::Vector<Shader*>& shaders )
 	{
-		Release();
-
-		m_valid = other.m_valid;
-		m_id = other.m_id;
-		m_name = other.m_name;
-		m_refCount = other.m_refCount;
-		m_inUse = other.m_inUse;
-
-		m_positionsName = m_positionsName;
-		m_normalsName = m_normalsName;
-		m_uvsName = m_uvsName;
-		m_vertexColoursName = m_vertexColoursName;
-
-		m_shaders = other.m_shaders;
-
-		Retain();
-
-		return *this;
-	}
-
-	ShaderProgram ShaderProgram::CreateInstance( const String& name, const Vector<Shader*>& shaders )
-	{
-		ShaderProgram program( name );
-		program.m_valid = true;
+		ShaderProgram* program = new ShaderProgram( name );
+		program->m_valid = true;
 
 		if( shaders.Size() == 0 )
 		{
 			DD_ASSERT_ERROR( shaders.Size() > 0, "Failed to provide any shaders to ShaderProgram!" );
 
-			program.m_valid = false;
+			program->m_valid = false;
 		}
 
 		for( const Shader* shader : shaders )
 		{
 			DD_ASSERT_ERROR( shader != nullptr, "Invalid shader given to program!" );
 
-			glAttachShader( program.m_id, shader->m_id );
+			glAttachShader( program->m_id, shader->m_id );
 			CheckGLError();
 		}
 
-		String256 msg = program.Link();
+		dd::String256 msg = program->Link();
 		if( !msg.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed: %s", msg.c_str() );
 
-			program.m_valid = false;
+			program->m_valid = false;
 		}
 
-		program.m_shaders = shaders;
+		program->m_shaders = shaders;
 		return program;
 	}
 
-	void ShaderProgram::ReloadAllShaders()
+	void ShaderProgram::ReloadAll()
 	{
 		for( auto it : s_instances )
 		{
-			it.second.Reload();
+			it.second->Reload();
 		}
 	}
 
-	String256 ShaderProgram::Link()
+	dd::String256 ShaderProgram::Link()
 	{
 		DD_PROFILE_SCOPED( ShaderProgram_Link );
 
 		glLinkProgram( m_id );
 
-		String256 msg;
+		dd::String256 msg;
 
 		GLint status;
 		glGetProgramiv( m_id, GL_LINK_STATUS, &status );
@@ -213,7 +185,7 @@ namespace dd
 			Use( false );
 		}
 
-		String256 msg = Link();
+		dd::String256 msg = Link();
 		if( !msg.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "Linking program failed!\n%s", msg.c_str() );
@@ -301,27 +273,12 @@ namespace dd
 		}
 	}
 
-	void ShaderProgram::SetPositionsName( const char* name )
-	{
-		m_positionsName = name;
-	}
-
 	bool ShaderProgram::BindPositions()
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 
-		if( m_positionsName.IsEmpty() )
-		{
-			return false;
-		}
-
-		return BindAttributeFloat( m_positionsName.c_str(), 3, 0, 0, false );
-	}
-
-	void ShaderProgram::SetNormalsName( const char* name )
-	{
-		m_normalsName = name;
+		return BindAttributeFloat( "Position", 3, 0, 0, false );
 	}
 
 	bool ShaderProgram::BindNormals()
@@ -329,35 +286,15 @@ namespace dd
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 
-		if( m_normalsName.IsEmpty() )
-		{
-			return false;
-		}
-		
-		return BindAttributeFloat( m_normalsName.c_str(), 3, 0, 0, true );
-	}
-
-	void ShaderProgram::SetUVsName( const char* name )
-	{
-		m_uvsName = name;
+		return BindAttributeFloat( "Normal", 3, 0, 0, true );
 	}
 
 	bool ShaderProgram::BindUVs()
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
-		
-		if( m_uvsName.IsEmpty() )
-		{
-			return false;
-		}
 
-		return BindAttributeFloat( m_uvsName.c_str(), 2, 0, 0, false );
-	}
-
-	void ShaderProgram::SetVertexColoursName( const char* name )
-	{
-		m_vertexColoursName = name;
+		return BindAttributeFloat( "UV", 2, 0, 0, false );
 	}
 
 	bool ShaderProgram::BindVertexColours()
@@ -365,14 +302,10 @@ namespace dd
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 
-		if( m_vertexColoursName.IsEmpty() )
-		{
-			return false;
-		}
-
-		return BindAttributeFloat( m_vertexColoursName.c_str(), 4, 0, 0, false );
+		return BindAttributeFloat( "VertexColour", 4, 0, 0, false );
 	}
 
+#pragma optimize( "", off )
 	bool ShaderProgram::BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
@@ -382,7 +315,9 @@ namespace dd
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )
 		{
-			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, stride * sizeof( float ), (const GLvoid*) (uint64) (first * sizeof( float )) );
+			const GLvoid* firstPtr = (const GLvoid*) ((uint64) first * sizeof( float ));
+
+			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, stride * sizeof( float ), firstPtr );
 			CheckGLError();
 
 			glEnableVertexAttribArray( loc );
@@ -515,33 +450,10 @@ namespace dd
 			CheckGLError();
 		}
 	}
-	
-	void ShaderProgram::Retain()
+
+	void ShaderProgram::SetCamera( const dd::ICamera& camera )
 	{
-		DD_ASSERT( m_refCount != nullptr );
-
-		++*m_refCount;
-	}
-
-	void ShaderProgram::Release()
-	{
-		DD_ASSERT( m_refCount != nullptr );
-
-		if( --*m_refCount == 0 )
-		{
-			for( const Shader* shader : m_shaders )
-			{
-				glDetachShader( m_id, shader->m_id );
-			}
-
-			if( m_id != OpenGL::InvalidID )
-			{
-				glDeleteProgram( m_id );
-				m_id = OpenGL::InvalidID;
-			}
-
-			delete m_refCount;
-			m_refCount = nullptr;
-		}
+		SetUniform( "View", camera.GetCameraMatrix() );
+		SetUniform( "Projection", camera.GetProjectionMatrix() );
 	}
 }

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IComponent.h"
-#include "Mesh.h"
+#include "MeshHandle.h"
 #include "PackedPool.h"
 #include "AABB.h"
 
@@ -22,11 +22,11 @@ namespace dd
 		using Pool = PackedPool<MeshComponent>;
 
 		MeshComponent();
-		MeshComponent( MeshHandle mesh );
+		MeshComponent( ddr::MeshHandle mesh );
 		MeshComponent( const MeshComponent& other );
 		~MeshComponent();
 
-		MeshHandle Mesh;
+		ddr::MeshHandle Mesh;
 		bool Hidden;
 		glm::vec4 Colour;
 		AABB Bounds;

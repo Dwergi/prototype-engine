@@ -378,7 +378,10 @@
     <ClInclude Include="src\ICamera.h" />
     <ClInclude Include="src\IDebugDraw.h" />
     <ClInclude Include="src\LightComponent.h" />
+    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\MaterialHandle.h" />
     <ClInclude Include="src\Math_dd.h" />
+    <ClInclude Include="src\MeshHandle.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\PackedPool.h" />
     <ClInclude Include="src\Ray.h" />
@@ -562,6 +565,7 @@
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
@@ -588,7 +592,6 @@
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\ShaderHandle.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\ShipSystem.cpp" />

@@ -13,7 +13,7 @@
 
 #include "GL/gl3w.h"
 
-namespace dd
+namespace ddr
 {
 	Texture::Texture()
 	{
@@ -51,7 +51,7 @@ namespace dd
 		m_valid = true;
 	}
 
-	void Texture::SetData( const ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
+	void Texture::SetData( const dd::ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( data.GetVoid() != nullptr );
@@ -64,7 +64,7 @@ namespace dd
 		CheckGLError();
 	}
 
-	void Texture::GetData( Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
+	void Texture::GetData( dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( data.GetVoid() != nullptr );

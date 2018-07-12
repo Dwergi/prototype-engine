@@ -528,6 +528,15 @@
     <ClInclude Include="src\EntityLayer.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\MaterialHandle.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshHandle.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -858,9 +867,6 @@
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShaderHandle.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\Texture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -896,6 +902,9 @@
     </ClCompile>
     <ClCompile Include="src\DataRequirement.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

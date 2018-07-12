@@ -26,7 +26,7 @@ namespace dd
 
 	MessageSubscription MessageQueue::Subscribe( MessageID message_type, std::function<void( Message* )> handler )
 	{
-		std::lock_guard<std::mutex> lock( m_mutex );
+		std::lock_guard lock( m_mutex );
 
 		MessageSubscription new_token;
 		new_token.Handler = m_nextHandlerID++;
@@ -48,7 +48,7 @@ namespace dd
 
 	void MessageQueue::Unsubscribe( MessageSubscription token )
 	{
-		std::lock_guard<std::mutex> lock( m_mutex );
+		std::lock_guard lock( m_mutex );
 
 		m_handlers.Remove( token.Handler );
 
@@ -69,7 +69,7 @@ namespace dd
 
 	void MessageQueue::Send( Message* message )
 	{
-		std::lock_guard<std::mutex> lock( m_mutex );
+		std::lock_guard lock( m_mutex );
 
 		m_pendingMessages.GetWrite().Add( message );
 	}
@@ -94,7 +94,7 @@ namespace dd
 	void MessageQueue::Update( float dt )
 	{
 		{
-			std::lock_guard<std::mutex> lock( m_mutex );
+			std::lock_guard lock( m_mutex );
 
 			m_pendingMessages.Swap();
 		}

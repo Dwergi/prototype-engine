@@ -16,7 +16,7 @@
 
 #include "GL/gl3w.h"
 
-namespace dd
+namespace ddr
 {
 	VAO FrameBuffer::m_fullScreenVAO;
 	VBO FrameBuffer::m_fullScreenVBO;
@@ -31,7 +31,7 @@ namespace dd
 		glm::vec3( 1.0f,  1.0f, 0.0f )
 	};
 
-	static const ConstBuffer<glm::vec3> s_fullScreenQuadBuffer( s_fullScreenQuadVertices, 6 );
+	static const dd::ConstBuffer<glm::vec3> s_fullScreenQuadBuffer( s_fullScreenQuadVertices, 6 );
 		
 	FrameBuffer::FrameBuffer()
 	{
@@ -101,19 +101,17 @@ namespace dd
 
 	void FrameBuffer::RenderInit()
 	{
-		if( !m_blitShader.IsValid() )
+		if( !m_blitShader.Valid() )
 		{
-			Vector<Shader*> shaders;
-			shaders.Add( Shader::Create( String32( "shaders\\blit.vertex" ), Shader::Type::Vertex ) );
-			shaders.Add( Shader::Create( String32( "shaders\\blit.pixel" ), Shader::Type::Pixel ) );
+			dd::Vector<Shader*> shaders;
+			shaders.Add( Shader::Create( dd::String32( "shaders\\blit.vertex" ), Shader::Type::Vertex ) );
+			shaders.Add( Shader::Create( dd::String32( "shaders\\blit.pixel" ), Shader::Type::Pixel ) );
 			
-			m_blitShader = ShaderProgram::Create( String8( "blit" ), shaders );
-			ShaderProgram& shader = *m_blitShader.Get();
+			m_blitShader = ShaderProgram::Create( dd::String8( "blit" ), shaders );
+			ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
 
-			shader.Use( true );
+			shader->Use( true );
 
-			shader.SetPositionsName( "Position" );
-			
 			m_fullScreenVAO.Create();
 			m_fullScreenVAO.Bind();
 
@@ -121,21 +119,21 @@ namespace dd
 			m_fullScreenVBO.Bind();
 			m_fullScreenVBO.SetData( s_fullScreenQuadBuffer );
 
-			shader.BindPositions();
+			shader->BindPositions();
 
 			m_fullScreenVAO.Unbind();
 
-			shader.Use( false );
+			shader->Use( false );
 		}
 	}
 
-	void FrameBuffer::RenderDepth( const ICamera& camera )
+	void FrameBuffer::RenderDepth( const dd::ICamera& camera )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_depth != nullptr );
 
-		ShaderProgram& shader = *m_blitShader.Get();
-		shader.Use( true );
+		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
+		shader->Use( true );
 
 		m_fullScreenVAO.Bind();
 		m_depth->Bind( 0 );
@@ -143,9 +141,9 @@ namespace dd
 		glDisable( GL_DEPTH_TEST );
 		CheckGLError();
 
-		shader.SetUniform( "Texture", *m_depth );
-		shader.SetUniform( "Near", camera.GetNear() );
-		shader.SetUniform( "DrawDepth", true );
+		shader->SetUniform( "Texture", *m_depth );
+		shader->SetUniform( "Near", camera.GetNear() );
+		shader->SetUniform( "DrawDepth", true );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckGLError();
@@ -155,7 +153,7 @@ namespace dd
 		m_depth->Unbind();
 		m_fullScreenVAO.Unbind();
 
-		shader.Use( false );
+		shader->Use( false );
 		CheckGLError();
 	}
 
@@ -164,8 +162,9 @@ namespace dd
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_colour != nullptr );
 
-		ShaderProgram& shader = *m_blitShader.Get();
-		shader.Use( true );
+		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
+
+		shader->Use( true );
 
 		m_fullScreenVAO.Bind();
 		
@@ -173,8 +172,8 @@ namespace dd
 
 		glDisable( GL_DEPTH_TEST );
 		
-		shader.SetUniform( "Texture", *m_colour );
-		shader.SetUniform( "DrawDepth", false );
+		shader->SetUniform( "Texture", *m_colour );
+		shader->SetUniform( "DrawDepth", false );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckGLError();
@@ -185,7 +184,7 @@ namespace dd
 
 		m_fullScreenVAO.Unbind();
 
-		shader.Use( false );
+		shader->Use( false );
 	}
 
 	void FrameBuffer::Blit()

@@ -3,7 +3,7 @@
 
 #include "GL/gl3w.h"
 
-namespace dd
+namespace ddr
 {
 	VAO::VAO() :
 		m_id( 0 ),

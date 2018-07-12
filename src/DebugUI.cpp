@@ -30,7 +30,7 @@ static double       g_Time = 0.0f;
 static bool         g_MouseJustPressed[3] = { false, false, false };
 static float        g_MouseWheel = 0.0f;
 static GLuint       g_FontTexture = 0;
-static int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
+static int         g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
 static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
 static int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
 static unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
@@ -91,7 +91,7 @@ namespace dd
 			{ 0.0f,                  0.0f,                  -1.0f, 0.0f },
 			{ -1.0f,                  1.0f,                   0.0f, 1.0f },
 		};
-		glUseProgram( g_ShaderHandle );
+		glUseProgram(g_ShaderHandle );
 		glUniform1i( g_AttribLocationTex, 0 );
 		glUniformMatrix4fv( g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0] );
 		glBindVertexArray( g_VaoHandle );
@@ -362,7 +362,7 @@ namespace dd
 		if( g_FragHandle != 0 ) glDeleteShader( g_FragHandle );
 		g_FragHandle = 0;
 
-		if( g_ShaderHandle != 0 ) glDeleteProgram( g_ShaderHandle );
+		if(g_ShaderHandle != 0 ) glDeleteProgram( g_ShaderHandle );
 		g_ShaderHandle = 0;
 
 		if( g_FontTexture )

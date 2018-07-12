@@ -12,6 +12,7 @@
 #include "EntityManager.h"
 #include "Frustum.h"
 #include "ICamera.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "MousePicking.h"
@@ -29,21 +30,9 @@
 
 #include "imgui/imgui.h"
 
-namespace dd
+namespace ddr
 {
-	static Fog s_fog;
-
-	Fog* Fog::Get()
-	{
-		if( s_fog.Enabled )
-		{
-			return &s_fog;
-		}
-
-		return nullptr;
-	}
-
-	Renderer::Renderer( const Window& window ) :
+	Renderer::Renderer( const dd::Window& window ) :
 		m_meshCount( 0 ),
 		m_window( window ),
 		m_frustumMeshCount( 0 )
@@ -60,43 +49,37 @@ namespace dd
 	// TODO: Don't do this.
 	static ShaderHandle CreateShaders( const char* name )
 	{
-		Vector<Shader*> shaders;
+		dd::Vector<Shader*> shaders;
 
-		Shader* vert = Shader::Create( String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
+		Shader* vert = Shader::Create( dd::String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
 		DD_ASSERT( vert != nullptr );
 		shaders.Add( vert );
 
-		Shader* geom = Shader::Create( String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
+		Shader* geom = Shader::Create( dd::String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
 		DD_ASSERT( geom != nullptr );
 		shaders.Add( geom );
 
-		Shader* pixel = Shader::Create( String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
+		Shader* pixel = Shader::Create( dd::String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
 		DD_ASSERT( pixel != nullptr );
 		shaders.Add( pixel );
 
-		ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
+		ShaderHandle handle = ShaderProgram::Create( dd::String8( name ), shaders );
 
-		ShaderProgram& shader = *handle.Get();
-		shader.Use( true );
-
-		shader.SetPositionsName( "Position" );
-		shader.SetNormalsName( "Normal" );
-
-		shader.Use( false );
+		ShaderProgram* shader = ShaderProgram::Get( handle );
 
 		return handle;
 	}
 
-	void Renderer::Initialize( EntityManager& entity_manager )
+	void Renderer::Initialize( dd::EntityManager& entity_manager )
 	{
 		{
-			EntityHandle directionalLight = entity_manager.CreateEntity<LightComponent, TransformComponent>();
-			ComponentHandle<LightComponent> light = directionalLight.Get<LightComponent>();
+			dd::EntityHandle directionalLight = entity_manager.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			dd::ComponentHandle<dd::LightComponent> light = directionalLight.Get<dd::LightComponent>();
 			light.Write()->IsDirectional = true;
 			light.Write()->Colour = glm::vec3( 1, 1, 1 );
 			light.Write()->Intensity = 0.5;
 
-			ComponentHandle<TransformComponent> transform = directionalLight.Get<TransformComponent>();
+			dd::ComponentHandle<dd::TransformComponent> transform = directionalLight.Get<dd::TransformComponent>();
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
 			transform.Write()->SetLocalPosition( direction );
 		}
@@ -104,16 +87,29 @@ namespace dd
 		m_createLight = true;
 	}
 
-	void Renderer::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
+	void Renderer::RenderInit( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
 	{
-		m_shaders.emplace_back( CreateShaders( "mesh" ) );
+		ShaderHandle shader_h = CreateShaders( "standard" );
+		ShaderProgram* shader = ShaderProgram::Get( shader_h );
+
+		MaterialHandle material_h = Material::Create( "standard" );
+		Material* material = Material::Get( material_h );
+		material->SetShader( shader_h );
 
 		m_frustum = new Frustum();
-		m_frustum->CreateRenderData( m_shaders[0] );
+		m_frustum->CreateRenderData( shader_h );
 		m_frustum->Update( camera );
 
-		m_unitCube = Mesh::Create( "cube", m_shaders[ 0 ] );
-		m_unitCube.Get()->MakeUnitCube();
+		m_unitCube = Mesh::Create( "cube" );
+
+		Mesh* mesh = Mesh::Get( m_unitCube );
+		mesh->SetMaterial( material_h );
+
+		shader->Use( true );
+
+		mesh->MakeUnitCube();
+
+		shader->Use( false );
 
 		CreateFrameBuffer( m_window.GetSize() );
 
@@ -137,18 +133,16 @@ namespace dd
 
 		delete m_frustum;
 		m_frustum = nullptr;
-
-		m_shaders.clear();
 	}
 
-	EntityHandle Renderer::CreateMeshEntity( EntityManager& entityManager, MeshHandle mesh_h, ShaderHandle shader, glm::vec4 colour, const glm::mat4& transform )
+	dd::EntityHandle Renderer::CreateMeshEntity( dd::EntityManager& entityManager, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
 	{
-		EntityHandle handle = entityManager.CreateEntity<TransformComponent, MeshComponent>();
+		dd::EntityHandle handle = entityManager.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
 
-		ComponentHandle<TransformComponent> transform_cmp = handle.Get<TransformComponent>();
+		dd::ComponentHandle<dd::TransformComponent> transform_cmp = handle.Get<dd::TransformComponent>();
 		transform_cmp.Write()->SetLocalTransform( transform );
 
-		ComponentHandle<MeshComponent> mesh_cmp = handle.Get<MeshComponent>();
+		dd::ComponentHandle<dd::MeshComponent> mesh_cmp = handle.Get<dd::MeshComponent>();
 		mesh_cmp.Write()->Mesh = mesh_h;
 		mesh_cmp.Write()->Colour = colour;
 		mesh_cmp.Write()->Hidden = false;
@@ -167,9 +161,9 @@ namespace dd
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
-			m_xAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
-			m_yAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
-			m_zAxis.Get<MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			m_xAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			m_yAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			m_zAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
 		}	
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
@@ -193,14 +187,14 @@ namespace dd
 		{
 			for( int i = 0; i < m_debugLights.size(); ++i )
 			{
-				String64 lightLabel( "Light " );
+				dd::String64 lightLabel( "Light " );
 				char buffer[16];
 				_itoa_s( i, buffer, 10 );
 				lightLabel += buffer;
 
-				EntityHandle entity = m_debugLights[ i ];
-				ComponentHandle<LightComponent> light = entity.Get<LightComponent>();
-				ComponentHandle<TransformComponent> transform = entity.Get<TransformComponent>();
+				dd::EntityHandle entity = m_debugLights[ i ];
+				dd::ComponentHandle<dd::LightComponent> light = entity.Get<dd::LightComponent>();
+				dd::ComponentHandle<dd::TransformComponent> transform = entity.Get<dd::TransformComponent>();
 
 				if( ImGui::TreeNodeEx( lightLabel.c_str(), ImGuiTreeNodeFlags_CollapsingHeader ) )
 				{
@@ -284,9 +278,9 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Fog", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &s_fog.Enabled );
-			ImGui::SliderFloat( "Distance", &s_fog.Distance, 0, 10000, "%.1f" );
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( s_fog.Colour ) );
+			ImGui::Checkbox( "Enabled", &m_fog.Enabled );
+			ImGui::SliderFloat( "Distance", &m_fog.Distance, 0, 10000, "%.1f" );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_fog.Colour ) );
 
 			ImGui::TreePop();
 		}
@@ -328,94 +322,126 @@ namespace dd
 		}
 	}
 
-	void Renderer::RenderMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp, 
-		const std::vector<EntityHandle>& lights, const ICamera& camera, const MousePicking* mousePicking )
+	void Renderer::RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, 
+		const std::vector<dd::EntityHandle>& lights, const dd::ICamera& camera, const dd::MousePicking* mousePicking )
 	{
-		glm::mat4 transform = transform_cmp->GetWorldTransform();
-
-		Mesh* mesh = mesh_cmp->Mesh.Get();
-		if( m_debugDrawBounds )
+		if( mesh_cmp->Hidden )
 		{
-			mesh = m_unitCube.Get();
-
-			glm::vec3 scale = mesh_cmp->Bounds.Max - mesh_cmp->Bounds.Min;
-			transform = glm::translate( mesh_cmp->Bounds.Center() ) * glm::scale( scale / 2.0f );
+			return;
 		}
 
-		if( mesh != nullptr && !mesh_cmp->Hidden )
+
+		Mesh* mesh = nullptr;
+
+		if( m_debugDrawBounds )
 		{
-			glm::vec4 debugMultiplier( 1, 1, 1, 1 );
+			mesh = Mesh::Get( m_unitCube );
+		}
+		else
+		{
+			mesh = Mesh::Get( mesh_cmp->Mesh );
+		}
 
-			if( mousePicking != nullptr )
-			{
-				if( entity == mousePicking->GetFocusedMesh() )
-				{
-					debugMultiplier.z = 1.5f;
-				}
-
-				if( entity == mousePicking->GetSelectedMesh() )
-				{
-					debugMultiplier.y = 1.5f;
-				}
-			}
-
-			// check if it intersects with the frustum
-			if( !m_frustumCulling || m_frustum->Intersects( mesh_cmp->Bounds ) )
-			{
-				if( m_debugHighlightFrustumMeshes )
-				{
-					debugMultiplier.x = 1.5f;
-				}
-
-				ShaderProgram* shader = mesh->GetShader();
-				shader->Use( true );
-
-				size_t lightCount = lights.size();
-				DD_ASSERT( lightCount <= 10 );
-				shader->SetUniform( "LightCount", (int) lightCount );
-				
-				for( int i = 0; i < lights.size(); ++i )
-				{
-					const TransformComponent* transformCmp = lights[i].Get<TransformComponent>().Read();
-					const LightComponent* lightCmp = lights[i].Get<LightComponent>().Read();
-
-					glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
-					if( lightCmp->IsDirectional )
-					{
-						position.w = 0;
-					}
-
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
-					shader->SetUniform( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
-				}
-
-				shader->SetUniform( "DrawStandard", m_debugDrawStandard );
-				shader->SetUniform( "Wireframe.Enabled", m_debugWireframe );
-				shader->SetUniform( "Wireframe.Colour", m_debugWireframeColour );
-				shader->SetUniform( "Wireframe.Width", m_debugWireframeWidth );
-
-				shader->SetUniform( "Wireframe.EdgeColour", m_debugWireframeEdgeColour );
-				shader->SetUniform( "Wireframe.EdgeWidth", m_debugWireframeEdgeWidth );
-				shader->SetUniform( "Wireframe.MaxDistance", m_debugWireframeMaxDistance );			
-
-				glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
-				mesh->SetColourMultiplier( colour );
-				mesh->Render( camera, *shader, transform );
-
-				shader->Use( false );
-
-				++m_frustumMeshCount;
-			}
+		if( mesh == nullptr )
+		{
+			return;
 		}
 
 		++m_meshCount;
+
+		// check if it intersects with the frustum
+		if( m_frustumCulling && !m_frustum->Intersects( mesh_cmp->Bounds ) )
+		{
+			return;
+		}
+
+		++m_frustumMeshCount;
+
+		glm::mat4 transform = transform_cmp->GetWorldTransform();
+
+		if( m_debugDrawBounds )
+		{
+			glm::vec3 scale = mesh_cmp->Bounds.Max - mesh_cmp->Bounds.Min;
+			transform = glm::translate( mesh_cmp->Bounds.Center() ) * glm::scale( scale / 2.0f );
+		}
+		
+		glm::vec4 debugMultiplier( 1, 1, 1, 1 );
+
+		if( mousePicking != nullptr )
+		{
+			if( entity == mousePicking->GetFocusedMesh() )
+			{
+				debugMultiplier.z = 1.5f;
+			}
+
+			if( entity == mousePicking->GetSelectedMesh() )
+			{
+				debugMultiplier.y = 1.5f;
+			}
+		}
+			
+		if( m_debugHighlightFrustumMeshes )
+		{
+			debugMultiplier.x = 1.5f;
+		}
+
+		Material* material = Material::Get( mesh->GetMaterial() );
+		DD_ASSERT( material != nullptr );
+
+		ShaderProgram* shader = ShaderProgram::Get( material->GetShader() );
+		DD_ASSERT( shader != nullptr );
+
+		shader->Use( true );
+
+		material->SetUniforms( *shader );
+
+		size_t lightCount = lights.size();
+		DD_ASSERT( lightCount <= 10 );
+		shader->SetUniform( "LightCount", (int) lightCount );
+
+		for( int i = 0; i < lights.size(); ++i )
+		{
+			const dd::TransformComponent* transformCmp = lights[ i ].Get<dd::TransformComponent>().Read();
+			const dd::LightComponent* lightCmp = lights[ i ].Get<dd::LightComponent>().Read();
+
+			glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
+			if( lightCmp->IsDirectional )
+			{
+				position.w = 0;
+			}
+
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
+			shader->SetUniform( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
+		}
+
+		shader->SetCamera( camera );
+
+		shader->SetUniform( "DrawStandard", m_debugDrawStandard );
+
+		shader->SetUniform( "Wireframe.Enabled", m_debugWireframe );
+		shader->SetUniform( "Wireframe.Colour", m_debugWireframeColour );
+		shader->SetUniform( "Wireframe.Width", m_debugWireframeWidth );
+		shader->SetUniform( "Wireframe.EdgeColour", m_debugWireframeEdgeColour );
+		shader->SetUniform( "Wireframe.EdgeWidth", m_debugWireframeEdgeWidth );
+		shader->SetUniform( "Wireframe.MaxDistance", m_debugWireframeMaxDistance );
+
+		shader->SetUniform( "Fog.Enabled", m_fog.Enabled );
+		shader->SetUniform( "Fog.Distance", m_fog.Distance );
+		shader->SetUniform( "Fog.Colour", m_fog.Colour );
+
+		glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
+		shader->SetUniform( "ObjectColour", colour );
+
+		mesh->Render( *shader, transform );
+
+		shader->Use( false );
 	}
 
-	void Renderer::CreateDebugMeshGrid( EntityManager& entityManager )
+	void Renderer::CreateDebugMeshGrid( dd::EntityManager& entityManager )
 	{
 		if( m_debugMeshGridCreated || !m_createDebugMeshGrid )
 			return;
@@ -426,7 +452,7 @@ namespace dd
 			{
 				for( int z = -5; z < 5; ++z )
 				{
-					CreateMeshEntity( entityManager, m_unitCube, m_shaders[0], glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
+					CreateMeshEntity( entityManager, m_unitCube, glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
 				}
 			}
 		}
@@ -434,17 +460,17 @@ namespace dd
 		m_debugMeshGridCreated = true;
 	}
 
-	EntityHandle Renderer::CreatePointLight( EntityManager& entityManager )
+	dd::EntityHandle Renderer::CreatePointLight( dd::EntityManager& entityManager )
 	{
 		glm::mat4 transform = glm::translate( glm::vec3( 0 ) ) * glm::scale( glm::vec3( 0.1f ) );
-		EntityHandle entity = CreateMeshEntity( entityManager, m_unitCube, m_shaders[ 0 ], glm::vec4( 1 ), transform );
-		ComponentHandle<LightComponent> light = entityManager.AddComponent<LightComponent>( entity );
+		dd::EntityHandle entity = CreateMeshEntity( entityManager, m_unitCube, glm::vec4( 1 ), transform );
+		dd::ComponentHandle<dd::LightComponent> light = entityManager.AddComponent<dd::LightComponent>( entity );
 		light.Write()->Ambient = 0.01f;
 
 		return entity;
 	}
 
-	void Renderer::UpdateDebugPointLights( EntityManager& entity_manager )
+	void Renderer::UpdateDebugPointLights( dd::EntityManager& entity_manager )
 	{
 		if( m_createLight )
 		{
@@ -455,10 +481,10 @@ namespace dd
 		if( m_deleteLight.IsValid() )
 		{
 			entity_manager.Destroy( m_deleteLight );
-			m_deleteLight = EntityHandle();
+			m_deleteLight = dd::EntityHandle();
 		}
 
-		entity_manager.ForAllWithReadable<MeshComponent, LightComponent>( []( auto entity, auto mesh, auto light )
+		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
 		{
 			if( mesh.Write() != nullptr )
 			{
@@ -467,22 +493,22 @@ namespace dd
 		} );
 	}
 
-	void Renderer::Update( EntityManager& entity_manager, float delta_t )
+	void Renderer::Update( dd::EntityManager& entity_manager, float delta_t )
 	{
 		if( !m_xAxis.IsValid() )
 		{
-			m_xAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[ 0 ], glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-			m_yAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[ 0 ], glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-			m_zAxis = CreateMeshEntity( entity_manager, m_unitCube, m_shaders[ 0 ], glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+			m_xAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+			m_yAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+			m_zAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 		}
 
 		CreateDebugMeshGrid( entity_manager );
 		UpdateDebugPointLights( entity_manager );
 
-		m_debugLights = entity_manager.FindAllWithWritable<LightComponent, TransformComponent>();
+		m_debugLights = entity_manager.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();
 	}
 
-	void Renderer::RenderDebug( IRenderer& debug_render )
+	void Renderer::RenderDebug( dd::IRenderer& debug_render )
 	{
 		m_framebuffer.BindDraw();
 
@@ -491,11 +517,11 @@ namespace dd
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::BeginRender( const ICamera& camera )
+	void Renderer::BeginRender( const dd::ICamera& camera )
 	{
 		if( m_reloadShaders )
 		{
-			ShaderProgram::ReloadAllShaders();
+			ShaderProgram::ReloadAll();
 			m_reloadShaders = false;
 		}
 
@@ -515,7 +541,7 @@ namespace dd
 		m_framebuffer.Clear();
 	}
 
-	void Renderer::Render( const EntityManager& entity_manager, const ICamera& camera )
+	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
 
@@ -533,9 +559,9 @@ namespace dd
 			m_forceUpdateFrustum = false;
 		}
 
-		std::vector<EntityHandle> lights = entity_manager.FindAllWithReadable<LightComponent, TransformComponent>();
+		std::vector<dd::EntityHandle> lights = entity_manager.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
 
-		entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &lights, &camera]( auto entity, auto mesh, auto transform )
+		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &lights, &camera]( auto entity, auto mesh, auto transform )
 		{ 
 			RenderMesh( entity, mesh.Read(), transform.Read(), lights, camera, m_mousePicking );
 		} );
@@ -548,7 +574,7 @@ namespace dd
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::EndRender( const ICamera& camera )
+	void Renderer::EndRender( const dd::ICamera& camera )
 	{
 		m_framebuffer.BindRead();
 

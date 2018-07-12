@@ -1,3 +1,9 @@
+//
+// ICamera.h - Interface for all camera implementations.
+// Copyright (C) Sebastian Nordgren 
+// April 13th 2016
+//
+
 #pragma once
 
 namespace dd

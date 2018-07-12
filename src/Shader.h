@@ -8,9 +8,7 @@
 
 #include "OpenGL.h"
 
-#include <atomic>
-
-namespace dd
+namespace ddr
 {
 	class Shader
 	{
@@ -27,17 +25,19 @@ namespace dd
 		// Create a shader with the given name and type.
 		// Load the contents from the given path.
 		//
-		static Shader* Create( const String& path, Type type );
-
-		Shader( const Shader& other );
-		~Shader();
-
-		Shader& operator=( const Shader& other );
+		static Shader* Create( const dd::String& path, Type type );
 
 		//
 		// Reload the shader from file.
 		//
 		bool Reload();
+
+		~Shader();
+
+		Shader( const Shader& other ) = delete;
+		Shader( Shader&& other ) = delete;
+		Shader& operator=( const Shader& other ) = delete;
+		Shader& operator=( Shader&& other ) = delete;
 		
 	private:
 
@@ -46,19 +46,14 @@ namespace dd
 		Type m_type;
 		GLuint m_id;
 
-		String128 m_path;
-		String256 m_source;
+		dd::String128 m_path;
+		dd::String256 m_source;
 		
-		std::atomic<int>* m_refCount;
+		static std::unordered_map<dd::String128, Shader*> sm_shaderCache;
+		static bool LoadFile( const dd::String& path, dd::String& outSource );
 
-		static std::unordered_map<String128, Shader*> sm_shaderCache;
-		static bool LoadFile( const String& path, String& outSource );
+		Shader( const dd::String& path, Type type );
 
-		Shader( const String& path, Type type );
-
-		String256 Compile( const String& source );
-
-		void Retain();
-		void Release();
+		dd::String256 Compile( const dd::String& source );
 	};
 }

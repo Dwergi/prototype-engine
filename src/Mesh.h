@@ -7,104 +7,82 @@
 #pragma once
 
 #include "AABB.h"
-#include "ShaderProgram.h"
+#include "MaterialHandle.h"
 #include "VAO.h"
 #include "VBO.h"
 
-#include <atomic>
 #include <memory>
 #include <unordered_map>
 
-namespace dd
+namespace ddr
 {
 	class ICamera;
+	class MaterialHandle;
 	class MeshHandle;
 	class ShaderProgram;
 
 	//
-	// A ref-counted mesh asset.
+	// A mesh asset.
 	//
 	class Mesh
 	{
 	public:
 
 		//
-		// Create (or retrieve) a handle to a mesh with the given name using the given shader.
+		// Create (or retrieve) a handle to a mesh with the given name.
 		//
-		static MeshHandle Create( const char* name, ShaderHandle program );
+		static MeshHandle Create( const char* name );
 
 		//
-		// Destroy the mesh associated with the given handle. All handles will become invalidated.
+		// Get the mesh instance associated with the given handle.
+		// Returns null if the handle does not reference a mesh that still exists.
+		//
+		static Mesh* Get( MeshHandle handle );
+
+		//
+		// Destroy the mesh associated with the given handle. 
 		//
 		static void Destroy( MeshHandle handle );
 
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( const ICamera& camera, ShaderProgram& shader, const glm::mat4& transform );
+		void Render( ShaderProgram& shader, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
-		const AABB& Bounds() const { return m_bounds; }
+		const dd::AABB& Bounds() const { return m_bounds; }
 
 		//
 		// Set the bounds of this mesh.
 		//
-		void SetBounds( const AABB& bounds ) { m_bounds = bounds; }
+		void SetBounds( const dd::AABB& bounds ) { m_bounds = bounds; }
 
 		//
 		// Set the positions that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		// The pointer in the buffer must remain valid for the lifetime of this mesh.
 		//
-		void SetPositions( const ConstBuffer<glm::vec3>& positions );
-
-		//
-		// Enable indexed drawing.
-		// SetIndices can be called before or after this, and the old buffer will be stored (but not used) between calls.
-		//
-		void EnableIndices( bool enabled ) { m_useIndex = enabled; }
+		void SetPositions( const dd::ConstBuffer<glm::vec3>& positions );
 
 		//
 		// Set the index buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetIndices( const ConstBuffer<uint>& indices );
-
-		//
-		// Enable/disable normals.
-		// SetNormals can be called before or after this, and the old buffer will be stored (but not used) between calls.
-		//
-		void EnableNormals( bool enabled ) { m_useNormal = enabled; }
+		void SetIndices( const dd::ConstBuffer<uint>& indices );
 
 		//
 		// Set the normal buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetNormals( const ConstBuffer<glm::vec3>& normals );
+		void SetNormals( const dd::ConstBuffer<glm::vec3>& normals );
 
-		//
-		// Enable/disable vertex colours.
-		// SetNormals can be called before or after this, and the old buffer will be stored (but not used) between calls.
-		//
-		void EnableVertexColours( bool enabled ) { m_useVertexColour = enabled; }
 		//
 		// Set the vertex colour buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetVertexColours( const ConstBuffer<glm::vec4>& colours );
-
-		//
-		// Enable/disable UV coordinates.
-		// SetUVs can be called before or after this, and the old buffer will be stored (but not used) between calls.
-		//
-		void EnableUVs( bool enabled ) { m_useUV = enabled; }
-
-		//
-		// Enable height colours.
-		//
-		void EnableHeightColours( bool enabled ) { m_useHeightColours = true; }
+		void SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours );
 
 		//
 		// Set the height colours to use for this mesh.
@@ -115,7 +93,17 @@ namespace dd
 		// Set the UV buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
-		void SetUVs( const ConstBuffer<glm::vec2>& uvs );
+		void SetUVs( const dd::ConstBuffer<glm::vec2>& uvs );
+
+		//
+		// Set the material that this mesh uses.
+		//
+		void SetMaterial( MaterialHandle material ) { m_material = material; }
+
+		//
+		// Get the material this mesh uses.
+		//
+		MaterialHandle GetMaterial() const { return m_material; }
 
 		//
 		// Send updated mesh data to the GPU from the same place it currently is.
@@ -123,103 +111,50 @@ namespace dd
 		void UpdateBuffers();
 
 		//
-		// Set a colour multiplier that is applied to all vertices of the mesh.
-		//
-		void SetColourMultiplier( const glm::vec4& colour ) { m_colourMultiplier = colour; }
-
-		//
-		// Get this mesh's shader.
-		//
-		ShaderProgram* GetShader() { return m_shader.Get(); }
-
-		//
-		// Use or release this mesh's shader.
-		//
-		void UseShader( bool use );
-
-		//
 		// Get the name of this mesh.
 		//
-		const String& GetName() const { return m_name; }
+		const dd::String& GetName() const { return m_name; }
 
 		void MakeUnitCube();
 
-		Mesh& operator=( const Mesh& other );
-		Mesh( const Mesh& other );
 		~Mesh();
 
-	private:
+		Mesh& operator=( const Mesh& ) = delete;
+		Mesh& operator=( Mesh&& ) = delete;
+		Mesh( const Mesh& ) = delete;
+		Mesh( Mesh&& ) = delete;
 
-		friend class MeshHandle;
+	private:
 
 		static std::mutex m_instanceMutex;
 		static std::unordered_map<uint64, Mesh*> m_instances;
 		
 		VBO m_vboPosition;
-		ConstBuffer<glm::vec3> m_bufferPosition;
+		dd::ConstBuffer<glm::vec3> m_bufferPosition;
 
-		bool m_useNormal { false };
 		VBO m_vboNormal;
-		ConstBuffer<glm::vec3> m_bufferNormal;
+		dd::ConstBuffer<glm::vec3> m_bufferNormal;
 
-		bool m_useIndex { false };
 		VBO m_vboIndex;
-		ConstBuffer<uint> m_bufferIndex;
+		dd::ConstBuffer<uint> m_bufferIndex;
 
-		bool m_useUV { false };
 		VBO m_vboUV;
-		ConstBuffer<glm::vec2> m_bufferUV;
+		dd::ConstBuffer<glm::vec2> m_bufferUV;
 
-		bool m_useVertexColour { false };
 		VBO m_vboVertexColour;
-		ConstBuffer<glm::vec4> m_bufferVertexColour;
+		dd::ConstBuffer<glm::vec4> m_bufferVertexColour;
 
-		bool m_useHeightColours { false };
-		ConstBuffer<glm::vec3> m_bufferHeightColours;
-		ConstBuffer<float> m_bufferHeightCutoffs;
+		dd::ConstBuffer<glm::vec3> m_bufferHeightColours;
+		dd::ConstBuffer<float> m_bufferHeightCutoffs;
 		const float* m_maxHeight { nullptr };
+
+		MaterialHandle m_material;
 		
 		VAO m_vao;
 
-		String128 m_name;
-		ShaderHandle m_shader;
-		AABB m_bounds;
+		dd::String128 m_name;
+		dd::AABB m_bounds;
 
-		glm::vec4 m_colourMultiplier;
-
-		std::atomic<int>* m_refCount;
-
-		void Retain();
-		void Release();
-
-		Mesh( const char* name, ShaderHandle program );
-
-		void Assign( const Mesh& other );
-
-		//
-		// Get the mesh instance associated with the given handle.
-		// Returns null if the handle does not reference a mesh that still exists.
-		//
-		static Mesh* Get( MeshHandle handle );
-	};
-
-	//
-	// A very simple handle to be used to reference a single global instance of a mesh in a semi-safe way.
-	// Use Mesh::Create to get a handle to a given mesh.
-	//
-	class MeshHandle
-	{
-	public:
-		MeshHandle() : m_hash( 0 ) {}
-
-		Mesh* Get() const { return Mesh::Get( *this ); }
-
-		bool IsValid() const { return m_hash != 0; }
-
-		BASIC_TYPE( MeshHandle )
-		
-	private:
-		friend class Mesh;
-		uint64 m_hash;
+		Mesh( const char* name );
 	};
 }

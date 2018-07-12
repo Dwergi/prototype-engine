@@ -15,10 +15,10 @@ namespace OpenGL
 	static const GLuint InvalidID = 0;
 }
 
-namespace dd
+namespace ddr
 {
 	typedef GLint ShaderLocation;
 	static const ShaderLocation InvalidLocation = -1;
 
-	String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform = nullptr );
+	dd::String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform = nullptr );
 }

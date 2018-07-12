@@ -8,7 +8,7 @@
 
 #include "OpenGL.h"
 
-namespace dd
+namespace ddr
 {
 	class VBO
 	{
@@ -26,7 +26,7 @@ namespace dd
 		void Create( GLenum target, GLenum usage );
 		void Destroy();
 
-		void SetData( const IBuffer& buffer );
+		void SetData( const dd::IBuffer& buffer );
 		void Update();
 
 		void Bind();
@@ -43,6 +43,6 @@ namespace dd
 		GLenum m_target { OpenGL::InvalidID };
 		GLenum m_usage { OpenGL::InvalidID };
 
-		const IBuffer* m_buffer { nullptr };
+		const dd::IBuffer* m_buffer { nullptr };
 	};
 }

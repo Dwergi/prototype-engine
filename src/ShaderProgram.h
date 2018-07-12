@@ -1,5 +1,5 @@
 //
-// ShaderProgram.h - Wrapper around OpenGL shader program.
+// ddr::ShaderProgram.h - Wrapper around OpenGL shader program.
 // Copyright (C) Sebastian Nordgren 
 // February 16th 2016
 //
@@ -9,10 +9,14 @@
 #include "ShaderHandle.h"
 #include "OpenGL.h"
 
-#include <atomic>
 #include <unordered_map>
 
 namespace dd
+{
+	class ICamera;
+}
+
+namespace ddr
 {
 	class Shader;
 	class Texture;
@@ -24,7 +28,7 @@ namespace dd
 		//
 		// Create a shader with the given name and shaders.
 		//
-		static ShaderHandle Create( const String& name, const Vector<Shader*>& shaders );
+		static ShaderHandle Create( const dd::String& name, const dd::Vector<Shader*>& shaders );
 
 		//
 		// Destroy the given shader entirely.
@@ -34,14 +38,15 @@ namespace dd
 		//
 		// Reload all shaders.
 		//
-		static void ReloadAllShaders();
+		static void ReloadAll();
 
-		ShaderProgram( const ShaderProgram& other );
-		~ShaderProgram();
+		//
+		// Get the shader program associated with the given handle.
+		// Returns null if none exists or the handle is invalid.
+		//
+		static ShaderProgram* Get( ShaderHandle handle );
 
-		ShaderProgram& operator=( const ShaderProgram& other );
-
-		const String& Name() const { return m_name; }
+		const dd::String& Name() const { return m_name; }
 
 		bool Reload();
 
@@ -50,16 +55,9 @@ namespace dd
 
 		bool IsValid() const { return m_valid; }
 
-		void SetPositionsName( const char* name );
 		bool BindPositions();
-
-		void SetNormalsName( const char* name );
 		bool BindNormals();
-
-		void SetUVsName( const char* name );
 		bool BindUVs();
-
-		void SetVertexColoursName( const char* name );
 		bool BindVertexColours();
 
 		bool BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized );
@@ -75,38 +73,35 @@ namespace dd
 		void SetUniform( const char* name, float flt );
 		void SetUniform( const char* name, const Texture& texture );
 
+		void SetCamera( const dd::ICamera& camera );
+
+		~ShaderProgram();
+
+		ShaderProgram( const ShaderProgram& other ) = delete;
+		ShaderProgram( ShaderProgram&& other ) = delete;
+		ShaderProgram& operator=( const ShaderProgram& other ) = delete;
+		ShaderProgram& operator=( ShaderProgram&& other ) = delete;
+
 	private:
 
-		friend class ShaderHandle;
+		friend class ddr::ShaderHandle;
 
-		static std::unordered_map<uint64, ShaderProgram> s_instances;
+		static std::unordered_map<uint64, ShaderProgram*> s_instances;
 
-		static ShaderProgram CreateInstance( const String& name, const Vector<Shader*>& shaders );
+		static ShaderProgram* CreateInstance( const dd::String& name, const dd::Vector<Shader*>& shaders );
 
-		String64 m_name;
+		dd::String64 m_name;
 		bool m_valid { false };
 		bool m_inUse { false };
 		uint m_id { OpenGL::InvalidID };
 
-		String64 m_positionsName;
-		String64 m_normalsName;
-		String64 m_uvsName;
-		String64 m_vertexColoursName;
+		dd::Vector<Shader*> m_shaders;
 
-		Vector<Shader*> m_shaders;
+		explicit ddr::ShaderProgram( const dd::String& name );
 
-		std::atomic<int>* m_refCount;
-
-		explicit ShaderProgram( const String& name );
-
-		String256 Link();
-
-		void Retain();
-		void Release();
+		dd::String256 Link();
 
 		ShaderLocation GetAttribute( const char* name ) const;
 		ShaderLocation GetUniform( const char* name ) const;
-
-		static ShaderProgram* Get( ShaderHandle handle );
 	};
 } 

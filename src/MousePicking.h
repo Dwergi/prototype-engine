@@ -18,13 +18,17 @@
 
 struct GLFWwindow;
 
+namespace ddr
+{
+	class ShaderProgram;
+}
+
 namespace dd
 {
 	class ICamera;
-	class Input; 
+	class Input;
 	class InputBindings;
 	class MeshComponent;
-	class ShaderProgram;
 	class TransformComponent;
 	class Window;
 
@@ -36,7 +40,7 @@ namespace dd
 
 		static const int DownScalingFactor = 2;
 
-		MousePicking( const Window& window, const ICamera& camera, const Input& input );
+		MousePicking( const Window& window, const Input& input );
 
 		virtual void Update( EntityManager& entity_manager, float dt ) override;
 
@@ -58,7 +62,7 @@ namespace dd
 
 	private:
 
-		const ICamera& m_camera;
+		const ICamera* m_camera;
 		const Input& m_input;
 		const Window& m_window;
 
@@ -69,11 +73,11 @@ namespace dd
 		EntityHandle m_selectedMesh;
 		EntityHandle m_focusedMesh;
 
-		ShaderHandle m_shader;
-		Texture m_idTexture;
-		Texture m_depthTexture;
+		ddr::ShaderHandle m_shader;
+		ddr::Texture m_idTexture;
+		ddr::Texture m_depthTexture;
 		
-		FrameBuffer m_framebuffer;
+		ddr::FrameBuffer m_framebuffer;
 
 		Buffer<byte> m_lastIDBuffer;
 		Buffer<byte> m_lastDepthBuffer;
@@ -93,6 +97,6 @@ namespace dd
 
 		void HandleInput( InputAction action, InputType type );
 
-		void RenderMesh( const ICamera& camera, ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh, const TransformComponent* transform );
+		void RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh, const TransformComponent* transform );
 	};
 }

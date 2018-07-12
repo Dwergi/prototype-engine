@@ -12,6 +12,8 @@
 #include "FPSCamera.h"
 #include "EntityManager.h"
 #include "InputBindings.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "MeshComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -97,23 +99,23 @@ namespace dd
 
 	namespace
 	{
-		ShaderHandle CreateShaders( const char* name )
+		ddr::ShaderHandle CreateShaders( const char* name )
 		{
-			Vector<Shader*> shaders;
+			dd::Vector<ddr::Shader*> shaders;
 
-			Shader* vert = Shader::Create( String32( "shaders\\standard.vertex" ), Shader::Type::Vertex );
+			ddr::Shader* vert = ddr::Shader::Create( String32( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
 			DD_ASSERT( vert != nullptr );
 			shaders.Add( vert );
 
-			Shader* geom = Shader::Create( String32( "shaders\\standard.geometry" ), Shader::Type::Geometry );
+			ddr::Shader* geom = ddr::Shader::Create( String32( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
 			DD_ASSERT( geom != nullptr );
 			shaders.Add( geom );
 
-			Shader* pixel = Shader::Create( String32( "shaders\\standard.pixel" ), Shader::Type::Pixel );
+			ddr::Shader* pixel = ddr::Shader::Create( String32( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
 			DD_ASSERT( pixel != nullptr );
 			shaders.Add( pixel );
 
-			ShaderHandle handle = ShaderProgram::Create( String8( name ), shaders );
+			ddr::ShaderHandle handle = ddr::ShaderProgram::Create( String8( name ), shaders );
 			return handle;
 		}
 	}
@@ -127,7 +129,7 @@ namespace dd
 		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( entity );
 		transform_cmp->SetLocalTransform( transform );
 
-		ShaderHandle shader = CreateShaders( "ship" );
+		ddr::ShaderHandle shader = CreateShaders( "ship" );
 		/*shader.Get()->Use( true );
 		shader.Get()->BindAttributeFloat( "Position", 3, 6, 0, false );
 		shader.Get()->BindAttributeFloat( "Normal", 3, 6, 3, false );
@@ -138,8 +140,11 @@ namespace dd
 		bounds.Expand( glm::vec3( 0.5f, 0, -1.0 ) );
 		bounds.Expand( glm::vec3( -0.5f, 0, -1.0 ) );
 
-		m_shipMesh = Mesh::Create( "ship", shader );
-		m_shipMesh.Get()->MakeUnitCube();
+		m_shipMesh = ddr::Mesh::Create( "ship" );
+
+		ddr::Mesh* mesh = ddr::Mesh::Get( m_shipMesh );
+		mesh->SetMaterial( ddr::Material::Create( "standard" ) );
+		mesh->MakeUnitCube();
 		
 		/*mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
 		mesh_h.Get()->SetBounds( bounds );*/
@@ -247,7 +252,7 @@ namespace dd
 
 	void ShipSystem::Shutdown( EntityManager& entity_manager )
 	{
-		Mesh::Destroy( m_shipMesh );
+		ddr::Mesh::Destroy( m_shipMesh );
 	}
 
 	void ShipSystem::DrawDebugInternal()

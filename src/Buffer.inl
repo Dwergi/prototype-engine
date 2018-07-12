@@ -56,7 +56,7 @@ template <typename T>
 ConstBuffer<T>& ConstBuffer<T>::operator=( ConstBuffer<T>&& other )
 {
 	Set( other.GetConst(), other.Size() );
-	other.Release();
+	other.ReleaseConst();
 
 	return *this;
 }
@@ -64,7 +64,7 @@ ConstBuffer<T>& ConstBuffer<T>::operator=( ConstBuffer<T>&& other )
 template <typename T>
 void ConstBuffer<T>::Set( const T* ptr, int count )
 {
-	DD_ASSERT( m_ptr == nullptr, "Overwriting a ConstBuffer pointer! Call Release first." );
+	DD_ASSERT( m_ptr == nullptr, "Overwriting a ConstBuffer pointer! Call ReleaseConst first." );
 
 	m_ptr = ptr;
 	m_count = count;

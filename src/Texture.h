@@ -8,7 +8,7 @@
 
 #include "OpenGL.h"
 
-namespace dd
+namespace ddr
 {
 	class Texture
 	{
@@ -22,8 +22,8 @@ namespace dd
 
 		glm::ivec2 GetSize() const { return m_size; }
 
-		void SetData( const ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
-		void GetData( Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
+		void SetData( const dd::ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
+		void GetData( dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType );
 
 		void Bind( int index );
 		void Unbind();

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "EntityHandle.h"
-#include "Mesh.h"
+#include "MeshHandle.h"
 #include "IDebugDraw.h"
 #include "InputAction.h"
 #include "ISystem.h"
@@ -51,7 +51,7 @@ namespace dd
 		glm::vec3 m_nextCameraPos;
 
 		EntityHandle m_lastShip;
-		MeshHandle m_shipMesh;
+		ddr::MeshHandle m_shipMesh;
 
 		DenseMap<InputAction, bool> m_inputs;
 		bool m_enabled { false };

@@ -1,9 +1,15 @@
+//
+// IRenderer.h - An interface for things that want to render something.
+// Copyright (C) Sebastian Nordgren 
+// July 12th 2018
+//
+
 #pragma once
 
 namespace dd
 {
-	class EntityManager;
 	class ICamera;
+	class EntityManager;
 	class FrameBuffer;
 
 	class IRenderer

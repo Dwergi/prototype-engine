@@ -11,7 +11,7 @@
 
 #include "GL/gl3w.h"
 
-namespace dd
+namespace ddr
 {
 	VBO::VBO()
 	{
@@ -98,7 +98,7 @@ namespace dd
 		}
 	}
 
-	void VBO::SetData( const IBuffer& buffer )
+	void VBO::SetData( const dd::IBuffer& buffer )
 	{
 		m_buffer = &buffer;
 

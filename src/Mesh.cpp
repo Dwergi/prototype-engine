@@ -9,14 +9,15 @@
 
 #include "ICamera.h"
 #include "GLError.h"
-#include "Shader.h"
+#include "Material.h"
+#include "ShaderProgram.h"
 #include "Renderer.h"
 
 #include "GL/gl3w.h"
 
 #include "glm/gtx/transform.hpp"
 
-namespace dd
+namespace ddr
 {
 	std::mutex Mesh::m_instanceMutex;
 	std::unordered_map<uint64, Mesh*> Mesh::m_instances;
@@ -73,7 +74,7 @@ namespace dd
 		glm::vec3( 1.0f,	1.0f,	1.0f ),
 	};
 
-	static ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, sizeof( s_unitCubePositions ) / sizeof( glm::vec3 ) );
+	static dd::ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, sizeof( s_unitCubePositions ) / sizeof( glm::vec3 ) );
 
 	static const glm::vec3 s_unitCubeNormals[] =
 	{
@@ -126,7 +127,7 @@ namespace dd
 		glm::vec3( 1.0f, 0.0f, 0.0f )
 	};
 
-	static const ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, sizeof( s_unitCubeNormals ) / sizeof( glm::vec3 ) );
+	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, sizeof( s_unitCubeNormals ) / sizeof( glm::vec3 ) );
 
 	static const glm::vec2 s_unitCubeUVs[] =
 	{
@@ -180,9 +181,11 @@ namespace dd
 		glm::vec2( 0.0f, 1.0f ),
 	};
 
+	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, sizeof( s_unitCubeUVs ) / sizeof( glm::vec2 ) );
+
 	Mesh* Mesh::Get( MeshHandle handle )
 	{
-		std::lock_guard<std::mutex> lock( m_instanceMutex );
+		std::lock_guard lock( m_instanceMutex );
 
 		auto it = m_instances.find( handle.m_hash );
 		if( it == m_instances.end() )
@@ -193,110 +196,63 @@ namespace dd
 		return it->second;
 	}
 
-	MeshHandle Mesh::Create( const char* name, ShaderHandle program )
+	MeshHandle Mesh::Create( const char* name )
 	{
 		DD_ASSERT( name != nullptr );
 		DD_ASSERT( strlen( name ) > 0 );
 
 		uint64 hash = dd::HashString( name, strlen( name ) );
-		hash ^= program.m_hash;
 
-		std::lock_guard<std::mutex> lock( m_instanceMutex );
+		std::lock_guard lock( m_instanceMutex );
 
 		auto it = m_instances.find( hash );
 		if( it == m_instances.end() )
 		{
-			m_instances.insert( std::make_pair( hash, new Mesh( name, program ) ) );
+			m_instances.insert( std::make_pair( hash, new Mesh( name ) ) );
 		}
 
-		MeshHandle handle;
-		handle.m_hash = hash;
+		MeshHandle mesh_h;
+		mesh_h.m_hash = hash;
 
-		return handle;
+		return mesh_h;
 	}
 
-	void Mesh::Destroy( MeshHandle handle )
+	void Mesh::Destroy( MeshHandle mesh_h )
 	{
-		Mesh* mesh = Get( handle );
+		Mesh* mesh = Get( mesh_h );
 		if( mesh != nullptr )
 		{
-			std::lock_guard<std::mutex> lock( m_instanceMutex );
+			std::lock_guard lock( m_instanceMutex );
 
 			delete mesh;
-			m_instances.erase( handle.m_hash );
+			m_instances.erase( mesh_h.m_hash );
 		}
 	}
 
-	Mesh::Mesh( const char* name, ShaderHandle program ) :
-		m_refCount( nullptr ),
-		m_shader( program ),
+	Mesh::Mesh( const char* name ) :
 		m_name( name )
 	{
 		DD_PROFILE_SCOPED( Mesh_Create );
 
 		m_vao.Create();
 		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-
-		m_refCount = new std::atomic<int>( 1 );
-	}
-
-	Mesh::Mesh( const Mesh& other )
-	{
-		Assign( other );
-
-		Retain();
 	}
 
 	Mesh::~Mesh()
 	{
-		Release();
+		m_vboPosition.Destroy();
+		m_vboIndex.Destroy();
+		m_vboNormal.Destroy();
+		m_vboUV.Destroy();
+		m_vboVertexColour.Destroy();
+
+		m_vao.Destroy();
 	}
 
-	Mesh& Mesh::operator=( const Mesh& other )
+	void Mesh::SetPositions( const dd::ConstBuffer<glm::vec3>& positions )
 	{
-		Release();
+		DD_ASSERT( m_material.IsValid() );
 
-		Assign( other );
-
-		Retain();
-
-		return *this;
-	}
-
-	void Mesh::Assign( const Mesh& other )
-	{
-		m_vboPosition = other.m_vboPosition;
-		m_bufferPosition = other.m_bufferPosition;
-
-		m_useNormal = other.m_useNormal;
-		m_vboNormal = other.m_vboNormal;
-		m_bufferNormal = other.m_bufferNormal;
-
-		m_useIndex = other.m_useIndex;
-		m_vboIndex = other.m_vboIndex;
-		m_bufferIndex = other.m_bufferIndex;
-
-		m_useUV = other.m_useUV;
-		m_vboUV = other.m_vboUV;
-		m_bufferUV = other.m_bufferUV;
-
-		m_useVertexColour = other.m_useVertexColour;
-		m_vboVertexColour = other.m_vboVertexColour;
-		m_bufferVertexColour = other.m_bufferVertexColour;
-
-		m_vao = other.m_vao;
-
-		m_name = other.m_name;
-		m_shader = other.m_shader;
-		m_bounds = other.m_bounds;
-
-		m_colourMultiplier = other.m_colourMultiplier;
-
-		m_refCount = other.m_refCount;
-	}
-
-	void Mesh::SetPositions( const ConstBuffer<glm::vec3>& positions )
-	{
 		m_bufferPosition = positions;
 
 		m_vao.Bind();
@@ -304,13 +260,16 @@ namespace dd
 		m_vboPosition.Bind();
 		m_vboPosition.SetData( m_bufferPosition );
 
-		m_shader.Get()->BindPositions();
+		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
+		shader->BindPositions();
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetNormals( const ConstBuffer<glm::vec3>& normals )
+	void Mesh::SetNormals( const dd::ConstBuffer<glm::vec3>& normals )
 	{
+		DD_ASSERT( m_material.IsValid() );
+
 		if( !m_vboNormal.IsValid() )
 		{
 			m_vboNormal.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -323,13 +282,16 @@ namespace dd
 		m_vboNormal.Bind();
 		m_vboNormal.SetData( m_bufferNormal );
 
-		m_shader.Get()->BindNormals();
+		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
+		shader->BindNormals();
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetIndices( const ConstBuffer<uint>& indices )
+	void Mesh::SetIndices( const dd::ConstBuffer<uint>& indices )
 	{
+		DD_ASSERT( m_material.IsValid() );
+
 		if( !m_vboIndex.IsValid() )
 		{
 			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -345,8 +307,10 @@ namespace dd
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetUVs( const ConstBuffer<glm::vec2>& uvs )
+	void Mesh::SetUVs( const dd::ConstBuffer<glm::vec2>& uvs )
 	{
+		DD_ASSERT( m_material.IsValid() );
+
 		if( !m_vboUV.IsValid() )
 		{
 			m_vboUV.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -359,13 +323,16 @@ namespace dd
 		m_vboUV.Bind();
 		m_vboUV.SetData( m_bufferUV );
 
-		m_shader.Get()->BindUVs();
+		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
+		shader->BindUVs();
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetVertexColours( const ConstBuffer<glm::vec4>& vertexColours )
+	void Mesh::SetVertexColours( const dd::ConstBuffer<glm::vec4>& vertexColours )
 	{
+		DD_ASSERT( m_material.IsValid() );
+
 		if( !m_vboVertexColour.IsValid() )
 		{
 			m_vboVertexColour.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -378,7 +345,8 @@ namespace dd
 		m_vboVertexColour.Bind();
 		m_vboVertexColour.SetData( m_bufferVertexColour );
 
-		m_shader.Get()->BindVertexColours();
+		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
+		shader->BindVertexColours();
 
 		m_vao.Unbind();
 	}
@@ -399,26 +367,16 @@ namespace dd
 		m_vboVertexColour.Update();
 	}
 
-	void Mesh::Render( const ICamera& camera, ShaderProgram& shader, const glm::mat4& transform )
+	void Mesh::Render( ShaderProgram& shader, const glm::mat4& transform )
 	{
+		DD_ASSERT( shader.InUse() );
+
 		DD_PROFILE_SCOPED( Mesh_Render );
 
 		shader.SetUniform( "Model", transform );
-		shader.SetUniform( "View", camera.GetCameraMatrix() );
-		shader.SetUniform( "ViewPosition", camera.GetPosition() );
-		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
-		shader.SetUniform( "ObjectColour", m_colourMultiplier );
 
-		if( Fog::Get() != nullptr )
-		{
-			Fog* fog = Fog::Get();
-			shader.SetUniform( "Fog.Enabled", fog->Enabled );
-			shader.SetUniform( "Fog.Distance", fog->Distance );
-			shader.SetUniform( "Fog.Colour", fog->Colour );
-		}
-
-		if( m_useHeightColours )
+		if( m_bufferHeightColours.Size() > 0 )
 		{
 			for( int i = 0; i < m_bufferHeightColours.Size(); ++i )
 			{
@@ -432,70 +390,27 @@ namespace dd
 
 		m_vao.Bind();
 
-		if( !m_useIndex )
+		if( m_vboIndex.IsValid() )
 		{
-			glDrawArrays( GL_TRIANGLES, 0, m_bufferPosition.Size() );
+			glDrawElements( GL_TRIANGLES, m_bufferIndex.Size(), GL_UNSIGNED_INT, 0 );
 			CheckGLError();
 		}
 		else
 		{
-			glDrawElements( GL_TRIANGLES, m_bufferIndex.Size(), GL_UNSIGNED_INT, 0 );
+			glDrawArrays( GL_TRIANGLES, 0, m_bufferPosition.Size() );
 			CheckGLError();
 		}
 
 		m_vao.Unbind();
 	}
 
-	void Mesh::Retain()
-	{ 
-		DD_ASSERT( m_refCount != nullptr );
-
-		++*m_refCount;
-	}
-
-	void Mesh::Release()
-	{
-		DD_ASSERT( m_refCount != nullptr );
-
-		if( --*m_refCount <= 0 )
-		{
-			m_vboPosition.Destroy();
-			m_vboIndex.Destroy();
-			m_vboNormal.Destroy();
-			m_vboUV.Destroy();
-			m_vboVertexColour.Destroy();
-
-			m_vao.Destroy();
-
-			delete m_refCount;
-		}
-	}
-
-	void Mesh::UseShader( bool use )
-	{
-		m_shader.Get()->Use( use );
-	}
-
 	void Mesh::MakeUnitCube()
 	{
-		ShaderProgram& shader = *m_shader.Get();
-		shader.Use( true );
-
-		shader.SetPositionsName( "Position" );
 		SetPositions( s_unitCubePositionsBuffer );
-
-		shader.SetNormalsName( "Normal" );
-
 		SetNormals( s_unitCubeNormalsBuffer );
+		SetUVs( s_unitCubeUVsBuffer );
 
-		//shader.SetUVsName( "UV" );
-
-		//Buffer<glm::vec2> uvs( const_cast<glm::vec2*>(s_unitCubeUVs), sizeof( s_unitCubeUVs ) / sizeof( glm::vec2 ) );
-		//SetUVs( uvs );
-
-		shader.Use( false );
-
-		AABB bounds;
+		dd::AABB bounds;
 		bounds.Expand( glm::vec3( -1, -1, -1 ) );
 		bounds.Expand( glm::vec3( 1, 1, 1 ) );
 		SetBounds( bounds );

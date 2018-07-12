@@ -11,6 +11,7 @@
 #include "EntityManager.h"
 #include "GLError.h"
 #include "JobSystem.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -27,7 +28,8 @@
 namespace dd
 {
 	uint TerrainChunk::s_indices[IndexCount];
-	ShaderHandle TerrainChunk::s_shader;
+	ddr::ShaderHandle TerrainChunk::s_shader;
+	ddr::MaterialHandle TerrainChunk::s_material;
 
 	TerrainChunk::TerrainChunk( const TerrainParameters& params, const TerrainChunkKey& key ) :
 		m_params( params ),
@@ -40,7 +42,7 @@ namespace dd
 
 	TerrainChunk::~TerrainChunk()
 	{
-		Mesh::Destroy( m_mesh );
+		ddr::Mesh::Destroy( m_mesh );
 
 		m_verticesBuffer.Release();
 		m_normalsBuffer.Release();
@@ -162,25 +164,25 @@ namespace dd
 
 	void TerrainChunk::CreateRenderResources()
 	{
-		Vector<Shader*> shaders;
+		Vector<ddr::Shader*> shaders;
 
-		Shader* vert = Shader::Create( String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
+		ddr::Shader* vert = ddr::Shader::Create( String8( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
 		DD_ASSERT( vert != nullptr );
 		shaders.Add( vert );
 
-		Shader* geom = Shader::Create( String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
+		ddr::Shader* geom = ddr::Shader::Create( String8( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
 		DD_ASSERT( geom != nullptr );
 		shaders.Add( geom );
 
-		Shader* pixel = Shader::Create( String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
+		ddr::Shader* pixel = ddr::Shader::Create( String8( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
 		DD_ASSERT( pixel != nullptr );
 		shaders.Add( pixel );
 
-		s_shader = ShaderProgram::Create( String8( "terrain" ), shaders );
+		s_shader = ddr::ShaderProgram::Create( String8( "terrain" ), shaders );
+		s_material = ddr::Material::Create( "terrain" );
 
-		ShaderProgram* shader = s_shader.Get();
-		shader->SetPositionsName( "Position" );
-		shader->SetNormalsName( "Normal" );
+		ddr::Material* material = ddr::Material::Get( s_material );
+		material->SetShader( s_shader );
 	}
 
 	void TerrainChunk::Generate()
@@ -248,7 +250,7 @@ namespace dd
 	{
 		if( m_destroy )
 		{
-			Mesh::Destroy( m_mesh );
+			ddr::Mesh::Destroy( m_mesh );
 		}
 
 		if( m_renderDirty )
@@ -258,7 +260,7 @@ namespace dd
 				CreateMesh( m_key );
 			}
 
-			Mesh* mesh = m_mesh.Get();
+			ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
 			mesh->UpdateBuffers();
 
 			float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
@@ -405,23 +407,22 @@ namespace dd
 		char name[ 128 ];
 		sprintf_s( name, 128, "%.2fx%.2f_%d", key.X, key.Y, key.LOD );
 
-		m_mesh = Mesh::Create( name, s_shader );
+		m_mesh = ddr::Mesh::Create( name );
 
-		Mesh* mesh = m_mesh.Get();
-		mesh->UseShader( true );
+		ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
+		mesh->SetMaterial( s_material );
+
+		ddr::Material* material = ddr::Material::Get( s_material );
+		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( material->GetShader() );
+
+		shader->Use( true );
 
 		mesh->SetPositions( m_verticesBuffer );
-
-		mesh->EnableNormals( true );
 		mesh->SetNormals( m_normalsBuffer );
-
-		mesh->EnableIndices( true );
 		mesh->SetIndices( m_indices );
-
-		mesh->EnableHeightColours( true );
 		mesh->SetHeightColours( m_params.HeightColours, m_params.HeightCutoffs, m_params.HeightLevelCount, m_params.HeightRange );
 
-		mesh->UseShader( false );
+		shader->Use( false );
 
 		DD_PROFILE_END();
 	}

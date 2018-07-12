@@ -117,7 +117,7 @@ namespace dd
 		if( m_hash == 0 )
 			return;
 
-		std::lock_guard<std::mutex> lock( s_mutex );
+		std::lock_guard lock( s_mutex );
 
 		std::shared_ptr<const char>* existing = s_instances.Find( m_hash );
 		if( existing != nullptr && existing->use_count() == 1 )
@@ -134,7 +134,7 @@ namespace dd
 		m_length = (uint) strlen( str );
 		m_hash = HashString( str, m_length );
 
-		std::lock_guard<std::mutex> lock( s_mutex );
+		std::lock_guard lock( s_mutex );
 
 		std::shared_ptr<const char>* existing = s_instances.Find( m_hash );
 		if( existing != nullptr )

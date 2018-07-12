@@ -11,10 +11,14 @@
 #include "VAO.h"
 #include "VBO.h"
 
-namespace dd 
+namespace dd
 {
 	struct AABB;
 	class ICamera;
+}
+
+namespace ddr 
+{
 	class ShaderProgram;
 
 	class alignas(16) Frustum
@@ -29,10 +33,10 @@ namespace dd
 		//
 		// Check if the frustum intersects with the given bounds.
 		//
-		bool Intersects( const AABB& bounds ) const;
+		bool Intersects( const dd::AABB& bounds ) const;
 
-		void Render( const ICamera& camera );
-		void Update( const ICamera& camera );
+		void Render( const dd::ICamera& camera );
+		void Update( const dd::ICamera& camera );
 
 		void* operator new( size_t i );
 		void operator delete( void* ptr);
@@ -40,9 +44,9 @@ namespace dd
 	private:
 
 		// corners of the frustum in world space
-		Buffer<glm::vec3> m_corners; 
+		dd::Buffer<glm::vec3> m_corners;
 		// planes of the frustum in world space
-		Plane m_planes[6]; 
+		dd::Plane m_planes[6];
 
 		glm::mat4 m_transform;
 
@@ -59,6 +63,6 @@ namespace dd
 
 		ShaderHandle m_shader;
 
-		void UpdateFrustum( const ICamera& camera );
+		void UpdateFrustum( const dd::ICamera& camera );
 	};
 }

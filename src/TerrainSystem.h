@@ -10,21 +10,22 @@
 #include "IDebugDraw.h"
 #include "IRenderer.h"
 #include "ISystem.h"
-#include "MeshComponent.h"
 #include "TerrainChunkKey.h"
-#include "TerrainChunkComponent.h"
 #include "TerrainParameters.h"
-#include "TransformComponent.h"
 
 #include <unordered_map>
 
+namespace ddr
+{
+	class ShaderProgram;
+}
+
 namespace dd
 {
-	class ICamera;
 	class EntityManager;
+	class ICamera;
 	class JobSystem;
 	class MeshComponent;
-	class ShaderProgram;
 	class TerrainChunk;
 	class TerrainChunkComponent;
 	class TransformComponent;
@@ -45,7 +46,7 @@ namespace dd
 		//
 		static const int ChunksPerDimension = 4;
 
-		TerrainSystem( const ICamera& camera, JobSystem& jobSystem );
+		TerrainSystem( JobSystem& jobSystem );
 		~TerrainSystem();
 
 		//
@@ -102,7 +103,6 @@ namespace dd
 		glm::ivec2 m_previousOffset;
 
 		TerrainParameters m_params;
-		const ICamera& m_camera;
 		JobSystem& m_jobSystem;
 
 		std::unordered_map<TerrainChunkKey, EntityHandle> m_existing;

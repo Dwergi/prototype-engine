@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace dd
+namespace ddr
 {
 	typedef unsigned int GLuint;
 	typedef int GLint;

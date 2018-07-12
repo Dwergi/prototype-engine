@@ -60,8 +60,7 @@ namespace dd
 		return colour;
 	}
 
-	TerrainSystem::TerrainSystem( const ICamera& camera, JobSystem& jobSystem ) :
-		m_camera( camera ),
+	TerrainSystem::TerrainSystem( JobSystem& jobSystem ) :
 		m_jobSystem( jobSystem ),
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
@@ -123,7 +122,8 @@ namespace dd
 			m_saveChunkImages = false;
 		}
 
-		glm::vec3 pos = m_camera.GetPosition();
+		DD_TODO( "Introduce Camera Component and use that here." );
+		glm::vec3 pos( 0.0f, 0.0f, 0.0f );
 		float chunk_size = TerrainChunk::Vertices * m_params.VertexDistance;
 
 		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );

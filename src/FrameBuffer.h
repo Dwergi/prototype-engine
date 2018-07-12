@@ -14,6 +14,10 @@
 namespace dd
 {
 	class ICamera;
+}
+
+namespace ddr
+{
 	class Texture;
 
 	class FrameBuffer
@@ -54,7 +58,7 @@ namespace dd
 		void RenderInit();
 
 		void Render();
-		void RenderDepth( const ICamera& camera );
+		void RenderDepth( const dd::ICamera& camera );
 
 		void Blit();
 

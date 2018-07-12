@@ -1,11 +1,11 @@
 #include "PrecompiledHeader.h"
 #include "OpenGL.h"
 
-namespace dd
+namespace ddr
 {
-	String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
+	dd::String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
 	{
-		String256 result;
+		dd::String256 result;
 		result += arrayName;
 		result += "[";
 

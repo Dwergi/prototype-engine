@@ -17,7 +17,7 @@ namespace dd
 	{
 	}
 	
-	MeshComponent::MeshComponent( MeshHandle mesh ) :
+	MeshComponent::MeshComponent( ddr::MeshHandle mesh ) :
 		Mesh( mesh ),
 		Hidden( false ),
 		Colour( glm::vec4( 1, 1, 1, 1 ) )
@@ -50,9 +50,10 @@ namespace dd
 
 	void MeshComponent::UpdateBounds( const glm::mat4& transform )
 	{
-		if( Mesh.Get() != nullptr )
+		ddr::Mesh* mesh = ddr::Mesh::Get( Mesh );
+		if( mesh != nullptr )
 		{
-			Bounds = Mesh.Get()->Bounds().GetTransformed( transform );
+			Bounds = mesh->Bounds().GetTransformed( transform );
 		}
 	}
 }

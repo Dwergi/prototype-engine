@@ -11,9 +11,9 @@
 
 #include "GL/gl3w.h"
 
-namespace dd
+namespace ddr
 {
-	std::unordered_map<String128, Shader*> Shader::sm_shaderCache;
+	std::unordered_map<dd::String128, Shader*> Shader::sm_shaderCache;
 
 	GLenum GetOpenGLShaderType( Shader::Type type )
 	{
@@ -32,59 +32,35 @@ namespace dd
 		return GL_INVALID_INDEX;
 	}
 
-	Shader::Shader( const String& path, Type type ) :
-		m_refCount( nullptr ),
+	Shader::Shader( const dd::String& path, Type type ) :
 		m_path( path ),
 		m_type( type )
 	{
 		m_id = glCreateShader( GetOpenGLShaderType( type ) );
 
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
-
-		m_refCount = new std::atomic<int>( 1 );
-	}
-
-	Shader::Shader( const Shader& other ) :
-		m_id( other.m_id ),
-		m_refCount( other.m_refCount ),
-		m_path( other.m_path ),
-		m_type( other.m_type )
-	{
-		Retain();
 	}
 
 	Shader::~Shader()
 	{
-		Release();
-	}
-
-	Shader& Shader::operator=( const Shader& other )
-	{
-		Release();
-
-		m_id = other.m_id;
-		m_refCount = other.m_refCount;
-		m_path = other.m_path;
-		m_type = other.m_type;
-		m_source = other.m_source;
-
-		Retain();
-
-		return *this;
+		if( m_id != OpenGL::InvalidID )
+		{
+			glDeleteShader( m_id );
+		}
 	}
 
 	bool Shader::Reload()
 	{
-		String256 oldSource = m_source;
+		dd::String256 oldSource = m_source;
 
-		String256 source;
+		dd::String256 source;
 		if( !LoadFile( m_path, source ) )
 		{
 			DD_ASSERT_ERROR( false, "'%s': Failed to load from path!", m_path.c_str() );
 			return false;
 		}
 
-		String256 message = Compile( source );
+		dd::String256 message = Compile( source );
 		if( !message.IsEmpty() )
 		{
 			DD_ASSERT_ERROR( false, "'%s': Compiling failed, message:\n %s", m_path.c_str(), message.c_str() );
@@ -99,11 +75,11 @@ namespace dd
 		return true;
 	}
 
-	String256 Shader::Compile( const String& source )
+	dd::String256 Shader::Compile( const dd::String& source )
 	{
 		DD_PROFILE_SCOPED( Shader_Compile );
 
-		String256 msg;
+		dd::String256 msg;
 
 		const char* src = source.c_str();
 		glShaderSource( m_id, 1, (const GLchar**) &src, NULL );
@@ -128,9 +104,9 @@ namespace dd
 		return msg;
 	}
 
-	bool Shader::LoadFile( const String& path, String& outSource )
+	bool Shader::LoadFile( const dd::String& path, dd::String& outSource )
 	{
-		std::unique_ptr<File> file = File::OpenDataFile( path, File::Mode::Read );
+		std::unique_ptr<dd::File> file = dd::File::OpenDataFile( path, dd::File::Mode::Read );
 		if( file == nullptr )
 		{
 			return false;
@@ -148,14 +124,13 @@ namespace dd
 		return true;
 	}
 
-	Shader* Shader::Create( const String& path, Shader::Type type )
+	Shader* Shader::Create( const dd::String& path, Shader::Type type )
 	{
 		DD_PROFILE_SCOPED( Shader_Create );
 
 		auto it = sm_shaderCache.find( path );
 		if( it != sm_shaderCache.end() )
 		{
-			it->second->Retain();
 			return it->second;
 		}
 		
@@ -169,28 +144,5 @@ namespace dd
 
 		sm_shaderCache.insert( std::make_pair( dd::String128( path ), shader ) );
 		return shader;
-	}
-
-	void Shader::Retain()
-	{
-		DD_ASSERT( m_refCount != nullptr );
-
-		++*m_refCount;
-	}
-
-	void Shader::Release()
-	{
-		DD_ASSERT( m_refCount != nullptr );
-
-		if( --*m_refCount <= 0 )
-		{
-			if( m_id != OpenGL::InvalidID )
-			{
-				glDeleteShader( m_id );
-			}
-
-			delete m_refCount;
-			m_refCount = nullptr;
-		}
 	}
 }

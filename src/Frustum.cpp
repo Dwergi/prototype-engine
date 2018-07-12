@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-namespace dd
+namespace ddr
 {
 	enum Corners
 	{
@@ -69,7 +69,7 @@ namespace dd
 		NEAR_BR, FAR_BR, FAR_TR
 	};
 
-	static Buffer<GLushort> s_indexBuffer( const_cast<GLushort*>( s_indices ), sizeof( s_indices ) / sizeof( GLushort ) );
+	static dd::Buffer<GLushort> s_indexBuffer( const_cast<GLushort*>( s_indices ), sizeof( s_indices ) / sizeof( GLushort ) );
 
 	const glm::vec3 s_colours[] =
 	{
@@ -92,7 +92,7 @@ namespace dd
 		delete[] corners;
 	}
 
-	void Frustum::Update( const ICamera& camera )
+	void Frustum::Update( const dd::ICamera& camera )
 	{
 		UpdateFrustum( camera );
 
@@ -103,12 +103,12 @@ namespace dd
 		}
 	}
 
-	bool Frustum::Intersects( const AABB& bounds ) const
+	bool Frustum::Intersects( const dd::AABB& bounds ) const
 	{
 		glm::vec3 corners[8];
 		bounds.GetCorners( corners );
 
-		for( const Plane& plane : m_planes )
+		for( const dd::Plane& plane : m_planes )
 		{
 			bool inside = false;
 
@@ -147,16 +147,17 @@ namespace dd
 		m_vboIndex.Bind();
 		m_vboIndex.SetData( s_indexBuffer );
 
-		ShaderProgram& shader = *m_shader.Get();
-		shader.Use( true );
-		shader.BindPositions();
+		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		shader->Use( true );
 
-		shader.Use( false );
+		shader->BindPositions();
+
+		shader->Use( false );
 
 		m_vao.Unbind();
 	}
 
-	void Frustum::Render( const ICamera& camera )
+	void Frustum::Render( const dd::ICamera& camera )
 	{
 		if( !m_vao.IsValid() )
 		{
@@ -172,32 +173,32 @@ namespace dd
 			m_dirty = false;
 		}
 
-		ShaderProgram& shader = *m_shader.Get();
+		ShaderProgram* shader = ShaderProgram::Get( m_shader );
 
-		shader.Use( true );
+		shader->Use( true );
 
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		shader.SetUniform( "Model", m_transform );
-		shader.SetUniform( "View", camera.GetCameraMatrix() );
-		shader.SetUniform( "Projection", camera.GetProjectionMatrix() );
+		shader->SetUniform( "Model", m_transform );
+		shader->SetUniform( "View", camera.GetCameraMatrix() );
+		shader->SetUniform( "Projection", camera.GetProjectionMatrix() );
 
 		for( int i = 0; i < 6; ++i )
 		{
-			shader.SetUniform( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
+			shader->SetUniform( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
 
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}
 
 		glDisable( GL_BLEND );
 
-		shader.Use( false );
+		shader->Use( false );
 
 		m_vao.Unbind();
 	}
 	
-	void Frustum::UpdateFrustum( const ICamera& camera )
+	void Frustum::UpdateFrustum( const dd::ICamera& camera )
 	{
 		m_vfov = camera.GetVerticalFOV();
 		m_aspectRatio = camera.GetAspectRatio();
@@ -242,12 +243,12 @@ namespace dd
 		m_corners[FAR_BL] = far_centre - far_up - far_right;
 		m_corners[FAR_BR] = far_centre - far_up + far_right;
 
-		m_planes[Planes::Top]	 = Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
-		m_planes[Planes::Bottom] = Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
-		m_planes[Planes::Left]	 = Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
-		m_planes[Planes::Right]	 = Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
-		m_planes[Planes::Near]	 = Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
-		m_planes[Planes::Far]	 = Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
+		m_planes[Planes::Top]	 = dd::Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
+		m_planes[Planes::Bottom] = dd::Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
+		m_planes[Planes::Left]	 = dd::Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
+		m_planes[Planes::Right]	 = dd::Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
+		m_planes[Planes::Near]	 = dd::Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
+		m_planes[Planes::Far]	 = dd::Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
 
 		m_dirty = true;
 	}
