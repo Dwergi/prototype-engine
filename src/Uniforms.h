@@ -59,19 +59,19 @@ namespace ddr
 		std::vector<IUniform*> m_uniforms;
 
 		template <typename T>
-		void Create( UniformType type, T value );
+		void Create( UniformType type, const char* name, T value );
 
 		template <typename T>
 		void SetValue( IUniform* uniform, UniformType type, T value );
 	};
 
 	template <typename T>
-	void UniformStorage::Create( UniformType type, T value )
+	void UniformStorage::Create( UniformType type, const char* name, T value )
 	{
 		Uniform<T>* created = new Uniform<T>();
-		created.Name = name;
-		created.Type = type;
-		created.Value = value;
+		created->Name = name;
+		created->Type = type;
+		created->Value = value;
 
 		m_uniforms.push_back( created );
 	}

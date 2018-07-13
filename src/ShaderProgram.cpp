@@ -381,6 +381,20 @@ namespace ddr
 		}
 	}
 
+	void ShaderProgram::SetUniform( const char* name, const glm::vec2& vec )
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform2fv( uniform, 1, glm::value_ptr( vec ) );
+			CheckGLError();
+		}
+	}
+
 	void ShaderProgram::SetUniform( const char* name, const glm::vec3& vec )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );

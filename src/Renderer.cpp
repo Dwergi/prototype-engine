@@ -37,8 +37,6 @@ namespace ddr
 		m_window( window ),
 		m_frustumMeshCount( 0 )
 	{
-		m_debugWireframeColour = glm::vec3( 0, 1, 0 );
-		m_debugWireframeEdgeColour = glm::vec3( 0, 0, 0 );
 	}
 
 	Renderer::~Renderer()
@@ -168,17 +166,17 @@ namespace ddr
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &m_debugWireframe );
+			ImGui::Checkbox( "Enabled", &m_wireframe.Enabled );
 
-			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
+			ImGui::DragFloat( "Width", &m_wireframe.Width, 0.01f, 0.0f, 10.0f );
 
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_debugWireframeColour ) );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe.Colour ) );
 
-			ImGui::DragFloat( "Edge Width", &m_debugWireframeEdgeWidth, 0.01f, 0.0f, m_debugWireframeWidth );
+			ImGui::DragFloat( "Edge Width", &m_wireframe.EdgeWidth, 0.01f, 0.0f, m_wireframe.Width );
 
-			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_debugWireframeEdgeColour ) );
+			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe.EdgeColour ) );
 
-			ImGui::DragFloat( "Max Distance", &m_debugWireframeMaxDistance, 1.0f, 0.0f, 1000.0f );
+			ImGui::DragFloat( "Max Distance", &m_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
 
 			ImGui::TreePop();
 		}
@@ -432,18 +430,6 @@ namespace ddr
 		shader->SetUniform( "Fog.Enabled", m_fog.Enabled );
 		shader->SetUniform( "Fog.Distance", m_fog.Distance );
 		shader->SetUniform( "Fog.Colour", m_fog.Colour );
-
-		if( m_terrain != nullptr )
-		{
-			for( int i = 0; i < m_terrain->HeightLevelCount; ++i )
-			{
-				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_terrain->HeightColours[ i ] );
-				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_terrain->HeightCutoffs[ i ] );
-			}
-
-			shader.SetUniform( "TerrainHeightCount", m_terrain->HeightLevelCount );
-			shader.SetUniform( "TerrainMaxHeight", m_terrain->HeightRange );
-		}
 
 		glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 		shader->SetUniform( "ObjectColour", colour );

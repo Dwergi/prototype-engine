@@ -66,6 +66,7 @@ namespace ddr
 
 		void SetUniform( const char* name, const glm::mat3& matrix );
 		void SetUniform( const char* name, const glm::mat4& matrix );
+		void SetUniform( const char* name, const glm::vec2& vec );
 		void SetUniform( const char* name, const glm::vec3& vector );
 		void SetUniform( const char* name, const glm::vec4& vector );
 		void SetUniform( const char* name, int i );

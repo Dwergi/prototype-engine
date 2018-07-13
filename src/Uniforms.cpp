@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "Uniforms.h"
 
+#include "ShaderProgram.h"
+
 namespace ddr
 {
 
@@ -29,11 +31,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Boolean, value );
+			SetValue( uniform, UniformType::Boolean, value );
 		}
 		else
 		{
-			Create( UniformType::Boolean, value );
+			Create( UniformType::Boolean, name, value );
 		}
 	}
 
@@ -42,11 +44,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Integer, value );
+			SetValue( uniform, UniformType::Integer, value );
 		}
 		else
 		{
-			Create( UniformType::Integer, value );
+			Create( UniformType::Integer, name, value );
 		}
 	}
 
@@ -55,11 +57,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Float, value );
+			SetValue( uniform, UniformType::Float, value );
 		}
 		else
 		{
-			Create( UniformType::Float, value );
+			Create( UniformType::Float, name, value );
 		}
 	}
 
@@ -68,11 +70,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Vector2, value );
+			SetValue( uniform, UniformType::Vector2, value );
 		}
 		else
 		{
-			Create( UniformType::Vector2, value );
+			Create( UniformType::Vector2, name, value );
 		}
 	}
 
@@ -81,11 +83,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Vector3, value );
+			SetValue( uniform, UniformType::Vector3, value );
 		}
 		else
 		{
-			Create( UniformType::Vector3, value );
+			Create( UniformType::Vector3, name, value );
 		}
 	}
 
@@ -94,11 +96,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Vector4, value );
+			SetValue( uniform, UniformType::Vector4, value );
 		}
 		else
 		{
-			Create( UniformType::Vector4, value );
+			Create( UniformType::Vector4, name, value );
 		}
 	}
 
@@ -107,11 +109,11 @@ namespace ddr
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
 		{
-			Set( uniform, UniformType::Matrix4, value );
+			SetValue( uniform, UniformType::Matrix4, value );
 		}
 		else
 		{
-			Create( UniformType::Matrix4, value );
+			Create( UniformType::Matrix4, name, value );
 		}
 	}
 
@@ -142,43 +144,43 @@ namespace ddr
 				case UniformType::Boolean:
 				{
 					Uniform<bool>* u = (Uniform<bool>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Integer:
 				{
 					Uniform<int>* u = (Uniform<int>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Float:
 				{
 					Uniform<float>* u = (Uniform<float>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Vector2:
 				{
 					Uniform<glm::vec2>* u = (Uniform<glm::vec2>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Vector3:
 				{
 					Uniform<glm::vec3>* u = (Uniform<glm::vec3>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Vector4:
 				{
 					Uniform<glm::vec4>* u = (Uniform<glm::vec4>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 				case UniformType::Matrix4:
 				{
 					Uniform<glm::mat4>* u = (Uniform<glm::mat4>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( u->Name.c_str(), u->Value );
 					break;
 				}
 			}
