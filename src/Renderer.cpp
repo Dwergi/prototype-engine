@@ -422,16 +422,28 @@ namespace ddr
 
 		shader->SetUniform( "DrawStandard", m_debugDrawStandard );
 
-		shader->SetUniform( "Wireframe.Enabled", m_debugWireframe );
-		shader->SetUniform( "Wireframe.Colour", m_debugWireframeColour );
-		shader->SetUniform( "Wireframe.Width", m_debugWireframeWidth );
-		shader->SetUniform( "Wireframe.EdgeColour", m_debugWireframeEdgeColour );
-		shader->SetUniform( "Wireframe.EdgeWidth", m_debugWireframeEdgeWidth );
-		shader->SetUniform( "Wireframe.MaxDistance", m_debugWireframeMaxDistance );
+		shader->SetUniform( "Wireframe.Enabled", m_wireframe.Enabled );
+		shader->SetUniform( "Wireframe.Colour", m_wireframe.Colour );
+		shader->SetUniform( "Wireframe.Width", m_wireframe.Width );
+		shader->SetUniform( "Wireframe.EdgeColour", m_wireframe.EdgeColour );
+		shader->SetUniform( "Wireframe.EdgeWidth", m_wireframe.EdgeWidth );
+		shader->SetUniform( "Wireframe.MaxDistance", m_wireframe.MaxDistance );
 
 		shader->SetUniform( "Fog.Enabled", m_fog.Enabled );
 		shader->SetUniform( "Fog.Distance", m_fog.Distance );
 		shader->SetUniform( "Fog.Colour", m_fog.Colour );
+
+		if( m_terrain != nullptr )
+		{
+			for( int i = 0; i < m_terrain->HeightLevelCount; ++i )
+			{
+				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_terrain->HeightColours[ i ] );
+				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_terrain->HeightCutoffs[ i ] );
+			}
+
+			shader.SetUniform( "TerrainHeightCount", m_terrain->HeightLevelCount );
+			shader.SetUniform( "TerrainMaxHeight", m_terrain->HeightRange );
+		}
 
 		glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
 		shader->SetUniform( "ObjectColour", colour );

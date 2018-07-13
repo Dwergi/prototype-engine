@@ -85,11 +85,6 @@ namespace ddr
 		void SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours );
 
 		//
-		// Set the height colours to use for this mesh.
-		//
-		void SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, const float& max_height );
-
-		//
 		// Set the UV buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
@@ -98,7 +93,7 @@ namespace ddr
 		//
 		// Set the material that this mesh uses.
 		//
-		void SetMaterial( MaterialHandle material ) { m_material = material; }
+		void SetMaterial( MaterialHandle material );
 
 		//
 		// Get the material this mesh uses.
@@ -144,10 +139,6 @@ namespace ddr
 		VBO m_vboVertexColour;
 		dd::ConstBuffer<glm::vec4> m_bufferVertexColour;
 
-		dd::ConstBuffer<glm::vec3> m_bufferHeightColours;
-		dd::ConstBuffer<float> m_bufferHeightCutoffs;
-		const float* m_maxHeight { nullptr };
-
 		MaterialHandle m_material;
 		
 		VAO m_vao;
@@ -156,5 +147,7 @@ namespace ddr
 		dd::AABB m_bounds;
 
 		Mesh( const char* name );
+
+		void BindToShader( ShaderProgram& shader );
 	};
 }

@@ -420,7 +420,6 @@ namespace dd
 		mesh->SetPositions( m_verticesBuffer );
 		mesh->SetNormals( m_normalsBuffer );
 		mesh->SetIndices( m_indices );
-		mesh->SetHeightColours( m_params.HeightColours, m_params.HeightCutoffs, m_params.HeightLevelCount, m_params.HeightRange );
 
 		shader->Use( false );
 

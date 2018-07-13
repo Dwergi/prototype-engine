@@ -58,6 +58,11 @@ namespace dd
 		// Get the number of LOD levels in use.
 		//
 		int GetLODLevels() const { return m_lodLevels; }
+
+		//
+		// Get the terrain parameters.
+		//
+		const TerrainParameters& GetTerrainParameters() const { return m_params; }
 		
 		//
 		// Initialize the terrain system.

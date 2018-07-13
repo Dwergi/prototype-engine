@@ -36,6 +36,19 @@ namespace ddr
 		glm::vec3 Colour { 0.6, 0.7, 0.8 };
 	};
 
+	struct Wireframe
+	{
+		bool Enabled { false };
+
+		glm::vec3 Colour;
+		float Width { 2.0f };
+
+		glm::vec3 EdgeColour;
+		float EdgeWidth { 0.5f };
+
+		float MaxDistance { 250.0f };
+	};
+
 	class Renderer : public dd::IDebugDraw, public dd::ISystem
 	{
 	public:
@@ -112,24 +125,17 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
-		bool m_debugWireframe { false };
 		bool m_debugFreezeFrustum { false };
 		bool m_forceUpdateFrustum { false };
 		bool m_reloadShaders { false };
-		float m_debugWireframeMaxDistance { 250.0f };
 
 		bool m_debugDrawDepth { false };
-
-		glm::vec3 m_debugWireframeColour;
-		float m_debugWireframeWidth { 2.0f };
-
-		glm::vec3 m_debugWireframeEdgeColour;
-		float m_debugWireframeEdgeWidth { 0.5f };
-
+	
 		dd::EntityHandle m_deleteLight;
 		bool m_createLight { false };
 
 		Fog m_fog;
+		Wireframe m_wireframe;
 
 		MeshHandle m_unitCube;
 

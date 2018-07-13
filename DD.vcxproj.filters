@@ -537,6 +537,9 @@
     <ClInclude Include="src\Material.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\Uniforms.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -904,6 +907,9 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\Material.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Uniforms.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

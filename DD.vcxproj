@@ -469,6 +469,7 @@
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
+    <ClInclude Include="src\Uniforms.h" />
     <ClInclude Include="src\UpdateData.h" />
     <ClInclude Include="src\VAO.h" />
     <ClInclude Include="src\Variable.h" />
@@ -690,6 +691,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TransformComponent.cpp" />
     <ClCompile Include="src\TrenchSystem.cpp" />
+    <ClCompile Include="src\Uniforms.cpp" />
     <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />

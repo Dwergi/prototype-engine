@@ -251,25 +251,18 @@ namespace ddr
 
 	void Mesh::SetPositions( const dd::ConstBuffer<glm::vec3>& positions )
 	{
-		DD_ASSERT( m_material.IsValid() );
-
 		m_bufferPosition = positions;
 
 		m_vao.Bind();
 
 		m_vboPosition.Bind();
 		m_vboPosition.SetData( m_bufferPosition );
-
-		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
-		shader->BindPositions();
-
+		
 		m_vao.Unbind();
 	}
 
 	void Mesh::SetNormals( const dd::ConstBuffer<glm::vec3>& normals )
 	{
-		DD_ASSERT( m_material.IsValid() );
-
 		if( !m_vboNormal.IsValid() )
 		{
 			m_vboNormal.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -281,17 +274,12 @@ namespace ddr
 
 		m_vboNormal.Bind();
 		m_vboNormal.SetData( m_bufferNormal );
-
-		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
-		shader->BindNormals();
-
+		
 		m_vao.Unbind();
 	}
 
 	void Mesh::SetIndices( const dd::ConstBuffer<uint>& indices )
 	{
-		DD_ASSERT( m_material.IsValid() );
-
 		if( !m_vboIndex.IsValid() )
 		{
 			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -309,8 +297,6 @@ namespace ddr
 
 	void Mesh::SetUVs( const dd::ConstBuffer<glm::vec2>& uvs )
 	{
-		DD_ASSERT( m_material.IsValid() );
-
 		if( !m_vboUV.IsValid() )
 		{
 			m_vboUV.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -322,10 +308,7 @@ namespace ddr
 
 		m_vboUV.Bind();
 		m_vboUV.SetData( m_bufferUV );
-
-		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
-		shader->BindUVs();
-
+		
 		m_vao.Unbind();
 	}
 
@@ -345,17 +328,12 @@ namespace ddr
 		m_vboVertexColour.Bind();
 		m_vboVertexColour.SetData( m_bufferVertexColour );
 
-		ShaderProgram* shader = ShaderProgram::Get( Material::Get( m_material )->GetShader() );
-		shader->BindVertexColours();
-
 		m_vao.Unbind();
 	}
 
-	void Mesh::SetHeightColours( const glm::vec3* colours, const float* cutoffs, int count, const float& max_height )
+	void Mesh::SetMaterial( MaterialHandle material )
 	{
-		m_bufferHeightColours.Set( colours, count );
-		m_bufferHeightCutoffs.Set( cutoffs, count );
-		m_maxHeight = &max_height;
+		m_material = material;
 	}
 
 	void Mesh::UpdateBuffers()
@@ -367,26 +345,43 @@ namespace ddr
 		m_vboVertexColour.Update();
 	}
 
+	void Mesh::BindToShader( ShaderProgram& shader )
+	{
+		m_vao.Bind();
+
+		if( m_vboPosition.IsValid() )
+		{
+			shader.BindPositions();
+		}
+
+		if( m_vboNormal.IsValid() )
+		{
+			shader.BindNormals();
+		}
+
+		if( m_vboUV.IsValid() )
+		{
+			shader.BindUVs();
+		}
+
+		if( m_vboVertexColour.IsValid() )
+		{
+			shader.BindVertexColours();
+		}
+
+		m_vao.Unbind();
+	}
+
 	void Mesh::Render( ShaderProgram& shader, const glm::mat4& transform )
 	{
 		DD_ASSERT( shader.InUse() );
 
 		DD_PROFILE_SCOPED( Mesh_Render );
 
+		BindToShader( shader );
+
 		shader.SetUniform( "Model", transform );
 		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
-
-		if( m_bufferHeightColours.Size() > 0 )
-		{
-			for( int i = 0; i < m_bufferHeightColours.Size(); ++i )
-			{
-				shader.SetUniform( GetArrayUniformName( "HeightLevels", i, "Colour" ).c_str(), m_bufferHeightColours[ i ] );
-				shader.SetUniform( GetArrayUniformName( "HeightLevels", i, "Cutoff" ).c_str(), m_bufferHeightCutoffs[ i ] );
-			}
-
-			shader.SetUniform( "HeightCount", m_bufferHeightColours.Size() );
-			shader.SetUniform( "MaxHeight", *m_maxHeight );
-		}
 
 		m_vao.Bind();
 
