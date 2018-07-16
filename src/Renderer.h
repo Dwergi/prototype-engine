@@ -43,10 +43,10 @@ namespace ddr
 	{
 		bool Enabled { false };
 
-		glm::vec3 Colour;
+		glm::vec3 Colour { 0, 1.0f, 0 };
 		float Width { 2.0f };
 
-		glm::vec3 EdgeColour;
+		glm::vec3 EdgeColour { 0, 0, 0 };
 		float EdgeWidth { 0.5f };
 
 		float MaxDistance { 250.0f };

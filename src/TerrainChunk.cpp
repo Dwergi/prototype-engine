@@ -13,6 +13,7 @@
 #include "JobSystem.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TerrainChunkKey.h"
@@ -419,6 +420,15 @@ namespace dd
 		mesh->SetPositions( m_verticesBuffer );
 		mesh->SetNormals( m_normalsBuffer );
 		mesh->SetIndices( m_indices );
+
+		for( int i = 0; i < m_params.HeightLevelCount; ++i )
+		{
+			shader->SetUniform( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[i] );
+			shader->SetUniform( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[i] );
+		}
+
+		shader->SetUniform( "TerrainHeightCount", m_params.HeightLevelCount );
+		shader->SetUniform( "TerrainMaxHeight", m_params.HeightRange );
 
 		shader->Use( false );
 
