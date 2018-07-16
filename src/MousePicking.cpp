@@ -16,6 +16,7 @@
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
+#include "Uniforms.h"
 #include "Window.h"
 
 #include "glm/gtx/rotate_vector.hpp"
@@ -168,6 +169,11 @@ namespace dd
 
 			ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
 			shader->Use( true );
+
+			uniforms.Set( "View", camera.GetCameraMatrix() );
+			uniforms.Set( "Projection", camera.GetProjectionMatrix() );
+
+			uniforms.Bind( *shader );
 
 			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, shader]( auto entity, auto mesh, auto transform )
 			{

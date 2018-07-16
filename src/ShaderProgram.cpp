@@ -192,15 +192,6 @@ namespace ddr
 			return false;
 		}
 
-		Use( true );
-
-		BindPositions();
-		BindNormals();
-		BindUVs();
-		BindVertexColours();
-
-		Use( false );
-
 		return true;
 	}
 
