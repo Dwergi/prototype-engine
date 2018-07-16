@@ -63,26 +63,23 @@ namespace ddr
 	}
 
 	// TODO: Don't do this.
-	static ShaderHandle CreateShaders( const char* name )
+	static ShaderHandle CreateShaders()
 	{
 		dd::Vector<Shader*> shaders;
 
-		Shader* vert = Shader::Create( dd::String8( "shaders\\standard.vertex" ), Shader::Type::Vertex );
+		Shader* vert = Shader::Create( dd::String32( "shaders\\standard.vertex" ), Shader::Type::Vertex );
 		DD_ASSERT( vert != nullptr );
 		shaders.Add( vert );
 
-		Shader* geom = Shader::Create( dd::String8( "shaders\\standard.geometry" ), Shader::Type::Geometry );
+		Shader* geom = Shader::Create( dd::String32( "shaders\\standard.geometry" ), Shader::Type::Geometry );
 		DD_ASSERT( geom != nullptr );
 		shaders.Add( geom );
 
-		Shader* pixel = Shader::Create( dd::String8( "shaders\\standard.pixel" ), Shader::Type::Pixel );
+		Shader* pixel = Shader::Create( dd::String32( "shaders\\standard.pixel" ), Shader::Type::Pixel );
 		DD_ASSERT( pixel != nullptr );
 		shaders.Add( pixel );
 
-		ShaderHandle handle = ShaderProgram::Create( dd::String8( name ), shaders );
-
-		ShaderProgram* shader = ShaderProgram::Get( handle );
-
+		ShaderHandle handle = ShaderProgram::Create( dd::String32( "standard" ), shaders );
 		return handle;
 	}
 
@@ -105,7 +102,7 @@ namespace ddr
 
 	void Renderer::RenderInit()
 	{
-		ShaderHandle shader_h = CreateShaders( "standard" );
+		ShaderHandle shader_h = CreateShaders();
 		ShaderProgram* shader = ShaderProgram::Get( shader_h );
 
 		MaterialHandle material_h = Material::Create( "standard" );

@@ -1,0 +1,20 @@
+#version 330 core
+
+layout( location = 0 ) in vec4 Colour;
+layout( location = 1 ) in vec3 Scale;
+layout( location = 2 ) in vec3 Position;
+
+out struct VertexData
+{
+	vec4 Colour;
+} Vertex;
+
+uniform mat4 View;
+uniform mat4 Projection;
+
+void main()
+{
+	Vertex.Colour = Colour;
+
+	gl_Position = Projection * View * vec4( Position * Scale, 1 );
+};

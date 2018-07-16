@@ -384,6 +384,7 @@
     <ClInclude Include="src\MeshHandle.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\PackedPool.h" />
+    <ClInclude Include="src\ParticleEmitter.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
@@ -587,6 +588,7 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MousePicking.cpp" />
+    <ClCompile Include="src\ParticleEmitter.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SceneGraphSystem.cpp" />

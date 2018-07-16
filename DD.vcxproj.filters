@@ -540,6 +540,9 @@
     <ClInclude Include="src\IDebugPanel.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\ParticleEmitter.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -911,6 +914,9 @@
     </ClCompile>
     <ClCompile Include="src\IDebugPanel.cpp">
       <Filter>DebugUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleEmitter.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
