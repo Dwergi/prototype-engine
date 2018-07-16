@@ -7,7 +7,7 @@
 #pragma once
 
 #include "ComponentHandle.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "IRenderer.h"
 #include "ISystem.h"
 #include "TerrainChunkKey.h"
@@ -32,7 +32,7 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : public ISystem, public IDebugDraw, public IRenderer
+	class TerrainSystem : public ISystem, public IDebugPanel, public IRenderer
 	{
 	public:
 
@@ -82,12 +82,12 @@ namespace dd
 		//
 		// Initialize render resources for the terrain system.
 		//
-		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
+		virtual void RenderInit() override;
 
 		//
 		// Update terrain chunks on the render thread.
 		//
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
+		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) override;
 
 		//
 		// Save the heightmaps of the terrain chunks generated.

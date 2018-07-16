@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "Material.h"
 
-#include "ShaderProgram.h"
+#include "Uniforms.h"
 
 namespace ddr
 {
@@ -65,11 +65,11 @@ namespace ddr
 		}
 	}
 
-	void Material::SetUniforms( ShaderProgram& shader )
+	void Material::UpdateUniforms( UniformStorage& uniforms ) const
 	{
-		shader.SetUniform( "Material.Shininess", m_shininess );
-		shader.SetUniform( "Material.Specular", m_specular );
-		shader.SetUniform( "Material.Diffuse", m_diffuse );
-		shader.SetUniform( "Material.Ambient", m_ambient );
+		uniforms.Set( "Material.Shininess", m_shininess );
+		uniforms.Set( "Material.Specular", m_specular );
+		uniforms.Set( "Material.Diffuse", m_diffuse );
+		uniforms.Set( "Material.Ambient", m_ambient );
 	}
 }

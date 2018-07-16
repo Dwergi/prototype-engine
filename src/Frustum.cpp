@@ -10,6 +10,7 @@
 #include "AABB.h"
 #include "ICamera.h"
 #include "ShaderProgram.h"
+#include "Uniforms.h"
 #include "VAO.h"
 
 #include "GL/gl3w.h"
@@ -157,12 +158,9 @@ namespace ddr
 		m_vao.Unbind();
 	}
 
-	void Frustum::Render( const dd::ICamera& camera )
+	void Frustum::Render( const dd::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		if( !m_vao.IsValid() )
-		{
-			CreateRenderData( m_shader );
-		}
+		DD_ASSERT( m_vao.IsValid() );
 
 		m_vao.Bind();
 
@@ -180,13 +178,11 @@ namespace ddr
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		shader->SetUniform( "Model", m_transform );
-		shader->SetUniform( "View", camera.GetCameraMatrix() );
-		shader->SetUniform( "Projection", camera.GetProjectionMatrix() );
-
+		uniforms.Set( "Model", m_transform );
+	
 		for( int i = 0; i < 6; ++i )
 		{
-			shader->SetUniform( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
+			uniforms.Set( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
 
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}

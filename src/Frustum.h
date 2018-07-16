@@ -20,6 +20,7 @@ namespace dd
 namespace ddr 
 {
 	class ShaderProgram;
+	class UniformStorage;
 
 	class alignas(16) Frustum
 	{
@@ -35,7 +36,7 @@ namespace ddr
 		//
 		bool Intersects( const dd::AABB& bounds ) const;
 
-		void Render( const dd::ICamera& camera );
+		void Render( const dd::ICamera& camera, ddr::UniformStorage& uniforms );
 		void Update( const dd::ICamera& camera );
 
 		void* operator new( size_t i );

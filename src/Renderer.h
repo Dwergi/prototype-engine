@@ -8,7 +8,7 @@
 
 #include "EntityHandle.h"
 #include "FrameBuffer.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "ISystem.h"
 #include "MeshHandle.h"
 #include "Texture.h"
@@ -28,12 +28,15 @@ namespace ddr
 {
 	class Frustum;
 	class ShaderProgram;
+	class UniformStorage;
 
 	struct Fog
 	{
 		bool Enabled { true };
 		float Distance { 1000.0f };
 		glm::vec3 Colour { 0.6, 0.7, 0.8 };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const;
 	};
 
 	struct Wireframe
@@ -47,9 +50,11 @@ namespace ddr
 		float EdgeWidth { 0.5f };
 
 		float MaxDistance { 250.0f };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const;
 	};
 
-	class Renderer : public dd::IDebugDraw, public dd::ISystem
+	class Renderer : public dd::IDebugPanel, public dd::ISystem
 	{
 	public:
 
@@ -69,12 +74,12 @@ namespace ddr
 		// Render a full frame.
 		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
 		//
-		void Render( const dd::EntityManager& entityManager, const dd::ICamera& camera );
+		void Render( const dd::EntityManager& entityManager, const dd::ICamera& camera, ddr::UniformStorage& uniforms );
 
 		//
 		// Initialize the renderer.
 		//
-		void RenderInit( const dd::EntityManager& entityManager, const dd::ICamera& camera );
+		void RenderInit();
 
 		//
 		// Allow the renderer to render debug.
@@ -148,7 +153,7 @@ namespace ddr
 
 		void SetRenderState();
 
-		void RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, const std::vector<dd::EntityHandle>& lights,
-			const dd::ICamera& camera, const dd::MousePicking* mouse_picking );
+		void RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, 
+			const dd::ICamera& camera, ddr::UniformStorage& uniforms, const dd::MousePicking* mouse_picking );
 	};
 }

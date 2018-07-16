@@ -12,11 +12,13 @@
 #include "JobSystem.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "OpenGL.h"
 #include "Random.h"
 #include "Stream.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
 #include "TransformComponent.h"
+#include "Uniforms.h"
 
 #include <algorithm>
 
@@ -82,7 +84,7 @@ namespace dd
 		m_requiresRegeneration = true;
 	}
 
-	void TerrainSystem::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
+	void TerrainSystem::RenderInit()
 	{
 		TerrainChunk::CreateRenderResources();
 	}
@@ -94,8 +96,17 @@ namespace dd
 		Update( entity_manager, 0 );
 	}
 
-	void TerrainSystem::Render( const EntityManager& entity_manager, const ICamera& camera )
+	void TerrainSystem::Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms )
 	{
+		for( int i = 0; i < m_params.HeightLevelCount; ++i )
+		{
+			uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[ i ] );
+			uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[ i ] );
+		}
+
+		uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
+		uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
+
 		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
 			[&entity_manager, this]( EntityHandle entity, auto chunk_h, auto mesh_h )
 		{

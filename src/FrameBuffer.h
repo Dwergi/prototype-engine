@@ -52,8 +52,8 @@ namespace ddr
 
 		GLuint ID() const { return m_fbo; }
 
-		Texture* GetColourTexture() const { return m_colour; }
-		Texture* GetDepthTexture() const { return m_depth; }
+		Texture* GetColourTexture() const { return m_texColour; }
+		Texture* GetDepthTexture() const { return m_texDepth; }
 
 		void RenderInit();
 
@@ -77,11 +77,11 @@ namespace ddr
 		GLint m_previousDraw { -1 };
 		GLint m_previousRead { -1 };
 
-		Texture* m_colour { nullptr };
-		Texture* m_depth { nullptr };
+		Texture* m_texColour { nullptr };
+		Texture* m_texDepth { nullptr };
 
 		static ShaderHandle m_blitShader;
-		static VBO m_fullScreenVBO;
-		static VAO m_fullScreenVAO;
+		static VBO m_vboFullscreen;
+		static VAO m_vaoFullscreen;
 	};
 }

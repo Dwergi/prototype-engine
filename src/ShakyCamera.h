@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ICamera.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "InputAction.h"
 
 namespace dd
@@ -9,7 +9,7 @@ namespace dd
 	class FPSCamera;
 	class InputBindings;
 
-	class ShakyCamera : public IDebugDraw, public ICamera
+	class ShakyCamera : public IDebugPanel, public ICamera
 	{
 	public:
 

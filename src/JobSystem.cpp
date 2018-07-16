@@ -3,6 +3,8 @@
 #include "PrecompiledHeader.h"
 #include "JobSystem.h"
 
+#define JOBSYSTEM_NO_THREADS
+
 namespace dd
 {
 	// the constructor just launches some amount of workers

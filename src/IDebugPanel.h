@@ -8,23 +8,23 @@
 
 namespace dd
 {
-	class IDebugDraw
+	class IDebugPanel
 	{
 	public:
 
-		IDebugDraw() :
+		IDebugPanel() :
 			m_debugOpen( false )
 		{
 
 		}
 
-		void DrawDebug();
+		void DrawDebugPanel();
 		void AddToMenu();
 
 		//
 		// Is this debug menu open?
 		//
-		bool IsDebugOpen() const { return m_debugOpen; }
+		bool IsDebugPanelOpen() const { return m_debugOpen; }
 
 		//
 		// Change the open status of this menu.

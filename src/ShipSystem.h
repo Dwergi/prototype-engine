@@ -8,7 +8,7 @@
 
 #include "EntityHandle.h"
 #include "MeshHandle.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "InputAction.h"
 #include "ISystem.h"
 
@@ -19,7 +19,7 @@ namespace dd
 	class ShipComponent;
 	class TransformComponent;
 
-	class ShipSystem : public ISystem, public IDebugDraw
+	class ShipSystem : public ISystem, public IDebugPanel
 	{
 	public:
 

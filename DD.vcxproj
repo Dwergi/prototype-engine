@@ -376,7 +376,7 @@
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\ICamera.h" />
-    <ClInclude Include="src\IDebugDraw.h" />
+    <ClInclude Include="src\IDebugPanel.h" />
     <ClInclude Include="src\LightComponent.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\MaterialHandle.h" />
@@ -581,7 +581,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\GLError.cpp" />
-    <ClCompile Include="src\IDebugDraw.cpp" />
+    <ClCompile Include="src\IDebugPanel.cpp" />
     <ClCompile Include="src\InputBindings.cpp" />
     <ClCompile Include="src\LightComponent.cpp" />
     <ClCompile Include="src\Mesh.cpp" />

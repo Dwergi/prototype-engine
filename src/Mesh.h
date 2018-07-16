@@ -125,19 +125,10 @@ namespace ddr
 		static std::unordered_map<uint64, Mesh*> m_instances;
 		
 		VBO m_vboPosition;
-		dd::ConstBuffer<glm::vec3> m_bufferPosition;
-
 		VBO m_vboNormal;
-		dd::ConstBuffer<glm::vec3> m_bufferNormal;
-
 		VBO m_vboIndex;
-		dd::ConstBuffer<uint> m_bufferIndex;
-
 		VBO m_vboUV;
-		dd::ConstBuffer<glm::vec2> m_bufferUV;
-
 		VBO m_vboVertexColour;
-		dd::ConstBuffer<glm::vec4> m_bufferVertexColour;
 
 		MaterialHandle m_material;
 		

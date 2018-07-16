@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "Timer.h"
 
 namespace dd
 {
-	class FrameTimer : public IDebugDraw
+	class FrameTimer : public IDebugPanel
 	{
 	public:
 

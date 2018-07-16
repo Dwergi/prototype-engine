@@ -71,3 +71,4 @@ AS_DEBUG/
 *.srctrlbm
 *.srctrlprj
 *.lib
+*.dat

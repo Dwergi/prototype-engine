@@ -24,7 +24,7 @@
 #include "FSM.h"
 #include "FPSCamera.h"
 #include "GLError.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "Input.h"
 #include "InputBindings.h"
 #include "JobSystem.h"
@@ -52,6 +52,7 @@
 #include "Timer.h"
 #include "TransformComponent.h"
 #include "TrenchSystem.h"
+#include "Uniforms.h"
 #include "Window.h"
 
 #include "DebugConsole.h"
@@ -329,13 +330,13 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 	WaitForAll( futures );
 }
 
-void InitializeRenderers( ddr::Renderer& renderer, const EntityManager& entity_manager, const ICamera& camera, const Vector<IRenderer*>& renderers )
+void InitializeRenderers( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers )
 {
-	renderer.RenderInit( entity_manager, camera );
+	renderer.RenderInit();
 
 	for( IRenderer* current : renderers )
 	{
-		current->RenderInit( entity_manager, camera );
+		current->RenderInit();
 	}
 }
 
@@ -380,7 +381,7 @@ void ShutdownSystems( EntityManager& entity_manager, const Vector<ISystem*>& sys
 	}
 }
 
-void DrawDebugUI( const Vector<IDebugDraw*>& views )
+void DrawDebugUI( const Vector<IDebugPanel*>& views )
 {
 	if( s_showDebugUI )
 	{
@@ -396,7 +397,7 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 
 			if( ImGui::BeginMenu( "Views" ) )
 			{
-				for( IDebugDraw* debug_view : views )
+				for( IDebugPanel* debug_view : views )
 				{
 					debug_view->AddToMenu();
 				}
@@ -408,16 +409,16 @@ void DrawDebugUI( const Vector<IDebugDraw*>& views )
 		}
 	}
 
-	for( IDebugDraw* debug_view : views )
+	for( IDebugPanel* debug_view : views )
 	{
-		if( debug_view->IsDebugOpen() )
-			debug_view->DrawDebug();
+		if( debug_view->IsDebugPanelOpen() )
+			debug_view->DrawDebugPanel();
 	}
 
 	s_frameTimer->DrawFPSCounter();
 }
 
-void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, DebugConsole& console )
+void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms, DebugConsole& console )
 {
 	IRenderer* debug_render = nullptr;
 
@@ -425,7 +426,7 @@ void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, Entit
 
 	for( IRenderer* current : renderers )
 	{
-		current->Render( entity_manager, camera );
+		current->Render( entity_manager, camera, uniforms );
 
 		if( current->ShouldRenderDebug() )
 		{
@@ -440,7 +441,7 @@ void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, Entit
 	}
 	else
 	{
-		renderer.Render( entity_manager, camera );
+		renderer.Render( entity_manager, camera, uniforms );
 	}
 }
 
@@ -483,6 +484,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		ddr::Renderer renderer( *s_window );
+		ddr::UniformStorage uniforms;
 
 		TerrainSystem terrain_system( jobSystem );
 
@@ -521,7 +523,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_frameTimer = new FrameTimer();
 		DebugConsole console( scriptEngine );
 
-		Vector<IDebugDraw*> debug_views;
+		Vector<IDebugPanel*> debug_views;
 		debug_views.Add( s_frameTimer );
 		debug_views.Add( &console );
 		debug_views.Add( &renderer );
@@ -570,7 +572,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		auto onRender = [&]()
 		{
 			DrawDebugUI( debug_views );
-			Render( renderer, renderers, entity_manager, shakyCam, console );
+			Render( renderer, renderers, entity_manager, shakyCam, uniforms, console );
 		};
 		renderState.SetOnEnter( onRender );
 
@@ -627,7 +629,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		s_fsm->Initialize( INITIALIZED );
 
 		InitializeSystems( jobSystem, entity_manager, systems );
-		InitializeRenderers( renderer, entity_manager, shakyCam, renderers );
+		InitializeRenderers( renderer, renderers );
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 

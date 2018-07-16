@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 
 struct ImGuiTextEditCallbackData;
 
 namespace dd
 {
-	class DebugConsole : public IDebugDraw
+	class DebugConsole : public IDebugPanel
 	{
 	public:
 

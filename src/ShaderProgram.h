@@ -64,16 +64,15 @@ namespace ddr
 		void EnableAttribute( const char* name );
 		void DisableAttribute( const char* name );
 
-		void SetUniform( const char* name, const glm::mat3& matrix );
-		void SetUniform( const char* name, const glm::mat4& matrix );
-		void SetUniform( const char* name, const glm::vec3& vector );
-		void SetUniform( const char* name, const glm::vec4& vector );
+		void SetUniform( const char* name, const glm::mat3& mat );
+		void SetUniform( const char* name, const glm::mat4& mat );
+		void SetUniform( const char* name, const glm::vec2& vec );
+		void SetUniform( const char* name, const glm::vec3& vec );
+		void SetUniform( const char* name, const glm::vec4& vec );
 		void SetUniform( const char* name, int i );
 		void SetUniform( const char* name, bool b );
 		void SetUniform( const char* name, float flt );
 		void SetUniform( const char* name, const Texture& texture );
-
-		void SetCamera( const dd::ICamera& camera );
 
 		~ShaderProgram();
 

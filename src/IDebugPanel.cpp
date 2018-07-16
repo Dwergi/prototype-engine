@@ -1,12 +1,12 @@
 
 #include "PrecompiledHeader.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 
 #include "imgui/imgui.h"
 
 namespace dd
 {
-	void IDebugDraw::DrawDebug()
+	void IDebugPanel::DrawDebugPanel()
 	{
 		ImGui::SetNextWindowPos( ImVec2( 30, 30 ), ImGuiSetCond_FirstUseEver );
 
@@ -21,7 +21,7 @@ namespace dd
 		ImGui::End();
 	}
 
-	void IDebugDraw::AddToMenu()
+	void IDebugPanel::AddToMenu()
 	{
 		ImGui::MenuItem( GetDebugTitle(), nullptr, &m_debugOpen );
 	}

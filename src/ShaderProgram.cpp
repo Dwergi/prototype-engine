@@ -245,20 +245,6 @@ namespace ddr
 		return attrib;
 	}
 
-	void ShaderProgram::DisableAttribute( const char* name )
-	{
-		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( IsValid(), "Program is invalid!" );
-		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
-
-		ShaderLocation loc = GetAttribute( name );
-		if( loc != InvalidLocation )
-		{
-			glDisableVertexAttribArray( loc );
-			CheckGLError();
-		}
-	}
-
 	void ShaderProgram::EnableAttribute( const char* name )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
@@ -269,6 +255,20 @@ namespace ddr
 		if( loc != InvalidLocation )
 		{
 			glEnableVertexAttribArray( loc );
+			CheckGLError();
+		}
+	}
+
+	void ShaderProgram::DisableAttribute( const char* name )
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glDisableVertexAttribArray( loc );
 			CheckGLError();
 		}
 	}
@@ -305,7 +305,6 @@ namespace ddr
 		return BindAttributeFloat( "VertexColour", 4, 0, 0, false );
 	}
 
-#pragma optimize( "", off )
 	bool ShaderProgram::BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
@@ -381,6 +380,20 @@ namespace ddr
 		}
 	}
 
+	void ShaderProgram::SetUniform( const char* name, const glm::vec2& vec )
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform2fv( uniform, 1, glm::value_ptr( vec ) );
+			CheckGLError();
+		}
+	}
+
 	void ShaderProgram::SetUniform( const char* name, const glm::vec3& vec )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
@@ -449,11 +462,5 @@ namespace ddr
 			glUniform1i( uniform, texture.GetTextureUnit() );
 			CheckGLError();
 		}
-	}
-
-	void ShaderProgram::SetCamera( const dd::ICamera& camera )
-	{
-		SetUniform( "View", camera.GetCameraMatrix() );
-		SetUniform( "Projection", camera.GetProjectionMatrix() );
 	}
 }

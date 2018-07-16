@@ -27,6 +27,8 @@ namespace ddr
 		void Destroy();
 
 		void SetData( const dd::IBuffer& buffer );
+		int GetDataSize() const { return m_buffer.SizeBytes(); }
+	
 		void Update();
 
 		void Bind();
@@ -43,6 +45,6 @@ namespace ddr
 		GLenum m_target { OpenGL::InvalidID };
 		GLenum m_usage { OpenGL::InvalidID };
 
-		const dd::IBuffer* m_buffer { nullptr };
+		dd::ConstBuffer<byte> m_buffer;
 	};
 }

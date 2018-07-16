@@ -49,7 +49,7 @@ namespace dd
 		if( action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED )
 		{
 			m_enabled = !m_enabled;
-			IDebugDraw::SetDebugOpen( m_enabled );
+			IDebugPanel::SetDebugOpen( m_enabled );
 		}
 	}
 
@@ -115,13 +115,11 @@ namespace dd
 		m_select = false;
 	}
 
-	void MousePicking::RenderInit( const EntityManager& entity_manager, const ICamera& camera )
+	void MousePicking::RenderInit()
 	{
 		Vector<ddr::Shader*> shaders;
 		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.vertex" ), ddr::Shader::Type::Vertex ) );
 		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.pixel" ), ddr::Shader::Type::Pixel ) );
-
-		m_camera = &camera;
 
 		m_shader = ddr::ShaderProgram::Create( String8( "picking" ), shaders );
 
@@ -146,7 +144,7 @@ namespace dd
 		m_framebuffer.RenderInit();
 	}
 
-	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera )
+	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		if( m_enabled )
 		{
@@ -197,7 +195,6 @@ namespace dd
 
 	void MousePicking::RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
 	{
-		shader.SetCamera( camera );
 		shader.SetUniform( "ID", entity.Handle );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
@@ -277,16 +274,16 @@ namespace dd
 		}
 	}
 
-	Ray MousePicking::GetScreenRay( const MousePosition& pos ) const
+	Ray MousePicking::GetScreenRay( const ICamera& camera, const MousePosition& pos ) const
 	{
-		glm::vec3 camera_dir( m_camera->GetDirection() );
+		glm::vec3 camera_dir( camera.GetDirection() );
 		glm::vec3 dir( camera_dir );
 		glm::vec3 up( 0, 1, 0 );
 
 		{
 			float width = (float) m_window.GetWidth();
 			float x_percent = (pos.Absolute.x - (width / 2)) / width;
-			float hfov = m_camera->GetVerticalFOV() * m_camera->GetAspectRatio();
+			float hfov = camera.GetVerticalFOV() * camera.GetAspectRatio();
 			float x_angle = hfov * x_percent;
 
 			dir = glm::rotate( camera_dir, -x_angle, up );
@@ -295,14 +292,14 @@ namespace dd
 		{
 			float height = (float) m_window.GetHeight();
 			float y_percent = (pos.Absolute.x - (height / 2)) / height;
-			float vfov = m_camera->GetVerticalFOV();
+			float vfov = camera.GetVerticalFOV();
 			float y_angle = vfov * y_percent;
 
-			glm::vec3 right = glm::normalize( glm::cross( m_camera->GetDirection(), up ) );
+			glm::vec3 right = glm::normalize( glm::cross( camera.GetDirection(), up ) );
 
 			dir = glm::rotate( dir, -y_angle, right );
 		}
 
-		return Ray( m_camera->GetPosition(), dir );
+		return Ray( camera.GetPosition(), dir );
 	}
 }

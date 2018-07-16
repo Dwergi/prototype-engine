@@ -432,9 +432,6 @@
     <ClInclude Include="src\Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\IDebugDraw.h">
-      <Filter>DebugUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShipComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -539,6 +536,9 @@
     </ClInclude>
     <ClInclude Include="src\Uniforms.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IDebugPanel.h">
+      <Filter>DebugUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -828,9 +828,6 @@
     <ClCompile Include="src\MousePicking.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\IDebugDraw.cpp">
-      <Filter>DebugUI</Filter>
-    </ClCompile>
     <ClCompile Include="src\ShipSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
@@ -911,6 +908,9 @@
     </ClCompile>
     <ClCompile Include="src\Uniforms.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDebugPanel.cpp">
+      <Filter>DebugUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

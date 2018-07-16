@@ -20,6 +20,7 @@
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
+#include "Uniforms.h"
 #include "Window.h"
 
 #include "GL/gl3w.h"
@@ -32,13 +33,28 @@
 
 namespace ddr
 {
+	void Fog::UpdateUniforms( ddr::UniformStorage& uniforms ) const
+	{
+		uniforms.Set( "Fog.Enabled", Enabled );
+		uniforms.Set( "Fog.Distance", Distance );
+		uniforms.Set( "Fog.Colour", Colour );
+	}
+
+	void Wireframe::UpdateUniforms( ddr::UniformStorage& uniforms ) const
+	{
+		uniforms.Set( "Wireframe.Enabled", Enabled );
+		uniforms.Set( "Wireframe.Colour", Colour );
+		uniforms.Set( "Wireframe.Width", Width );
+		uniforms.Set( "Wireframe.EdgeColour", EdgeColour );
+		uniforms.Set( "Wireframe.EdgeWidth", EdgeWidth );
+		uniforms.Set( "Wireframe.MaxDistance", MaxDistance );
+	}
+
 	Renderer::Renderer( const dd::Window& window ) :
 		m_meshCount( 0 ),
 		m_window( window ),
 		m_frustumMeshCount( 0 )
 	{
-		m_debugWireframeColour = glm::vec3( 0, 1, 0 );
-		m_debugWireframeEdgeColour = glm::vec3( 0, 0, 0 );
 	}
 
 	Renderer::~Renderer()
@@ -87,7 +103,7 @@ namespace ddr
 		m_createLight = true;
 	}
 
-	void Renderer::RenderInit( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
+	void Renderer::RenderInit()
 	{
 		ShaderHandle shader_h = CreateShaders( "standard" );
 		ShaderProgram* shader = ShaderProgram::Get( shader_h );
@@ -98,7 +114,6 @@ namespace ddr
 
 		m_frustum = new Frustum();
 		m_frustum->CreateRenderData( shader_h );
-		m_frustum->Update( camera );
 
 		m_unitCube = Mesh::Create( "cube" );
 
@@ -168,17 +183,17 @@ namespace ddr
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &m_debugWireframe );
+			ImGui::Checkbox( "Enabled", &m_wireframe.Enabled );
 
-			ImGui::DragFloat( "Width", &m_debugWireframeWidth, 0.01f, 0.0f, 10.0f );
+			ImGui::DragFloat( "Width", &m_wireframe.Width, 0.01f, 0.0f, 10.0f );
 
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_debugWireframeColour ) );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe.Colour ) );
 
-			ImGui::DragFloat( "Edge Width", &m_debugWireframeEdgeWidth, 0.01f, 0.0f, m_debugWireframeWidth );
+			ImGui::DragFloat( "Edge Width", &m_wireframe.EdgeWidth, 0.01f, 0.0f, m_wireframe.Width );
 
-			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_debugWireframeEdgeColour ) );
+			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe.EdgeColour ) );
 
-			ImGui::DragFloat( "Max Distance", &m_debugWireframeMaxDistance, 1.0f, 0.0f, 1000.0f );
+			ImGui::DragFloat( "Max Distance", &m_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
 
 			ImGui::TreePop();
 		}
@@ -323,7 +338,7 @@ namespace ddr
 	}
 
 	void Renderer::RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, 
-		const std::vector<dd::EntityHandle>& lights, const dd::ICamera& camera, const dd::MousePicking* mousePicking )
+		const dd::ICamera& camera, ddr::UniformStorage& uniforms, const dd::MousePicking* mousePicking )
 	{
 		if( mesh_cmp->Hidden )
 		{
@@ -393,60 +408,12 @@ namespace ddr
 
 		shader->Use( true );
 
-		material->SetUniforms( *shader );
-
-		size_t lightCount = lights.size();
-		DD_ASSERT( lightCount <= 10 );
-		shader->SetUniform( "LightCount", (int) lightCount );
-
-		for( int i = 0; i < lights.size(); ++i )
-		{
-			const dd::TransformComponent* transformCmp = lights[ i ].Get<dd::TransformComponent>().Read();
-			const dd::LightComponent* lightCmp = lights[ i ].Get<dd::LightComponent>().Read();
-
-			glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
-			if( lightCmp->IsDirectional )
-			{
-				position.w = 0;
-			}
-
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
-			shader->SetUniform( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
-		}
-
-		shader->SetCamera( camera );
-
-		shader->SetUniform( "DrawStandard", m_debugDrawStandard );
-
-		shader->SetUniform( "Wireframe.Enabled", m_wireframe.Enabled );
-		shader->SetUniform( "Wireframe.Colour", m_wireframe.Colour );
-		shader->SetUniform( "Wireframe.Width", m_wireframe.Width );
-		shader->SetUniform( "Wireframe.EdgeColour", m_wireframe.EdgeColour );
-		shader->SetUniform( "Wireframe.EdgeWidth", m_wireframe.EdgeWidth );
-		shader->SetUniform( "Wireframe.MaxDistance", m_wireframe.MaxDistance );
-
-		shader->SetUniform( "Fog.Enabled", m_fog.Enabled );
-		shader->SetUniform( "Fog.Distance", m_fog.Distance );
-		shader->SetUniform( "Fog.Colour", m_fog.Colour );
-
-		if( m_terrain != nullptr )
-		{
-			for( int i = 0; i < m_terrain->HeightLevelCount; ++i )
-			{
-				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_terrain->HeightColours[ i ] );
-				shader.SetUniform( GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_terrain->HeightCutoffs[ i ] );
-			}
-
-			shader.SetUniform( "TerrainHeightCount", m_terrain->HeightLevelCount );
-			shader.SetUniform( "TerrainMaxHeight", m_terrain->HeightRange );
-		}
+		material->UpdateUniforms( uniforms );
 
 		glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
-		shader->SetUniform( "ObjectColour", colour );
+		uniforms.Set( "ObjectColour", colour );
+
+		uniforms.Bind( *shader );
 
 		mesh->Render( *shader, transform );
 
@@ -553,7 +520,7 @@ namespace ddr
 		m_framebuffer.Clear();
 	}
 
-	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
+	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
 
@@ -573,14 +540,45 @@ namespace ddr
 
 		std::vector<dd::EntityHandle> lights = entity_manager.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
 
-		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &lights, &camera]( auto entity, auto mesh, auto transform )
+		size_t lightCount = lights.size();
+		DD_ASSERT( lightCount <= 10 );
+		uniforms.Set( "LightCount", (int) lightCount );
+
+		for( int i = 0; i < lights.size(); ++i )
+		{
+			const dd::TransformComponent* transformCmp = lights[ i ].Get<dd::TransformComponent>().Read();
+			const dd::LightComponent* lightCmp = lights[ i ].Get<dd::LightComponent>().Read();
+
+			glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
+			if( lightCmp->IsDirectional )
+			{
+				position.w = 0;
+			}
+
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
+		}
+
+		uniforms.Set( "View", camera.GetCameraMatrix() );
+		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
+
+		m_wireframe.UpdateUniforms( uniforms );
+		m_fog.UpdateUniforms( uniforms );
+
+		uniforms.Set( "DrawStandard", m_debugDrawStandard );
+
+		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
 		{ 
-			RenderMesh( entity, mesh.Read(), transform.Read(), lights, camera, m_mousePicking );
+			RenderMesh( entity, mesh.Read(), transform.Read(), camera, uniforms, m_mousePicking );
 		} );
 
 		if( m_debugFreezeFrustum )
 		{
-			m_frustum->Render( camera );
+			m_frustum->Render( camera, uniforms );
 		}
 
 		m_framebuffer.UnbindDraw();

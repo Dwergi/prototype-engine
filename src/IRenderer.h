@@ -6,6 +6,11 @@
 
 #pragma once
 
+namespace ddr
+{
+	class UniformStorage;
+}
+
 namespace dd
 {
 	class ICamera;
@@ -16,8 +21,8 @@ namespace dd
 	{
 	public:
 
-		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) {}
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) {}
+		virtual void RenderInit() {}
+		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) {}
 		virtual void RenderShutdown() {}
 
 		virtual bool ShouldRenderDebug() const { return false; }

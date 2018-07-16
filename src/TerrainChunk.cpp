@@ -158,7 +158,6 @@ namespace dd
 			index += 3;
 		}
 
-
 		DD_ASSERT( index == IndexCount );
 	}
 

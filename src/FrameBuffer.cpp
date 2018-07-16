@@ -18,8 +18,8 @@
 
 namespace ddr
 {
-	VAO FrameBuffer::m_fullScreenVAO;
-	VBO FrameBuffer::m_fullScreenVBO;
+	VAO FrameBuffer::m_vaoFullscreen;
+	VBO FrameBuffer::m_vboFullscreen;
 	ShaderHandle FrameBuffer::m_blitShader;
 
 	static const glm::vec3 s_fullScreenQuadVertices[] = {
@@ -42,8 +42,8 @@ namespace ddr
 	{
 		m_valid = other.m_valid;
 		m_fbo = other.m_fbo;
-		m_colour = other.m_colour;
-		m_depth = other.m_depth;
+		m_texColour = other.m_texColour;
+		m_texDepth = other.m_texDepth;
 	}
 
 	FrameBuffer::~FrameBuffer()
@@ -55,15 +55,15 @@ namespace ddr
 	{
 		m_valid = other.m_valid;
 		m_fbo = other.m_fbo;
-		m_colour = other.m_colour;
-		m_depth = other.m_depth;
+		m_texColour = other.m_texColour;
+		m_texDepth = other.m_texDepth;
 
 		return *this;
 	}
 
 	bool FrameBuffer::Create( Texture& target, Texture* depth )
 	{
-		m_colour = &target;
+		m_texColour = &target;
 
 		glGenFramebuffers( 1, &m_fbo );
 		CheckGLError();
@@ -71,7 +71,7 @@ namespace ddr
 		glBindFramebuffer( GL_FRAMEBUFFER, m_fbo );
 		CheckGLError();
 
-		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colour->ID(), 0 );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texColour->ID(), 0 );
 		CheckGLError();
 
 		GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
@@ -80,9 +80,9 @@ namespace ddr
 
 		if( depth != nullptr )
 		{
-			m_depth = depth;
+			m_texDepth = depth;
 
-			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth->ID(), 0 );
+			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_texDepth->ID(), 0 );
 			CheckGLError();
 		}
 
@@ -112,16 +112,16 @@ namespace ddr
 
 			shader->Use( true );
 
-			m_fullScreenVAO.Create();
-			m_fullScreenVAO.Bind();
+			m_vaoFullscreen.Create();
+			m_vaoFullscreen.Bind();
 
-			m_fullScreenVBO.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-			m_fullScreenVBO.Bind();
-			m_fullScreenVBO.SetData( s_fullScreenQuadBuffer );
+			m_vboFullscreen.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+			m_vboFullscreen.Bind();
+			m_vboFullscreen.SetData( s_fullScreenQuadBuffer );
 
 			shader->BindPositions();
 
-			m_fullScreenVAO.Unbind();
+			m_vaoFullscreen.Unbind();
 
 			shader->Use( false );
 		}
@@ -130,18 +130,18 @@ namespace ddr
 	void FrameBuffer::RenderDepth( const dd::ICamera& camera )
 	{
 		DD_ASSERT( IsValid() );
-		DD_ASSERT( m_depth != nullptr );
+		DD_ASSERT( m_texDepth != nullptr );
 
 		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
 		shader->Use( true );
 
-		m_fullScreenVAO.Bind();
-		m_depth->Bind( 0 );
+		m_vaoFullscreen.Bind();
+		m_texDepth->Bind( 0 );
 
 		glDisable( GL_DEPTH_TEST );
 		CheckGLError();
 
-		shader->SetUniform( "Texture", *m_depth );
+		shader->SetUniform( "Texture", *m_texDepth );
 		shader->SetUniform( "Near", camera.GetNear() );
 		shader->SetUniform( "DrawDepth", true );
 
@@ -150,8 +150,8 @@ namespace ddr
 
 		glEnable( GL_DEPTH_TEST );
 
-		m_depth->Unbind();
-		m_fullScreenVAO.Unbind();
+		m_texDepth->Unbind();
+		m_vaoFullscreen.Unbind();
 
 		shader->Use( false );
 		CheckGLError();
@@ -160,19 +160,19 @@ namespace ddr
 	void FrameBuffer::Render()
 	{
 		DD_ASSERT( IsValid() );
-		DD_ASSERT( m_colour != nullptr );
+		DD_ASSERT( m_texColour != nullptr );
 
 		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
 
 		shader->Use( true );
 
-		m_fullScreenVAO.Bind();
+		m_vaoFullscreen.Bind();
 		
-		m_colour->Bind( 0 );
+		m_texColour->Bind( 0 );
 
 		glDisable( GL_DEPTH_TEST );
 		
-		shader->SetUniform( "Texture", *m_colour );
+		shader->SetUniform( "Texture", *m_texColour );
 		shader->SetUniform( "DrawDepth", false );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
@@ -180,9 +180,9 @@ namespace ddr
 
 		glEnable( GL_DEPTH_TEST );
 
-		m_colour->Unbind();
+		m_texColour->Unbind();
 
-		m_fullScreenVAO.Unbind();
+		m_vaoFullscreen.Unbind();
 
 		shader->Use( false );
 	}
@@ -199,7 +199,7 @@ namespace ddr
 		CheckGLError();
 
 		glBlitFramebuffer(
-			0, 0, m_colour->GetSize().x, m_colour->GetSize().y,
+			0, 0, m_texColour->GetSize().x, m_texColour->GetSize().y,
 			0, 0, viewport[2], viewport[3],
 			GL_COLOR_BUFFER_BIT, GL_LINEAR );
 		CheckGLError();
@@ -221,8 +221,8 @@ namespace ddr
 			m_fbo = OpenGL::InvalidID;
 		}
 
-		m_depth = nullptr;
-		m_colour = nullptr;
+		m_texDepth = nullptr;
+		m_texColour = nullptr;
 		m_valid = false;
 	}
 
@@ -257,7 +257,7 @@ namespace ddr
 		m_previousSize = glm::vec2( viewport[2], viewport[3] );
 		CheckGLError();
 
-		glViewport( 0, 0, m_colour->GetSize().x, m_colour->GetSize().y );
+		glViewport( 0, 0, m_texColour->GetSize().x, m_texColour->GetSize().y );
 		CheckGLError();
 	}
 	

@@ -88,19 +88,19 @@ namespace ddr
 
 	void VBO::Update()
 	{
-		if( m_buffer != nullptr )
+		if( m_buffer.GetVoid() != nullptr )
 		{
-			glNamedBufferData( m_id, m_buffer->SizeBytes(), NULL, m_usage );
+			glNamedBufferData( m_id, m_buffer.SizeBytes(), NULL, m_usage );
 			CheckGLError();
 
-			glNamedBufferData( m_id, m_buffer->SizeBytes(), m_buffer->GetVoid(), m_usage );
+			glNamedBufferData( m_id, m_buffer.SizeBytes(), m_buffer.GetVoid(), m_usage );
 			CheckGLError();
 		}
 	}
 
 	void VBO::SetData( const dd::IBuffer& buffer )
 	{
-		m_buffer = &buffer;
+		m_buffer.Set( (byte*) buffer.GetVoid(), buffer.SizeBytes() );
 
 		glNamedBufferData( m_id, buffer.SizeBytes(), buffer.GetVoid(), m_usage );
 		CheckGLError();

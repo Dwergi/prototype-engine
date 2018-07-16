@@ -14,6 +14,8 @@
 
 namespace ddr
 {
+	class UniformStorage;
+
 	class Material
 	{
 	public:
@@ -45,9 +47,9 @@ namespace ddr
 		ShaderHandle GetShader() const { return m_shader; }
 
 		//
-		// Set the current values of the material's properties to the uniforms of the given shader.
+		// Set the current values of the material's properties to the uniform storage.
 		//
-		void SetUniforms( ShaderProgram& shader );
+		void UpdateUniforms( UniformStorage& uniforms ) const;
 
 		//
 		// Material properties - Phong shading model.

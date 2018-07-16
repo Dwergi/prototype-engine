@@ -7,7 +7,7 @@
 #pragma once
 
 #include "EntityHandle.h"
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "InputAction.h"
 #include "IRenderer.h"
 #include "ISystem.h"
@@ -34,7 +34,7 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking : public ISystem, public IDebugDraw, public IRenderer
+	class MousePicking : public ISystem, public IDebugPanel, public IRenderer
 	{
 	public:
 
@@ -54,15 +54,14 @@ namespace dd
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
-		virtual void RenderInit( const EntityManager& entity_manager, const ICamera& camera ) override;
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera ) override;
+		virtual void RenderInit() override;
+		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
 		virtual void RenderDebug() override;
 
 	private:
 
-		const ICamera* m_camera;
 		const Input& m_input;
 		const Window& m_window;
 
@@ -92,7 +91,7 @@ namespace dd
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
-		Ray GetScreenRay( const MousePosition& pos ) const;
+		Ray GetScreenRay( const ICamera& camera, const MousePosition& pos ) const;
 		void HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
 
 		void HandleInput( InputAction action, InputType type );

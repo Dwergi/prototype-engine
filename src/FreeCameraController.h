@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "IDebugDraw.h"
+#include "IDebugPanel.h"
 #include "Input.h"
 
 namespace dd
@@ -14,7 +14,7 @@ namespace dd
 	class FPSCamera;
 	class InputBindings;
 
-	class FreeCameraController : public IDebugDraw
+	class FreeCameraController : public IDebugPanel
 	{
 	public:
 
