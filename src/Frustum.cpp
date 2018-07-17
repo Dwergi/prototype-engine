@@ -135,27 +135,27 @@ namespace ddr
 	void Frustum::CreateRenderData( ShaderHandle shader_h )
 	{
 		m_shader = shader_h;
+		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		shader->Use( true );
 
 		m_vao.Create();
-
 		m_vao.Bind();
 
 		m_vboVertex.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboVertex.Bind();
 		m_vboVertex.SetData( m_corners );
 
+		shader->BindPositions();
+		m_vboVertex.Unbind();
+
 		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboIndex.Bind();
 		m_vboIndex.SetData( s_indexBuffer );
-
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
-		shader->Use( true );
-
-		shader->BindPositions();
-
-		shader->Use( false );
+		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
+
+		shader->Use( false );
 	}
 
 	void Frustum::Render( const dd::ICamera& camera, ddr::UniformStorage& uniforms )
@@ -166,7 +166,7 @@ namespace ddr
 
 		if( m_dirty )
 		{
-			m_vboVertex.Update();
+			m_vboVertex.UpdateData();
 
 			m_dirty = false;
 		}
@@ -179,6 +179,8 @@ namespace ddr
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		uniforms.Set( "Model", m_transform );
+
+		m_vboIndex.Bind();
 	
 		for( int i = 0; i < 6; ++i )
 		{
@@ -186,6 +188,8 @@ namespace ddr
 
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}
+
+		m_vboIndex.Unbind();
 
 		glDisable( GL_BLEND );
 

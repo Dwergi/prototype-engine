@@ -66,24 +66,24 @@ namespace ddr
 		m_texColour = &target;
 
 		glGenFramebuffers( 1, &m_fbo );
-		CheckGLError();
+		CheckOGLError();
 
 		glBindFramebuffer( GL_FRAMEBUFFER, m_fbo );
-		CheckGLError();
+		CheckOGLError();
 
 		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texColour->ID(), 0 );
-		CheckGLError();
+		CheckOGLError();
 
 		GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
 		glNamedFramebufferDrawBuffers( m_fbo, 1, draw_buffers );
-		CheckGLError();
+		CheckOGLError();
 
 		if( depth != nullptr )
 		{
 			m_texDepth = depth;
 
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_texDepth->ID(), 0 );
-			CheckGLError();
+			CheckOGLError();
 		}
 
 		GLuint status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
@@ -121,6 +121,8 @@ namespace ddr
 
 			shader->BindPositions();
 
+			m_vboFullscreen.Unbind();
+
 			m_vaoFullscreen.Unbind();
 
 			shader->Use( false );
@@ -139,14 +141,14 @@ namespace ddr
 		m_texDepth->Bind( 0 );
 
 		glDisable( GL_DEPTH_TEST );
-		CheckGLError();
+		CheckOGLError();
 
 		shader->SetUniform( "Texture", *m_texDepth );
 		shader->SetUniform( "Near", camera.GetNear() );
 		shader->SetUniform( "DrawDepth", true );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
-		CheckGLError();
+		CheckOGLError();
 
 		glEnable( GL_DEPTH_TEST );
 
@@ -154,7 +156,7 @@ namespace ddr
 		m_vaoFullscreen.Unbind();
 
 		shader->Use( false );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void FrameBuffer::Render()
@@ -176,7 +178,7 @@ namespace ddr
 		shader->SetUniform( "DrawDepth", false );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
-		CheckGLError();
+		CheckOGLError();
 
 		glEnable( GL_DEPTH_TEST );
 
@@ -193,19 +195,19 @@ namespace ddr
 		glGetIntegerv( GL_VIEWPORT, viewport );
 
 		glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &m_previousRead );
-		CheckGLError();
+		CheckOGLError();
 
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_fbo );
-		CheckGLError();
+		CheckOGLError();
 
 		glBlitFramebuffer(
 			0, 0, m_texColour->GetSize().x, m_texColour->GetSize().y,
 			0, 0, viewport[2], viewport[3],
 			GL_COLOR_BUFFER_BIT, GL_LINEAR );
-		CheckGLError();
+		CheckOGLError();
 
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_previousRead );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void FrameBuffer::Destroy()
@@ -216,7 +218,7 @@ namespace ddr
 		if( m_fbo != OpenGL::InvalidID )
 		{
 			glDeleteBuffers( 1, &m_fbo );
-			CheckGLError();
+			CheckOGLError();
 
 			m_fbo = OpenGL::InvalidID;
 		}
@@ -231,7 +233,7 @@ namespace ddr
 		glClearDepthf( m_clearDepth );
 		glClearColor( m_clearColour.r, m_clearColour.g, m_clearColour.b, m_clearColour.a );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void FrameBuffer::BindRead()
@@ -241,7 +243,7 @@ namespace ddr
 		glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &m_previousRead );
 
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_fbo );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void FrameBuffer::BindDraw()
@@ -255,22 +257,22 @@ namespace ddr
 		GLint viewport[4];
 		glGetIntegerv( GL_VIEWPORT, viewport );
 		m_previousSize = glm::vec2( viewport[2], viewport[3] );
-		CheckGLError();
+		CheckOGLError();
 
 		glViewport( 0, 0, m_texColour->GetSize().x, m_texColour->GetSize().y );
-		CheckGLError();
+		CheckOGLError();
 	}
 	
 	void FrameBuffer::UnbindRead()
 	{
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, m_previousRead );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void FrameBuffer::UnbindDraw()
 	{
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_previousDraw );
 		glViewport( 0, 0, m_previousSize.x, m_previousSize.y );
-		CheckGLError();
+		CheckOGLError();
 	}
 }

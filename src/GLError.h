@@ -6,8 +6,8 @@
 
 #pragma once
 
-#define CheckGLError() dd::_CheckGLError(__FILE__, __LINE__, false )
-#define DiscardGLError() dd::_CheckGLError(__FILE__, __LINE__, true )
+#define CheckOGLError() dd::_CheckGLError(__FILE__, __LINE__, false )
+#define DiscardOGLError() dd::_CheckGLError(__FILE__, __LINE__, true )
 
 namespace dd
 {

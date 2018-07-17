@@ -28,11 +28,20 @@ namespace ddr
 		glm::vec3( 1.0f,  1.0f, 0.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_screenFacingQuadBuffer( s_screenFacingQuadVertices, 6 );
-
 	static VAO s_vaoParticle;
 	static VBO s_vboParticle;
 	static ShaderHandle s_shaderParticle;
+
+	static const int MaxParticles = 512;
+
+	static glm::vec3 s_positions[ MaxParticles ];
+	static VBO s_vboPositions;
+
+	static glm::vec3 s_sizes[ MaxParticles ];
+	static VBO s_vboSizes;
+
+	static glm::vec4 s_colours[ MaxParticles ];
+	static VBO s_vboColours;
 
 	ParticleEmitter::ParticleEmitter()
 	{
@@ -46,15 +55,6 @@ namespace ddr
 
 	void ParticleEmitter::CreateRenderResources()
 	{
-		s_vaoParticle.Create();
-		s_vaoParticle.Bind();
-
-		s_vboParticle.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		s_vboParticle.Bind();
-		s_vboParticle.SetData( s_screenFacingQuadBuffer );
-
-		s_vaoParticle.Unbind();
-
 		dd::Vector<Shader*> shaders;
 
 		Shader* vert = Shader::Create( dd::String32( "shaders\\particle.vertex" ), Shader::Type::Vertex );
@@ -66,6 +66,45 @@ namespace ddr
 		shaders.Add( pixel );
 
 		s_shaderParticle = ShaderProgram::Create( dd::String8( "particle" ), shaders );
+
+		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
+		DD_ASSERT( shader != nullptr );
+
+		shader->Use( true );
+
+		s_vaoParticle.Create();
+		s_vaoParticle.Bind();
+
+		s_vboParticle.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		s_vboParticle.Bind();
+		s_vboParticle.SetData( dd::ConstBuffer<glm::vec3>( s_screenFacingQuadVertices, 6 ) );
+		shader->BindPositions();
+		s_vboParticle.Unbind();
+
+		s_vboPositions.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		s_vboPositions.Bind();
+		s_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( s_positions, MaxParticles ) );
+		shader->BindAttributeVec3( "PositionInstanced", false );
+		shader->SetAttributeInstanced( "PositionInstanced" );
+		s_vboPositions.Unbind();
+
+		s_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		s_vboSizes.Bind();
+		s_vboSizes.SetData( dd::ConstBuffer<glm::vec3>( s_sizes, MaxParticles ) );
+		shader->BindAttributeVec3( "ScaleInstanced", false );
+		shader->SetAttributeInstanced( "ScaleInstanced" );
+		s_vboSizes.Unbind();
+
+		s_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		s_vboColours.Bind();
+		s_vboColours.SetData( dd::ConstBuffer<glm::vec4>( s_colours, MaxParticles ) );
+		shader->BindAttributeVec3( "ColourInstanced", false );
+		shader->SetAttributeInstanced( "ColourInstanced" );
+		s_vboColours.Unbind();
+
+		s_vaoParticle.Unbind();
+
+		shader->Use( false );
 	}
 
 	void ParticleEmitter::Update( float delta_t )
@@ -98,16 +137,17 @@ namespace ddr
 
 	void ParticleEmitter::Render( const dd::ICamera& camera, UniformStorage& uniforms )
 	{
-		static glm::mat4 s_transforms[ 10 ];
-		static glm::vec4 s_colours[ 10 ];
-
 		for( int i = 0; i < 10; ++i )
 		{
-			s_transforms[ i ] = glm::scale( glm::translate( glm::vec3( (float) i ) ), glm::vec3( 0.05f ) );
+			s_positions[ i ] = glm::vec3( (float) i );
+			s_sizes[ i ] = glm::vec3( (float) i );
 			s_colours[ i ] = glm::vec4( 1 );
 		}
+
+		s_vboPositions.UpdateData();
+		s_vboSizes.UpdateData();
+		s_vboColours.UpdateData();
 		
 		s_vaoParticle.Bind();
-
 	}
 }

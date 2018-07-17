@@ -259,6 +259,7 @@ namespace ddr
 
 		m_vboPosition.Bind();
 		m_vboPosition.SetData( positions );
+		m_vboPosition.Unbind();
 		
 		m_vao.Unbind();
 	}
@@ -274,6 +275,7 @@ namespace ddr
 
 		m_vboNormal.Bind();
 		m_vboNormal.SetData( normals );
+		m_vboNormal.Unbind();
 		
 		m_vao.Unbind();
 	}
@@ -289,6 +291,7 @@ namespace ddr
 
 		m_vboIndex.Bind();
 		m_vboIndex.SetData( indices );
+		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
 	}
@@ -304,7 +307,8 @@ namespace ddr
 
 		m_vboUV.Bind();
 		m_vboUV.SetData( uvs );
-		
+		m_vboUV.Unbind();
+
 		m_vao.Unbind();
 	}
 
@@ -330,11 +334,11 @@ namespace ddr
 
 	void Mesh::UpdateBuffers()
 	{
-		m_vboPosition.Update();
-		m_vboNormal.Update();
-		m_vboIndex.Update();
-		m_vboUV.Update();
-		m_vboVertexColour.Update();
+		m_vboPosition.UpdateData();
+		m_vboNormal.UpdateData();
+		m_vboIndex.UpdateData();
+		m_vboUV.UpdateData();
+		m_vboVertexColour.UpdateData();
 	}
 
 	void Mesh::BindToShader( ShaderProgram& shader )
@@ -343,24 +347,28 @@ namespace ddr
 		{
 			m_vboPosition.Bind();
 			shader.BindPositions();
+			m_vboPosition.Unbind();
 		}
 
 		if( m_vboNormal.IsValid() )
 		{
 			m_vboNormal.Bind();
 			shader.BindNormals();
+			m_vboNormal.Unbind();
 		}
 
 		if( m_vboUV.IsValid() )
 		{
 			m_vboUV.Bind();
 			shader.BindUVs();
+			m_vboUV.Unbind();
 		}
 
 		if( m_vboVertexColour.IsValid() )
 		{
 			m_vboVertexColour.Bind();
 			shader.BindVertexColours();
+			m_vboVertexColour.Unbind();
 		}
 	}
 
@@ -379,13 +387,17 @@ namespace ddr
 
 		if( m_vboIndex.IsValid() )
 		{
+			m_vboIndex.Bind();
+
 			glDrawElements( GL_TRIANGLES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0 );
-			CheckGLError();
+			CheckOGLError();
+
+			m_vboIndex.Unbind();
 		}
 		else
 		{
 			glDrawArrays( GL_TRIANGLES, 0, m_vboPosition.GetDataSize() );
-			CheckGLError();
+			CheckOGLError();
 		}
 
 		m_vao.Unbind();

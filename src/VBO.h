@@ -29,7 +29,7 @@ namespace ddr
 		void SetData( const dd::IBuffer& buffer );
 		int GetDataSize() const { return m_buffer.SizeBytes(); }
 	
-		void Update();
+		void UpdateData();
 
 		void Bind();
 		void Unbind();
@@ -38,6 +38,8 @@ namespace ddr
 		GLuint ID() const { return m_id; }
 
 		VBO& operator=( const VBO& other );
+
+		static GLint GetCurrentVBO( GLenum target );
 
 	private:
 

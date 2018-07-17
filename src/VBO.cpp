@@ -13,6 +13,28 @@
 
 namespace ddr
 {
+	GLint VBO::GetCurrentVBO( GLenum m_target )
+	{
+		GLint current = OpenGL::InvalidID;
+
+		switch( m_target )
+		{
+		case GL_ARRAY_BUFFER:
+			glGetIntegerv( GL_ARRAY_BUFFER_BINDING, &current );
+			break;
+		case GL_ELEMENT_ARRAY_BUFFER:
+			glGetIntegerv( GL_ELEMENT_ARRAY_BUFFER_BINDING, &current );
+			break;
+		default:
+			DD_ASSERT( false, "Unknown target specified!" );
+			break;
+		}
+
+		CheckOGLError();
+
+		return current;
+	}
+
 	VBO::VBO()
 	{
 
@@ -50,7 +72,7 @@ namespace ddr
 		DD_ASSERT( usage != OpenGL::InvalidID, "Invalid usage in VBO::Create!" );
 
 		glGenBuffers( 1, &m_id );
-		CheckGLError();
+		CheckOGLError();
 
 		m_target = target;
 		m_usage = usage;
@@ -60,9 +82,8 @@ namespace ddr
 	{
 		if( IsValid() )
 		{
-
 			glDeleteBuffers( 1, &m_id );
-			CheckGLError();
+			CheckOGLError();
 		}
 
 		m_id = OpenGL::InvalidID;
@@ -74,27 +95,33 @@ namespace ddr
 	{
 		DD_ASSERT( IsValid() );
 
+		GLint current = GetCurrentVBO( m_target );
+		DD_ASSERT( current == 0, "VBO already bound to given target, make sure you unbind your buffers!" );
+
 		glBindBuffer( m_target, m_id );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void VBO::Unbind()
 	{
 		DD_ASSERT( IsValid() );
 
+		GLint current = GetCurrentVBO( m_target );
+		DD_ASSERT( current == m_id, "Unbinding different buffer!" );
+
 		glBindBuffer( m_target, 0 );
-		CheckGLError();
+		CheckOGLError();
 	}
 
-	void VBO::Update()
+	void VBO::UpdateData()
 	{
 		if( m_buffer.GetVoid() != nullptr )
 		{
 			glNamedBufferData( m_id, m_buffer.SizeBytes(), NULL, m_usage );
-			CheckGLError();
+			CheckOGLError();
 
 			glNamedBufferData( m_id, m_buffer.SizeBytes(), m_buffer.GetVoid(), m_usage );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -103,6 +130,6 @@ namespace ddr
 		m_buffer.Set( (byte*) buffer.GetVoid(), buffer.SizeBytes() );
 
 		glNamedBufferData( m_id, buffer.SizeBytes(), buffer.GetVoid(), m_usage );
-		CheckGLError();
+		CheckOGLError();
 	}
 }

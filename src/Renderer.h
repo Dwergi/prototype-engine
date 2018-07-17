@@ -30,30 +30,6 @@ namespace ddr
 	class ShaderProgram;
 	class UniformStorage;
 
-	struct Fog
-	{
-		bool Enabled { true };
-		float Distance { 1000.0f };
-		glm::vec3 Colour { 0.6, 0.7, 0.8 };
-
-		void UpdateUniforms( ddr::UniformStorage& uniforms ) const;
-	};
-
-	struct Wireframe
-	{
-		bool Enabled { false };
-
-		glm::vec3 Colour { 0, 1.0f, 0 };
-		float Width { 2.0f };
-
-		glm::vec3 EdgeColour { 0, 0, 0 };
-		float EdgeWidth { 0.5f };
-
-		float MaxDistance { 250.0f };
-
-		void UpdateUniforms( ddr::UniformStorage& uniforms ) const;
-	};
-
 	class Renderer : public dd::IDebugPanel, public dd::ISystem
 	{
 	public:
@@ -138,9 +114,6 @@ namespace ddr
 	
 		dd::EntityHandle m_deleteLight;
 		bool m_createLight { false };
-
-		Fog m_fog;
-		Wireframe m_wireframe;
 
 		MeshHandle m_unitCube;
 

@@ -28,17 +28,17 @@ namespace ddr
 	void Texture::Create( glm::ivec2 size, GLenum format, int mips )
 	{
 		glGenTextures( 1, &m_id );
-		CheckGLError();
+		CheckOGLError();
 
 		glBindTexture( GL_TEXTURE_2D, m_id );
-		CheckGLError();
+		CheckOGLError();
 
 		m_format = format;
 		m_size = size;
 		m_mips = mips;
 
 		glTexStorage2D( GL_TEXTURE_2D, mips, m_format, m_size.x, m_size.y );
-		CheckGLError();
+		CheckOGLError();
 
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -61,7 +61,7 @@ namespace ddr
 		DD_ASSERT( mip >= 0 );
 
 		glTextureSubImage2D( m_id, mip, 0, 0, m_size.x, m_size.y, dataFormat, dataType, data.GetVoid() );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void Texture::GetData( dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
@@ -74,7 +74,7 @@ namespace ddr
 		DD_ASSERT( mip >= 0 );
 
 		glGetTextureImage( m_id, mip, dataFormat, dataType, data.SizeBytes(), data.Get() );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	void Texture::Destroy()
@@ -82,7 +82,7 @@ namespace ddr
 		if( m_id != OpenGL::InvalidID )
 		{
 			glDeleteTextures( 1, &m_id );
-			CheckGLError();
+			CheckOGLError();
 		}
 
 		m_id = OpenGL::InvalidID;
@@ -95,7 +95,7 @@ namespace ddr
 		DD_ASSERT( index >= 0 );
 
 		glBindTextureUnit( index, m_id );
-		CheckGLError();
+		CheckOGLError();
 
 		m_textureUnit = index;
 	}

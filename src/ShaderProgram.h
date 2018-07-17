@@ -60,7 +60,12 @@ namespace ddr
 		bool BindUVs();
 		bool BindVertexColours();
 
-		bool BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized );
+		bool BindAttributeVec2( const char* name, bool normalized );
+		bool BindAttributeVec3( const char* name, bool normalized );
+		bool BindAttributeVec4( const char* name, bool normalized );
+
+		bool SetAttributeInstanced( const char* name );
+
 		void EnableAttribute( const char* name );
 		void DisableAttribute( const char* name );
 
@@ -102,5 +107,7 @@ namespace ddr
 
 		ShaderLocation GetAttribute( const char* name ) const;
 		ShaderLocation GetUniform( const char* name ) const;
+
+		bool BindAttributeFloat( const char* name, uint components, bool normalized );
 	};
 } 

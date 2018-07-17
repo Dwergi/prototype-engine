@@ -33,22 +33,47 @@
 
 namespace ddr
 {
-	void Fog::UpdateUniforms( ddr::UniformStorage& uniforms ) const
-	{
-		uniforms.Set( "Fog.Enabled", Enabled );
-		uniforms.Set( "Fog.Distance", Distance );
-		uniforms.Set( "Fog.Colour", Colour );
-	}
 
-	void Wireframe::UpdateUniforms( ddr::UniformStorage& uniforms ) const
+	struct Fog
 	{
-		uniforms.Set( "Wireframe.Enabled", Enabled );
-		uniforms.Set( "Wireframe.Colour", Colour );
-		uniforms.Set( "Wireframe.Width", Width );
-		uniforms.Set( "Wireframe.EdgeColour", EdgeColour );
-		uniforms.Set( "Wireframe.EdgeWidth", EdgeWidth );
-		uniforms.Set( "Wireframe.MaxDistance", MaxDistance );
-	}
+		bool Enabled { true };
+		float Distance { 1000.0f };
+		glm::vec3 Colour { 0.6, 0.7, 0.8 };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const
+		{
+			uniforms.Set( "Fog.Enabled", Enabled );
+			uniforms.Set( "Fog.Distance", Distance );
+			uniforms.Set( "Fog.Colour", Colour );
+		}
+	};
+
+	Fog s_fog;
+
+	struct Wireframe
+	{
+		bool Enabled { false };
+
+		glm::vec3 Colour { 0, 1.0f, 0 };
+		float Width { 2.0f };
+
+		glm::vec3 EdgeColour { 0, 0, 0 };
+		float EdgeWidth { 0.5f };
+
+		float MaxDistance { 250.0f };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const
+		{
+			uniforms.Set( "Wireframe.Enabled", Enabled );
+			uniforms.Set( "Wireframe.Colour", Colour );
+			uniforms.Set( "Wireframe.Width", Width );
+			uniforms.Set( "Wireframe.EdgeColour", EdgeColour );
+			uniforms.Set( "Wireframe.EdgeWidth", EdgeWidth );
+			uniforms.Set( "Wireframe.MaxDistance", MaxDistance );
+		}
+	};
+
+	Wireframe s_wireframe;
 
 	Renderer::Renderer( const dd::Window& window ) :
 		m_meshCount( 0 ),
@@ -180,17 +205,17 @@ namespace ddr
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &m_wireframe.Enabled );
+			ImGui::Checkbox( "Enabled", &s_wireframe.Enabled );
 
-			ImGui::DragFloat( "Width", &m_wireframe.Width, 0.01f, 0.0f, 10.0f );
+			ImGui::DragFloat( "Width", &s_wireframe.Width, 0.01f, 0.0f, 10.0f );
 
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe.Colour ) );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( s_wireframe.Colour ) );
 
-			ImGui::DragFloat( "Edge Width", &m_wireframe.EdgeWidth, 0.01f, 0.0f, m_wireframe.Width );
+			ImGui::DragFloat( "Edge Width", &s_wireframe.EdgeWidth, 0.01f, 0.0f, s_wireframe.Width );
 
-			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe.EdgeColour ) );
+			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( s_wireframe.EdgeColour ) );
 
-			ImGui::DragFloat( "Max Distance", &m_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
+			ImGui::DragFloat( "Max Distance", &s_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
 
 			ImGui::TreePop();
 		}
@@ -290,9 +315,9 @@ namespace ddr
 
 		if( ImGui::TreeNodeEx( "Fog", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::Checkbox( "Enabled", &m_fog.Enabled );
-			ImGui::SliderFloat( "Distance", &m_fog.Distance, 0, 10000, "%.1f" );
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_fog.Colour ) );
+			ImGui::Checkbox( "Enabled", &s_fog.Enabled );
+			ImGui::SliderFloat( "Distance", &s_fog.Distance, 0, 10000, "%.1f" );
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( s_fog.Colour ) );
 
 			ImGui::TreePop();
 		}
@@ -563,8 +588,8 @@ namespace ddr
 		uniforms.Set( "View", camera.GetCameraMatrix() );
 		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
 
-		m_wireframe.UpdateUniforms( uniforms );
-		m_fog.UpdateUniforms( uniforms );
+		s_wireframe.UpdateUniforms( uniforms );
+		s_fog.UpdateUniforms( uniforms );
 
 		uniforms.Set( "DrawStandard", m_debugDrawStandard );
 
@@ -588,7 +613,7 @@ namespace ddr
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glViewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
-		CheckGLError();
+		CheckOGLError();
 
 		if( m_debugDrawDepth )
 		{

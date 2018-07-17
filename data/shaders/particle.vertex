@@ -1,12 +1,14 @@
 #version 330 core
 
-layout( location = 0 ) in vec4 Colour;
-layout( location = 1 ) in vec3 Scale;
-layout( location = 2 ) in vec3 Position;
+layout( location = 0 ) in vec3 Position;
+layout( location = 1 ) in vec3 PositionInstanced;
+layout( location = 2 ) in vec4 ColourInstanced;
+layout( location = 3 ) in vec3 ScaleInstanced;
 
 out struct VertexData
 {
 	vec4 Colour;
+	vec3 Position;
 } Vertex;
 
 uniform mat4 View;
@@ -15,6 +17,7 @@ uniform mat4 Projection;
 void main()
 {
 	Vertex.Colour = Colour;
+	Vertex.Position = Projection * View * vec4( Position * Scale + PositionInstanced, 1 );
 
-	gl_Position = Projection * View * vec4( Position * Scale, 1 );
+	gl_Position = Vertex.Position;
 };

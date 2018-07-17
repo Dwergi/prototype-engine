@@ -122,15 +122,15 @@ namespace dd
 	{
 		glfwPollEvents();
 		glfwSwapBuffers( m_glfwWindow );
-		CheckGLError();
+		CheckOGLError();
 
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		CheckGLError();
+		CheckOGLError();
 
 		glViewport( 0, 0, m_size.x, m_size.y );
-		CheckGLError();
+		CheckOGLError();
 
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 

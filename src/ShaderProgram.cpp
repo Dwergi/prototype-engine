@@ -12,6 +12,8 @@
 #include "Shader.h"
 #include "ShaderHandle.h"
 #include "Texture.h"
+#include "VAO.h"
+#include "VBO.h"
 
 #include "GL/gl3w.h"
 
@@ -76,7 +78,7 @@ namespace ddr
 		m_inUse( false )
 	{
 		m_id = glCreateProgram();
-		CheckGLError();
+		CheckOGLError();
 
 		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "glCreateProgram failed!" );
 	}
@@ -112,7 +114,7 @@ namespace ddr
 			DD_ASSERT_ERROR( shader != nullptr, "Invalid shader given to program!" );
 
 			glAttachShader( program->m_id, shader->m_id );
-			CheckGLError();
+			CheckOGLError();
 		}
 
 		dd::String256 msg = program->Link();
@@ -145,7 +147,7 @@ namespace ddr
 
 		GLint status;
 		glGetProgramiv( m_id, GL_LINK_STATUS, &status );
-		CheckGLError();
+		CheckOGLError();
 
 		if( status == GL_FALSE )
 		{
@@ -153,11 +155,11 @@ namespace ddr
 
 			GLint infoLogLength;
 			glGetProgramiv( m_id, GL_INFO_LOG_LENGTH, &infoLogLength );
-			CheckGLError();
+			CheckOGLError();
 
 			char* strInfoLog = new char[infoLogLength + 1];
 			glGetProgramInfoLog( m_id, infoLogLength, NULL, strInfoLog );
-			CheckGLError();
+			CheckOGLError();
 
 			strInfoLog[ infoLogLength ] = '\0';
 
@@ -206,7 +208,7 @@ namespace ddr
 
 		int current;
 		glGetIntegerv( GL_CURRENT_PROGRAM, &current );
-		CheckGLError();
+		CheckOGLError();
 
 		if( use )
 		{
@@ -220,7 +222,7 @@ namespace ddr
 		m_inUse = use;
 
 		glUseProgram( m_inUse ? m_id : 0 );
-		CheckGLError();
+		CheckOGLError();
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const
@@ -230,8 +232,7 @@ namespace ddr
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
 		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name );
-
-		CheckGLError();
+		CheckOGLError();
 
 		return attrib;
 	}
@@ -242,11 +243,14 @@ namespace ddr
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )
 		{
 			glEnableVertexAttribArray( loc );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -256,62 +260,93 @@ namespace ddr
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty attribute name given!" );
 
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )
 		{
 			glDisableVertexAttribArray( loc );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
 	bool ShaderProgram::BindPositions()
 	{
-		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( IsValid(), "Program is invalid!" );
-
-		return BindAttributeFloat( "Position", 3, 0, 0, false );
+		return BindAttributeVec3( "Position", false );
 	}
 
 	bool ShaderProgram::BindNormals()
 	{
-		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( IsValid(), "Program is invalid!" );
-
-		return BindAttributeFloat( "Normal", 3, 0, 0, true );
+		return BindAttributeVec3( "Normal", true );
 	}
 
 	bool ShaderProgram::BindUVs()
 	{
-		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( IsValid(), "Program is invalid!" );
-
-		return BindAttributeFloat( "UV", 2, 0, 0, false );
+		return BindAttributeVec2( "UV", false );
 	}
 
 	bool ShaderProgram::BindVertexColours()
 	{
-		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
-		DD_ASSERT( IsValid(), "Program is invalid!" );
-
-		return BindAttributeFloat( "VertexColour", 4, 0, 0, false );
+		return BindAttributeVec4( "VertexColour", false );
 	}
 
-	bool ShaderProgram::BindAttributeFloat( const char* name, uint components, uint stride, uint first, bool normalized )
+	bool ShaderProgram::BindAttributeVec2( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 2, normalized );
+	}
+
+	bool ShaderProgram::BindAttributeVec3( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 3, normalized );
+	}
+
+	bool ShaderProgram::BindAttributeVec4( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 4, normalized );
+	}
+
+	bool ShaderProgram::BindAttributeFloat( const char* name, uint components, bool normalized )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
 		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
 
+		GLint currentVBO = VBO::GetCurrentVBO( GL_ARRAY_BUFFER );
+		DD_ASSERT( currentVBO != OpenGL::InvalidID, "No VBO is bound!" );
+
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )
 		{
-			const GLvoid* firstPtr = (const GLvoid*) ((uint64) first * sizeof( float ));
-
-			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, stride * sizeof( float ), firstPtr );
-			CheckGLError();
+			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, 0, nullptr );
+			CheckOGLError();
 
 			glEnableVertexAttribArray( loc );
-			CheckGLError();
+			CheckOGLError();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool ShaderProgram::SetAttributeInstanced( const char* name )
+	{
+		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
+		DD_ASSERT( IsValid(), "Program is invalid!" );
+		DD_ASSERT( strlen( name ) > 0, "Empty uniform name given!" );
+
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glVertexAttribDivisor( loc, 1 );
+			CheckOGLError();
 
 			return true;
 		}
@@ -339,7 +374,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform1f( uniform, f );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -353,7 +388,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform1i( uniform, i );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -367,7 +402,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform1i( uniform, b );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -381,7 +416,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform2fv( uniform, 1, glm::value_ptr( vec ) );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -395,7 +430,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform3fv( uniform, 1, glm::value_ptr( vec ) );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -409,7 +444,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform4fv( uniform, 1, glm::value_ptr( vec ) );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -423,7 +458,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniformMatrix3fv( uniform, 1, false, glm::value_ptr( mat ) );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -437,7 +472,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniformMatrix4fv( uniform, 1, false, glm::value_ptr( mat ) );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 
@@ -451,7 +486,7 @@ namespace ddr
 		if( uniform != InvalidLocation )
 		{
 			glUniform1i( uniform, texture.GetTextureUnit() );
-			CheckGLError();
+			CheckOGLError();
 		}
 	}
 }

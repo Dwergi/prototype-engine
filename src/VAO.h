@@ -30,9 +30,11 @@ namespace ddr
 
 		VAO& operator=( const VAO& other );
 
+		static GLint GetCurrentVAO();
+
 	private:
 
-		GLuint m_id;
-		GLint m_previous;
+		GLuint m_id { 0 };
+		bool m_bound { false };
 	};
 }
