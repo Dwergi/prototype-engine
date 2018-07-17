@@ -59,6 +59,7 @@ Temporary Items
 # DD-specific things
 *.opensdf
 AS_DEBUG/
+Debug/
 *.pch
 *.user
 *.opendb
@@ -70,5 +71,4 @@ AS_DEBUG/
 *.srctrldb
 *.srctrlbm
 *.srctrlprj
-*.lib
 *.dat

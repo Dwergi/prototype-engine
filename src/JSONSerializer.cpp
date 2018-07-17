@@ -9,16 +9,16 @@
 
 #include "arduinojson/ArduinoJson.h"
 
+/*
 namespace dd
 {
 	class JSONPrint 
-		: public ArduinoJson::Print
 	{
 	public:
 		JSONPrint( WriteStream& stream )
 			: m_stream( stream ) {}
 
-		virtual size_t write( uint8_t c ) override
+		size_t write( uint8_t c )
 		{
 			m_stream.WriteByte( c );
 			return 1;
@@ -92,7 +92,7 @@ namespace dd
 
 		JsonObject& root = buffer.createObject();
 
-		root["type"] = buffer.strdup( type->FullTypeName().c_str() );
+		root["type"] = type->FullTypeName().c_str();
 		JsonObject& members = root.createNestedObject( "members" );
 
 		for( const Member& member : type->Members() )
@@ -123,11 +123,11 @@ namespace dd
 		}
 		else if( type->IsDerivedFrom( GET_TYPE( String ) ) )
 		{
-			return JsonVariant( buffer.strdup( var.GetValue<String>().c_str() ) );
+			return JsonVariant( var.GetValue<String>().c_str() );
 		}
 		else if( type == GET_TYPE( SharedString ) )
 		{
-			return JsonVariant( buffer.strdup( var.GetValue<SharedString>().c_str() ) );
+			return JsonVariant( var.GetValue<SharedString>().c_str() );
 		}
 		else if( type->Members().Size() > 0 )
 		{
@@ -310,4 +310,4 @@ namespace dd
 		return SetFromVariant( var, variant );
 	}
 	//===================================================================================
-}
+}*/

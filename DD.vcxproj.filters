@@ -46,9 +46,6 @@
     <Filter Include="Includes">
       <UniqueIdentifier>{6f7b570c-e8a9-463e-a549-5bb17d2ab414}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\Base64">
-      <UniqueIdentifier>{abdd00ba-8514-4fb8-9e22-3857ff01f626}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\PCG">
       <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
     </Filter>
@@ -209,18 +206,6 @@
     </ClInclude>
     <ClInclude Include="src\TypeInfoHelpers.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="include\base64\include\cdecode.h">
-      <Filter>Includes\Base64</Filter>
-    </ClInclude>
-    <ClInclude Include="include\base64\include\cencode.h">
-      <Filter>Includes\Base64</Filter>
-    </ClInclude>
-    <ClInclude Include="include\base64\include\decode.h">
-      <Filter>Includes\Base64</Filter>
-    </ClInclude>
-    <ClInclude Include="include\base64\include\encode.h">
-      <Filter>Includes\Base64</Filter>
     </ClInclude>
     <ClInclude Include="src\JSONSerializer.h">
       <Filter>Serialization</Filter>
@@ -623,12 +608,6 @@
     </ClCompile>
     <ClCompile Include="src\FunctionSignature.cpp">
       <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="include\base64\src\cdecode.c">
-      <Filter>Includes\Base64</Filter>
-    </ClCompile>
-    <ClCompile Include="include\base64\src\cencode.c">
-      <Filter>Includes\Base64</Filter>
     </ClCompile>
     <ClCompile Include="src\JSONSerializer.cpp">
       <Filter>Serialization</Filter>

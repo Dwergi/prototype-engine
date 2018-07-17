@@ -472,8 +472,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 	s_mainThread = std::this_thread::get_id();
 
 	{
-		JobSystem jobSystem( 7u );
-		SwarmSystem swarm_system;
+		//SwarmSystem swarm_system;
 
 		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );
 		s_input = new Input( *s_window );
@@ -488,12 +487,14 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		camera.SetPosition( glm::vec3( 0, 10, 0 ) );
 		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
 
-		ShakyCamera shakyCam( camera, bindings );
+		ShakyCamera shaky_cam( camera, bindings );
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		ddr::Renderer renderer( *s_window );
 		ddr::UniformStorage uniforms;
+
+		JobSystem jobSystem( 7u );
 
 		TerrainSystem terrain_system( jobSystem );
 
@@ -519,7 +520,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		Vector<ISystem*> systems;
 		systems.Add( &renderer );
 		systems.Add( &scene_graph );
-		systems.Add( &swarm_system );
+		//systems.Add( &swarm_system );
 		//systems.Add( &trench_system );
 		systems.Add( &mouse_picking );
 		//systems.Add( s_shipSystem );
@@ -545,7 +546,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		debug_views.Add( s_freeCam );
 		//debug_views.Add( s_shipSystem );
 		debug_views.Add( &terrain_system );
-		debug_views.Add( &shakyCam );
+		debug_views.Add( &shaky_cam );
 		debug_views.Add( &particle_system );
 		debug_views.Add( &mesh_renderer );
 
@@ -579,7 +580,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			float delta_t = s_frameTimer->Delta();
 			camera.SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 
-			UpdateFreeCam( *s_freeCam, shakyCam, *s_input, delta_t );
+			UpdateFreeCam( *s_freeCam, shaky_cam, *s_input, delta_t );
 			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
 		};
 		updateState.SetOnEnter( onUpdate );
@@ -589,7 +590,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		{
 			float delta_t = s_frameTimer->Delta();
 			DrawDebugUI( debug_views );
-			Render( renderer, renderers, entity_manager, shakyCam, uniforms, delta_t );
+			Render( renderer, renderers, entity_manager, shaky_cam, uniforms, delta_t );
 		};
 		renderState.SetOnEnter( onRender );
 

@@ -48,21 +48,26 @@ namespace ddr
 		void Set( const char* name, glm::vec4 value );
 		void Set( const char* name, glm::mat4 value );
 
-		void Erase( const char* name );
-
 		void Bind( ShaderProgram& shader );
 
 		IUniform* Find( const char* name );
 
 	private:
 
-		std::vector<IUniform*> m_uniforms;
+		static const int MAX_UNIFORMS = 256;
+		static const int UNIFORM_SIZE = sizeof( Uniform<glm::mat4> );
+
+		int m_count { 0 };
+
+		byte m_uniforms[MAX_UNIFORMS * UNIFORM_SIZE];
 
 		template <typename T>
 		void Create( const char* name, UniformType type, T value );
 
 		template <typename T>
 		void SetValue( IUniform* uniform, UniformType type, T value );
+
+		IUniform* Access( int index ) const;
 	};
 
 	template <typename T>

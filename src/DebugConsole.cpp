@@ -52,18 +52,6 @@ namespace
 		s_stream.Write( str );
 	}
 
-	void grabEntityHandle( dd::EntityHandle handle )
-	{
-		dd::JSONSerializer serializer( s_stream );
-		serializer.Serialize( handle );
-	}
-
-	void grabTransformComponent( dd::TransformComponent* cmp )
-	{
-		dd::JSONSerializer serializer( s_stream );
-		serializer.Serialize( *cmp );
-	}
-
 	void grab()
 	{
 		// There is no value
@@ -103,8 +91,6 @@ namespace dd
 		engine.RegisterFunction<decltype(&grabUint), &grabUint>( "_grab" );
 		engine.RegisterFunction<decltype(&grabFloat), &grabFloat>( "_grab" );
 		engine.RegisterFunction<decltype(&grabDouble), &grabDouble>( "_grab" );
-		engine.RegisterFunction<decltype(&grabEntityHandle), &grabEntityHandle>( "_grab" );
-		engine.RegisterFunction<decltype(&grabTransformComponent), &grabTransformComponent>( "_grab" );
 		engine.RegisterFunction<decltype(&grab), &grab>( "_grab" );
 		/*engine.RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
 	}

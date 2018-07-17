@@ -142,7 +142,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32d.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
@@ -172,7 +172,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;sfml-system-s64-d.lib;opengl32.lib;glfw64d.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -202,7 +202,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui32.lib;angelscript32.lib;sfml-network-s.lib;sfml-audio-s.lib;sfml-system-s.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <LinkStatus>false</LinkStatus>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
@@ -234,7 +234,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <AdditionalDependencies>imgui64.lib;angelscript64.lib;sfml-network-s64.lib;sfml-audio-s64.lib;sfml-system-s64.lib;opengl32.lib;glfw64.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
@@ -268,7 +268,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <ShowProgress>NotSet</ShowProgress>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
@@ -305,7 +305,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;sfml-system-s64-d.lib;opengl32.lib;glfw64.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\imgui\lib;$(SolutionDir)include\wren\lib;$(SolutionDir)include\angelscript\lib;$(SolutionDir)include\glfw\lib;$(SolutionDir)include\sfml\lib;$(SolutionDir)include\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
     </Link>
@@ -323,10 +323,6 @@
     <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h" />
     <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h" />
     <ClInclude Include="include\arduinojson\ArduinoJson.h" />
-    <ClInclude Include="include\base64\include\cdecode.h" />
-    <ClInclude Include="include\base64\include\cencode.h" />
-    <ClInclude Include="include\base64\include\decode.h" />
-    <ClInclude Include="include\base64\include\encode.h" />
     <ClInclude Include="include\catch\catch.hpp" />
     <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
     <ClInclude Include="include\glm\fwd.hpp" />
@@ -503,22 +499,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="include\base64\src\cdecode.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="include\base64\src\cencode.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>

@@ -87,25 +87,35 @@ def proc_t(proc):
 def write(f, s):
     f.write(s.encode('utf-8'))
 
+def touch_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def download(url, dst):
+    if os.path.exists(dst):
+        print('Reusing {0}...'.format(dst))
+        return
+
+    print('Downloading {0}...'.format(dst))
+    web = urllib2.urlopen(url)
+    with open(dst, 'wb') as f:
+        f.writelines(web.readlines())
+
 parser = argparse.ArgumentParser(description='gl3w generator script')
 parser.add_argument('--ext', action='store_true', help='Load extensions')
 parser.add_argument('--root', type=str, default='', help='Root directory')
 args = parser.parse_args()
 
 # Create directories
-if not os.path.exists(os.path.join(args.root, 'include/GL')):
-    os.makedirs(os.path.join(args.root, 'include/GL'))
-if not os.path.exists(os.path.join(args.root, 'src')):
-    os.makedirs(os.path.join(args.root, 'src'))
+touch_dir(os.path.join(args.root, 'include/GL'))
+touch_dir(os.path.join(args.root, 'include/KHR'))
+touch_dir(os.path.join(args.root, 'src'))
 
-# Download glcorearb.h
-if not os.path.exists(os.path.join(args.root, 'include/GL/glcorearb.h')):
-    print('Downloading glcorearb.h to {0}...'.format(os.path.join(args.root, 'include/GL/glcorearb.h')))
-    web = urllib2.urlopen('http://www.opengl.org/registry/api/GL/glcorearb.h')
-    with open(os.path.join(args.root, 'include/GL/glcorearb.h'), 'wb') as f:
-        f.writelines(web.readlines())
-else:
-    print('Reusing glcorearb.h from {0}...'.format(os.path.join(args.root, 'include/GL')))
+# Download glcorearb.h and khrplatform.h
+download('https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h',
+         os.path.join(args.root, 'include/GL/glcorearb.h'))
+download('https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h',
+         os.path.join(args.root, 'include/KHR/khrplatform.h'))
 
 # Parse function names from glcorearb.h
 print('Parsing glcorearb.h header...')
@@ -122,7 +132,7 @@ with open(os.path.join(args.root, 'include/GL/glcorearb.h'), 'r') as f:
 procs.sort()
 
 # Generate gl3w.h
-print('Generating gl3w.h in {0}...'.format(os.path.join(args.root, 'include/GL')))
+print('Generating {0}...'.format(os.path.join(args.root, 'include/GL/gl3w.h')))
 with open(os.path.join(args.root, 'include/GL/gl3w.h'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#ifndef __gl3w_h_
@@ -177,7 +187,7 @@ extern union GL3WProcs gl3wProcs;
 ''')
 
 # Generate gl3w.c
-print('Generating gl3w.c in {0}...'.format(os.path.join(args.root, 'src')))
+print('Generating {0}...'.format(os.path.join(args.root, 'src/gl3w.c')))
 with open(os.path.join(args.root, 'src/gl3w.c'), 'wb') as f:
     write(f, UNLICENSE)
     write(f, r'''#include <GL/gl3w.h>
@@ -295,16 +305,16 @@ static void load_procs(GL3WGetProcAddressProc proc);
 
 int gl3wInit(void)
 {
-	return gl3wInit2(get_proc);
-}
-
-int gl3wInit2(GL3WGetProcAddressProc proc)
-{
 	int res = open_libgl();
 	if (res)
 		return res;
 
 	atexit(close_libgl);
+	return gl3wInit2(get_proc);
+}
+
+int gl3wInit2(GL3WGetProcAddressProc proc)
+{
 	load_procs(proc);
 	return parse_version();
 }

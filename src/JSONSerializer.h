@@ -8,6 +8,7 @@
 
 #include "Serialization.h"
 
+/*
 namespace ArduinoJson
 {
 	class JsonVariant;
@@ -65,4 +66,4 @@ namespace dd
 		return Deserialize( Variable( GET_TYPE( T ), &obj ) );
 	}
 	//===================================================================================
-}
+}*/

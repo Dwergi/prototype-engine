@@ -11,15 +11,20 @@
 
 namespace ddr
 {
+	IUniform* UniformStorage::Access( int index ) const
+	{
+		return reinterpret_cast<IUniform*>(m_uniforms[index * UNIFORM_SIZE]);
+	}
+
 	template <typename T>
 	void UniformStorage::Create( const char* name, UniformType type, T value )
 	{
-		Uniform<T>* created = new Uniform<T>();
+		Uniform<T>* created = (Uniform<T>*) Access( m_count );
 		created->Name = name;
 		created->Type = type;
 		created->Value = value;
 
-		m_uniforms.push_back( created );
+		++m_count;
 	}
 
 	UniformStorage::UniformStorage()
@@ -28,12 +33,6 @@ namespace ddr
 
 	UniformStorage::~UniformStorage()
 	{
-		for( IUniform* uniform : m_uniforms )
-		{
-			delete uniform;
-		}
-
-		m_uniforms.clear();
 	}
 
 	void UniformStorage::Set( const char* name, bool value )
@@ -127,28 +126,12 @@ namespace ddr
 		}
 	}
 
-	void UniformStorage::Erase( const char* name )
-	{
-		auto it = m_uniforms.begin();
-		for( ; it != m_uniforms.end(); ++it )
-		{
-			if( (*it)->Name == name )
-			{
-				break;
-			}
-		}
-
-		if( it != m_uniforms.end() )
-		{
-			delete *it;
-			m_uniforms.erase( it );
-		}
-	}
-
 	void UniformStorage::Bind( ShaderProgram& shader )
 	{
-		for( IUniform* uniform : m_uniforms )
+		for( int i = 0; i < m_count; ++i )
 		{
+			IUniform* uniform = Access( i );
+
 			switch( uniform->Type )
 			{
 				case UniformType::Boolean:
@@ -199,8 +182,10 @@ namespace ddr
 
 	IUniform* UniformStorage::Find( const char* name )
 	{
-		for( IUniform* uniform : m_uniforms )
+		for( int i = 0; i < m_count; ++i )
 		{
+			IUniform* uniform = Access( i );
+
 			if( uniform->Name == name )
 			{
 				return uniform;
