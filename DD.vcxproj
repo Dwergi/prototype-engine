@@ -382,6 +382,7 @@
     <ClInclude Include="src\MaterialHandle.h" />
     <ClInclude Include="src\Math_dd.h" />
     <ClInclude Include="src\MeshHandle.h" />
+    <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\PackedPool.h" />
     <ClInclude Include="src\ParticleEmitter.h" />
@@ -568,6 +569,7 @@
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />

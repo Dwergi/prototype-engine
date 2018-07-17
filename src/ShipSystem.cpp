@@ -97,29 +97,6 @@ namespace dd
 			*state = false;
 	}
 
-	namespace
-	{
-		ddr::ShaderHandle CreateShaders( const char* name )
-		{
-			dd::Vector<ddr::Shader*> shaders;
-
-			ddr::Shader* vert = ddr::Shader::Create( String32( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
-			DD_ASSERT( vert != nullptr );
-			shaders.Add( vert );
-
-			ddr::Shader* geom = ddr::Shader::Create( String32( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
-			DD_ASSERT( geom != nullptr );
-			shaders.Add( geom );
-
-			ddr::Shader* pixel = ddr::Shader::Create( String32( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
-			DD_ASSERT( pixel != nullptr );
-			shaders.Add( pixel );
-
-			ddr::ShaderHandle handle = ddr::ShaderProgram::Create( String8( name ), shaders );
-			return handle;
-		}
-	}
-
 	void ShipSystem::CreateShip( EntityManager& entity_manager )
 	{
 		EntityHandle entity = entity_manager.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
@@ -129,7 +106,7 @@ namespace dd
 		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( entity );
 		transform_cmp->SetLocalTransform( transform );
 
-		ddr::ShaderHandle shader = CreateShaders( "ship" );
+		ddr::ShaderHandle shader = ddr::ShaderProgram::Load( "standard" );
 		/*shader.Get()->Use( true );
 		shader.Get()->BindAttributeFloat( "Position", 3, 6, 0, false );
 		shader.Get()->BindAttributeFloat( "Normal", 3, 6, 3, false );

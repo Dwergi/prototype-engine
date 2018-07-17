@@ -16,9 +16,16 @@ namespace dd
 
 		static const uint64 DEFAULT_SEED = -1;
 
+		Random64( uint64 seed = DEFAULT_SEED );
 		Random64( uint64 min, uint64 max, uint64 seed = DEFAULT_SEED );
 
 		uint64 Next();
+
+		uint64 Max() const { return m_max; }
+		void SetMax( uint64 max ) { m_max = max; }
+
+		uint64 Min() const { return m_min; }
+		void SetMin( uint64 min ) { m_min = min; }
 
 	private:
 
@@ -34,9 +41,16 @@ namespace dd
 
 		static const uint DEFAULT_SEED = -1;
 
+		Random32( uint seed = DEFAULT_SEED );
 		Random32( uint min, uint max, uint seed = DEFAULT_SEED );
 
 		uint Next();
+
+		uint Max() const { return m_max; }
+		void SetMax( uint max ) { m_max = max; }
+
+		uint Min() const { return m_min; }
+		void SetMin( uint min ) { m_min = min; }
 
 	private:
 
@@ -52,9 +66,16 @@ namespace dd
 
 		static const int DEFAULT_SEED = -1;
 
+		RandomInt( int seed = DEFAULT_SEED );
 		RandomInt( int min, int max, int seed = DEFAULT_SEED );
 
 		int Next();
+
+		int Max() const { return m_max; }
+		void SetMax( int max ) { m_max = max; }
+
+		int Min() const { return m_min; }
+		void SetMin( int min ) { m_min = min; }
 
 	private:
 
@@ -70,9 +91,16 @@ namespace dd
 
 		static const uint DEFAULT_SEED = -1;
 
+		RandomFloat( uint seed = DEFAULT_SEED );
 		RandomFloat( float min, float max, uint seed = DEFAULT_SEED );
 
 		float Next();
+
+		float Max() const { return m_max; }
+		void SetMax( float max ) { m_max = max; }
+
+		float Min() const { return m_min; }
+		void SetMin( float min ) { m_min = min; }
 
 	private:
 

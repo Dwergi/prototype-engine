@@ -198,6 +198,21 @@ namespace ddr
 
 	MeshHandle Mesh::Create( const char* name )
 	{
+		MeshHandle mesh_h = Find( name );
+		if( !mesh_h.IsValid() )
+		{
+			std::lock_guard lock( m_instanceMutex );
+
+			mesh_h.m_hash = dd::HashString( name, strlen( name ) );
+
+			m_instances.insert( std::make_pair( mesh_h.m_hash, new Mesh( name ) ) );
+		}
+
+		return mesh_h;
+	}
+
+	MeshHandle Mesh::Find( const char* name )
+	{
 		DD_ASSERT( name != nullptr );
 		DD_ASSERT( strlen( name ) > 0 );
 
@@ -205,14 +220,13 @@ namespace ddr
 
 		std::lock_guard lock( m_instanceMutex );
 
-		auto it = m_instances.find( hash );
-		if( it == m_instances.end() )
-		{
-			m_instances.insert( std::make_pair( hash, new Mesh( name ) ) );
-		}
-
 		MeshHandle mesh_h;
-		mesh_h.m_hash = hash;
+
+		auto it = m_instances.find( hash );
+		if( it != m_instances.end() )
+		{
+			mesh_h.m_hash = hash;
+		}
 
 		return mesh_h;
 	}
@@ -407,7 +421,7 @@ namespace ddr
 	{
 		SetPositions( s_unitCubePositionsBuffer );
 		SetNormals( s_unitCubeNormalsBuffer );
-		SetUVs( s_unitCubeUVsBuffer );
+		//SetUVs( s_unitCubeUVsBuffer );
 
 		dd::AABB bounds;
 		bounds.Expand( glm::vec3( -1, -1, -1 ) );

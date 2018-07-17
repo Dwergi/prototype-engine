@@ -584,7 +584,7 @@ TEST_CASE( "Full Update Loop" )
 
 	BENCHMARK( "Create Entities" )
 	{
-		for( int i = 0; i < 10000; ++i )
+		for( int i = 0; i < 1000; ++i )
 		{
 			ddc::Entity e = layer.Create();
 			FirstComponent& first = layer.AddComponent<FirstComponent>( e );
@@ -608,7 +608,7 @@ TEST_CASE( "Full Update Loop" )
 		}
 	}
 
-	for( int i = 0; i < 10000; ++i )
+	for( int i = 0; i < 1000; ++i )
 	{
 		ddc::Entity e;
 		e.ID = i;

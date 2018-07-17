@@ -132,9 +132,9 @@ namespace ddr
 		return true;
 	}
 
-	void Frustum::CreateRenderData( ShaderHandle shader_h )
+	void Frustum::CreateRenderData()
 	{
-		m_shader = shader_h;
+		m_shader = ShaderProgram::Load( "standard" );
 		ShaderProgram* shader = ShaderProgram::Get( m_shader );
 		shader->Use( true );
 
@@ -175,12 +175,12 @@ namespace ddr
 
 		shader->Use( true );
 
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
 		uniforms.Set( "Model", m_transform );
 
 		m_vboIndex.Bind();
+
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	
 		for( int i = 0; i < 6; ++i )
 		{
@@ -189,9 +189,9 @@ namespace ddr
 			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
 		}
 
-		m_vboIndex.Unbind();
-
 		glDisable( GL_BLEND );
+
+		m_vboIndex.Unbind();
 
 		shader->Use( false );
 

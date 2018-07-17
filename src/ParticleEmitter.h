@@ -6,6 +6,10 @@
 
 #pragma once
 
+#include "IDebugPanel.h"
+#include "IRenderer.h"
+#include "ISystem.h"
+#include "Random.h"
 #include "ShaderHandle.h"
 #include "VAO.h"
 #include "VBO.h"
@@ -27,20 +31,23 @@ namespace ddr
 		glm::vec2 Size;
 		float Age { 0 };
 		float Lifetime { 0 };
-		bool Alive { false };
+		float Distance { -1 };
+
+		bool Alive() { return Age < Lifetime; }
 	};
 
-	class ParticleEmitter
+	class ParticleEmitter : public dd::IDebugPanel, public dd::IRenderer, public dd::ISystem
 	{
 	public:
 
 		ParticleEmitter();
 		~ParticleEmitter();
 
-		void Update( float delta_t );
-		void Render( const dd::ICamera& camera, UniformStorage& uniforms );
+		virtual void RenderInit() override;
+		virtual bool UsesAlpha() const override { return true; }
 
-		static void CreateRenderResources();
+		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
+		virtual void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms ) override;
 
 		ParticleEmitter( const ParticleEmitter& ) = delete;
 		ParticleEmitter( ParticleEmitter&& ) = delete;
@@ -49,12 +56,39 @@ namespace ddr
 
 	private:
 
-		static const int MaxParticles = 512;
+		static const int MaxParticles = 10000;
+		static int CurrentParticles;
+
+		static dd::RandomFloat s_rngLifetime;
+
+		static dd::RandomFloat s_rngVelocityX;
+		static dd::RandomFloat s_rngVelocityY;
+		static dd::RandomFloat s_rngVelocityZ;
+
+		static dd::RandomFloat s_rngColourR;
+		static dd::RandomFloat s_rngColourG;
+		static dd::RandomFloat s_rngColourB;
+
+		static dd::RandomFloat s_rngSizeX;
+		static dd::RandomFloat s_rngSizeY;
+
 		Particle m_particles[ MaxParticles ];
 
 		int m_liveCount { 0 };
 
-		float m_age { 0 };
+		float m_age { 0 };			// in seconds
 		float m_emissionRate { 0 }; // particles per second
+
+		glm::vec3 m_positions[ MaxParticles ];
+		VBO m_vboPositions;
+
+		glm::vec2 m_sizes[ MaxParticles ];
+		VBO m_vboSizes;
+
+		glm::vec4 m_colours[ MaxParticles ];
+		VBO m_vboColours;
+
+		virtual void DrawDebugInternal() override;
+		virtual const char* GetDebugTitle() const {	return "Particles"; }
 	};
 }

@@ -14,6 +14,17 @@
 
 namespace dd
 {
+	Random64::Random64( uint64 seed ) :
+		m_rng( seed ),
+		m_min( std::numeric_limits<uint64>::min() ),
+		m_max( std::numeric_limits<uint64>::max() )
+	{
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
+
 	Random64::Random64( uint64 min, uint64 max, uint64 seed )
 		: m_min( min ),
 		m_max( max ),
@@ -34,6 +45,17 @@ namespace dd
 		uint64 clamped = m_min + out % (m_max - m_min);
 
 		return clamped;
+	}
+
+	Random32::Random32( uint seed ) :
+		m_rng( seed ),
+		m_min( std::numeric_limits<uint>::min() ),
+		m_max( std::numeric_limits<uint>::max() )
+	{
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
 	}
 	
 	Random32::Random32( uint min, uint max, uint seed )
@@ -58,10 +80,21 @@ namespace dd
 		return clamped;
 	}
 
-	RandomInt::RandomInt( int min, int max, int seed )
-		: m_min( min ),
-		m_max( max ),
-		m_rng( seed )
+	RandomInt::RandomInt( int seed ) :
+		m_rng( seed ),
+		m_min( std::numeric_limits<int>::min() ),
+		m_max( std::numeric_limits<int>::max() )
+	{
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
+
+	RandomInt::RandomInt( int min, int max, int seed ) :
+		m_rng( seed ),
+		m_min( min ),
+		m_max( max )
 	{
 		DD_ASSERT( min < max );
 
@@ -80,10 +113,21 @@ namespace dd
 		return clamped;
 	}
 
+	RandomFloat::RandomFloat( uint seed ) :
+		m_rng( seed ),
+		m_min( 0.0f ),
+		m_max( 1.0f )
+	{
+		if( seed == DEFAULT_SEED )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
+
 	RandomFloat::RandomFloat( float min, float max, uint seed ) :
+		m_rng( seed ),
 		m_min( min ),
-		m_max( max ),
-		m_rng( seed )
+		m_max( max )
 	{
 		DD_ASSERT( min < max );
 		

@@ -25,10 +25,22 @@ namespace ddr
 	{
 	public:
 
+		// 
+		// Load a shader of the given name, assuming that it uses standard extensions. 
+		// For anything more advanced, use Create.
+		//
+		static ShaderHandle Load( const char* name );
+
 		//
 		// Create a shader with the given name and shaders.
 		//
-		static ShaderHandle Create( const dd::String& name, const dd::Vector<Shader*>& shaders );
+		static ShaderHandle Create( const char* name, const dd::Vector<Shader*>& shaders );
+
+		//
+		// Find a shader with the given name. 
+		// Returns an invalid handle if none exists.
+		//
+		static ShaderHandle Find( const char* name );
 
 		//
 		// Destroy the given shader entirely.
@@ -66,8 +78,8 @@ namespace ddr
 
 		bool SetAttributeInstanced( const char* name );
 
-		void EnableAttribute( const char* name );
-		void DisableAttribute( const char* name );
+		bool EnableAttribute( const char* name );
+		bool DisableAttribute( const char* name );
 
 		void SetUniform( const char* name, const glm::mat3& mat );
 		void SetUniform( const char* name, const glm::mat4& mat );
@@ -92,7 +104,7 @@ namespace ddr
 
 		static std::unordered_map<uint64, ShaderProgram*> s_instances;
 
-		static ShaderProgram* CreateInstance( const dd::String& name, const dd::Vector<Shader*>& shaders );
+		static ShaderProgram* CreateInstance( const char* name, const dd::Vector<Shader*>& shaders );
 
 		dd::String64 m_name;
 		bool m_valid { false };
@@ -101,7 +113,7 @@ namespace ddr
 
 		dd::Vector<Shader*> m_shaders;
 
-		explicit ddr::ShaderProgram( const dd::String& name );
+		explicit ddr::ShaderProgram( const char* name );
 
 		dd::String256 Link();
 

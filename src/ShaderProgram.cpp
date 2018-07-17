@@ -23,15 +23,65 @@ namespace ddr
 {
 	std::unordered_map<uint64, ShaderProgram*> ShaderProgram::s_instances;
 
-	ShaderHandle ShaderProgram::Create( const dd::String& name, const dd::Vector<Shader*>& shaders )
+	ShaderHandle ShaderProgram::Load( const char* name )
 	{
+		ShaderHandle shader_h = ShaderProgram::Find( name );
+		if( !shader_h.Valid() )
+		{
+			const dd::String16 folder( "shaders\\" );
+
+			dd::Vector<Shader*> shaders;
+			shaders.Reserve( 3 );
+
+			{
+				dd::String32 vertexPath( folder );
+				vertexPath += name;
+				vertexPath += ".vertex";
+
+				Shader* vertex = Shader::Create( vertexPath, Shader::Type::Vertex );
+				DD_ASSERT( vertex != nullptr );
+				shaders.Add( vertex );
+			}
+
+			{
+				dd::String32 geometryPath( folder );
+				geometryPath += name;
+				geometryPath += ".geometry";
+
+				Shader* geom = Shader::Create( geometryPath, Shader::Type::Geometry );
+				if( geom != nullptr )
+				{
+					shaders.Add( geom );
+				}
+			}
+
+			{
+				dd::String32 pixelPath( folder );
+				pixelPath += name;
+				pixelPath += ".pixel";
+
+				Shader* pixel = Shader::Create( pixelPath, Shader::Type::Pixel );
+				DD_ASSERT( pixel != nullptr );
+				shaders.Add( pixel );
+			}
+
+			shader_h = ShaderProgram::Create( name, shaders );
+		}
+
+		return shader_h;
+	}
+
+	ShaderHandle ShaderProgram::Create( const char* name, const dd::Vector<Shader*>& shaders )
+	{
+		DD_ASSERT( strlen( name ) > 0 );
+
 		DD_PROFILE_SCOPED( ShaderProgram_Create );
 
-		uint64 hash = dd::Hash( name );
-
-		auto it = s_instances.find( hash );
-		if( it == s_instances.end() )
+		ShaderHandle handle = Find( name );
+		if( !handle.Valid() )
 		{
+			uint64 hash = dd::HashString( name, strlen( name ) );
+
 			ShaderProgram* program = CreateInstance( name, shaders );
 			if( program->IsValid() )
 			{
@@ -40,16 +90,31 @@ namespace ddr
 			else
 			{
 				delete program;
-				hash = 0;
 
 				DD_ASSERT_ERROR( false, "ShaderProgram::CreateInstance returned an invalid program!" );
 			}
+
+			handle.m_hash = hash;
 		}
 
-		ShaderHandle handle;
-		handle.m_hash = hash;
-
 		return handle;
+	}
+
+	ShaderHandle ShaderProgram::Find( const char* name )
+	{
+		DD_ASSERT( strlen( name ) > 0 );
+
+		uint64 hash = dd::HashString( name, strlen( name ) );
+
+		ShaderHandle handle;
+
+		auto it = s_instances.find( hash );
+		if( it != s_instances.end() )
+		{
+			handle.m_hash = hash;
+		}
+		
+		return handle;	
 	}
 
 	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
@@ -73,9 +138,8 @@ namespace ddr
 		}
 	}
 
-	ShaderProgram::ShaderProgram( const dd::String& name )
-		: m_name( name ),
-		m_inUse( false )
+	ShaderProgram::ShaderProgram( const char* name ) : 
+		m_name( name )
 	{
 		m_id = glCreateProgram();
 		CheckOGLError();
@@ -97,7 +161,7 @@ namespace ddr
 		}
 	}
 
-	ShaderProgram* ShaderProgram::CreateInstance( const dd::String& name, const dd::Vector<Shader*>& shaders )
+	ShaderProgram* ShaderProgram::CreateInstance( const char* name, const dd::Vector<Shader*>& shaders )
 	{
 		ShaderProgram* program = new ShaderProgram( name );
 		program->m_valid = true;
@@ -182,11 +246,6 @@ namespace ddr
 			}
 		}
 
-		if( InUse() )
-		{
-			Use( false );
-		}
-
 		dd::String256 msg = Link();
 		if( !msg.IsEmpty() )
 		{
@@ -237,7 +296,7 @@ namespace ddr
 		return attrib;
 	}
 
-	void ShaderProgram::EnableAttribute( const char* name )
+	bool ShaderProgram::EnableAttribute( const char* name )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
@@ -251,10 +310,15 @@ namespace ddr
 		{
 			glEnableVertexAttribArray( loc );
 			CheckOGLError();
+
+			return true;
 		}
+
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		return false;
 	}
 
-	void ShaderProgram::DisableAttribute( const char* name )
+	bool ShaderProgram::DisableAttribute( const char* name )
 	{
 		DD_ASSERT( m_inUse, "Need to use shader before trying to access it!" );
 		DD_ASSERT( IsValid(), "Program is invalid!" );
@@ -268,7 +332,12 @@ namespace ddr
 		{
 			glDisableVertexAttribArray( loc );
 			CheckOGLError();
+
+			return true;
 		}
+
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		return false;
 	}
 
 	bool ShaderProgram::BindPositions()
@@ -330,6 +399,7 @@ namespace ddr
 			return true;
 		}
 
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
 		return false;
 	}
 
@@ -351,6 +421,7 @@ namespace ddr
 			return true;
 		}
 
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
 		return false;
 	}
 

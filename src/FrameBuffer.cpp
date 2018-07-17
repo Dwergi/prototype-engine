@@ -103,11 +103,7 @@ namespace ddr
 	{
 		if( !m_blitShader.Valid() )
 		{
-			dd::Vector<Shader*> shaders;
-			shaders.Add( Shader::Create( dd::String32( "shaders\\blit.vertex" ), Shader::Type::Vertex ) );
-			shaders.Add( Shader::Create( dd::String32( "shaders\\blit.pixel" ), Shader::Type::Pixel ) );
-			
-			m_blitShader = ShaderProgram::Create( dd::String8( "blit" ), shaders );
+			m_blitShader = ShaderProgram::Load( "blit" );
 			ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
 
 			shader->Use( true );

@@ -6,6 +6,11 @@
 
 #pragma once
 
+namespace ddr
+{
+	class Frustum;
+}
+
 namespace dd
 {
 	class ICamera
@@ -53,8 +58,13 @@ namespace dd
 		virtual glm::vec3 GetPosition() const = 0;
 
 		//
-		// Is the camera dirty?
+		// Get the view frustum of the camera.
 		//
-		virtual bool IsDirty() const = 0;
+		virtual const ddr::Frustum& GetFrustum() const = 0;
+
+		//
+		// Update the camera.
+		//
+		virtual void Update( float delta_t ) = 0;
 	};
 }

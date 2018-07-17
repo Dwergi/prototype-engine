@@ -56,7 +56,6 @@ namespace ddr
 		dd::String256 source;
 		if( !LoadFile( m_path, source ) )
 		{
-			DD_ASSERT_ERROR( false, "'%s': Failed to load from path!", m_path.c_str() );
 			return false;
 		}
 

@@ -34,6 +34,11 @@ namespace ddr
 		static MeshHandle Create( const char* name );
 
 		//
+		// Find a handle to a mesh with the given name.
+		//
+		static MeshHandle Find( const char* name );
+
+		//
 		// Get the mesh instance associated with the given handle.
 		// Returns null if the handle does not reference a mesh that still exists.
 		//

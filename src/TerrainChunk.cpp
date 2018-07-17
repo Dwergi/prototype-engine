@@ -164,21 +164,7 @@ namespace dd
 
 	void TerrainChunk::CreateRenderResources()
 	{
-		Vector<ddr::Shader*> shaders;
-
-		ddr::Shader* vert = ddr::Shader::Create( String8( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
-		DD_ASSERT( vert != nullptr );
-		shaders.Add( vert );
-
-		ddr::Shader* geom = ddr::Shader::Create( String8( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
-		DD_ASSERT( geom != nullptr );
-		shaders.Add( geom );
-
-		ddr::Shader* pixel = ddr::Shader::Create( String8( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
-		DD_ASSERT( pixel != nullptr );
-		shaders.Add( pixel );
-
-		s_shader = ddr::ShaderProgram::Create( String8( "terrain" ), shaders );
+		s_shader = ddr::ShaderProgram::Load( "standard" );
 		s_material = ddr::Material::Create( "terrain" );
 
 		ddr::Material* material = ddr::Material::Get( s_material );

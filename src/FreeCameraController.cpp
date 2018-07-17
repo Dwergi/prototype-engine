@@ -172,6 +172,8 @@ namespace dd
 			position += scaled;
 			m_camera.SetPosition( position );
 		}
+
+		m_camera.Update( dt );
 	}
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )

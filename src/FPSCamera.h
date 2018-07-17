@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ICamera.h"
+#include "Frustum.h"
 
 #include <glm/glm.hpp>
 
@@ -47,8 +48,9 @@ namespace dd
 		virtual glm::mat4 GetProjectionMatrix() const override;
 		virtual glm::mat4 GetCameraMatrix() const override;
 
-		virtual bool IsDirty() const override { return m_dirty; }
-		void SetClean() { m_dirty = false; }
+		virtual const ddr::Frustum& GetFrustum() const override { return m_frustum; }
+
+		virtual void Update( float delta_t ) override;
 
 		void CopyValuesFrom( const FPSCamera& other );
 		
@@ -73,6 +75,8 @@ namespace dd
 
 	private:
 
+		ddr::Frustum m_frustum;
+
 		glm::vec3 m_direction;
 		glm::vec3 m_position;
 
@@ -83,6 +87,5 @@ namespace dd
 		float m_aspectRatio { 0 };
 		float m_yaw { 0 };
 		float m_pitch { 0 };
-		bool m_dirty { true };
 	};
 }

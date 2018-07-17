@@ -40,8 +40,6 @@ namespace dd
 			return;
 		}
 
-		m_dirty = true;
-
 		m_position = pos;
 	}
 
@@ -51,8 +49,6 @@ namespace dd
 		{
 			return;
 		}
-
-		m_dirty = true;
 
 		// wrap the x direction
 		m_yaw = dd::wrap( yaw, 0.0f, 360.0f );
@@ -72,15 +68,13 @@ namespace dd
 	{
 		return m_direction;
 	}
-	
+
 	void FPSCamera::SetDirection( const glm::vec3& dir )
 	{
 		if( m_direction == dir )
 		{
 			return;
 		}
-
-		m_dirty = true;
 
 		m_direction = glm::normalize( dir );
 	}
@@ -95,8 +89,6 @@ namespace dd
 		if( dist_near != m_near )
 		{
 			m_near = dist_near;
-
-			m_dirty = true;
 		}
 	}
 
@@ -110,8 +102,6 @@ namespace dd
 		if( dist_far != m_far )
 		{
 			m_far = dist_far;
-
-			m_dirty = true;
 		}
 	}
 
@@ -125,8 +115,6 @@ namespace dd
 		if( m_vfov != vfov )
 		{
 			m_vfov = vfov;
-		
-			m_dirty = true;
 		}
 	}
 
@@ -141,8 +129,6 @@ namespace dd
 		if( aspectRatio != m_aspectRatio )
 		{
 			m_aspectRatio = aspectRatio;
-
-			m_dirty = true;
 		}
 	}
 
@@ -159,6 +145,11 @@ namespace dd
 	glm::mat4 FPSCamera::GetCameraMatrix() const
 	{
 		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
+	}
+
+	void FPSCamera::Update( float delta_t )
+	{
+		m_frustum.Update( *this );
 	}
 
 	void FPSCamera::CopyValuesFrom( const FPSCamera& other )

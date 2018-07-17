@@ -118,11 +118,7 @@ namespace dd
 
 	void MousePicking::RenderInit()
 	{
-		Vector<ddr::Shader*> shaders;
-		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.vertex" ), ddr::Shader::Type::Vertex ) );
-		shaders.Add( ddr::Shader::Create( String8( "shaders\\picking.pixel" ), ddr::Shader::Type::Pixel ) );
-
-		m_shader = ddr::ShaderProgram::Create( String8( "picking" ), shaders );
+		m_shader = ddr::ShaderProgram::Load( "picking" );
 
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();

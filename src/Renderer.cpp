@@ -17,6 +17,7 @@
 #include "MeshComponent.h"
 #include "MousePicking.h"
 #include "LightComponent.h"
+#include "ParticleEmitter.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -76,36 +77,13 @@ namespace ddr
 	Wireframe s_wireframe;
 
 	Renderer::Renderer( const dd::Window& window ) :
-		m_meshCount( 0 ),
-		m_window( window ),
-		m_frustumMeshCount( 0 )
+		m_window( window )
 	{
 	}
 
 	Renderer::~Renderer()
 	{
 
-	}
-
-	// TODO: Don't do this.
-	static ShaderHandle CreateShaders()
-	{
-		dd::Vector<Shader*> shaders;
-
-		Shader* vert = Shader::Create( dd::String32( "shaders\\standard.vertex" ), Shader::Type::Vertex );
-		DD_ASSERT( vert != nullptr );
-		shaders.Add( vert );
-
-		Shader* geom = Shader::Create( dd::String32( "shaders\\standard.geometry" ), Shader::Type::Geometry );
-		DD_ASSERT( geom != nullptr );
-		shaders.Add( geom );
-
-		Shader* pixel = Shader::Create( dd::String32( "shaders\\standard.pixel" ), Shader::Type::Pixel );
-		DD_ASSERT( pixel != nullptr );
-		shaders.Add( pixel );
-
-		ShaderHandle handle = ShaderProgram::Create( dd::String32( "standard" ), shaders );
-		return handle;
 	}
 
 	void Renderer::Initialize( dd::EntityManager& entity_manager )
@@ -127,26 +105,31 @@ namespace ddr
 
 	void Renderer::RenderInit()
 	{
-		ShaderHandle shader_h = CreateShaders();
-		ShaderProgram* shader = ShaderProgram::Get( shader_h );
+		m_unitCube = Mesh::Find( "unitcube" );
+		if( !m_unitCube.IsValid() )
+		{
+			m_unitCube = Mesh::Create( "unitcube" );
 
-		MaterialHandle material_h = Material::Create( "standard" );
-		Material* material = Material::Get( material_h );
-		material->SetShader( shader_h );
+			Mesh* mesh = Mesh::Get( m_unitCube );
+			DD_ASSERT( mesh != nullptr );
 
-		m_frustum = new Frustum();
-		m_frustum->CreateRenderData( shader_h );
+			ShaderHandle shader_h = ShaderProgram::Load( "standard" );
+			ShaderProgram* shader = ShaderProgram::Get( shader_h );
+			DD_ASSERT( shader != nullptr );
 
-		m_unitCube = Mesh::Create( "cube" );
+			MaterialHandle material_h = Material::Create( "standard" );
+			Material* material = Material::Get( material_h );
+			DD_ASSERT( material != nullptr );
 
-		Mesh* mesh = Mesh::Get( m_unitCube );
-		mesh->SetMaterial( material_h );
+			material->SetShader( shader_h );
+			mesh->SetMaterial( material_h );
 
-		shader->Use( true );
+			shader->Use( true );
 
-		mesh->MakeUnitCube();
+			mesh->MakeUnitCube();
 
-		shader->Use( false );
+			shader->Use( false );
+		}
 
 		CreateFrameBuffer( m_window.GetSize() );
 
@@ -167,9 +150,6 @@ namespace ddr
 	void Renderer::Shutdown()
 	{
 		Mesh::Destroy( m_unitCube );
-
-		delete m_frustum;
-		m_frustum = nullptr;
 	}
 
 	dd::EntityHandle Renderer::CreateMeshEntity( dd::EntityManager& entityManager, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
@@ -189,9 +169,6 @@ namespace ddr
 
 	void Renderer::DrawDebugInternal()
 	{
-		ImGui::Value( "Meshes", m_meshCount );
-		ImGui::Value( "Unculled Meshes", m_frustumMeshCount );
-
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
@@ -288,7 +265,6 @@ namespace ddr
 				}
 			}
 
-
 			if( m_debugLights.size() < 10 )
 			{
 				if( ImGui::Button( "Create Light" ) )
@@ -296,19 +272,6 @@ namespace ddr
 					m_createLight = true;
 				}
 			}
-
-			ImGui::TreePop();
-		}
-
-		if( ImGui::TreeNodeEx( "Frustum", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			if( ImGui::Checkbox( "Freeze", &m_debugFreezeFrustum ) && m_debugFreezeFrustum )
-			{
-				m_forceUpdateFrustum = true;
-			}
-
-			ImGui::Checkbox( "Enable Culling", &m_frustumCulling );
-			ImGui::Checkbox( "Highlight Meshes in Frustum", &m_debugHighlightFrustumMeshes );
 
 			ImGui::TreePop();
 		}
@@ -357,89 +320,6 @@ namespace ddr
 			glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
-	}
-
-	void Renderer::RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, 
-		const dd::ICamera& camera, ddr::UniformStorage& uniforms, const dd::MousePicking* mousePicking )
-	{
-		if( mesh_cmp->Hidden )
-		{
-			return;
-		}
-
-
-		Mesh* mesh = nullptr;
-
-		if( m_debugDrawBounds )
-		{
-			mesh = Mesh::Get( m_unitCube );
-		}
-		else
-		{
-			mesh = Mesh::Get( mesh_cmp->Mesh );
-		}
-
-		if( mesh == nullptr )
-		{
-			return;
-		}
-
-		++m_meshCount;
-
-		// check if it intersects with the frustum
-		if( m_frustumCulling && !m_frustum->Intersects( mesh_cmp->Bounds ) )
-		{
-			return;
-		}
-
-		++m_frustumMeshCount;
-
-		glm::mat4 transform = transform_cmp->GetWorldTransform();
-
-		if( m_debugDrawBounds )
-		{
-			glm::vec3 scale = mesh_cmp->Bounds.Max - mesh_cmp->Bounds.Min;
-			transform = glm::translate( mesh_cmp->Bounds.Center() ) * glm::scale( scale / 2.0f );
-		}
-		
-		glm::vec4 debugMultiplier( 1, 1, 1, 1 );
-
-		if( mousePicking != nullptr )
-		{
-			if( entity == mousePicking->GetFocusedMesh() )
-			{
-				debugMultiplier.z = 1.5f;
-			}
-
-			if( entity == mousePicking->GetSelectedMesh() )
-			{
-				debugMultiplier.y = 1.5f;
-			}
-		}
-			
-		if( m_debugHighlightFrustumMeshes )
-		{
-			debugMultiplier.x = 1.5f;
-		}
-
-		Material* material = Material::Get( mesh->GetMaterial() );
-		DD_ASSERT( material != nullptr );
-
-		ShaderProgram* shader = ShaderProgram::Get( material->GetShader() );
-		DD_ASSERT( shader != nullptr );
-
-		shader->Use( true );
-
-		material->UpdateUniforms( uniforms );
-
-		glm::vec4 colour = mesh_cmp->Colour * debugMultiplier;
-		uniforms.Set( "ObjectColour", colour );
-
-		uniforms.Bind( *shader );
-
-		mesh->Render( *shader, transform );
-
-		shader->Use( false );
 	}
 
 	void Renderer::CreateDebugMeshGrid( dd::EntityManager& entityManager )
@@ -518,8 +398,10 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::BeginRender( const dd::ICamera& camera )
+	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms )
 	{
+		DD_ASSERT( m_window.IsContextValid() );
+
 		if( m_reloadShaders )
 		{
 			ShaderProgram::ReloadAll();
@@ -540,26 +422,10 @@ namespace ddr
 		m_framebuffer.BindRead();
 		m_framebuffer.BindDraw();
 		m_framebuffer.Clear();
-	}
-
-	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, ddr::UniformStorage& uniforms )
-	{
-		DD_ASSERT( m_window.IsContextValid() );
-
-		m_framebuffer.BindDraw();
-
-		m_frustumMeshCount = 0;
-		m_meshCount = 0;
 
 		SetRenderState();
 
-		if( !m_debugFreezeFrustum && camera.IsDirty() || m_forceUpdateFrustum )
-		{
-			m_frustum->Update( camera );
-
-			m_forceUpdateFrustum = false;
-		}
-
+		DD_TODO( "Move this to a light renderer.")
 		std::vector<dd::EntityHandle> lights = entity_manager.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
 
 		size_t lightCount = lights.size();
@@ -592,18 +458,6 @@ namespace ddr
 		s_fog.UpdateUniforms( uniforms );
 
 		uniforms.Set( "DrawStandard", m_debugDrawStandard );
-
-		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
-		{ 
-			RenderMesh( entity, mesh.Read(), transform.Read(), camera, uniforms, m_mousePicking );
-		} );
-
-		if( m_debugFreezeFrustum )
-		{
-			m_frustum->Render( camera, uniforms );
-		}
-
-		m_framebuffer.UnbindDraw();
 	}
 
 	void Renderer::EndRender( const dd::ICamera& camera )

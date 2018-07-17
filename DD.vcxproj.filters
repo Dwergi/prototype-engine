@@ -543,6 +543,9 @@
     <ClInclude Include="src\ParticleEmitter.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\MeshRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -916,6 +919,9 @@
       <Filter>DebugUI</Filter>
     </ClCompile>
     <ClCompile Include="src\ParticleEmitter.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

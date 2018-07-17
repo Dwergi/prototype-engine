@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Frustum.h"
 #include "ICamera.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
@@ -51,7 +52,7 @@ namespace dd
 		//
 		// Update the shakiness.
 		//
-		void Update( float delta_t );
+		virtual void Update( float delta_t ) override;
 
 		// 
 		// Add trauma (0-1) to the current amount. 
@@ -68,11 +69,10 @@ namespace dd
 		//
 		void SetSeed( float seed ) { m_seed = seed; }
 
-
 		//
 		// IDebugDraw implementation
 		//
-		virtual const char * GetDebugTitle() const override { return "Shaky Camera"; }
+		virtual const char* GetDebugTitle() const override { return "Shaky Camera"; }
 
 		//
 		// ICamera implementation
@@ -83,9 +83,9 @@ namespace dd
 		virtual float GetAspectRatio() const override;
 		virtual float GetNear() const override;
 		virtual float GetFar() const override;
-		virtual glm::vec3 GetDirection() const override;
+		virtual glm::vec3 GetDirection() const override { return m_direction; }
 		virtual glm::vec3 GetPosition() const override;
-		virtual bool IsDirty() const override;
+		virtual const ddr::Frustum& GetFrustum() const override { return m_frustum; }
 
 	protected:
 
@@ -103,6 +103,8 @@ namespace dd
 		float m_yaw { 0 };
 		float m_pitch { 0 };
 		float m_roll { 0 };
+
+		ddr::Frustum m_frustum;
 
 		void AddTraumaHandler( InputAction action, InputType type );
 	};

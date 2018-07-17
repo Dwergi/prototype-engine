@@ -79,6 +79,8 @@ namespace dd
 			std::cos( m_pitch ) * std::cos( m_yaw ) );
 
 		AddTrauma( -(delta_t * TraumaDecayRate) );
+
+		m_frustum.Update( *this );
 	}
 
 	void ShakyCamera::AddTrauma( float amount )
@@ -117,11 +119,6 @@ namespace dd
 		return m_sourceCamera.GetFar();
 	}
 
-	glm::vec3 ShakyCamera::GetDirection() const
-	{
-		return m_direction;
-	}
-
 	glm::vec3 ShakyCamera::GetPosition() const
 	{
 		return m_sourceCamera.GetPosition();
@@ -141,10 +138,5 @@ namespace dd
 		glm::vec3 position = m_sourceCamera.GetPosition();
 
 		return glm::lookAt( position, position + m_direction, up.xyz() );
-	}
-
-	bool ShakyCamera::IsDirty() const
-	{
-		return m_sourceCamera.IsDirty() || m_trauma > 0;
 	}
 }

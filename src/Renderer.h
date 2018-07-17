@@ -43,14 +43,15 @@ namespace ddr
 
 		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
 
-		void BeginRender( const dd::ICamera& camera );
-		void EndRender( const dd::ICamera& camera );
+		//
+		// Setup render states, uniforms, and the like for other renderers.
+		//
+		void BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms );
 
 		//
-		// Render a full frame.
-		// Does NOT call Window::Swap, which is done in main loop because of debug UI stuff.
+		// Complete the render. Does *NOT* call Swap - that's in the main loop.
 		//
-		void Render( const dd::EntityManager& entityManager, const dd::ICamera& camera, ddr::UniformStorage& uniforms );
+		void EndRender( const dd::ICamera& camera );
 
 		//
 		// Initialize the renderer.
@@ -62,13 +63,6 @@ namespace ddr
 		//
 		void RenderDebug( dd::IRenderer& debug_render );
 
-		//
-		// Set the mouse picking helper to use.
-		//
-		void SetMousePicking( dd::MousePicking* mouse_picking ) { m_mousePicking = mouse_picking; }
-
-		virtual const char* GetDebugTitle() const override { return "Renderer"; }
-
 	protected:
 
 		//
@@ -79,8 +73,6 @@ namespace ddr
 	private:
 
 		const dd::Window& m_window;
-		Frustum* m_frustum { nullptr };
-		dd::MousePicking* m_mousePicking { nullptr };
 		
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;
@@ -92,22 +84,16 @@ namespace ddr
 
 		std::vector<dd::EntityHandle> m_debugLights;
 
-		int m_meshCount { 0 };
-		int m_frustumMeshCount { 0 };
-
 		glm::ivec2 m_previousSize { -1, -1 };
 
 		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
 
-		bool m_frustumCulling { true };
 		bool m_debugDrawStandard { true };
 		bool m_debugDrawAxes { true };
 		bool m_debugDrawBounds { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
-		bool m_debugFreezeFrustum { false };
-		bool m_forceUpdateFrustum { false };
 		bool m_reloadShaders { false };
 
 		bool m_debugDrawDepth { false };
@@ -126,7 +112,6 @@ namespace ddr
 
 		void SetRenderState();
 
-		void RenderMesh( dd::EntityHandle entity, const dd::MeshComponent* mesh_cmp, const dd::TransformComponent* transform_cmp, 
-			const dd::ICamera& camera, ddr::UniformStorage& uniforms, const dd::MousePicking* mouse_picking );
+		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};
 }

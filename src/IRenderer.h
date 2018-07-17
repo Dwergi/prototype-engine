@@ -27,5 +27,7 @@ namespace dd
 
 		virtual bool ShouldRenderDebug() const { return false; }
 		virtual void RenderDebug() {}
+
+		virtual bool UsesAlpha() const { return false; }
 	};
 }

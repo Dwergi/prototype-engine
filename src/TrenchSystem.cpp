@@ -112,32 +112,9 @@ namespace dd
 
 	}
 
-	namespace
-	{
-		ddr::ShaderHandle CreateShaders( const char* name )
-		{
-			Vector<ddr::Shader*> shaders;
-
-			ddr::Shader* vert = ddr::Shader::Create( String8( "shaders\\standard.vertex" ), ddr::Shader::Type::Vertex );
-			DD_ASSERT( vert != nullptr );
-			shaders.Add( vert );
-
-			ddr::Shader* geom = ddr::Shader::Create( String8( "shaders\\standard.geometry" ), ddr::Shader::Type::Geometry );
-			DD_ASSERT( geom != nullptr );
-			shaders.Add( geom );
-
-			ddr::Shader* pixel = ddr::Shader::Create( String8( "shaders\\standard.pixel" ), ddr::Shader::Type::Pixel );
-			DD_ASSERT( pixel != nullptr );
-			shaders.Add( pixel );
-
-			ddr::ShaderHandle handle = ddr::ShaderProgram::Create( String8( name ), shaders );
-			return handle;
-		}
-	}
-
 	void TrenchSystem::CreateRenderResources()
 	{
-		m_shader = CreateShaders( "trench_chunk" );
+		m_shader = ddr::ShaderProgram::Load( "standard" );
 		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
 		DD_ASSERT( shader != nullptr );
 

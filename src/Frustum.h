@@ -29,7 +29,7 @@ namespace ddr
 		Frustum();
 		~Frustum();
 
-		void CreateRenderData( ShaderHandle shader );
+		void CreateRenderData();
 
 		//
 		// Check if the frustum intersects with the given bounds.

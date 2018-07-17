@@ -30,6 +30,7 @@
 #include "JobSystem.h"
 #include "LightComponent.h"
 #include "MeshComponent.h"
+#include "MeshRenderer.h"
 #include "Message.h"
 #include "MousePicking.h"
 #include "OctreeComponent.h"
@@ -37,6 +38,7 @@
 #include "Recorder.h"
 #include "Renderer.h"
 #include "FrameBuffer.h"
+#include "ParticleEmitter.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -418,19 +420,22 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views )
 	s_frameTimer->DrawFPSCounter();
 }
 
-void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms, DebugConsole& console )
+void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms, float delta_t )
 {
 	IRenderer* debug_render = nullptr;
 
-	renderer.BeginRender( camera );
+	renderer.BeginRender( entity_manager, camera, uniforms );
 
-	for( IRenderer* current : renderers )
+	for( IRenderer* r : renderers )
 	{
-		current->Render( entity_manager, camera, uniforms );
-
-		if( current->ShouldRenderDebug() )
+		if( !r->UsesAlpha() )
 		{
-			debug_render = current;
+			r->Render( entity_manager, camera, uniforms );
+		}
+
+		if( r->ShouldRenderDebug() )
+		{
+			debug_render = r;
 			break;
 		}
 	}
@@ -439,9 +444,13 @@ void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, Entit
 	{
 		renderer.RenderDebug( *debug_render );
 	}
-	else
+
+	for( IRenderer* r : renderers )
 	{
-		renderer.Render( entity_manager, camera, uniforms );
+		if( r->UsesAlpha() )
+		{
+			r->Render( entity_manager, camera, uniforms );
+		}
 	}
 }
 
@@ -488,6 +497,8 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 		TerrainSystem terrain_system( jobSystem );
 
+		ddr::ParticleEmitter particle_system;
+
 		SceneGraphSystem scene_graph;
 
 		//TrenchSystem trench_system( camera );
@@ -503,7 +514,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		MousePicking mouse_picking( *s_window, *s_input );
 		mouse_picking.BindActions( bindings );
 
-		renderer.SetMousePicking( &mouse_picking );
+		ddr::MeshRenderer mesh_renderer( mouse_picking );
 
 		Vector<ISystem*> systems;
 		systems.Add( &renderer );
@@ -513,10 +524,13 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		systems.Add( &mouse_picking );
 		//systems.Add( s_shipSystem );
 		systems.Add( &terrain_system );
+		systems.Add( &particle_system );
 
 		Vector<IRenderer*> renderers;
 		renderers.Add( &mouse_picking );
 		renderers.Add( &terrain_system );
+		renderers.Add( &particle_system );
+		renderers.Add( &mesh_renderer );
 
 		BindKeys( *s_input );
 
@@ -532,6 +546,8 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		//debug_views.Add( s_shipSystem );
 		debug_views.Add( &terrain_system );
 		debug_views.Add( &shakyCam );
+		debug_views.Add( &particle_system );
+		debug_views.Add( &mesh_renderer );
 
 		s_fsm = new FSM();
 		s_fsm->AddState( INITIALIZED );
@@ -571,8 +587,9 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		FSMState& renderState = s_fsm->AddState( RENDER );
 		auto onRender = [&]()
 		{
+			float delta_t = s_frameTimer->Delta();
 			DrawDebugUI( debug_views );
-			Render( renderer, renderers, entity_manager, shakyCam, uniforms, console );
+			Render( renderer, renderers, entity_manager, shakyCam, uniforms, delta_t );
 		};
 		renderState.SetOnEnter( onRender );
 
@@ -591,7 +608,7 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 		auto onPostRender = [&]()
 		{
 			PostRenderSystems( jobSystem, entity_manager, systems, s_frameTimer->Delta() );
-			camera.SetClean();
+
 			s_frameTimer->DelayFrame();
 		};
 		postRenderState.SetOnEnter( onPostRender );
