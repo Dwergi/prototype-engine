@@ -10,7 +10,7 @@
 #include "Random.h"
 #include "Ray.h"
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 TEST_CASE( "[BVHTree] Add" )
 {
@@ -162,7 +162,7 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 		tree.Add( new_entry );
 	}
 
-	DD_DIAGNOSTIC( "Entries: %llu, Buckets: %llu, Tree Rebuilds: %d\n", tree.GetEntryCount(), tree.GetBucketCount(), tree.GetRebuildCount() );
+	DD_DIAGNOSTIC( "Entries: %zu, Buckets: %zu, Tree Rebuilds: %d\n", tree.GetEntryCount(), tree.GetBucketCount(), tree.GetRebuildCount() );
 
 	int x, y, z;
 	tree.CountBucketSplits( x, y, z );
@@ -170,7 +170,7 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 	int most = dd::max( x, dd::max( y, z ) );
 	int least = dd::min( x, dd::min( y, z ) );
 
-	REQUIRE( (most - least) < (tree.GetBucketCount() / 10) );
+	REQUIRE( (size_t) (most - least) < (tree.GetBucketCount() / 10) );
 
 	for( int i = 0; i < 256; ++i )
 	{

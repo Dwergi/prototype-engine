@@ -35,7 +35,7 @@ namespace std
 	{
 		std::size_t operator()( const dd::TerrainChunkKey& key ) const
 		{
-			return (std::size_t( key.X ) << 36) + (std::size_t( key.Y ) << 8) + ~(key.LOD & 0xff);
+			return (std::size_t( key.X ) << 18) + (std::size_t( key.Y ) << 4) + ~(key.LOD & 0xff);
 		}
 	};
 }

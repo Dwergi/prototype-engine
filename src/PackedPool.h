@@ -47,8 +47,8 @@ namespace dd
 		
 		struct ComponentEntry
 		{
-			int Handle { -1 };
-			int Index { -1 };
+			uint Handle { ~0u };
+			uint Index { ~0u };
 		};
 
 		uint m_count { 0 };

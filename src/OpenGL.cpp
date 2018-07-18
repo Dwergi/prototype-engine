@@ -3,14 +3,14 @@
 
 namespace ddr
 {
-	dd::String128 GetArrayUniformName( const char* arrayName, int index, const char* uniform )
+	dd::String128 GetArrayUniformName( const char* arrayName, size_t index, const char* uniform )
 	{
 		dd::String256 result;
 		result += arrayName;
 		result += "[";
 
 		char buffer[ 32 ];
-		_itoa_s( index, buffer, 10 );
+		_itoa_s( (int) index, buffer, 10 );
 		result += buffer;
 
 		result += "]";

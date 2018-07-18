@@ -197,7 +197,7 @@ namespace dd
 
 	void MousePicking::RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
 	{
-		shader.SetUniform( "ID", entity.Handle );
+		shader.SetUniform( "ID", (int) entity.Handle );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
 		mesh->Render( shader, transform_cmp->GetWorldTransform() );

@@ -18,8 +18,8 @@ namespace ddc
 	struct Entity
 	{
 		uint Alive : 1;
-		int ID : 21;
-		int Version : 10;
+		uint ID : 21;
+		uint Version : 10;
 	};
 
 	struct EntityLayer

@@ -22,11 +22,11 @@ namespace dd
 		{
 			struct
 			{
-				int ID : 22;
-				int Version : 10;
+				uint ID : 22;
+				uint Version : 10;
 			};
 
-			int Handle;
+			uint Handle;
 		};
 		
 		EntityHandle();

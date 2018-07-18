@@ -68,9 +68,9 @@ namespace std
 	template <>
 	struct hash<dd::SharedString>
 	{
-		std::size_t operator()( const dd::SharedString& str ) const
+		size_t operator()( const dd::SharedString& str ) const
 		{
-			return dd::HashString( str.c_str(), str.Length() );
+			return (size_t) dd::HashString( str.c_str(), str.Length() );
 		}
 	};
 }

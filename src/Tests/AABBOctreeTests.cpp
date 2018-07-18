@@ -9,7 +9,7 @@
 
 #include "Random.h"
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 using namespace dd;
 

@@ -236,7 +236,7 @@ namespace ddc
 			nodes.push_back( node );
 		}
 
-		for( int sys = 0; sys < systems.Size(); ++sys )
+		for( size_t sys = 0; sys < systems.Size(); ++sys )
 		{
 			System* system = systems[ sys ];
 
@@ -244,7 +244,7 @@ namespace ddc
 			{
 				if( req->Usage() == DataUsage::Write )
 				{
-					for( int other = 0; other < systems.Size(); ++other )
+					for( size_t other = 0; other < systems.Size(); ++other )
 					{
 						if( sys == other )
 							continue;

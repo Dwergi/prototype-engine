@@ -199,11 +199,11 @@ namespace ddr
 
 		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_debugLights.size(); ++i )
+			for( size_t i = 0; i < m_debugLights.size(); ++i )
 			{
 				dd::String64 lightLabel( "Light " );
 				char buffer[16];
-				_itoa_s( i, buffer, 10 );
+				_itoa_s( (int) i, buffer, 10 );
 				lightLabel += buffer;
 
 				dd::EntityHandle entity = m_debugLights[ i ];
@@ -432,7 +432,7 @@ namespace ddr
 		DD_ASSERT( lightCount <= 10 );
 		uniforms.Set( "LightCount", (int) lightCount );
 
-		for( int i = 0; i < lights.size(); ++i )
+		for( size_t i = 0; i < lights.size(); ++i )
 		{
 			const dd::TransformComponent* transformCmp = lights[ i ].Get<dd::TransformComponent>().Read();
 			const dd::LightComponent* lightCmp = lights[ i ].Get<dd::LightComponent>().Read();

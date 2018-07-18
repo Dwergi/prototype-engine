@@ -180,7 +180,7 @@ namespace dd
 			}
 		}
 
-		DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%llu\n", buckets_tested, m_buckets.size() );
+		DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return nearest;
 	}
@@ -221,7 +221,7 @@ namespace dd
 			}
 		}
 
-		DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%llu\n", buckets_tested, m_buckets.size() );
+		DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return hit;
 	}

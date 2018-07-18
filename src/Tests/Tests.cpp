@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "Tests.h"
 #define CATCH_CONFIG_RUNNER
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 int tests::RunTests( int argc, char* argv[] )
 {

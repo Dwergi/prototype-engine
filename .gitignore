@@ -59,7 +59,6 @@ Temporary Items
 # DD-specific things
 *.opensdf
 AS_DEBUG/
-Debug/
 *.pch
 *.user
 *.opendb

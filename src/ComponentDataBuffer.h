@@ -41,9 +41,9 @@ namespace ddc
 
 		size_t Size() const { return m_buffer.Size(); }
 
-		const T& Get( int index ) const
+		const T& Get( size_t index ) const
 		{
-			DD_ASSERT( index >= 0 && index < m_buffer.Size() );
+			DD_ASSERT( index < m_buffer.Size() );
 
 			return *(reinterpret_cast<T*>(m_buffer.Data()) + index);
 		}
@@ -69,9 +69,9 @@ namespace ddc
 
 		size_t Size() const { return m_buffer.Size(); }
 
-		T& Get( int index ) const
+		T& Get( size_t index ) const
 		{
-			DD_ASSERT( index >= 0 && index < m_buffer.Size() );
+			DD_ASSERT( index < m_buffer.Size() );
 
 			return *(reinterpret_cast<T*>(m_buffer.Data()) + index);
 		}

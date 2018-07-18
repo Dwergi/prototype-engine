@@ -6,7 +6,7 @@
 #include "UpdateData.h"
 #include "System.h"
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 struct FirstComponent
 {
@@ -50,7 +50,7 @@ struct TestSystem : ddc::System
 
 		DD_ASSERT( read.Size() == write.Size() );
 
-		for( int i = 0; i < read.Size(); ++i )
+		for( size_t i = 0; i < read.Size(); ++i )
 		{
 			const FirstComponent& cmp = read.Get( i );
 			write.Get( i ).SecondValue = cmp.FirstValue;
@@ -77,7 +77,7 @@ struct DependentSystem : ddc::System
 
 		DD_ASSERT( read.Size() == write.Size() );
 
-		for( int i = 0; i < read.Size(); ++i )
+		for( size_t i = 0; i < read.Size(); ++i )
 		{
 			const SecondComponent& cmp = read.Get( i );
 			write.Get( i ).ThirdValue = cmp.SecondValue;
@@ -100,7 +100,7 @@ struct ReaderSystem : ddc::System
 	{
 		ddc::ReadBuffer<ThirdComponent> read = data.GetRead<ThirdComponent>();
 
-		for( int i = 0; i < read.Size(); ++i )
+		for( size_t i = 0; i < read.Size(); ++i )
 		{
 			const ThirdComponent& cmp = read.Get( i );
 			int x = cmp.ThirdValue * cmp.ThirdValue;
@@ -124,7 +124,7 @@ struct OnlyReaderSystem : ddc::System
 		ddc::ReadBuffer<FirstComponent> read1 = data.GetRead<FirstComponent>();
 		ddc::ReadBuffer<SecondComponent> read2 = data.GetRead<SecondComponent>();
 
-		for( int i = 0; i < read1.Size(); ++i )
+		for( size_t i = 0; i < read1.Size(); ++i )
 		{
 			const FirstComponent& cmp1 = read1.Get( i );
 			const SecondComponent& cmp2 = read2.Get( i );
