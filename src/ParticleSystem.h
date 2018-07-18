@@ -1,5 +1,5 @@
 //
-// ParticleEmitter.h - A particle emitter.
+// ParticleSystem.h - A particle emitter.
 // Copyright (C) Sebastian Nordgren 
 // July 16th 2018
 //
@@ -36,12 +36,12 @@ namespace ddr
 		bool Alive() { return Age < Lifetime; }
 	};
 
-	class ParticleEmitter : public dd::IDebugPanel, public dd::IRenderer, public dd::ISystem
+	class ParticleSystem : public dd::IDebugPanel, public dd::IRenderer, public dd::ISystem
 	{
 	public:
 
-		ParticleEmitter();
-		~ParticleEmitter();
+		ParticleSystem();
+		~ParticleSystem();
 
 		virtual void RenderInit() override;
 		virtual bool UsesAlpha() const override { return true; }
@@ -49,10 +49,10 @@ namespace ddr
 		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
 		virtual void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms ) override;
 
-		ParticleEmitter( const ParticleEmitter& ) = delete;
-		ParticleEmitter( ParticleEmitter&& ) = delete;
-		ParticleEmitter& operator=( const ParticleEmitter& ) = delete;
-		ParticleEmitter& operator=( ParticleEmitter&& ) = delete;
+		ParticleSystem( const ParticleSystem& ) = delete;
+		ParticleSystem( ParticleSystem&& ) = delete;
+		ParticleSystem& operator=( const ParticleSystem& ) = delete;
+		ParticleSystem& operator=( ParticleSystem&& ) = delete;
 
 	private:
 

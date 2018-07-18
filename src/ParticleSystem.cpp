@@ -1,11 +1,11 @@
 //
-// ParticleEmitter.cpp - A particle emitter.
+// ParticleSystem.cpp - A particle emitter.
 // Copyright (C) Sebastian Nordgren 
 // July 16th 2018
 //
 
 #include "PrecompiledHeader.h"
-#include "ParticleEmitter.h"
+#include "ParticleSystem.h"
 
 #include "ICamera.h"
 #include "OpenGL.h"
@@ -49,32 +49,32 @@ namespace ddr
 
 	static const glm::vec3 s_gravity( 0, -9.81, 0 );
 
-	dd::RandomFloat ParticleEmitter::s_rngLifetime( 0.5f, 5.0f );
+	dd::RandomFloat ParticleSystem::s_rngLifetime( 0.5f, 5.0f );
 
-	dd::RandomFloat ParticleEmitter::s_rngSizeX( 0, 1 );
-	dd::RandomFloat ParticleEmitter::s_rngSizeY( 0, 1 );
+	dd::RandomFloat ParticleSystem::s_rngSizeX( 0, 1 );
+	dd::RandomFloat ParticleSystem::s_rngSizeY( 0, 1 );
 
-	dd::RandomFloat ParticleEmitter::s_rngVelocityX( -10.0f, 10.0f );
-	dd::RandomFloat ParticleEmitter::s_rngVelocityY( -10.0f, 10.0f );
-	dd::RandomFloat ParticleEmitter::s_rngVelocityZ( -10.0f, 10.0f );
+	dd::RandomFloat ParticleSystem::s_rngVelocityX( -10.0f, 10.0f );
+	dd::RandomFloat ParticleSystem::s_rngVelocityY( -10.0f, 10.0f );
+	dd::RandomFloat ParticleSystem::s_rngVelocityZ( -10.0f, 10.0f );
 
-	dd::RandomFloat ParticleEmitter::s_rngColourR( 0, 1 );
-	dd::RandomFloat ParticleEmitter::s_rngColourG( 0, 1 );
-	dd::RandomFloat ParticleEmitter::s_rngColourB( 0, 1 );
+	dd::RandomFloat ParticleSystem::s_rngColourR( 0, 1 );
+	dd::RandomFloat ParticleSystem::s_rngColourG( 0, 1 );
+	dd::RandomFloat ParticleSystem::s_rngColourB( 0, 1 );
 
-	int ParticleEmitter::CurrentParticles = 1000;
+	int ParticleSystem::CurrentParticles = 1000;
 
-	ParticleEmitter::ParticleEmitter()
+	ParticleSystem::ParticleSystem()
 	{
 
 	}
 
-	ParticleEmitter::~ParticleEmitter()
+	ParticleSystem::~ParticleSystem()
 	{
 
 	}
 
-	void ParticleEmitter::RenderInit()
+	void ParticleSystem::RenderInit()
 	{
 		dd::Vector<Shader*> shaders;
 
@@ -123,7 +123,7 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void ParticleEmitter::Update( dd::EntityManager& entity_manager, float delta_t )
+	void ParticleSystem::Update( dd::EntityManager& entity_manager, float delta_t )
 	{
 		m_age += delta_t;
 
@@ -166,7 +166,7 @@ namespace ddr
 		}
 	}
 
-	void ParticleEmitter::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms )
+	void ParticleSystem::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms )
 	{
 		for( Particle& particle : m_particles )
 		{
@@ -221,7 +221,7 @@ namespace ddr
 		s_vaoParticle.Unbind();
 	}
 
-	void ParticleEmitter::DrawDebugInternal()
+	void ParticleSystem::DrawDebugInternal()
 	{
 		ImGui::SliderInt( "Max Particles", &CurrentParticles, 0, MaxParticles );
 

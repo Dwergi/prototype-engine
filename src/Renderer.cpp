@@ -17,7 +17,7 @@
 #include "MeshComponent.h"
 #include "MousePicking.h"
 #include "LightComponent.h"
-#include "ParticleEmitter.h"
+#include "ParticleSystem.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -79,11 +79,12 @@ namespace ddr
 	Renderer::Renderer( const dd::Window& window ) :
 		m_window( window )
 	{
+		m_uniforms = new ddr::UniformStorage();
 	}
 
 	Renderer::~Renderer()
 	{
-
+		delete m_uniforms;
 	}
 
 	void Renderer::Initialize( dd::EntityManager& entity_manager )
@@ -132,8 +133,17 @@ namespace ddr
 		}
 
 		CreateFrameBuffer( m_window.GetSize() );
-
 		m_previousSize = m_window.GetSize();
+
+		for( dd::IRenderer* current : m_renderers )
+		{
+			current->RenderInit();
+		}
+	}
+
+	void Renderer::Register( dd::IRenderer& renderer )
+	{
+		m_renderers.push_back( &renderer );
 	}
 
 	void Renderer::CreateFrameBuffer( glm::ivec2 size )
@@ -170,7 +180,6 @@ namespace ddr
 	void Renderer::DrawDebugInternal()
 	{
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
-		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
@@ -398,7 +407,41 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms )
+	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
+	{
+		dd::IRenderer* debug_render = nullptr;
+
+		BeginRender( entity_manager, camera );
+
+		for( dd::IRenderer* r : m_renderers )
+		{
+			if( !r->UsesAlpha() )
+			{
+				r->Render( entity_manager, camera, *m_uniforms );
+			}
+
+			if( r->ShouldRenderDebug() )
+			{
+				debug_render = r;
+				break;
+			}
+		}
+
+		if( debug_render != nullptr )
+		{
+			RenderDebug( *debug_render );
+		}
+
+		for( dd::IRenderer* r : m_renderers )
+		{
+			if( r->UsesAlpha() )
+			{
+				r->Render( entity_manager, camera, *m_uniforms );
+			}
+		}
+	}
+
+	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
 
@@ -430,7 +473,7 @@ namespace ddr
 
 		size_t lightCount = lights.size();
 		DD_ASSERT( lightCount <= 10 );
-		uniforms.Set( "LightCount", (int) lightCount );
+		m_uniforms->Set( "LightCount", (int) lightCount );
 
 		for( size_t i = 0; i < lights.size(); ++i )
 		{
@@ -443,21 +486,21 @@ namespace ddr
 				position.w = 0;
 			}
 
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
+			m_uniforms->Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
 		}
 
-		uniforms.Set( "View", camera.GetCameraMatrix() );
-		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
+		m_uniforms->Set( "View", camera.GetCameraMatrix() );
+		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
 
-		s_wireframe.UpdateUniforms( uniforms );
-		s_fog.UpdateUniforms( uniforms );
+		s_wireframe.UpdateUniforms( *m_uniforms );
+		s_fog.UpdateUniforms( *m_uniforms );
 
-		uniforms.Set( "DrawStandard", m_debugDrawStandard );
+		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}
 
 	void Renderer::EndRender( const dd::ICamera& camera )

@@ -11,16 +11,18 @@
 
 namespace ddr
 {
-	IUniform* UniformStorage::Access( int index ) const
+	IUniform* UniformStorage::Access( int index )
 	{
-		return reinterpret_cast<IUniform*>(m_uniforms[index * UNIFORM_SIZE]);
+		return reinterpret_cast<IUniform*>(m_uniforms + index * UNIFORM_SIZE);
 	}
 
 	template <typename T>
 	void UniformStorage::Create( const char* name, UniformType type, T value )
 	{
+		DD_ASSERT( strlen( name ) < 256 );
+
 		Uniform<T>* created = (Uniform<T>*) Access( m_count );
-		created->Name = name;
+		strcpy_s( created->Name, 256, name );
 		created->Type = type;
 		created->Value = value;
 
@@ -137,43 +139,43 @@ namespace ddr
 				case UniformType::Boolean:
 				{
 					Uniform<bool>* u = (Uniform<bool>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Integer:
 				{
 					Uniform<int>* u = (Uniform<int>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Float:
 				{
 					Uniform<float>* u = (Uniform<float>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Vector2:
 				{
 					Uniform<glm::vec2>* u = (Uniform<glm::vec2>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Vector3:
 				{
 					Uniform<glm::vec3>* u = (Uniform<glm::vec3>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Vector4:
 				{
 					Uniform<glm::vec4>* u = (Uniform<glm::vec4>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 				case UniformType::Matrix4:
 				{
 					Uniform<glm::mat4>* u = (Uniform<glm::mat4>*) uniform;
-					shader.SetUniform( u->Name.c_str(), u->Value );
+					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
 			}
@@ -186,7 +188,7 @@ namespace ddr
 		{
 			IUniform* uniform = Access( i );
 
-			if( uniform->Name == name )
+			if( strcmp( uniform->Name, name ) == 0 )
 			{
 				return uniform;
 			}

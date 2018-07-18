@@ -24,7 +24,7 @@ namespace ddr
 	struct IUniform
 	{
 		UniformType Type;
-		dd::String32 Name;
+		char Name[256];
 	};
 
 	template <typename T>
@@ -67,7 +67,7 @@ namespace ddr
 		template <typename T>
 		void SetValue( IUniform* uniform, UniformType type, T value );
 
-		IUniform* Access( int index ) const;
+		IUniform* Access( int index );
 	};
 
 	template <typename T>

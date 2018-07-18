@@ -55,17 +55,8 @@
     <Filter Include="Includes\gl3w">
       <UniqueIdentifier>{e87999f1-1019-463f-9d68-497df60b60de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\Catch">
-      <UniqueIdentifier>{ceb3961e-5856-4686-b625-9db1fcc59eb0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Includes\Remotery">
-      <UniqueIdentifier>{6478ffbb-0dc4-46f1-8153-9faffa4eab73}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Jobs">
       <UniqueIdentifier>{b44a65d4-1a70-45cc-b448-f311fd301d07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Includes\GLM">
-      <UniqueIdentifier>{468c9f6f-eacc-4308-9c92-3a2397200665}</UniqueIdentifier>
     </Filter>
     <Filter Include="Messaging">
       <UniqueIdentifier>{81c3db90-4cb0-48f4-b975-6bc058b48c4d}</UniqueIdentifier>
@@ -99,6 +90,12 @@
     </Filter>
     <Filter Include="Terrain">
       <UniqueIdentifier>{758bee55-cb5e-4124-9267-662811966cfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\glm">
+      <UniqueIdentifier>{468c9f6f-eacc-4308-9c92-3a2397200665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Remotery">
+      <UniqueIdentifier>{58c842eb-9aa0-4b70-a0f0-cb124cdd8966}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -261,12 +258,6 @@
     <ClInclude Include="include\gl3w\include\GL\gl3w.h">
       <Filter>Includes\gl3w</Filter>
     </ClInclude>
-    <ClInclude Include="include\catch\catch.hpp">
-      <Filter>Includes\Catch</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Remotery\lib\Remotery.h">
-      <Filter>Includes\Remotery</Filter>
-    </ClInclude>
     <ClInclude Include="src\JobSystem.h">
       <Filter>Jobs</Filter>
     </ClInclude>
@@ -274,10 +265,10 @@
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="include\glm\fwd.hpp">
-      <Filter>Includes\GLM</Filter>
+      <Filter>Includes\glm</Filter>
     </ClInclude>
     <ClInclude Include="include\glm\glm.hpp">
-      <Filter>Includes\GLM</Filter>
+      <Filter>Includes\glm</Filter>
     </ClInclude>
     <ClInclude Include="src\AABB.h">
       <Filter>Math</Filter>
@@ -525,11 +516,14 @@
     <ClInclude Include="src\IDebugPanel.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleEmitter.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshRenderer.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystem.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Remotery\lib\Remotery.h">
+      <Filter>Includes\Remotery</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -665,9 +659,6 @@
     </ClCompile>
     <ClCompile Include="include\gl3w\src\gl3w.c">
       <Filter>Includes\gl3w</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Remotery\lib\Remotery.c">
-      <Filter>Includes\Remotery</Filter>
     </ClCompile>
     <ClCompile Include="src\JobSystem.cpp">
       <Filter>Jobs</Filter>
@@ -897,11 +888,14 @@
     <ClCompile Include="src\IDebugPanel.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleEmitter.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\MeshRenderer.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystem.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Remotery\lib\Remotery.c">
+      <Filter>Includes\Remotery</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

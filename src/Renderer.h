@@ -46,7 +46,12 @@ namespace ddr
 		//
 		// Setup render states, uniforms, and the like for other renderers.
 		//
-		void BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms );
+		void BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera );
+
+		//
+		// Render all the registered renderers.
+		//
+		void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera );
 
 		//
 		// Complete the render. Does *NOT* call Swap - that's in the main loop.
@@ -59,9 +64,9 @@ namespace ddr
 		void RenderInit();
 
 		//
-		// Allow the renderer to render debug.
+		// Register a renderer.
 		//
-		void RenderDebug( dd::IRenderer& debug_render );
+		void Register( dd::IRenderer& renderer );
 
 	protected:
 
@@ -83,25 +88,26 @@ namespace ddr
 		dd::EntityHandle m_zAxis;
 
 		std::vector<dd::EntityHandle> m_debugLights;
+		std::vector<dd::IRenderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
 
 		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
 
 		bool m_debugDrawStandard { true };
+		bool m_debugDrawDepth { false };
 		bool m_debugDrawAxes { true };
-		bool m_debugDrawBounds { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
 		bool m_reloadShaders { false };
-
-		bool m_debugDrawDepth { false };
 	
 		dd::EntityHandle m_deleteLight;
 		bool m_createLight { false };
 
 		MeshHandle m_unitCube;
+
+		ddr::UniformStorage* m_uniforms { nullptr };
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
@@ -111,6 +117,7 @@ namespace ddr
 		void UpdateDebugPointLights( dd::EntityManager& entityManager );
 
 		void SetRenderState();
+		void RenderDebug( dd::IRenderer& debug_render );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

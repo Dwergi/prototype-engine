@@ -27,7 +27,7 @@
 #include "IDebugPanel.h"
 #include "Input.h"
 #include "InputBindings.h"
-#include "JobSystem.h"
+#include "jobsystem.h"
 #include "LightComponent.h"
 #include "MeshComponent.h"
 #include "MeshRenderer.h"
@@ -38,7 +38,7 @@
 #include "Recorder.h"
 #include "Renderer.h"
 #include "FrameBuffer.h"
-#include "ParticleEmitter.h"
+#include "ParticleSystem.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -61,8 +61,6 @@
 
 #include "imgui/imgui.h"
 
-#include "Remotery/lib/Remotery.h"
-
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "GL/gl3w.h"
@@ -81,13 +79,23 @@ uint s_maxFPS = 60;
 bool s_showDebugUI = false;
 DebugUI* s_debugUI = nullptr;
 
-Input* s_input = nullptr;
-FreeCameraController* s_freeCam = nullptr;
-ShipSystem* s_shipSystem = nullptr;
 Window* s_window = nullptr;
+Input* s_input = nullptr;
+
+ShakyCamera* s_shakyCamera = nullptr;
+FPSCamera* s_fpsCamera = nullptr;
+FreeCameraController* s_freeCamera = nullptr;
 EntityManager* s_entityManager = nullptr;
+AngelScriptEngine* s_scriptEngine = nullptr;
 FrameTimer* s_frameTimer = nullptr;
+ShipSystem* s_shipSystem = nullptr;
 FSM* s_fsm = nullptr;
+TerrainSystem* s_terrainSystem = nullptr;
+InputBindings* s_inputBindings = nullptr;
+DebugConsole* s_debugConsole = nullptr;
+
+ddr::Renderer* s_renderer = nullptr;
+
 Assert s_assert;
 
 std::thread::id s_mainThread;
@@ -189,7 +197,7 @@ void ToggleFreeCam( InputAction action, InputType type )
 {
 	if( action == InputAction::TOGGLE_FREECAM && type == InputType::RELEASED )
 	{
-		s_freeCam->Enable( !s_freeCam->IsEnabled() );
+		s_freeCamera->Enable( !s_freeCamera->IsEnabled() );
 		s_shipSystem->Enable( !s_shipSystem->IsEnabled() );
 	}
 }
@@ -332,16 +340,6 @@ void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, con
 	WaitForAll( futures );
 }
 
-void InitializeRenderers( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers )
-{
-	renderer.RenderInit();
-
-	for( IRenderer* current : renderers )
-	{
-		current->RenderInit();
-	}
-}
-
 void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
 {
 	std::vector<std::future<void>> futures;
@@ -420,40 +418,6 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views )
 	s_frameTimer->DrawFPSCounter();
 }
 
-void Render( ddr::Renderer& renderer, const Vector<IRenderer*>& renderers, EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms, float delta_t )
-{
-	IRenderer* debug_render = nullptr;
-
-	renderer.BeginRender( entity_manager, camera, uniforms );
-
-	for( IRenderer* r : renderers )
-	{
-		if( !r->UsesAlpha() )
-		{
-			r->Render( entity_manager, camera, uniforms );
-		}
-
-		if( r->ShouldRenderDebug() )
-		{
-			debug_render = r;
-			break;
-		}
-	}
-
-	if( debug_render != nullptr )
-	{
-		renderer.RenderDebug( *debug_render );
-	}
-
-	for( IRenderer* r : renderers )
-	{
-		if( r->UsesAlpha() )
-		{
-			r->Render( entity_manager, camera, uniforms );
-		}
-	}
-}
-
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 {
 	input.Update( delta_t );
@@ -464,164 +428,162 @@ void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 	bindings.Dispatch( events );
 }
 
-int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
+int GameMain()
 {
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
+	JobSystem jobsystem( 7u );
+
 	s_mainThread = std::this_thread::get_id();
 
 	{
-		//SwarmSystem swarm_system;
-
 		s_window = new Window( glm::ivec2( 1280, 720 ), "DD" );
 		s_input = new Input( *s_window );
 
-		InputBindings bindings;
-		bindings.RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
-		bindings.RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
-		bindings.RegisterHandler( InputAction::EXIT, &Exit );
-		bindings.RegisterHandler( InputAction::BREAK, &TriggerAssert );
-
-		FPSCamera camera( *s_window );
-		camera.SetPosition( glm::vec3( 0, 10, 0 ) );
-		camera.SetDirection( glm::vec3( 0, 0, 1 ) );
-
-		ShakyCamera shaky_cam( camera, bindings );
+		s_inputBindings = new InputBindings();
+		s_inputBindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
+		s_inputBindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
+		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
+		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
-		ddr::Renderer renderer( *s_window );
-		ddr::UniformStorage uniforms;
-
-		JobSystem jobSystem( 7u );
-
-		TerrainSystem terrain_system( jobSystem );
-
-		ddr::ParticleEmitter particle_system;
+		s_renderer = new ddr::Renderer( *s_window );
 
 		SceneGraphSystem scene_graph;
 
-		//TrenchSystem trench_system( camera );
+		//SwarmSystem swarm_system;
+
+		//TrenchSystem trench_system( *s_shakyCam  );
 		//trench_system.CreateRenderResources();
 
-		s_freeCam = new FreeCameraController( camera );
-		s_freeCam->BindActions( bindings );
+		s_fpsCamera = new FPSCamera( *s_window );
+		s_fpsCamera->SetPosition( glm::vec3( 0, 10, 0 ) );
+		s_fpsCamera->SetDirection( glm::vec3( 0, 0, 1 ) );
 
-		//s_shipSystem = new ShipSystem( camera );
+		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *s_inputBindings );
+		
+		s_freeCamera = new FreeCameraController( *s_fpsCamera );
+		s_freeCamera->BindActions( *s_inputBindings );
+
+		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input );
+		mouse_picking->BindActions( *s_inputBindings );
+
+		//ShipSystem ship_system( *s_shakyCam  );
+		//s_shipSystem = &ship_system;
 		//s_shipSystem->BindActions( bindings );
-		//s_shipSystem->CreateShip( entity_manager );
+		//s_shipSystem->CreateShip( *s_entityManager );
 
-		MousePicking mouse_picking( *s_window, *s_input );
-		mouse_picking.BindActions( bindings );
-
-		ddr::MeshRenderer mesh_renderer( mouse_picking );
+		s_terrainSystem = new TerrainSystem( jobsystem );
+		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
+		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
 		Vector<ISystem*> systems;
-		systems.Add( &renderer );
+		systems.Add( s_renderer );
 		systems.Add( &scene_graph );
 		//systems.Add( &swarm_system );
 		//systems.Add( &trench_system );
-		systems.Add( &mouse_picking );
+		systems.Add( mouse_picking );
 		//systems.Add( s_shipSystem );
-		systems.Add( &terrain_system );
-		systems.Add( &particle_system );
-
-		Vector<IRenderer*> renderers;
-		renderers.Add( &mouse_picking );
-		renderers.Add( &terrain_system );
-		renderers.Add( &particle_system );
-		renderers.Add( &mesh_renderer );
+		systems.Add( s_terrainSystem );
+		systems.Add( particle_system );
+		
+		s_renderer->Register( *mouse_picking );
+		s_renderer->Register( *mesh_renderer );
+		s_renderer->Register( *s_terrainSystem );
+		s_renderer->Register( *particle_system );
 
 		BindKeys( *s_input );
 
 		s_frameTimer = new FrameTimer();
-		DebugConsole console( scriptEngine );
+
+		s_debugConsole = new DebugConsole( *s_scriptEngine );
 
 		Vector<IDebugPanel*> debug_views;
 		debug_views.Add( s_frameTimer );
-		debug_views.Add( &console );
-		debug_views.Add( &renderer );
-		debug_views.Add( &mouse_picking );
-		debug_views.Add( s_freeCam );
+		debug_views.Add( s_debugConsole );
+		debug_views.Add( s_renderer );
+		debug_views.Add( mouse_picking );
+		debug_views.Add( s_freeCamera );
 		//debug_views.Add( s_shipSystem );
-		debug_views.Add( &terrain_system );
-		debug_views.Add( &shaky_cam );
-		debug_views.Add( &particle_system );
-		debug_views.Add( &mesh_renderer );
+		debug_views.Add( s_terrainSystem );
+		debug_views.Add( s_shakyCamera );
+		debug_views.Add( particle_system );
+		debug_views.Add( mesh_renderer );
 
 		s_fsm = new FSM();
 		s_fsm->AddState( INITIALIZED );
 
-		FSMState& updateTimerState = s_fsm->AddState( UPDATE_TIMER );
+		s_fsm->AddState( UPDATE_TIMER );
 		auto onUpdateTimer = [&]()
 		{
 			s_frameTimer->SetMaxFPS( s_maxFPS );
 			s_frameTimer->Update();
 
 			float delta_t = s_frameTimer->Delta();
-			UpdateInput( *s_input, bindings, delta_t );
+			UpdateInput( *s_input, *s_inputBindings, delta_t );
 			s_debugUI->Update( delta_t );
 		};
-		updateTimerState.SetOnEnter( onUpdateTimer );
+		s_fsm->SetOnEnter( UPDATE_TIMER, onUpdateTimer );
 
-		FSMState& preupdateState = s_fsm->AddState( PREUPDATE );
+		s_fsm->AddState( PREUPDATE );
 		auto onPreupdate = [&]()
 		{
 			float delta_t = s_frameTimer->Delta();
-			entity_manager.Update( delta_t );
-			PreUpdateSystems( jobSystem, entity_manager, systems, delta_t );
+			s_entityManager->Update( delta_t );
+			PreUpdateSystems( jobsystem, *s_entityManager, systems, delta_t );
 		};
-		preupdateState.SetOnEnter( onPreupdate );
+		s_fsm->SetOnEnter( PREUPDATE, onPreupdate );
 
-		FSMState& updateState = s_fsm->AddState( UPDATE );
+		s_fsm->AddState( UPDATE );
 		auto onUpdate = [&]()
 		{
 			float delta_t = s_frameTimer->Delta();
-			camera.SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 
-			UpdateFreeCam( *s_freeCam, shaky_cam, *s_input, delta_t );
-			UpdateSystems( jobSystem, entity_manager, systems, delta_t );
+			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
+			UpdateSystems( jobsystem, *s_entityManager, systems, delta_t );
 		};
-		updateState.SetOnEnter( onUpdate );
+		s_fsm->SetOnEnter( UPDATE, onUpdate );
 
-		FSMState& renderState = s_fsm->AddState( RENDER );
+		s_fsm->AddState( RENDER );
 		auto onRender = [&]()
 		{
 			float delta_t = s_frameTimer->Delta();
 			DrawDebugUI( debug_views );
-			Render( renderer, renderers, entity_manager, shaky_cam, uniforms, delta_t );
+			s_renderer->Render( *s_entityManager, *s_shakyCamera );
 		};
-		renderState.SetOnEnter( onRender );
+		s_fsm->SetOnEnter( RENDER, onRender );
 
-		FSMState& endFrameState = s_fsm->AddState( RENDER_END_FRAME );
+		s_fsm->AddState( RENDER_END_FRAME );
 		auto onEndFrame = [&]()
 		{
-			renderer.EndRender( camera );
+			s_renderer->EndRender( *s_shakyCamera );
 
 			ImGui::Render();
 
 			s_window->Swap();
 		};
-		endFrameState.SetOnEnter( onEndFrame );
+		s_fsm->SetOnEnter( RENDER_END_FRAME, onEndFrame );
 
-		FSMState& postRenderState = s_fsm->AddState( POSTRENDER );
+		s_fsm->AddState( POSTRENDER );
 		auto onPostRender = [&]()
 		{
-			PostRenderSystems( jobSystem, entity_manager, systems, s_frameTimer->Delta() );
+			PostRenderSystems( jobsystem, *s_entityManager, systems, s_frameTimer->Delta() );
 
 			s_frameTimer->DelayFrame();
 		};
-		postRenderState.SetOnEnter( onPostRender );
+		s_fsm->SetOnEnter( POSTRENDER, onPostRender );
 
-		FSMState& openAssertState = s_fsm->AddState( OPEN_ASSERT );
+		s_fsm->AddState( OPEN_ASSERT );
 
-		FSMState& assertDialogState = s_fsm->AddState( ASSERT_DIALOG );
+		s_fsm->AddState( ASSERT_DIALOG );
 		auto onAssertDialog = [&]()
 		{
 			DrawAssertDialog( s_window->GetSize(), s_assert );
 		};
-		assertDialogState.SetOnEnter( onAssertDialog );
+		s_fsm->SetOnEnter( ASSERT_DIALOG, onAssertDialog );
 
 		s_fsm->AddTransition( INITIALIZED, UPDATE_TIMER );
 		s_fsm->AddTransition( UPDATE_TIMER, PREUPDATE );
@@ -646,8 +608,8 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 
 		s_fsm->Initialize( INITIALIZED );
 
-		InitializeSystems( jobSystem, entity_manager, systems );
-		InitializeRenderers( renderer, renderers );
+		InitializeSystems( jobsystem, *s_entityManager, systems );
+		s_renderer->RenderInit();
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 
@@ -667,19 +629,17 @@ int GameMain( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 			s_fsm->TransitionTo( POSTRENDER );
 		}
 
-		ShutdownSystems( entity_manager, systems );
+		ShutdownSystems( *s_entityManager, systems );
 		systems.Clear();
 
-		entity_manager.DestroyAll();
+		s_entityManager->DestroyAll();
 
-		renderer.Shutdown();
+		s_renderer->Shutdown();
+		delete s_renderer;
+
+		s_window->Close();
+		delete s_window;
 	}
-
-	delete s_freeCam;
-	delete s_shipSystem;
-
-	s_window->Close();
-	delete s_window;
 
 	DD_PROFILE_DEINIT();
 
@@ -707,8 +667,6 @@ int TestMain( int argc, char* argv[] )
 //
 int main( int argc, char* argv[] )
 {
-	TypeInfo::RegisterDefaultTypes();
-
 	CommandLine cmdLine( argv, argc );
 	if( cmdLine.Exists( "noassert" ) )
 	{
@@ -724,23 +682,23 @@ int main( int argc, char* argv[] )
 		File::SetDataRoot( "../../../data" );
 	}
 
+	TypeInfo::RegisterDefaultTypes();
 	REGISTER_TYPE( CommandLine );
 
-	AngelScriptEngine scriptEngine;
+	s_scriptEngine = new AngelScriptEngine();
 	REGISTER_TYPE( AngelScriptEngine );
 
-	EntityManager entity_manager;
+	TypeInfo::SetScriptEngine( s_scriptEngine );
+
+	s_entityManager = new EntityManager();
 	REGISTER_TYPE( EntityManager );
-	s_entityManager = &entity_manager;
 
-	TypeInfo::SetScriptEngine( &scriptEngine );
-
-	RegisterGameTypes( entity_manager, scriptEngine );
-	RegisterGlobalScriptFunctions( scriptEngine );
+	RegisterGameTypes( *s_entityManager, *s_scriptEngine );
+	RegisterGlobalScriptFunctions( *s_scriptEngine );
 
 #ifdef _TEST
 	return TestMain( argc, argv );
 #else
-	return GameMain( entity_manager, scriptEngine );
+	return GameMain();
 #endif
 }

@@ -6,6 +6,7 @@
 
 #include "PrecompiledHeader.h"
 #include "Socket.h"
+/*
 
 #include "SFML/Network/IpAddress.hpp"
 #include "SFML/Network/UdpSocket.hpp"
@@ -75,4 +76,4 @@ namespace dd
 
 		return status == sf::Socket::Status::Done;
 	}
-}
+}*/

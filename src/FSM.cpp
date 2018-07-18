@@ -51,40 +51,47 @@ namespace dd
 		m_transitions.Add( std::make_pair( from, to ) );
 	}
 
-	FSMState& FSM::AddState( int id )
+	void FSM::AddState( int id )
 	{
-		auto it = m_states.insert( std::make_pair( id, FSMState( id ) ) );
-		return it.first->second;
+		m_states.insert( std::make_pair( id, FSM::State( id ) ) );
 	}
 
-	FSMState::FSMState( int id ) :
+	void FSM::SetOnEnter( int id, FunctionView<void()> on_enter )
+	{
+		auto it = m_states.find( id );
+		if( it != m_states.end() )
+		{
+			it->second.m_onEnter = on_enter;
+		}
+	}
+
+	void FSM::SetOnExit( int id, FunctionView<void()> on_exit )
+	{
+		auto it = m_states.find( id );
+		if( it != m_states.end() )
+		{
+			it->second.m_onExit = on_exit;
+		}
+	}
+
+	FSM::State::State( int id ) :
 		m_id( id )
 	{
 		
 	}
 
-	FSMState::FSMState( const FSMState& other ) :
+	FSM::State::State( const FSM::State& other ) :
 		m_id( other.m_id )
 	{
 
 	}
 
-	FSMState::~FSMState()
+	FSM::State::~State()
 	{
 
 	}
 
-	void FSMState::SetOnEnter( FunctionView<void()> on_enter )
-	{	
-		m_onEnter = on_enter;
-	}
-
-	void FSMState::SetOnExit( FunctionView<void()> on_exit )
-	{
-		m_onExit = on_exit;
-	}
-
-	void FSMState::Enter() const
+	void FSM::State::Enter() const
 	{
 		if( m_onEnter.valid() )
 		{
@@ -92,7 +99,7 @@ namespace dd
 		}
 	}
 
-	void FSMState::Exit() const 
+	void FSM::State::Exit() const
 	{
 		if( m_onExit.valid() )
 		{
