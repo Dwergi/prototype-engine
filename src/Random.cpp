@@ -141,9 +141,9 @@ namespace dd
 	{
 		uint val = m_rng();
 		
-		float range = UINT_MAX / (m_max - m_min);
-		float rem = m_min + (val / range);
+		float factor = val / (float) UINT_MAX; // between 0 and 1
+		float fval = m_min + (m_max - m_min) * factor;
 
-		return rem;
+		return fval;
 	}
 }
