@@ -51,7 +51,11 @@ namespace dd
 
 	void FreeCameraController::BindActions( InputBindings& bindings )
 	{
-		auto handle_input = std::bind( &FreeCameraController::HandleInput, std::ref( *this ), std::placeholders::_1, std::placeholders::_2 );
+		auto handle_input = [this]( InputAction action, InputType type )
+		{
+			HandleInput( action, type );
+		};
+
 		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
 		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
 		bindings.RegisterHandler( InputAction::LEFT, handle_input );

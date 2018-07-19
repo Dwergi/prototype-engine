@@ -27,7 +27,8 @@ namespace dd
 		ADD_MINOR_TRAUMA,
 		ADD_MAJOR_TRAUMA,
 		TOGGLE_PICKING,
-		BREAK
+		BREAK,
+		START_PARTICLE
 	};
 
 	enum class InputType : unsigned int

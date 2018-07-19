@@ -140,8 +140,9 @@ namespace dd
 	float RandomFloat::Next()
 	{
 		uint val = m_rng();
-
-		float rem = m_min + (val / static_cast<float>(UINT_MAX / (m_max - m_min)));
+		
+		float range = UINT_MAX / (m_max - m_min);
+		float rem = m_min + (val / range);
 
 		return rem;
 	}

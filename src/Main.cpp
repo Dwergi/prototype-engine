@@ -290,6 +290,7 @@ void BindKeys( Input& input )
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
 	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
+	input.BindKey( 'E', InputAction::START_PARTICLE );
 }
 
 void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
@@ -476,7 +477,16 @@ int GameMain()
 		//s_shipSystem->CreateShip( *s_entityManager );
 
 		s_terrainSystem = new TerrainSystem( jobsystem );
+
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
+		s_inputBindings->RegisterHandler( InputAction::START_PARTICLE, [particle_system]( InputAction action, InputType type )
+		{
+			if( type == InputType::RELEASED )
+			{
+				particle_system->StartEmitting();
+			}
+		} );
+
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
 		Vector<ISystem*> systems;

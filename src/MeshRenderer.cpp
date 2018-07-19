@@ -61,6 +61,9 @@ namespace ddr
 
 	void MeshRenderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
+		m_meshCount = 0;
+		m_unculledMeshCount = 0;
+
 		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
 		{
 			RenderMesh( entity, *mesh.Read(), *transform.Read(), camera, uniforms );

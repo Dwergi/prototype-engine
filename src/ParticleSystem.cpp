@@ -123,11 +123,25 @@ namespace ddr
 		shader->Use( false );
 	}
 
+	void ParticleSystem::StartEmitting()
+	{
+		m_age = 0;
+	}
+
 	void ParticleSystem::Update( dd::EntityManager& entity_manager, float delta_t )
 	{
 		m_age += delta_t;
+		
+		UpdateLiveParticles( delta_t );
 
-		// update existing
+		if( m_age < m_lifetime )
+		{
+			EmitNewParticles( delta_t );
+		}
+	}
+
+	void ParticleSystem::UpdateLiveParticles( float delta_t )
+	{
 		for( Particle& particle : m_particles )
 		{
 			if( particle.Alive() )
@@ -147,9 +161,24 @@ namespace ddr
 				particle.Velocity += s_gravity * delta_t;
 			}
 		}
+	}
 
-		for( int i = 0; i < CurrentParticles; ++i )
+	void ParticleSystem::EmitNewParticles( float delta_t )
+	{
+		m_emissionAccumulator += m_emissionRate * delta_t;
+		int toEmit = (int) m_emissionAccumulator;
+
+		m_emissionAccumulator = m_emissionAccumulator - toEmit;
+
+		int emitted = 0;
+
+		for( int i = 0; i < MaxParticles; ++i )
 		{
+			if( emitted >= toEmit || m_liveCount > CurrentParticles )
+			{
+				break;
+			}
+
 			Particle& particle = m_particles[ i ];
 
 			if( !particle.Alive() )
@@ -162,6 +191,20 @@ namespace ddr
 				particle.Colour = glm::vec4( s_rngColourR.Next(), s_rngColourG.Next(), s_rngColourB.Next(), 1 );
 
 				++m_liveCount;
+				++emitted;
+			}
+		}
+	}
+
+	void ParticleSystem::KillAllParticles()
+	{
+		for( int i = 0; i < MaxParticles; ++i )
+		{
+			Particle& particle = m_particles[ i ];
+
+			if( particle.Alive() )
+			{
+				particle.Age = particle.Lifetime;
 			}
 		}
 	}
@@ -223,21 +266,36 @@ namespace ddr
 
 	void ParticleSystem::DrawDebugInternal()
 	{
-		ImGui::SliderInt( "Max Particles", &CurrentParticles, 0, MaxParticles );
+		if( ImGui::Button( "Start" ) )
+		{
+			StartEmitting();
+		}
 
+		ImGui::SliderInt( "Max Particles", &CurrentParticles, 0, MaxParticles );
+		ImGui::SliderFloat( "Emitter Lifetime", &m_lifetime, 0, 300 );
+		
+		{
+			float max_emission_rate = CurrentParticles / s_rngLifetime.Max(); // any higher and we can end up saturating the buffer
+
+			ImGui::SliderFloat( "Emission Rate", &m_emissionRate, 0.f, max_emission_rate );
+		}
+
+		if( ImGui::TreeNodeEx( "Lifetime", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			float lifetime_min = s_rngLifetime.Min();
 			float lifetime_max = s_rngLifetime.Max();
 
-			if( ImGui::SliderFloat( "Lifetime Min", &lifetime_min, 0, lifetime_max ) )
+			if( ImGui::SliderFloat( "Min", &lifetime_min, 0, lifetime_max ) )
 			{
 				s_rngLifetime.SetMin( lifetime_min );
 			}
 
-			if( ImGui::SliderFloat( "Lifetime Max", &lifetime_max, lifetime_min, 10 ) )
+			if( ImGui::SliderFloat( "Max", &lifetime_max, lifetime_min, 10 ) )
 			{
 				s_rngLifetime.SetMax( lifetime_max );
 			}
+
+			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Colour", ImGuiTreeNodeFlags_CollapsingHeader ) )

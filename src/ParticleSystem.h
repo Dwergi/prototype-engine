@@ -49,6 +49,8 @@ namespace ddr
 		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
 		virtual void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms ) override;
 
+		void StartEmitting();
+
 		ParticleSystem( const ParticleSystem& ) = delete;
 		ParticleSystem( ParticleSystem&& ) = delete;
 		ParticleSystem& operator=( const ParticleSystem& ) = delete;
@@ -74,10 +76,13 @@ namespace ddr
 
 		Particle m_particles[ MaxParticles ];
 
-		int m_liveCount { 0 };
+		int m_liveCount		{ 0 };
 
-		float m_age { 0 };			// in seconds
-		float m_emissionRate { 0 }; // particles per second
+		float m_lifetime	{ 3 };	// in seconds
+		float m_age			{ 3 };	// in seconds
+
+		float m_emissionRate { 200.0 }; // particles per second
+		float m_emissionAccumulator { 0 }; // fractional particles that were not emitted last tick
 
 		glm::vec3 m_positions[ MaxParticles ];
 		VBO m_vboPositions;
@@ -90,5 +95,9 @@ namespace ddr
 
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
+
+		void UpdateLiveParticles( float delta_t );
+		void EmitNewParticles( float delta_t );
+		void KillAllParticles();
 	};
 }
