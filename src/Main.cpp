@@ -479,13 +479,7 @@ int GameMain()
 		s_terrainSystem = new TerrainSystem( jobsystem );
 
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
-		s_inputBindings->RegisterHandler( InputAction::START_PARTICLE, [particle_system]( InputAction action, InputType type )
-		{
-			if( type == InputType::RELEASED )
-			{
-				particle_system->StartEmitting();
-			}
-		} );
+		particle_system->BindActions( *s_inputBindings );
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
@@ -497,7 +491,6 @@ int GameMain()
 		systems.Add( mouse_picking );
 		//systems.Add( s_shipSystem );
 		systems.Add( s_terrainSystem );
-		systems.Add( particle_system );
 		
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *mesh_renderer );

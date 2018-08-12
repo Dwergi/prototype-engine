@@ -8,6 +8,7 @@
 #include "ParticleSystem.h"
 
 #include "ICamera.h"
+#include "InputBindings.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -49,22 +50,9 @@ namespace ddr
 
 	static const glm::vec3 s_gravity( 0, -9.81, 0 );
 
-	dd::RandomFloat ParticleSystem::s_rngLifetime( 0.5f, 5.0f );
-
-	dd::RandomFloat ParticleSystem::s_rngSizeX( 0, 1 );
-	dd::RandomFloat ParticleSystem::s_rngSizeY( 0, 1 );
-
-	dd::RandomFloat ParticleSystem::s_rngVelocityX( -10.0f, 10.0f );
-	dd::RandomFloat ParticleSystem::s_rngVelocityY( -10.0f, 10.0f );
-	dd::RandomFloat ParticleSystem::s_rngVelocityZ( -10.0f, 10.0f );
-
-	dd::RandomFloat ParticleSystem::s_rngColourR( 0, 1 );
-	dd::RandomFloat ParticleSystem::s_rngColourG( 0, 1 );
-	dd::RandomFloat ParticleSystem::s_rngColourB( 0, 1 );
-
-	int ParticleSystem::CurrentParticles = 1000;
-
-	ParticleSystem::ParticleSystem()
+	ParticleSystem::ParticleSystem() :
+		ddc::System( "Particles" ),
+		req_particles( *this )
 	{
 
 	}
@@ -72,6 +60,17 @@ namespace ddr
 	ParticleSystem::~ParticleSystem()
 	{
 
+	}
+	
+	void ParticleSystem::BindActions( dd::InputBindings& bindings )
+	{
+		bindings.RegisterHandler( dd::InputAction::START_PARTICLE, [this]( dd::InputAction action, dd::InputType type )
+		{
+			if( type == dd::InputType::RELEASED )
+			{
+				m_startEmitting = true;
+			}
+		} );
 	}
 
 	void ParticleSystem::RenderInit()
@@ -99,21 +98,21 @@ namespace ddr
 
 		m_vboPositions.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboPositions.Bind();
-		m_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( m_positions, MaxParticles ) );
+		m_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( m_positions, ddc::MaxParticles ) );
 		shader->BindAttributeVec3( "PositionInstanced", false );
 		shader->SetAttributeInstanced( "PositionInstanced" );
 		m_vboPositions.Unbind();
 
 		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboSizes.Bind();
-		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, MaxParticles ) );
+		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, ddc::MaxParticles ) );
 		shader->BindAttributeVec2( "ScaleInstanced", false );
 		shader->SetAttributeInstanced( "ScaleInstanced" );
 		m_vboSizes.Unbind();
 
 		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboColours.Bind();
-		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, MaxParticles ) );
+		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, ddc::MaxParticles ) );
 		shader->BindAttributeVec4( "ColourInstanced", false );
 		shader->SetAttributeInstanced( "ColourInstanced" );
 		m_vboColours.Unbind();
@@ -123,34 +122,51 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void ParticleSystem::StartEmitting()
+	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		m_age = 0;
-	}
+		ddc::ReadWriteBuffer<ddc::ParticleSystemComponent> data_buffer = update_data.GetReadWrite<ddc::ParticleSystemComponent>();
 
-	void ParticleSystem::Update( dd::EntityManager& entity_manager, float delta_t )
-	{
-		m_age += delta_t;
-		
-		UpdateLiveParticles( delta_t );
-
-		if( m_age < m_lifetime )
+		for( size_t i = 0; i < data_buffer.Size(); ++i )
 		{
-			EmitNewParticles( delta_t );
+			ddc::ParticleSystemComponent& cmp = data_buffer.Access( i );
+
+			if( m_killAllParticles )
+			{
+				for( size_t i = 0; i < ddc::MaxParticles; ++i )
+				{
+					ddc::Particle& particle = cmp.m_particles[i];
+
+					if( particle.Alive() )
+					{
+						particle.Age = particle.Lifetime;
+					}
+				}
+
+				cmp.m_age = cmp.m_lifetime;
+			}
+
+			UpdateLiveParticles( cmp, delta_t );
+
+			if( cmp.m_age < cmp.m_lifetime )
+			{
+				EmitNewParticles( cmp, delta_t );
+			}
 		}
 	}
 
-	void ParticleSystem::UpdateLiveParticles( float delta_t )
+	void ParticleSystem::UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t )
 	{
-		for( Particle& particle : m_particles )
+		for( size_t particle_index = 0; particle_index < cmp.m_liveCount; ++particle_index )
 		{
+			ddc::Particle& particle = cmp.m_particles[particle_index];
+
 			if( particle.Alive() )
 			{
-				particle.Age += delta_t;
+				particle.Age += dd::seconds( delta_t );
 
 				if( !particle.Alive() )
 				{
-					--m_liveCount;
+					--cmp.m_liveCount;
 					continue;
 				}
 
@@ -163,90 +179,41 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::EmitNewParticles( float delta_t )
+	void ParticleSystem::EmitNewParticles( ddc::ParticleSystemComponent& cmp, float delta_t )
 	{
-		m_emissionAccumulator += m_emissionRate * delta_t;
-		int toEmit = (int) m_emissionAccumulator;
+		cmp.m_emissionAccumulator += cmp.m_emissionRate * delta_t;
+		int toEmit = (int) cmp.m_emissionAccumulator;
 
-		m_emissionAccumulator = m_emissionAccumulator - toEmit;
+		cmp.m_emissionAccumulator = cmp.m_emissionAccumulator - toEmit;
 
 		int emitted = 0;
 
-		for( int i = 0; i < MaxParticles; ++i )
+		for( int i = 0; i < ddc::MaxParticles; ++i )
 		{
-			if( emitted >= toEmit || m_liveCount > CurrentParticles )
+			if( emitted >= toEmit || cmp.m_liveCount > CurrentMaxParticles )
 			{
 				break;
 			}
 
-			Particle& particle = m_particles[ i ];
+			ddc::Particle& particle = cmp.m_particles[ i ];
 
 			if( !particle.Alive() )
 			{
 				particle.Position = glm::vec3( 0, 50, 0 );
-				particle.Velocity = glm::vec3( s_rngVelocityX.Next(), s_rngVelocityY.Next(), s_rngVelocityZ.Next() );
-				particle.Size = glm::vec2( s_rngSizeX.Next(), s_rngSizeY.Next() );
-				particle.Lifetime = s_rngLifetime.Next();
+				particle.Velocity = glm::mix( cmp.m_minVelocity, cmp.m_maxVelocity, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) );
+				particle.Size = glm::mix( cmp.m_minSize, cmp.m_maxSize, glm::vec2( cmp.m_rng.Next(), cmp.m_rng.Next() ) );
+				particle.Lifetime = glm::mix( cmp.m_minLifetime.Value, cmp.m_maxLifetime.Value, cmp.m_rng.Next() );
 				particle.Age = 0;
-				particle.Colour = glm::vec4( s_rngColourR.Next(), s_rngColourG.Next(), s_rngColourB.Next(), 1 );
+				particle.Colour = glm::vec4( glm::mix( cmp.m_minColour, cmp.m_maxColour, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) ), 1 );
 
-				++m_liveCount;
+				++cmp.m_liveCount;
 				++emitted;
 			}
 		}
 	}
 
-	void ParticleSystem::KillAllParticles()
+	void ParticleSystem::Render( const ddc::EntityLayer& entity_layer, const dd::ICamera& camera, UniformStorage& uniforms )
 	{
-		for( int i = 0; i < MaxParticles; ++i )
-		{
-			Particle& particle = m_particles[ i ];
-
-			if( particle.Alive() )
-			{
-				particle.Age = particle.Lifetime;
-			}
-		}
-	}
-
-	void ParticleSystem::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms )
-	{
-		for( Particle& particle : m_particles )
-		{
-			if( particle.Alive() )
-			{
-				particle.Distance = glm::distance2( particle.Position, camera.GetPosition() );
-			}
-			else
-			{
-				particle.Distance = -1;
-			}
-		}
-
-		std::sort( &m_particles[ 0 ], &m_particles[ MaxParticles ], []( const Particle& a, const Particle& b )
-		{
-			return a.Distance > b.Distance;
-		} );
-
-		int index = 0;
-		for( Particle& particle : m_particles )
-		{
-			if( particle.Alive() )
-			{
-				m_positions[ index ] = particle.Position;
-				m_colours[ index ] = particle.Colour;
-				m_sizes[ index ] = particle.Size;
-
-				++index;
-			}
-		}
-
-		m_vboPositions.UpdateData();
-		m_vboSizes.UpdateData();
-		m_vboColours.UpdateData();
-		
-		s_vaoParticle.Bind();
-
 		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
 		shader->Use( true );
 
@@ -255,141 +222,111 @@ namespace ddr
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		glDrawArraysInstanced( GL_TRIANGLES, 0, 6, index );
+		s_vaoParticle.Bind();
+
+		std::vector<ddc::Entity> particle_systems;
+		entity_layer.FindAllWith<ddc::ParticleSystemComponent>( particle_systems );
+
+		for( ddc::Entity& entity : particle_systems )
+		{
+			ddc::ParticleSystemComponent* cmp = entity_layer.AccessComponent<ddc::ParticleSystemComponent>( entity );
+			for( ddc::Particle& particle : cmp->m_particles )
+			{
+				if( particle.Alive() )
+				{
+					particle.Distance = glm::distance2( particle.Position, camera.GetPosition() );
+				}
+				else
+				{
+					particle.Distance = -1;
+				}
+			}
+
+			std::sort( &cmp->m_particles[0], &cmp->m_particles[ddc::MaxParticles], []( const ddc::Particle& a, const ddc::Particle& b )
+			{
+				return a.Distance > b.Distance;
+			} );
+
+			int index = 0;
+			for( ddc::Particle& particle : cmp->m_particles )
+			{
+				if( particle.Alive() )
+				{
+					m_positions[index] = particle.Position;
+					m_colours[index] = particle.Colour;
+					m_sizes[index] = particle.Size;
+
+					++index;
+				}
+			}
+
+			m_vboPositions.UpdateData();
+			m_vboSizes.UpdateData();
+			m_vboColours.UpdateData();
+
+			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, index );
+		}
+
+		s_vaoParticle.Unbind();
 
 		glDisable( GL_BLEND );
 
 		shader->Use( false );
-
-		s_vaoParticle.Unbind();
 	}
 
 	void ParticleSystem::DrawDebugInternal()
 	{
-		if( ImGui::Button( "Start" ) )
+		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, ddc::MaxParticles );
+
+		if( m_selected == nullptr )
 		{
-			StartEmitting();
+			ImGui::Text( "<no selection>" );
+			return;
 		}
 
-		ImGui::SliderInt( "Max Particles", &CurrentParticles, 0, MaxParticles );
-		ImGui::SliderFloat( "Emitter Lifetime", &m_lifetime, 0, 300 );
+		if( ImGui::Button( "Start" ) )
+		{
+			m_selected->m_age = 0;
+		}
+
+		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->m_lifetime.Value, 0, 300 );
 		
 		{
-			float max_emission_rate = CurrentParticles / s_rngLifetime.Max(); // any higher and we can end up saturating the buffer
+			float max_emission_rate = CurrentMaxParticles / m_selected->m_maxLifetime.Value; // any higher and we can end up saturating the buffer
 
-			ImGui::SliderFloat( "Emission Rate", &m_emissionRate, 0.f, max_emission_rate );
+			ImGui::SliderFloat( "Emission Rate", &m_selected->m_emissionRate, 0.f, max_emission_rate );
 		}
 
 		if( ImGui::TreeNodeEx( "Lifetime", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			float lifetime_min = s_rngLifetime.Min();
-			float lifetime_max = s_rngLifetime.Max();
-
-			if( ImGui::SliderFloat( "Min", &lifetime_min, 0, lifetime_max ) )
-			{
-				s_rngLifetime.SetMin( lifetime_min );
-			}
-
-			if( ImGui::SliderFloat( "Max", &lifetime_max, lifetime_min, 10 ) )
-			{
-				s_rngLifetime.SetMax( lifetime_max );
-			}
+			ImGui::SliderFloat( "Min", &m_selected->m_minLifetime.Value, 0, m_selected->m_maxLifetime.Value );
+			ImGui::SliderFloat( "Max", &m_selected->m_maxLifetime.Value, m_selected->m_minLifetime.Value, 10 );
 
 			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Colour", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			{
-				float colour_r_min = s_rngColourR.Min();
-				float colour_r_max = s_rngColourR.Max();
-				if( ImGui::DragFloatRange2( "R", &colour_r_min, &colour_r_max, 0.001f, 0, 1 ) )
-				{
-					s_rngColourR.SetMin( colour_r_min );
-					s_rngColourR.SetMax( colour_r_max );
-				}
-
-			}
-
-			{
-				float colour_g_min = s_rngColourG.Min();
-				float colour_g_max = s_rngColourG.Max();
-				if( ImGui::DragFloatRange2( "G", &colour_g_min, &colour_g_max, 0.001f, 0, 1 ) )
-				{
-					s_rngColourG.SetMin( colour_g_min );
-					s_rngColourG.SetMax( colour_g_max );
-				}
-			}
-
-			{
-				float colour_b_min = s_rngColourB.Min();
-				float colour_b_max = s_rngColourB.Max();
-				if( ImGui::DragFloatRange2( "B", &colour_b_min, &colour_b_max, 0.001f, 0, 1 ) )
-				{
-					s_rngColourB.SetMin( colour_b_min );
-					s_rngColourB.SetMax( colour_b_max );
-				}
-			}
+			ImGui::DragFloatRange2( "R", &m_selected->m_minColour.r, &m_selected->m_maxColour.r, 0.001f, 0, 1 );
+			ImGui::DragFloatRange2( "G", &m_selected->m_minColour.g, &m_selected->m_maxColour.g, 0.001f, 0, 1 );
+			ImGui::DragFloatRange2( "B", &m_selected->m_minColour.b, &m_selected->m_maxColour.b, 0.001f, 0, 1 );
 
 			ImGui::TreePop();
 		}
 		
 		if( ImGui::TreeNodeEx( "Velocity", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			{
-				float velocity_x_min = s_rngVelocityX.Min();
-				float velocity_x_max = s_rngVelocityX.Max();
-				if( ImGui::DragFloatRange2( "X", &velocity_x_min, &velocity_x_max, 0.1f, -50, 50, "%.1f" ) )
-				{
-					s_rngVelocityX.SetMin( velocity_x_min );
-					s_rngVelocityX.SetMax( velocity_x_max );
-				}
-			}
-
-			{
-				float velocity_y_min = s_rngVelocityY.Min();
-				float velocity_y_max = s_rngVelocityY.Max();
-				if( ImGui::DragFloatRange2( "Y", &velocity_y_min, &velocity_y_max, 0.1f, -50, 50, "%.1f" ) )
-				{
-					s_rngVelocityY.SetMin( velocity_y_min );
-					s_rngVelocityY.SetMax( velocity_y_max );
-				}
-			}
-
-			{
-				float velocity_z_min = s_rngVelocityZ.Min();
-				float velocity_z_max = s_rngVelocityZ.Max();
-				if( ImGui::DragFloatRange2( "Z", &velocity_z_min, &velocity_z_max, 0.1f, -50, 50, "%.1f" ) )
-				{
-					s_rngVelocityZ.SetMin( velocity_z_min );
-					s_rngVelocityZ.SetMax( velocity_z_max );
-				}
-			}
+			ImGui::DragFloatRange2( "X", &m_selected->m_minVelocity.x, &m_selected->m_maxVelocity.x, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Y", &m_selected->m_minVelocity.y, &m_selected->m_maxVelocity.y, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Z", &m_selected->m_minVelocity.z, &m_selected->m_maxVelocity.z, 0.1f, -50, 50, "%.1f" );
 
 			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Size", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			{
-				float size_x_min = s_rngSizeX.Min();
-				float size_x_max = s_rngSizeX.Max();
-				if( ImGui::DragFloatRange2( "X", &size_x_min, &size_x_max, 0.01f, 0, 5, "%.2f" ) )
-				{
-					s_rngSizeX.SetMin( size_x_min );
-					s_rngSizeX.SetMax( size_x_max );
-				}
-			}
-
-			{
-				float size_y_min = s_rngSizeY.Min();
-				float size_y_max = s_rngSizeY.Max();
-				if( ImGui::DragFloatRange2( "Y", &size_y_min, &size_y_max, 0.01f, 0, 5, "%.2f" ) )
-				{
-					s_rngSizeY.SetMin( size_y_min );
-					s_rngSizeY.SetMax( size_y_max );
-				}
-			}
+			ImGui::DragFloatRange2( "X", &m_selected->m_minSize.x, &m_selected->m_maxSize.x, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Y", &m_selected->m_minSize.y, &m_selected->m_maxSize.y, 0.1f, -50, 50, "%.1f" );
 
 			ImGui::TreePop();
 		}

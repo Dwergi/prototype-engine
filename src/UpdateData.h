@@ -43,6 +43,22 @@ namespace ddc
 			throw std::exception( "No write buffer found for component. Check your requirements!" );
 		}
 
+		template <typename T>
+		ReadWriteBuffer<T> GetReadWrite() const
+		{
+			for( const ComponentDataBuffer& buffer : m_buffers )
+			{
+				if( buffer.Component() == T::Type )
+				{
+					DD_ASSERT( buffer.Usage() == DataUsage::ReadWrite );
+
+					return ReadWriteBuffer<T>( buffer );
+				}
+			}
+
+			throw std::exception( "No read-write buffer found for component. Check your requirements!" );
+		}
+
 		void Commit();
 
 	private:

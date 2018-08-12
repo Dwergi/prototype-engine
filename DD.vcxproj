@@ -381,6 +381,7 @@
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\PackedPool.h" />
     <ClInclude Include="src\ParticleSystem.h" />
+    <ClInclude Include="src\ParticleSystemComponent.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
@@ -467,6 +468,7 @@
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
     <ClInclude Include="src\Uniforms.h" />
+    <ClInclude Include="src\Units.h" />
     <ClInclude Include="src\UpdateData.h" />
     <ClInclude Include="src\VAO.h" />
     <ClInclude Include="src\Variable.h" />
@@ -570,6 +572,7 @@
     <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MousePicking.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
+    <ClCompile Include="src\ParticleSystemComponent.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SceneGraphSystem.cpp" />
@@ -675,6 +678,7 @@
     <ClCompile Include="src\TransformComponent.cpp" />
     <ClCompile Include="src\TrenchSystem.cpp" />
     <ClCompile Include="src\Uniforms.cpp" />
+    <ClCompile Include="src\Units.cpp" />
     <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />

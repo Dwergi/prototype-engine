@@ -39,7 +39,7 @@ namespace dd
 	{
 	public:
 
-		static const uint DEFAULT_SEED = -1;
+		static const uint DEFAULT_SEED = ~0;
 
 		Random32( uint seed = DEFAULT_SEED );
 		Random32( uint min, uint max, uint seed = DEFAULT_SEED );

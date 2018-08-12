@@ -25,18 +25,14 @@ namespace ddc
 	};
 
 	template <typename T>
-	struct ReadBuffer
+	struct DataBuffer
 	{
-		ReadBuffer( const ComponentDataBuffer& buffer )
-			: m_buffer( buffer )
+		DataBuffer( const ComponentDataBuffer& buffer, DataUsage usage ) :
+			m_buffer( buffer ),
+			m_usage( usage )
 		{
-			DD_ASSERT( buffer.Usage() == DataUsage::Read );
 			DD_ASSERT( buffer.Component() == T::Type );
-		}
-
-		ReadBuffer( const ReadBuffer& other ) :
-			m_buffer( other.m_buffer )
-		{
+			DD_ASSERT( buffer.Usage() == m_usage );
 		}
 
 		size_t Size() const { return m_buffer.Size(); }
@@ -44,39 +40,64 @@ namespace ddc
 		const T& Get( size_t index ) const
 		{
 			DD_ASSERT( index < m_buffer.Size() );
+			DD_ASSERT( m_usage == DataUsage::Read || m_usage == DataUsage::ReadWrite );
+
+			return *(reinterpret_cast<const T*>(m_buffer.Data()) + index);
+		}
+
+		T& Access( size_t index ) const
+		{
+			DD_ASSERT( index < m_buffer.Size() );
+			DD_ASSERT( m_usage == DataUsage::Write || m_usage == DataUsage::ReadWrite );
 
 			return *(reinterpret_cast<T*>(m_buffer.Data()) + index);
 		}
 
 	private:
 		const ComponentDataBuffer& m_buffer;
+		const DataUsage m_usage;
 	};
 
 	template <typename T>
-	struct WriteBuffer
+	struct ReadBuffer : DataBuffer<T>
 	{
-		WriteBuffer( const ComponentDataBuffer& buffer )
-			: m_buffer( buffer )
+		ReadBuffer( const ComponentDataBuffer& buffer ) :
+			DataBuffer<T>( buffer, DataUsage::Read )
 		{
-			DD_ASSERT( buffer.Usage() == DataUsage::Write );
-			DD_ASSERT( buffer.Component() == T::Type );
+		}
+
+		ReadBuffer( const ReadBuffer& other ) :
+			DataBuffer<T>( other.m_buffer, DataUsage::Read )
+		{
+		}
+	};
+
+	template <typename T>
+	struct WriteBuffer : DataBuffer<T>
+	{
+		WriteBuffer( const ComponentDataBuffer& buffer ) :
+			DataBuffer<T>( buffer, DataUsage::Write )
+		{
 		}
 
 		WriteBuffer( const WriteBuffer& other ) :
-			m_buffer( other.m_buffer )
+			DataBuffer<T>( other.m_buffer, DataUsage::Write )
+		{
+		}
+	};
+
+	template <typename T>
+	struct ReadWriteBuffer : DataBuffer<T>
+	{
+		ReadWriteBuffer( const ComponentDataBuffer& buffer ) :
+			DataBuffer<T>( buffer, DataUsage::ReadWrite )
+
 		{
 		}
 
-		size_t Size() const { return m_buffer.Size(); }
-
-		T& Get( size_t index ) const
+		ReadWriteBuffer( const ReadWriteBuffer& other ) :
+			DataBuffer<T>( other.m_buffer, DataUsage::ReadWrite )
 		{
-			DD_ASSERT( index < m_buffer.Size() );
-
-			return *(reinterpret_cast<T*>(m_buffer.Data()) + index);
 		}
-
-	private:
-		const ComponentDataBuffer& m_buffer;
 	};
 }

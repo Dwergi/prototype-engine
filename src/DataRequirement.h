@@ -12,7 +12,8 @@ namespace ddc
 	{
 		Invalid,
 		Read,
-		Write
+		Write,
+		ReadWrite
 	};
 
 	struct ComponentType;
@@ -54,6 +55,16 @@ namespace ddc
 	{
 		WriteRequirement( System& system ) :
 			DataRequirement( TComponent::Type, DataUsage::Write, system )
+		{
+		}
+	};
+
+
+	template <typename TComponent>
+	struct ReadWriteRequirement : DataRequirement
+	{
+		ReadWriteRequirement( System& system ) :
+			DataRequirement( TComponent::Type, DataUsage::ReadWrite, system )
 		{
 		}
 	};

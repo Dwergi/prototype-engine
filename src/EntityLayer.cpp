@@ -115,12 +115,12 @@ namespace ddc
 		}
 	}
 
-	void EntityLayer::FindAllWith( const dd::IArray<int>& components, std::vector<Entity>& outEntities ) const 
+	void EntityLayer::FindAllWith( const dd::IArray<TypeID>& components, std::vector<Entity>& outEntities ) const
 	{
 		std::bitset<MAX_COMPONENTS> mask;
-		for( int id : components )
+		for( TypeID& type : components )
 		{
-			mask.set( id, true );
+			mask.set( type, true );
 		}
 
 		for( int i = 0; i < m_count; ++i )
@@ -135,7 +135,7 @@ namespace ddc
 		}
 	}
 
-	void UpdateSystem( System& system, EntityLayer& layer, int partition_count )
+	void UpdateSystem( System& system, EntityLayer& layer, float delta_t, int partition_count )
 	{
 		// filter entities that have the requirements
 		dd::Array<TypeID, MAX_COMPONENTS> components;
@@ -176,7 +176,7 @@ namespace ddc
 
 			UpdateData data( layer, entity_span, system.GetRequirements() );
 
-			system.Update( data );
+			system.Update( data, delta_t );
 
 			data.Commit();
 

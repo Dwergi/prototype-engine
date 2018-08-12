@@ -8,35 +8,30 @@
 
 #include "IDebugPanel.h"
 #include "IRenderer.h"
-#include "ISystem.h"
-#include "Random.h"
+#include "System.h"
 #include "ShaderHandle.h"
 #include "VAO.h"
 #include "VBO.h"
+#include "ParticleSystemComponent.h"
+#include "DataRequirement.h"
+#include "UpdateData.h"
 
 namespace dd
 {
 	class ICamera;
+	class InputBindings;
+}
+
+namespace ddc
+{
+	struct UpdateData;
 }
 
 namespace ddr
 {
 	class UniformStorage;
 
-	struct Particle
-	{
-		glm::vec4 Colour;
-		glm::vec3 Velocity;
-		glm::vec3 Position;
-		glm::vec2 Size;
-		float Age { 0 };
-		float Lifetime { 0 };
-		float Distance { -1 };
-
-		bool Alive() { return Age < Lifetime; }
-	};
-
-	class ParticleSystem : public dd::IDebugPanel, public dd::IRenderer, public dd::ISystem
+	class ParticleSystem : public dd::IDebugPanel, public dd::IRenderer, public ddc::System
 	{
 	public:
 
@@ -46,58 +41,41 @@ namespace ddr
 		virtual void RenderInit() override;
 		virtual bool UsesAlpha() const override { return true; }
 
-		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
-		virtual void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, UniformStorage& uniforms ) override;
+		virtual void Update( const ddc::UpdateData& data, float delta ) override;
+		virtual void Render( const ddc::EntityLayer& entity_layer, const dd::ICamera& camera, UniformStorage& uniforms );
 
-		void StartEmitting();
+		void BindActions( dd::InputBindings& input_bindings );
 
 		ParticleSystem( const ParticleSystem& ) = delete;
 		ParticleSystem( ParticleSystem&& ) = delete;
 		ParticleSystem& operator=( const ParticleSystem& ) = delete;
 		ParticleSystem& operator=( ParticleSystem&& ) = delete;
 
+
 	private:
 
-		static const int MaxParticles = 10000;
-		static int CurrentParticles;
+		int CurrentMaxParticles { 1000 };
 
-		static dd::RandomFloat s_rngLifetime;
+		bool m_killAllParticles { false };
+		bool m_startEmitting { false };
 
-		static dd::RandomFloat s_rngVelocityX;
-		static dd::RandomFloat s_rngVelocityY;
-		static dd::RandomFloat s_rngVelocityZ;
+		ddc::ParticleSystemComponent* m_selected { nullptr };
 
-		static dd::RandomFloat s_rngColourR;
-		static dd::RandomFloat s_rngColourG;
-		static dd::RandomFloat s_rngColourB;
-
-		static dd::RandomFloat s_rngSizeX;
-		static dd::RandomFloat s_rngSizeY;
-
-		Particle m_particles[ MaxParticles ];
-
-		int m_liveCount		{ 0 };
-
-		float m_lifetime	{ 3 };	// in seconds
-		float m_age			{ 3 };	// in seconds
-
-		float m_emissionRate { 200.0 }; // particles per second
-		float m_emissionAccumulator { 0 }; // fractional particles that were not emitted last tick
-
-		glm::vec3 m_positions[ MaxParticles ];
+		glm::vec3 m_positions[ ddc::MaxParticles ];
 		VBO m_vboPositions;
 
-		glm::vec2 m_sizes[ MaxParticles ];
+		glm::vec2 m_sizes[ ddc::MaxParticles ];
 		VBO m_vboSizes;
 
-		glm::vec4 m_colours[ MaxParticles ];
+		glm::vec4 m_colours[ ddc::MaxParticles ];
 		VBO m_vboColours;
 
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
-		void UpdateLiveParticles( float delta_t );
-		void EmitNewParticles( float delta_t );
-		void KillAllParticles();
+		void UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
+		void EmitNewParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
+
+		ddc::ReadWriteRequirement<ddc::ParticleSystemComponent> req_particles;
 	};
 }

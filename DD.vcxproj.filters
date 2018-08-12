@@ -519,11 +519,17 @@
     <ClInclude Include="src\MeshRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleSystem.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="include\Remotery\lib\Remotery.h">
       <Filter>Includes\Remotery</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystemComponent.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Units.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -891,11 +897,17 @@
     <ClCompile Include="src\MeshRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystem.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="include\Remotery\lib\Remotery.c">
       <Filter>Includes\Remotery</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystemComponent.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Units.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -70,7 +70,15 @@ namespace ddc
 			RemoveComponent( entity, T::Type.ID );
 		}
 
-		void FindAllWith( const dd::IArray<int>& nodes, std::vector<Entity>& outEntities ) const;
+		template <typename T>
+		void FindAllWith( std::vector<Entity>& outEntities ) const
+		{
+			dd::Array<TypeID, 1> components;
+			components.Add( T::Type.ID );
+			FindAllWith( components, outEntities );
+		}
+
+		void FindAllWith( const dd::IArray<TypeID>& components, std::vector<Entity>& outEntities ) const;
 
 	private:
 
@@ -101,7 +109,7 @@ namespace ddc
 
 	const int PARTITION_COUNT = 4;
 
-	void UpdateSystem( System& system, EntityLayer& space, int partitions = PARTITION_COUNT );
+	void UpdateSystem( System& system, EntityLayer& space, float delta_t, int partitions = PARTITION_COUNT );
 
 	void OrderSystemsByComponent( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
 
