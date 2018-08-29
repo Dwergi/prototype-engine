@@ -13,6 +13,7 @@
 #include "InputBindings.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "RenderData.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -141,7 +142,7 @@ namespace dd
 		m_framebuffer.RenderInit();
 	}
 
-	void MousePicking::Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms )
+	void MousePicking::Render( const ddr::RenderData& data )
 	{
 		if( m_enabled )
 		{
@@ -166,15 +167,20 @@ namespace dd
 			ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
 			shader->Use( true );
 
+			ddr::UniformStorage& uniforms = data.Uniforms();
+			ddr::ICamera& camera = data.Camera();
+
 			uniforms.Set( "View", camera.GetCameraMatrix() );
 			uniforms.Set( "Projection", camera.GetProjectionMatrix() );
 
 			uniforms.Bind( *shader );
 
-			entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, shader]( auto entity, auto mesh, auto transform )
+			DD_TODO( "Uncomment" );
+
+			/*entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, shader]( auto entity, auto mesh, auto transform )
 			{
 				RenderMesh( camera, *shader, entity, mesh.Read(), transform.Read() );
-			} );
+			} );*/
 
 			shader->Use( false );
 
@@ -195,7 +201,7 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
+	void MousePicking::RenderMesh( const ddr::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
 	{
 		shader.SetUniform( "ID", (int) entity.Handle );
 
@@ -276,7 +282,7 @@ namespace dd
 		}
 	}
 
-	Ray MousePicking::GetScreenRay( const ICamera& camera, const MousePosition& pos ) const
+	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const
 	{
 		glm::vec3 camera_dir( camera.GetDirection() );
 		glm::vec3 dir( camera_dir );

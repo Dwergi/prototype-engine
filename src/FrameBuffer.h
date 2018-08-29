@@ -11,13 +11,9 @@
 #include "VAO.h"
 #include "VBO.h"
 
-namespace dd
-{
-	class ICamera;
-}
-
 namespace ddr
 {
+	class ICamera;
 	class Texture;
 
 	class FrameBuffer
@@ -58,7 +54,7 @@ namespace ddr
 		void RenderInit();
 
 		void Render();
-		void RenderDepth( const dd::ICamera& camera );
+		void RenderDepth( const ddr::ICamera& camera );
 
 		void Blit();
 

@@ -9,6 +9,7 @@
 
 #include "AABB.h"
 #include "ICamera.h"
+#include "RenderData.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
 #include "VAO.h"
@@ -93,7 +94,7 @@ namespace ddr
 		delete[] corners;
 	}
 
-	void Frustum::Update( const dd::ICamera& camera )
+	void Frustum::Update( const ddr::ICamera& camera )
 	{
 		UpdateFrustum( camera );
 
@@ -158,7 +159,7 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void Frustum::Render( const dd::ICamera& camera, ddr::UniformStorage& uniforms )
+	void Frustum::Render( const ddr::RenderData& data )
 	{
 		DD_ASSERT( m_vao.IsValid() );
 
@@ -170,6 +171,8 @@ namespace ddr
 
 			m_dirty = false;
 		}
+
+		UniformStorage& uniforms = data.Uniforms();
 
 		ShaderProgram* shader = ShaderProgram::Get( m_shader );
 
@@ -198,7 +201,7 @@ namespace ddr
 		m_vao.Unbind();
 	}
 	
-	void Frustum::UpdateFrustum( const dd::ICamera& camera )
+	void Frustum::UpdateFrustum( const ddr::ICamera& camera )
 	{
 		m_vfov = camera.GetVerticalFOV();
 		m_aspectRatio = camera.GetAspectRatio();

@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "OpenGL.h"
 #include "Random.h"
+#include "RenderData.h"
 #include "Stream.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
@@ -96,8 +97,10 @@ namespace dd
 		Update( entity_manager, 0 );
 	}
 
-	void TerrainSystem::Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms )
+	void TerrainSystem::Render( const ddr::RenderData& data )
 	{
+		ddr::UniformStorage& uniforms = data.Uniforms();
+
 		for( int i = 0; i < m_params.HeightLevelCount; ++i )
 		{
 			uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[ i ] );
@@ -107,14 +110,16 @@ namespace dd
 		uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
 		uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
 
-		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
+		DD_TODO( "Uncomment" );
+
+		/*entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
 			[&entity_manager, this]( EntityHandle entity, auto chunk_h, auto mesh_h )
 		{
 			TerrainChunkComponent* chunk_cmp = chunk_h.Write();
 			chunk_cmp->Chunk->RenderUpdate();
 
 			mesh_h.Write()->Mesh = chunk_cmp->Chunk->GetMesh();
-		} );
+		} );*/
 	}
 
 	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )

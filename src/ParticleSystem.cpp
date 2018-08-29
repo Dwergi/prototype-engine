@@ -10,6 +10,7 @@
 #include "ICamera.h"
 #include "InputBindings.h"
 #include "OpenGL.h"
+#include "RenderData.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
@@ -162,7 +163,7 @@ namespace ddr
 
 			if( particle.Alive() )
 			{
-				particle.Age += dd::seconds( delta_t );
+				particle.Age += float( delta_t );
 
 				if( !particle.Alive() )
 				{
@@ -202,7 +203,7 @@ namespace ddr
 				particle.Position = glm::vec3( 0, 50, 0 );
 				particle.Velocity = glm::mix( cmp.m_minVelocity, cmp.m_maxVelocity, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) );
 				particle.Size = glm::mix( cmp.m_minSize, cmp.m_maxSize, glm::vec2( cmp.m_rng.Next(), cmp.m_rng.Next() ) );
-				particle.Lifetime = glm::mix( cmp.m_minLifetime.Value, cmp.m_maxLifetime.Value, cmp.m_rng.Next() );
+				particle.Lifetime = glm::mix( cmp.m_minLifetime, cmp.m_maxLifetime, cmp.m_rng.Next() );
 				particle.Age = 0;
 				particle.Colour = glm::vec4( glm::mix( cmp.m_minColour, cmp.m_maxColour, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) ), 1 );
 
@@ -212,10 +213,14 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::Render( const ddc::EntityLayer& entity_layer, const dd::ICamera& camera, UniformStorage& uniforms )
+	void ParticleSystem::Render( const ddr::RenderData& data )
 	{
 		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
 		shader->Use( true );
+
+		ddr::UniformStorage& uniforms = data.Uniforms();
+		ddr::ICamera& camera = data.Camera();
+		ddc::World& world = data.World();
 
 		uniforms.Bind( *shader );
 
@@ -224,12 +229,13 @@ namespace ddr
 
 		s_vaoParticle.Bind();
 
+
 		std::vector<ddc::Entity> particle_systems;
-		entity_layer.FindAllWith<ddc::ParticleSystemComponent>( particle_systems );
+		world.FindAllWith<ddc::ParticleSystemComponent>( particle_systems );
 
 		for( ddc::Entity& entity : particle_systems )
 		{
-			ddc::ParticleSystemComponent* cmp = entity_layer.AccessComponent<ddc::ParticleSystemComponent>( entity );
+			ddc::ParticleSystemComponent* cmp = world.AccessComponent<ddc::ParticleSystemComponent>( entity );
 			for( ddc::Particle& particle : cmp->m_particles )
 			{
 				if( particle.Alive() )
@@ -289,18 +295,18 @@ namespace ddr
 			m_selected->m_age = 0;
 		}
 
-		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->m_lifetime.Value, 0, 300 );
+		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->m_lifetime, 0, 300 );
 		
 		{
-			float max_emission_rate = CurrentMaxParticles / m_selected->m_maxLifetime.Value; // any higher and we can end up saturating the buffer
+			float max_emission_rate = CurrentMaxParticles / m_selected->m_maxLifetime; // any higher and we can end up saturating the buffer
 
 			ImGui::SliderFloat( "Emission Rate", &m_selected->m_emissionRate, 0.f, max_emission_rate );
 		}
 
 		if( ImGui::TreeNodeEx( "Lifetime", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::SliderFloat( "Min", &m_selected->m_minLifetime.Value, 0, m_selected->m_maxLifetime.Value );
-			ImGui::SliderFloat( "Max", &m_selected->m_maxLifetime.Value, m_selected->m_minLifetime.Value, 10 );
+			ImGui::SliderFloat( "Min", &m_selected->m_minLifetime, 0, m_selected->m_maxLifetime );
+			ImGui::SliderFloat( "Max", &m_selected->m_maxLifetime, m_selected->m_minLifetime, 10 );
 
 			ImGui::TreePop();
 		}

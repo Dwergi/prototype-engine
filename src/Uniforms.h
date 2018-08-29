@@ -33,7 +33,7 @@ namespace ddr
 		T Value;
 	};
 
-	class UniformStorage
+	struct UniformStorage
 	{
 	public:
 

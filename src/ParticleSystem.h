@@ -29,9 +29,9 @@ namespace ddc
 
 namespace ddr
 {
-	class UniformStorage;
+	struct UniformStorage;
 
-	class ParticleSystem : public dd::IDebugPanel, public dd::IRenderer, public ddc::System
+	class ParticleSystem : public dd::IDebugPanel, public ddr::IRenderer, public ddc::System
 	{
 	public:
 
@@ -41,8 +41,8 @@ namespace ddr
 		virtual void RenderInit() override;
 		virtual bool UsesAlpha() const override { return true; }
 
-		virtual void Update( const ddc::UpdateData& data, float delta ) override;
-		virtual void Render( const ddc::EntityLayer& entity_layer, const dd::ICamera& camera, UniformStorage& uniforms );
+		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
+		virtual void Render( const ddr::RenderData& data );
 
 		void BindActions( dd::InputBindings& input_bindings );
 

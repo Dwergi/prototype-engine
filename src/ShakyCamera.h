@@ -10,7 +10,7 @@ namespace dd
 	class FPSCamera;
 	class InputBindings;
 
-	class ShakyCamera : public IDebugPanel, public ICamera
+	class ShakyCamera : public IDebugPanel, public ddr::ICamera
 	{
 	public:
 

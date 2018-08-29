@@ -14,7 +14,7 @@
 
 namespace ddr
 {
-	class UniformStorage;
+	struct UniformStorage;
 
 	class Material
 	{

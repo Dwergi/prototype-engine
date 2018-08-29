@@ -1,5 +1,5 @@
 #include "PrecompiledHeader.h"
-#include "EntityLayer.h"
+#include "World.h"
 
 #include "ComponentDataBuffer.h"
 #include "JobSystem.h"

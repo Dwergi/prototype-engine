@@ -19,7 +19,7 @@ namespace ddr
 
 namespace dd
 {
-	class JobSystem;
+	struct JobSystem;
 
 	struct TerrainParameters;
 

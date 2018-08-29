@@ -125,7 +125,7 @@ namespace ddr
 		}
 	}
 
-	void FrameBuffer::RenderDepth( const dd::ICamera& camera )
+	void FrameBuffer::RenderDepth( const ddr::ICamera& camera )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texDepth != nullptr );

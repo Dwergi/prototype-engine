@@ -339,7 +339,6 @@
     <ClInclude Include="src\ComponentType.h" />
     <ClInclude Include="src\DataRequirement.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
-    <ClInclude Include="src\EntityLayer.h" />
     <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -409,6 +408,7 @@
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
+    <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
@@ -477,6 +477,7 @@
     <ClInclude Include="src\Vector4.h" />
     <ClInclude Include="src\ComponentPairIterator.h" />
     <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
@@ -544,7 +545,6 @@
     <ClCompile Include="src\ComponentDataBuffer.cpp" />
     <ClCompile Include="src\DataRequirement.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
-    <ClCompile Include="src\EntityLayer.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
@@ -574,6 +574,7 @@
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\ParticleSystemComponent.cpp" />
     <ClCompile Include="src\Ray.cpp" />
+    <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SceneGraphSystem.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
@@ -682,6 +683,7 @@
     <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
+    <ClCompile Include="src\World.cpp" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
       <FileType>CppCode</FileType>

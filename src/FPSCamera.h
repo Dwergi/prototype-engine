@@ -15,7 +15,7 @@ namespace dd
 {
 	class Window;
 
-	class FPSCamera : public ICamera
+	class FPSCamera : public ddr::ICamera
 	{
 	public:
 

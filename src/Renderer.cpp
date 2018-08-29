@@ -135,13 +135,13 @@ namespace ddr
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
 
-		for( dd::IRenderer* current : m_renderers )
+		for( ddr::IRenderer* current : m_renderers )
 		{
 			current->RenderInit();
 		}
 	}
 
-	void Renderer::Register( dd::IRenderer& renderer )
+	void Renderer::Register( ddr::IRenderer& renderer )
 	{
 		m_renderers.push_back( &renderer );
 	}
@@ -398,7 +398,7 @@ namespace ddr
 		m_debugLights = entity_manager.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();
 	}
 
-	void Renderer::RenderDebug( dd::IRenderer& debug_render )
+	void Renderer::RenderDebug( ddr::IRenderer& debug_render )
 	{
 		m_framebuffer.BindDraw();
 
@@ -407,13 +407,15 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
+	void Renderer::Render( const dd::EntityManager& entity_manager, const ddr::ICamera& camera )
 	{
-		dd::IRenderer* debug_render = nullptr;
+		ddr::IRenderer* debug_render = nullptr;
 
 		BeginRender( entity_manager, camera );
 
-		for( dd::IRenderer* r : m_renderers )
+		DD_TODO( "Uncomment" );
+
+		/*for( ddr::IRenderer* r : m_renderers )
 		{
 			if( !r->UsesAlpha() )
 			{
@@ -432,16 +434,16 @@ namespace ddr
 			RenderDebug( *debug_render );
 		}
 
-		for( dd::IRenderer* r : m_renderers )
+		for( ddr::IRenderer* r : m_renderers )
 		{
 			if( r->UsesAlpha() )
 			{
 				r->Render( entity_manager, camera, *m_uniforms );
 			}
-		}
+		}*/
 	}
 
-	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera )
+	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const ddr::ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
 
@@ -503,7 +505,7 @@ namespace ddr
 		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}
 
-	void Renderer::EndRender( const dd::ICamera& camera )
+	void Renderer::EndRender( const ddr::ICamera& camera )
 	{
 		m_framebuffer.BindRead();
 

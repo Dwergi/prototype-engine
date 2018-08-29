@@ -20,14 +20,14 @@ namespace dd
 
 namespace ddr
 {
-	class MeshRenderer : public dd::IDebugPanel, public dd::IRenderer
+	class MeshRenderer : public dd::IDebugPanel, public ddr::IRenderer
 	{
 	public:
 
 		MeshRenderer( const dd::MousePicking& m_mousePicking );
 
 		virtual void RenderInit() override;
-		virtual void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, ddr::UniformStorage& uniforms ) override;
+		virtual void Render( const ddr::RenderData& render_data ) override;
 
 	private:
 
@@ -42,7 +42,7 @@ namespace ddr
 		const dd::MousePicking& m_mousePicking;
 
 		void RenderMesh( dd::EntityHandle entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-			const dd::ICamera& camera, ddr::UniformStorage& uniforms );
+			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }

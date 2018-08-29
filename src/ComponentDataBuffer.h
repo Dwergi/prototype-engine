@@ -1,20 +1,20 @@
 #pragma once
 
 #include "DataRequirement.h"
-#include "EntityLayer.h"
+#include "World.h"
 
 namespace ddc
 {
 	struct ComponentDataBuffer
 	{
-		ComponentDataBuffer( dd::Span<Entity> entities, EntityLayer& space, const ComponentType& component, DataUsage usage, byte* storage );
+		ComponentDataBuffer( dd::Span<Entity> entities, World& space, const ComponentType& component, DataUsage usage, byte* storage );
 
 		const ComponentType& Component() const { return m_component; }
 		DataUsage Usage() const { return m_usage; }
 		size_t Size() const { return m_count; }
 		void* Data() const { return m_storage; }
 
-		void Commit( dd::Span<Entity> entities, EntityLayer& layer );
+		void Commit( dd::Span<Entity> entities, World& layer );
 
 	private:
 		const ComponentType& m_component;

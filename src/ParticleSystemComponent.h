@@ -20,8 +20,8 @@ namespace ddc
 		glm::vec3 Velocity;
 		glm::vec3 Position;
 		glm::vec2 Size;
-		dd::seconds Age { 0 };
-		dd::seconds Lifetime { 0 };
+		float Age { 0 };
+		float Lifetime { 0 };
 		dd::metres Distance { -1 };
 
 		bool Alive() const { return Age < Lifetime; }
@@ -37,9 +37,9 @@ namespace ddc
 		dd::RandomFloat m_rng;
 
 		// in seconds
-		dd::seconds m_minLifetime;
-		dd::seconds m_maxLifetime;
-		dd::seconds m_lifetime { 3 };
+		float m_minLifetime;
+		float m_maxLifetime;
+		float m_lifetime { 3 };
 
 		// metres per second
 		glm::vec3 m_minVelocity; 
@@ -54,7 +54,7 @@ namespace ddc
 		size_t m_liveCount { 0 };
 		Particle m_particles[MaxParticles];
 
-		dd::seconds m_age { 3 };	// in seconds
+		float m_age { 3 };	// in seconds
 
 		float m_emissionRate { 200.0 }; // particles per second
 		float m_emissionAccumulator { 0 }; // fractional particles that were not emitted last tick

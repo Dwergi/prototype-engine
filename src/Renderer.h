@@ -16,8 +16,6 @@
 namespace dd
 {
 	class EntityManager;
-	class ICamera;
-	class IRenderer;
 	class MeshComponent;
 	class MousePicking;
 	class TransformComponent;
@@ -26,9 +24,11 @@ namespace dd
 
 namespace ddr
 {
+	class ICamera;
+	class IRenderer;
 	class Frustum;
 	class ShaderProgram;
-	class UniformStorage;
+	struct UniformStorage;
 
 	class Renderer : public dd::IDebugPanel, public dd::ISystem
 	{
@@ -46,17 +46,17 @@ namespace ddr
 		//
 		// Setup render states, uniforms, and the like for other renderers.
 		//
-		void BeginRender( const dd::EntityManager& entity_manager, const dd::ICamera& camera );
+		void BeginRender( const dd::EntityManager& entity_manager, const ddr::ICamera& camera );
 
 		//
 		// Render all the registered renderers.
 		//
-		void Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera );
+		void Render( const dd::EntityManager& entity_manager, const ddr::ICamera& camera );
 
 		//
 		// Complete the render. Does *NOT* call Swap - that's in the main loop.
 		//
-		void EndRender( const dd::ICamera& camera );
+		void EndRender( const ddr::ICamera& camera );
 
 		//
 		// Initialize the renderer.
@@ -66,7 +66,7 @@ namespace ddr
 		//
 		// Register a renderer.
 		//
-		void Register( dd::IRenderer& renderer );
+		void Register( ddr::IRenderer& renderer );
 
 	protected:
 
@@ -88,7 +88,7 @@ namespace ddr
 		dd::EntityHandle m_zAxis;
 
 		std::vector<dd::EntityHandle> m_debugLights;
-		std::vector<dd::IRenderer*> m_renderers;
+		std::vector<ddr::IRenderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
 
@@ -117,7 +117,7 @@ namespace ddr
 		void UpdateDebugPointLights( dd::EntityManager& entityManager );
 
 		void SetRenderState();
-		void RenderDebug( dd::IRenderer& debug_render );
+		void RenderDebug( ddr::IRenderer& debug_render );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

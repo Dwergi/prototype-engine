@@ -498,9 +498,6 @@
     <ClInclude Include="src\ComponentDataBuffer.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntityLayer.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\MaterialHandle.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -531,6 +528,9 @@
     <ClInclude Include="src\Units.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\RenderData.h" />
+    <ClInclude Include="src\World.h" />
+    <ClInclude Include="src\LightSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -876,9 +876,6 @@
     <ClCompile Include="src\UpdateData.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityLayer.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\ComponentDataBuffer.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -909,6 +906,9 @@
     <ClCompile Include="src\Units.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderData.cpp" />
+    <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\LightSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

@@ -20,12 +20,12 @@ struct GLFWwindow;
 
 namespace ddr
 {
+	class ICamera;
 	class ShaderProgram;
 }
 
 namespace dd
 {
-	class ICamera;
 	class Input;
 	class InputBindings;
 	class MeshComponent;
@@ -34,7 +34,7 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking : public ISystem, public IDebugPanel, public IRenderer
+	class MousePicking : public ISystem, public IDebugPanel, public ddr::IRenderer
 	{
 	public:
 
@@ -55,7 +55,7 @@ namespace dd
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
 		virtual void RenderInit() override;
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) override;
+		virtual void Render( const ddr::RenderData& data ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
 		virtual void RenderDebug() override;
@@ -91,11 +91,11 @@ namespace dd
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
-		Ray GetScreenRay( const ICamera& camera, const MousePosition& pos ) const;
+		Ray GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const;
 		void HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
 
 		void HandleInput( InputAction action, InputType type );
 
-		void RenderMesh( const dd::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh, const TransformComponent* transform );
+		void RenderMesh( const ddr::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh, const TransformComponent* transform );
 	};
 }

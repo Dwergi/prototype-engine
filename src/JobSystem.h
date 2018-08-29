@@ -14,7 +14,7 @@
 
 namespace dd
 {
-	class JobSystem {
+	struct JobSystem {
 	public:
 		JobSystem( size_t threads );
 		~JobSystem();

@@ -3,7 +3,7 @@
 
 namespace ddc
 {
-	ComponentDataBuffer::ComponentDataBuffer( dd::Span<Entity> entities, EntityLayer& layer, const ComponentType& component, DataUsage usage, byte* storage ) :
+	ComponentDataBuffer::ComponentDataBuffer( dd::Span<Entity> entities, World& world, const ComponentType& component, DataUsage usage, byte* storage ) :
 		m_component( component ),
 		m_usage( usage ),
 		m_storage( storage )
@@ -17,14 +17,14 @@ namespace ddc
 
 		for( Entity entity : entities )
 		{
-			const void* src = layer.GetComponent( entity, m_component.ID );
+			const void* src = world.GetComponent( entity, m_component.ID );
 			memcpy( dest, src, m_component.Size );
 
 			dest += m_component.Size;
 		}
 	}
 
-	void ComponentDataBuffer::Commit( dd::Span<Entity> entities, EntityLayer& layer )
+	void ComponentDataBuffer::Commit( dd::Span<Entity> entities, World& world )
 	{
 		if( m_usage != DataUsage::Write )
 		{
@@ -37,7 +37,7 @@ namespace ddc
 
 		for( Entity entity : entities )
 		{
-			void* dest = layer.AccessComponent( entity, m_component.ID );
+			void* dest = world.AccessComponent( entity, m_component.ID );
 
 			if( dest_start == nullptr )
 			{

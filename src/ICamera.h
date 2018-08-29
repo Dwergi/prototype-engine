@@ -9,10 +9,7 @@
 namespace ddr
 {
 	class Frustum;
-}
 
-namespace dd
-{
 	class ICamera
 	{
 	public:

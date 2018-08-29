@@ -24,7 +24,7 @@ namespace dd
 {
 	class EntityManager;
 	class ICamera;
-	class JobSystem;
+	struct JobSystem;
 	class MeshComponent;
 	class TerrainChunk;
 	class TerrainChunkComponent;
@@ -32,7 +32,7 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : public ISystem, public IDebugPanel, public IRenderer
+	class TerrainSystem : public ISystem, public IDebugPanel, public ddr::IRenderer
 	{
 	public:
 
@@ -87,7 +87,7 @@ namespace dd
 		//
 		// Update terrain chunks on the render thread.
 		//
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) override;
+		virtual void Render( const ddr::RenderData& data ) override;
 
 		//
 		// Save the heightmaps of the terrain chunks generated.

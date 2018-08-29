@@ -59,19 +59,20 @@ namespace ddr
 		}
 	}
 
-	void MeshRenderer::Render( const dd::EntityManager& entity_manager, const dd::ICamera& camera, ddr::UniformStorage& uniforms )
+	void MeshRenderer::Render( const ddr::RenderData& data )
 	{
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 
-		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
+		DD_TODO( "Uncomment" );
+		/*entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
 		{
 			RenderMesh( entity, *mesh.Read(), *transform.Read(), camera, uniforms );
-		} );
+		} );*/
 	}
 
 	void MeshRenderer::RenderMesh( dd::EntityHandle entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-		const dd::ICamera& camera, ddr::UniformStorage& uniforms )
+		const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		if( mesh_cmp.Hidden )
 		{

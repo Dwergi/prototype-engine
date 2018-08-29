@@ -14,13 +14,14 @@
 namespace dd
 {
 	struct AABB;
-	class ICamera;
 }
 
 namespace ddr 
 {
+	class ICamera;
+	struct RenderData;
 	class ShaderProgram;
-	class UniformStorage;
+	struct UniformStorage;
 
 	class alignas(16) Frustum
 	{
@@ -36,8 +37,8 @@ namespace ddr
 		//
 		bool Intersects( const dd::AABB& bounds ) const;
 
-		void Render( const dd::ICamera& camera, ddr::UniformStorage& uniforms );
-		void Update( const dd::ICamera& camera );
+		void Render( const ddr::RenderData& render_data );
+		void Update( const ddr::ICamera& camera );
 
 		void* operator new( size_t i );
 		void operator delete( void* ptr);
@@ -64,6 +65,6 @@ namespace ddr
 
 		ShaderHandle m_shader;
 
-		void UpdateFrustum( const dd::ICamera& camera );
+		void UpdateFrustum( const ddr::ICamera& camera );
 	};
 }

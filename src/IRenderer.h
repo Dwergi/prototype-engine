@@ -8,21 +8,17 @@
 
 namespace ddr
 {
-	class UniformStorage;
-}
-
-namespace dd
-{
 	class ICamera;
-	class EntityManager;
 	class FrameBuffer;
+	struct RenderData;
+	struct UniformStorage;
 
 	class IRenderer
 	{
 	public:
 
 		virtual void RenderInit() {}
-		virtual void Render( const EntityManager& entity_manager, const ICamera& camera, ddr::UniformStorage& uniforms ) {}
+		virtual void Render( const RenderData& render_data ) {}
 		virtual void RenderShutdown() {}
 
 		virtual bool ShouldRenderDebug() const { return false; }

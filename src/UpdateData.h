@@ -5,11 +5,11 @@
 namespace ddc
 {
 	struct DataRequirement;
-	struct EntityLayer;
+	struct World;
 
 	struct UpdateData
 	{
-		UpdateData( EntityLayer& layer, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+		UpdateData( World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
 
 		template <typename T>
 		ReadBuffer<T> GetRead() const
@@ -65,7 +65,7 @@ namespace ddc
 
 		size_t m_entityCount { 0 };
 
-		EntityLayer& m_layer;
+		World& m_world;
 		dd::Span<Entity> m_entities;
 		std::vector<ComponentDataBuffer> m_buffers;
 	};

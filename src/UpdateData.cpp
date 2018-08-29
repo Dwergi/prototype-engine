@@ -3,8 +3,8 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( EntityLayer& layer, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
-		m_layer( layer ),
+	UpdateData::UpdateData( World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
+		m_world( world ),
 		m_entities( entities )
 	{
 		m_buffers.reserve( requirements.Size() );
@@ -15,7 +15,7 @@ namespace ddc
 		{
 			byte* storage = req->GetBuffer() + (entity_offset * req->Component().Size);
 
-			ComponentDataBuffer data_buffer( entities, layer, req->Component(), req->Usage(), storage );
+			ComponentDataBuffer data_buffer( entities, world, req->Component(), req->Usage(), storage );
 			m_buffers.push_back( data_buffer );
 		}
 	}
@@ -24,7 +24,7 @@ namespace ddc
 	{
 		for( ComponentDataBuffer& buffer : m_buffers )
 		{
-			buffer.Commit( m_entities, m_layer );
+			buffer.Commit( m_entities, m_world );
 		}
 	}
 }
