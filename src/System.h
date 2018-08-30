@@ -16,9 +16,9 @@ namespace ddc
 		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 
-		virtual void Initialize( World& world ) = 0;
+		virtual void Initialize( World& world ) {}
 		virtual void Update( const UpdateData& data, float delta_t ) = 0;
-		virtual void Shutdown( World& world ) = 0;
+		virtual void Shutdown( World& world ) {}
 
 		int MaxPartitions() const { return m_partitions; }
 

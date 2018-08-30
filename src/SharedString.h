@@ -46,7 +46,7 @@ namespace dd
 
 		void Clear();
 
-		BASIC_TYPE( SharedString )
+		DD_BASIC_TYPE( SharedString )
 		
 		DEFINE_ITERATORS( const char, *m_ptr, m_length )
 

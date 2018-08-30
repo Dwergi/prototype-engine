@@ -8,7 +8,6 @@
 #include "TerrainChunk.h"
 
 #include "ICamera.h"
-#include "EntityManager.h"
 #include "GLError.h"
 #include "JobSystem.h"
 #include "Material.h"

@@ -6,18 +6,15 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 
 namespace dd
 {
 	class SharedString;
 
-	class ScriptComponent : public IComponent
+	class ScriptComponent
 	{
 	public:
-		using Pool = PackedPool<ScriptComponent>;
-
 		ScriptComponent();
 
 		void SetModule( const String& moduleName ) { m_module = moduleName; }
@@ -26,8 +23,10 @@ namespace dd
 		bool IsLoaded() const { return m_loaded; }
 		void SetLoaded( bool loaded ) { m_loaded = loaded; }
 
-		BEGIN_TYPE( ScriptComponent )
-		END_TYPE
+		DD_COMPONENT;
+
+		DD_BEGIN_TYPE( ScriptComponent )
+		DD_END_TYPE
 
 	private:
 		String64 m_module;

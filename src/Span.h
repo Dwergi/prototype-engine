@@ -13,13 +13,21 @@ namespace dd
 	template <typename T>
 	struct Span
 	{
-		Span( const std::vector<T>& container, size_t count, size_t offset = 0 )
+		Span( const std::vector<T>& container, size_t count = ~0, size_t offset = 0 )
 		{
 			const T* begin = &(*container.begin());
 			m_begin = begin + offset;
 			m_end = begin + offset + count;
 
-			m_size = count;
+			if( count != ~0 )
+			{
+				m_size = count;
+			}
+			else
+			{
+				m_size = container.size();
+			}
+
 			m_offset = offset;
 		}
 
@@ -40,6 +48,15 @@ namespace dd
 
 			m_size = count;
 			m_offset = offset;
+		}
+
+		void operator=( const dd::Span<T>& other )
+		{
+			m_begin = other.m_begin;
+			m_end = other.m_end;
+
+			m_size = other.m_size;
+			m_offset = other.m_offset;
 		}
 
 		size_t Offset() const

@@ -66,7 +66,7 @@ namespace dd
 		bool StartsWith( const char* other ) const;
 		bool StartsWith( const String& other ) const;
 
-		BASIC_TYPE( String )
+		DD_BASIC_TYPE( String )
 
 		DEFINE_ITERATORS( char, m_buffer.Get(), m_length )
 

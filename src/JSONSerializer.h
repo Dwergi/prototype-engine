@@ -8,7 +8,6 @@
 
 #include "Serialization.h"
 
-/*
 namespace ArduinoJson
 {
 	class JsonVariant;
@@ -57,13 +56,13 @@ namespace dd
 	template <typename T>
 	bool JSONSerializer::Serialize( const T& obj )
 	{
-		return Serialize( Variable( GET_TYPE( T ), const_cast<T*>( &obj ) ) );
+		return Serialize( Variable( DD_TYPE( T ), const_cast<T*>( &obj ) ) );
 	}
 
 	template <typename T>
 	bool JSONDeserializer::Deserialize( T& obj )
 	{
-		return Deserialize( Variable( GET_TYPE( T ), &obj ) );
+		return Deserialize( Variable( DD_TYPE( T ), &obj ) );
 	}
 	//===================================================================================
-}*/
+}

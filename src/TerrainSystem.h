@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include "ComponentHandle.h"
 #include "IDebugPanel.h"
-#include "IRenderer.h"
+#include "Renderer.h"
 #include "System.h"
 #include "TerrainChunkKey.h"
 #include "TerrainParameters.h"
@@ -31,7 +30,7 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : public ddc::System, public IDebugPanel, public ddr::IRenderer
+	class TerrainSystem : public ddc::System, public IDebugPanel, public ddr::Renderer
 	{
 	public:
 

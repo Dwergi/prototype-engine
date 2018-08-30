@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "SwarmSystem.h"
 
-#include "EntityManager.h"
 #include "PlayerComponent.h"
 #include "TransformComponent.h"
 
@@ -33,8 +32,9 @@ namespace dd
 	// maximum acceleration rate in meters per second per second
 	const float AccelerationRate = 1.0f;
 
-	SwarmSystem::SwarmSystem()
-		: m_agentsTree( new AABBOctree(), new AABBOctree() )
+	SwarmSystem::SwarmSystem() :
+		ddc::System( "Swarm System" ),
+		m_agentsTree( new AABBOctree(), new AABBOctree() )
 	{
 
 	}
@@ -44,8 +44,9 @@ namespace dd
 
 	}
 
-	void SwarmSystem::Update( EntityManager& manager, float dt )
+	void SwarmSystem::Update( const ddc::UpdateData& data, float dt )
 	{
+		DD_TODO( "Reimplement swarm system" );
 		/*float turn_multiplier = TurnSpeed * dt;
 		float accel_multiplier = AccelerationRate * dt;
 

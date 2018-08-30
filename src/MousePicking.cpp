@@ -8,7 +8,6 @@
 #include "MousePicking.h"
 
 #include "ICamera.h"
-#include "EntityManager.h"
 #include "Input.h"
 #include "InputBindings.h"
 #include "MeshComponent.h"
@@ -181,8 +180,8 @@ namespace dd
 
 			DD_TODO( "Uncomment" );
 
-			ddc::ReadBuffer<dd::MeshComponent> meshes = data.Read<dd::MeshComponent>();
-			ddc::ReadBuffer<dd::TransformComponent> transforms = data.Read<dd::TransformComponent>();
+			ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
+			ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
 			dd::Span<ddc::Entity> entities = data.Entities();
 
 			for( size_t i = 0; i < data.Size(); ++i )

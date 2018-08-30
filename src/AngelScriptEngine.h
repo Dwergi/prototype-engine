@@ -124,7 +124,7 @@ namespace dd
 
 		asIScriptEngine* GetInternalEngine() const { return m_engine; }
 
-		BASIC_TYPE( AngelScriptEngine )
+		DD_BASIC_TYPE( AngelScriptEngine )
 
 	private:
 

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Entities">
-      <UniqueIdentifier>{e6bb35dd-2203-4178-90ef-e4b2b9a1e0b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Components">
       <UniqueIdentifier>{14cc0615-506d-4cb2-b805-c376da85f96c}</UniqueIdentifier>
     </Filter>
@@ -39,9 +36,6 @@
     </Filter>
     <Filter Include="DebugUI">
       <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Components\Pools">
-      <UniqueIdentifier>{8d309a51-ff54-4264-b346-5a708869a8b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Includes">
       <UniqueIdentifier>{6f7b570c-e8a9-463e-a549-5bb17d2ab414}</UniqueIdentifier>
@@ -97,11 +91,11 @@
     <Filter Include="Includes\Remotery">
       <UniqueIdentifier>{58c842eb-9aa0-4b70-a0f0-cb124cdd8966}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{ee689d3c-b742-422d-9a3a-910f8d2d5092}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\EntityHandle.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -137,9 +131,6 @@
     </ClInclude>
     <ClInclude Include="src\Timer.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentHandle.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\SwarmAgentComponent.h">
       <Filter>Components</Filter>
@@ -240,9 +231,6 @@
     <ClInclude Include="src\Globals.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComponentPairIterator.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
     <ClInclude Include="include\pcg\pcg_extras.hpp">
       <Filter>Includes\PCG</Filter>
     </ClInclude>
@@ -333,9 +321,6 @@
     <ClInclude Include="src\ShaderProgram.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -354,14 +339,8 @@
     <ClInclude Include="src\TerrainSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\TerrainChunk.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainChunkKey.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h">
       <Filter>Script\AngelScript\Add-Ons</Filter>
@@ -386,9 +365,6 @@
     </ClInclude>
     <ClInclude Include="src\File.h">
       <Filter>File</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EntityManager.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\GenericHandle.h">
       <Filter>Containers</Filter>
@@ -441,9 +417,6 @@
     <ClInclude Include="src\TerrainChunkComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\IComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShaderHandle.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -451,9 +424,6 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\Texture.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\FrameBuffer.h">
@@ -471,32 +441,11 @@
     <ClInclude Include="src\TerrainParameters.h">
       <Filter>Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="src\PackedPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IComponentPool.h">
-      <Filter>Components\Pools</Filter>
-    </ClInclude>
     <ClInclude Include="src\Span.h">
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="src\BVHTree.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DataRequirement.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentType.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\System.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UpdateData.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentDataBuffer.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\MaterialHandle.h">
       <Filter>Rendering</Filter>
@@ -528,20 +477,44 @@
     <ClInclude Include="src\Units.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\World.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\RenderData.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainChunk.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainChunkKey.h">
+      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\Entity.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\World.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentBuffer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemsSorting.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataRequirement.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UpdateData.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\System.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WorldRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\EntityHandle.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\BoundingBox.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -663,9 +636,6 @@
     <ClCompile Include="src\DebugConsole.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\PP_Assert.cpp">
       <Filter>Includes\PP Assert</Filter>
     </ClCompile>
@@ -738,9 +708,6 @@
     <ClCompile Include="src\ShaderProgram.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\MeshComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -759,17 +726,11 @@
     <ClCompile Include="src\VBO.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\TerrainChunk.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\TerrainSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainChunkKey.cpp">
-      <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\AngelScriptTests.cpp">
       <Filter>Tests</Filter>
@@ -791,12 +752,6 @@
     </ClCompile>
     <ClCompile Include="src\File.cpp">
       <Filter>File</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityManager.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\EntityManagerTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\DoubleBuffer.cpp">
       <Filter>Containers</Filter>
@@ -824,9 +779,6 @@
     </ClCompile>
     <ClCompile Include="src\ScriptComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\ComponentHandleTests.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\PlaneTests.cpp">
       <Filter>Tests</Filter>
@@ -879,15 +831,6 @@
     <ClCompile Include="src\Tests\BVHTreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\UpdateData.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ComponentDataBuffer.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DataRequirement.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\Material.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -912,10 +855,37 @@
     <ClCompile Include="src\Units.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderData.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainChunk.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainChunkKey.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
     <ClCompile Include="src\World.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderData.cpp">
+    <ClCompile Include="src\ComponentBuffer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TrenchComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemsSorting.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataRequirement.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UpdateData.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorldRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
@@ -944,14 +914,8 @@
     <None Include="src\AngelScriptEngine.inl">
       <Filter>Script\AngelScript</Filter>
     </None>
-    <None Include="src\EntityManager.inl">
-      <Filter>Entities</Filter>
-    </None>
     <None Include="src\DoubleBuffer.inl">
       <Filter>Containers</Filter>
-    </None>
-    <None Include="src\PackedPool.inl">
-      <Filter>Components\Pools</Filter>
     </None>
   </ItemGroup>
 </Project>

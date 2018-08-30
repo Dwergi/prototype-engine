@@ -8,22 +8,20 @@
 
 #include "SwarmAgentComponent.h"
 #include "DoubleBuffer.h"
-#include "ISystem.h"
+#include "System.h"
 #include "AABBOctree.h"
 
 namespace dd
 {
-	class EntityManager;
-
-	class SwarmSystem : public ISystem
+	class SwarmSystem : public ddc::System
 	{
 	public:
 		SwarmSystem();
 		virtual ~SwarmSystem();
 
-		virtual void Update( EntityManager& entity_manager, float dt ) override;
+		virtual void Update( const ddc::UpdateData& data, float dt ) override;
 
-		BASIC_TYPE( SwarmSystem )
+		DD_BASIC_TYPE( SwarmSystem )
 
 	private:
 

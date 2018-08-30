@@ -335,8 +335,7 @@
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\BVHTree.h" />
-    <ClInclude Include="src\ComponentDataBuffer.h" />
-    <ClInclude Include="src\ComponentType.h" />
+    <ClInclude Include="src\ComponentBuffer.h" />
     <ClInclude Include="src\DataRequirement.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\Entity.h" />
@@ -348,11 +347,9 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
-    <ClInclude Include="src\IRenderer.h" />
+    <ClInclude Include="src\System.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
-    <ClInclude Include="src\IComponent.h" />
-    <ClInclude Include="src\ComponentHandle.h" />
-    <ClInclude Include="src\IComponentPool.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\DebugConsole.h" />
     <ClInclude Include="src\DebugUI.h" />
@@ -379,7 +376,6 @@
     <ClInclude Include="src\MeshHandle.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\OpenGL.h" />
-    <ClInclude Include="src\PackedPool.h" />
     <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\ParticleSystemComponent.h" />
     <ClInclude Include="src\Ray.h" />
@@ -410,7 +406,7 @@
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
-    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\AngelScriptEngine.h" />
@@ -432,7 +428,7 @@
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
-    <ClInclude Include="src\System.h" />
+    <ClInclude Include="src\SystemsSorting.h" />
     <ClInclude Include="src\TerrainChunk.h" />
     <ClInclude Include="src\TerrainChunkComponent.h" />
     <ClInclude Include="src\TerrainChunkKey.h" />
@@ -463,8 +459,6 @@
     <ClInclude Include="src\TypeInfo.h" />
     <ClInclude Include="src\TypeInfoHelpers.h" />
     <ClInclude Include="src\TypeInfoMacros.h" />
-    <ClInclude Include="src\EntityHandle.h" />
-    <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
@@ -476,7 +470,6 @@
     <ClInclude Include="src\VBO.h" />
     <ClInclude Include="src\Vector.h" />
     <ClInclude Include="src\Vector4.h" />
-    <ClInclude Include="src\ComponentPairIterator.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\World.h" />
   </ItemGroup>
@@ -543,7 +536,7 @@
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
-    <ClCompile Include="src\ComponentDataBuffer.cpp" />
+    <ClCompile Include="src\ComponentBuffer.cpp" />
     <ClCompile Include="src\DataRequirement.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
@@ -574,9 +567,10 @@
     <ClCompile Include="src\MousePicking.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\ParticleSystemComponent.cpp" />
+    <ClCompile Include="src\PlayerComponent.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\SceneGraphSystem.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />
@@ -586,6 +580,7 @@
     <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\StringBinding.cpp" />
+    <ClCompile Include="src\SystemsSorting.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
     <ClCompile Include="src\TerrainChunkComponent.cpp" />
     <ClCompile Include="src\TerrainChunkKey.cpp" />
@@ -603,22 +598,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Tests\ComponentHandleTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Tests\EntityManagerTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Tests\EntityTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
@@ -678,6 +657,7 @@
     </ClCompile>
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TransformComponent.cpp" />
+    <ClCompile Include="src\TrenchComponent.cpp" />
     <ClCompile Include="src\TrenchSystem.cpp" />
     <ClCompile Include="src\Uniforms.cpp" />
     <ClCompile Include="src\Units.cpp" />
@@ -692,8 +672,6 @@
     <ClCompile Include="src\CommandLine.cpp" />
     <ClCompile Include="src\DebugConsole.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
-    <ClCompile Include="src\EntityHandle.cpp" />
-    <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\Function.cpp" />
     <ClCompile Include="src\FunctionSignature.cpp" />
@@ -750,14 +728,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Tests\CommandLineTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Tests\ComponentPoolTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -885,8 +855,6 @@
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseMap.inl" />
     <None Include="src\DoubleBuffer.inl" />
-    <None Include="src\EntityManager.inl" />
-    <None Include="src\PackedPool.inl" />
     <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
     <None Include="src\AngelScriptEngine.inl" />

@@ -130,45 +130,45 @@ namespace dd
 		sm_defaultsRegistered = true;
 
 		// integers
-		REGISTER_POD( int );
-		REGISTER_POD( char );
-		REGISTER_POD( int16 );
-		REGISTER_POD( int64 );
+		DD_REGISTER_POD( int );
+		DD_REGISTER_POD( char );
+		DD_REGISTER_POD( int16 );
+		DD_REGISTER_POD( int64 );
 		
 		// unsigned integers
-		REGISTER_POD( uint );
-		REGISTER_POD( byte );
-		REGISTER_POD( uint16 );
-		REGISTER_POD( uint64 );
+		DD_REGISTER_POD( uint );
+		DD_REGISTER_POD( byte );
+		DD_REGISTER_POD( uint16 );
+		DD_REGISTER_POD( uint64 );
 
-		REGISTER_POD( float );
-		REGISTER_POD( double );
+		DD_REGISTER_POD( float );
+		DD_REGISTER_POD( double );
 		
-		REGISTER_POD( char* );
+		DD_REGISTER_POD( char* );
 
-		REGISTER_POD( bool );
+		DD_REGISTER_POD( bool );
 
-		REGISTER_TYPE( dd::String );
+		DD_REGISTER_TYPE( dd::String );
 
-		REGISTER_TYPE( dd::String8 );
-		REGISTER_PARENT( dd::String8, dd::String );
+		DD_REGISTER_TYPE( dd::String8 );
+		DD_REGISTER_PARENT( dd::String8, dd::String );
 
-		REGISTER_TYPE( dd::String16 );
-		REGISTER_PARENT( dd::String16, dd::String );
+		DD_REGISTER_TYPE( dd::String16 );
+		DD_REGISTER_PARENT( dd::String16, dd::String );
 
-		REGISTER_TYPE( dd::String32 );
-		REGISTER_PARENT( dd::String32, dd::String );
+		DD_REGISTER_TYPE( dd::String32 );
+		DD_REGISTER_PARENT( dd::String32, dd::String );
 		
-		REGISTER_TYPE( dd::String64 );
-		REGISTER_PARENT( dd::String64, dd::String );
+		DD_REGISTER_TYPE( dd::String64 );
+		DD_REGISTER_PARENT( dd::String64, dd::String );
 		
-		REGISTER_TYPE( dd::String128 );
-		REGISTER_PARENT( dd::String128, dd::String );
+		DD_REGISTER_TYPE( dd::String128 );
+		DD_REGISTER_PARENT( dd::String128, dd::String );
 
-		REGISTER_TYPE( dd::String256 );
-		REGISTER_PARENT( dd::String256, dd::String );
+		DD_REGISTER_TYPE( dd::String256 );
+		DD_REGISTER_PARENT( dd::String256, dd::String );
 
-		REGISTER_TYPE( dd::SharedString );
+		DD_REGISTER_TYPE( dd::SharedString );
 	}
 
 	void TypeInfo::SetScriptEngine( AngelScriptEngine* scriptEngine )

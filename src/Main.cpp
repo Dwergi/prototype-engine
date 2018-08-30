@@ -35,7 +35,7 @@
 #include "OctreeComponent.h"
 #include "Random.h"
 #include "Recorder.h"
-#include "Renderer.h"
+#include "WorldRenderer.h"
 #include "FrameBuffer.h"
 #include "ParticleSystem.h"
 #include "SceneGraphSystem.h"
@@ -120,19 +120,18 @@ void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
 	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
 }
 
-
 void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
 	RegisterString( scriptEngine );
 
-	REGISTER_POD( glm::vec3 );
+	DD_REGISTER_POD( glm::vec3 );
 	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
 	vec3Type->RegisterScriptType<glm::vec3, true>();
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
-	REGISTER_POD( glm::vec4 );
+	DD_REGISTER_POD( glm::vec4 );
 	TypeInfo* vec4Type = TypeInfo::AccessType<glm::vec4>();
 	vec4Type->RegisterScriptType<glm::vec4, true>();
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
@@ -140,12 +139,12 @@ void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& script
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
 	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "w" );
 
-	REGISTER_POD( glm::mat4 );
+	DD_REGISTER_POD( glm::mat4 );
 
-	REGISTER_TYPE( EntityHandle );
-	REGISTER_TYPE( IComponent );
-	REGISTER_TYPE( Message );
-	REGISTER_TYPE( ddr::MeshHandle );
+	DD_REGISTER_TYPE( EntityHandle );
+	DD_REGISTER_TYPE( IComponent );
+	DD_REGISTER_TYPE( Message );
+	DD_REGISTER_TYPE( ddr::MeshHandle );
 
 	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
 	TypeInfo::RegisterComponent<OctreeComponent>( "OctreeComponent" );
@@ -316,7 +315,9 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views )
 	for( IDebugPanel* debug_view : views )
 	{
 		if( debug_view->IsDebugPanelOpen() )
+		{
 			debug_view->DrawDebugPanel();
+		}
 	}
 
 	s_frameTimer->DrawFPSCounter();
@@ -351,9 +352,7 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
 		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
 
-		//s_debugUI = new DebugUI( *s_window, *s_input );
-
-		s_renderer = new ddr::WorldRenderer( *s_window );
+		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		//SceneGraphSystem scene_graph;
 		//SwarmSystem swarm_system;
@@ -378,26 +377,27 @@ int GameMain()
 		//s_shipSystem->BindActions( bindings );
 		//s_shipSystem->CreateShip( *s_world );
 
-		//s_terrainSystem = new TerrainSystem( jobsystem );
+		s_terrainSystem = new TerrainSystem( jobsystem );
 
-		//ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
-		//particle_system->BindActions( *s_inputBindings );
+		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
+		particle_system->BindActions( *s_inputBindings );
+
+		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
+
+		s_world = new ddc::World();
+		s_world->Initialize();
+
+		s_world->RegisterSystem( *s_terrainSystem );
+		s_world->RegisterSystem( *mouse_picking );
+
+		s_renderer = new ddr::WorldRenderer( *s_window );
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
-		/*Vector<System*> systems;
-		systems.Add( s_renderer );
-		//systems.Add( &scene_graph );
-		//systems.Add( &swarm_system );
-		//systems.Add( &trench_system );
-		systems.Add( mouse_picking );
-		//systems.Add( s_shipSystem );
-		systems.Add( s_terrainSystem );*/
-	
 		s_renderer->Register( *mesh_renderer );
-		//s_renderer->Register( *mouse_picking );
-		//s_renderer->Register( *s_terrainSystem );
-		//s_renderer->Register( *particle_system );
+		s_renderer->Register( *mouse_picking );
+		s_renderer->Register( *s_terrainSystem );
+		s_renderer->Register( *particle_renderer );
 
 		BindKeys( *s_input );
 
@@ -410,15 +410,14 @@ int GameMain()
 		debug_views.Add( s_renderer );
 		debug_views.Add( s_freeCamera );
 		debug_views.Add( mouse_picking );
+		debug_views.Add( s_shakyCamera );
+		debug_views.Add( particle_system );
+		debug_views.Add( s_terrainSystem );
+		debug_views.Add( mesh_renderer );
 
 		/*debug_views.Add( s_debugConsole );
 		//debug_views.Add( s_shipSystem );
-		debug_views.Add( s_terrainSystem );
-		debug_views.Add( s_shakyCamera );
-		debug_views.Add( particle_system );
-		debug_views.Add( mesh_renderer );*/
-
-		//InitializeSystems( jobsystem, *s_world, systems );
+		*/
 
 		s_renderer->Initialize( *s_world );
 		s_renderer->InitializeRenderer();
@@ -509,15 +508,15 @@ int main( int argc, char* argv[] )
 	}
 
 	/*TypeInfo::RegisterDefaultTypes();
-	REGISTER_TYPE( CommandLine );
+	DD_REGISTER_TYPE( CommandLine );
 
 	s_scriptEngine = new AngelScriptEngine();
-	REGISTER_TYPE( AngelScriptEngine );
+	DD_REGISTER_TYPE( AngelScriptEngine );
 
 	TypeInfo::SetScriptEngine( s_scriptEngine );
 
 	s_world = new ddc::World();
-	REGISTER_TYPE( ddc::World );
+	DD_REGISTER_TYPE( ddc::World );
 
 	RegisterGameTypes( *s_world, *s_scriptEngine );
 	RegisterGlobalScriptFunctions( *s_scriptEngine ); */

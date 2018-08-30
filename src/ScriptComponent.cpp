@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "ScriptComponent.h"
 
+DD_COMPONENT_CPP( dd::ScriptComponent );
+
 namespace dd
 {
 	ScriptComponent::ScriptComponent()

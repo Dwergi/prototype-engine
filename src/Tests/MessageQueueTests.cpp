@@ -8,7 +8,6 @@
 
 #include "catch2/catch.hpp"
 
-#include "EntityManager.h"
 #include "MessageQueue.h"
 
 bool called = false;
@@ -20,9 +19,9 @@ struct TestMessage : public dd::Message
 {
 	uint Payload;
 
-	BEGIN_TYPE( TestMessage )
-		PARENT( dd::Message )
-	END_TYPE
+	DD_BEGIN_TYPE( TestMessage )
+		DD_PARENT( dd::Message )
+	DD_END_TYPE
 };
 
 dd::Message* Received;
@@ -41,8 +40,8 @@ void TestFunction2( dd::Message* msg )
 
 TEST_CASE( "[MessageSystem]" )
 {
-	REGISTER_TYPE( dd::Message );
-	REGISTER_TYPE( TestMessage );
+	DD_REGISTER_TYPE( dd::Message );
+	DD_REGISTER_TYPE( TestMessage );
 
 	dd::MessageQueue system;
 	Received = nullptr;

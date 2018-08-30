@@ -15,23 +15,23 @@ namespace Test
 	{
 		uint DerivedThing;
 
-		BEGIN_TYPE( DerivedStruct )
-			PARENT( SimpleStruct )
-			MEMBER( DerivedStruct, DerivedThing )
-		END_TYPE
+		DD_BEGIN_TYPE( DerivedStruct )
+			DD_PARENT( SimpleStruct )
+			DD_MEMBER( DerivedStruct, DerivedThing )
+		DD_END_TYPE
 	};
 }
 
 TEST_CASE( "[TypeInfo] Find" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
 
-	const dd::TypeInfo* type = GET_TYPE( Test::SimpleStruct );
+	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
 
 	using namespace Test;
 
-	const dd::TypeInfo* typeAlias = GET_TYPE( SimpleStruct );
+	const dd::TypeInfo* typeAlias = DD_TYPE( SimpleStruct );
 	REQUIRE( typeAlias != nullptr );
 
 	REQUIRE( type == typeAlias );
@@ -39,9 +39,9 @@ TEST_CASE( "[TypeInfo] Find" )
 
 TEST_CASE( "[TypeInfo] Namespace" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
 
-	const dd::TypeInfo* type = GET_TYPE( Test::SimpleStruct );
+	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
 
 	REQUIRE( type->Namespace() == "Test" );
@@ -49,7 +49,7 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 	using namespace Test;
 
-	const dd::TypeInfo* typeAlias = GET_TYPE( SimpleStruct );
+	const dd::TypeInfo* typeAlias = DD_TYPE( SimpleStruct );
 	REQUIRE( typeAlias != nullptr );
 
 	REQUIRE( typeAlias->Namespace() == "Test" );
@@ -58,10 +58,10 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 TEST_CASE( "[TypeInfo] Derived" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::DerivedStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::DerivedStruct );
 
-	const dd::TypeInfo* type = GET_TYPE( Test::DerivedStruct );
+	const dd::TypeInfo* type = DD_TYPE( Test::DerivedStruct );
 	REQUIRE( type != nullptr );
 
 	REQUIRE( type->Namespace() == "Test" );

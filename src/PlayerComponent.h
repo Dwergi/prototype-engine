@@ -6,22 +6,20 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 
 namespace dd
 {
-	class PlayerComponent : public IComponent
+	class PlayerComponent
 	{
 	public:
-
-		typedef PackedPool<PlayerComponent> Pool;
 
 		PlayerComponent() {}
 		virtual ~PlayerComponent() {}
 
-		BEGIN_TYPE( PlayerComponent )
-			PARENT( IComponent )
-		END_TYPE
+		DD_COMPONENT;
+
+		DD_BEGIN_TYPE( PlayerComponent )
+		DD_END_TYPE
 	};
 }

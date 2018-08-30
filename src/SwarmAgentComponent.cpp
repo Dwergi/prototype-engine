@@ -7,6 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "SwarmAgentComponent.h"
 
+DD_COMPONENT_CPP( dd::SwarmAgentComponent );
+
 dd::SwarmAgentComponent::SwarmAgentComponent()
 {
 }

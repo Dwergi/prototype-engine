@@ -7,7 +7,6 @@
 #pragma once
 
 #include "ComponentType.h"
-#include "PackedPool.h"
 #include "Vector4.h"
 
 namespace dd

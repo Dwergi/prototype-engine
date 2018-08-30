@@ -1,13 +1,14 @@
 #include "PrecompiledHeader.h"
 #include "ScriptSystem.h"
 
-#include "EntityManager.h"
 #include "ScriptComponent.h"
+#include "UpdateData.h"
 
 namespace dd
 {
-	ScriptSystem::ScriptSystem( AngelScriptEngine& scriptEngine )
-		: m_scriptEngine( scriptEngine )
+	ScriptSystem::ScriptSystem( AngelScriptEngine& scriptEngine ) : 
+		ddc::System( "Script System" ),
+		m_scriptEngine( scriptEngine )
 	{
 	}
 
@@ -15,9 +16,10 @@ namespace dd
 	{
 	}
 
-	void ScriptSystem::Update( EntityManager& entityManager, float dt )
+	void ScriptSystem::Update( const ddc::UpdateData& data, float dt )
 	{
-		entityManager.ForAllWithWritable<ScriptComponent>( [this]( EntityHandle entity, ComponentHandle<ScriptComponent> component )
+		DD_TODO( "Uncomment" );
+		/*entityManager.ForAllWithWritable<ScriptComponent>( [this]( EntityHandle entity, ComponentHandle<ScriptComponent> component )
 		{
 			ScriptComponent* writable = component.Write();
 			if( !writable->IsLoaded() )
@@ -43,6 +45,6 @@ namespace dd
 			{
 				(*function)(dt);
 			}
-		} );
+		} );*/
 	}
 }

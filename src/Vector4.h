@@ -92,11 +92,11 @@ namespace dd
 		float& operator[]( unsigned int component );
 		float operator[]( unsigned int component ) const;
 
-		BEGIN_SCRIPT_OBJECT( Vector4 )
-			MEMBER( Vector4, X )
-			MEMBER( Vector4, Y )
-			MEMBER( Vector4, Z )
-			MEMBER( Vector4, W )
-		END_TYPE
+		DD_SCRIPT_OBJECT( Vector4 )
+			DD_MEMBER( Vector4, X )
+			DD_MEMBER( Vector4, Y )
+			DD_MEMBER( Vector4, Z )
+			DD_MEMBER( Vector4, W )
+		DD_END_TYPE
 	};
 }

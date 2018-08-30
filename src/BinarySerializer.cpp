@@ -57,12 +57,12 @@ namespace dd
 			stream.Write( var.Data(), type->Size() );
 			return true;
 		}
-		else if( type->IsDerivedFrom( GET_TYPE( String ) ) )
+		else if( type->IsDerivedFrom( DD_TYPE( String ) ) )
 		{
 			stream.Write( var.GetValue<String>().c_str() );
 			return true;
 		}
-		else if( type == GET_TYPE( SharedString ) )
+		else if( type == DD_TYPE( SharedString ) )
 		{
 			stream.Write( var.GetValue<SharedString>().c_str() );
 			return true;
@@ -142,12 +142,12 @@ namespace dd
 			stream.Read( var.Data(), type->Size() );
 			return true;
 		}
-		else if( type->IsDerivedFrom( GET_TYPE( String ) ) )
+		else if( type->IsDerivedFrom( DD_TYPE( String ) ) )
 		{
 			stream.Read( var.GetValue<String>() );
 			return true;
 		}
-		else if( type == GET_TYPE( SharedString ) )
+		else if( type == DD_TYPE( SharedString ) )
 		{
 			String256 str;
 			stream.Read( str );

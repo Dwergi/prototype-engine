@@ -16,7 +16,7 @@ namespace dd
 		bool Exists( const char* key ) const;
 		const String& GetValue( const char* key ) const;
 
-		BASIC_TYPE( CommandLine )
+		DD_BASIC_TYPE( CommandLine )
 
 	private:
 

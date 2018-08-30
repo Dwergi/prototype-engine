@@ -7,7 +7,6 @@
 #pragma once
 
 #include "ComponentType.h"
-#include "PackedPool.h"
 #include "TerrainChunkKey.h"
 
 namespace dd
@@ -25,6 +24,6 @@ namespace dd
 
 		DD_COMPONENT;
 
-		BASIC_TYPE( TerrainChunkComponent )
+		DD_BASIC_TYPE( TerrainChunkComponent )
 	};
 }

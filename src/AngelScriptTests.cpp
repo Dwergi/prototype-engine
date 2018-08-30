@@ -52,8 +52,8 @@ struct AngelScriptTest
 	static bool FunctionRetCalled;
 	static bool FunctionArgCalled;
 
-	BEGIN_SCRIPT_OBJECT( AngelScriptTest )
-	END_TYPE
+	DD_SCRIPT_OBJECT( AngelScriptTest )
+	DD_END_TYPE
 };
 
 bool AngelScriptTest::FunctionCalled = false;
@@ -81,7 +81,7 @@ namespace Test
 
 TEST_CASE( "[AngelScript] Register Class" )
 {
-	REGISTER_TYPE( AngelScriptTest );
+	DD_REGISTER_TYPE( AngelScriptTest );
 
 	dd::AngelScriptEngine engine;
 
@@ -89,8 +89,8 @@ TEST_CASE( "[AngelScript] Register Class" )
 
 	SECTION( "Members" )
 	{
-		engine.RegisterMember<AngelScriptTest, int, &AngelScriptTest::Integer>( "Integer", GET_TYPE( AngelScriptTest ) );
-		engine.RegisterMember<AngelScriptTest, bool, &AngelScriptTest::Boolean>( "Boolean", GET_TYPE( AngelScriptTest ) );
+		engine.RegisterMember<AngelScriptTest, int, &AngelScriptTest::Integer>( "Integer", DD_TYPE( AngelScriptTest ) );
+		engine.RegisterMember<AngelScriptTest, bool, &AngelScriptTest::Boolean>( "Boolean", DD_TYPE( AngelScriptTest ) );
 	}
 
 	SECTION( "Methods" )
@@ -132,7 +132,7 @@ TEST_CASE( "[AngelScript] Call Function" )
 	dd::AngelScriptEngine engine;
 	dd::TypeInfo::SetScriptEngine( &engine );
 
-	REGISTER_POD( glm::vec3 );
+	DD_REGISTER_POD( glm::vec3 );
 	dd::TypeInfo* vec3Type = dd::TypeInfo::AccessType<glm::vec3>();
 	vec3Type->RegisterScriptType<glm::vec3, true>();
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );

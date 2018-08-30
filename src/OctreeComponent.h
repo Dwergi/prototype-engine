@@ -6,24 +6,19 @@
 
 #pragma once
 
-#include "IComponent.h"
 #include "AABBOctree.h"
-#include "PackedPool.h"
 
 namespace dd
 {
-	class OctreeComponent : public IComponent
+	class OctreeComponent
 	{
 	public:
-		using Pool = PackedPool<OctreeComponent>;
-
 		OctreeEntry Entry;
 
 		OctreeComponent() {}
 
-		BEGIN_TYPE( OctreeComponent )
-			PARENT( IComponent )
-			MEMBER( OctreeComponent, Entry )
-		END_TYPE
+		DD_BEGIN_TYPE( OctreeComponent )
+			DD_MEMBER( OctreeComponent, Entry )
+		DD_END_TYPE
 	};
 }

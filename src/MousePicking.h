@@ -10,7 +10,7 @@
 #include "FrameBuffer.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
-#include "IRenderer.h"
+#include "Renderer.h"
 #include "System.h"
 #include "Ray.h"
 #include "ShaderHandle.h"
@@ -34,7 +34,7 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking : public ddc::System, public IDebugPanel, public ddr::IRenderer
+	class MousePicking : public ddc::System, public IDebugPanel, public ddr::Renderer
 	{
 	public:
 

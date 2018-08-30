@@ -12,6 +12,6 @@ namespace dd
 	{
 		uint Type;
 
-		BASIC_TYPE( Message )
+		DD_BASIC_TYPE( Message )
 	};
 }

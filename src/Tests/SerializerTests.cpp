@@ -13,11 +13,10 @@
 
 using namespace dd;
 
-/*
 TEST_CASE( "[Serialization] Serialize to JSON" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::NestedStruct );
 
 	String256 out;
 	WriteStream stream( out );
@@ -307,8 +306,8 @@ TEST_CASE( "[Deserialization] POD From JSON" )
 
 TEST_CASE( "[Deserialization] Structs from JSON" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::NestedStruct );
 
 	byte in[2048];
 	ReadStream stream( in, 2048 );
@@ -362,4 +361,4 @@ TEST_CASE( "[Deserialization] Structs from JSON" )
 		REQUIRE( complex.Nested == s );
 		REQUIRE( complex.SecondInt == 50 );
 	}
-}*/
+}

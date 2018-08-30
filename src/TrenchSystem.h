@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "EntityHandle.h"
 #include "MeshHandle.h"
 #include "ShaderHandle.h"
 #include "System.h"

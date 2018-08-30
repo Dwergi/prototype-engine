@@ -15,8 +15,8 @@ using namespace dd;
 
 TEST_CASE( "[Serialization] Serialize to Binary" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::NestedStruct );
 
 	byte out[2048];
 	WriteStream stream( out, 2048 );
@@ -328,8 +328,8 @@ TEST_CASE( "[Deserialization] POD From Binary" )
 
 TEST_CASE( "[Deserialization] Structs from Binary" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
-	REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::NestedStruct );
 
 	byte in[2048];
 	WriteStream writer( in, 2048 );

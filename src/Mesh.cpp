@@ -10,9 +10,10 @@
 #include "ICamera.h"
 #include "GLError.h"
 #include "Material.h"
+#include "MeshHandle.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
-#include "Renderer.h"
+#include "WorldRenderer.h"
 
 #include "GL/gl3w.h"
 

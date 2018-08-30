@@ -54,24 +54,24 @@ namespace dd
 
 		void CopyValuesFrom( const FPSCamera& other );
 		
-		BEGIN_SCRIPT_OBJECT( FPSCamera )
-			METHOD( FPSCamera, SetRotation )
-			METHOD( FPSCamera, GetYaw )
-			METHOD( FPSCamera, GetPitch )
-			METHOD( FPSCamera, GetPosition )
-			METHOD( FPSCamera, SetPosition )
-			METHOD( FPSCamera, GetDirection )
-			METHOD( FPSCamera, SetDirection )
-			METHOD( FPSCamera, GetNear )
-			METHOD( FPSCamera, SetNear )
-			METHOD( FPSCamera, GetFar )
-			METHOD( FPSCamera, SetFar )
-			METHOD( FPSCamera, GetAspectRatio )
-			METHOD( FPSCamera, SetAspectRatio )
-			METHOD( FPSCamera, GetProjectionMatrix )
-			METHOD( FPSCamera, GetVerticalFOV )
-			METHOD( FPSCamera, SetVerticalFOV )
-		END_TYPE
+		DD_SCRIPT_OBJECT( FPSCamera )
+			DD_METHOD( FPSCamera, SetRotation )
+			DD_METHOD( FPSCamera, GetYaw )
+			DD_METHOD( FPSCamera, GetPitch )
+			DD_METHOD( FPSCamera, GetPosition )
+			DD_METHOD( FPSCamera, SetPosition )
+			DD_METHOD( FPSCamera, GetDirection )
+			DD_METHOD( FPSCamera, SetDirection )
+			DD_METHOD( FPSCamera, GetNear )
+			DD_METHOD( FPSCamera, SetNear )
+			DD_METHOD( FPSCamera, GetFar )
+			DD_METHOD( FPSCamera, SetFar )
+			DD_METHOD( FPSCamera, GetAspectRatio )
+			DD_METHOD( FPSCamera, SetAspectRatio )
+			DD_METHOD( FPSCamera, GetProjectionMatrix )
+			DD_METHOD( FPSCamera, GetVerticalFOV )
+			DD_METHOD( FPSCamera, SetVerticalFOV )
+		DD_END_TYPE
 
 	private:
 

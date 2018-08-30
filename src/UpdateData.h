@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ComponentDataBuffer.h"
+#include "ComponentBuffer.h"
 
 namespace ddc
 {
@@ -20,7 +20,7 @@ namespace ddc
 		template <typename T>
 		ReadBuffer<T> Read() const
 		{
-			for( const ComponentDataBuffer& buffer : m_buffers )
+			for( const ComponentBuffer& buffer : m_buffers )
 			{
 				if( buffer.Component() == T::Type )
 				{
@@ -36,7 +36,7 @@ namespace ddc
 		template <typename T>
 		WriteBuffer<T> Write() const
 		{
-			for( const ComponentDataBuffer& buffer : m_buffers )
+			for( const ComponentBuffer& buffer : m_buffers )
 			{
 				if( buffer.Component() == T::Type )
 				{
@@ -55,6 +55,6 @@ namespace ddc
 
 		ddc::World& m_world;
 		dd::Span<Entity> m_entities;
-		std::vector<ComponentDataBuffer> m_buffers;
+		std::vector<ComponentBuffer> m_buffers;
 	};
 }

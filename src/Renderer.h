@@ -1,115 +1,39 @@
 //
-// Renderer.h - Master renderer class, coordinates all rendering.
+// Renderer.h - An interface for things that want to render something.
 // Copyright (C) Sebastian Nordgren 
-// April 14th 2016
+// July 12th 2018
 //
 
 #pragma once
 
-#include "FrameBuffer.h"
-#include "IDebugPanel.h"
-#include "System.h"
-#include "MeshHandle.h"
-#include "Texture.h"
-
-namespace dd
-{
-	class MeshComponent;
-	class MousePicking;
-	class TransformComponent;
-	class Window;
-}
+#include "DataRequirement.h"
+#include "RenderData.h"
 
 namespace ddr
 {
-	class ICamera;
-	class IRenderer;
-	struct Frustum;
-	struct RenderData;
-	struct UniformStorage;
-
-	class WorldRenderer : public dd::IDebugPanel, public ddc::System
+	class Renderer
 	{
 	public:
 
-		WorldRenderer( const dd::Window& window );
-		~WorldRenderer();
+		virtual void RenderInit() {}
+		virtual void Render( const RenderData& render_data ) {}
+		virtual void RenderShutdown() {}
 
-		virtual void Initialize( ddc::World& world ) override;
+		virtual bool ShouldRenderDebug() const { return false; }
+		virtual void RenderDebug( const RenderData& render_data ) {}
 
-		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
+		virtual bool UsesAlpha() const { return false; }
 
-		virtual void Shutdown( ddc::World& world ) override;
-
-		//
-		// Initialize the renderer.
-		//
-		void InitializeRenderer();
-
-		//
-		// Render all the registered renderers.
-		//
-		void Render( const ddc::World& world, const ddr::ICamera& camera );
-
-		//
-		// Register a renderer.
-		//
-		void Register( ddr::IRenderer& renderer );
+		const dd::IArray<const ddc::DataRequirement*>& GetRequirements() const { return m_requirements; }
 
 	protected:
 
-		//
-		// Draw the debug menu.
-		//
-		virtual void DrawDebugInternal() override;
+		template <typename T>
+		void Require() { m_requirements.Add( new ddc::ReadRequirement<T>() ); }
 
 	private:
+		dd::Array<const ddc::DataRequirement*, ddc::MAX_COMPONENTS> m_requirements;
 
-		const dd::Window& m_window;
-		
-		FrameBuffer m_framebuffer;
-		Texture m_colourTexture;
-		Texture m_depthTexture;
-		
-		ddc::Entity m_xAxis;
-		ddc::Entity m_yAxis;
-		ddc::Entity m_zAxis;
-
-		std::vector<ddc::Entity> m_debugLights;
-		std::vector<ddr::IRenderer*> m_renderers;
-
-		glm::ivec2 m_previousSize { -1, -1 };
-
-		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
-
-		bool m_debugDrawStandard { true };
-		bool m_debugDrawDepth { false };
-		bool m_debugDrawAxes { true };
-		bool m_debugHighlightFrustumMeshes { false };
-		bool m_debugMeshGridCreated { false };
-		bool m_createDebugMeshGrid { false };
-		bool m_reloadShaders { false };
-	
-		ddc::Entity m_deleteLight;
-		bool m_createLight { false };
-
-		MeshHandle m_unitCube;
-
-		ddr::UniformStorage* m_uniforms { nullptr };
-
-		void CreateFrameBuffer( glm::ivec2 size );
-
-		void CreateDebugMeshGrid( ddc::World& world );
-		ddc::Entity CreateMeshEntity( ddc::World& world, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform );
-		ddc::Entity CreatePointLight( ddc::World& world );
-		void UpdateDebugPointLights( ddc::World& world );
-
-		void SetRenderState();
-		void RenderDebug( const ddr::RenderData& data, ddr::IRenderer& debug_render );
-
-		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );
-		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
-
-		virtual const char* GetDebugTitle() const override { return "Renderer"; }
+		void CallRenderer( ddr::Renderer& renderer, const ddc::World& world, const ddr::ICamera& camera );
 	};
 }

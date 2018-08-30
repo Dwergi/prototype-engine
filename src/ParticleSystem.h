@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "IRenderer.h"
+#include "Renderer.h"
 #include "System.h"
 #include "ShaderHandle.h"
 #include "VAO.h"
@@ -29,7 +29,7 @@ namespace ddc
 
 namespace ddr
 {
-	struct ParticleSystemRenderer : ddr::IRenderer
+	struct ParticleSystemRenderer : ddr::Renderer
 	{
 	public:
 

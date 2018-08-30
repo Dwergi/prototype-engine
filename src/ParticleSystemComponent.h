@@ -12,7 +12,7 @@
 
 namespace ddc
 {
-	static const int MaxParticles = 8 * 1024;
+	static const int MaxParticles = 1024;
 
 	struct Particle
 	{

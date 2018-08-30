@@ -1,19 +1,25 @@
 #include "PrecompiledHeader.h"
 #include "catch2/catch.hpp"
 
-#include "EntityManager.h"
 #include "ScriptSystem.h"
 #include "ScriptComponent.h"
+#include "Span.h"
+#include "UpdateData.h"
+#include "World.h"
 
 TEST_CASE( "[ScriptSystem] Update Is Called" )
 {
-	dd::EntityManager entityManager;
+	ddc::World world;
+	ddc::Entity entity = world.CreateEntity();
+
+	std::vector<ddc::Entity> entities;
+	entities.push_back( entity );
+
+	dd::Array<const ddc::DataRequirement*, 1> reqs;
+	reqs.Add( new ddc::WriteRequirement<dd::ScriptComponent>() );
+
+	ddc::UpdateData data( world, dd::Span<ddc::Entity>( entities ), reqs );
 	
-	entityManager.RegisterComponent<dd::ScriptComponent>();
-
-	dd::EntityHandle handle = entityManager.Create();
-	dd::ComponentHandle<dd::ScriptComponent> script = entityManager.AddComponent<dd::ScriptComponent>( handle );
-	script.Write()->SetModule( dd::String32( "test_component" ) );
-
-
+	dd::ScriptComponent& script = world.AddComponent<dd::ScriptComponent>( entity );
+	script.SetModule( dd::String32( "test_component" ) );
 }

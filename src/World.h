@@ -3,6 +3,7 @@
 #include "ComponentType.h"
 #include "Entity.h"
 #include "FunctionView.h"
+#include "MessageQueue.h"
 
 #include <bitset>
 #include <unordered_map>
@@ -24,6 +25,9 @@ namespace ddc
 
 		void Initialize() {}
 		void Shutdown() {}
+
+		dd::MessageQueue& Messages() { return m_messages; }
+		const dd::MessageQueue& Messages() const { return m_messages; }
 
 		//
 		// Create an entity. 
@@ -159,6 +163,8 @@ namespace ddc
 
 		int m_count { 0 };
 
+		dd::MessageQueue m_messages;
+
 		std::vector<Entity> m_entities;
 		std::vector<int> m_free;
 		std::vector<std::bitset<MAX_COMPONENTS>> m_ownership;
@@ -207,10 +213,4 @@ namespace ddc
 			}
 		}
 	}
-
-	/*void OrderSystemsByComponent( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
-
-	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
-
-	void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, World& layer );*/
 }

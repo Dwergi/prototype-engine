@@ -66,12 +66,12 @@ namespace dd
 	template <typename T>
 	bool BinarySerializer::Serialize( const T& obj )
 	{
-		return Serialize( Variable( GET_TYPE( T ), const_cast<T*>(&obj) ) );
+		return Serialize( Variable( DD_TYPE( T ), const_cast<T*>(&obj) ) );
 	}
 
 	template <typename T>
 	bool BinaryDeserializer::Deserialize( const T& obj )
 	{
-		return Deserialize( Variable( GET_TYPE( T ), const_cast<T*>(&obj) ) );
+		return Deserialize( Variable( DD_TYPE( T ), const_cast<T*>(&obj) ) );
 	}
 }

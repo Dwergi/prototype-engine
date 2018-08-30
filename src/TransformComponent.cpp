@@ -9,6 +9,4 @@
 #include "PrecompiledHeader.h"
 #include "TransformComponent.h"
 
-#include "EntityManager.h"
-
 DD_COMPONENT_CPP( dd::TransformComponent );

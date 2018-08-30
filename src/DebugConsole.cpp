@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "DebugConsole.h"
 
-#include "EntityHandle.h"
 #include "TransformComponent.h"
 
 #include "JsonSerializer.h"

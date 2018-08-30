@@ -6,18 +6,15 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 #include "Vector4.h"
 #include "AABBOctree.h"
 
 namespace dd
 {
-	class SwarmAgentComponent : public IComponent
+	class SwarmAgentComponent
 	{
 	public:
-
-		typedef PackedPool<SwarmAgentComponent> Pool;
 
 		glm::vec3 Velocity;
 		OctreeEntry OctreeHandle;
@@ -25,10 +22,11 @@ namespace dd
 		SwarmAgentComponent();
 		virtual ~SwarmAgentComponent();
 
-		BEGIN_SCRIPT_OBJECT( SwarmAgentComponent )
-			PARENT( IComponent )
-			MEMBER( SwarmAgentComponent, Velocity )
-			MEMBER( SwarmAgentComponent, OctreeHandle )
-		END_TYPE
+		DD_COMPONENT;
+
+		DD_SCRIPT_OBJECT( SwarmAgentComponent )
+			DD_MEMBER( SwarmAgentComponent, Velocity )
+			DD_MEMBER( SwarmAgentComponent, OctreeHandle )
+		DD_END_TYPE
 	};
 }

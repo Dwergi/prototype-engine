@@ -70,7 +70,7 @@ namespace dd
 		//
 		T& Write() const;
 
-		BASIC_TYPE( DoubleBuffer<T> )
+		DD_BASIC_TYPE( DoubleBuffer<T> )
 	};
 }
 

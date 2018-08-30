@@ -10,7 +10,7 @@ namespace ddc
 	void TypeName::Construct( void* ptr ) { new (ptr) TypeName; } \
 	const ddc::ComponentType TypeName::Type( #TypeName, sizeof( TypeName ), &TypeName::Construct )
 
-	static const int MAX_ENTITIES = 32 * 1024;
+	static const int MAX_ENTITIES = 1024;
 	static const int MAX_COMPONENTS = 32;
 
 	typedef int TypeID;

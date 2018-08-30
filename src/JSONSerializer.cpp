@@ -9,7 +9,6 @@
 
 #include "arduinojson/ArduinoJson.h"
 
-/*
 namespace dd
 {
 	class JSONPrint 
@@ -18,7 +17,7 @@ namespace dd
 		JSONPrint( WriteStream& stream )
 			: m_stream( stream ) {}
 
-		size_t write( uint8_t c )
+		size_t print( uint8_t c )
 		{
 			m_stream.WriteByte( c );
 			return 1;
@@ -29,7 +28,7 @@ namespace dd
 	};
 
 #define POD( T ) \
-	if( type == GET_TYPE( T ) ) \
+	if( type == DD_TYPE( T ) ) \
 		return JsonVariant( var.GetValue<T>() );
 
 	JsonVariant GetPODVariant( Variable var, JsonBuffer& buffer )
@@ -121,11 +120,11 @@ namespace dd
 		{
 			return GetArrayVariant( var, buffer );
 		}
-		else if( type->IsDerivedFrom( GET_TYPE( String ) ) )
+		else if( type->IsDerivedFrom( DD_TYPE( String ) ) )
 		{
 			return JsonVariant( var.GetValue<String>().c_str() );
 		}
-		else if( type == GET_TYPE( SharedString ) )
+		else if( type == DD_TYPE( SharedString ) )
 		{
 			return JsonVariant( var.GetValue<SharedString>().c_str() );
 		}
@@ -170,7 +169,7 @@ namespace dd
 	}
 
 #define POD( T ) \
-	if( var.Type() == GET_TYPE( T ) ) \
+	if( var.Type() == DD_TYPE( T ) ) \
 		return SetPOD<T>( var, variant );
 
 	bool SetPODFromVariant( Variable& var, const JsonVariant& variant )
@@ -213,7 +212,7 @@ namespace dd
 			contained->PlacementNew( buffer );
 
 			Variable element( contained, buffer );
-			if( !SetFromVariant( element, arr.get( i ) ) )
+			if( !SetFromVariant( element, arr[ i ] ) )
 			{
 				delete[] buffer;
 				return false;
@@ -244,7 +243,7 @@ namespace dd
 		{
 			Variable member_var( var, member );
 
-			const JsonVariant& member_variant = members.get( member.Name().c_str() );
+			const JsonVariant& member_variant = members[ member.Name().c_str() ];
 			if( !member_variant.success() )
 				return false;
 
@@ -262,7 +261,7 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 
-		if( type->IsDerivedFrom( GET_TYPE( String ) ) )
+		if( type->IsDerivedFrom( DD_TYPE( String ) ) )
 		{
 			if( !variant.is<const char*>() )
 				return false;
@@ -270,7 +269,7 @@ namespace dd
 			var.GetValue<String>() = variant.as<const char*>();
 			return true;
 		}
-		else if( type == GET_TYPE( SharedString ) )
+		else if( type == DD_TYPE( SharedString ) )
 		{
 			if( !variant.is<const char*>() )
 				return false;
@@ -309,5 +308,4 @@ namespace dd
 
 		return SetFromVariant( var, variant );
 	}
-	//===================================================================================
-}*/
+}

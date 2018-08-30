@@ -35,7 +35,7 @@ void test_int_prop( dd::Property* int_prop )
 
 TEST_CASE( "[property] Integer properties" )
 {
-	REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_TYPE( Test::SimpleStruct );
 	Test::SimpleStruct test_struct;
 
 	SECTION( "Simple" )
@@ -52,7 +52,7 @@ TEST_CASE( "[property] Integer properties" )
 
 	SECTION( "Nested Struct ")
 	{
-		REGISTER_TYPE( Test::NestedStruct );
+		DD_REGISTER_TYPE( Test::NestedStruct );
 		Test::NestedStruct nested;
 		dd::PropertyList nested_props( nested );
 

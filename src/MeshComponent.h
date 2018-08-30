@@ -28,10 +28,10 @@ namespace dd
 
 		DD_COMPONENT;
 
-		BEGIN_TYPE( MeshComponent )
-			MEMBER( MeshComponent, Mesh )
-			MEMBER( MeshComponent, Hidden )
-			MEMBER( MeshComponent, Colour )
-		END_TYPE
+		DD_BEGIN_TYPE( MeshComponent )
+			DD_MEMBER( MeshComponent, Mesh )
+			DD_MEMBER( MeshComponent, Hidden )
+			DD_MEMBER( MeshComponent, Colour )
+		DD_END_TYPE
 	};
 }

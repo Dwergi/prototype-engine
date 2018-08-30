@@ -6,16 +6,13 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 
 namespace dd
 {
-	class ShipComponent : public IComponent
+	class ShipComponent
 	{
 	public:
-		typedef PackedPool<ShipComponent> Pool;
-
 		glm::vec3 Velocity;
 		float MaximumSpeed;
 		float MinimumSpeed;
@@ -33,8 +30,9 @@ namespace dd
 		// The number of seconds to recharge to full boost.
 		float BoostMaximum;
 
-		BEGIN_SCRIPT_OBJECT( ShipComponent )
-			PARENT( IComponent )
-		END_TYPE
+		DD_COMPONENT;
+
+		DD_SCRIPT_OBJECT( ShipComponent )
+		DD_END_TYPE
 	};
 };

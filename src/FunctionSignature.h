@@ -47,7 +47,7 @@ namespace dd
 		// Static function with return value
 		template <typename R>
 		FunctionSignature( R (*fn)() )
-			: m_ret( GET_TYPE( R ) )
+			: m_ret( DD_TYPE( R ) )
 			, m_args( nullptr )
 			, m_argCount( 0 )
 			, m_context( nullptr )
@@ -57,7 +57,7 @@ namespace dd
 		// Overload to deal with not being able to allocate a zero size array.
 		template <typename R, typename... Args>
 		FunctionSignature( R (*fn)( Args... ) )
-			: m_ret( GET_TYPE( R ) )
+			: m_ret( DD_TYPE( R ) )
 			, m_context( nullptr )
 		{
 			constexpr const std::size_t ArgCount = sizeof...(Args);
@@ -89,17 +89,17 @@ namespace dd
 		// Method with return value, non-const
 		template <typename C, typename R>
 		FunctionSignature( R (C::*fn)() )
-			: m_ret( GET_TYPE( R ) )
+			: m_ret( DD_TYPE( R ) )
 			, m_argCount( 0 )
 			, m_args( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename R, typename... Args>
 		FunctionSignature( R (C::*fn)( Args... ) )
-			: m_ret( GET_TYPE( R ) )
-			, m_context( GET_TYPE( C ) )
+			: m_ret( DD_TYPE( R ) )
+			, m_context( DD_TYPE( C ) )
 		{
 			constexpr const std::size_t ArgCount = sizeof...(Args);
 			static const TypeInfo* s_args[ArgCount];
@@ -117,14 +117,14 @@ namespace dd
 			: m_ret( nullptr )
 			, m_argCount( 0 )
 			, m_args( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename... Args>
 		FunctionSignature( void (C::*fn)( Args... ) )
 			: m_ret( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 			constexpr const std::size_t ArgCount = sizeof...(Args);
 			static const TypeInfo* s_args[ArgCount];
@@ -138,17 +138,17 @@ namespace dd
 		// Method with return value, const
 		template <typename C, typename R>
 		FunctionSignature( R (C::*fn)() const )
-			: m_ret( GET_TYPE( R ) )
+			: m_ret( DD_TYPE( R ) )
 			, m_argCount( 0 )
 			, m_args( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename R, typename... Args>
 		FunctionSignature( R (C::*fn)( Args... ) const )
-			: m_ret( GET_TYPE( R ) )
-			, m_context( GET_TYPE( C ) )
+			: m_ret( DD_TYPE( R ) )
+			, m_context( DD_TYPE( C ) )
 		{
 			constexpr const std::size_t ArgCount = sizeof...(Args);
 			static const TypeInfo* s_args[ArgCount];
@@ -165,14 +165,14 @@ namespace dd
 			: m_ret( nullptr )
 			, m_argCount( 0 )
 			, m_args( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 		}
 
 		template <typename C, typename... Args>
 		FunctionSignature( void (C::*fn)( Args... ) const )
 			: m_ret( nullptr )
-			, m_context( GET_TYPE( C ) )
+			, m_context( DD_TYPE( C ) )
 		{
 			constexpr const std::size_t ArgCount = sizeof...(Args);
 			static const TypeInfo* s_args[ArgCount];

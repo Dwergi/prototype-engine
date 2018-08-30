@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "TerrainSystem.h"
 
-#include "EntityManager.h"
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "MeshComponent.h"

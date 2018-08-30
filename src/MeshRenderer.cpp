@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "MeshRenderer.h"
 
-#include "EntityManager.h"
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
@@ -30,7 +29,8 @@ namespace ddr
 	MeshRenderer::MeshRenderer( const dd::MousePicking& mousePicking ) :
 		m_mousePicking( mousePicking )
 	{
-
+		Require<dd::MeshComponent>();
+		Require<dd::TransformComponent>();
 	}
 
 	void MeshRenderer::RenderInit()
@@ -64,11 +64,14 @@ namespace ddr
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 
-		DD_TODO( "Uncomment" );
-		/*entity_manager.ForAllWithReadable<dd::MeshComponent, dd::TransformComponent>( [this, &camera, &uniforms]( auto entity, auto mesh, auto transform )
+		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
+		dd::Span<ddc::Entity> entities = data.Entities();
+		
+		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			RenderMesh( entity, *mesh.Read(), *transform.Read(), camera, uniforms );
-		} );*/
+			RenderMesh( entities[i], meshes[i], transforms[i], data.Camera(), data.Uniforms() );
+		}
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,

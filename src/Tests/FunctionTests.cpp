@@ -161,7 +161,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Void, No Args" )
 	{
-		dd::Function fn = FUNCTION( VoidNoArgs );
+		dd::Function fn = DD_FUNCTION( VoidNoArgs );
 
 		fn();
 
@@ -170,7 +170,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Void, Single Arg" )
 	{
-		dd::Function fn = FUNCTION( VoidSingleArg );
+		dd::Function fn = DD_FUNCTION( VoidSingleArg );
 
 		fn( 1 );
 
@@ -180,7 +180,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Void, Two Args" )
 	{
-		dd::Function fn = FUNCTION( VoidTwoArgs );
+		dd::Function fn = DD_FUNCTION( VoidTwoArgs );
 
 		fn( 1, 10.0f );
 
@@ -192,7 +192,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Return, No Args" )
 	{
-		dd::Function fn = FUNCTION( RetNoArgs );
+		dd::Function fn = DD_FUNCTION( RetNoArgs );
 
 		int ret = -1;
 		dd::Variable var( ret );
@@ -205,7 +205,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Return, Single Arg" )
 	{
-		dd::Function fn = FUNCTION( RetSingleArg );
+		dd::Function fn = DD_FUNCTION( RetSingleArg );
 
 		int ret = -1;
 		dd::Variable var( ret );
@@ -219,7 +219,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 
 	SECTION( "Return, Two Args" )
 	{
-		dd::Function fn = FUNCTION( RetTwoArgs );
+		dd::Function fn = DD_FUNCTION( RetTwoArgs );
 
 		int ret = -1;
 		dd::Variable var( ret );
@@ -243,7 +243,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, No Args, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidNoArgs );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidNoArgs );
 		fn.Bind( instance );
 
 		fn();
@@ -253,7 +253,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, Single Arg, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidSingleArg );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidSingleArg );
 		fn.Bind( instance );
 
 		fn( 1 );
@@ -264,7 +264,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, Two Args, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidTwoArgs );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidTwoArgs );
 		fn.Bind( instance );
 
 		fn( 1, 10.0f );
@@ -276,7 +276,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, No Args, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidNoArgsConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidNoArgsConst );
 		fn.Bind( instance );
 
 		fn();
@@ -286,7 +286,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, Single Arg, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidSingleArgConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidSingleArgConst );
 		fn.Bind( instance );
 
 		fn( 1 );
@@ -297,7 +297,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Void, Two Args, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::VoidTwoArgsConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::VoidTwoArgsConst );
 		fn.Bind( instance );
 
 		fn( 1, 10.0f );
@@ -309,7 +309,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, No Args, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetNoArgs );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetNoArgs );
 		fn.Bind( instance );
 
 		int ret = -1;
@@ -323,7 +323,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, Single Arg, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetSingleArg );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetSingleArg );
 		fn.Bind( instance );
 
 		int ret = -1;
@@ -338,7 +338,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, Two Args, Not Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetTwoArgs );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetTwoArgs );
 		fn.Bind( instance );
 
 		int ret = -1;
@@ -354,7 +354,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, No Args, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetNoArgsConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetNoArgsConst );
 		fn.Bind( instance );
 
 		int ret = -1;
@@ -368,7 +368,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, Single Arg, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetSingleArgConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetSingleArgConst );
 		fn.Bind( instance );
 
 		int ret = -1;
@@ -383,7 +383,7 @@ TEST_CASE( "[Functions] Methods" )
 
 	SECTION( "Return, Two Args, Const" )
 	{
-		dd::Function fn = FUNCTION( Test::TestClass::RetTwoArgsConst );
+		dd::Function fn = DD_FUNCTION( Test::TestClass::RetTwoArgsConst );
 		fn.Bind( instance );
 
 		int ret = -1;

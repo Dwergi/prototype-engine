@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ComponentDataBuffer.h"
+#include "ComponentBuffer.h"
 #include "Span.h"
 
 namespace ddc
@@ -21,11 +21,42 @@ namespace ddr
 	class ICamera;
 	struct UniformStorage;
 
+	template <typename T>
+	struct RenderBuffer
+	{
+		RenderBuffer( const ddc::ComponentBuffer& buffer ) :
+			m_buffer( buffer )
+		{
+			DD_ASSERT( buffer.Component() == T::Type );
+			DD_ASSERT( buffer.Usage() == ddc::DataUsage::Read );
+		}
+
+		const T& Get( size_t index ) const
+		{
+			DD_ASSERT( index < m_buffer.Size() );
+
+			return *(Data() + index);
+		}
+
+		const T& operator[]( size_t index ) const
+		{
+			return Get( index );
+		}
+
+	protected:
+		const ddc::ComponentBuffer& m_buffer;
+
+		const T* Data() const
+		{
+			return reinterpret_cast<const T*>(m_buffer.Data());
+		}
+	};
+
 	struct RenderData
 	{
 	public:
-		RenderData( const ddc::World& world, dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements,
-			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
+		RenderData( const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+			dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements );
 
 		const ddc::World& World() const { return m_world; }
 		const ddr::ICamera& Camera() const { return m_camera; }
@@ -36,29 +67,13 @@ namespace ddr
 		size_t Size() const { return m_entities.Size(); }
 
 		template <typename T>
-		ddc::ReadBuffer<T> Read() const
+		ddr::RenderBuffer<T> Get() const
 		{
-			for( const ddc::ComponentDataBuffer& buffer : m_buffers )
+			for( const ddc::ComponentBuffer& buffer : m_buffers )
 			{
-				if( buffer.Component() == T::Type && 
-					buffer.Usage() == ddc::DataUsage::Read )
+				if( buffer.Component() == T::Type )
 				{
-					return ddc::ReadBuffer<T>( buffer );
-				}
-			}
-
-			throw std::exception( "No read buffer found for component. Check your requirements!" );
-		}
-
-		template <typename T>
-		ddc::WriteBuffer<T> Write() const
-		{
-			for( const ddc::ComponentDataBuffer& buffer : m_buffers )
-			{
-				if( buffer.Component() == T::Type && 
-					buffer.Usage() == ddc::DataUsage::Write )
-				{
-					return ddc::WriteBuffer<T>( buffer );
+					return ddr::RenderBuffer<T>( buffer );
 				}
 			}
 
@@ -71,6 +86,6 @@ namespace ddr
 		ddr::UniformStorage& m_uniforms;
 		dd::Span<ddc::Entity> m_entities;
 
-		std::vector<ddc::ComponentDataBuffer> m_buffers;
+		std::vector<ddc::ComponentBuffer> m_buffers;
 	};
 }

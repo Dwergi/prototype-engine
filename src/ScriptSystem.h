@@ -6,20 +6,26 @@
 
 #pragma once
 
-#include "ISystem.h"
+#include "System.h"
+
+namespace ddc
+{
+	struct UpdateData;
+}
 
 namespace dd
 {
-	class ScriptSystem : ISystem
+	class ScriptSystem : ddc::System
 	{
 	public:
 		ScriptSystem( AngelScriptEngine& script_engine );
 		~ScriptSystem();
 
-		virtual void Update( EntityManager& entity_manager, float dt ) override;
+		virtual void Initialize( ddc::World& ) {}
+		virtual void Update( const ddc::UpdateData& data, float dt );
+		virtual void Shutdown( ddc::World& ) {}
 
 	private:
-
 		AngelScriptEngine& m_scriptEngine;
 	};
 }

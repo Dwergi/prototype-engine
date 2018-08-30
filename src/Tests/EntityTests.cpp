@@ -1,10 +1,11 @@
 #include "PrecompiledHeader.h"
 #include "World.h"
 
-#include "ComponentDataBuffer.h"
+#include "ComponentBuffer.h"
 #include "JobSystem.h"
 #include "UpdateData.h"
 #include "System.h"
+#include "SystemsSorting.h"
 
 #include "catch2/catch.hpp"
 
@@ -36,14 +37,13 @@ DD_COMPONENT_CPP( ThirdComponent );
 struct TestSystem : ddc::System
 {
 	TestSystem() :
-		System( "TestSystem" ),
-		m_firstRead( *this ),
-		m_secondWrite( *this )
+		System( "TestSystem" )
 	{
-
+		RequireRead<FirstComponent>();
+		RequireWrite<SecondComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data ) override
+	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
 		ddc::ReadBuffer<FirstComponent> read = data.Read<FirstComponent>();
 		ddc::WriteBuffer<SecondComponent> write = data.Write<SecondComponent>();
@@ -53,24 +53,21 @@ struct TestSystem : ddc::System
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
 			const FirstComponent& cmp = read.Get( i );
-			write.Get( i ).SecondValue = cmp.FirstValue;
+			write.Access( i ).SecondValue = cmp.FirstValue;
 		}
 	}
-
-	ddc::ReadRequirement<FirstComponent> m_firstRead;
-	ddc::WriteRequirement<SecondComponent> m_secondWrite;
 };
 
 struct DependentSystem : ddc::System
 {
 	DependentSystem() :
-		System( "DependentSystem" ),
-		m_secondRead( *this ),
-		m_thirdWrite( *this )
+		System( "DependentSystem" )
 	{
+		RequireRead<SecondComponent>();
+		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data ) override
+	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
 		ddc::ReadBuffer<SecondComponent> read = data.Read<SecondComponent>();
 		ddc::WriteBuffer<ThirdComponent> write = data.Write<ThirdComponent>();
@@ -80,23 +77,20 @@ struct DependentSystem : ddc::System
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
 			const SecondComponent& cmp = read.Get( i );
-			write.Get( i ).ThirdValue = cmp.SecondValue;
+			write.Access( i ).ThirdValue = cmp.SecondValue;
 		}
 	}
-
-	ddc::ReadRequirement<SecondComponent> m_secondRead;
-	ddc::WriteRequirement<ThirdComponent> m_thirdWrite;
 };
 
 struct ReaderSystem : ddc::System
 {
 	ReaderSystem() :
-		System( "ReaderSystem" ),
-		m_thirdRead( *this )
+		System( "ReaderSystem" )
 	{
+		RequireRead<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data ) override
+	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
 		ddc::ReadBuffer<ThirdComponent> read = data.Read<ThirdComponent>();
 
@@ -106,20 +100,18 @@ struct ReaderSystem : ddc::System
 			int x = cmp.ThirdValue * cmp.ThirdValue;
 		}
 	}
-
-	ddc::ReadRequirement<ThirdComponent> m_thirdRead;
 };
 
 struct OnlyReaderSystem : ddc::System
 {
 	OnlyReaderSystem() :
-		System( "OnlyReaderSystem" ),
-		m_firstRead( *this ),
-		m_secondRead( *this )
+		System( "OnlyReaderSystem" )
 	{
+		RequireWrite<FirstComponent>();
+		RequireWrite<SecondComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data ) override
+	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
 		ddc::ReadBuffer<FirstComponent> read1 = data.Read<FirstComponent>();
 		ddc::ReadBuffer<SecondComponent> read2 = data.Read<SecondComponent>();
@@ -131,94 +123,90 @@ struct OnlyReaderSystem : ddc::System
 			int x = cmp1.FirstValue * cmp2.SecondValue;
 		}
 	}
-
-	ddc::ReadRequirement<FirstComponent> m_firstRead;
-	ddc::ReadRequirement<SecondComponent> m_secondRead;
 };
 
 struct OnlyWriterSystem : ddc::System
 {
 	OnlyWriterSystem() :
-		System( "OnlyWriterSystem" ),
-		m_secondWrite( *this ),
-		m_thirdWrite( *this )
+		System( "OnlyWriterSystem" )
 	{
+		RequireWrite<SecondComponent>();
+		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data ) override {}
-
-	ddc::WriteRequirement<SecondComponent> m_secondWrite;
-	ddc::WriteRequirement<ThirdComponent> m_thirdWrite;
+	virtual void Update( const ddc::UpdateData& data, float delta_t ) override {}
 };
 
 TEST_CASE( "EntityManager" )
 {
-	ddc::EntityLayer layer;
+	ddc::World world;
 
-	ddc::Entity a = layer.Create();
+	ddc::Entity a = world.CreateEntity();
 	REQUIRE( a.ID == 0 );
 
-	ddc::Entity b = layer.Create();
+	ddc::Entity b = world.CreateEntity();
 	REQUIRE( b.ID == 1 );
 
-	ddc::Entity c = layer.Create();
+	ddc::Entity c = world.CreateEntity();
 	REQUIRE( c.ID == 2 );
 
-	layer.Destroy( a );
+	world.DestroyEntity( a );
 	
-	ddc::Entity a2 = layer.Create();
+	ddc::Entity a2 = world.CreateEntity();
 	REQUIRE( a2.ID == a.ID );
 	REQUIRE( a2.Version == 1 );
 
-	layer.Destroy( b );
+	world.DestroyEntity( b );
 
-	ddc::Entity b2 = layer.Create();
+	ddc::Entity b2 = world.CreateEntity();
 	REQUIRE( b2.ID == b.ID );
 	REQUIRE( b2.Version == 1 );
 }
 
 TEST_CASE( "Component" )
 {
-	ddc::EntityLayer layer;
-	ddc::Entity a = layer.Create();
+	ddc::World world;
+	ddc::Entity a = world.CreateEntity();
 
-	bool found = layer.HasComponent<FirstComponent>( a );
+	bool found = world.HasComponent<FirstComponent>( a );
 	REQUIRE( found == false );
 
-	FirstComponent& cmp = layer.AddComponent<FirstComponent>( a );
+	FirstComponent& cmp = world.AddComponent<FirstComponent>( a );
 	REQUIRE( cmp.FirstValue == -100 );
 
 	REQUIRE( &cmp.GetType() == &FirstComponent::Type );
 
 	cmp.FirstValue = 5;
 
-	const FirstComponent& cmp2 = *layer.AccessComponent<FirstComponent>( a );
+	const FirstComponent& cmp2 = *world.AccessComponent<FirstComponent>( a );
 	REQUIRE( cmp2.FirstValue == 5 );
 	REQUIRE( cmp.FirstValue == cmp2.FirstValue );
 
-	REQUIRE( layer.HasComponent<FirstComponent>( a ) );
+	REQUIRE( world.HasComponent<FirstComponent>( a ) );
 
-	layer.RemoveComponent<FirstComponent>( a );
-	REQUIRE_FALSE( layer.HasComponent<FirstComponent>( a ) );
+	world.RemoveComponent<FirstComponent>( a );
+	REQUIRE_FALSE( world.HasComponent<FirstComponent>( a ) );
 }
 
 TEST_CASE( "Update System" )
 {
-	ddc::EntityLayer layer;
+	ddc::World world;
 
 	for( int i = 0; i < 8; ++i )
 	{
-		ddc::Entity e = layer.Create();
+		ddc::Entity e = world.CreateEntity();
 
-		FirstComponent& simple = layer.AddComponent<FirstComponent>( e );
+		FirstComponent& simple = world.AddComponent<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = layer.AddComponent<SecondComponent>( e );
+		SecondComponent& other = world.AddComponent<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
 	TestSystem system;
-	ddc::UpdateSystem( system, layer );
+	world.RegisterSystem( system );
+
+	world.Update( 0 );
 
 	for( int i = 0; i < 8; ++i )
 	{
@@ -226,34 +214,36 @@ TEST_CASE( "Update System" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *layer.AccessComponent<FirstComponent>( e );
+		FirstComponent& simple = *world.AccessComponent<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *layer.AccessComponent<SecondComponent>( e );
+		SecondComponent& other = *world.AccessComponent<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
 
 TEST_CASE( "Update With Discontinuity" )
 {
-	ddc::EntityLayer layer;
+	ddc::World world;
 
 	for( int i = 0; i < 5; ++i )
 	{
-		ddc::Entity e = layer.Create();
+		ddc::Entity e = world.CreateEntity();
 
 		if( i == 2 )
 			continue;
 		
-		FirstComponent& simple = layer.AddComponent<FirstComponent>( e );
+		FirstComponent& simple = world.AddComponent<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = layer.AddComponent<SecondComponent>( e );
+		SecondComponent& other = world.AddComponent<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
 	TestSystem system;
-	ddc::UpdateSystem( system, layer, 1 );
+	world.RegisterSystem( system );
+
+	world.Update( 0 );
 
 	for( int i = 0; i < 5; ++i )
 	{
@@ -264,10 +254,10 @@ TEST_CASE( "Update With Discontinuity" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *layer.AccessComponent<FirstComponent>( e );
+		FirstComponent& simple = *world.AccessComponent<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *layer.AccessComponent<SecondComponent>( e );
+		SecondComponent& other = *world.AccessComponent<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
@@ -277,23 +267,25 @@ TEST_CASE( "Update Multiple Systems" )
 	TestSystem a;
 	DependentSystem b;
 
-	ddc::EntityLayer layer;
+	ddc::World world;
+	world.RegisterSystem( a );
+	world.RegisterSystem( b );
 
 	for( int i = 0; i < 4; ++i )
 	{
-		ddc::Entity e = layer.Create();
+		ddc::Entity e = world.CreateEntity();
 
-		FirstComponent& first = layer.AddComponent<FirstComponent>( e );
+		FirstComponent& first = world.AddComponent<FirstComponent>( e );
 		first.FirstValue = i;
 
-		SecondComponent& second = layer.AddComponent<SecondComponent>( e );
+		SecondComponent& second = world.AddComponent<SecondComponent>( e );
 		second.SecondValue = -1;
 
-		ThirdComponent& third = layer.AddComponent<ThirdComponent>( e );
+		ThirdComponent& third = world.AddComponent<ThirdComponent>( e );
 		third.ThirdValue = -1;
 	}
 
-	ddc::UpdateSystem( a, layer );
+	world.Update( 0.0f );
 
 	for( int i = 0; i < 4; ++i )
 	{
@@ -301,11 +293,11 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		SecondComponent& second = *layer.AccessComponent<SecondComponent>( e );
+		SecondComponent& second = *world.AccessComponent<SecondComponent>( e );
 		REQUIRE( second.SecondValue == e.ID );
 	}
 
-	ddc::UpdateSystem( b, layer );
+	world.Update( 0 );
 
 	for( int i = 0; i < 4; ++i )
 	{
@@ -313,7 +305,7 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		ThirdComponent& third = *layer.AccessComponent<ThirdComponent>( e );
+		ThirdComponent& third = *world.AccessComponent<ThirdComponent>( e );
 		REQUIRE( third.ThirdValue == e.ID );
 	}
 }
@@ -511,9 +503,11 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 1 ].m_system == &b );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::EntityLayer layer;
+		ddc::World world;
+		world.RegisterSystem( a );
+		world.RegisterSystem( b );
 
-		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
+		world.Update( 0 );
 	}
 
 	SECTION( "Multiple Roots" )
@@ -537,9 +531,11 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 2 ].m_system == &c );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::EntityLayer layer;
+		ddc::World world;
+		world.RegisterSystem( a );
+		world.RegisterSystem( b );
 
-		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
+		world.Update( 0 );
 	}
 
 	SECTION( "Diamond" )
@@ -567,9 +563,12 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 3 ].m_system == &d );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::EntityLayer layer;
+		ddc::World world;
+		world.RegisterSystem( a );
+		world.RegisterSystem( b );
+		world.RegisterSystem( c );
 
-		ddc::UpdateSystemsWithTreeScheduling( ordered, jobsystem, layer );
+		world.Update( 0 );
 	}
 }
 
@@ -580,20 +579,24 @@ TEST_CASE( "Full Update Loop" )
 	ReaderSystem c;
 
 	ddc::System* systems[] = { &a, &b, &c };
-	ddc::EntityLayer layer;
+	ddc::World world;
+
+	world.RegisterSystem( a );
+	world.RegisterSystem( b );
+	world.RegisterSystem( c );
 
 	BENCHMARK( "Create Entities" )
 	{
 		for( int i = 0; i < 1000; ++i )
 		{
-			ddc::Entity e = layer.Create();
-			FirstComponent& first = layer.AddComponent<FirstComponent>( e );
+			ddc::Entity e = world.CreateEntity();
+			FirstComponent& first = world.AddComponent<FirstComponent>( e );
 			first.FirstValue = i;
 
-			SecondComponent& second = layer.AddComponent<SecondComponent>( e );
+			SecondComponent& second = world.AddComponent<SecondComponent>( e );
 			second.SecondValue = 0;
 
-			ThirdComponent& third = layer.AddComponent<ThirdComponent>( e );
+			ThirdComponent& third = world.AddComponent<ThirdComponent>( e );
 			third.ThirdValue = 0;
 		}
 	}
@@ -602,9 +605,7 @@ TEST_CASE( "Full Update Loop" )
 	{
 		for( int i = 0; i < 1000; ++i )
 		{
-			ddc::UpdateSystem( a, layer );
-			ddc::UpdateSystem( b, layer );
-			ddc::UpdateSystem( c, layer );
+			world.Update( 0.0f );
 		}
 	}
 
@@ -614,10 +615,10 @@ TEST_CASE( "Full Update Loop" )
 		e.ID = i;
 		e.Version = 0;
 
-		const SecondComponent* second = layer.GetComponent<SecondComponent>( e );
+		const SecondComponent* second = world.GetComponent<SecondComponent>( e );
 		REQUIRE( second->SecondValue == i );
 
-		const ThirdComponent* third = layer.GetComponent<ThirdComponent>( e );
+		const ThirdComponent* third = world.GetComponent<ThirdComponent>( e );
 		REQUIRE( third->ThirdValue == i );
 	}
 }

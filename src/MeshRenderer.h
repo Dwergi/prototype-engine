@@ -8,7 +8,7 @@
 
 #include "Entity.h"
 #include "IDebugPanel.h"
-#include "IRenderer.h"
+#include "Renderer.h"
 #include "MeshHandle.h"
 
 namespace dd
@@ -20,7 +20,7 @@ namespace dd
 
 namespace ddr
 {
-	class MeshRenderer : public dd::IDebugPanel, public ddr::IRenderer
+	class MeshRenderer : public dd::IDebugPanel, public ddr::Renderer
 	{
 	public:
 

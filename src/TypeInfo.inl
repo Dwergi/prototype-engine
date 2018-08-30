@@ -152,7 +152,7 @@ namespace dd
 	template <typename T>
 	void TypeInfo::RegisterParentType()
 	{
-		const TypeInfo* parent = GET_TYPE( T );
+		const TypeInfo* parent = DD_TYPE( T );
 		DD_ASSERT( parent->IsRegistered() );
 
 		m_parentType = parent;

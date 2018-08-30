@@ -6,23 +6,21 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 
 namespace dd
 {
-	class TrenchComponent : public IComponent
+	class TrenchComponent
 	{
 	public:
 
 		glm::vec3 Direction;
 
-		typedef PackedPool<TrenchComponent> Pool;
-
 		TrenchComponent() { }
 
-		BEGIN_SCRIPT_OBJECT( TrenchComponent )
-			PARENT( IComponent )
-		END_TYPE
+		DD_COMPONENT;
+
+		DD_SCRIPT_OBJECT( TrenchComponent )
+		DD_END_TYPE
 	};
 }

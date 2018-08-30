@@ -67,7 +67,7 @@ void TestWaitB()
 
 void TestWaitA( dd::JobSystem* system )
 {
-	system->Schedule( FUNCTION( TestWaitB ), "B" );
+	system->Schedule( DD_FUNCTION( TestWaitB ), "B" );
 
 	ScheduledB = true;
 
@@ -84,7 +84,7 @@ TEST_CASE( "[JobSystem]" )
 	{
 		SECTION( "- Function" )
 		{
-			auto f = system.Schedule( FUNCTION( FreeFunctionVoid ) );
+			auto f = system.Schedule( DD_FUNCTION( FreeFunctionVoid ) );
 			f.wait();
 		}
 
@@ -117,7 +117,7 @@ TEST_CASE( "[JobSystem]" )
 		{
 			SECTION( "- Function" )
 			{
-				dd::Function fn = FUNCTION( TestStruct::TestFunctionVoid );
+				dd::Function fn = DD_FUNCTION( TestStruct::TestFunctionVoid );
 				fn.Bind( test_struct );
 				auto f = system.Schedule( fn );
 				f.wait();
