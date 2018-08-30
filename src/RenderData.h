@@ -24,11 +24,12 @@ namespace ddr
 	struct RenderData
 	{
 	public:
-		RenderData( ddc::World& world, dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements,
-			ddr::ICamera& camera, ddr::UniformStorage& uniforms );
+		RenderData( const ddc::World& world, dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements,
+			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
-		ddc::World& World() const { return m_world; }
-		ddr::ICamera& Camera() const { return m_camera; }
+		const ddc::World& World() const { return m_world; }
+		const ddr::ICamera& Camera() const { return m_camera; }
+
 		ddr::UniformStorage& Uniforms() const { return m_uniforms; }
 
 		const dd::Span<ddc::Entity> Entities() const { return m_entities; }
@@ -65,8 +66,8 @@ namespace ddr
 		}
 
 	private:
-		ddc::World& m_world;
-		ddr::ICamera& m_camera;
+		const ddc::World& m_world;
+		const ddr::ICamera& m_camera;
 		ddr::UniformStorage& m_uniforms;
 		dd::Span<ddc::Entity> m_entities;
 

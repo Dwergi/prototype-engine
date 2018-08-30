@@ -9,10 +9,17 @@
 
 #include "TerrainChunk.h"
 
+DD_COMPONENT_CPP( dd::TerrainChunkComponent );
+
 namespace dd
 {
 	TerrainChunkComponent::TerrainChunkComponent()
 	{
 
+	}
+
+	TerrainChunkComponent::TerrainChunkComponent( const TerrainChunkComponent& other )
+	{
+		Chunk = other.Chunk;
 	}
 }

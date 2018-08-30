@@ -8,6 +8,7 @@
 #include "Uniforms.h"
 
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 namespace ddr
 {
@@ -115,7 +116,20 @@ namespace ddr
 		}
 	}
 
-	void UniformStorage::Set( const char* name, glm::mat4 value )
+	void UniformStorage::Set( const char* name, const glm::mat3& value )
+	{
+		IUniform* uniform = Find( name );
+		if( uniform != nullptr )
+		{
+			SetValue( uniform, UniformType::Matrix3, value );
+		}
+		else
+		{
+			Create( name, UniformType::Matrix3, value );
+		}
+	}
+
+	void UniformStorage::Set( const char* name, const glm::mat4& value )
 	{
 		IUniform* uniform = Find( name );
 		if( uniform != nullptr )
@@ -125,6 +139,19 @@ namespace ddr
 		else
 		{
 			Create( name, UniformType::Matrix4, value );
+		}
+	}
+
+	void UniformStorage::Set( const char* name, const ddr::Texture& value )
+	{
+		IUniform* uniform = Find( name );
+		if( uniform != nullptr )
+		{
+			SetValue( uniform, UniformType::Texture, value.GetTextureUnit() );
+		}
+		else
+		{
+			Create( name, UniformType::Texture, value.GetTextureUnit() );
 		}
 	}
 
@@ -172,9 +199,21 @@ namespace ddr
 					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
+				case UniformType::Matrix3:
+				{
+					Uniform<glm::mat3>* u = (Uniform<glm::mat3>*) uniform;
+					shader.SetUniform( u->Name, u->Value );
+					break;
+				}
 				case UniformType::Matrix4:
 				{
 					Uniform<glm::mat4>* u = (Uniform<glm::mat4>*) uniform;
+					shader.SetUniform( u->Name, u->Value );
+					break;
+				}
+				case UniformType::Texture:
+				{
+					Uniform<int>* u = (Uniform<int>*) uniform;
 					shader.SetUniform( u->Name, u->Value );
 					break;
 				}

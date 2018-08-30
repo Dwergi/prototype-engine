@@ -21,7 +21,7 @@ TEST_CASE( "[DoubleBuffer] Swap" )
 	DoubleBuffer<Vector<int>> buffer( &v1, &v2, false );
 
 	{
-		Vector<int>& write = buffer.GetWrite();
+		Vector<int>& write = buffer.Write();
 
 		for( int i = 0; i < 16; ++i )
 		{
@@ -32,7 +32,7 @@ TEST_CASE( "[DoubleBuffer] Swap" )
 	buffer.Swap();
 
 	{
-		const Vector<int>& read = buffer.GetRead();
+		const Vector<int>& read = buffer.Read();
 		for( int i = 0; i < 16; ++i )
 		{
 			REQUIRE( read[i] == i );
@@ -46,7 +46,7 @@ TEST_CASE( "[DoubleBuffer] Duplicate" )
 	DoubleBuffer<Vector<int>> buffer( &v1, &v2, false );
 
 	{
-		Vector<int>& write = buffer.GetWrite();
+		Vector<int>& write = buffer.Write();
 
 		for( int i = 0; i < 16; ++i )
 		{
@@ -58,7 +58,7 @@ TEST_CASE( "[DoubleBuffer] Duplicate" )
 	buffer.Duplicate();
 
 	{
-		Vector<int>& write = buffer.GetWrite();
+		Vector<int>& write = buffer.Write();
 		for( int i = 0; i < 16; ++i )
 		{
 			REQUIRE( write[i] == i );
@@ -73,7 +73,7 @@ TEST_CASE( "[DoubleBuffer] Duplicate With Copy" )
 	DoubleBuffer<Vector<String16>> buffer( &v1, &v2, false );
 
 	{
-		Vector<String16>& write = buffer.GetWrite();
+		Vector<String16>& write = buffer.Write();
 
 		for( int i = 0; i < 16; ++i )
 		{
@@ -87,7 +87,7 @@ TEST_CASE( "[DoubleBuffer] Duplicate With Copy" )
 	buffer.Duplicate();
 
 	{
-		Vector<String16>& write = buffer.GetWrite();
+		Vector<String16>& write = buffer.Write();
 		for( int i = 0; i < 16; ++i )
 		{
 			int test = atoi( write[ i ].c_str() );

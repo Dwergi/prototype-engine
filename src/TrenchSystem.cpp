@@ -7,7 +7,6 @@
 #include "PrecompiledHeader.h"
 #include "TrenchSystem.h"
 
-#include "EntityManager.h"
 #include "ICamera.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -15,6 +14,7 @@
 #include "PlayerComponent.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
+#include "World.h"
 
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -101,6 +101,7 @@ namespace dd
 	*/
 
 	TrenchSystem::TrenchSystem() :
+		ddc::System( "Trench System" ),
 		m_trenchDirection( 0.0f, 0.0f, 1.0f ),
 		m_trenchOrigin( 0.0f, 0.0f, 0.0f )
 	{
@@ -142,26 +143,26 @@ namespace dd
 		mesh->SetBounds( bounds );
 	}
 
-	EntityHandle TrenchSystem::CreateTrenchChunk( glm::vec3 position, EntityManager& entity_manager )
+	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::World& world )
 	{
-		EntityHandle handle = entity_manager.CreateEntity<TransformComponent, MeshComponent>();
+		ddc::Entity entity = world.CreateEntity<TransformComponent, MeshComponent>();
 
 		glm::mat4 scale = glm::scale( glm::vec3( TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH ) );
 		glm::mat4 translate = glm::translate( position );
 		glm::mat4 transform = translate * scale;
 
-		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( handle );
-		transform_cmp->SetLocalTransform( transform );
+		TransformComponent* transform_cmp = world.AccessComponent<TransformComponent>( entity );
+		transform_cmp->Local = transform;
 
-		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( handle );
+		MeshComponent* mesh_cmp = world.AccessComponent<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;
 		mesh_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
 		mesh_cmp->Hidden = false;
 
-		return handle;
+		return entity;
 	}
 
-	void TrenchSystem::Update( EntityManager& entity_manager, float delta_t )
+	void TrenchSystem::Update( const ddc::UpdateData& data, float delta_t )
 	{
 		/*// cache these here to avoid recalculating for all components
 		glm::vec3 player_pos = m_camera.GetPosition();

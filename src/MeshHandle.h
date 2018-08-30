@@ -11,7 +11,7 @@ namespace ddr
 {
 	class Mesh;
 
-	class MeshHandle
+	struct MeshHandle
 	{
 	public:
 		MeshHandle() : m_hash( 0 ) {}

@@ -6,16 +6,13 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "PackedPool.h"
+#include "ComponentType.h"
 
 namespace dd
 {
-	class LightComponent : public IComponent
+	class LightComponent
 	{
 	public:
-
-		using Pool = PackedPool<LightComponent>;
 
 		LightComponent();
 		LightComponent( const LightComponent& other );
@@ -31,5 +28,7 @@ namespace dd
 		float Specular { 0.5f };
 		float Attenuation { 1.0f };
 		bool IsDirectional { false };
+
+		DD_COMPONENT;
 	};
 }

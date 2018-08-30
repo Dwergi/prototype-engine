@@ -40,22 +40,37 @@ namespace ddc
 		const T& Get( size_t index ) const
 		{
 			DD_ASSERT( index < m_buffer.Size() );
-			DD_ASSERT( m_usage == DataUsage::Read || m_usage == DataUsage::ReadWrite );
+			DD_ASSERT( m_usage == DataUsage::Read );
 
-			return *(reinterpret_cast<const T*>(m_buffer.Data()) + index);
+			return *(ConstData() + index);
 		}
 
 		T& Access( size_t index ) const
 		{
 			DD_ASSERT( index < m_buffer.Size() );
-			DD_ASSERT( m_usage == DataUsage::Write || m_usage == DataUsage::ReadWrite );
+			DD_ASSERT( m_usage == DataUsage::Write );
 
-			return *(reinterpret_cast<T*>(m_buffer.Data()) + index);
+			return *(Data() + index);
 		}
 
-	private:
+		const T& operator[]( size_t index ) const
+		{
+			return Get( index );
+		}
+
+	protected:
 		const ComponentDataBuffer& m_buffer;
 		const DataUsage m_usage;
+
+		const T* ConstData() const 
+		{
+			return reinterpret_cast<const T*>(m_buffer.Data());
+		}
+
+		T* Data() const
+		{ 
+			return reinterpret_cast<T*>(m_buffer.Data());
+		}
 	};
 
 	template <typename T>
@@ -70,6 +85,9 @@ namespace ddc
 			DataBuffer<T>( other.m_buffer, DataUsage::Read )
 		{
 		}
+
+		const T* begin() const { return ConstData(); }
+		const T* end() const { return ConstData() + Size(); }
 	};
 
 	template <typename T>
@@ -84,20 +102,13 @@ namespace ddc
 			DataBuffer<T>( other.m_buffer, DataUsage::Write )
 		{
 		}
-	};
 
-	template <typename T>
-	struct ReadWriteBuffer : DataBuffer<T>
-	{
-		ReadWriteBuffer( const ComponentDataBuffer& buffer ) :
-			DataBuffer<T>( buffer, DataUsage::ReadWrite )
-
+		T& operator[]( size_t index )
 		{
+			return Access( index );
 		}
 
-		ReadWriteBuffer( const ReadWriteBuffer& other ) :
-			DataBuffer<T>( other.m_buffer, DataUsage::ReadWrite )
-		{
-		}
+		T* begin() const { return Data(); }
+		T* end() const { return Data() + Size(); }
 	};
 }

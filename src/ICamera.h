@@ -8,7 +8,7 @@
 
 namespace ddr
 {
-	class Frustum;
+	struct Frustum;
 
 	class ICamera
 	{

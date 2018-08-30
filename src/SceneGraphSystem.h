@@ -6,13 +6,15 @@
 
 #pragma once
 
-#include "ISystem.h"
+#include "System.h"
 
 namespace dd
 {
-	class SceneGraphSystem : public ISystem
+	class SceneGraphSystem : public ddc::System
 	{
 	public:
-		virtual void PreUpdate( EntityManager& entity_manager, float dt ) override;
+		SceneGraphSystem();
+
+		virtual void Update( const ddc::UpdateData& data, float dt ) override;
 	};
 }

@@ -63,12 +63,12 @@ namespace dd
 		//
 		// Get the read buffer.
 		//
-		const T& GetRead() const;
+		const T& Read() const;
 
 		//
 		// Get the write buffer.
 		//
-		T& GetWrite() const;
+		T& Write() const;
 
 		BASIC_TYPE( DoubleBuffer<T> )
 	};

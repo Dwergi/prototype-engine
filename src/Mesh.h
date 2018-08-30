@@ -17,9 +17,9 @@
 namespace ddr
 {
 	class ICamera;
-	class MaterialHandle;
-	class MeshHandle;
-	class ShaderProgram;
+	struct MeshHandle;
+	struct ShaderProgram;
+	struct UniformStorage;
 
 	//
 	// A mesh asset.
@@ -52,7 +52,7 @@ namespace ddr
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( ShaderProgram& shader, const glm::mat4& transform );
+		void Render( UniformStorage& uniforms, ShaderProgram& shader, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.

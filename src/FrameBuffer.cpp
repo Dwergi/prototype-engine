@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "Texture.h"
+#include "Uniforms.h"
 #include "Window.h"
 
 #include "GL/gl3w.h"
@@ -125,7 +126,7 @@ namespace ddr
 		}
 	}
 
-	void FrameBuffer::RenderDepth( const ddr::ICamera& camera )
+	void FrameBuffer::RenderDepth( ddr::UniformStorage& uniforms, const ddr::ICamera& camera )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texDepth != nullptr );
@@ -139,9 +140,11 @@ namespace ddr
 		glDisable( GL_DEPTH_TEST );
 		CheckOGLError();
 
-		shader->SetUniform( "Texture", *m_texDepth );
-		shader->SetUniform( "Near", camera.GetNear() );
-		shader->SetUniform( "DrawDepth", true );
+		uniforms.Set( "Texture", *m_texDepth );
+		uniforms.Set( "Near", camera.GetNear() );
+		uniforms.Set( "DrawDepth", true );
+
+		uniforms.Bind( *shader );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
@@ -155,7 +158,7 @@ namespace ddr
 		CheckOGLError();
 	}
 
-	void FrameBuffer::Render()
+	void FrameBuffer::Render( ddr::UniformStorage& uniforms )
 	{
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texColour != nullptr );
@@ -170,8 +173,8 @@ namespace ddr
 
 		glDisable( GL_DEPTH_TEST );
 		
-		shader->SetUniform( "Texture", *m_texColour );
-		shader->SetUniform( "DrawDepth", false );
+		uniforms.Set( "Texture", *m_texColour );
+		uniforms.Set( "DrawDepth", false );
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();

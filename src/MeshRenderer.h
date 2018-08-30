@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "EntityHandle.h"
+#include "Entity.h"
 #include "IDebugPanel.h"
 #include "IRenderer.h"
 #include "MeshHandle.h"
@@ -41,7 +41,7 @@ namespace ddr
 		
 		const dd::MousePicking& m_mousePicking;
 
-		void RenderMesh( dd::EntityHandle entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
 		virtual void DrawDebugInternal() override;

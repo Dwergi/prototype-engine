@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ComponentType.h"
+#include "Entity.h"
+#include "FunctionView.h"
 
 #include <bitset>
 #include <unordered_map>
@@ -13,53 +15,26 @@ namespace dd
 
 namespace ddc
 {
-	struct World;
 	struct System;
-
-	struct Entity
-	{
-		friend struct World;
-
-		Entity() :
-			Handle( ~0 ),
-			Flags( 0 )
-		{
-		}
-
-		bool IsValid() const { return Handle != ~0; }
-
-		union
-		{
-			struct
-			{
-				uint ID : 22;
-				uint Version : 10;
-			};
-
-			uint Handle;
-		};
-
-		union
-		{
-			struct
-			{
-				byte Alive : 1;
-				byte Create : 1;
-				byte Destroy : 1;
-			};
-
-			uint Flags;
-		};
-	};
+	struct SystemNode;
 
 	struct World
 	{
 		World();
 
+		void Initialize() {}
+		void Shutdown() {}
+
 		//
 		// Create an entity. 
 		// This entity will not participate in the current frame's updates, but rather be updated after the next Update().
 		//
+		Entity CreateEntity();
+
+		//
+		// Create an entity with the given component types.
+		//
+		template <typename... TComponents>
 		Entity CreateEntity();
 
 		// 
@@ -165,9 +140,7 @@ namespace ddc
 		template <typename T>
 		void FindAllWith( std::vector<Entity>& outEntities ) const
 		{
-			dd::Array<TypeID, 1> components;
-			components.Add( T::Type.ID );
-			FindAllWith( components, outEntities );
+			ForAllWith<T>( [&outEntities]( Entity e, T& ) { outEntities.push_back( e ); } );
 		}
 
 		//
@@ -175,9 +148,15 @@ namespace ddc
 		//
 		void FindAllWith( const dd::IArray<TypeID>& components, std::vector<Entity>& outEntities ) const;
 
+
+		//
+		// Find all entities with the given type and return them in the given vector.
+		//
+		template <typename T>
+		void ForAllWith( std::function<void( Entity, T& )> fn ) const;
+
 	private:
 
-		const int PARTITION_COUNT = 4;
 		int m_count { 0 };
 
 		std::vector<Entity> m_entities;
@@ -188,24 +167,46 @@ namespace ddc
 		
 		std::vector<System*> m_systems;
 
-		void UpdateSystem( System* system, float delta_t, int partition_count );
+		void UpdateSystem( System* system, float delta_t );
+		void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, float delta_t );
 	};
 
-	struct SystemNode
+	using ExpandType = int[];
+
+	template <typename... TComponents>
+	Entity World::CreateEntity()
 	{
-		struct Edge
+		Entity entity = CreateEntity();
+		
+		ExpandType
 		{
-			size_t m_from;
-			size_t m_to;
+			0, (AddComponent<TComponents>( entity ), 0)...
 		};
 
-		System* m_system { nullptr };
+		return entity;
+	}
 
-		std::vector<Edge> m_out;
-		std::vector<Edge> m_in;
+	template <typename T>
+	void World::ForAllWith( std::function<void( Entity, T& )> fn ) const
+	{
+		std::bitset<MAX_COMPONENTS> mask;
+		mask.set( T::Type.ID, true );
 
-		std::shared_future<void> m_update;
-	};
+		for( int i = 0; i < m_count; ++i )
+		{
+			Entity entity = m_entities[ i ];
+			if( entity.Alive )
+			{
+				std::bitset<MAX_COMPONENTS> entity_mask = mask;
+				entity_mask &= m_ownership[ i ];
+
+				if( entity_mask.any() )
+				{
+					fn( entity, *AccessComponent<T>( entity ) );
+				}
+			}
+		}
+	}
 
 	/*void OrderSystemsByComponent( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_nodes );
 

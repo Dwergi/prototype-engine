@@ -20,10 +20,10 @@ namespace ddr
 {
 	class ICamera;
 	struct RenderData;
-	class ShaderProgram;
+	struct ShaderProgram;
 	struct UniformStorage;
 
-	class alignas(16) Frustum
+	struct alignas(16) Frustum
 	{
 	public:
 

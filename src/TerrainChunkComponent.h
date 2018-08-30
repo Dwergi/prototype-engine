@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "IComponent.h"
+#include "ComponentType.h"
 #include "PackedPool.h"
 #include "TerrainChunkKey.h"
 
@@ -14,16 +14,16 @@ namespace dd
 {
 	class TerrainChunk;
 
-	class TerrainChunkComponent : public IComponent
+	class TerrainChunkComponent
 	{
 	public:
 
-		using Pool = PackedPool<TerrainChunkComponent>;
-
 		TerrainChunkComponent();
+		TerrainChunkComponent( const TerrainChunkComponent& other );
 
 		TerrainChunk* Chunk { nullptr };
-		bool IsActive { false };
+
+		DD_COMPONENT;
 
 		BASIC_TYPE( TerrainChunkComponent )
 	};

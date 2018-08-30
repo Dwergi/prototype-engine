@@ -18,6 +18,7 @@
 #include "ShaderProgram.h"
 #include "TerrainChunkKey.h"
 #include "TerrainParameters.h"
+#include "Uniforms.h"
 
 #include "GL/gl3w.h"
 
@@ -232,7 +233,7 @@ namespace dd
 		}
 	}
 
-	void TerrainChunk::RenderUpdate()
+	void TerrainChunk::RenderUpdate( ddr::UniformStorage& uniforms )
 	{
 		if( m_destroy )
 		{
@@ -249,12 +250,24 @@ namespace dd
 			ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
 			mesh->UpdateBuffers();
 
+			for( int i = 0; i < m_params.HeightLevelCount; ++i )
+			{
+				uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[ i ] );
+				uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[ i ] );
+			}
+
+			uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
+			uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
+
 			float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 			float total_size = actual_distance * Vertices;
 
 			AABB bounds;
 			bounds.Expand( glm::vec3( 0 ) );
-			bounds.Expand( glm::vec3( total_size, m_params.HeightRange + (1 - (m_key.LOD / 10.0f)), total_size ) );
+
+			float height = m_params.HeightRange + (1 - (m_key.LOD / 10.0f));
+
+			bounds.Expand( glm::vec3( total_size, height, total_size ) );
 
 			mesh->SetBounds( bounds );
 
@@ -398,25 +411,9 @@ namespace dd
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
 		mesh->SetMaterial( s_material );
 
-		ddr::Material* material = ddr::Material::Get( s_material );
-		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( material->GetShader() );
-
-		shader->Use( true );
-
 		mesh->SetPositions( m_verticesBuffer );
 		mesh->SetNormals( m_normalsBuffer );
 		mesh->SetIndices( m_indices );
-
-		for( int i = 0; i < m_params.HeightLevelCount; ++i )
-		{
-			shader->SetUniform( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[i] );
-			shader->SetUniform( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[i] );
-		}
-
-		shader->SetUniform( "TerrainHeightCount", m_params.HeightLevelCount );
-		shader->SetUniform( "TerrainMaxHeight", m_params.HeightRange );
-
-		shader->Use( false );
 
 		DD_PROFILE_END();
 	}

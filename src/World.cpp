@@ -91,7 +91,7 @@ namespace ddc
 
 		for( System* system : m_systems )
 		{
-			UpdateSystem( system, delta_t, PARTITION_COUNT );
+			UpdateSystem( system, delta_t );
 		}
 	}
 
@@ -164,17 +164,20 @@ namespace ddc
 
 		for( int i = 0; i < m_count; ++i )
 		{
-			std::bitset<MAX_COMPONENTS> entity_mask = mask;
-			entity_mask &= m_ownership[ i ];
-
-			if( m_entities[ i ].Alive && entity_mask.any() )
+			if( m_entities[ i ].Alive )
 			{
-				outEntities.push_back( m_entities[ i ] );
+				std::bitset<MAX_COMPONENTS> entity_mask = mask;
+				entity_mask &= m_ownership[ i ];
+
+				if( entity_mask.any() )
+				{
+					outEntities.push_back( m_entities[ i ] );
+				}
 			}
 		}
 	}
 
-	void World::UpdateSystem( System* system, float delta_t, int partition_count )
+	void World::UpdateSystem( System* system, float delta_t )
 	{
 		// filter entities that have the requirements
 		dd::Array<TypeID, MAX_COMPONENTS> components;
@@ -192,6 +195,8 @@ namespace ddc
 		{
 			return;
 		}
+
+		int partition_count = system->MaxPartitions();
 
 		size_t partition_size = entities.size() / partition_count;
 
@@ -222,6 +227,22 @@ namespace ddc
 			entity_start += entity_count;
 		}
 	}
+
+	struct SystemNode
+	{
+		struct Edge
+		{
+			size_t m_from;
+			size_t m_to;
+		};
+
+		System* m_system { nullptr };
+
+		std::vector<Edge> m_out;
+		std::vector<Edge> m_in;
+
+		std::shared_future<void> m_update;
+	};
 
 	static void SortSystemsTopologically( const std::vector<SystemNode>& nodes, std::vector<SystemNode>& out_sorted )
 	{
@@ -260,6 +281,76 @@ namespace ddc
 					node.m_system = nullptr;
 				}
 			}
+		}
+	}
+
+
+	static void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems )
+	{
+		std::vector<SystemNode> nodes;
+		nodes.reserve( systems.Size() );
+
+		for( System* system : systems )
+		{
+			SystemNode node;
+			node.m_system = system;
+			nodes.push_back( node );
+		}
+
+		for( size_t sys = 0; sys < systems.Size(); ++sys )
+		{
+			const System* system = systems[ sys ];
+
+			const dd::IArray<const System*>& deps = system->GetDependencies();
+			for( size_t dep = 0; dep < deps.Size(); ++dep )
+			{
+				DD_ASSERT( system != systems[ dep ], "Can't depend on the same system!" );
+
+				SystemNode::Edge edge;
+				edge.m_from = dep;
+				edge.m_to = sys;
+
+				nodes[ dep ].m_out.push_back( edge );
+				nodes[ sys ].m_in.push_back( edge );
+			}
+		}
+
+		SortSystemsTopologically( nodes, out_ordered_systems );
+	}
+
+	static void WaitForAllDependencies( SystemNode& s, std::vector<SystemNode>& systems )
+	{
+		size_t ready = 0;
+
+		while( ready < s.m_in.size() )
+		{
+			for( SystemNode::Edge& e : s.m_in )
+			{
+				SystemNode& dep = systems[ e.m_from ];
+				std::future_status s = dep.m_update.wait_for( std::chrono::microseconds( 1 ) );
+
+				if( s == std::future_status::ready )
+				{
+					++ready;
+				}
+			}
+		}
+	}
+
+	void World::UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, float delta_t )
+	{
+		for( SystemNode& s : systems )
+		{
+			if( s.m_system == nullptr )
+				continue;
+
+			std::future<void> f = jobsystem.Schedule( [this, &s, &systems, delta_t]()
+			{
+				WaitForAllDependencies( s, systems );
+				UpdateSystem( s.m_system, delta_t );
+			} );
+
+			s.m_update = f.share();
 		}
 	}
 
@@ -310,74 +401,5 @@ namespace ddc
 		}
 
 		SortSystemsTopologically( nodes, out_ordered_systems );
-	}
-
-	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems )
-	{
-		std::vector<SystemNode> nodes;
-		nodes.reserve( systems.Size() );
-
-		for( System* system : systems )
-		{
-			SystemNode node;
-			node.m_system = system;
-			nodes.push_back( node );
-		}
-
-		for( size_t sys = 0; sys < systems.Size(); ++sys )
-		{
-			const System* system = systems[ sys ];
-
-			const dd::IArray<const System*>& deps = system->GetDependencies();
-			for( size_t dep = 0; dep < deps.Size(); ++dep )
-			{
-				DD_ASSERT( system != systems[ dep ], "Can't depend on the same system!" );
-
-				SystemNode::Edge edge;
-				edge.m_from = dep;
-				edge.m_to = sys;
-				
-				nodes[ dep ].m_out.push_back( edge );
-				nodes[ sys ].m_in.push_back( edge );
-			}
-		}
-
-		SortSystemsTopologically( nodes, out_ordered_systems );
-	}
-
-	void WaitForAllDependencies( SystemNode& s, std::vector<SystemNode>& systems )
-	{
-		size_t ready = 0;
-
-		while( ready < s.m_in.size() )
-		{
-			for( SystemNode::Edge& e : s.m_in )
-			{
-				SystemNode& dep = systems[ e.m_from ];
-				std::future_status s = dep.m_update.wait_for( std::chrono::microseconds( 1 ) );
-
-				if( s == std::future_status::ready )
-				{
-					++ready;
-				}
-			}
-		}
-	}
-
-	void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, World& layer )
-	{
-		for( SystemNode& s : systems )
-		{
-			if( s.m_system == nullptr )
-				continue;
-
-			std::future<void> f = jobsystem.Schedule( [&layer, &s, &systems]()
-			{
-				WaitForAllDependencies( s, systems );
-				UpdateSystem( *(s.m_system), layer, 1 );
-			} );
-
-			s.m_update = f.share();
-		}
 	}*/
 }

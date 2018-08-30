@@ -9,7 +9,6 @@
 
 #include "AABB.h"
 #include "GLError.h"
-#include "EntityManager.h"
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
@@ -23,6 +22,7 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "Window.h"
+#include "World.h"
 
 #include "GL/gl3w.h"
 
@@ -76,35 +76,37 @@ namespace ddr
 
 	Wireframe s_wireframe;
 
-	Renderer::Renderer( const dd::Window& window ) :
+	WorldRenderer::WorldRenderer( const dd::Window& window ) :
+		ddc::System( "World Renderer" ),
 		m_window( window )
 	{
 		m_uniforms = new ddr::UniformStorage();
 	}
 
-	Renderer::~Renderer()
+	WorldRenderer::~WorldRenderer()
 	{
 		delete m_uniforms;
 	}
 
-	void Renderer::Initialize( dd::EntityManager& entity_manager )
+	void WorldRenderer::Initialize( ddc::World& world )
 	{
 		{
-			dd::EntityHandle directionalLight = entity_manager.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-			dd::ComponentHandle<dd::LightComponent> light = directionalLight.Get<dd::LightComponent>();
-			light.Write()->IsDirectional = true;
-			light.Write()->Colour = glm::vec3( 1, 1, 1 );
-			light.Write()->Intensity = 0.5;
+			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			dd::LightComponent* light = world.AccessComponent<dd::LightComponent>( entity );
 
-			dd::ComponentHandle<dd::TransformComponent> transform = directionalLight.Get<dd::TransformComponent>();
+			light->IsDirectional = true;
+			light->Colour = glm::vec3( 1, 1, 1 );
+			light->Intensity = 0.5;
+
+			dd::TransformComponent* transform = world.AccessComponent<dd::TransformComponent>( entity );
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
-			transform.Write()->SetLocalPosition( direction );
+			transform->Local[3].xyz = direction;
 		}
 
 		m_createLight = true;
 	}
 
-	void Renderer::RenderInit()
+	void WorldRenderer::InitializeRenderer()
 	{
 		m_unitCube = Mesh::Find( "unitcube" );
 		if( !m_unitCube.IsValid() )
@@ -141,12 +143,12 @@ namespace ddr
 		}
 	}
 
-	void Renderer::Register( ddr::IRenderer& renderer )
+	void WorldRenderer::Register( ddr::IRenderer& renderer )
 	{
 		m_renderers.push_back( &renderer );
 	}
 
-	void Renderer::CreateFrameBuffer( glm::ivec2 size )
+	void WorldRenderer::CreateFrameBuffer( glm::ivec2 size )
 	{
 		m_colourTexture.Create( size, GL_SRGB8_ALPHA8, 1 );
 		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
@@ -157,36 +159,37 @@ namespace ddr
 		m_framebuffer.RenderInit();
 	}
 
-	void Renderer::Shutdown()
+	void WorldRenderer::Shutdown( ddc::World& world )
 	{
 		Mesh::Destroy( m_unitCube );
 	}
 
-	dd::EntityHandle Renderer::CreateMeshEntity( dd::EntityManager& entityManager, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
+	ddc::Entity WorldRenderer::CreateMeshEntity( ddc::World& world, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
 	{
-		dd::EntityHandle handle = entityManager.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
 
-		dd::ComponentHandle<dd::TransformComponent> transform_cmp = handle.Get<dd::TransformComponent>();
-		transform_cmp.Write()->SetLocalTransform( transform );
+		dd::TransformComponent* transform_cmp = world.AccessComponent<dd::TransformComponent>( entity );
+		transform_cmp->Local = transform;
 
-		dd::ComponentHandle<dd::MeshComponent> mesh_cmp = handle.Get<dd::MeshComponent>();
-		mesh_cmp.Write()->Mesh = mesh_h;
-		mesh_cmp.Write()->Colour = colour;
-		mesh_cmp.Write()->Hidden = false;
+		dd::MeshComponent* mesh_cmp = world.AccessComponent<dd::MeshComponent>( entity );
+		mesh_cmp->Mesh = mesh_h;
+		mesh_cmp->Colour = colour;
+		mesh_cmp->Hidden = false;
 
-		return handle;
+		return entity;
 	}
 
-	void Renderer::DrawDebugInternal()
+	void WorldRenderer::DrawDebugInternal()
 	{
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
 		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
 		{
-			m_xAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
-			m_yAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
-			m_zAxis.Get<dd::MeshComponent>().Write()->Hidden = !m_debugDrawAxes;
+			DD_TODO( "Uncomment" );
+		/*	m_xAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;
+			m_yAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;
+			m_zAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;*/
 		}	
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
@@ -215,54 +218,55 @@ namespace ddr
 				_itoa_s( (int) i, buffer, 10 );
 				lightLabel += buffer;
 
-				dd::EntityHandle entity = m_debugLights[ i ];
-				dd::ComponentHandle<dd::LightComponent> light = entity.Get<dd::LightComponent>();
-				dd::ComponentHandle<dd::TransformComponent> transform = entity.Get<dd::TransformComponent>();
+				DD_TODO( "Uncomment" );
+				/*ddc::Entity entity = m_debugLights[ i ];
+				dd::LightComponent& light = entity.Get<dd::LightComponent>();
+				dd::TransformComponent& transform = entity.Get<dd::TransformComponent>();
 
 				if( ImGui::TreeNodeEx( lightLabel.c_str(), ImGuiTreeNodeFlags_CollapsingHeader ) )
 				{
-					bool directional = light.Read()->IsDirectional;
+					bool directional = light.IsDirectional;
 					if( ImGui::Checkbox( "Directional?", &directional ) )
 					{
-						light.Write()->IsDirectional = directional;
+						light.IsDirectional = directional;
 					}
 					
-					glm::vec3 light_colour = light.Read()->Colour;
+					glm::vec3 light_colour = light.Colour;
 					if( ImGui::ColorEdit3( "Colour", glm::value_ptr( light_colour ) ) )
 					{
-						light.Write()->Colour = light_colour;
+						light.Colour = light_colour;
 					}
 
-					float intensity = light.Read()->Intensity;
+					float intensity = light.Intensity;
 					if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
 					{
-						light.Write()->Intensity = intensity;
+						light.Intensity = intensity;
 					}
 
-					float attenuation = light.Read()->Attenuation;
+					float attenuation = light.Attenuation;
 					if( ImGui::DragFloat( "Attenuation", &attenuation, 0.01, 0, 1 ) )
 					{
-						light.Write()->Attenuation = attenuation;
+						light.Attenuation = attenuation;
 					}
 
-					glm::vec3 light_position = transform.Read()->GetLocalPosition();
+					glm::vec3 light_position = transform.GetLocalPosition();
 
-					const char* positionLabel = light.Read()->IsDirectional ? "Direction" : "Position";
+					const char* positionLabel = light.IsDirectional ? "Direction" : "Position";
 					if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
 					{
-						transform.Write()->SetLocalPosition( light_position );
+						transform.SetLocalPosition( light_position );
 					}
 
-					float ambient = light.Read()->Ambient;
+					float ambient = light.Ambient;
 					if( ImGui::SliderFloat( "Ambient", &ambient, 0.0f, 1.0f ) )
 					{
-						light.Write()->Ambient = ambient;
+						light.Ambient = ambient;
 					}
 
-					float specular = light.Read()->Specular;
+					float specular = light.Specular;
 					if( ImGui::SliderFloat( "Specular", &specular, 0.0f, 1.0f ) )
 					{
-						light.Write()->Specular = specular;
+						light.Specular = specular;
 					}
 
 					if( ImGui::Button( "Delete" ) )
@@ -271,7 +275,7 @@ namespace ddr
 					}
 
 					ImGui::TreePop();
-				}
+				}*/
 			}
 
 			if( m_debugLights.size() < 10 )
@@ -305,7 +309,7 @@ namespace ddr
 		}
 	}
 
-	void Renderer::SetRenderState()
+	void WorldRenderer::SetRenderState()
 	{
 		if( m_debugDrawStandard )
 		{
@@ -331,7 +335,7 @@ namespace ddr
 		}
 	}
 
-	void Renderer::CreateDebugMeshGrid( dd::EntityManager& entityManager )
+	void WorldRenderer::CreateDebugMeshGrid( ddc::World& world )
 	{
 		if( m_debugMeshGridCreated || !m_createDebugMeshGrid )
 			return;
@@ -342,7 +346,7 @@ namespace ddr
 			{
 				for( int z = -5; z < 5; ++z )
 				{
-					CreateMeshEntity( entityManager, m_unitCube, glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
+					CreateMeshEntity( world, m_unitCube, glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
 				}
 			}
 		}
@@ -350,68 +354,72 @@ namespace ddr
 		m_debugMeshGridCreated = true;
 	}
 
-	dd::EntityHandle Renderer::CreatePointLight( dd::EntityManager& entityManager )
+	ddc::Entity WorldRenderer::CreatePointLight( ddc::World& world )
 	{
 		glm::mat4 transform = glm::translate( glm::vec3( 0 ) ) * glm::scale( glm::vec3( 0.1f ) );
-		dd::EntityHandle entity = CreateMeshEntity( entityManager, m_unitCube, glm::vec4( 1 ), transform );
-		dd::ComponentHandle<dd::LightComponent> light = entityManager.AddComponent<dd::LightComponent>( entity );
-		light.Write()->Ambient = 0.01f;
+		ddc::Entity entity = CreateMeshEntity( world, m_unitCube, glm::vec4( 1 ), transform );
+		dd::LightComponent& light = world.AddComponent<dd::LightComponent>( entity );
+		light.Ambient = 0.01f;
 
 		return entity;
 	}
 
-	void Renderer::UpdateDebugPointLights( dd::EntityManager& entity_manager )
+	void WorldRenderer::UpdateDebugPointLights( ddc::World& world )
 	{
 		if( m_createLight )
 		{
-			CreatePointLight( entity_manager );
+			CreatePointLight( world );
 			m_createLight = false;
 		}
 
 		if( m_deleteLight.IsValid() )
 		{
-			entity_manager.Destroy( m_deleteLight );
-			m_deleteLight = dd::EntityHandle();
+			world.DestroyEntity( m_deleteLight );
+			m_deleteLight = ddc::Entity();
 		}
 
-		entity_manager.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
+		DD_TODO( "Uncomment" );
+		/*world.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
 		{
 			if( mesh.Write() != nullptr )
 			{
-				mesh.Write()->Colour = glm::vec4( light.Read()->Colour, 1);
+				mesh.Colour = glm::vec4( light.Colour, 1);
 			}
-		} );
+		} );*/
 	}
 
-	void Renderer::Update( dd::EntityManager& entity_manager, float delta_t )
+	void WorldRenderer::Update( const ddc::UpdateData& data, float delta_t )
 	{
+		ddc::World& world = data.World();
+
 		if( !m_xAxis.IsValid() )
 		{
-			m_xAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-			m_yAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-			m_zAxis = CreateMeshEntity( entity_manager, m_unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+			m_xAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+			m_yAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+			m_zAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 		}
 
-		CreateDebugMeshGrid( entity_manager );
-		UpdateDebugPointLights( entity_manager );
+		CreateDebugMeshGrid( world );
+		UpdateDebugPointLights( world );
 
-		m_debugLights = entity_manager.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();
+		DD_TODO( "Uncomment" );
+		//m_debugLights = world.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();
 	}
 
-	void Renderer::RenderDebug( ddr::IRenderer& debug_render )
+	void WorldRenderer::RenderDebug( const ddr::RenderData& data, ddr::IRenderer& debug_render )
 	{
 		m_framebuffer.BindDraw();
 
-		debug_render.RenderDebug();
+		debug_render.RenderDebug( data );
 
 		m_framebuffer.UnbindDraw();
 	}
 
-	void Renderer::Render( const dd::EntityManager& entity_manager, const ddr::ICamera& camera )
+	void WorldRenderer::Render( const ddc::World& world, const ddr::ICamera& camera )
 	{
 		ddr::IRenderer* debug_render = nullptr;
 
-		BeginRender( entity_manager, camera );
+		BeginRender( world, camera );
 
 		DD_TODO( "Uncomment" );
 
@@ -419,7 +427,7 @@ namespace ddr
 		{
 			if( !r->UsesAlpha() )
 			{
-				r->Render( entity_manager, camera, *m_uniforms );
+				r->Render( world, camera, *m_uniforms );
 			}
 
 			if( r->ShouldRenderDebug() )
@@ -438,12 +446,12 @@ namespace ddr
 		{
 			if( r->UsesAlpha() )
 			{
-				r->Render( entity_manager, camera, *m_uniforms );
+				r->Render( world, camera, *m_uniforms );
 			}
 		}*/
 	}
 
-	void Renderer::BeginRender( const dd::EntityManager& entity_manager, const ddr::ICamera& camera )
+	void WorldRenderer::BeginRender( const ddc::World& world, const ddr::ICamera& camera )
 	{
 		DD_ASSERT( m_window.IsContextValid() );
 
@@ -470,8 +478,8 @@ namespace ddr
 
 		SetRenderState();
 
-		DD_TODO( "Move this to a light renderer.")
-		std::vector<dd::EntityHandle> lights = entity_manager.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
+		DD_TODO( "Move this to a light renderer." );
+/*		std::vector<ddc::Entity> lights = world.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
 
 		size_t lightCount = lights.size();
 		DD_ASSERT( lightCount <= 10 );
@@ -497,7 +505,7 @@ namespace ddr
 		}
 
 		m_uniforms->Set( "View", camera.GetCameraMatrix() );
-		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
+		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );*/
 
 		s_wireframe.UpdateUniforms( *m_uniforms );
 		s_fog.UpdateUniforms( *m_uniforms );
@@ -505,7 +513,7 @@ namespace ddr
 		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}
 
-	void Renderer::EndRender( const ddr::ICamera& camera )
+	void WorldRenderer::EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera )
 	{
 		m_framebuffer.BindRead();
 
@@ -516,7 +524,7 @@ namespace ddr
 
 		if( m_debugDrawDepth )
 		{
-			m_framebuffer.RenderDepth( camera );
+			m_framebuffer.RenderDepth( uniforms, camera );
 		}
 		else
 		{

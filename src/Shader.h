@@ -10,7 +10,7 @@
 
 namespace ddr
 {
-	class Shader
+	struct Shader
 	{
 	public:
 
@@ -41,7 +41,7 @@ namespace ddr
 		
 	private:
 
-		friend class ShaderProgram;
+		friend struct ShaderProgram;
 
 		Type m_type;
 		GLuint m_id;

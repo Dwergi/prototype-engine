@@ -55,7 +55,7 @@ namespace dd
 		SwarmAgentComponent::Pool& swarm_write = Services::GetWritePool<SwarmAgentComponent>();
 		swarm_write.Clear();
 
-		const AABBOctree& octree_read = m_agentsTree.GetRead();
+		const AABBOctree& octree_read = m_agentsTree.Read();
 		const SwarmAgentComponent::Pool& swarm_read = Services::GetReadPool<SwarmAgentComponent>();
 
 		DenseMap<OctreeEntry, const SwarmAgentComponent*> entry_map;
@@ -64,7 +64,7 @@ namespace dd
 			entry_map.Add( cmp_read.OctreeHandle, &cmp_read );
 		}
 
-		AABBOctree& octree_write = m_agentsTree.GetWrite();
+		AABBOctree& octree_write = m_agentsTree.Write();
 		octree_write.Clear();
 
 		Vector<OctreeEntry> temp_entries;

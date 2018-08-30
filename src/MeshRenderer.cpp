@@ -71,7 +71,7 @@ namespace ddr
 		} );*/
 	}
 
-	void MeshRenderer::RenderMesh( dd::EntityHandle entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 		const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		if( mesh_cmp.Hidden )
@@ -105,7 +105,7 @@ namespace ddr
 
 		++m_unculledMeshCount;
 
-		glm::mat4 transform = transform_cmp.GetWorldTransform();
+		glm::mat4 transform = transform_cmp.World;
 
 		if( m_debugDrawBounds )
 		{
@@ -145,7 +145,7 @@ namespace ddr
 
 		uniforms.Bind( *shader );
 
-		mesh->Render( *shader, transform );
+		mesh->Render( uniforms, *shader, transform );
 
 		shader->Use( false );
 	}

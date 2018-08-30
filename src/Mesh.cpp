@@ -11,6 +11,7 @@
 #include "GLError.h"
 #include "Material.h"
 #include "ShaderProgram.h"
+#include "Uniforms.h"
 #include "Renderer.h"
 
 #include "GL/gl3w.h"
@@ -386,7 +387,7 @@ namespace ddr
 		}
 	}
 
-	void Mesh::Render( ShaderProgram& shader, const glm::mat4& transform )
+	void Mesh::Render( UniformStorage& uniforms, ShaderProgram& shader, const glm::mat4& transform )
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
@@ -394,10 +395,12 @@ namespace ddr
 
 		m_vao.Bind();
 
-		BindToShader( shader );
+		uniforms.Set( "Model", transform );
+		uniforms.Set( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
 
-		shader.SetUniform( "Model", transform );
-		shader.SetUniform( "NormalMatrix", glm::transpose( glm::inverse( glm::mat3( transform ) ) ) );
+		uniforms.Bind( shader );
+
+		BindToShader( shader );
 
 		if( m_vboIndex.IsValid() )
 		{

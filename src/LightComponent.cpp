@@ -1,6 +1,8 @@
 #include "PrecompiledHeader.h"
 #include "LightComponent.h"
 
+DD_COMPONENT_CPP( dd::LightComponent );
+
 namespace dd
 {
 	LightComponent::LightComponent()

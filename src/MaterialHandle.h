@@ -13,7 +13,7 @@ namespace ddr
 {
 	class Material;
 
-	class MaterialHandle
+	struct MaterialHandle
 	{
 	public:
 		MaterialHandle() : m_hash( 0 ) {}

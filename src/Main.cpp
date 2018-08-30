@@ -17,7 +17,6 @@
 #include "DebugUI.h"
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
-#include "EntityManager.h"
 #include "File.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
@@ -56,6 +55,7 @@
 #include "TrenchSystem.h"
 #include "Uniforms.h"
 #include "Window.h"
+#include "World.h"
 
 #include "DebugConsole.h"
 
@@ -85,7 +85,7 @@ Input* s_input = nullptr;
 ShakyCamera* s_shakyCamera = nullptr;
 FPSCamera* s_fpsCamera = nullptr;
 FreeCameraController* s_freeCamera = nullptr;
-EntityManager* s_entityManager = nullptr;
+ddc::World* s_world = nullptr;
 AngelScriptEngine* s_scriptEngine = nullptr;
 FrameTimer* s_frameTimer = nullptr;
 ShipSystem* s_shipSystem = nullptr;
@@ -94,36 +94,22 @@ TerrainSystem* s_terrainSystem = nullptr;
 InputBindings* s_inputBindings = nullptr;
 DebugConsole* s_debugConsole = nullptr;
 
-ddr::Renderer* s_renderer = nullptr;
+ddr::WorldRenderer* s_renderer = nullptr;
 
 Assert s_assert;
 
 std::thread::id s_mainThread;
 
-enum FSMStates
-{
-	INITIALIZED,
-	UPDATE_TIMER,
-	PREUPDATE,
-	UPDATE,
-	RENDER,
-	RENDER_END_FRAME,
-	POSTRENDER,
-	OPEN_ASSERT,
-	ASSERT_DIALOG
-};
-
 #define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
-TransformComponent* GetTransformComponent( EntityHandle entity )
+/*TransformComponent* GetTransformComponent( EntityHandle entity )
 {
 	return entity.Get<TransformComponent>().Write();
 }
 
-EntityHandle GetEntityHandle( uint id )
+ddc::Entity GetEntityHandle( uint id )
 {
-	EntityHandle handle( id, *s_entityManager );
-	return handle;
+	return s_world->GetEntityHandle( id );
 }
 
 void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
@@ -133,6 +119,7 @@ void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
 
 	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
 }
+
 
 void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
 {
@@ -161,29 +148,15 @@ void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& script
 	REGISTER_TYPE( ddr::MeshHandle );
 
 	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
-	entity_manager.RegisterComponent<TransformComponent>();
-
 	TypeInfo::RegisterComponent<OctreeComponent>( "OctreeComponent" );
-	entity_manager.RegisterComponent<OctreeComponent>();
-
 	TypeInfo::RegisterComponent<SwarmAgentComponent>( "SwarmAgentComponent" );
-	entity_manager.RegisterComponent<SwarmAgentComponent>();
-
 	TypeInfo::RegisterComponent<MeshComponent>( "MeshComponent" );
-	entity_manager.RegisterComponent<MeshComponent>();
-
 	TypeInfo::RegisterComponent<ShipComponent>( "ShipComponent" );
-	entity_manager.RegisterComponent<ShipComponent>();
-
 	TypeInfo::RegisterComponent<ScriptComponent>( "ScriptComponent" );
-	entity_manager.RegisterComponent<ScriptComponent>();
-
 	TypeInfo::RegisterComponent<LightComponent>( "LightComponent" );
-	entity_manager.RegisterComponent<LightComponent>();
-
 	TypeInfo::RegisterComponent<TerrainChunkComponent>( "TerrainChunkComponent" );
-	entity_manager.RegisterComponent<TerrainChunkComponent>();
 }
+*/
 
 void ToggleConsole( InputAction action, InputType type )
 {
@@ -232,7 +205,8 @@ void CheckAssert()
 	{
 		s_input->CaptureMouse( false );
 
-		s_fsm->TransitionTo( OPEN_ASSERT );
+		DD_TODO( "Assert Rendering" );
+		/*s_fsm->TransitionTo( OPEN_ASSERT );
 
 		do
 		{
@@ -240,7 +214,7 @@ void CheckAssert()
 			s_fsm->TransitionTo( ASSERT_DIALOG );
 			s_fsm->TransitionTo( RENDER_END_FRAME );
 		} 
-		while( s_assert.Open );
+		while( s_assert.Open );*/
 	}
 }
 
@@ -311,77 +285,6 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
-void WaitForAll( std::vector<std::future<void>>& futures )
-{
-	size_t ready = 0;
-
-	while( ready < futures.size() )
-	{
-		for( std::future<void>& f : futures )
-		{
-			std::future_status s = f.wait_for( std::chrono::microseconds( 1 ) );
-
-			if( s == std::future_status::ready )
-			{
-				++ready;
-			}
-		}
-	}
-}
-
-void InitializeSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems )
-{
-	std::vector<std::future<void>> futures;
-
-	for( ISystem* system : systems )
-	{
-		futures.push_back( jobsystem.Schedule( [&entity_manager, system]() { system->Initialize( entity_manager ); } ) );
-	}
-
-	WaitForAll( futures );
-}
-
-void PreUpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
-{
-	std::vector<std::future<void>> futures;
-	for( ISystem* system : systems )
-	{
-		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PreUpdate( entity_manager, delta_t ); } ) );
-	}
-
-	WaitForAll( futures );
-}
-
-void UpdateSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
-{
-	std::vector<std::future<void>> futures;
-	for( ISystem* system : systems )
-	{
-		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->Update( entity_manager, delta_t ); } ) );
-	}
-
-	WaitForAll( futures );
-}
-
-void PostRenderSystems( JobSystem& jobsystem, EntityManager& entity_manager, const Vector<ISystem*>& systems, float delta_t )
-{
-	std::vector<std::future<void>> futures;
-	for( ISystem* system : systems )
-	{
-		futures.push_back( jobsystem.Schedule( [&entity_manager, system, delta_t]() { system->PostRender( entity_manager, delta_t ); } ) );
-	}
-
-	WaitForAll( futures );
-}
-
-void ShutdownSystems( EntityManager& entity_manager, const Vector<ISystem*>& systems )
-{
-	for( ISystem* system : systems )
-	{
-		system->Shutdown( entity_manager );
-	}
-}
-
 void DrawDebugUI( const Vector<IDebugPanel*>& views )
 {
 	if( s_showDebugUI )
@@ -448,12 +351,11 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
 		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
 
-		s_debugUI = new DebugUI( *s_window, *s_input );
+		//s_debugUI = new DebugUI( *s_window, *s_input );
 
-		s_renderer = new ddr::Renderer( *s_window );
+		s_renderer = new ddr::WorldRenderer( *s_window );
 
-		SceneGraphSystem scene_graph;
-
+		//SceneGraphSystem scene_graph;
 		//SwarmSystem swarm_system;
 
 		//TrenchSystem trench_system( *s_shakyCam  );
@@ -474,145 +376,52 @@ int GameMain()
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
 		//s_shipSystem->BindActions( bindings );
-		//s_shipSystem->CreateShip( *s_entityManager );
+		//s_shipSystem->CreateShip( *s_world );
 
-		s_terrainSystem = new TerrainSystem( jobsystem );
+		//s_terrainSystem = new TerrainSystem( jobsystem );
 
-		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
-		particle_system->BindActions( *s_inputBindings );
+		//ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
+		//particle_system->BindActions( *s_inputBindings );
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
-		Vector<ISystem*> systems;
+		/*Vector<System*> systems;
 		systems.Add( s_renderer );
-		systems.Add( &scene_graph );
+		//systems.Add( &scene_graph );
 		//systems.Add( &swarm_system );
 		//systems.Add( &trench_system );
 		systems.Add( mouse_picking );
 		//systems.Add( s_shipSystem );
-		systems.Add( s_terrainSystem );
-		
-		s_renderer->Register( *mouse_picking );
+		systems.Add( s_terrainSystem );*/
+	
 		s_renderer->Register( *mesh_renderer );
-		s_renderer->Register( *s_terrainSystem );
-		s_renderer->Register( *particle_system );
+		//s_renderer->Register( *mouse_picking );
+		//s_renderer->Register( *s_terrainSystem );
+		//s_renderer->Register( *particle_system );
 
 		BindKeys( *s_input );
 
 		s_frameTimer = new FrameTimer();
 
-		s_debugConsole = new DebugConsole( *s_scriptEngine );
+		//s_debugConsole = new DebugConsole( *s_scriptEngine );
 
 		Vector<IDebugPanel*> debug_views;
 		debug_views.Add( s_frameTimer );
-		debug_views.Add( s_debugConsole );
 		debug_views.Add( s_renderer );
-		debug_views.Add( mouse_picking );
 		debug_views.Add( s_freeCamera );
+		debug_views.Add( mouse_picking );
+
+		/*debug_views.Add( s_debugConsole );
 		//debug_views.Add( s_shipSystem );
 		debug_views.Add( s_terrainSystem );
 		debug_views.Add( s_shakyCamera );
 		debug_views.Add( particle_system );
-		debug_views.Add( mesh_renderer );
+		debug_views.Add( mesh_renderer );*/
 
-		s_fsm = new FSM();
-		s_fsm->AddState( INITIALIZED );
+		//InitializeSystems( jobsystem, *s_world, systems );
 
-		s_fsm->AddState( UPDATE_TIMER );
-		auto onUpdateTimer = [&]()
-		{
-			s_frameTimer->SetMaxFPS( s_maxFPS );
-			s_frameTimer->Update();
-
-			float delta_t = s_frameTimer->Delta();
-			UpdateInput( *s_input, *s_inputBindings, delta_t );
-			s_debugUI->Update( delta_t );
-		};
-		s_fsm->SetOnEnter( UPDATE_TIMER, onUpdateTimer );
-
-		s_fsm->AddState( PREUPDATE );
-		auto onPreupdate = [&]()
-		{
-			float delta_t = s_frameTimer->Delta();
-			s_entityManager->Update( delta_t );
-			PreUpdateSystems( jobsystem, *s_entityManager, systems, delta_t );
-		};
-		s_fsm->SetOnEnter( PREUPDATE, onPreupdate );
-
-		s_fsm->AddState( UPDATE );
-		auto onUpdate = [&]()
-		{
-			float delta_t = s_frameTimer->Delta();
-			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
-
-			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
-			UpdateSystems( jobsystem, *s_entityManager, systems, delta_t );
-		};
-		s_fsm->SetOnEnter( UPDATE, onUpdate );
-
-		s_fsm->AddState( RENDER );
-		auto onRender = [&]()
-		{
-			float delta_t = s_frameTimer->Delta();
-			DrawDebugUI( debug_views );
-			s_renderer->Render( *s_entityManager, *s_shakyCamera );
-		};
-		s_fsm->SetOnEnter( RENDER, onRender );
-
-		s_fsm->AddState( RENDER_END_FRAME );
-		auto onEndFrame = [&]()
-		{
-			s_renderer->EndRender( *s_shakyCamera );
-
-			ImGui::Render();
-
-			s_window->Swap();
-		};
-		s_fsm->SetOnEnter( RENDER_END_FRAME, onEndFrame );
-
-		s_fsm->AddState( POSTRENDER );
-		auto onPostRender = [&]()
-		{
-			PostRenderSystems( jobsystem, *s_entityManager, systems, s_frameTimer->Delta() );
-
-			s_frameTimer->DelayFrame();
-		};
-		s_fsm->SetOnEnter( POSTRENDER, onPostRender );
-
-		s_fsm->AddState( OPEN_ASSERT );
-
-		s_fsm->AddState( ASSERT_DIALOG );
-		auto onAssertDialog = [&]()
-		{
-			DrawAssertDialog( s_window->GetSize(), s_assert );
-		};
-		s_fsm->SetOnEnter( ASSERT_DIALOG, onAssertDialog );
-
-		s_fsm->AddTransition( INITIALIZED, UPDATE_TIMER );
-		s_fsm->AddTransition( UPDATE_TIMER, PREUPDATE );
-		s_fsm->AddTransition( PREUPDATE, UPDATE );
-		s_fsm->AddTransition( UPDATE, RENDER );
-		s_fsm->AddTransition( RENDER, RENDER_END_FRAME );
-		s_fsm->AddTransition( RENDER_END_FRAME, POSTRENDER );
-		s_fsm->AddTransition( POSTRENDER, UPDATE_TIMER );
-
-		s_fsm->AddTransition( INITIALIZED, OPEN_ASSERT );
-		s_fsm->AddTransition( UPDATE_TIMER, OPEN_ASSERT );
-		s_fsm->AddTransition( PREUPDATE, OPEN_ASSERT );
-		s_fsm->AddTransition( UPDATE, OPEN_ASSERT );
-		s_fsm->AddTransition( RENDER, OPEN_ASSERT );
-		s_fsm->AddTransition( POSTRENDER, OPEN_ASSERT );
-		s_fsm->AddTransition( RENDER_END_FRAME, OPEN_ASSERT );
-
-		s_fsm->AddTransition( OPEN_ASSERT, UPDATE_TIMER );
-		s_fsm->AddTransition( UPDATE_TIMER, ASSERT_DIALOG );
-		s_fsm->AddTransition( ASSERT_DIALOG, RENDER_END_FRAME );
-		s_fsm->AddTransition( RENDER_END_FRAME, UPDATE_TIMER );
-
-		s_fsm->Initialize( INITIALIZED );
-
-		InitializeSystems( jobsystem, *s_entityManager, systems );
-		s_renderer->RenderInit();
+		s_renderer->Initialize( *s_world );
+		s_renderer->InitializeRenderer();
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 
@@ -623,22 +432,36 @@ int GameMain()
 			DD_PROFILE_SCOPED( Frame );
 
 			CheckAssert();
-			
-			s_fsm->TransitionTo( UPDATE_TIMER );
-			s_fsm->TransitionTo( PREUPDATE );
-			s_fsm->TransitionTo( UPDATE );
-			s_fsm->TransitionTo( RENDER );
-			s_fsm->TransitionTo( RENDER_END_FRAME );
-			s_fsm->TransitionTo( POSTRENDER );
+
+			s_frameTimer->SetMaxFPS( s_maxFPS );
+			s_frameTimer->Update();
+
+			float delta_t = s_frameTimer->Delta();
+
+			UpdateInput( *s_input, *s_inputBindings, delta_t );
+			s_debugUI->Update( delta_t );
+
+			s_world->Update( delta_t );
+
+			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+
+			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
+		
+			DrawDebugUI( debug_views );
+			s_renderer->Render( *s_world, *s_shakyCamera );
+
+			ImGui::Render();
+
+			s_window->Swap();
 		}
 
-		ShutdownSystems( *s_entityManager, systems );
-		systems.Clear();
+		//ShutdownSystems( *s_world, systems );
+		//systems.Clear();
 
-		s_entityManager->DestroyAll();
-
-		s_renderer->Shutdown();
+		s_renderer->Shutdown( *s_world );
 		delete s_renderer;
+
+		s_world->Shutdown();
 
 		s_window->Close();
 		delete s_window;
@@ -685,7 +508,7 @@ int main( int argc, char* argv[] )
 		File::SetDataRoot( "../../../data" );
 	}
 
-	TypeInfo::RegisterDefaultTypes();
+	/*TypeInfo::RegisterDefaultTypes();
 	REGISTER_TYPE( CommandLine );
 
 	s_scriptEngine = new AngelScriptEngine();
@@ -693,11 +516,11 @@ int main( int argc, char* argv[] )
 
 	TypeInfo::SetScriptEngine( s_scriptEngine );
 
-	s_entityManager = new EntityManager();
-	REGISTER_TYPE( EntityManager );
+	s_world = new ddc::World();
+	REGISTER_TYPE( ddc::World );
 
-	RegisterGameTypes( *s_entityManager, *s_scriptEngine );
-	RegisterGlobalScriptFunctions( *s_scriptEngine );
+	RegisterGameTypes( *s_world, *s_scriptEngine );
+	RegisterGlobalScriptFunctions( *s_scriptEngine ); */
 
 #ifdef _TEST
 	return TestMain( argc, argv );

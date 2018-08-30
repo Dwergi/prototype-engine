@@ -528,9 +528,15 @@
     <ClInclude Include="src\Units.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderData.h" />
-    <ClInclude Include="src\World.h" />
-    <ClInclude Include="src\LightSystem.h" />
+    <ClInclude Include="src\World.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderData.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityHandle.cpp">
@@ -906,9 +912,12 @@
     <ClCompile Include="src\Units.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderData.cpp" />
-    <ClCompile Include="src\World.cpp" />
-    <ClCompile Include="src\LightSystem.cpp" />
+    <ClCompile Include="src\World.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderData.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

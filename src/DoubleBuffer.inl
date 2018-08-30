@@ -22,17 +22,17 @@ namespace dd
 	template <typename T>
 	void DoubleBuffer<T>::Duplicate() const
 	{
-		GetWrite() = GetRead();
+		Write() = Read();
 	}
 
 	template <typename T>
-	const T& DoubleBuffer<T>::GetRead() const
+	const T& DoubleBuffer<T>::Read() const
 	{
 		return *reinterpret_cast<T*>( m_read );
 	}
 
 	template <typename T>
-	T& DoubleBuffer<T>::GetWrite() const
+	T& DoubleBuffer<T>::Write() const
 	{
 		return *reinterpret_cast<T*>( m_write );
 	}

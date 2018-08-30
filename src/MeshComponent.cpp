@@ -9,6 +9,8 @@
 
 #include "Mesh.h"
 
+DD_COMPONENT_CPP( dd::MeshComponent );
+
 namespace dd
 {
 	MeshComponent::MeshComponent() : 
@@ -25,7 +27,6 @@ namespace dd
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
-		IComponent( other ),
 		Mesh( other.Mesh ),
 		Hidden( other.Hidden ),
 		Colour( other.Colour ),
@@ -36,24 +37,5 @@ namespace dd
 	MeshComponent::~MeshComponent()
 	{
 
-	}
-
-	MeshComponent& MeshComponent::operator=( const MeshComponent& other )
-	{
-		Mesh = other.Mesh;
-		Hidden = other.Hidden;
-		Colour = other.Colour;
-		Bounds = other.Bounds;
-		
-		return *this;
-	}
-
-	void MeshComponent::UpdateBounds( const glm::mat4& transform )
-	{
-		ddr::Mesh* mesh = ddr::Mesh::Get( Mesh );
-		if( mesh != nullptr )
-		{
-			Bounds = mesh->Bounds().GetTransformed( transform );
-		}
 	}
 }

@@ -13,7 +13,7 @@ namespace dd
 			return;
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		pool->GetWrite().Remove( handle );
+		pool->Write().Remove( handle );
 	}
 
 	template <typename Component>
@@ -23,7 +23,7 @@ namespace dd
 			return ComponentHandle<Component>();
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		pool->GetWrite().Create( handle );
+		pool->Write().Create( handle );
 		return ComponentHandle<Component>( handle );
 	}
 
@@ -34,7 +34,7 @@ namespace dd
 			return ComponentHandle<Component>();
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		pool.GetWrite().Construct( handle, std::forward( args )... );
+		pool.Write().Construct( handle, std::forward( args )... );
 		return pool( handle, pool );
 	}
 
@@ -72,7 +72,7 @@ namespace dd
 			return false;
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		return pool->GetRead().Exists( handle );
+		return pool->Read().Exists( handle );
 	}
 
 	template <typename Component>
@@ -82,7 +82,7 @@ namespace dd
 			return false;
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		return pool->GetWrite().Exists( handle );
+		return pool->Write().Exists( handle );
 	}
 
 	template <typename... Components>
@@ -140,14 +140,14 @@ namespace dd
 		std::lock_guard<std::recursive_mutex> lock( m_mutex );
 
 		const DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
-		pool->GetWrite().Create( handle );
+		pool->Write().Create( handle );
 	}
 
 	template <typename... Components>
 	std::vector<EntityHandle> EntityManager::FindAllWithReadable() const
 	{
 		std::vector<EntityHandle> result;
-		for( EntityHandle e : m_entities.GetRead() )
+		for( EntityHandle e : m_entities.Read() )
 		{
 			if( HasAllReadable<Components...>( e ) )
 			{
@@ -162,7 +162,7 @@ namespace dd
 	std::vector<EntityHandle> EntityManager::FindAllWithWritable() const
 	{
 		std::vector<EntityHandle> result;
-		for( EntityHandle e : m_entities.GetWrite() )
+		for( EntityHandle e : m_entities.Write() )
 		{
 			if( HasAllWritable<Components...>( e ) )
 			{
@@ -176,7 +176,7 @@ namespace dd
 	template <typename... Components>
 	void EntityManager::ForAllWithReadable( typename identity<std::function<void(EntityHandle, ComponentHandle<Components>...)>>::type f ) const
 	{
-		for( EntityHandle e : m_entities.GetRead() )
+		for( EntityHandle e : m_entities.Read() )
 		{
 			if( HasAllReadable<Components...>( e ) )
 			{
@@ -188,7 +188,7 @@ namespace dd
 	template <typename... Components>
 	void EntityManager::ForAllWithWritable( typename identity<std::function<void( EntityHandle, ComponentHandle<Components>... )>>::type f ) const
 	{
-		for( EntityHandle e : m_entities.GetWrite() )
+		for( EntityHandle e : m_entities.Write() )
 		{
 			if( HasAllWritable<Components...>( e ) )
 			{
@@ -203,7 +203,7 @@ namespace dd
 		DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
 
 		DD_ASSERT( pool != nullptr, "No pool found for component!" );
-		return pool->GetRead().Find( h );
+		return pool->Read().Find( h );
 	}
 
 	template <typename Component>
@@ -212,7 +212,7 @@ namespace dd
 		DoubleBuffer<typename Component::Pool>* pool = GetPool<Component>();
 
 		DD_ASSERT( pool != nullptr, "No pool found for component!" );
-		return pool->GetWrite().Find( h );
+		return pool->Write().Find( h );
 	}
 
 	template <typename Component>

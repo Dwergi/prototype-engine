@@ -59,8 +59,8 @@ namespace dd
 	{
 		std::lock_guard lock( m_mutex );
 
-		std::vector<int>& free = m_free.GetWrite();
-		std::vector<EntityHandle>& entities = m_entities.GetWrite();
+		std::vector<int>& free = m_free.Write();
+		std::vector<EntityHandle>& entities = m_entities.Write();
 
 		if( free.empty() )
 		{
@@ -89,13 +89,13 @@ namespace dd
 
 		std::lock_guard lock( m_mutex );
 
-		if( handle.ID < m_entities.GetWrite().size() )
+		if( handle.ID < m_entities.Write().size() )
 		{
-			if( m_entities.GetWrite()[ handle.ID ].Version != handle.Version )
+			if( m_entities.Write()[ handle.ID ].Version != handle.Version )
 				return;
 
-			m_entities.GetWrite()[ handle.ID ].Version++;
-			m_free.GetWrite().push_back( handle.ID );
+			m_entities.Write()[ handle.ID ].Version++;
+			m_free.Write().push_back( handle.ID );
 
 			for( auto& it : m_pools )
 			{
@@ -112,7 +112,7 @@ namespace dd
 	{
 		std::lock_guard lock( m_mutex );
 
-		for( EntityHandle entity : m_entities.GetWrite() )
+		for( EntityHandle entity : m_entities.Write() )
 		{
 			Destroy( entity );
 		}
@@ -126,17 +126,17 @@ namespace dd
 		std::lock_guard lock( m_mutex );
 
 		// check readable
-		if( entity.ID < m_entities.GetRead().size() )
+		if( entity.ID < m_entities.Read().size() )
 		{
-			EntityHandle readEntity = m_entities.GetRead()[ entity.ID ];
+			EntityHandle readEntity = m_entities.Read()[ entity.ID ];
 			if( readEntity.Version == entity.Version )
 				return true;
 		}
 
 		// check writable
-		if( entity.ID < m_entities.GetWrite().size() )
+		if( entity.ID < m_entities.Write().size() )
 		{
-			EntityHandle writeEntity = m_entities.GetWrite()[ entity.ID ];
+			EntityHandle writeEntity = m_entities.Write()[ entity.ID ];
 			if( writeEntity.Version == entity.Version )
 				return true;
 		}

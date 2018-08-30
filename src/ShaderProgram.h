@@ -11,17 +11,13 @@
 
 #include <unordered_map>
 
-namespace dd
-{
-	class ICamera;
-}
-
 namespace ddr
 {
-	class Shader;
+	struct Shader;
 	class Texture;
+	struct UniformStorage;
 
-	class ShaderProgram
+	struct ShaderProgram
 	{
 	public:
 
@@ -81,16 +77,6 @@ namespace ddr
 		bool EnableAttribute( const char* name );
 		bool DisableAttribute( const char* name );
 
-		void SetUniform( const char* name, const glm::mat3& mat );
-		void SetUniform( const char* name, const glm::mat4& mat );
-		void SetUniform( const char* name, const glm::vec2& vec );
-		void SetUniform( const char* name, const glm::vec3& vec );
-		void SetUniform( const char* name, const glm::vec4& vec );
-		void SetUniform( const char* name, int i );
-		void SetUniform( const char* name, bool b );
-		void SetUniform( const char* name, float flt );
-		void SetUniform( const char* name, const Texture& texture );
-
 		~ShaderProgram();
 
 		ShaderProgram( const ShaderProgram& other ) = delete;
@@ -100,7 +86,8 @@ namespace ddr
 
 	private:
 
-		friend class ddr::ShaderHandle;
+		friend struct ddr::ShaderHandle;
+		friend struct ddr::UniformStorage;
 
 		static std::unordered_map<uint64, ShaderProgram*> s_instances;
 
@@ -121,5 +108,15 @@ namespace ddr
 		ShaderLocation GetUniform( const char* name ) const;
 
 		bool BindAttributeFloat( const char* name, uint components, bool normalized );
+
+		void SetUniform( const char* name, const glm::mat3& mat );
+		void SetUniform( const char* name, const glm::mat4& mat );
+		void SetUniform( const char* name, const glm::vec2& vec );
+		void SetUniform( const char* name, const glm::vec3& vec );
+		void SetUniform( const char* name, const glm::vec4& vec );
+		void SetUniform( const char* name, int i );
+		void SetUniform( const char* name, bool b );
+		void SetUniform( const char* name, float flt );
+		void SetUniform( const char* name, const Texture& texture );
 	};
 } 

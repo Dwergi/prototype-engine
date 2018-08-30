@@ -64,9 +64,14 @@ namespace dd
 	}
 
 	TerrainSystem::TerrainSystem( JobSystem& jobSystem ) :
+		ddc::System( "Terrain System" ),
 		m_jobSystem( jobSystem ),
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
+		RequireWrite<TerrainChunkComponent>();
+		RequireWrite<MeshComponent>();
+
+		SetPartitions( 1 );
 	}
 
 	TerrainSystem::~TerrainSystem()
@@ -74,9 +79,9 @@ namespace dd
 		
 	}
 
-	void TerrainSystem::Shutdown( EntityManager& entity_manager )
+	void TerrainSystem::Shutdown( ddc::World& world )
 	{
-		DestroyChunks( entity_manager );
+		DestroyChunks( world );
 	}
 
 	void TerrainSystem::SetLODLevels( int lods )
@@ -90,11 +95,9 @@ namespace dd
 		TerrainChunk::CreateRenderResources();
 	}
 
-	void TerrainSystem::Initialize( EntityManager& entity_manager )
+	void TerrainSystem::Initialize( ddc::World& world )
 	{
 		TerrainChunk::InitializeShared();
-
-		Update( entity_manager, 0 );
 	}
 
 	void TerrainSystem::Render( const ddr::RenderData& data )
@@ -112,8 +115,8 @@ namespace dd
 
 		DD_TODO( "Uncomment" );
 
-		/*entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
-			[&entity_manager, this]( EntityHandle entity, auto chunk_h, auto mesh_h )
+		/*world.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
+			[&world, this]( ddc::Entity& entity, auto chunk_h, auto mesh_h )
 		{
 			TerrainChunkComponent* chunk_cmp = chunk_h.Write();
 			chunk_cmp->Chunk->RenderUpdate();
@@ -122,18 +125,20 @@ namespace dd
 		} );*/
 	}
 
-	void TerrainSystem::Update( EntityManager& entity_manager, float delta_t )
+	void TerrainSystem::Update( const ddc::UpdateData& data, float delta_t )
 	{
+		ddc::World& world = data.World();
+
 		if( m_requiresRegeneration )
 		{
-			DestroyChunks( entity_manager );
+			DestroyChunks( world );
 
 			m_requiresRegeneration = false;
 		}
 
 		if( m_saveChunkImages )
 		{
-			SaveChunkImages( entity_manager );
+			SaveChunkImages( world );
 
 			m_saveChunkImages = false;
 		}
@@ -145,65 +150,65 @@ namespace dd
 		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );
 		if( m_previousOffset != origin )
 		{
-			GenerateTerrain( entity_manager, origin );
+			GenerateTerrain( data, origin );
 
 			m_previousOffset = origin;
 		}
 
-		entity_manager.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
-			[&entity_manager, this, delta_t]( EntityHandle entity, auto chunk_cmp, auto mesh_cmp )
-			{
-				UpdateChunk( entity, chunk_cmp.Write(), mesh_cmp.Write(), delta_t );
-			} );
+		ddc::WriteBuffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+		ddc::WriteBuffer<MeshComponent> meshes = data.Write<MeshComponent>();
+
+		for( size_t i = 0; i < data.Size(); ++i )
+		{
+			UpdateChunk( chunks[ i ], meshes[ i ], delta_t );
+		}
 	}
 
-	void TerrainSystem::UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, float delta_t )
+	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, float delta_t )
 	{
 		if( m_params.UseDebugColours )
 		{
-			mesh_cmp->Colour = GetMeshColour( chunk_cmp->Chunk->GetKey() );
+			mesh_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetKey() );
 		}
 		else
 		{
-			mesh_cmp->Colour = glm::vec4( 1, 1, 1, 1 );
+			mesh_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 
-		chunk_cmp->Chunk->Update( m_jobSystem, delta_t );
+		chunk_cmp.Chunk->Update( m_jobSystem, delta_t );
 	}
 
-	void TerrainSystem::GenerateTerrain( EntityManager& entity_manager, const glm::ivec2 offset )
+	void TerrainSystem::GenerateTerrain( const ddc::UpdateData& data, const glm::ivec2 offset )
 	{
 		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
 			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
 
-		Vector<TerrainChunkKey> toGenerate;
-		toGenerate.Reserve( expected );
+		Vector<TerrainChunkKey> required_chunks;
+		required_chunks.Reserve( expected );
 
 		// start with a 4x4 grid of the lowest LOD level, 
 		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
 		for( int lod = 0; lod < m_lodLevels; ++lod )
 		{
-			GenerateLODLevel( entity_manager, lod, toGenerate, offset );
+			GenerateLODLevel( lod, required_chunks, offset );
 		}
 
-		UpdateTerrainChunks( entity_manager, toGenerate );
+		UpdateTerrainChunks( data, required_chunks );
 	}
 
-	void TerrainSystem::UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required_chunks )
+	void TerrainSystem::UpdateTerrainChunks( const ddc::UpdateData& data, const Vector<TerrainChunkKey>& required_chunks )
 	{
-		const std::vector<EntityHandle>& existing_entities = entity_manager.FindAllWithWritable<TerrainChunkComponent, MeshComponent, TransformComponent>();
+		ddc::World& world = data.World();
+
+		ddc::WriteBuffer<MeshComponent> meshes = data.Write<MeshComponent>();
+		ddc::ReadBuffer<TerrainChunkComponent> chunks = data.Read<TerrainChunkComponent>();
+		dd::Span<ddc::Entity> entities = data.Entities();
 
 		m_existing.clear();
 
-		for( const EntityHandle& entity : existing_entities )
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			TerrainChunkComponent* terrain_chunk = entity.Get<TerrainChunkComponent>().Write();
-			const TerrainChunkKey& existing_key = terrain_chunk->Chunk->GetKey();
-
-			terrain_chunk->IsActive = false;
-			entity.Get<MeshComponent>().Write()->Hidden = true;
-
-			m_existing.insert( std::make_pair( existing_key, entity ) );
+			m_existing.insert( std::make_pair( chunks[ i ].Chunk->GetKey(), entities[ i ] ) );
 		}
 
 		Vector<TerrainChunkKey> missing_chunks;
@@ -224,19 +229,19 @@ namespace dd
 			}
 		}
 		
-		for( EntityHandle& entity : m_active )
+		for( ddc::Entity entity : m_active )
 		{
-			entity.Get<TerrainChunkComponent>().Write()->IsActive = true;
-			entity.Get<MeshComponent>().Write()->Hidden = false;
+			world.AccessComponent<MeshComponent>( entity )->Hidden = false;
 		}
 
 		for( const TerrainChunkKey& key : missing_chunks )
 		{
-			CreateChunk( entity_manager, key );
+			ddc::Entity created = CreateChunk( world, key );
+			m_existing.insert( std::make_pair( key, created ) );
 		}
 	}
 
-	void TerrainSystem::GenerateLODLevel( EntityManager& entity_manager, int lod, Vector<TerrainChunkKey>& toGenerate, const glm::ivec2 offset )
+	void TerrainSystem::GenerateLODLevel( int lod, Vector<TerrainChunkKey>& toGenerate, const glm::ivec2 offset )
 	{
 		glm::ivec2 lod_offset( offset.x >> lod, offset.y >> lod );
 
@@ -279,41 +284,40 @@ namespace dd
 		DD_ASSERT( expected == generated, "Wrong amount of chunks have been generated!\nExpected: %d\tActual: %d", expected, generated );
 	}
 
-	void TerrainSystem::CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key )
+	ddc::Entity TerrainSystem::CreateChunk( ddc::World& world, const TerrainChunkKey& key )
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		EntityHandle entity = entity_manager.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent>();
+		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent>();
 
-		TransformComponent* transform_cmp = entity.Get<TransformComponent>().Write();
+		TransformComponent* transform_cmp = world.AccessComponent<TransformComponent>( entity );
 		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
-		transform_cmp->UpdateWorldTransform();
 
-		TerrainChunkComponent* chunk_cmp = entity.Get<TerrainChunkComponent>().Write();
+		TerrainChunkComponent* chunk_cmp = world.AccessComponent<TerrainChunkComponent>( entity );
 		TerrainChunk* chunk = new TerrainChunk( m_params, key );
 		chunk_cmp->Chunk = chunk;
-		chunk_cmp->IsActive = true;
 
 		chunk->Generate();
+
+		return entity;
 	}
 
-	void TerrainSystem::DestroyChunks( EntityManager& entity_manager )
+	void TerrainSystem::DestroyChunks( ddc::World& world )
 	{
-		entity_manager.ForAllWithWritable<TerrainChunkComponent>( []( auto entity, auto chunk_h )
+		world.ForAllWith<TerrainChunkComponent>( [&world]( ddc::Entity entity, TerrainChunkComponent& chunk )
 		{
-			TerrainChunkComponent* chunk_cmp = chunk_h.Write();
-			delete chunk_cmp->Chunk;
-			chunk_cmp->Chunk = nullptr;
-			chunk_cmp->IsActive = false;
-			entity.Destroy();
+			delete chunk.Chunk;
+			chunk.Chunk = nullptr;
+			world.DestroyEntity( entity );
 		} );
 	}
 
-	void TerrainSystem::SaveChunkImages( const EntityManager& entity_manager ) const
+	void TerrainSystem::SaveChunkImages( const ddc::World& world ) const
 	{
 		int chunk_index = 0;
 
-		entity_manager.ForAllWithReadable<TerrainChunkComponent>( [&chunk_index]( EntityHandle entity, ComponentHandle<TerrainChunkComponent> chunk_h )
+		DD_TODO( "Uncomment" );
+		/*world.ForAllWithReadable<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, ComponentHandle<TerrainChunkComponent> chunk_h )
 		{
 			String64 chunk_file;
 			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
@@ -326,7 +330,7 @@ namespace dd
 			chunk_h.Read()->Chunk->WriteNormalImage( chunk_normal_file.c_str() );
 
 			++chunk_index;
-		} );
+		} );*/
 	}
 
 	void TerrainSystem::DrawDebugInternal()

@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "EntityHandle.h"
+#include "Entity.h"
+#include "FrameBuffer.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
 #include "IRenderer.h"
-#include "ISystem.h"
+#include "System.h"
 #include "Ray.h"
-#include "FrameBuffer.h"
 #include "ShaderHandle.h"
 #include "Texture.h"
 
@@ -21,7 +21,7 @@ struct GLFWwindow;
 namespace ddr
 {
 	class ICamera;
-	class ShaderProgram;
+	struct ShaderProgram;
 }
 
 namespace dd
@@ -34,7 +34,7 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking : public ISystem, public IDebugPanel, public ddr::IRenderer
+	class MousePicking : public ddc::System, public IDebugPanel, public ddr::IRenderer
 	{
 	public:
 
@@ -42,10 +42,12 @@ namespace dd
 
 		MousePicking( const Window& window, const Input& input );
 
-		virtual void Update( EntityManager& entity_manager, float dt ) override;
+		virtual void Initialize( ddc::World& ) override {}
+		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
+		virtual void Shutdown( ddc::World& ) override {}
 
-		EntityHandle GetFocusedMesh() const { return m_focusedMesh; }
-		EntityHandle GetSelectedMesh() const { return m_selectedMesh; }
+		ddc::Entity GetFocusedMesh() const { return m_focusedMesh; }
+		ddc::Entity GetSelectedMesh() const { return m_selectedMesh; }
 
 		int GetEntityHandleAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
@@ -58,7 +60,7 @@ namespace dd
 		virtual void Render( const ddr::RenderData& data ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
-		virtual void RenderDebug() override;
+		virtual void RenderDebug( const ddr::RenderData& data ) override;
 
 	private:
 
@@ -69,8 +71,8 @@ namespace dd
 		bool m_enabled { false };
 		bool m_renderDebug { false };
 
-		EntityHandle m_selectedMesh;
-		EntityHandle m_focusedMesh;
+		ddc::Entity m_selectedMesh;
+		ddc::Entity m_focusedMesh;
 
 		ddr::ShaderHandle m_shader;
 		ddr::Texture m_idTexture;
@@ -92,10 +94,10 @@ namespace dd
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
 		Ray GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const;
-		void HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
+		void HitTestMesh( ddc::Entity entity, const MeshComponent& mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
 
 		void HandleInput( InputAction action, InputType type );
 
-		void RenderMesh( const ddr::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh, const TransformComponent* transform );
+		void RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, const MeshComponent& mesh_cmp, const TransformComponent& transform_cmp );
 	};
 }

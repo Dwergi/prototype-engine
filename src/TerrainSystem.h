@@ -9,7 +9,7 @@
 #include "ComponentHandle.h"
 #include "IDebugPanel.h"
 #include "IRenderer.h"
-#include "ISystem.h"
+#include "System.h"
 #include "TerrainChunkKey.h"
 #include "TerrainParameters.h"
 
@@ -17,12 +17,11 @@
 
 namespace ddr
 {
-	class ShaderProgram;
+	struct ShaderProgram;
 }
 
 namespace dd
 {
-	class EntityManager;
 	class ICamera;
 	struct JobSystem;
 	class MeshComponent;
@@ -32,7 +31,7 @@ namespace dd
 
 	struct TerrainChunkKey;
 
-	class TerrainSystem : public ISystem, public IDebugPanel, public ddr::IRenderer
+	class TerrainSystem : public ddc::System, public IDebugPanel, public ddr::IRenderer
 	{
 	public:
 
@@ -67,17 +66,17 @@ namespace dd
 		//
 		// Initialize the terrain system.
 		//
-		virtual void Initialize( EntityManager& entityManager ) override;
+		virtual void Initialize( ddc::World& world ) override;
 
 		//
 		// Update the terrain system.
 		//
-		virtual void Update( EntityManager& entityManager, float delta_t ) override;
+		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
 
 		//
 		// Shut down the terrain system and destroy terrain chunk meshes.
 		//
-		virtual void Shutdown( EntityManager& entity_manager ) override;
+		virtual void Shutdown( ddc::World& world ) override;
 
 		//
 		// Initialize render resources for the terrain system.
@@ -92,7 +91,7 @@ namespace dd
 		//
 		// Save the heightmaps of the terrain chunks generated.
 		//
-		void SaveChunkImages( const EntityManager& entity_manager ) const;
+		void SaveChunkImages( const ddc::World& world ) const;
 
 		//
 		// The name to display in the debug view list.
@@ -110,19 +109,19 @@ namespace dd
 		TerrainParameters m_params;
 		JobSystem& m_jobSystem;
 
-		std::unordered_map<TerrainChunkKey, EntityHandle> m_existing;
-		Vector<EntityHandle> m_active;
+		std::unordered_map<TerrainChunkKey, ddc::Entity> m_existing;
+		Vector<ddc::Entity> m_active;
 
 		virtual void DrawDebugInternal() override;
 
-		void GenerateTerrain( EntityManager& entity_manager, const glm::ivec2 offset );
-		void GenerateLODLevel( EntityManager& entity_manager, int lodLevel, Vector<TerrainChunkKey>& toGenerate, glm::ivec2 offset );
+		void GenerateTerrain( const ddc::UpdateData& world, const glm::ivec2 offset );
+		void GenerateLODLevel( int lodLevel, Vector<TerrainChunkKey>& toGenerate, glm::ivec2 offset );
 
-		void CreateChunk( EntityManager& entity_manager, const TerrainChunkKey& key );
+		ddc::Entity CreateChunk( ddc::World& world, const TerrainChunkKey& key );
 
-		void UpdateChunk( EntityHandle entity, TerrainChunkComponent* chunk_cmp, MeshComponent* mesh_cmp, float delta_t );
-		void UpdateTerrainChunks( EntityManager& entity_manager, const Vector<TerrainChunkKey>& required );
+		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, float delta_t );
+		void UpdateTerrainChunks( const ddc::UpdateData& world, const Vector<TerrainChunkKey>& required );
 
-		void DestroyChunks( EntityManager& entity_manager );
+		void DestroyChunks( ddc::World& world );
 	};
 }

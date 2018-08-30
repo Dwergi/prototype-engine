@@ -14,7 +14,8 @@
 namespace ddr
 {
 	class ICamera;
-	class ShaderProgram;
+	struct ShaderProgram;
+	struct UniformStorage;
 }
 
 namespace dd
@@ -49,7 +50,7 @@ namespace dd
 		void SetNoiseOffset( glm::vec2 origin );
 
 		void Update( JobSystem& job_system, float delta_t );
-		void RenderUpdate();
+		void RenderUpdate( ddr::UniformStorage& uniforms );
 
 		void Destroy();
 

@@ -29,20 +29,36 @@ namespace ddc
 
 namespace ddr
 {
-	struct UniformStorage;
+	struct ParticleSystemRenderer : ddr::IRenderer
+	{
+	public:
 
-	class ParticleSystem : public dd::IDebugPanel, public ddr::IRenderer, public ddc::System
+		virtual void RenderInit() override;
+		virtual bool UsesAlpha() const override { return true; }
+		virtual void Render( const ddr::RenderData& data );
+
+	private:
+		glm::vec3 m_positions[ ddc::MaxParticles ];
+		VBO m_vboPositions;
+
+		glm::vec2 m_sizes[ ddc::MaxParticles ];
+		VBO m_vboSizes;
+
+		glm::vec4 m_colours[ ddc::MaxParticles ];
+		VBO m_vboColours;
+
+	};
+
+	struct ParticleSystem : ddc::System, dd::IDebugPanel
 	{
 	public:
 
 		ParticleSystem();
 		~ParticleSystem();
 
-		virtual void RenderInit() override;
-		virtual bool UsesAlpha() const override { return true; }
-
+		virtual void Initialize( ddc::World& ) override {}
 		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
-		virtual void Render( const ddr::RenderData& data );
+		virtual void Shutdown( ddc::World& ) override {}
 
 		void BindActions( dd::InputBindings& input_bindings );
 
@@ -50,7 +66,6 @@ namespace ddr
 		ParticleSystem( ParticleSystem&& ) = delete;
 		ParticleSystem& operator=( const ParticleSystem& ) = delete;
 		ParticleSystem& operator=( ParticleSystem&& ) = delete;
-
 
 	private:
 
@@ -61,21 +76,10 @@ namespace ddr
 
 		ddc::ParticleSystemComponent* m_selected { nullptr };
 
-		glm::vec3 m_positions[ ddc::MaxParticles ];
-		VBO m_vboPositions;
-
-		glm::vec2 m_sizes[ ddc::MaxParticles ];
-		VBO m_vboSizes;
-
-		glm::vec4 m_colours[ ddc::MaxParticles ];
-		VBO m_vboColours;
-
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
 		void EmitNewParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
-
-		ddc::ReadWriteRequirement<ddc::ParticleSystemComponent> req_particles;
 	};
 }

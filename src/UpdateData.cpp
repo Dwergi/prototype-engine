@@ -3,7 +3,7 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
+	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
 		m_world( world ),
 		m_entities( entities )
 	{

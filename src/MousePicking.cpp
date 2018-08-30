@@ -18,7 +18,9 @@
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
+#include "UpdateData.h"
 #include "Window.h"
+#include "World.h"
 
 #include "glm/gtx/rotate_vector.hpp"
 
@@ -29,6 +31,7 @@
 namespace dd
 {
 	MousePicking::MousePicking( const Window& window, const Input& input ) : 
+		ddc::System( "Mouse Picking" ),
 		m_window( window ),
 		m_input( input )
 	{
@@ -45,7 +48,7 @@ namespace dd
 		if( action == InputAction::SELECT_MESH && type == InputType::RELEASED )
 		{
 			m_select = true;
-			m_selectedMesh = EntityHandle();
+			m_selectedMesh = ddc::Entity();
 		}
 
 		if( action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED )
@@ -81,17 +84,18 @@ namespace dd
 		return base[index];
 	}
 
-	void MousePicking::Update( EntityManager& entity_manager, float dt )
+	void MousePicking::Update( const ddc::UpdateData& data, float delta_t )
 	{
 		if( m_enabled )
 		{
-			m_focusedMesh = EntityHandle();
+			m_focusedMesh = ddc::Entity();
 
 			m_position = m_input.GetMousePosition().Absolute;
 			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
 			m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
 
-			EntityHandle entity = EntityHandle( m_handle, entity_manager );
+			ddc::Entity entity = data.World().GetEntity( m_handle );
+
 			if( entity.IsValid() )
 			{
 				m_focusedMesh = entity;
@@ -111,7 +115,7 @@ namespace dd
 		}
 		else
 		{
-			m_focusedMesh = EntityHandle();
+			m_focusedMesh = ddc::Entity();
 		}
 
 		m_select = false;
@@ -164,25 +168,29 @@ namespace dd
 
 			m_framebuffer.Clear();
 
-			ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
-			shader->Use( true );
+			ddr::ShaderProgram& shader = *ddr::ShaderProgram::Get( m_shader );
+			shader.Use( true );
 
 			ddr::UniformStorage& uniforms = data.Uniforms();
-			ddr::ICamera& camera = data.Camera();
+			const ddr::ICamera& camera = data.Camera();
 
 			uniforms.Set( "View", camera.GetCameraMatrix() );
 			uniforms.Set( "Projection", camera.GetProjectionMatrix() );
 
-			uniforms.Bind( *shader );
+			uniforms.Bind( shader );
 
 			DD_TODO( "Uncomment" );
 
-			/*entity_manager.ForAllWithReadable<MeshComponent, TransformComponent>( [this, &camera, shader]( auto entity, auto mesh, auto transform )
-			{
-				RenderMesh( camera, *shader, entity, mesh.Read(), transform.Read() );
-			} );*/
+			ddc::ReadBuffer<dd::MeshComponent> meshes = data.Read<dd::MeshComponent>();
+			ddc::ReadBuffer<dd::TransformComponent> transforms = data.Read<dd::TransformComponent>();
+			dd::Span<ddc::Entity> entities = data.Entities();
 
-			shader->Use( false );
+			for( size_t i = 0; i < data.Size(); ++i )
+			{
+				RenderMesh( uniforms, shader, entities[ i ], meshes[ i ], transforms[ i ] );
+			}
+
+			shader.Use( false );
 
 			m_framebuffer.UnbindRead();
 			m_framebuffer.UnbindDraw();
@@ -192,21 +200,21 @@ namespace dd
 		}
 	}
 
-	void MousePicking::RenderDebug()
+	void MousePicking::RenderDebug( const ddr::RenderData& data )
 	{
 		m_framebuffer.BindRead();
 
-		m_framebuffer.Render();
+		m_framebuffer.Render( data.Uniforms() );
 
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::RenderMesh( const ddr::ICamera& camera, ddr::ShaderProgram& shader, EntityHandle entity, const MeshComponent* mesh_cmp, const TransformComponent* transform_cmp )
+	void MousePicking::RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, const MeshComponent& mesh_cmp, const TransformComponent& transform_cmp )
 	{
-		shader.SetUniform( "ID", (int) entity.Handle );
+		uniforms.Set( "ID", (int) entity.ID );
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
-		mesh->Render( shader, transform_cmp->GetWorldTransform() );
+		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
+		mesh->Render( uniforms, shader, transform_cmp.World );
 	}
 
 	void MousePicking::DrawDebugInternal()
@@ -222,7 +230,8 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			if( m_focusedMesh.IsValid() )
+			DD_TODO( "Uncomment." );
+			/*if( m_focusedMesh.IsValid() )
 			{
 				ddr::MeshHandle mesh_h = m_focusedMesh.Get<MeshComponent>().Read()->Mesh;
 				
@@ -232,7 +241,7 @@ namespace dd
 				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
 				ImGui::Value( "Position", focused_mesh_pos, "%.2f" );
 			}
-			else
+			else*/
 			{
 				ImGui::Text( "Name: <none>" );
 				ImGui::Text( "Position: <none>" );
@@ -243,7 +252,8 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Selected", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			if( m_selectedMesh.IsValid() )
+			DD_TODO( "Uncomment." );
+			/*if( m_selectedMesh.IsValid() )
 			{
 				ddr::MeshHandle mesh_h = m_selectedMesh.Get<MeshComponent>().Read()->Mesh;
 
@@ -253,7 +263,7 @@ namespace dd
 				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
 				ImGui::Value( "Position", selected_mesh_pos, "%.2f" );
 			}
-			else
+			else*/
 			{
 				ImGui::Text( "Name: <none>" );
 				ImGui::Text( "Position: <none>" );
@@ -263,12 +273,12 @@ namespace dd
 		}
 	}
 
-	void MousePicking::HitTestMesh( EntityHandle entity, const MeshComponent* mesh_cmp, const Ray& mouse_ray, float& nearest_distance )
+	void MousePicking::HitTestMesh( ddc::Entity entity, const MeshComponent& mesh_cmp, const Ray& mouse_ray, float& nearest_distance )
 	{
-		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp->Mesh );
-		if( mesh != nullptr && !mesh_cmp->Hidden )
+		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
+		if( mesh != nullptr && !mesh_cmp.Hidden )
 		{
-			const AABB& bounds = mesh_cmp->Bounds;
+			const AABB& bounds = mesh_cmp.Bounds;
 
 			float distance;
 			if( bounds.IntersectsRay( mouse_ray, distance ) )

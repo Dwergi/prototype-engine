@@ -52,10 +52,9 @@ namespace ddr
 	static const glm::vec3 s_gravity( 0, -9.81, 0 );
 
 	ParticleSystem::ParticleSystem() :
-		ddc::System( "Particles" ),
-		req_particles( *this )
+		ddc::System( "Particles" )
 	{
-
+		RequireRead<ddc::ParticleSystemComponent>();
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -74,7 +73,7 @@ namespace ddr
 		} );
 	}
 
-	void ParticleSystem::RenderInit()
+	void ParticleSystemRenderer::RenderInit()
 	{
 		dd::Vector<Shader*> shaders;
 
@@ -125,7 +124,7 @@ namespace ddr
 
 	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		ddc::ReadWriteBuffer<ddc::ParticleSystemComponent> data_buffer = update_data.GetReadWrite<ddc::ParticleSystemComponent>();
+		ddc::WriteBuffer<ddc::ParticleSystemComponent> data_buffer = update_data.Write<ddc::ParticleSystemComponent>();
 
 		for( size_t i = 0; i < data_buffer.Size(); ++i )
 		{
@@ -213,14 +212,14 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::Render( const ddr::RenderData& data )
+	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
 	{
 		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
 		shader->Use( true );
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
-		ddr::ICamera& camera = data.Camera();
-		ddc::World& world = data.World();
+		const ddr::ICamera& camera = data.Camera();
+		const ddc::World& world = data.World();
 
 		uniforms.Bind( *shader );
 
@@ -228,7 +227,6 @@ namespace ddr
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		s_vaoParticle.Bind();
-
 
 		std::vector<ddc::Entity> particle_systems;
 		world.FindAllWith<ddc::ParticleSystemComponent>( particle_systems );

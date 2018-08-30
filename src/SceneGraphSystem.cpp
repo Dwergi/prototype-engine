@@ -7,22 +7,22 @@
 #include "PrecompiledHeader.h"
 #include "SceneGraphSystem.h"
 
-#include "EntityManager.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
 
 namespace dd
 {
-	void SceneGraphSystem::PreUpdate( EntityManager& entity_manager, float dt )
+	SceneGraphSystem::SceneGraphSystem() : 
+		ddc::System( "Scene Graph" )
 	{
-		entity_manager.ForAllWithWritable<TransformComponent>( [this]( auto entity, auto transform )
-		{
-			transform.Write()->UpdateWorldTransform();
-		} );
+		RequireWrite<dd::TransformComponent>();
+	}
 
-		entity_manager.ForAllWithWritable<TransformComponent, MeshComponent>( [this]( auto entity, auto transform, auto mesh )
+	void SceneGraphSystem::Update( const ddc::UpdateData& data, float dt )
+	{
+		for( dd::TransformComponent& transform : data.Write<dd::TransformComponent>() )
 		{
-			mesh.Write()->UpdateBounds( transform.Write()->GetWorldTransform() );
-		} );
+			DD_TODO( "Apply parent transform" );
+		}
 	}
 }

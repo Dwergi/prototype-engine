@@ -10,7 +10,6 @@
 #include "ShipSystem.h"
 
 #include "FPSCamera.h"
-#include "EntityManager.h"
 #include "InputBindings.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -19,6 +18,7 @@
 #include "ShaderProgram.h"
 #include "ShipComponent.h"
 #include "TransformComponent.h"
+#include "World.h"
 
 #include "imgui/imgui.h"
 
@@ -50,6 +50,7 @@ namespace dd
 	};
 
 	ShipSystem::ShipSystem( FPSCamera& camera ) :
+		ddc::System( "Ship System" ),
 		m_camera( camera )
 	{
 		m_inputs.Add( InputAction::FORWARD, false );
@@ -73,15 +74,17 @@ namespace dd
 		bindings.RegisterHandler( InputAction::BOOST, handle_input );
 	}
 	
-	void ShipSystem::Update( EntityManager& entity_manager, float dt )
+	void ShipSystem::Update( const ddc::UpdateData& data, float dt )
 	{
 		if( !m_enabled )
 			return;
 
-		entity_manager.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
+		DD_TODO( "Uncomment" );
+
+	/*	world.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
 		{
 			UpdateShip( entity, transform, ship, dt );
-		} );
+		} );*/
 	}
 
 	void ShipSystem::HandleInput( InputAction action, InputType type )
@@ -97,20 +100,22 @@ namespace dd
 			*state = false;
 	}
 
-	void ShipSystem::CreateShip( EntityManager& entity_manager )
+	void ShipSystem::CreateShip( ddc::World& world )
 	{
-		EntityHandle entity = entity_manager.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
+		DD_TODO( "Uncomment" );
+		/*
+		EntityHandle entity = world.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
 
 		glm::mat4 transform = glm::translate( glm::vec3( 0, 2.5, 10 ) );
 
-		TransformComponent* transform_cmp = entity_manager.GetWritable<TransformComponent>( entity );
-		transform_cmp->SetLocalTransform( transform );
+		TransformComponent* transform_cmp = world.GetWritable<TransformComponent>( entity );
+		transform_cmp->Local = transform;
 
 		ddr::ShaderHandle shader = ddr::ShaderProgram::Load( "standard" );
-		/*shader.Get()->Use( true );
+		/ *shader.Get()->Use( true );
 		shader.Get()->BindAttributeFloat( "Position", 3, 6, 0, false );
 		shader.Get()->BindAttributeFloat( "Normal", 3, 6, 3, false );
-		shader.Get()->Use( false );*/
+		shader.Get()->Use( false );* /
 
 		AABB bounds;
 		bounds.Expand( glm::vec3( 0, 0, 1 ) );
@@ -123,15 +128,15 @@ namespace dd
 		mesh->SetMaterial( ddr::Material::Create( "standard" ) );
 		mesh->MakeUnitCube();
 		
-		/*mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
-		mesh_h.Get()->SetBounds( bounds );*/
+		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
+		mesh_h.Get()->SetBounds( bounds );* /
 
-		MeshComponent* mesh_cmp = entity_manager.GetWritable<MeshComponent>( entity );
+		MeshComponent* mesh_cmp = world.GetWritable<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_shipMesh;
 		mesh_cmp->Colour = glm::vec4( 1, 0, 0, 1 );
 		mesh_cmp->Hidden = false;
 
-		ShipComponent* ship_cmp = entity_manager.GetWritable<ShipComponent>( entity );
+		ShipComponent* ship_cmp = world.GetWritable<ShipComponent>( entity );
 		ship_cmp->Acceleration = 5.0f;
 		ship_cmp->Velocity = glm::vec3( 0, 0, 1 );
 		ship_cmp->BoostFactor = 2.0f;
@@ -141,28 +146,14 @@ namespace dd
 		ship_cmp->BoostRemaining = ship_cmp->BoostMaximum;
 		ship_cmp->BoostRechargeRate = 2.0f;
 
-		m_lastShip = entity;
+		m_lastShip = entity;*/
 	}
 
-	void ShipSystem::UpdateShip( EntityHandle entity, ComponentHandle<TransformComponent> transform, ComponentHandle<ShipComponent> ship, float delta_t )
+	void ShipSystem::UpdateShip( TransformComponent& transform, ShipComponent& ship, float delta_t )
 	{
-		const TransformComponent* transform_read = transform.Read();
-		TransformComponent* transform_write = transform.Write();
-
-		const ShipComponent* ship_read = ship.Read();
-		ShipComponent* ship_write = ship.Write();
-
-		if( transform_read == nullptr ||
-			transform_write == nullptr ||
-			ship_read == nullptr ||
-			ship_write == nullptr )
-		{
-			return;
-		}
-
-		glm::vec3 current_velocity = ship_read->Velocity;
+		glm::vec3 current_velocity = ship.Velocity;
 		float current_speed = glm::length( current_velocity );
-		glm::vec3 current_position = transform_read->GetLocalPosition();
+		glm::vec3 current_position = transform.GetLocalPosition();
 		bool boosting = false;
 
 		glm::vec3 other_modifiers = glm::vec3( 0, 0, 0 );
@@ -171,10 +162,10 @@ namespace dd
 		glm::vec3 right = glm::normalize( glm::cross( current_velocity, up ) );
 
 		if( m_inputs[InputAction::FORWARD] )
-			current_velocity *= 1.0f + (ship_read->Acceleration * delta_t);
+			current_velocity *= 1.0f + (ship.Acceleration * delta_t);
 
 		if( m_inputs[InputAction::BACKWARD] )
-			current_velocity *= 1.0f - (ship_read->Acceleration * delta_t);
+			current_velocity *= 1.0f - (ship.Acceleration * delta_t);
 
 		if( m_inputs[InputAction::UP] )
 			other_modifiers += up * current_speed * delta_t;
@@ -188,46 +179,36 @@ namespace dd
 		if( m_inputs[InputAction::LEFT] )
 			other_modifiers -= right * current_speed * delta_t;
 
-		if( m_inputs[InputAction::BOOST] && ship_read->BoostRemaining > 0 )
+		if( m_inputs[InputAction::BOOST] && ship.BoostRemaining > 0 )
 		{
-			float boost_amount = dd::min( ship_write->BoostRemaining, delta_t );
-			current_velocity *= 1.0f + (ship_read->Acceleration * ship_read->BoostFactor * boost_amount);
-			ship_write->BoostRemaining -= boost_amount;
+			float boost_amount = dd::min( ship.BoostRemaining, delta_t );
+			current_velocity *= 1.0f + (ship.Acceleration * ship.BoostFactor * boost_amount);
+			ship.BoostRemaining -= boost_amount;
 			boosting = true;
 		}
 		else
 		{
-			ship_write->BoostRemaining = dd::min( ship_read->BoostRemaining + (1.0f / ship_read->BoostRechargeRate) * delta_t, ship_read->BoostMaximum );
+			ship.BoostRemaining = dd::min( ship.BoostRemaining + (1.0f / ship.BoostRechargeRate) * delta_t, ship.BoostMaximum );
 		}
 
 		float speed = glm::length( current_velocity );
-		float max_speed = boosting ? ship_read->MaximumSpeed * ship_read->BoostFactor : ship_read->MaximumSpeed;
+		float max_speed = boosting ? ship.MaximumSpeed * ship.BoostFactor : ship.MaximumSpeed;
 
-		float clamped_speed = glm::clamp( speed, ship_read->MinimumSpeed, max_speed );
+		float clamped_speed = glm::clamp( speed, ship.MinimumSpeed, max_speed );
 		current_velocity = glm::normalize( current_velocity ) * clamped_speed;
 
 		glm::vec3 delta_v = current_velocity * delta_t;
 
-		ship_write->Velocity = current_velocity;
+		ship.Velocity = current_velocity;
 
-		transform_write->SetLocalPosition( current_position + delta_v + other_modifiers );
+		transform.SetLocalPosition( current_position + delta_v + other_modifiers );
 
 		// move camera after the ship
 		m_nextCameraPos = m_camera.GetPosition() + delta_v + other_modifiers;
-		//m_camera.SetDirection( m_camera.GetPosition() - transform_write->GetWorldPosition() );
-
-		m_lastShip = entity;
+		//m_camera.SetDirection( m_camera.GetPosition() - transform.GetWorldPosition() );
 	}
 
-	void ShipSystem::PostRender( EntityManager& entity_manager, float dt )
-	{
-		if( !m_enabled )
-			return;
-
-		m_camera.SetPosition( m_nextCameraPos );
-	}
-
-	void ShipSystem::Shutdown( EntityManager& entity_manager )
+	void ShipSystem::Shutdown( ddc::World& world )
 	{
 		ddr::Mesh::Destroy( m_shipMesh );
 	}
@@ -236,32 +217,33 @@ namespace dd
 	{
 		if( m_lastShip.IsValid() )
 		{
-			ImGui::Checkbox( "Enabled", &m_enabled );
+			DD_TODO( "Uncomment" );
+			/*ImGui::Checkbox( "Enabled", &m_enabled );
 
 			TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();
 
-			glm::vec3 pos = transform->GetWorldPosition();
+			glm::vec3 pos = transform.GetWorldPosition();
 			ImGui::Value( "Position", pos, "%.2f" );
 
 			ShipComponent* ship = m_lastShip.Get<ShipComponent>().Write();
 
-			glm::vec3 velocity = ship->Velocity;
+			glm::vec3 velocity = ship.Velocity;
 			ImGui::Value( "Velocity", velocity, "%.2f" );
 
-			ImGui::SliderFloat( "Acceleration", &ship->Acceleration, 0.0f, 100.0f, "%.2f" );
+			ImGui::SliderFloat( "Acceleration", &ship.Acceleration, 0.0f, 100.0f, "%.2f" );
 
-			ImGui::DragFloatRange2( "Speed", &ship->MinimumSpeed, &ship->MaximumSpeed, 1.0f, 0.0f, 100.0f, "%.2f" );
+			ImGui::DragFloatRange2( "Speed", &ship.MinimumSpeed, &ship.MaximumSpeed, 1.0f, 0.0f, 100.0f, "%.2f" );
 
-			ImGui::Value( "Current Boost", ship->BoostRemaining, "%.2f" );
+			ImGui::Value( "Current Boost", ship.BoostRemaining, "%.2f" );
 
 			if( ImGui::TreeNodeEx( "Boost", ImGuiTreeNodeFlags_CollapsingHeader ) )
 			{
-				ImGui::SliderFloat( "Maximum", &ship->BoostMaximum, 0.0f, 100.0f, "%.2f" );
-				ImGui::SliderFloat( "Recharge Rate", &ship->BoostRechargeRate, 0.0f, 100.0f, "%.2f" );
-				ImGui::SliderFloat( "Factor", &ship->BoostFactor, 0.0f, 10.0f, "%.2f" );
+				ImGui::SliderFloat( "Maximum", &ship.BoostMaximum, 0.0f, 100.0f, "%.2f" );
+				ImGui::SliderFloat( "Recharge Rate", &ship.BoostRechargeRate, 0.0f, 100.0f, "%.2f" );
+				ImGui::SliderFloat( "Factor", &ship.BoostFactor, 0.0f, 10.0f, "%.2f" );
 
 				ImGui::TreePop();
-			}
+			}*/
 		}
 	}
 }

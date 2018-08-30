@@ -6,20 +6,15 @@
 
 #pragma once
 
-#include "IComponent.h"
-#include "MeshHandle.h"
-#include "PackedPool.h"
 #include "AABB.h"
+#include "ComponentType.h"
+#include "MeshHandle.h"
 
 namespace dd
 {
-	class TransformComponent;
-
-	class MeshComponent : public IComponent
+	class MeshComponent
 	{
 	public: 
-
-		using Pool = PackedPool<MeshComponent>;
 
 		MeshComponent();
 		MeshComponent( ddr::MeshHandle mesh );
@@ -31,8 +26,7 @@ namespace dd
 		glm::vec4 Colour;
 		AABB Bounds;
 
-		MeshComponent& operator=( const MeshComponent& other );
-		void UpdateBounds( const glm::mat4& transform );
+		DD_COMPONENT;
 
 		BEGIN_TYPE( MeshComponent )
 			MEMBER( MeshComponent, Mesh )

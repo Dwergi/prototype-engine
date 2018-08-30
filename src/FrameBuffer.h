@@ -15,6 +15,7 @@ namespace ddr
 {
 	class ICamera;
 	class Texture;
+	struct UniformStorage;
 
 	class FrameBuffer
 	{
@@ -53,8 +54,8 @@ namespace ddr
 
 		void RenderInit();
 
-		void Render();
-		void RenderDepth( const ddr::ICamera& camera );
+		void Render( ddr::UniformStorage& uniforms );
+		void RenderDepth( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
 		void Blit();
 

@@ -6,16 +6,14 @@
 
 #pragma once
 
-#include "EntityHandle.h"
 #include "FrameBuffer.h"
 #include "IDebugPanel.h"
-#include "ISystem.h"
+#include "System.h"
 #include "MeshHandle.h"
 #include "Texture.h"
 
 namespace dd
 {
-	class EntityManager;
 	class MeshComponent;
 	class MousePicking;
 	class TransformComponent;
@@ -26,42 +24,32 @@ namespace ddr
 {
 	class ICamera;
 	class IRenderer;
-	class Frustum;
-	class ShaderProgram;
+	struct Frustum;
+	struct RenderData;
 	struct UniformStorage;
 
-	class Renderer : public dd::IDebugPanel, public dd::ISystem
+	class WorldRenderer : public dd::IDebugPanel, public ddc::System
 	{
 	public:
 
-		Renderer( const dd::Window& window );
-		~Renderer();
+		WorldRenderer( const dd::Window& window );
+		~WorldRenderer();
 
-		void Shutdown();
+		virtual void Initialize( ddc::World& world ) override;
 
-		virtual void Initialize( dd::EntityManager& entity_manager ) override;
+		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
 
-		virtual void Update( dd::EntityManager& entity_manager, float delta_t ) override;
-
-		//
-		// Setup render states, uniforms, and the like for other renderers.
-		//
-		void BeginRender( const dd::EntityManager& entity_manager, const ddr::ICamera& camera );
-
-		//
-		// Render all the registered renderers.
-		//
-		void Render( const dd::EntityManager& entity_manager, const ddr::ICamera& camera );
-
-		//
-		// Complete the render. Does *NOT* call Swap - that's in the main loop.
-		//
-		void EndRender( const ddr::ICamera& camera );
+		virtual void Shutdown( ddc::World& world ) override;
 
 		//
 		// Initialize the renderer.
 		//
-		void RenderInit();
+		void InitializeRenderer();
+
+		//
+		// Render all the registered renderers.
+		//
+		void Render( const ddc::World& world, const ddr::ICamera& camera );
 
 		//
 		// Register a renderer.
@@ -83,11 +71,11 @@ namespace ddr
 		Texture m_colourTexture;
 		Texture m_depthTexture;
 		
-		dd::EntityHandle m_xAxis;
-		dd::EntityHandle m_yAxis;
-		dd::EntityHandle m_zAxis;
+		ddc::Entity m_xAxis;
+		ddc::Entity m_yAxis;
+		ddc::Entity m_zAxis;
 
-		std::vector<dd::EntityHandle> m_debugLights;
+		std::vector<ddc::Entity> m_debugLights;
 		std::vector<ddr::IRenderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
@@ -102,7 +90,7 @@ namespace ddr
 		bool m_createDebugMeshGrid { false };
 		bool m_reloadShaders { false };
 	
-		dd::EntityHandle m_deleteLight;
+		ddc::Entity m_deleteLight;
 		bool m_createLight { false };
 
 		MeshHandle m_unitCube;
@@ -111,13 +99,16 @@ namespace ddr
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
-		void CreateDebugMeshGrid( dd::EntityManager& entityManager );
-		dd::EntityHandle CreateMeshEntity( dd::EntityManager& entityManager, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform );
-		dd::EntityHandle CreatePointLight( dd::EntityManager& entityManager );
-		void UpdateDebugPointLights( dd::EntityManager& entityManager );
+		void CreateDebugMeshGrid( ddc::World& world );
+		ddc::Entity CreateMeshEntity( ddc::World& world, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform );
+		ddc::Entity CreatePointLight( ddc::World& world );
+		void UpdateDebugPointLights( ddc::World& world );
 
 		void SetRenderState();
-		void RenderDebug( ddr::IRenderer& debug_render );
+		void RenderDebug( const ddr::RenderData& data, ddr::IRenderer& debug_render );
+
+		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );
+		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

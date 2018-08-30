@@ -9,10 +9,16 @@ namespace ddc
 
 	struct UpdateData
 	{
-		UpdateData( World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+		UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+
+		ddc::World& World() const { return m_world; }
+
+		dd::Span<Entity> Entities() const { return m_entities; }
+
+		size_t Size() const { return m_entities.Size(); }
 
 		template <typename T>
-		ReadBuffer<T> GetRead() const
+		ReadBuffer<T> Read() const
 		{
 			for( const ComponentDataBuffer& buffer : m_buffers )
 			{
@@ -28,7 +34,7 @@ namespace ddc
 		}
 
 		template <typename T>
-		WriteBuffer<T> GetWrite() const
+		WriteBuffer<T> Write() const
 		{
 			for( const ComponentDataBuffer& buffer : m_buffers )
 			{
@@ -43,29 +49,11 @@ namespace ddc
 			throw std::exception( "No write buffer found for component. Check your requirements!" );
 		}
 
-		template <typename T>
-		ReadWriteBuffer<T> GetReadWrite() const
-		{
-			for( const ComponentDataBuffer& buffer : m_buffers )
-			{
-				if( buffer.Component() == T::Type )
-				{
-					DD_ASSERT( buffer.Usage() == DataUsage::ReadWrite );
-
-					return ReadWriteBuffer<T>( buffer );
-				}
-			}
-
-			throw std::exception( "No read-write buffer found for component. Check your requirements!" );
-		}
-
 		void Commit();
 
 	private:
 
-		size_t m_entityCount { 0 };
-
-		World& m_world;
+		ddc::World& m_world;
 		dd::Span<Entity> m_entities;
 		std::vector<ComponentDataBuffer> m_buffers;
 	};

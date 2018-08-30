@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ComponentType.h"
+#include "DataRequirement.h"
+#include "UpdateData.h"
 
 namespace ddc
 {
-	struct DataRequirement;
-	struct UpdateData;
+	struct World;
 
 	struct System
 	{
@@ -16,17 +16,32 @@ namespace ddc
 		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 
-		virtual void Initialize() {}
+		virtual void Initialize( World& world ) = 0;
 		virtual void Update( const UpdateData& data, float delta_t ) = 0;
-		virtual void Shutdown() {}
+		virtual void Shutdown( World& world ) = 0;
+
+		int MaxPartitions() const { return m_partitions; }
+
+	protected:
+
+		template <typename T>
+		void RequireRead() { m_requirements.Add( new ReadRequirement<T>() ); }
+
+		template <typename T>
+		void RequireWrite() { m_requirements.Add( new WriteRequirement<T>() ); }
+
+		void SetPartitions( int count )
+		{
+			DD_ASSERT( count > 0 && count <= MAX_PARTITIONS );
+			m_partitions = count;
+		}
 
 	private:
 		dd::Array<const DataRequirement*, MAX_COMPONENTS> m_requirements;
 		dd::Array<const System*, 32> m_dependencies;
 		dd::String64 m_name;
 
-		friend struct DataRequirement;
-
-		void RegisterDataRequirement( const DataRequirement& req ) { m_requirements.Add( &req ); }
+		const static int MAX_PARTITIONS = 8;
+		int m_partitions { MAX_PARTITIONS };
 	};
 }

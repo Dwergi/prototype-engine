@@ -11,9 +11,9 @@
 
 namespace ddr
 {
-	class ShaderProgram;
+	struct ShaderProgram;
 
-	class ShaderHandle
+	struct ShaderHandle
 	{
 	public:
 		ShaderHandle() : m_hash( 0 ) {}
@@ -21,7 +21,7 @@ namespace ddr
 		bool Valid() const { return m_hash != 0; }
 
 	private:
-		friend class ShaderProgram;
+		friend struct ShaderProgram;
 
 		uint64 m_hash;
 	};

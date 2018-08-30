@@ -71,7 +71,7 @@ namespace dd
 	{
 		std::lock_guard lock( m_mutex );
 
-		m_pendingMessages.GetWrite().Add( message );
+		m_pendingMessages.Write().Add( message );
 	}
 
 	void MessageQueue::Dispatch( Message* message ) const
@@ -99,12 +99,12 @@ namespace dd
 			m_pendingMessages.Swap();
 		}
 
-		for( Message* message : m_pendingMessages.GetRead() )
+		for( Message* message : m_pendingMessages.Read() )
 		{
 			Dispatch( message );
 		}
 
-		m_pendingMessages.GetWrite().Clear();
+		m_pendingMessages.Write().Clear();
 	}
 
 	int MessageQueue::GetSubscriberCount( MessageID message_type ) const
@@ -124,6 +124,6 @@ namespace dd
 
 	int MessageQueue::GetPendingMessageCount() const
 	{
-		return m_pendingMessages.GetWrite().Size();
+		return m_pendingMessages.Write().Size();
 	}
 }

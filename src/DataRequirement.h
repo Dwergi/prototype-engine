@@ -6,17 +6,17 @@
 
 #pragma once
 
+#include "ComponentType.h"
+
 namespace ddc
 {
 	enum class DataUsage
 	{
 		Invalid,
 		Read,
-		Write,
-		ReadWrite
+		Write
 	};
 
-	struct ComponentType;
 	struct System;
 
 	struct DataRequirement
@@ -33,7 +33,7 @@ namespace ddc
 		byte* GetBuffer() const { return m_buffer; }
 
 	protected:
-		DataRequirement( const ComponentType& component, DataUsage usage, System& system );
+		DataRequirement( const ComponentType& component, DataUsage usage );
 
 	private:
 		const ComponentType* m_component { 0 };
@@ -44,8 +44,8 @@ namespace ddc
 	template <typename TComponent>
 	struct ReadRequirement : DataRequirement
 	{
-		ReadRequirement( System& system ) :
-			DataRequirement( TComponent::Type, DataUsage::Read, system )
+		ReadRequirement() :
+			DataRequirement( TComponent::Type, DataUsage::Read )
 		{
 		}
 	};
@@ -53,18 +53,8 @@ namespace ddc
 	template <typename TComponent>
 	struct WriteRequirement : DataRequirement
 	{
-		WriteRequirement( System& system ) :
-			DataRequirement( TComponent::Type, DataUsage::Write, system )
-		{
-		}
-	};
-
-
-	template <typename TComponent>
-	struct ReadWriteRequirement : DataRequirement
-	{
-		ReadWriteRequirement( System& system ) :
-			DataRequirement( TComponent::Type, DataUsage::ReadWrite, system )
+		WriteRequirement() :
+			DataRequirement( TComponent::Type, DataUsage::Write )
 		{
 		}
 	};

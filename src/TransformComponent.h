@@ -6,46 +6,27 @@
 
 #pragma once
 
-#include "IComponent.h"
+#include "ComponentType.h"
 #include "PackedPool.h"
 #include "Vector4.h"
 
 namespace dd
 {
-	class TransformComponent : public IComponent
+	class TransformComponent
 	{
 	public:
 
-		typedef PackedPool<TransformComponent> Pool;
+		glm::mat4 Local;
+		glm::mat4 World;
 
-		TransformComponent();
-		TransformComponent( const TransformComponent& other );
+		void SetLocalPosition( glm::vec3 v ) { Local[ 3 ].xyz = v; }
+		glm::vec3 GetLocalPosition() const { return Local[ 3 ].xyz; }
 
-		void SetLocalPosition( const glm::vec3& pos );
-		void SetLocalTransform( const glm::mat4& transform );
+		void SetWorldPosition( glm::vec3 v ) { World[ 3 ].xyz = v; }
+		glm::vec3 GetWorldPosition() const { return World[ 3 ].xyz; }
 
-		glm::vec3 GetLocalPosition() const { return m_local[3].xyz(); }
-		const glm::mat4& GetLocalTransform() const { return m_local; }
-
-		glm::vec3 GetWorldPosition() const { return m_world[3].xyz(); }
-		const glm::mat4& GetWorldTransform() const { return m_world; }
-
-		EntityHandle GetParent() const { return m_parent; }
-		void SetParent( EntityHandle parent ) { m_parent = parent; }
-
-		void UpdateWorldTransform();
+		DD_COMPONENT;
 
 		ALIGNED_ALLOCATORS( 16 )
-		
-		BEGIN_SCRIPT_OBJECT( TransformComponent )
-			PARENT( IComponent )
-		END_TYPE
-
-	private:
-
-		EntityHandle m_parent;
-		bool m_dirty;
-		glm::mat4 m_local;
-		glm::mat4 m_world;
 	};
 }

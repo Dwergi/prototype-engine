@@ -8,7 +8,8 @@
 
 namespace ddr
 {
-	class ShaderProgram;
+	struct ShaderProgram;
+	class Texture;
 
 	enum class UniformType
 	{
@@ -18,7 +19,9 @@ namespace ddr
 		Vector2,
 		Vector3,
 		Vector4,
-		Matrix4
+		Matrix3,
+		Matrix4,
+		Texture
 	};
 
 	struct IUniform
@@ -46,7 +49,9 @@ namespace ddr
 		void Set( const char* name, glm::vec2 value );
 		void Set( const char* name, glm::vec3 value );
 		void Set( const char* name, glm::vec4 value );
-		void Set( const char* name, glm::mat4 value );
+		void Set( const char* name, const glm::mat3& value );
+		void Set( const char* name, const glm::mat4& value );
+		void Set( const char* name, const ddr::Texture& value );
 
 		void Bind( ShaderProgram& shader );
 

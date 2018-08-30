@@ -6,13 +6,11 @@
 
 namespace ddc
 {
-	DataRequirement::DataRequirement( const ComponentType& component, DataUsage usage, System& system ) :
+	DataRequirement::DataRequirement( const ComponentType& component, DataUsage usage ) :
 		m_component( &component ),
 		m_usage( usage )
 	{
 		m_buffer = new byte[ component.Size * MAX_ENTITIES ];
-
-		system.RegisterDataRequirement( *this );
 	}
 
 	DataRequirement::DataRequirement( const DataRequirement& other )

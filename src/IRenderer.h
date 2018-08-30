@@ -6,13 +6,11 @@
 
 #pragma once
 
+#include "DataRequirement.h"
+#include "RenderData.h"
+
 namespace ddr
 {
-	class ICamera;
-	class FrameBuffer;
-	struct RenderData;
-	struct UniformStorage;
-
 	class IRenderer
 	{
 	public:
@@ -22,8 +20,19 @@ namespace ddr
 		virtual void RenderShutdown() {}
 
 		virtual bool ShouldRenderDebug() const { return false; }
-		virtual void RenderDebug() {}
+		virtual void RenderDebug( const RenderData& render_data ) {}
 
 		virtual bool UsesAlpha() const { return false; }
+
+	protected:
+
+		template <typename T>
+		void RequireRead() { m_requirements.Add( new ddc::ReadRequirement<T>() ) }
+
+		template <typename T>
+		void RequireWrite() { m_requirements.Add( new ddc::WriteRequirement<T>() ) }
+
+	private:
+		dd::Array<const ddc::DataRequirement*, ddc::MAX_COMPONENTS> m_requirements;
 	};
 }
