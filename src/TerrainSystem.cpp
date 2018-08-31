@@ -123,7 +123,13 @@ namespace dd
 		{
 			chunks[ i ].Chunk->RenderUpdate( data.Uniforms() );
 
-			ddr::Mesh::Get( meshes[i].Mesh )->UpdateBuffers();
+			ddr::MeshHandle mesh_h = meshes[ i ].Mesh;
+
+			if( mesh_h.IsValid() )
+			{
+				ddr::Mesh* mesh = ddr::Mesh::Get( mesh_h );
+				mesh->UpdateBuffers();
+			}
 		}
 	}
 
@@ -204,7 +210,7 @@ namespace dd
 		ddc::World& world = data.World();
 
 		ddc::WriteBuffer<MeshComponent> meshes = data.Write<MeshComponent>();
-		ddc::ReadBuffer<TerrainChunkComponent> chunks = data.Read<TerrainChunkComponent>();
+		ddc::WriteBuffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
 		dd::Span<ddc::Entity> entities = data.Entities();
 
 		m_existing.clear();

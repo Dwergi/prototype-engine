@@ -77,7 +77,6 @@ namespace ddr
 	Wireframe s_wireframe;
 
 	WorldRenderer::WorldRenderer( const dd::Window& window ) :
-		ddc::System( "World Renderer" ),
 		m_window( window )
 	{
 		m_uniforms = new ddr::UniformStorage();
@@ -88,52 +87,8 @@ namespace ddr
 		delete m_uniforms;
 	}
 
-	void WorldRenderer::Initialize( ddc::World& world )
-	{
-		{
-			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-			dd::LightComponent* light = world.AccessComponent<dd::LightComponent>( entity );
-
-			light->IsDirectional = true;
-			light->Colour = glm::vec3( 1, 1, 1 );
-			light->Intensity = 0.5;
-
-			dd::TransformComponent* transform = world.AccessComponent<dd::TransformComponent>( entity );
-			glm::vec3 direction( 0.5, 0.4, -0.3 );
-			transform->Local[3].xyz = direction;
-		}
-
-		m_createLight = true;
-	}
-
 	void WorldRenderer::InitializeRenderer()
 	{
-		m_unitCube = Mesh::Find( "unitcube" );
-		if( !m_unitCube.IsValid() )
-		{
-			m_unitCube = Mesh::Create( "unitcube" );
-
-			Mesh* mesh = Mesh::Get( m_unitCube );
-			DD_ASSERT( mesh != nullptr );
-
-			ShaderHandle shader_h = ShaderProgram::Load( "standard" );
-			ShaderProgram* shader = ShaderProgram::Get( shader_h );
-			DD_ASSERT( shader != nullptr );
-
-			MaterialHandle material_h = Material::Create( "standard" );
-			Material* material = Material::Get( material_h );
-			DD_ASSERT( material != nullptr );
-
-			material->SetShader( shader_h );
-			mesh->SetMaterial( material_h );
-
-			shader->Use( true );
-
-			mesh->MakeUnitCube();
-
-			shader->Use( false );
-		}
-
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
 
@@ -159,38 +114,12 @@ namespace ddr
 		m_framebuffer.RenderInit();
 	}
 
-	void WorldRenderer::Shutdown( ddc::World& world )
-	{
-		Mesh::Destroy( m_unitCube );
-	}
-
-	ddc::Entity WorldRenderer::CreateMeshEntity( ddc::World& world, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
-	{
-		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
-
-		dd::TransformComponent* transform_cmp = world.AccessComponent<dd::TransformComponent>( entity );
-		transform_cmp->Local = transform;
-
-		dd::MeshComponent* mesh_cmp = world.AccessComponent<dd::MeshComponent>( entity );
-		mesh_cmp->Mesh = mesh_h;
-		mesh_cmp->Colour = colour;
-		mesh_cmp->Hidden = false;
-
-		return entity;
-	}
-
 	void WorldRenderer::DrawDebugInternal()
 	{
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
-		if( ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes ) )
-		{
-			DD_TODO( "Uncomment" );
-		/*	m_xAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;
-			m_yAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;
-			m_zAxis.Get<dd::MeshComponent>().Hidden = !m_debugDrawAxes;*/
-		}	
+		ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes );
 
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
@@ -335,7 +264,7 @@ namespace ddr
 		}
 	}
 
-	void WorldRenderer::CreateDebugMeshGrid( ddc::World& world )
+	/*void WorldRenderer::CreateDebugMeshGrid( ddc::World& world )
 	{
 		if( m_debugMeshGridCreated || !m_createDebugMeshGrid )
 			return;
@@ -379,32 +308,21 @@ namespace ddr
 		}
 
 		DD_TODO( "Uncomment" );
-		/*world.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
+		world.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
 		{
 			if( mesh.Write() != nullptr )
 			{
 				mesh.Colour = glm::vec4( light.Colour, 1);
 			}
-		} );*/
-	}
+		} );
+	}*/
 
-	void WorldRenderer::Update( const ddc::UpdateData& data, float delta_t )
-	{
-		ddc::World& world = data.World();
+	// TODO: Move to a debug renderer or something. 
+	/*CreateDebugMeshGrid( world );
+	UpdateDebugPointLights( world );
 
-		if( !m_xAxis.IsValid() )
-		{
-			m_xAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-			m_yAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-			m_zAxis = CreateMeshEntity( world, m_unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
-		}
-
-		CreateDebugMeshGrid( world );
-		UpdateDebugPointLights( world );
-
-		DD_TODO( "Uncomment" );
-		//m_debugLights = world.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();
-	}
+	DD_TODO( "Uncomment" );
+	m_debugLights = world.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();*/
 
 	void WorldRenderer::RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render )
 	{

@@ -14,7 +14,7 @@ namespace ddc
 
 		Entity() :
 			Handle( ~0 ),
-			Flags( ~0 )
+			Flags( 0 )
 		{
 		}
 

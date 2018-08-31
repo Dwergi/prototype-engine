@@ -15,9 +15,9 @@ namespace ddc
 		size_t buffer_size = entities.Size() * m_component.Size;
 		byte* dest = m_storage;
 
-		for( Entity entity : entities )
+		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			const void* src = world.GetComponent( entity, m_component.ID );
+			const void* src = world.GetComponent( entities[i], m_component.ID );
 			DD_ASSERT( src != nullptr );
 
 			memcpy( dest, src, m_component.Size );

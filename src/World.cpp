@@ -159,6 +159,11 @@ namespace ddc
 
 	const void* World::GetComponent( Entity entity, TypeID id ) const
 	{
+		if( entity.ID > 10000 )
+		{
+			__debugbreak();
+		}
+
 		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;

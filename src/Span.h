@@ -15,6 +15,11 @@ namespace dd
 	{
 		Span( const std::vector<T>& container, size_t count = ~0, size_t offset = 0 )
 		{
+			if( container.empty() )
+			{
+				return;
+			}
+
 			const T* begin = &(*container.begin());
 			m_begin = begin + offset;
 			m_end = begin + offset + count;
@@ -33,6 +38,11 @@ namespace dd
 
 		Span( T* ptr, size_t count, size_t offset = 0 )
 		{
+			if( count == 0 )
+			{
+				return;
+			}
+
 			m_begin = ptr + offset;
 			m_end = ptr + offset + count;
 
@@ -86,8 +96,8 @@ namespace dd
 			return m_end;
 		}
 
-		const T* m_begin;
-		const T* m_end;
+		const T* m_begin { nullptr };
+		const T* m_end { nullptr };
 
 		size_t m_size { 0 };
 		size_t m_offset { 0 };

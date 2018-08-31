@@ -28,6 +28,8 @@
 #include "InputBindings.h"
 #include "jobsystem.h"
 #include "LightComponent.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "MeshComponent.h"
 #include "MeshRenderer.h"
 #include "Message.h"
@@ -62,6 +64,7 @@
 
 #include "imgui/imgui.h"
 
+#include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "GL/gl3w.h"
@@ -334,6 +337,50 @@ void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 	bindings.Dispatch( events );
 }
 
+ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
+{
+	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
+
+	dd::TransformComponent* transform_cmp = world.AccessComponent<dd::TransformComponent>( entity );
+	transform_cmp->Local = transform;
+
+	dd::MeshComponent* mesh_cmp = world.AccessComponent<dd::MeshComponent>( entity );
+	mesh_cmp->Mesh = mesh_h;
+	mesh_cmp->Colour = colour;
+	mesh_cmp->Hidden = false;
+
+	return entity;
+}
+
+void CreateUnitCube()
+{
+	ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
+	if( !unitCube.IsValid() )
+	{
+		unitCube = ddr::Mesh::Create( "unitcube" );
+
+		ddr::Mesh* mesh = ddr::Mesh::Get( unitCube );
+		DD_ASSERT( mesh != nullptr );
+
+		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "standard" );
+		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
+		DD_ASSERT( shader != nullptr );
+
+		ddr::MaterialHandle material_h = ddr::Material::Create( "standard" );
+		ddr::Material* material = ddr::Material::Get( material_h );
+		DD_ASSERT( material != nullptr );
+
+		material->SetShader( shader_h );
+		mesh->SetMaterial( material_h );
+
+		shader->Use( true );
+
+		mesh->MakeUnitCube();
+
+		shader->Use( false );
+	}
+}
+
 int GameMain()
 {
 	DD_PROFILE_INIT();
@@ -421,9 +468,25 @@ int GameMain()
 
 		s_world->Initialize();
 
-		s_renderer->Initialize( *s_world );
 		s_renderer->InitializeRenderer();
 
+		CreateUnitCube();
+
+		// dir light
+		{
+			ddc::Entity entity = s_world->CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			dd::LightComponent* light = s_world->AccessComponent<dd::LightComponent>( entity );
+
+			light->IsDirectional = true;
+			light->Colour = glm::vec3( 1, 1, 1 );
+			light->Intensity = 0.5;
+
+			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
+			glm::vec3 direction( 0.5, 0.4, -0.3 );
+			transform->Local[ 3 ].xyz = direction;
+		}
+		
+		// particle system
 		{
 			ddc::Entity entity = s_world->CreateEntity<ddc::ParticleSystemComponent, dd::TransformComponent>();
 			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
@@ -433,6 +496,15 @@ int GameMain()
 			ddc::ParticleSystemComponent* particle = s_world->AccessComponent<ddc::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
 			particle->m_lifetime = 1000;
+		}
+
+		// axes
+		{
+			ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
+
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
@@ -470,7 +542,7 @@ int GameMain()
 		//ShutdownSystems( *s_world, systems );
 		//systems.Clear();
 
-		s_renderer->Shutdown( *s_world );
+		s_renderer->ShutdownRenderer();
 		delete s_renderer;
 
 		s_world->Shutdown();

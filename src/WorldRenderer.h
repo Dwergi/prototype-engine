@@ -28,18 +28,12 @@ namespace ddr
 	struct RenderData;
 	struct UniformStorage;
 
-	class WorldRenderer : public dd::IDebugPanel, public ddc::System
+	class WorldRenderer : public dd::IDebugPanel
 	{
 	public:
 
 		WorldRenderer( const dd::Window& window );
 		~WorldRenderer();
-
-		virtual void Initialize( ddc::World& world ) override;
-
-		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
-
-		virtual void Shutdown( ddc::World& world ) override;
 
 		//
 		// Initialize the renderer.
@@ -50,6 +44,8 @@ namespace ddr
 		// Render all the registered renderers.
 		//
 		void Render( const ddc::World& world, const ddr::ICamera& camera );
+
+		void ShutdownRenderer() {}
 
 		//
 		// Register a renderer.
@@ -99,8 +95,7 @@ namespace ddr
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
-		void CreateDebugMeshGrid( ddc::World& world );
-		ddc::Entity CreateMeshEntity( ddc::World& world, MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform );
+		//void CreateDebugMeshGrid( ddc::World& world );
 		ddc::Entity CreatePointLight( ddc::World& world );
 		void UpdateDebugPointLights( ddc::World& world );
 
