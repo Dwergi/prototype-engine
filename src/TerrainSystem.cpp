@@ -70,6 +70,9 @@ namespace dd
 		RequireWrite<TerrainChunkComponent>();
 		RequireWrite<MeshComponent>();
 
+		Require<TerrainChunkComponent>();
+		Require<MeshComponent>();
+
 		SetPartitions( 1 );
 	}
 
@@ -112,16 +115,16 @@ namespace dd
 		uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
 		uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
 
-		DD_TODO( "Uncomment" );
+		ddr::RenderBuffer<TerrainChunkComponent> chunks = data.Get<TerrainChunkComponent>();
+		ddr::RenderBuffer<MeshComponent> meshes = data.Get<MeshComponent>();
+		dd::Span<ddc::Entity> entities = data.Entities();
 
-		/*world.ForAllWithWritable<TerrainChunkComponent, MeshComponent>(
-			[&world, this]( ddc::Entity& entity, auto chunk_h, auto mesh_h )
+		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			TerrainChunkComponent* chunk_cmp = chunk_h.Write();
-			chunk_cmp->Chunk->RenderUpdate();
+			chunks[ i ].Chunk->RenderUpdate( data.Uniforms() );
 
-			mesh_h.Write()->Mesh = chunk_cmp->Chunk->GetMesh();
-		} );*/
+			ddr::Mesh::Get( meshes[i].Mesh )->UpdateBuffers();
+		}
 	}
 
 	void TerrainSystem::Update( const ddc::UpdateData& data, float delta_t )
@@ -175,6 +178,7 @@ namespace dd
 		}
 
 		chunk_cmp.Chunk->Update( m_jobSystem, delta_t );
+		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 	}
 
 	void TerrainSystem::GenerateTerrain( const ddc::UpdateData& data, const glm::ivec2 offset )
@@ -316,20 +320,20 @@ namespace dd
 		int chunk_index = 0;
 
 		DD_TODO( "Uncomment" );
-		/*world.ForAllWithReadable<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, ComponentHandle<TerrainChunkComponent> chunk_h )
+		world.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
 		{
 			String64 chunk_file;
 			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
 
-			chunk_h.Read()->Chunk->WriteHeightImage( chunk_file.c_str() );
+			chunk.Chunk->WriteHeightImage( chunk_file.c_str() );
 
 			String64 chunk_normal_file;
 			snprintf( chunk_file.data(), 64, "terrain_%d_n.tga", chunk_index );
 
-			chunk_h.Read()->Chunk->WriteNormalImage( chunk_normal_file.c_str() );
+			chunk.Chunk->WriteNormalImage( chunk_normal_file.c_str() );
 
 			++chunk_index;
-		} );*/
+		} );
 	}
 
 	void TerrainSystem::DrawDebugInternal()

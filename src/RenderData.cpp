@@ -31,5 +31,7 @@ namespace ddr
 			ddc::ComponentBuffer buffer( entities, world, req->Component(), ddc::DataUsage::Read, storage );
 			m_buffers.push_back( buffer );
 		}
+
+		DD_ASSERT( m_buffers.size() > 0, "No requirements registered." );
 	}
 }

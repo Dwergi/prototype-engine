@@ -31,6 +31,8 @@ namespace ddr
 			DD_ASSERT( buffer.Usage() == ddc::DataUsage::Read );
 		}
 
+		size_t Size() const { return m_buffer.Size(); }
+
 		const T& Get( size_t index ) const
 		{
 			DD_ASSERT( index < m_buffer.Size() );
@@ -42,6 +44,9 @@ namespace ddr
 		{
 			return Get( index );
 		}
+
+		const T* begin() const { return Data(); }
+		const T* end() const { return Data() + Size(); }
 
 	protected:
 		const ddc::ComponentBuffer& m_buffer;

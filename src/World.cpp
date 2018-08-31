@@ -26,54 +26,20 @@ namespace ddc
 		}
 	}
 
-	Entity World::CreateEntity()
+	void World::Initialize()
 	{
-		if( m_free.empty() )
+		for( System* system : m_systems )
 		{
-			m_free.push_back( m_count );
-
-			Entity new_entity;
-			new_entity.ID = m_count;
-			new_entity.Version = -1;
-
-			m_entities.push_back( new_entity );
-			m_ownership.push_back( 0 );
-
-			++m_count;
+			system->Initialize( *this );
 		}
-
-		int idx = dd::pop_front( m_free );
-
-		Entity& entity = m_entities[idx];
-		entity.Version++;
-		entity.Create = true;
-		return entity;
 	}
 
-	void World::DestroyEntity( Entity entity )
+	void World::Shutdown()
 	{
-		DD_ASSERT( IsAlive( entity ) );
-
-		m_free.push_back( entity.ID );
-		m_entities[entity.ID].Destroy = true;
-	}
-
-	Entity World::GetEntity( uint id ) const
-	{
-		if( id < m_entities.size() )
+		for( System* system : m_systems )
 		{
-			return m_entities[id];
+			system->Shutdown( *this );
 		}
-
-		return Entity();
-	}
-
-	bool World::IsAlive( Entity entity ) const
-	{
-		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
-
-		return m_entities[entity.ID].Version == entity.Version &&
-			(m_entities[entity.ID].Alive || m_entities[entity.ID].Create);
 	}
 
 	void World::Update( float delta_t )
@@ -102,6 +68,57 @@ namespace ddc
 	void World::RegisterSystem( System& system )
 	{
 		m_systems.push_back( &system );
+	}
+
+
+	Entity World::CreateEntity()
+	{
+		if( m_free.empty() )
+		{
+			m_free.push_back( m_count );
+
+			Entity new_entity;
+			new_entity.ID = m_count;
+			new_entity.Version = -1;
+
+			m_entities.push_back( new_entity );
+			m_ownership.push_back( 0 );
+
+			++m_count;
+		}
+
+		int idx = dd::pop_front( m_free );
+
+		Entity& entity = m_entities[ idx ];
+		entity.Version++;
+		entity.Create = true;
+		return entity;
+	}
+
+	void World::DestroyEntity( Entity entity )
+	{
+		DD_ASSERT( IsAlive( entity ) );
+
+		m_free.push_back( entity.ID );
+		m_entities[ entity.ID ].Destroy = true;
+	}
+
+	Entity World::GetEntity( uint id ) const
+	{
+		if( id < m_entities.size() )
+		{
+			return m_entities[ id ];
+		}
+
+		return Entity();
+	}
+
+	bool World::IsAlive( Entity entity ) const
+	{
+		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
+
+		return m_entities[ entity.ID ].Version == entity.Version &&
+			(m_entities[ entity.ID ].Alive || m_entities[ entity.ID ].Create);
 	}
 
 	bool World::HasComponent( Entity entity, TypeID id ) const
@@ -195,11 +212,6 @@ namespace ddc
 		std::vector<Entity> entities;
 		FindAllWith( components, entities );
 
-		if( entities.size() == 0 )
-		{
-			return;
-		}
-
 		int partition_count = system->MaxPartitions();
 
 		size_t partition_size = entities.size() / partition_count;
@@ -213,11 +225,6 @@ namespace ddc
 			{
 				size_t remainder = entities.size() - partition_size * partition_count;
 				entity_count = partition_size + remainder;
-			}
-
-			if( entity_count == 0 )
-			{
-				continue;
 			}
 
 			dd::Span<Entity> entity_span( entities, entity_count, entity_start );

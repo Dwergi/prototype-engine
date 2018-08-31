@@ -61,6 +61,11 @@ namespace ddr
 	{
 
 	}
+
+	void ParticleSystem::Initialize( ddc::World& world )
+	{
+		
+	}
 	
 	void ParticleSystem::BindActions( dd::InputBindings& bindings )
 	{
@@ -71,6 +76,11 @@ namespace ddr
 				m_startEmitting = true;
 			}
 		} );
+	}
+
+	ParticleSystemRenderer::ParticleSystemRenderer()
+	{
+		Require<ddc::ParticleSystemComponent>();
 	}
 
 	void ParticleSystemRenderer::RenderInit()
@@ -228,31 +238,22 @@ namespace ddr
 
 		s_vaoParticle.Bind();
 
-		std::vector<ddc::Entity> particle_systems;
-		world.FindAllWith<ddc::ParticleSystemComponent>( particle_systems );
+		ddr::RenderBuffer<ddc::ParticleSystemComponent> particle_systems = data.Get<ddc::ParticleSystemComponent>();
 
-		for( ddc::Entity& entity : particle_systems )
+		glm::vec3 cam_pos = camera.GetPosition();
+
+		for( const ddc::ParticleSystemComponent& cmp : particle_systems )
 		{
-			ddc::ParticleSystemComponent* cmp = world.AccessComponent<ddc::ParticleSystemComponent>( entity );
-			for( ddc::Particle& particle : cmp->m_particles )
-			{
-				if( particle.Alive() )
-				{
-					particle.Distance = glm::distance2( particle.Position, camera.GetPosition() );
-				}
-				else
-				{
-					particle.Distance = -1;
-				}
-			}
+			memcpy( m_tempBuffer, cmp.m_particles, sizeof( ddc::Particle ) * ddc::MaxParticles );
 
-			std::sort( &cmp->m_particles[0], &cmp->m_particles[ddc::MaxParticles], []( const ddc::Particle& a, const ddc::Particle& b )
+			std::sort( &m_tempBuffer[0], &m_tempBuffer[ddc::MaxParticles], 
+				[cam_pos]( const ddc::Particle& a, const ddc::Particle& b )
 			{
-				return a.Distance > b.Distance;
+				return glm::distance2( a.Position, cam_pos ) > glm::distance2( b.Position, cam_pos );
 			} );
 
 			int index = 0;
-			for( ddc::Particle& particle : cmp->m_particles )
+			for( const ddc::Particle& particle : m_tempBuffer )
 			{
 				if( particle.Alive() )
 				{

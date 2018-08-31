@@ -38,6 +38,7 @@
 #include "WorldRenderer.h"
 #include "FrameBuffer.h"
 #include "ParticleSystem.h"
+#include "ParticleSystemComponent.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -385,7 +386,6 @@ int GameMain()
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
 		s_world = new ddc::World();
-		s_world->Initialize();
 
 		s_world->RegisterSystem( *s_terrainSystem );
 		s_world->RegisterSystem( *mouse_picking );
@@ -394,10 +394,10 @@ int GameMain()
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
-		s_renderer->Register( *mesh_renderer );
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *s_terrainSystem );
 		s_renderer->Register( *particle_renderer );
+		s_renderer->Register( *mesh_renderer );
 
 		BindKeys( *s_input );
 
@@ -419,8 +419,21 @@ int GameMain()
 		//debug_views.Add( s_shipSystem );
 		*/
 
+		s_world->Initialize();
+
 		s_renderer->Initialize( *s_world );
 		s_renderer->InitializeRenderer();
+
+		{
+			ddc::Entity entity = s_world->CreateEntity<ddc::ParticleSystemComponent, dd::TransformComponent>();
+			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
+			transform->SetLocalPosition( glm::vec3( 10, 10, 10 ) );
+			transform->SetWorldPosition( glm::vec3( 10, 10, 10 ) );
+
+			ddc::ParticleSystemComponent* particle = s_world->AccessComponent<ddc::ParticleSystemComponent>( entity );
+			particle->m_age = 0;
+			particle->m_lifetime = 1000;
+		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 

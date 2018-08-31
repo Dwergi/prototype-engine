@@ -34,6 +34,8 @@ namespace dd
 		m_window( window ),
 		m_input( input )
 	{
+		Require<dd::MeshComponent>();
+		Require<dd::TransformComponent>();
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )

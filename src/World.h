@@ -23,8 +23,15 @@ namespace ddc
 	{
 		World();
 
-		void Initialize() {}
-		void Shutdown() {}
+		//
+		// Initialize all currently registered systems.
+		//
+		void Initialize();
+
+		//
+		// Shut down all currently registered systems.
+		//
+		void Shutdown();
 
 		dd::MessageQueue& Messages() { return m_messages; }
 		const dd::MessageQueue& Messages() const { return m_messages; }

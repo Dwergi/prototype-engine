@@ -473,6 +473,8 @@ namespace ddr
 					[]( Renderer& rend, const RenderData& data ) { rend.Render( data ); } );
 			}
 		}
+
+		EndRender( *m_uniforms, camera );
 	}
 
 	void WorldRenderer::BeginRender( const ddc::World& world, const ddr::ICamera& camera )

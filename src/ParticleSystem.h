@@ -33,6 +33,8 @@ namespace ddr
 	{
 	public:
 
+		ParticleSystemRenderer();
+
 		virtual void RenderInit() override;
 		virtual bool UsesAlpha() const override { return true; }
 		virtual void Render( const ddr::RenderData& data );
@@ -47,6 +49,7 @@ namespace ddr
 		glm::vec4 m_colours[ ddc::MaxParticles ];
 		VBO m_vboColours;
 
+		ddc::Particle m_tempBuffer[ ddc::MaxParticles ];
 	};
 
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
@@ -56,7 +59,7 @@ namespace ddr
 		ParticleSystem();
 		~ParticleSystem();
 
-		virtual void Initialize( ddc::World& ) override {}
+		virtual void Initialize( ddc::World& ) override;
 		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
 		virtual void Shutdown( ddc::World& ) override {}
 

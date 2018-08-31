@@ -14,13 +14,25 @@ namespace ddc
 
 		Entity() :
 			Handle( ~0 ),
-			Flags( 0 )
+			Flags( ~0 )
 		{
 		}
 
-		bool IsValid() const { return Handle != ~0; }
+		Entity( const Entity& other )
+		{
+			Handle = other.Handle;
+			Flags = other.Flags;
+		}
 
-		bool operator==( Entity other ) const {	return Handle == other.Handle; }
+		void operator=( const Entity& other )
+		{
+			Handle = other.Handle;
+			Flags = other.Flags;
+		}
+
+		bool operator==( Entity other ) const { return Handle == other.Handle; }
+
+		bool IsValid() const { return Handle != ~0; }
 
 		union
 		{
