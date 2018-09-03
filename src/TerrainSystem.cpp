@@ -244,12 +244,12 @@ namespace dd
 
 	void TerrainSystem::GenerateLODLevel( int lod, Vector<TerrainChunkKey>& toGenerate, const glm::ivec2 offset )
 	{
+		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
+
 		glm::ivec2 lod_offset( offset.x >> lod, offset.y >> lod );
 
 		const float vertex_distance = m_params.VertexDistance * (1 << lod);
 		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
-
-		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
 
 		const int halfChunks = ChunksPerDimension / 2;
 		const int quarterChunks = halfChunks / 2;
@@ -317,7 +317,6 @@ namespace dd
 	{
 		int chunk_index = 0;
 
-		DD_TODO( "Uncomment" );
 		world.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
 		{
 			String64 chunk_file;

@@ -13,7 +13,25 @@ namespace ddc
 
 	DD_STATIC_ASSERT( sizeof( Entity ) <= sizeof( uint ) + sizeof( uint ) );
 
-	World::World()
+	static void WaitForAllFutures( std::vector<std::shared_future<void>>& futures )
+	{
+		size_t ready = 0;
+		while( ready < futures.size() )
+		{
+			ready = 0;
+			for( std::shared_future<void>& f : futures )
+			{
+				std::future_status s = f.wait_for( std::chrono::microseconds( 1 ) );
+				if( s == std::future_status::ready )
+				{
+					++ready;
+				}
+			}
+		}
+	}
+
+	World::World( dd::JobSystem& jobsystem ) :
+		m_jobsystem( jobsystem )
 	{
 		m_components.resize( ComponentType::Count );
 		for( int i = 0; i < ComponentType::Count; ++i )
@@ -32,6 +50,8 @@ namespace ddc
 		{
 			system->Initialize( *this );
 		}
+
+		ddc::OrderSystemsByDependencies( dd::Span<System*>( m_systems ), m_orderedSystems );
 	}
 
 	void World::Shutdown()
@@ -59,9 +79,21 @@ namespace ddc
 			}
 		}
 
-		for( System* system : m_systems )
+		UpdateSystemsWithTreeScheduling( delta_t );
+
+		std::vector<std::shared_future<void>> updates;
+		updates.reserve( m_orderedSystems.size() );
+
+		for( SystemNode& s : m_orderedSystems )
 		{
-			UpdateSystem( system, delta_t );
+			updates.push_back( s.m_update );
+		}
+
+		WaitForAllFutures( updates );
+
+		for( SystemNode& s : m_orderedSystems )
+		{
+			s.m_update = std::shared_future<void>();
 		}
 	}
 
@@ -69,7 +101,6 @@ namespace ddc
 	{
 		m_systems.push_back( &system );
 	}
-
 
 	Entity World::CreateEntity()
 	{
@@ -205,8 +236,10 @@ namespace ddc
 		}
 	}
 
-	void World::UpdateSystem( System* system, float delta_t )
+	void World::UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t )
 	{
+		WaitForAllFutures( dependencies );
+
 		// filter entities that have the requirements
 		dd::Array<TypeID, MAX_COMPONENTS> components;
 		for( const DataRequirement* req : system->GetRequirements() )
@@ -217,66 +250,37 @@ namespace ddc
 		std::vector<Entity> entities;
 		FindAllWith( components, entities );
 
-		int partition_count = system->MaxPartitions();
+		dd::Span<Entity> entity_span( entities );
 
-		size_t partition_size = entities.size() / partition_count;
+		UpdateData data( *this, entity_span, system->GetRequirements() );
+		system->Update( data, delta_t );
 
-		size_t entity_start = 0;
-		for( int partition = 0; partition < partition_count; ++partition )
-		{
-			size_t entity_count = partition_size;
-
-			if( partition == 0 )
-			{
-				size_t remainder = entities.size() - partition_size * partition_count;
-				entity_count = partition_size + remainder;
-			}
-
-			dd::Span<Entity> entity_span( entities, entity_count, entity_start );
-
-			UpdateData data( *this, entity_span, system->GetRequirements() );
-
-			system->Update( data, delta_t );
-
-			data.Commit();
-
-			entity_start += entity_count;
-		}
+		data.Commit();
 	}
 
-	static void WaitForAllDependencies( SystemNode& s, std::vector<SystemNode>& systems )
+	std::vector<std::shared_future<void>> GetFutures( SystemNode& s, std::vector<SystemNode>& systems )
 	{
-		size_t ready = 0;
+		std::vector<std::shared_future<void>> futures;
 
-		while( ready < s.m_in.size() )
+		for( SystemNode::Edge& e : s.m_in )
 		{
-			for( SystemNode::Edge& e : s.m_in )
-			{
-				SystemNode& dep = systems[ e.m_from ];
-				std::future_status s = dep.m_update.wait_for( std::chrono::microseconds( 1 ) );
-
-				if( s == std::future_status::ready )
-				{
-					++ready;
-				}
-			}
+			SystemNode& dep = systems[ e.m_from ];
+			futures.push_back( dep.m_update );
 		}
+
+		return futures;
 	}
 
-	void World::UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, float delta_t )
+	void World::UpdateSystemsWithTreeScheduling( float delta_t )
 	{
-		for( SystemNode& s : systems )
+		for( SystemNode& s : m_orderedSystems )
 		{
-			if( s.m_system == nullptr )
-				continue;
+			DD_ASSERT( s.m_system != nullptr );
 
-			std::future<void> f = jobsystem.Schedule( [this, &s, &systems, delta_t]()
+			s.m_update = m_jobsystem.Schedule( [this, &s, delta_t]()
 			{
-				WaitForAllDependencies( s, systems );
-				UpdateSystem( s.m_system, delta_t );
-			} );
-
-			s.m_update = f.share();
+				UpdateSystem( s.m_system, GetFutures( s, m_orderedSystems ), delta_t );
+			} ).share();
 		}
 	}
 }

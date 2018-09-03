@@ -11,7 +11,7 @@ namespace ddc
 	{
 		System( const char* name ) : m_name( name ) {}
 
-		void RegisterDependency( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
+		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
 		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }

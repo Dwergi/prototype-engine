@@ -21,7 +21,7 @@ namespace ddc
 
 	struct World
 	{
-		World();
+		World( dd::JobSystem& jobsystem );
 
 		//
 		// Initialize all currently registered systems.
@@ -171,6 +171,7 @@ namespace ddc
 		int m_count { 0 };
 
 		dd::MessageQueue m_messages;
+		dd::JobSystem& m_jobsystem;
 
 		std::vector<Entity> m_entities;
 		std::vector<int> m_free;
@@ -179,9 +180,10 @@ namespace ddc
 		std::vector<byte*> m_components;
 		
 		std::vector<System*> m_systems;
+		std::vector<SystemNode> m_orderedSystems;
 
-		void UpdateSystem( System* system, float delta_t );
-		void UpdateSystemsWithTreeScheduling( std::vector<SystemNode>& systems, dd::JobSystem& jobsystem, float delta_t );
+		void UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t );
+		void UpdateSystemsWithTreeScheduling( float delta_t );
 	};
 
 	using ExpandType = int[];

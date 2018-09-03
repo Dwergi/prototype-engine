@@ -95,7 +95,6 @@ AngelScriptEngine* s_scriptEngine = nullptr;
 FrameTimer* s_frameTimer = nullptr;
 ShipSystem* s_shipSystem = nullptr;
 FSM* s_fsm = nullptr;
-TerrainSystem* s_terrainSystem = nullptr;
 InputBindings* s_inputBindings = nullptr;
 DebugConsole* s_debugConsole = nullptr;
 
@@ -387,7 +386,8 @@ int GameMain()
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
-	JobSystem jobsystem( 7u );
+	unsigned int threads = std::thread::hardware_concurrency();
+	JobSystem jobsystem( threads - 1 );
 
 	s_mainThread = std::this_thread::get_id();
 
@@ -403,7 +403,7 @@ int GameMain()
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
-		SceneGraphSystem scene_graph;
+		SceneGraphSystem* scene_graph = new SceneGraphSystem();
 		//SwarmSystem swarm_system;
 
 		//TrenchSystem trench_system( *s_shakyCam  );
@@ -420,23 +420,27 @@ int GameMain()
 
 		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input );
 		mouse_picking->BindActions( *s_inputBindings );
+		mouse_picking->DependsOn( *scene_graph );
 
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
 		//s_shipSystem->BindActions( bindings );
 		//s_shipSystem->CreateShip( *s_world );
 
-		s_terrainSystem = new TerrainSystem( jobsystem );
+		TerrainSystem* terrain_system = new TerrainSystem( jobsystem );
 
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *s_inputBindings );
+		particle_system->DependsOn( *scene_graph );
+		particle_system->DependsOn( *mouse_picking );
+		particle_system->DependsOn( *terrain_system );
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
-		s_world = new ddc::World();
+		s_world = new ddc::World( jobsystem );
 
-		s_world->RegisterSystem( *s_terrainSystem );
-		s_world->RegisterSystem( scene_graph );
+		s_world->RegisterSystem( *terrain_system );
+		s_world->RegisterSystem( *scene_graph );
 		s_world->RegisterSystem( *mouse_picking );
 		s_world->RegisterSystem( *particle_system );
 
@@ -447,7 +451,7 @@ int GameMain()
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
 
 		s_renderer->Register( *mouse_picking );
-		s_renderer->Register( *s_terrainSystem );
+		s_renderer->Register( *terrain_system );
 		s_renderer->Register( *light_renderer );
 		s_renderer->Register( *particle_renderer );
 		s_renderer->Register( *mesh_renderer );
@@ -465,7 +469,7 @@ int GameMain()
 		debug_views.Add( mouse_picking );
 		debug_views.Add( s_shakyCamera );
 		debug_views.Add( particle_system );
-		debug_views.Add( s_terrainSystem );
+		debug_views.Add( terrain_system );
 		debug_views.Add( mesh_renderer );
 
 		/*debug_views.Add( s_debugConsole );

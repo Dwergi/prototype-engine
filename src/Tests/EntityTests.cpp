@@ -420,7 +420,7 @@ TEST_CASE( "Schedule Systems By Dependency" )
 		TestSystem a;
 
 		TestSystem b;
-		b.RegisterDependency( a );
+		b.DependsOn( a );
 
 		ddc::System* systems[] = { &a, &b };
 
@@ -438,10 +438,10 @@ TEST_CASE( "Schedule Systems By Dependency" )
 		TestSystem a;
 
 		TestSystem b;
-		b.RegisterDependency( a );
+		b.DependsOn( a );
 
 		TestSystem c;
-		c.RegisterDependency( b );
+		c.DependsOn( b );
 
 		ddc::System* systems[] = { &a, &b, &c };
 
@@ -460,14 +460,14 @@ TEST_CASE( "Schedule Systems By Dependency" )
 		TestSystem a;
 
 		TestSystem b;
-		b.RegisterDependency( a );
+		b.DependsOn( a );
 
 		TestSystem c;
-		c.RegisterDependency( a );
+		c.DependsOn( a );
 
 		TestSystem d;
-		d.RegisterDependency( b );
-		d.RegisterDependency( c );
+		d.DependsOn( b );
+		d.DependsOn( c );
 
 		ddc::System* systems[] = { &a, &b, &c, &d };
 
@@ -490,7 +490,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		TestSystem a;
 
 		TestSystem b;
-		b.RegisterDependency( a );
+		b.DependsOn( a );
 
 		ddc::System* systems[] = { &a, &b };
 
@@ -516,8 +516,8 @@ TEST_CASE( "Update With Tree Scheduling" )
 		TestSystem b;
 
 		TestSystem c;
-		c.RegisterDependency( a );
-		c.RegisterDependency( b );
+		c.DependsOn( a );
+		c.DependsOn( b );
 
 		ddc::System* systems[] = { &a, &b, &c };
 
@@ -544,11 +544,11 @@ TEST_CASE( "Update With Tree Scheduling" )
 
 		TestSystem b;
 		TestSystem c;
-		c.RegisterDependency( a );
-		c.RegisterDependency( b );
+		c.DependsOn( a );
+		c.DependsOn( b );
 
 		TestSystem d;
-		d.RegisterDependency( c );
+		d.DependsOn( c );
 
 		ddc::System* systems[] = { &a, &b, &c, &d };
 

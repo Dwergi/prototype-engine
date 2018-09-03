@@ -20,10 +20,6 @@ namespace dd
 				return;
 			}
 
-			const T* begin = &(*container.begin());
-			m_begin = begin + offset;
-			m_end = begin + offset + count;
-
 			if( count != ~0 )
 			{
 				m_size = count;
@@ -34,6 +30,10 @@ namespace dd
 			}
 
 			m_offset = offset;
+
+			const T* begin = &(*container.begin());
+			m_begin = begin + m_offset;
+
 		}
 
 		Span( T* ptr, size_t count, size_t offset = 0 )
@@ -43,30 +43,27 @@ namespace dd
 				return;
 			}
 
-			m_begin = ptr + offset;
-			m_end = ptr + offset + count;
-
 			m_size = count;
 			m_offset = offset;
+
+			m_begin = ptr + offset;
 		}
 
 		template <size_t Size>
 		Span( T( &arr )[ Size ], size_t count = Size, size_t offset = 0 )
 		{
-			m_begin = arr + offset;
-			m_end = arr + offset + count;
-
 			m_size = count;
 			m_offset = offset;
+
+			m_begin = arr + m_offset;
 		}
 
 		void operator=( const dd::Span<T>& other )
 		{
-			m_begin = other.m_begin;
-			m_end = other.m_end;
-
 			m_size = other.m_size;
 			m_offset = other.m_offset;
+
+			m_begin = other.m_begin;
 		}
 
 		size_t Offset() const
@@ -93,11 +90,10 @@ namespace dd
 
 		const T* end() const
 		{
-			return m_end;
+			return m_begin + m_offset + m_size;
 		}
 
 		const T* m_begin { nullptr };
-		const T* m_end { nullptr };
 
 		size_t m_size { 0 };
 		size_t m_offset { 0 };
