@@ -21,7 +21,6 @@ namespace dd
 		void SetLocalPosition( glm::vec3 v ) { Local[ 3 ].xyz = v; }
 		glm::vec3 GetLocalPosition() const { return Local[ 3 ].xyz; }
 
-		void SetWorldPosition( glm::vec3 v ) { World[ 3 ].xyz = v; }
 		glm::vec3 GetWorldPosition() const { return World[ 3 ].xyz; }
 
 		DD_COMPONENT;

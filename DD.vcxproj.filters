@@ -513,6 +513,9 @@
     <ClInclude Include="src\Renderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\LightRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BoundingBox.cpp">
@@ -886,6 +889,9 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\WorldRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

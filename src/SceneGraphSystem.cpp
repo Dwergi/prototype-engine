@@ -22,7 +22,7 @@ namespace dd
 	{
 		for( dd::TransformComponent& transform : data.Write<dd::TransformComponent>() )
 		{
-			DD_TODO( "Apply parent transform" );
+			transform.World = transform.Local;
 		}
 	}
 }

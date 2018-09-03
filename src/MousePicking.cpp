@@ -173,14 +173,7 @@ namespace dd
 			shader.Use( true );
 
 			ddr::UniformStorage& uniforms = data.Uniforms();
-			const ddr::ICamera& camera = data.Camera();
-
-			uniforms.Set( "View", camera.GetCameraMatrix() );
-			uniforms.Set( "Projection", camera.GetProjectionMatrix() );
-
 			uniforms.Bind( shader );
-
-			DD_TODO( "Uncomment" );
 
 			ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
 			ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();

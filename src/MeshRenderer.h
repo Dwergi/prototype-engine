@@ -33,7 +33,7 @@ namespace ddr
 
 		int m_meshCount { 0 };
 		int m_unculledMeshCount { 0 };
-		bool m_debugDrawBounds { true };
+		bool m_debugDrawBounds { false };
 		bool m_frustumCull { true };
 		bool m_debugHighlightFrustumMeshes { false };
 

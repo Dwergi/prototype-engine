@@ -355,6 +355,8 @@ namespace ddr
 		m_vboIndex.UpdateData();
 		m_vboUV.UpdateData();
 		m_vboVertexColour.UpdateData();
+
+		m_dirty = false;
 	}
 
 	void Mesh::BindToShader( ShaderProgram& shader )

@@ -249,15 +249,6 @@ namespace dd
 			ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
 			mesh->UpdateBuffers();
 
-			for( int i = 0; i < m_params.HeightLevelCount; ++i )
-			{
-				uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[ i ] );
-				uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[ i ] );
-			}
-
-			uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
-			uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
-
 			float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 			float total_size = actual_distance * Vertices;
 
@@ -269,6 +260,7 @@ namespace dd
 			bounds.Expand( glm::vec3( total_size, height, total_size ) );
 
 			mesh->SetBounds( bounds );
+			mesh->SetDirty();
 
 			m_renderDirty = false;
 		}

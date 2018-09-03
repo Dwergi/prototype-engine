@@ -8,7 +8,7 @@
 
 #include "ComponentType.h"
 
-namespace dd
+namespace ddr
 {
 	class LightComponent
 	{

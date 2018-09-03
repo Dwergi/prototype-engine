@@ -122,14 +122,6 @@ namespace dd
 		for( size_t i = 0; i < entities.Size(); ++i )
 		{
 			chunks[ i ].Chunk->RenderUpdate( data.Uniforms() );
-
-			ddr::MeshHandle mesh_h = meshes[ i ].Mesh;
-
-			if( mesh_h.IsValid() )
-			{
-				ddr::Mesh* mesh = ddr::Mesh::Get( mesh_h );
-				mesh->UpdateBuffers();
-			}
 		}
 	}
 

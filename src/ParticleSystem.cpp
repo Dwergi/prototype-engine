@@ -14,6 +14,7 @@
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
+#include "TransformComponent.h"
 
 #include "glm/gtx/norm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -54,7 +55,8 @@ namespace ddr
 	ParticleSystem::ParticleSystem() :
 		ddc::System( "Particles" )
 	{
-		RequireRead<ddc::ParticleSystemComponent>();
+		RequireWrite<ddc::ParticleSystemComponent>();
+		RequireRead<dd::TransformComponent>();
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -134,17 +136,18 @@ namespace ddr
 
 	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		ddc::WriteBuffer<ddc::ParticleSystemComponent> data_buffer = update_data.Write<ddc::ParticleSystemComponent>();
+		ddc::WriteBuffer<ddc::ParticleSystemComponent> particles = update_data.Write<ddc::ParticleSystemComponent>();
+		ddc::ReadBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
 
-		for( size_t i = 0; i < data_buffer.Size(); ++i )
+		for( size_t i = 0; i < particles.Size(); ++i )
 		{
-			ddc::ParticleSystemComponent& cmp = data_buffer.Access( i );
-
+			ddc::ParticleSystemComponent& system = particles[ i ];
+				
 			if( m_killAllParticles )
 			{
 				for( size_t i = 0; i < ddc::MaxParticles; ++i )
 				{
-					ddc::Particle& particle = cmp.m_particles[i];
+					ddc::Particle& particle = system.m_particles[i];
 
 					if( particle.Alive() )
 					{
@@ -152,23 +155,23 @@ namespace ddr
 					}
 				}
 
-				cmp.m_age = cmp.m_lifetime;
+				system.m_age = system.m_lifetime;
 			}
 
-			UpdateLiveParticles( cmp, delta_t );
+			UpdateLiveParticles( system, delta_t );
 
-			if( cmp.m_age < cmp.m_lifetime )
+			if( system.m_age < system.m_lifetime )
 			{
-				EmitNewParticles( cmp, delta_t );
+				EmitNewParticles( system, transforms[ i ].World, delta_t );
 			}
 		}
 	}
 
-	void ParticleSystem::UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t )
+	void ParticleSystem::UpdateLiveParticles( ddc::ParticleSystemComponent& system, float delta_t )
 	{
-		for( size_t particle_index = 0; particle_index < cmp.m_liveCount; ++particle_index )
+		for( size_t particle_index = 0; particle_index < system.m_liveCount; ++particle_index )
 		{
-			ddc::Particle& particle = cmp.m_particles[particle_index];
+			ddc::Particle& particle = system.m_particles[particle_index];
 
 			if( particle.Alive() )
 			{
@@ -176,7 +179,7 @@ namespace ddr
 
 				if( !particle.Alive() )
 				{
-					--cmp.m_liveCount;
+					--system.m_liveCount;
 					continue;
 				}
 
@@ -189,34 +192,38 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::EmitNewParticles( ddc::ParticleSystemComponent& cmp, float delta_t )
+	void ParticleSystem::EmitNewParticles( ddc::ParticleSystemComponent& system, const glm::mat4& transform, float delta_t )
 	{
-		cmp.m_emissionAccumulator += cmp.m_emissionRate * delta_t;
-		int toEmit = (int) cmp.m_emissionAccumulator;
+		system.m_emissionAccumulator += system.m_emissionRate * delta_t;
+		int toEmit = (int) system.m_emissionAccumulator;
 
-		cmp.m_emissionAccumulator = cmp.m_emissionAccumulator - toEmit;
+		system.m_emissionAccumulator = system.m_emissionAccumulator - toEmit;
 
 		int emitted = 0;
 
 		for( int i = 0; i < ddc::MaxParticles; ++i )
 		{
-			if( emitted >= toEmit || cmp.m_liveCount > CurrentMaxParticles )
+			if( emitted >= toEmit || system.m_liveCount > CurrentMaxParticles )
 			{
 				break;
 			}
 
-			ddc::Particle& particle = cmp.m_particles[ i ];
+			ddc::Particle& particle = system.m_particles[ i ];
 
 			if( !particle.Alive() )
 			{
-				particle.Position = glm::vec3( 0, 50, 0 );
-				particle.Velocity = glm::mix( cmp.m_minVelocity, cmp.m_maxVelocity, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) );
-				particle.Size = glm::mix( cmp.m_minSize, cmp.m_maxSize, glm::vec2( cmp.m_rng.Next(), cmp.m_rng.Next() ) );
-				particle.Lifetime = glm::mix( cmp.m_minLifetime, cmp.m_maxLifetime, cmp.m_rng.Next() );
-				particle.Age = 0;
-				particle.Colour = glm::vec4( glm::mix( cmp.m_minColour, cmp.m_maxColour, glm::vec3( cmp.m_rng.Next(), cmp.m_rng.Next(), cmp.m_rng.Next() ) ), 1 );
+				particle.Position = transform[ 3 ].xyz;
 
-				++cmp.m_liveCount;
+				glm::mat3 rotation( transform[ 0 ].xyz, transform[ 1 ].xyz, transform[ 2 ].xyz );
+
+				glm::vec3 velocity = glm::mix( system.m_minVelocity, system.m_maxVelocity, glm::vec3( system.m_rng.Next(), system.m_rng.Next(), system.m_rng.Next() ) );
+				particle.Velocity = velocity * rotation;
+				particle.Size = glm::mix( system.m_minSize, system.m_maxSize, glm::vec2( system.m_rng.Next(), system.m_rng.Next() ) );
+				particle.Lifetime = glm::mix( system.m_minLifetime, system.m_maxLifetime, system.m_rng.Next() );
+				particle.Age = 0;
+				particle.Colour = glm::vec4( glm::mix( system.m_minColour, system.m_maxColour, glm::vec3( system.m_rng.Next(), system.m_rng.Next(), system.m_rng.Next() ) ), 1 );
+
+				++system.m_liveCount;
 				++emitted;
 			}
 		}
@@ -242,9 +249,9 @@ namespace ddr
 
 		glm::vec3 cam_pos = camera.GetPosition();
 
-		for( const ddc::ParticleSystemComponent& cmp : particle_systems )
+		for( const ddc::ParticleSystemComponent& system : particle_systems )
 		{
-			memcpy( m_tempBuffer, cmp.m_particles, sizeof( ddc::Particle ) * ddc::MaxParticles );
+			memcpy( m_tempBuffer, system.m_particles, sizeof( ddc::Particle ) * ddc::MaxParticles );
 
 			std::sort( &m_tempBuffer[0], &m_tempBuffer[ddc::MaxParticles], 
 				[cam_pos]( const ddc::Particle& a, const ddc::Particle& b )

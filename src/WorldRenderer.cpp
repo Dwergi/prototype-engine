@@ -422,37 +422,11 @@ namespace ddr
 
 		SetRenderState();
 
-		DD_TODO( "Move this to a light renderer." );
-/*		std::vector<ddc::Entity> lights = world.FindAllWithReadable<dd::LightComponent, dd::TransformComponent>();
-
-		size_t lightCount = lights.size();
-		DD_ASSERT( lightCount <= 10 );
-		m_uniforms->Set( "LightCount", (int) lightCount );
-
-		for( size_t i = 0; i < lights.size(); ++i )
-		{
-			const dd::TransformComponent* transformCmp = lights[ i ].Get<dd::TransformComponent>().Read();
-			const dd::LightComponent* lightCmp = lights[ i ].Get<dd::LightComponent>().Read();
-
-			glm::vec4 position( transformCmp->GetWorldPosition(), 1 );
-			if( lightCmp->IsDirectional )
-			{
-				position.w = 0;
-			}
-
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), lightCmp->Colour );
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), lightCmp->Intensity );
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), lightCmp->Attenuation );
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), lightCmp->Ambient );
-			m_uniforms->Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), lightCmp->Specular );
-		}
-
-		m_uniforms->Set( "View", camera.GetCameraMatrix() );
-		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );*/
-
 		s_wireframe.UpdateUniforms( *m_uniforms );
 		s_fog.UpdateUniforms( *m_uniforms );
+
+		m_uniforms->Set( "View", camera.GetCameraMatrix() );
+		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
 
 		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}

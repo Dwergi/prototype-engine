@@ -347,6 +347,7 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
+    <ClInclude Include="src\LightRenderer.h" />
     <ClInclude Include="src\System.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
@@ -543,6 +544,7 @@
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
+    <ClCompile Include="src\LightRenderer.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />

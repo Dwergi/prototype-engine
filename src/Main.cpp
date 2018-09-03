@@ -28,6 +28,7 @@
 #include "InputBindings.h"
 #include "jobsystem.h"
 #include "LightComponent.h"
+#include "LightRenderer.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -402,7 +403,7 @@ int GameMain()
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
-		//SceneGraphSystem scene_graph;
+		SceneGraphSystem scene_graph;
 		//SwarmSystem swarm_system;
 
 		//TrenchSystem trench_system( *s_shakyCam  );
@@ -435,14 +436,19 @@ int GameMain()
 		s_world = new ddc::World();
 
 		s_world->RegisterSystem( *s_terrainSystem );
+		s_world->RegisterSystem( scene_graph );
 		s_world->RegisterSystem( *mouse_picking );
+		s_world->RegisterSystem( *particle_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
+		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
+
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *s_terrainSystem );
+		s_renderer->Register( *light_renderer );
 		s_renderer->Register( *particle_renderer );
 		s_renderer->Register( *mesh_renderer );
 
@@ -474,8 +480,8 @@ int GameMain()
 
 		// dir light
 		{
-			ddc::Entity entity = s_world->CreateEntity<dd::LightComponent, dd::TransformComponent>();
-			dd::LightComponent* light = s_world->AccessComponent<dd::LightComponent>( entity );
+			ddc::Entity entity = s_world->CreateEntity<ddr::LightComponent, dd::TransformComponent>();
+			ddr::LightComponent* light = s_world->AccessComponent<ddr::LightComponent>( entity );
 
 			light->IsDirectional = true;
 			light->Colour = glm::vec3( 1, 1, 1 );
@@ -490,8 +496,7 @@ int GameMain()
 		{
 			ddc::Entity entity = s_world->CreateEntity<ddc::ParticleSystemComponent, dd::TransformComponent>();
 			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
-			transform->SetLocalPosition( glm::vec3( 10, 10, 10 ) );
-			transform->SetWorldPosition( glm::vec3( 10, 10, 10 ) );
+			transform->SetLocalPosition( glm::vec3( 10, 50, 10 ) );
 
 			ddc::ParticleSystemComponent* particle = s_world->AccessComponent<ddc::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
@@ -508,8 +513,8 @@ int GameMain()
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
-		pempek::assert::implementation::setAssertHandler( OnAssert ); 
-		::ShowWindow( GetConsoleWindow(), SW_HIDE );
+		//pempek::assert::implementation::setAssertHandler( OnAssert ); 
+		//::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 		while( !s_window->ShouldClose() )
 		{

@@ -83,6 +83,6 @@ namespace ddr
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
-		void EmitNewParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
+		void EmitNewParticles( ddc::ParticleSystemComponent& cmp, const glm::mat4& transform, float delta_t );
 	};
 }

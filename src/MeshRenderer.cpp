@@ -98,6 +98,11 @@ namespace ddr
 			return;
 		}
 
+		if( mesh->IsDirty() )
+		{
+			mesh->UpdateBuffers();
+		}
+
 		++m_meshCount;
 
 		// check if it intersects with the frustum

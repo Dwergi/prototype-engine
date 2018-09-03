@@ -115,6 +115,9 @@ namespace ddr
 		//
 		const dd::String& GetName() const { return m_name; }
 
+		bool IsDirty() const { return m_dirty; }
+		void SetDirty() { m_dirty = true; }
+
 		void MakeUnitCube();
 
 		~Mesh();
@@ -128,6 +131,8 @@ namespace ddr
 
 		static std::mutex m_instanceMutex;
 		static std::unordered_map<uint64, Mesh*> m_instances;
+
+		bool m_dirty { false };
 		
 		VBO m_vboPosition;
 		VBO m_vboNormal;
