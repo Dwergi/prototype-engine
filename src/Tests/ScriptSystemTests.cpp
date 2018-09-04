@@ -20,6 +20,6 @@ TEST_CASE( "[ScriptSystem] Update Is Called" )
 
 	ddc::UpdateData data( world, dd::Span<ddc::Entity>( entities ), reqs );
 	
-	dd::ScriptComponent& script = world.AddComponent<dd::ScriptComponent>( entity );
+	dd::ScriptComponent& script = world.Add<dd::ScriptComponent>( entity );
 	script.SetModule( dd::String32( "test_component" ) );
 }

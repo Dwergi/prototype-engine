@@ -23,6 +23,14 @@ ConstBuffer<T>::ConstBuffer( const T* ptr, int count ) :
 }
 
 template <typename T>
+ConstBuffer<T>::ConstBuffer( const T* ptr, size_t count ) :
+	IBuffer( sizeof( T ) )
+{
+	m_ptr = ptr;
+	m_count = (int) count;
+}
+
+template <typename T>
 ConstBuffer<T>::ConstBuffer( const ConstBuffer<T>& other ) :
 	IBuffer( sizeof( T ) )
 {
@@ -107,9 +115,17 @@ int ConstBuffer<T>::Size() const
 template <typename T>
 const T& ConstBuffer<T>::operator[]( int index ) const
 {
-	DD_ASSERT( index < m_count );
+	DD_ASSERT( index >= 0 && index < m_count );
 
 	return GetConst()[index];
+}
+
+template <typename T>
+const T& ConstBuffer<T>::operator[]( size_t index ) const
+{
+	DD_ASSERT( index < m_count );
+
+	return GetConst()[ index ];
 }
 
 template <typename T>
@@ -138,6 +154,13 @@ Buffer<T>::Buffer( T* ptr, int count ) :
 	ConstBuffer( ptr, count )
 {
 	
+}
+
+template <typename T>
+Buffer<T>::Buffer( T* ptr, size_t count ) :
+	ConstBuffer( ptr, count )
+{
+
 }
 
 template <typename T>
@@ -206,10 +229,19 @@ T* Buffer<T>::Release()
 template <typename T>
 T& Buffer<T>::operator[]( int index ) const
 {
+	DD_ASSERT( index >= 0 && index < m_count );
+
+	return Get()[ index ];
+}
+
+template <typename T>
+T& Buffer<T>::operator[]( size_t index ) const
+{
 	DD_ASSERT( index < m_count );
 
 	return Get()[ index ];
 }
+
 
 template <typename T>
 bool Buffer<T>::operator==( const Buffer<T>& other ) const

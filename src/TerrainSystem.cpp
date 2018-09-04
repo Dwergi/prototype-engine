@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "TerrainSystem.h"
 
+#include "BoundsComponent.h"
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "MeshComponent.h"
@@ -64,6 +65,7 @@ namespace dd
 
 	TerrainSystem::TerrainSystem( JobSystem& jobSystem ) :
 		ddc::System( "Terrain System" ),
+		ddr::Renderer( "Terrain" ),
 		m_jobSystem( jobSystem ),
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
@@ -155,8 +157,8 @@ namespace dd
 			m_previousOffset = origin;
 		}
 
-		ddc::WriteBuffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
-		ddc::WriteBuffer<MeshComponent> meshes = data.Write<MeshComponent>();
+		dd::Buffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+		dd::Buffer<MeshComponent> meshes = data.Write<MeshComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
@@ -201,14 +203,17 @@ namespace dd
 	{
 		ddc::World& world = data.World();
 
-		ddc::WriteBuffer<MeshComponent> meshes = data.Write<MeshComponent>();
-		ddc::WriteBuffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+		dd::Buffer<MeshComponent> meshes = data.Write<MeshComponent>();
+		dd::Buffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+
 		dd::Span<ddc::Entity> entities = data.Entities();
 
 		m_existing.clear();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
+			world.RemoveTag( entities[ i ], ddc::Tag::Visible );
+
 			m_existing.insert( std::make_pair( chunks[ i ].Chunk->GetKey(), entities[ i ] ) );
 		}
 
@@ -232,7 +237,7 @@ namespace dd
 		
 		for( ddc::Entity entity : m_active )
 		{
-			world.AccessComponent<MeshComponent>( entity )->Hidden = false;
+			world.AddTag( entity, ddc::Tag::Visible );
 		}
 
 		for( const TerrainChunkKey& key : missing_chunks )
@@ -289,12 +294,13 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent>();
+		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundsComponent>();
+		world.AddTag( entity, ddc::Tag::Visible );
 
-		TransformComponent* transform_cmp = world.AccessComponent<TransformComponent>( entity );
+		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
 		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
 
-		TerrainChunkComponent* chunk_cmp = world.AccessComponent<TerrainChunkComponent>( entity );
+		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
 		TerrainChunk* chunk = new TerrainChunk( m_params, key );
 		chunk_cmp->Chunk = chunk;
 

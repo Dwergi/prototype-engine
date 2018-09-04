@@ -22,7 +22,7 @@ namespace dd
 		glm::vec2 Size;
 		float Age { 0 };
 		float Lifetime { 0 };
-		dd::metres Distance { -1 };
+		float Distance { -1 };
 
 		bool Alive() const { return Age < Lifetime; }
 	};

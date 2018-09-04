@@ -18,7 +18,6 @@
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
-#include "VisibilityComponent.h"
 
 #include "imgui/imgui.h"
 
@@ -29,9 +28,12 @@
 namespace ddr
 {
 	MeshRenderer::MeshRenderer( const dd::MousePicking& mousePicking ) :
+		ddr::Renderer( "Meshes" ),
 		m_mousePicking( mousePicking )
 	{
+		RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
+		Require<dd::BoundsComponent>();
 		Require<dd::TransformComponent>();
 	}
 
@@ -66,24 +68,21 @@ namespace ddr
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 
-		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
 		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
+		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
+		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+
 		dd::Span<ddc::Entity> entities = data.Entities();
 		
 		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			const dd::VisibilityComponent* vis = data.World().GetComponent<dd::VisibilityComponent>( entities[i] );
-			if( vis == nullptr || vis->Visible )
-			{
-				RenderMesh( entities[i], meshes[i], transforms[i], data.Camera(), data.Uniforms() );
-			}
+			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], data.Camera(), data.Uniforms() );
 		}
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 		const dd::BoundsComponent& bounds_cmp, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		
 		Mesh* mesh = nullptr;
 
 		if( m_debugDrawBounds )
@@ -108,7 +107,7 @@ namespace ddr
 		++m_meshCount;
 
 		// check if it intersects with the frustum
-		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.Bounds ) )
+		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.World ) )
 		{
 			return;
 		}
@@ -119,8 +118,8 @@ namespace ddr
 
 		if( m_debugDrawBounds )
 		{
-			glm::vec3 scale = bounds_cmp.Bounds.Max - bounds_cmp.Bounds.Min;
-			transform = glm::translate( bounds_cmp.Bounds.Center() ) * glm::scale( scale / 2.0f );
+			glm::vec3 scale = bounds_cmp.World.Max - bounds_cmp.World.Min;
+			transform = glm::translate( bounds_cmp.World.Center() ) * glm::scale( scale / 2.0f );
 		}
 
 		glm::vec4 debugMultiplier( 1, 1, 1, 1 );

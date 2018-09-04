@@ -16,6 +16,12 @@ namespace dd
 
 namespace ddc
 {
+	enum class Tag : uint
+	{
+		None = 0,
+		Visible = 1
+	};
+
 	struct System;
 	struct SystemNode;
 
@@ -84,7 +90,7 @@ namespace ddc
 		// Access a component from the given entity.
 		//
 		template <typename T> 
-		T* AccessComponent( Entity entity ) const
+		T* Access( Entity entity ) const
 		{
 			return reinterpret_cast<T*>( AccessComponent( entity, T::Type.ID ) );
 		}
@@ -98,7 +104,7 @@ namespace ddc
 		// Get a component from the given entity.
 		//
 		template <typename T>
-		const T* GetComponent( Entity entity ) const
+		const T* Get( Entity entity ) const
 		{
 			return reinterpret_cast<const T*>(GetComponent( entity, T::Type.ID ));
 		}
@@ -112,7 +118,7 @@ namespace ddc
 		// Does the given entity have a component of the given type?
 		//
 		template <typename T>
-		bool HasComponent( Entity entity ) const
+		bool Has( Entity entity ) const
 		{
 			return HasComponent( entity, T::Type.ID );
 		}
@@ -126,7 +132,7 @@ namespace ddc
 		// Add a component to the given entity of the given type.
 		//
 		template <typename T>
-		T& AddComponent( Entity entity )
+		T& Add( Entity entity )
 		{
 			return *reinterpret_cast<T*>( AddComponent( entity, T::Type.ID ) );
 		}
@@ -140,7 +146,7 @@ namespace ddc
 		// Remove a component from the given entity of the given type.
 		//
 		template <typename T>
-		void RemoveComponent( Entity entity )
+		void Remove( Entity entity )
 		{
 			RemoveComponent( entity, T::Type.ID );
 		}
@@ -157,7 +163,7 @@ namespace ddc
 		//
 		// Find all entities with the given type IDs and return them in the given vector.
 		//
-		void FindAllWith( const dd::IArray<TypeID>& components, std::vector<Entity>& outEntities ) const;
+		void FindAllWith( const dd::IArray<TypeID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const;
 
 
 		//
@@ -166,16 +172,37 @@ namespace ddc
 		template <typename T>
 		void ForAllWith( std::function<void( Entity, T& )> fn ) const;
 
+		//
+		// Does the given entity have the given tag?
+		//
+		bool HasTag( Entity e, Tag tag );
+
+		//
+		// Add the given tag to the given entity.
+		//
+		void AddTag( Entity e, Tag tag );
+
+		//
+		// Remove the given tag from the given enitty.
+		//
+		void RemoveTag( Entity e, Tag tag );
+
 	private:
+
+		struct EntityEntry
+		{
+			Entity Entity;
+			std::bitset<MAX_COMPONENTS> Ownership;
+			std::bitset<MAX_TAGS> Tags;
+		};
 
 		int m_count { 0 };
 
 		dd::MessageQueue m_messages;
 		dd::JobSystem& m_jobsystem;
 
-		std::vector<Entity> m_entities;
+		std::vector<EntityEntry> m_entities;
 		std::vector<int> m_free;
-		std::vector<std::bitset<MAX_COMPONENTS>> m_ownership;
 
 		std::vector<byte*> m_components;
 		
@@ -195,7 +222,7 @@ namespace ddc
 		
 		ExpandType
 		{
-			0, (AddComponent<TComponents>( entity ), 0)...
+			0, (Add<TComponents>( entity ), 0)...
 		};
 
 		return entity;
@@ -209,15 +236,15 @@ namespace ddc
 
 		for( int i = 0; i < m_count; ++i )
 		{
-			Entity entity = m_entities[ i ];
-			if( entity.Alive )
+			const EntityEntry& entry = m_entities[ i ];
+			if( IsAlive( entry.Entity ) )
 			{
 				std::bitset<MAX_COMPONENTS> entity_mask = mask;
-				entity_mask &= m_ownership[ i ];
+				entity_mask &= entry.Ownership;
 
 				if( entity_mask.any() )
 				{
-					fn( entity, *AccessComponent<T>( entity ) );
+					fn( entry.Entity, *Access<T>( entry.Entity ) );
 				}
 			}
 		}

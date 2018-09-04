@@ -26,6 +26,7 @@ namespace ddr
 
 namespace dd
 {
+	struct AABB;
 	class Input;
 	class InputBindings;
 	class MeshComponent;
@@ -34,17 +35,13 @@ namespace dd
 
 	struct MousePosition;
 
-	class MousePicking : public ddc::System, public IDebugPanel, public ddr::Renderer
+	class MousePicking : public IDebugPanel, public ddr::Renderer
 	{
 	public:
 
 		static const int DownScalingFactor = 2;
 
 		MousePicking( const Window& window, const Input& input );
-
-		virtual void Initialize( ddc::World& ) override {}
-		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
-		virtual void Shutdown( ddc::World& ) override {}
 
 		ddc::Entity GetFocusedMesh() const { return m_focusedMesh; }
 		ddc::Entity GetSelectedMesh() const { return m_selectedMesh; }
@@ -94,7 +91,7 @@ namespace dd
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
 		Ray GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const;
-		void HitTestMesh( ddc::Entity entity, const MeshComponent& mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
+		void HitTestBounds( ddc::Entity entity, const AABB& mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
 
 		void HandleInput( InputAction action, InputType type );
 

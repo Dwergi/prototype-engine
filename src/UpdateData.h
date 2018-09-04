@@ -18,7 +18,7 @@ namespace ddc
 		size_t Size() const { return m_entities.Size(); }
 
 		template <typename T>
-		ReadBuffer<T> Read() const
+		dd::ConstBuffer<T> Read() const
 		{
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
@@ -26,7 +26,7 @@ namespace ddc
 				{
 					DD_ASSERT( buffer.Usage() == DataUsage::Read );
 
-					return ReadBuffer<T>( buffer );
+					return dd::ConstBuffer<T>( (const T*) buffer.Data(), buffer.Size() );
 				}
 			}
 
@@ -34,7 +34,7 @@ namespace ddc
 		}
 
 		template <typename T>
-		WriteBuffer<T> Write() const
+		dd::Buffer<T> Write() const
 		{
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
@@ -42,7 +42,7 @@ namespace ddc
 				{
 					DD_ASSERT( buffer.Usage() == DataUsage::Write );
 
-					return WriteBuffer<T>( buffer );
+					return dd::Buffer<T>( (T*) buffer.Data(), buffer.Size() );
 				}
 			}
 

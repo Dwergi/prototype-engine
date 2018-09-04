@@ -80,9 +80,11 @@ namespace ddr
 		} );
 	}
 
-	ParticleSystemRenderer::ParticleSystemRenderer()
+	ParticleSystemRenderer::ParticleSystemRenderer() : 
+		ddr::Renderer( "Particle Systems" )
 	{
 		Require<dd::ParticleSystemComponent>();
+		RequireTag( ddc::Tag::Visible );
 	}
 
 	void ParticleSystemRenderer::RenderInit()
@@ -136,8 +138,8 @@ namespace ddr
 
 	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		ddc::WriteBuffer<dd::ParticleSystemComponent> particles = update_data.Write<dd::ParticleSystemComponent>();
-		ddc::ReadBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
+		dd::Buffer<dd::ParticleSystemComponent> particles = update_data.Write<dd::ParticleSystemComponent>();
+		dd::ConstBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
 
 		for( size_t i = 0; i < particles.Size(); ++i )
 		{
@@ -253,23 +255,30 @@ namespace ddr
 		{
 			memcpy( m_tempBuffer, system.m_particles, sizeof( dd::Particle ) * dd::MaxParticles );
 
-			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MaxParticles], 
-				[cam_pos]( const dd::Particle& a, const dd::Particle& b )
+			for( dd::Particle& p : m_tempBuffer )
 			{
-				return glm::distance2( a.Position, cam_pos ) > glm::distance2( b.Position, cam_pos );
+				p.Distance = p.Alive() ? glm::distance2( p.Position, cam_pos ) : -1;
+			}
+
+			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MaxParticles], 
+				[]( const dd::Particle& a, const dd::Particle& b )
+			{
+				return a.Distance > b.Distance;
 			} );
 
 			int index = 0;
 			for( const dd::Particle& particle : m_tempBuffer )
 			{
-				if( particle.Alive() )
+				if( !particle.Alive() )
 				{
-					m_positions[index] = particle.Position;
-					m_colours[index] = particle.Colour;
-					m_sizes[index] = particle.Size;
-
-					++index;
+					break;
 				}
+
+				m_positions[ index ] = particle.Position;
+				m_colours[ index ] = particle.Colour;
+				m_sizes[ index ] = particle.Size;
+
+				++index;
 			}
 
 			m_vboPositions.UpdateData();

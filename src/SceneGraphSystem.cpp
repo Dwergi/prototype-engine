@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "SceneGraphSystem.h"
 
-#include "MeshComponent.h"
+#include "BoundsComponent.h"
 #include "TransformComponent.h"
 
 namespace dd
@@ -16,15 +16,19 @@ namespace dd
 		ddc::System( "Scene Graph" )
 	{
 		RequireWrite<dd::TransformComponent>();
+		RequireWrite<dd::BoundsComponent>();
 	}
 
 	void SceneGraphSystem::Update( const ddc::UpdateData& data, float dt )
 	{
-		ddc::WriteBuffer<dd::TransformComponent> transforms = data.Write<dd::TransformComponent>();
+		dd::Buffer<dd::TransformComponent> transforms = data.Write<dd::TransformComponent>();
+		dd::Buffer<dd::BoundsComponent> bounds = data.Write<dd::BoundsComponent>();
 
-		for( dd::TransformComponent& transform : transforms )
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			transform.World = transform.Local;
+			transforms[ i ].World = transforms[ i ].Local;
+			bounds[ i ].World = bounds[ i ].Local.GetTransformed( transforms[ i ].World );
 		}
+
 	}
 }

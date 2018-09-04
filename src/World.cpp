@@ -64,18 +64,18 @@ namespace ddc
 
 	void World::Update( float delta_t )
 	{
-		for( Entity& entity : m_entities )
+		for( EntityEntry& entry : m_entities )
 		{
-			if( entity.Destroy )
+			if( entry.Entity.Destroy )
 			{
-				entity.Alive = false;
-				entity.Destroy = false;
-				entity.Create = false;
+				entry.Entity.Alive = false;
+				entry.Entity.Destroy = false;
+				entry.Entity.Create = false;
 			}
 
-			if( entity.Create )
+			if( entry.Entity.Create )
 			{
-				entity.Alive = true;
+				entry.Entity.Alive = true;
 			}
 		}
 
@@ -108,22 +108,21 @@ namespace ddc
 		{
 			m_free.push_back( m_count );
 
-			Entity new_entity;
-			new_entity.ID = m_count;
-			new_entity.Version = -1;
+			EntityEntry new_entry;
+			new_entry.Entity.ID = m_count;
+			new_entry.Entity.Version = -1;
 
-			m_entities.push_back( new_entity );
-			m_ownership.push_back( 0 );
+			m_entities.push_back( new_entry );
 
 			++m_count;
 		}
 
 		int idx = dd::pop_front( m_free );
 
-		Entity& entity = m_entities[ idx ];
-		entity.Version++;
-		entity.Create = true;
-		return entity;
+		EntityEntry& entry = m_entities[ idx ];
+		entry.Entity.Version++;
+		entry.Entity.Create = true;
+		return entry.Entity;
 	}
 
 	void World::DestroyEntity( Entity entity )
@@ -131,14 +130,14 @@ namespace ddc
 		DD_ASSERT( IsAlive( entity ) );
 
 		m_free.push_back( entity.ID );
-		m_entities[ entity.ID ].Destroy = true;
+		m_entities[ entity.ID ].Entity.Destroy = true;
 	}
 
 	Entity World::GetEntity( uint id ) const
 	{
 		if( id < m_entities.size() )
 		{
-			return m_entities[ id ];
+			return m_entities[ id ].Entity;
 		}
 
 		return Entity();
@@ -148,8 +147,10 @@ namespace ddc
 	{
 		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
 
-		return m_entities[ entity.ID ].Version == entity.Version &&
-			(m_entities[ entity.ID ].Alive || m_entities[ entity.ID ].Create);
+		const EntityEntry& entry = m_entities[ entity.ID ];
+
+		return entry.Entity.Version == entity.Version &&
+			(entry.Entity.Alive || entry.Entity.Create);
 	}
 
 	bool World::HasComponent( Entity entity, TypeID id ) const
@@ -159,7 +160,7 @@ namespace ddc
 			return false;
 		}
 
-		return m_ownership[entity.ID].test( id );
+		return m_entities[entity.ID].Ownership.test( id );
 	}
 
 	void* World::AddComponent( Entity entity, TypeID id )
@@ -169,7 +170,7 @@ namespace ddc
 			return AccessComponent( entity, id );
 		}
 
-		m_ownership[entity.ID].set( id, true );
+		m_entities[entity.ID].Ownership.set( id, true );
 
 		void* ptr = AccessComponent( entity, id );
 		DD_ASSERT( ptr != nullptr );
@@ -190,11 +191,6 @@ namespace ddc
 
 	const void* World::GetComponent( Entity entity, TypeID id ) const
 	{
-		if( entity.ID > 10000 )
-		{
-			__debugbreak();
-		}
-
 		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
@@ -207,7 +203,7 @@ namespace ddc
 	{
 		if( HasComponent( entity, id ) )
 		{
-			m_ownership[entity.ID].set( id, false );
+			m_entities[entity.ID].Ownership.set( id, false );
 		}
 		else
 		{
@@ -215,7 +211,7 @@ namespace ddc
 		}
 	}
 
-	void World::FindAllWith( const dd::IArray<TypeID>& components, std::vector<Entity>& outEntities ) const
+	void World::FindAllWith( const dd::IArray<TypeID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const
 	{
 		std::bitset<MAX_COMPONENTS> required;
 		for( TypeID& type : components )
@@ -225,15 +221,44 @@ namespace ddc
 
 		for( int i = 0; i < m_count; ++i )
 		{
-			if( m_entities[ i ].Alive )
+			const EntityEntry& entry = m_entities[ i ];
+
+			if( IsAlive( entry.Entity ) )
 			{
-				std::bitset<MAX_COMPONENTS> entity_mask = required & m_ownership[i];
-				if( entity_mask.count() == required.count() )
+				std::bitset<MAX_TAGS> entity_tags = tags & entry.Tags;
+				std::bitset<MAX_COMPONENTS> entity_components = required & m_entities[i].Ownership;
+
+				if( entity_components.count() == required.count() && 
+					entity_tags.count() == tags.count() )
 				{
-					outEntities.push_back( m_entities[ i ] );
+					outEntities.push_back( m_entities[i].Entity );
 				}
 			}
 		}
+	}
+
+	bool World::HasTag( Entity e, Tag tag )
+	{
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
+
+		return m_entities[ e.ID ].Tags.test( (uint) tag );
+	}
+
+	void World::AddTag( Entity e, Tag tag )
+	{
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
+
+		m_entities[ e.ID ].Tags.set( (uint) tag );
+	}
+
+	void World::RemoveTag( Entity e, Tag tag )
+	{
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
+
+		m_entities[ e.ID ].Tags.reset( (uint) tag );
 	}
 
 	void World::UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t )
@@ -247,8 +272,10 @@ namespace ddc
 			components.Add( req->Component().ID );
 		}
 
+		const std::bitset<MAX_TAGS>& tags = system->GetRequiredTags();
+
 		std::vector<Entity> entities;
-		FindAllWith( components, entities );
+		FindAllWith( components, tags, entities );
 
 		dd::Span<Entity> entity_span( entities );
 

@@ -31,11 +31,12 @@
 namespace dd
 {
 	MousePicking::MousePicking( const Window& window, const Input& input ) : 
-		ddc::System( "Mouse Picking" ),
+		ddr::Renderer( "Mouse Picking" ),
 		m_window( window ),
 		m_input( input )
 	{
-		Require<dd::BoundsComponent>();
+		ddr::Renderer::RequireTag( ddc::Tag::Visible );
+		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
 	}
 
@@ -86,43 +87,6 @@ namespace dd
 		return base[index];
 	}
 
-	void MousePicking::Update( const ddc::UpdateData& data, float delta_t )
-	{
-		if( m_enabled )
-		{
-			m_focusedMesh = ddc::Entity();
-
-			m_position = m_input.GetMousePosition().Absolute;
-			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
-			m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
-
-			ddc::Entity entity = data.World().GetEntity( m_handle );
-
-			if( entity.IsValid() )
-			{
-				m_focusedMesh = entity;
-			}
-			else
-			{
-				m_handle = -1;
-			}
-			
-			if( m_focusedMesh.IsValid() )
-			{
-				if( m_select )
-				{
-					m_selectedMesh = m_focusedMesh;
-				}
-			}
-		}
-		else
-		{
-			m_focusedMesh = ddc::Entity();
-		}
-
-		m_select = false;
-	}
-
 	void MousePicking::RenderInit()
 	{
 		m_shader = ddr::ShaderProgram::Load( "picking" );
@@ -150,6 +114,8 @@ namespace dd
 
 	void MousePicking::Render( const ddr::RenderData& data )
 	{
+		m_focusedMesh = ddc::Entity();
+
 		if( m_enabled )
 		{
 			if( m_previousSize != m_window.GetSize() )
@@ -192,6 +158,31 @@ namespace dd
 
 			m_idTexture.GetData( m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT );
 			m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
+
+			m_position = m_input.GetMousePosition().Absolute;
+			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
+			m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
+
+			ddc::Entity entity = data.World().GetEntity( m_handle );
+
+			if( entity.IsValid() )
+			{
+				m_focusedMesh = entity;
+			}
+			else
+			{
+				m_handle = -1;
+			}
+
+			if( m_focusedMesh.IsValid() )
+			{
+				if( m_select )
+				{
+					m_selectedMesh = m_focusedMesh;
+				}
+			}
+
+			m_select = false;
 		}
 	}
 
@@ -227,12 +218,12 @@ namespace dd
 		{
 			if( m_focusedMesh.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.GetComponent<MeshComponent>( m_focusedMesh )->Mesh;
+				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focusedMesh )->Mesh;
 				
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 mesh_pos = world.GetComponent<TransformComponent>( m_focusedMesh )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focusedMesh )->GetLocalPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -248,12 +239,12 @@ namespace dd
 		{
 			if( m_selectedMesh.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.GetComponent<MeshComponent>( m_selectedMesh )->Mesh;
+				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_selectedMesh )->Mesh;
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 mesh_pos = world.GetComponent<TransformComponent>( m_selectedMesh )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selectedMesh )->GetLocalPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -266,21 +257,15 @@ namespace dd
 		}
 	}
 
-	void MousePicking::HitTestMesh( ddc::Entity entity, const MeshComponent& mesh_cmp, const Ray& mouse_ray, float& nearest_distance )
+	void MousePicking::HitTestBounds( ddc::Entity entity, const AABB& bounds, const Ray& mouse_ray, float& nearest_distance )
 	{
-		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
-		if( mesh != nullptr && !mesh_cmp.Hidden )
+		float distance;
+		if( bounds.IntersectsRay( mouse_ray, distance ) )
 		{
-			const AABB& bounds = mesh_cmp.Bounds;
-
-			float distance;
-			if( bounds.IntersectsRay( mouse_ray, distance ) )
+			if( distance < nearest_distance )
 			{
-				if( distance < nearest_distance )
-				{
-					nearest_distance = distance;
-					m_focusedMesh = entity;
-				}
+				nearest_distance = distance;
+				m_focusedMesh = entity;
 			}
 		}
 	}

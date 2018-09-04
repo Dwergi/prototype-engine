@@ -9,7 +9,8 @@
 
 namespace ddr
 {
-	LightRenderer::LightRenderer()
+	LightRenderer::LightRenderer() : 
+		ddr::Renderer( "Lights" )
 	{
 		Require<dd::TransformComponent>();
 		Require<ddr::LightComponent>();

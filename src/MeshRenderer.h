@@ -13,6 +13,7 @@
 
 namespace dd
 {
+	struct BoundsComponent;
 	class MeshComponent; 
 	class MousePicking;
 	class TransformComponent;
@@ -42,7 +43,7 @@ namespace ddr
 		const dd::MousePicking& m_mousePicking;
 
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
+			const dd::BoundsComponent& bounds_cmp, const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }

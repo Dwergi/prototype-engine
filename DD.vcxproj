@@ -344,7 +344,6 @@
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
     <ClInclude Include="src\AutoList.h" />
-    <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
@@ -383,7 +382,6 @@
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\ISystem.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\JobSystem.h" />
     <ClInclude Include="src\JSONSerializer.h" />
@@ -536,7 +534,7 @@
     </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
-    <ClCompile Include="src\BoundingBox.cpp" />
+    <ClCompile Include="src\BoundsComponent.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\ComponentBuffer.cpp" />

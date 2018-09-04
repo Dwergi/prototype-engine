@@ -287,7 +287,7 @@ namespace ddr
 	{
 		glm::mat4 transform = glm::translate( glm::vec3( 0 ) ) * glm::scale( glm::vec3( 0.1f ) );
 		ddc::Entity entity = CreateMeshEntity( world, m_unitCube, glm::vec4( 1 ), transform );
-		dd::LightComponent& light = world.AddComponent<dd::LightComponent>( entity );
+		dd::LightComponent& light = world.Add<dd::LightComponent>( entity );
 		light.Ambient = 0.01f;
 
 		return entity;
@@ -341,8 +341,10 @@ namespace ddr
 			components.Add( req->Component().ID );
 		}
 
+		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();
+
 		std::vector<ddc::Entity> entities;
-		world.FindAllWith( components, entities );
+		world.FindAllWith( components, tags, entities );
 
 		if( entities.size() == 0 )
 		{

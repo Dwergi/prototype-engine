@@ -12,6 +12,7 @@ namespace ddc
 
 	static const int MAX_ENTITIES = 1024;
 	static const int MAX_COMPONENTS = 32;
+	static const int MAX_TAGS = 32;
 
 	typedef int TypeID;
 

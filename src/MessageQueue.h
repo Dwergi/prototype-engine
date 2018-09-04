@@ -10,7 +10,6 @@
 #include "DoubleBuffer.h"
 #include "Message.h"
 #include "MessageTypes.h"
-#include "ISystem.h"
 
 #include <mutex>
 

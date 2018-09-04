@@ -18,7 +18,7 @@ namespace dd
 
 		virtual ~IBuffer();
 
-		const void* GetVoid() const;
+		virtual const void* GetVoid() const = 0;
 		int SizeBytes() const;
 
 	protected:
@@ -26,7 +26,6 @@ namespace dd
 		IBuffer( uint element_size );
 
 		int m_count { 0 };
-		const void* m_ptr { nullptr };
 
 	private:
 
@@ -43,6 +42,7 @@ namespace dd
 
 		ConstBuffer();
 		ConstBuffer( const T* ptr, int count );
+		ConstBuffer( const T* ptr, size_t count );
 		ConstBuffer( const ConstBuffer<T>& other );
 		ConstBuffer( ConstBuffer<T>&& other );
 		virtual ~ConstBuffer();
@@ -51,9 +51,11 @@ namespace dd
 		ConstBuffer<T>& operator=( ConstBuffer<T>&& other );
 
 		const T& operator[]( int idx ) const;
+		const T& operator[]( size_t idx ) const;
 
 		void Set( const T* ptr, int count );
 		const T* GetConst() const;
+		virtual const void* GetVoid() const override { return m_ptr; }
 
 		const T* ReleaseConst();
 
@@ -63,6 +65,12 @@ namespace dd
 
 		bool operator==( const ConstBuffer<T>& other ) const;
 		bool operator!=( const ConstBuffer<T>& other ) const;
+
+		const T* begin() const { return GetConst(); }
+		const T* end() const { return GetConst() + Size(); }
+
+	protected:
+		const T* m_ptr { nullptr };
 	};
 
 	//
@@ -75,6 +83,7 @@ namespace dd
 
 		Buffer();
 		Buffer( T* ptr, int count );
+		Buffer( T* ptr, size_t count );
 		Buffer( const Buffer<T>& other );
 		Buffer( Buffer<T>&& other );
 		virtual ~Buffer();
@@ -83,6 +92,7 @@ namespace dd
 		Buffer<T>& operator=( Buffer<T>&& other );
 
 		T& operator[]( int idx ) const;
+		T& operator[]( size_t idx ) const;
 
 		void Set( T* ptr, int count );
 		T* Get() const;
@@ -91,6 +101,9 @@ namespace dd
 
 		bool operator==( const Buffer<T>& other ) const;
 		bool operator!=( const Buffer<T>& other ) const;
+
+		T* begin() const { return Get(); }
+		T* end() const { return Get() + Size(); }
 	};
 
 	#include "Buffer.inl"

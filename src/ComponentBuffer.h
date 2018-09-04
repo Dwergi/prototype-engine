@@ -22,7 +22,7 @@ namespace ddc
 		size_t m_count { 0 };
 	};
 
-	template <typename T>
+	/*template <typename T>
 	struct DataBuffer
 	{
 		DataBuffer( const ComponentBuffer& buffer, DataUsage usage ) :
@@ -108,5 +108,5 @@ namespace ddc
 
 		T* begin() const { return Data(); }
 		T* end() const { return Data() + Size(); }
-	};
+	};*/
 }

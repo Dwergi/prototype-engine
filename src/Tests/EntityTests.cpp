@@ -45,8 +45,8 @@ struct TestSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
-		ddc::ReadBuffer<FirstComponent> read = data.Read<FirstComponent>();
-		ddc::WriteBuffer<SecondComponent> write = data.Write<SecondComponent>();
+		dd::ConstBuffer<FirstComponent> read = data.Read<FirstComponent>();
+		dd::Buffer<SecondComponent> write = data.Write<SecondComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -69,8 +69,8 @@ struct DependentSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
-		ddc::ReadBuffer<SecondComponent> read = data.Read<SecondComponent>();
-		ddc::WriteBuffer<ThirdComponent> write = data.Write<ThirdComponent>();
+		dd::ConstBuffer<SecondComponent> read = data.Read<SecondComponent>();
+		dd::Buffer<ThirdComponent> write = data.Write<ThirdComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -92,7 +92,7 @@ struct ReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
-		ddc::ReadBuffer<ThirdComponent> read = data.Read<ThirdComponent>();
+		dd::ConstBuffer<ThirdComponent> read = data.Read<ThirdComponent>();
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
@@ -113,8 +113,8 @@ struct OnlyReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
 	{
-		ddc::ReadBuffer<FirstComponent> read1 = data.Read<FirstComponent>();
-		ddc::ReadBuffer<SecondComponent> read2 = data.Read<SecondComponent>();
+		dd::ConstBuffer<FirstComponent> read1 = data.Read<FirstComponent>();
+		dd::ConstBuffer<SecondComponent> read2 = data.Read<SecondComponent>();
 
 		for( size_t i = 0; i < read1.Size(); ++i )
 		{
@@ -168,24 +168,24 @@ TEST_CASE( "Component" )
 	ddc::World world;
 	ddc::Entity a = world.CreateEntity();
 
-	bool found = world.HasComponent<FirstComponent>( a );
+	bool found = world.Has<FirstComponent>( a );
 	REQUIRE( found == false );
 
-	FirstComponent& cmp = world.AddComponent<FirstComponent>( a );
+	FirstComponent& cmp = world.Add<FirstComponent>( a );
 	REQUIRE( cmp.FirstValue == -100 );
 
 	REQUIRE( &cmp.GetType() == &FirstComponent::Type );
 
 	cmp.FirstValue = 5;
 
-	const FirstComponent& cmp2 = *world.AccessComponent<FirstComponent>( a );
+	const FirstComponent& cmp2 = *world.Access<FirstComponent>( a );
 	REQUIRE( cmp2.FirstValue == 5 );
 	REQUIRE( cmp.FirstValue == cmp2.FirstValue );
 
-	REQUIRE( world.HasComponent<FirstComponent>( a ) );
+	REQUIRE( world.Has<FirstComponent>( a ) );
 
-	world.RemoveComponent<FirstComponent>( a );
-	REQUIRE_FALSE( world.HasComponent<FirstComponent>( a ) );
+	world.Remove<FirstComponent>( a );
+	REQUIRE_FALSE( world.Has<FirstComponent>( a ) );
 }
 
 TEST_CASE( "Update System" )
@@ -196,10 +196,10 @@ TEST_CASE( "Update System" )
 	{
 		ddc::Entity e = world.CreateEntity();
 
-		FirstComponent& simple = world.AddComponent<FirstComponent>( e );
+		FirstComponent& simple = world.Add<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = world.AddComponent<SecondComponent>( e );
+		SecondComponent& other = world.Add<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
@@ -214,10 +214,10 @@ TEST_CASE( "Update System" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *world.AccessComponent<FirstComponent>( e );
+		FirstComponent& simple = *world.Access<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *world.AccessComponent<SecondComponent>( e );
+		SecondComponent& other = *world.Access<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
@@ -233,10 +233,10 @@ TEST_CASE( "Update With Discontinuity" )
 		if( i == 2 )
 			continue;
 		
-		FirstComponent& simple = world.AddComponent<FirstComponent>( e );
+		FirstComponent& simple = world.Add<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = world.AddComponent<SecondComponent>( e );
+		SecondComponent& other = world.Add<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
@@ -254,10 +254,10 @@ TEST_CASE( "Update With Discontinuity" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *world.AccessComponent<FirstComponent>( e );
+		FirstComponent& simple = *world.Access<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *world.AccessComponent<SecondComponent>( e );
+		SecondComponent& other = *world.Access<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
@@ -275,13 +275,13 @@ TEST_CASE( "Update Multiple Systems" )
 	{
 		ddc::Entity e = world.CreateEntity();
 
-		FirstComponent& first = world.AddComponent<FirstComponent>( e );
+		FirstComponent& first = world.Add<FirstComponent>( e );
 		first.FirstValue = i;
 
-		SecondComponent& second = world.AddComponent<SecondComponent>( e );
+		SecondComponent& second = world.Add<SecondComponent>( e );
 		second.SecondValue = -1;
 
-		ThirdComponent& third = world.AddComponent<ThirdComponent>( e );
+		ThirdComponent& third = world.Add<ThirdComponent>( e );
 		third.ThirdValue = -1;
 	}
 
@@ -293,7 +293,7 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		SecondComponent& second = *world.AccessComponent<SecondComponent>( e );
+		SecondComponent& second = *world.Access<SecondComponent>( e );
 		REQUIRE( second.SecondValue == e.ID );
 	}
 
@@ -305,7 +305,7 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		ThirdComponent& third = *world.AccessComponent<ThirdComponent>( e );
+		ThirdComponent& third = *world.Access<ThirdComponent>( e );
 		REQUIRE( third.ThirdValue == e.ID );
 	}
 }
@@ -590,13 +590,13 @@ TEST_CASE( "Full Update Loop" )
 		for( int i = 0; i < 1000; ++i )
 		{
 			ddc::Entity e = world.CreateEntity();
-			FirstComponent& first = world.AddComponent<FirstComponent>( e );
+			FirstComponent& first = world.Add<FirstComponent>( e );
 			first.FirstValue = i;
 
-			SecondComponent& second = world.AddComponent<SecondComponent>( e );
+			SecondComponent& second = world.Add<SecondComponent>( e );
 			second.SecondValue = 0;
 
-			ThirdComponent& third = world.AddComponent<ThirdComponent>( e );
+			ThirdComponent& third = world.Add<ThirdComponent>( e );
 			third.ThirdValue = 0;
 		}
 	}
@@ -615,10 +615,10 @@ TEST_CASE( "Full Update Loop" )
 		e.ID = i;
 		e.Version = 0;
 
-		const SecondComponent* second = world.GetComponent<SecondComponent>( e );
+		const SecondComponent* second = world.Get<SecondComponent>( e );
 		REQUIRE( second->SecondValue == i );
 
-		const ThirdComponent* third = world.GetComponent<ThirdComponent>( e );
+		const ThirdComponent* third = world.Get<ThirdComponent>( e );
 		REQUIRE( third->ThirdValue == i );
 	}
 }

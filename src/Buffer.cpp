@@ -17,14 +17,8 @@ namespace dd
 
 	IBuffer::~IBuffer()
 	{
-		m_ptr = nullptr;
 		m_count = 0;
 		m_elementSize = 0;
-	}
-
-	const void* IBuffer::GetVoid() const
-	{
-		return m_ptr;
 	}
 
 	int IBuffer::SizeBytes() const

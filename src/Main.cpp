@@ -14,6 +14,7 @@
 
 #endif
 
+#include "BoundsComponent.h"
 #include "DebugUI.h"
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
@@ -346,15 +347,19 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views, const ddc::World& world )
 
 ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
 {
-	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent>();
+	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundsComponent>();
 
-	dd::TransformComponent* transform_cmp = world.AccessComponent<dd::TransformComponent>( entity );
+	dd::TransformComponent* transform_cmp = world.Access<dd::TransformComponent>( entity );
 	transform_cmp->Local = transform;
 
-	dd::MeshComponent* mesh_cmp = world.AccessComponent<dd::MeshComponent>( entity );
+	dd::MeshComponent* mesh_cmp = world.Access<dd::MeshComponent>( entity );
 	mesh_cmp->Mesh = mesh_h;
 	mesh_cmp->Colour = colour;
-	mesh_cmp->Hidden = false;
+
+	dd::BoundsComponent* bounds_cmp = world.Access<dd::BoundsComponent>( entity );
+	bounds_cmp->Local = ddr::Mesh::Get( mesh_h )->Bounds();
+
+	world.AddTag( entity, ddc::Tag::Visible );
 
 	return entity;
 }
@@ -428,7 +433,6 @@ int GameMain()
 
 		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input );
 		mouse_picking->BindActions( *s_inputBindings );
-		mouse_picking->DependsOn( *scene_graph );
 
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
@@ -440,7 +444,6 @@ int GameMain()
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *s_inputBindings );
 		particle_system->DependsOn( *scene_graph );
-		particle_system->DependsOn( *mouse_picking );
 		particle_system->DependsOn( *terrain_system );
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
@@ -449,7 +452,6 @@ int GameMain()
 
 		s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *scene_graph );
-		s_world->RegisterSystem( *mouse_picking );
 		s_world->RegisterSystem( *particle_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
@@ -493,24 +495,29 @@ int GameMain()
 		// dir light
 		{
 			ddc::Entity entity = s_world->CreateEntity<ddr::LightComponent, dd::TransformComponent>();
-			ddr::LightComponent* light = s_world->AccessComponent<ddr::LightComponent>( entity );
+			ddr::LightComponent* light = s_world->Access<ddr::LightComponent>( entity );
 
 			light->IsDirectional = true;
 			light->Colour = glm::vec3( 1, 1, 1 );
 			light->Intensity = 0.5;
 
-			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
+			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
 			transform->Local[ 3 ].xyz = direction;
 		}
 		
 		// particle system
 		{
-			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent>();
-			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
-			transform->SetLocalPosition( glm::vec3( 10, 50, 10 ) );
+			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundsComponent>();
+			s_world->AddTag( entity, ddc::Tag::Visible );
 
-			dd::ParticleSystemComponent* particle = s_world->AccessComponent<dd::ParticleSystemComponent>( entity );
+			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
+			transform->SetLocalPosition( glm::vec3( 10, 60, 10 ) );
+
+			dd::BoundsComponent* bounds = s_world->Access<dd::BoundsComponent>( entity );
+			bounds->Local = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+
+			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
 			particle->m_lifetime = 1000;
 		}

@@ -15,6 +15,7 @@ namespace ddc
 
 		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
+		const std::bitset<MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 		virtual void Initialize( World& world ) {}
 		virtual void Update( const UpdateData& data, float delta_t ) = 0;
@@ -30,6 +31,9 @@ namespace ddc
 		template <typename T>
 		void RequireWrite() { m_requirements.Add( new WriteRequirement<T>() ); }
 
+		template <typename T>
+		void RequireTag( Tag tag ) { m_tags.set( (uint) tag ); }
+
 		void SetPartitions( int count )
 		{
 			DD_ASSERT( count > 0 && count <= MAX_PARTITIONS );
@@ -38,6 +42,8 @@ namespace ddc
 
 	private:
 		dd::Array<const DataRequirement*, MAX_COMPONENTS> m_requirements;
+		std::bitset<MAX_TAGS> m_tags;
+
 		dd::Array<const System*, 32> m_dependencies;
 		dd::String64 m_name;
 

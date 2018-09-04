@@ -151,14 +151,14 @@ namespace dd
 		glm::mat4 translate = glm::translate( position );
 		glm::mat4 transform = translate * scale;
 
-		TransformComponent* transform_cmp = world.AccessComponent<TransformComponent>( entity );
+		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
 		transform_cmp->Local = transform;
 
-		MeshComponent* mesh_cmp = world.AccessComponent<MeshComponent>( entity );
+		MeshComponent* mesh_cmp = world.Access<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;
 		mesh_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
-		mesh_cmp->Hidden = false;
 
+		world.AddTag( entity, ddc::Tag::Visible );
 		return entity;
 	}
 
