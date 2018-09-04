@@ -31,8 +31,8 @@ namespace dd
 
 	protected:
 		Vector<Property> m_properties;
-		const TypeInfo* m_type;
-		void* m_base;
+		const TypeInfo* m_type { nullptr };
+		void* m_base { nullptr };
 
 		void AddMembers( const TypeInfo* typeInfo, void* base );
 	};

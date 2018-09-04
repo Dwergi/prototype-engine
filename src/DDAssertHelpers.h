@@ -13,7 +13,7 @@ namespace dd
 		String256 Info;
 		String256 Message;
 		bool Open { false };
-		AssertAction Action;
+		AssertAction Action { AssertAction::None };
 	};
 
 	String256 FormatAssert( int level, const char* file, int line, const char* function, const char* expression );

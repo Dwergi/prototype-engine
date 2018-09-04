@@ -38,8 +38,8 @@ namespace dd
 		static void RenderDrawLists( ImDrawData* draw_data );
 		void CreateFontsTexture();
 
-		bool m_focused;
-		Input* m_input;
-		Window* m_window;
+		bool m_focused { false };
+		Input* m_input { nullptr };
+		Window* m_window { nullptr };
 	};
 }

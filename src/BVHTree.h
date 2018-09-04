@@ -76,7 +76,7 @@ namespace dd
 			dd::Array<size_t, MAX_ENTRIES> Entries;
 
 			// The axis along which this node was split. (Diagnostic)
-			Axis SplitAxis;
+			Axis SplitAxis { Axis::X };
 
 			bool IsLeaf() const { return Left == INVALID && Right == INVALID; }
 			bool IsEmpty() const { return IsLeaf() && Entries.Size() == 0; }

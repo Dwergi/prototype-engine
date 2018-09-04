@@ -59,8 +59,8 @@ namespace dd
 		Variable& operator=( const Variable& rhs );
 
 	private:
-		void* m_data;
-		const TypeInfo* m_typeInfo;
+		void* m_data { nullptr };
+		const TypeInfo* m_typeInfo { nullptr };
 	};
 	
 	template <typename T>

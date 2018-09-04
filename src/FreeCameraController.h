@@ -43,7 +43,7 @@ namespace dd
 	
 	private:
 
-		FPSCamera & m_camera;
+		FPSCamera& m_camera;
 		glm::vec2 m_mouseDelta;
 
 		bool m_enabled { true };

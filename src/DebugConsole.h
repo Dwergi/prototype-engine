@@ -28,9 +28,9 @@ namespace dd
 
 		char				m_inputBuf[256];
 		Vector<String128>	m_items;
-		bool				m_scrollToBottom;
+		bool				m_scrollToBottom { false };
 		Vector<String128>	m_history;
-		int					m_historyPos;    // -1: new line, 0..History.Size-1 browsing history.
+		int					m_historyPos { -1 };   // -1: new line, 0..History.Size-1 browsing history.
 		Vector<String64>	m_commands;
 		AngelScriptEngine&  m_scriptEngine;
 

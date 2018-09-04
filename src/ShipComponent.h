@@ -14,21 +14,21 @@ namespace dd
 	{
 	public:
 		glm::vec3 Velocity;
-		float MaximumSpeed;
-		float MinimumSpeed;
-		float Acceleration;
+		float MaximumSpeed { 0 };
+		float MinimumSpeed { 0 };
+		float Acceleration { 0 };
 
 		// A multiplier for acceleration when boosting.
-		float BoostFactor;
+		float BoostFactor { 0 };
 		
 		// The amount of time you can boost for, in seconds.
-		float BoostRemaining; 
+		float BoostRemaining { 0 };
 
 		// The number of seconds it takes to recharge one second of boost.
-		float BoostRechargeRate; 
+		float BoostRechargeRate { 0 };
 
 		// The number of seconds to recharge to full boost.
-		float BoostMaximum;
+		float BoostMaximum { 0 };
 
 		DD_COMPONENT;
 

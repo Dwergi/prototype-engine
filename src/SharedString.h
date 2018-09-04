@@ -53,8 +53,8 @@ namespace dd
 	private:
 
 		std::shared_ptr<const char> m_ptr;
-		uint m_length;
-		uint64 m_hash;
+		uint m_length { 0 };
+		uint64 m_hash { 0 };
 
 		static std::mutex s_mutex;
 		static DenseMap<uint64, std::shared_ptr<const char>> s_instances;

@@ -37,8 +37,8 @@ namespace dd
 
 	private:
 
-		Member* m_member;
-		void* m_ptr;
+		Member* m_member { nullptr };
+		void* m_ptr { nullptr };
 
 		void* GetPtr() const { return m_ptr; }
 

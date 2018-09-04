@@ -44,14 +44,14 @@ namespace dd
 	private:
 
 		Timer m_timer;
-		float m_targetDelta;
-		float m_lastFrameTime;
-		float m_currentFrameTime;
-		float m_gameDelta;
-		float m_appDelta;
-		float m_deltaWithoutDelay;
-		float m_slidingDelta;
-		uint m_maxFPS;
+		float m_targetDelta { 0.0f };
+		float m_lastFrameTime { 0.0f };
+		float m_currentFrameTime { 0.0f };
+		float m_gameDelta { 0.0f };
+		float m_appDelta { 0.0f };
+		float m_deltaWithoutDelay { 0.0f };
+		float m_slidingDelta { 0.0f };
+		uint m_maxFPS { 0 };
 		bool m_drawCompact { true };
 		bool m_paused { false };
 

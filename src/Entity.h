@@ -42,7 +42,7 @@ namespace ddc
 				uint Version : 10;
 			};
 
-			uint Handle;
+			uint Handle { 0 };
 		};
 
 		union
@@ -54,7 +54,7 @@ namespace ddc
 				byte Destroy : 1;
 			};
 
-			uint Flags;
+			uint Flags { 0 };
 		};
 	};
 }

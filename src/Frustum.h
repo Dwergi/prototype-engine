@@ -47,6 +47,7 @@ namespace ddr
 
 		// corners of the frustum in world space
 		dd::Buffer<glm::vec3> m_corners;
+
 		// planes of the frustum in world space
 		dd::Plane m_planes[6];
 
