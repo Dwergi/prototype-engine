@@ -37,10 +37,6 @@ namespace dd
 
 		virtual const char* GetDebugTitle() const override { return "Ship"; }
 
-	protected:
-
-		virtual void DrawDebugInternal() override;
-
 	private:
 
 		FPSCamera& m_camera;
@@ -56,5 +52,7 @@ namespace dd
 		void UpdateShip( TransformComponent& transform, ShipComponent& ship, float delta_t );
 
 		void CreateShip( ddc::World& world );
+
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 	};
 }

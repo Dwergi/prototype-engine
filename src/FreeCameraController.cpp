@@ -81,7 +81,7 @@ namespace dd
 			*state = false;
 	}
 
-	void FreeCameraController::DrawDebugInternal()
+	void FreeCameraController::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiSetCond_FirstUseEver );
 
@@ -182,7 +182,7 @@ namespace dd
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )
 	{
-		m_mouseDelta = pos.Delta;
+		m_mouseDelta = pos.GameDelta;
 	}
 
 	void FreeCameraController::UpdateScroll( const MousePosition& pos )
@@ -191,7 +191,7 @@ namespace dd
 		
 		float degs = glm::degrees( vfov );
 
-		degs *= std::powf( 2.f, -pos.Delta.y * ZoomSpeed );
+		degs *= std::powf( 2.f, -pos.GameDelta.y * ZoomSpeed );
 
 		//degs += ZoomSpeed * -pos.DeltaY;
 		degs = glm::clamp( degs, 5.f, 89.f );

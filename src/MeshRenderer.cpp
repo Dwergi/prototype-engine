@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "MeshRenderer.h"
 
+#include "BoundsComponent.h"
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
@@ -17,6 +18,7 @@
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
+#include "VisibilityComponent.h"
 
 #include "imgui/imgui.h"
 
@@ -70,18 +72,18 @@ namespace ddr
 		
 		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], data.Camera(), data.Uniforms() );
+			const dd::VisibilityComponent* vis = data.World().GetComponent<dd::VisibilityComponent>( entities[i] );
+			if( vis == nullptr || vis->Visible )
+			{
+				RenderMesh( entities[i], meshes[i], transforms[i], data.Camera(), data.Uniforms() );
+			}
 		}
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-		const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
+		const dd::BoundsComponent& bounds_cmp, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		if( mesh_cmp.Hidden )
-		{
-			return;
-		}
-
+		
 		Mesh* mesh = nullptr;
 
 		if( m_debugDrawBounds )
@@ -106,7 +108,7 @@ namespace ddr
 		++m_meshCount;
 
 		// check if it intersects with the frustum
-		if( m_frustumCull && !camera.GetFrustum().Intersects( mesh_cmp.Bounds ) )
+		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.Bounds ) )
 		{
 			return;
 		}
@@ -117,8 +119,8 @@ namespace ddr
 
 		if( m_debugDrawBounds )
 		{
-			glm::vec3 scale = mesh_cmp.Bounds.Max - mesh_cmp.Bounds.Min;
-			transform = glm::translate( mesh_cmp.Bounds.Center() ) * glm::scale( scale / 2.0f );
+			glm::vec3 scale = bounds_cmp.Bounds.Max - bounds_cmp.Bounds.Min;
+			transform = glm::translate( bounds_cmp.Bounds.Center() ) * glm::scale( scale / 2.0f );
 		}
 
 		glm::vec4 debugMultiplier( 1, 1, 1, 1 );
@@ -158,7 +160,7 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void MeshRenderer::DrawDebugInternal()
+	void MeshRenderer::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );

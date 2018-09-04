@@ -20,9 +20,13 @@ namespace dd
 		void Update();
 		void DelayFrame();
 
+		void SetPaused( bool paused ) { m_paused = paused; }
+
 		void SetMaxFPS( uint max_fps ) { m_maxFPS = max_fps; }
 
-		float Delta() const { return m_delta; }
+		float GameDelta() const { return m_gameDelta; }
+		float AppDelta() const { return m_appDelta; }
+
 		float SlidingDelta() const { return m_slidingDelta; }
 		float DeltaWithoutDelay() const { return m_deltaWithoutDelay; }
 
@@ -35,7 +39,7 @@ namespace dd
 
 	protected:
 
-		virtual void DrawDebugInternal() override;
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 
 	private:
 
@@ -43,11 +47,13 @@ namespace dd
 		float m_targetDelta;
 		float m_lastFrameTime;
 		float m_currentFrameTime;
-		float m_delta;
+		float m_gameDelta;
+		float m_appDelta;
 		float m_deltaWithoutDelay;
 		float m_slidingDelta;
 		uint m_maxFPS;
 		bool m_drawCompact { true };
+		bool m_paused { false };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE];

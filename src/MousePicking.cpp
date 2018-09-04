@@ -12,6 +12,7 @@
 #include "InputBindings.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "ParticleSystemComponent.h"
 #include "RenderData.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -34,7 +35,7 @@ namespace dd
 		m_window( window ),
 		m_input( input )
 	{
-		Require<dd::MeshComponent>();
+		Require<dd::BoundsComponent>();
 		Require<dd::TransformComponent>();
 	}
 
@@ -211,7 +212,7 @@ namespace dd
 		mesh->Render( uniforms, shader, transform_cmp.World );
 	}
 
-	void MousePicking::DrawDebugInternal()
+	void MousePicking::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
@@ -224,18 +225,17 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			DD_TODO( "Uncomment." );
-			/*if( m_focusedMesh.IsValid() )
+			if( m_focusedMesh.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = m_focusedMesh.Get<MeshComponent>().Read()->Mesh;
+				ddr::MeshHandle mesh_h = world.GetComponent<MeshComponent>( m_focusedMesh )->Mesh;
 				
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 focused_mesh_pos = m_focusedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Value( "Position", focused_mesh_pos, "%.2f" );
+				glm::vec3 mesh_pos = world.GetComponent<TransformComponent>( m_focusedMesh )->GetLocalPosition();
+				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
-			else*/
+			else
 			{
 				ImGui::Text( "Name: <none>" );
 				ImGui::Text( "Position: <none>" );
@@ -246,18 +246,17 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Selected", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			DD_TODO( "Uncomment." );
-			/*if( m_selectedMesh.IsValid() )
+			if( m_selectedMesh.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = m_selectedMesh.Get<MeshComponent>().Read()->Mesh;
+				ddr::MeshHandle mesh_h = world.GetComponent<MeshComponent>( m_selectedMesh )->Mesh;
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 selected_mesh_pos = m_selectedMesh.Get<TransformComponent>().Read()->GetWorldPosition();
-				ImGui::Value( "Position", selected_mesh_pos, "%.2f" );
+				glm::vec3 mesh_pos = world.GetComponent<TransformComponent>( m_selectedMesh )->GetLocalPosition();
+				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
-			else*/
+			else
 			{
 				ImGui::Text( "Name: <none>" );
 				ImGui::Text( "Position: <none>" );

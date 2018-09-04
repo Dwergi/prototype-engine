@@ -10,7 +10,7 @@
 #include "Random.h"
 #include "Units.h"
 
-namespace ddc
+namespace dd
 {
 	static const int MaxParticles = 1024;
 

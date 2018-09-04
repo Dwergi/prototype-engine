@@ -59,11 +59,11 @@ namespace dd
 
 		glfwGetCursorPos( m_glfwWindow, &newX, &newY );
 
-		m_mousePosition.Delta = glm::vec2( (float) (m_mousePosition.Absolute.x - newX), (float) (m_mousePosition.Absolute.y - newY) );
+		m_mousePosition.GameDelta = glm::vec2( (float) (m_mousePosition.Absolute.x - newX), (float) (m_mousePosition.Absolute.y - newY) );
 		m_mousePosition.Absolute = glm::vec2( (float) newX, (float) newY );
 
 		m_scrollPosition = m_tempScrollPosition;
-		m_tempScrollPosition.Delta = glm::vec2();
+		m_tempScrollPosition.GameDelta = glm::vec2();
 
 		m_currentEvents.Swap( m_pendingEvents );
 		m_pendingEvents.Clear();
@@ -151,7 +151,7 @@ namespace dd
 
 	void Input::ScrollCallback( GLFWwindow* window, double xOffset, double yOffset )
 	{
-		m_pInstance->m_tempScrollPosition.Delta = glm::vec2( (float) xOffset, (float) yOffset );
+		m_pInstance->m_tempScrollPosition.GameDelta = glm::vec2( (float) xOffset, (float) yOffset );
 		m_pInstance->m_tempScrollPosition.Absolute += glm::vec2( (float) xOffset, (float) yOffset );
 
 		for( GLFWscrollfun fn : m_pInstance->m_scrollCallbacks )

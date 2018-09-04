@@ -7,10 +7,10 @@
 #include "PrecompiledHeader.h"
 #include "ParticleSystemComponent.h"
 
-namespace ddc
-{
-	DD_COMPONENT_CPP( ParticleSystemComponent );
+DD_COMPONENT_CPP( dd::ParticleSystemComponent );
 
+namespace dd
+{
 	ParticleSystemComponent::ParticleSystemComponent() :
 		m_minLifetime( 0.5 ), m_maxLifetime( 5.0 ),
 		m_minVelocity( -10.0f, -10.0f, -10.0f ), m_maxVelocity( 10.0f, 10.0f, 10.0f ),

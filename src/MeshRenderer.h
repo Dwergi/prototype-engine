@@ -44,7 +44,7 @@ namespace ddr
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
-		virtual void DrawDebugInternal() override;
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }
 	};
 }

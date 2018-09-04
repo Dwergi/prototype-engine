@@ -20,7 +20,9 @@ namespace dd
 
 	void SceneGraphSystem::Update( const ddc::UpdateData& data, float dt )
 	{
-		for( dd::TransformComponent& transform : data.Write<dd::TransformComponent>() )
+		ddc::WriteBuffer<dd::TransformComponent> transforms = data.Write<dd::TransformComponent>();
+
+		for( dd::TransformComponent& transform : transforms )
 		{
 			transform.World = transform.Local;
 		}

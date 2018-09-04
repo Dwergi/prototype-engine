@@ -57,7 +57,7 @@ namespace ddr
 		//
 		// Draw the debug menu.
 		//
-		virtual void DrawDebugInternal() override;
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 
 	private:
 

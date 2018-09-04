@@ -202,22 +202,37 @@ void Exit( InputAction action, InputType type )
 	}
 }
 
+void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
+{
+	input.Update( delta_t );
+
+	// update input
+	Array<InputEvent, 64> events;
+	input.GetKeyEvents( events );
+	bindings.Dispatch( events );
+}
+
 void CheckAssert()
 {
 	if( s_assert.Open )
 	{
 		s_input->CaptureMouse( false );
 
-		DD_TODO( "Assert Rendering" );
-		/*s_fsm->TransitionTo( OPEN_ASSERT );
-
 		do
 		{
-			s_fsm->TransitionTo( UPDATE_TIMER );
-			s_fsm->TransitionTo( ASSERT_DIALOG );
-			s_fsm->TransitionTo( RENDER_END_FRAME );
+			s_frameTimer->Update();
+
+			float delta_t = s_frameTimer->AppDelta();
+			UpdateInput( *s_input, *s_inputBindings, delta_t );
+			s_debugUI->Update( delta_t );
+
+			DrawAssertDialog( s_window->GetSize(), s_assert );
+
+			ImGui::Render();
+
+			s_window->Swap();
 		} 
-		while( s_assert.Open );*/
+		while( s_assert.Open );
 	}
 }
 
@@ -288,7 +303,7 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
-void DrawDebugUI( const Vector<IDebugPanel*>& views )
+void DrawDebugUI( const Vector<IDebugPanel*>& views, const ddc::World& world )
 {
 	if( s_showDebugUI )
 	{
@@ -297,7 +312,9 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views )
 			if( ImGui::BeginMenu( "File" ) )
 			{
 				if( ImGui::MenuItem( "Exit" ) )
+				{
 					s_window->SetToClose();
+				}
 
 				ImGui::EndMenu();
 			}
@@ -320,21 +337,11 @@ void DrawDebugUI( const Vector<IDebugPanel*>& views )
 	{
 		if( debug_view->IsDebugPanelOpen() )
 		{
-			debug_view->DrawDebugPanel();
+			debug_view->DrawDebugPanel( world );
 		}
 	}
 
 	s_frameTimer->DrawFPSCounter();
-}
-
-void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
-{
-	input.Update( delta_t );
-
-	// update input
-	Array<InputEvent, 64> events;
-	input.GetKeyEvents( events );
-	bindings.Dispatch( events );
 }
 
 ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
@@ -404,6 +411,7 @@ int GameMain()
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		SceneGraphSystem* scene_graph = new SceneGraphSystem();
+
 		//SwarmSystem swarm_system;
 
 		//TrenchSystem trench_system( *s_shakyCam  );
@@ -459,6 +467,7 @@ int GameMain()
 		BindKeys( *s_input );
 
 		s_frameTimer = new FrameTimer();
+		s_frameTimer->SetMaxFPS( s_maxFPS );
 
 		//s_debugConsole = new DebugConsole( *s_scriptEngine );
 
@@ -472,9 +481,8 @@ int GameMain()
 		debug_views.Add( terrain_system );
 		debug_views.Add( mesh_renderer );
 
-		/*debug_views.Add( s_debugConsole );
+		//debug_views.Add( s_debugConsole );
 		//debug_views.Add( s_shipSystem );
-		*/
 
 		s_world->Initialize();
 
@@ -498,11 +506,11 @@ int GameMain()
 		
 		// particle system
 		{
-			ddc::Entity entity = s_world->CreateEntity<ddc::ParticleSystemComponent, dd::TransformComponent>();
+			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent>();
 			dd::TransformComponent* transform = s_world->AccessComponent<dd::TransformComponent>( entity );
 			transform->SetLocalPosition( glm::vec3( 10, 50, 10 ) );
 
-			ddc::ParticleSystemComponent* particle = s_world->AccessComponent<ddc::ParticleSystemComponent>( entity );
+			dd::ParticleSystemComponent* particle = s_world->AccessComponent<dd::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
 			particle->m_lifetime = 1000;
 		}
@@ -517,8 +525,8 @@ int GameMain()
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
-		//pempek::assert::implementation::setAssertHandler( OnAssert ); 
-		//::ShowWindow( GetConsoleWindow(), SW_HIDE );
+		pempek::assert::implementation::setAssertHandler( OnAssert ); 
+		::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 		while( !s_window->ShouldClose() )
 		{
@@ -529,7 +537,7 @@ int GameMain()
 			s_frameTimer->SetMaxFPS( s_maxFPS );
 			s_frameTimer->Update();
 
-			float delta_t = s_frameTimer->Delta();
+			float delta_t = s_frameTimer->GameDelta();
 
 			UpdateInput( *s_input, *s_inputBindings, delta_t );
 			s_debugUI->Update( delta_t );
@@ -540,16 +548,15 @@ int GameMain()
 
 			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
 		
-			DrawDebugUI( debug_views );
+			DrawDebugUI( debug_views, *s_world );
 			s_renderer->Render( *s_world, *s_shakyCamera );
 
 			ImGui::Render();
 
 			s_window->Swap();
+			
+			s_frameTimer->DelayFrame();
 		}
-
-		//ShutdownSystems( *s_world, systems );
-		//systems.Clear();
 
 		s_renderer->ShutdownRenderer();
 		delete s_renderer;

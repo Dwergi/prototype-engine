@@ -40,16 +40,16 @@ namespace ddr
 		virtual void Render( const ddr::RenderData& data );
 
 	private:
-		glm::vec3 m_positions[ ddc::MaxParticles ];
+		glm::vec3 m_positions[ dd::MaxParticles ];
 		VBO m_vboPositions;
 
-		glm::vec2 m_sizes[ ddc::MaxParticles ];
+		glm::vec2 m_sizes[ dd::MaxParticles ];
 		VBO m_vboSizes;
 
-		glm::vec4 m_colours[ ddc::MaxParticles ];
+		glm::vec4 m_colours[ dd::MaxParticles ];
 		VBO m_vboColours;
 
-		ddc::Particle m_tempBuffer[ ddc::MaxParticles ];
+		dd::Particle m_tempBuffer[ dd::MaxParticles ];
 	};
 
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
@@ -77,12 +77,12 @@ namespace ddr
 		bool m_killAllParticles { false };
 		bool m_startEmitting { false };
 
-		ddc::ParticleSystemComponent* m_selected { nullptr };
+		dd::ParticleSystemComponent* m_selected { nullptr };
 
-		virtual void DrawDebugInternal() override;
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
-		void UpdateLiveParticles( ddc::ParticleSystemComponent& cmp, float delta_t );
-		void EmitNewParticles( ddc::ParticleSystemComponent& cmp, const glm::mat4& transform, float delta_t );
+		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );
+		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const glm::mat4& transform, float delta_t );
 	};
 }

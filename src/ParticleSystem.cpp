@@ -55,7 +55,7 @@ namespace ddr
 	ParticleSystem::ParticleSystem() :
 		ddc::System( "Particles" )
 	{
-		RequireWrite<ddc::ParticleSystemComponent>();
+		RequireWrite<dd::ParticleSystemComponent>();
 		RequireRead<dd::TransformComponent>();
 	}
 
@@ -82,7 +82,7 @@ namespace ddr
 
 	ParticleSystemRenderer::ParticleSystemRenderer()
 	{
-		Require<ddc::ParticleSystemComponent>();
+		Require<dd::ParticleSystemComponent>();
 	}
 
 	void ParticleSystemRenderer::RenderInit()
@@ -110,21 +110,21 @@ namespace ddr
 
 		m_vboPositions.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboPositions.Bind();
-		m_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( m_positions, ddc::MaxParticles ) );
+		m_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MaxParticles ) );
 		shader->BindAttributeVec3( "PositionInstanced", false );
 		shader->SetAttributeInstanced( "PositionInstanced" );
 		m_vboPositions.Unbind();
 
 		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboSizes.Bind();
-		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, ddc::MaxParticles ) );
+		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MaxParticles ) );
 		shader->BindAttributeVec2( "ScaleInstanced", false );
 		shader->SetAttributeInstanced( "ScaleInstanced" );
 		m_vboSizes.Unbind();
 
 		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboColours.Bind();
-		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, ddc::MaxParticles ) );
+		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MaxParticles ) );
 		shader->BindAttributeVec4( "ColourInstanced", false );
 		shader->SetAttributeInstanced( "ColourInstanced" );
 		m_vboColours.Unbind();
@@ -136,18 +136,18 @@ namespace ddr
 
 	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		ddc::WriteBuffer<ddc::ParticleSystemComponent> particles = update_data.Write<ddc::ParticleSystemComponent>();
+		ddc::WriteBuffer<dd::ParticleSystemComponent> particles = update_data.Write<dd::ParticleSystemComponent>();
 		ddc::ReadBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
 
 		for( size_t i = 0; i < particles.Size(); ++i )
 		{
-			ddc::ParticleSystemComponent& system = particles[ i ];
+			dd::ParticleSystemComponent& system = particles[ i ];
 				
 			if( m_killAllParticles )
 			{
-				for( size_t i = 0; i < ddc::MaxParticles; ++i )
+				for( size_t i = 0; i < dd::MaxParticles; ++i )
 				{
-					ddc::Particle& particle = system.m_particles[i];
+					dd::Particle& particle = system.m_particles[i];
 
 					if( particle.Alive() )
 					{
@@ -167,11 +167,11 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::UpdateLiveParticles( ddc::ParticleSystemComponent& system, float delta_t )
+	void ParticleSystem::UpdateLiveParticles( dd::ParticleSystemComponent& system, float delta_t )
 	{
 		for( size_t particle_index = 0; particle_index < system.m_liveCount; ++particle_index )
 		{
-			ddc::Particle& particle = system.m_particles[particle_index];
+			dd::Particle& particle = system.m_particles[particle_index];
 
 			if( particle.Alive() )
 			{
@@ -192,7 +192,7 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystem::EmitNewParticles( ddc::ParticleSystemComponent& system, const glm::mat4& transform, float delta_t )
+	void ParticleSystem::EmitNewParticles( dd::ParticleSystemComponent& system, const glm::mat4& transform, float delta_t )
 	{
 		system.m_emissionAccumulator += system.m_emissionRate * delta_t;
 		int toEmit = (int) system.m_emissionAccumulator;
@@ -201,14 +201,14 @@ namespace ddr
 
 		int emitted = 0;
 
-		for( int i = 0; i < ddc::MaxParticles; ++i )
+		for( int i = 0; i < dd::MaxParticles; ++i )
 		{
 			if( emitted >= toEmit || system.m_liveCount > CurrentMaxParticles )
 			{
 				break;
 			}
 
-			ddc::Particle& particle = system.m_particles[ i ];
+			dd::Particle& particle = system.m_particles[ i ];
 
 			if( !particle.Alive() )
 			{
@@ -245,22 +245,22 @@ namespace ddr
 
 		s_vaoParticle.Bind();
 
-		ddr::RenderBuffer<ddc::ParticleSystemComponent> particle_systems = data.Get<ddc::ParticleSystemComponent>();
+		ddr::RenderBuffer<dd::ParticleSystemComponent> particle_systems = data.Get<dd::ParticleSystemComponent>();
 
 		glm::vec3 cam_pos = camera.GetPosition();
 
-		for( const ddc::ParticleSystemComponent& system : particle_systems )
+		for( const dd::ParticleSystemComponent& system : particle_systems )
 		{
-			memcpy( m_tempBuffer, system.m_particles, sizeof( ddc::Particle ) * ddc::MaxParticles );
+			memcpy( m_tempBuffer, system.m_particles, sizeof( dd::Particle ) * dd::MaxParticles );
 
-			std::sort( &m_tempBuffer[0], &m_tempBuffer[ddc::MaxParticles], 
-				[cam_pos]( const ddc::Particle& a, const ddc::Particle& b )
+			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MaxParticles], 
+				[cam_pos]( const dd::Particle& a, const dd::Particle& b )
 			{
 				return glm::distance2( a.Position, cam_pos ) > glm::distance2( b.Position, cam_pos );
 			} );
 
 			int index = 0;
-			for( const ddc::Particle& particle : m_tempBuffer )
+			for( const dd::Particle& particle : m_tempBuffer )
 			{
 				if( particle.Alive() )
 				{
@@ -286,9 +286,9 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void ParticleSystem::DrawDebugInternal()
+	void ParticleSystem::DrawDebugInternal( const ddc::World& world )
 	{
-		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, ddc::MaxParticles );
+		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MaxParticles );
 
 		if( m_selected == nullptr )
 		{

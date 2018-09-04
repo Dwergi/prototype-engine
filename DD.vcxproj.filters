@@ -516,6 +516,12 @@
     <ClInclude Include="src\LightRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\BoundsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VisibilityComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BoundingBox.cpp">

@@ -14,23 +14,19 @@ DD_COMPONENT_CPP( dd::MeshComponent );
 namespace dd
 {
 	MeshComponent::MeshComponent() : 
-		Hidden( false ),
 		Colour( glm::vec4( 1, 1, 1, 1 ) )
 	{
 	}
 	
 	MeshComponent::MeshComponent( ddr::MeshHandle mesh ) :
 		Mesh( mesh ),
-		Hidden( false ),
 		Colour( glm::vec4( 1, 1, 1, 1 ) )
 	{
 	}
 	
 	MeshComponent::MeshComponent( const MeshComponent& other ) :
 		Mesh( other.Mesh ),
-		Hidden( other.Hidden ),
-		Colour( other.Colour ),
-		Bounds( other.Bounds )
+		Colour( other.Colour )
 	{
 	}
 

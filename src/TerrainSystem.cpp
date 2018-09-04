@@ -333,7 +333,7 @@ namespace dd
 		} );
 	}
 
-	void TerrainSystem::DrawDebugInternal()
+	void TerrainSystem::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::Value( "Chunks", (int) m_existing.size() );
 		ImGui::Value( "Active", m_active.Size() );

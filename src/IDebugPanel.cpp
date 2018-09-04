@@ -6,7 +6,7 @@
 
 namespace dd
 {
-	void IDebugPanel::DrawDebugPanel()
+	void IDebugPanel::DrawDebugPanel( const ddc::World& world )
 	{
 		ImGui::SetNextWindowPos( ImVec2( 30, 30 ), ImGuiSetCond_FirstUseEver );
 
@@ -16,7 +16,7 @@ namespace dd
 			return;
 		}
 
-		DrawDebugInternal();
+		DrawDebugInternal( world );
 
 		ImGui::End();
 	}

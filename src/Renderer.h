@@ -31,9 +31,10 @@ namespace ddr
 		template <typename T>
 		void Require() { m_requirements.Add( new ddc::ReadRequirement<T>() ); }
 
+		template <typename T>
+		void Optional() { m_requirements.Add( new ddc::ReadRequirement<T>() ); }
+
 	private:
 		dd::Array<const ddc::DataRequirement*, ddc::MAX_COMPONENTS> m_requirements;
-
-		void CallRenderer( ddr::Renderer& renderer, const ddc::World& world, const ddr::ICamera& camera );
 	};
 }

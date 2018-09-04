@@ -213,7 +213,7 @@ namespace dd
 		ddr::Mesh::Destroy( m_shipMesh );
 	}
 
-	void ShipSystem::DrawDebugInternal()
+	void ShipSystem::DrawDebugInternal( const ddc::World& world )
 	{
 		if( m_lastShip.IsValid() )
 		{

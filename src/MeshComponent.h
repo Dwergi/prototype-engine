@@ -22,15 +22,12 @@ namespace dd
 		~MeshComponent();
 
 		ddr::MeshHandle Mesh;
-		bool Hidden;
 		glm::vec4 Colour;
-		AABB Bounds;
 
 		DD_COMPONENT;
 
 		DD_BEGIN_TYPE( MeshComponent )
 			DD_MEMBER( MeshComponent, Mesh )
-			DD_MEMBER( MeshComponent, Hidden )
 			DD_MEMBER( MeshComponent, Colour )
 		DD_END_TYPE
 	};

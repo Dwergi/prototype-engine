@@ -19,7 +19,8 @@ namespace dd
 		m_targetDelta = 1.0f / m_maxFPS;
 		m_lastFrameTime = 0.0f;
 		m_currentFrameTime = -m_targetDelta;
-		m_delta = m_targetDelta;
+		m_gameDelta = m_targetDelta;
+		m_appDelta = m_targetDelta;
 		m_deltaWithoutDelay = m_targetDelta;
 
 		// fill history with standard deltas
@@ -36,7 +37,12 @@ namespace dd
 		m_targetDelta = 1.0f / m_maxFPS;
 		m_lastFrameTime = m_currentFrameTime;
 		m_currentFrameTime = m_timer.Time();
-		m_delta = m_currentFrameTime - m_lastFrameTime;
+		m_appDelta = m_currentFrameTime - m_lastFrameTime;
+
+		if( !m_paused )
+		{
+			m_gameDelta = m_appDelta;
+		}
 
 		// update sliding window
 		m_frameTimes[m_currentSlidingFrame] = m_deltaWithoutDelay * 1000.f;
@@ -71,7 +77,7 @@ namespace dd
 		}
 	}
 
-	void FrameTimer::DrawDebugInternal()
+	void FrameTimer::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
 

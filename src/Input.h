@@ -20,7 +20,7 @@ namespace dd
 
 	struct MousePosition
 	{
-		glm::vec2 Delta;
+		glm::vec2 GameDelta;
 		glm::vec2 Absolute;
 
 		MousePosition() {}

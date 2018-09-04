@@ -6,6 +6,11 @@
 
 #pragma once
 
+namespace ddc
+{
+	struct World;
+}
+
 namespace dd
 {
 	class IDebugPanel
@@ -18,7 +23,7 @@ namespace dd
 
 		}
 
-		void DrawDebugPanel();
+		void DrawDebugPanel( const ddc::World& world );
 		void AddToMenu();
 
 		//
@@ -38,7 +43,7 @@ namespace dd
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
-		virtual void DrawDebugInternal() = 0;
+		virtual void DrawDebugInternal( const ddc::World& world ) = 0;
 		virtual const char* GetDebugTitle() const = 0;
 	};
 }
