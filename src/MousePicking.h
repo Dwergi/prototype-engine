@@ -30,7 +30,7 @@ namespace dd
 	class Input;
 	class InputBindings;
 	class MeshComponent;
-	class TransformComponent;
+	struct TransformComponent;
 	class Window;
 
 	struct MousePosition;

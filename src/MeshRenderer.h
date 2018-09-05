@@ -16,7 +16,7 @@ namespace dd
 	struct BoundsComponent;
 	class MeshComponent; 
 	class MousePicking;
-	class TransformComponent;
+	struct TransformComponent;
 }
 
 namespace ddr

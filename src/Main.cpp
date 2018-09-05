@@ -217,6 +217,12 @@ void CheckAssert()
 {
 	if( s_assert.Open )
 	{
+		static dd::String256 s_message;
+		s_message = s_assert.Info;
+		s_message += s_assert.Message;
+
+		printf( s_message.c_str() );
+
 		s_input->CaptureMouse( false );
 
 		do
@@ -440,11 +446,11 @@ int GameMain()
 		//s_shipSystem->CreateShip( *s_world );
 
 		TerrainSystem* terrain_system = new TerrainSystem( jobsystem );
+		terrain_system->DependsOn( *scene_graph );
 
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *s_inputBindings );
 		particle_system->DependsOn( *scene_graph );
-		particle_system->DependsOn( *terrain_system );
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 

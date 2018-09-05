@@ -29,6 +29,5 @@ namespace dd
 			transforms[ i ].World = transforms[ i ].Local;
 			bounds[ i ].World = bounds[ i ].Local.GetTransformed( transforms[ i ].World );
 		}
-
 	}
 }

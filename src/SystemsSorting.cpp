@@ -5,6 +5,19 @@
 
 namespace ddc
 {
+	size_t FindNodeIndex( const System* to_find, const std::vector<SystemNode>& nodes )
+	{
+		for( size_t i = 0; i < nodes.size(); ++i )
+		{
+			if( to_find == nodes[i].m_system )
+			{
+				return i;
+			}
+		}
+
+		DD_ASSERT( "Not found, all is doomed." );
+		return ~0;
+	}
 
 	void SortSystemsTopologically( const std::vector<SystemNode>& nodes, std::vector<SystemNode>& out_sorted )
 	{
@@ -24,19 +37,19 @@ namespace ddc
 
 					for( SystemNode::Edge& outEdge : node.m_out )
 					{
-						SystemNode& destNode = scratch[outEdge.m_to];
+						SystemNode& dest_node = scratch[outEdge.m_to];
 
 						size_t i = 0;
-						for( ; i < destNode.m_in.size(); ++i )
+						for( ; i < dest_node.m_in.size(); ++i )
 						{
-							SystemNode::Edge& inEdge = destNode.m_in[i];
-							if( inEdge.m_from == n )
+							SystemNode::Edge& in_edge = dest_node.m_in[i];
+							if( in_edge.m_from == n )
 							{
 								break;
 							}
 						}
 
-						destNode.m_in.erase( destNode.m_in.begin() + i );
+						dest_node.m_in.erase( dest_node.m_in.begin() + i );
 					}
 
 					node.m_out.clear();
@@ -44,8 +57,31 @@ namespace ddc
 				}
 			}
 		}
-	}
 
+		// remap node indices to new sorted ones
+		std::vector<size_t> new_indices;
+		new_indices.reserve( nodes.size() );
+
+		for( const SystemNode& n : nodes )
+		{
+			new_indices.push_back( FindNodeIndex( n.m_system, out_sorted ) );
+		}
+
+		for( SystemNode& node : out_sorted )
+		{
+			for( SystemNode::Edge& edge : node.m_in )
+			{
+				edge.m_from = new_indices[edge.m_from];
+				edge.m_to = new_indices[edge.m_to];
+			}
+
+			for( SystemNode::Edge& edge : node.m_out )
+			{
+				edge.m_from = new_indices[edge.m_from];
+				edge.m_to = new_indices[edge.m_to];
+			}
+		}
+	}
 
 	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems )
 	{
@@ -59,21 +95,23 @@ namespace ddc
 			nodes.push_back( node );
 		}
 
-		for( size_t sys = 0; sys < systems.Size(); ++sys )
+		for( size_t s = 0; s < systems.Size(); ++s )
 		{
-			const System* system = systems[sys];
-
-			const dd::IArray<const System*>& deps = system->GetDependencies();
-			for( size_t dep = 0; dep < deps.Size(); ++dep )
+			const System* system = systems[s];
+			for( const System* dep : system->GetDependencies() )
 			{
-				DD_ASSERT( system != systems[dep], "Can't depend on the same system!" );
+				DD_ASSERT( system != dep, "Can't depend on the same system!" );
+
+				size_t dep_index = FindNodeIndex( dep, nodes );
 
 				SystemNode::Edge edge;
-				edge.m_from = dep;
-				edge.m_to = sys;
+				edge.m_from = dep_index;
+				edge.m_to = s;
 
-				nodes[dep].m_out.push_back( edge );
-				nodes[sys].m_in.push_back( edge );
+				DD_ASSERT( edge.m_from != edge.m_to );
+
+				nodes[dep_index].m_out.push_back( edge );
+				nodes[s].m_in.push_back( edge );
 			}
 		}
 

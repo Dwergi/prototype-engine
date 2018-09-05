@@ -216,7 +216,7 @@ namespace dd
 		m_dataDirty = true;
 	}
 
-	void TerrainChunk::Update( JobSystem& job_system, float delta_t )
+	void TerrainChunk::Update( JobSystem& job_system )
 	{
 		if( m_dataDirty )
 		{
@@ -241,25 +241,18 @@ namespace dd
 
 		if( m_renderDirty )
 		{
-			if( !m_mesh.IsValid() )
+			ddr::Mesh* mesh;
+
+			if( m_mesh.IsValid() )
 			{
-				CreateMesh( m_key );
+				mesh = ddr::Mesh::Get( m_mesh );
 			}
-
-			ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
-			mesh->UpdateBuffers();
-
-			float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
-			float total_size = actual_distance * Vertices;
-
-			AABB bounds;
-			bounds.Expand( glm::vec3( 0 ) );
-
-			float height = m_params.HeightRange + (1 - (m_key.LOD / 10.0f));
-
-			bounds.Expand( glm::vec3( total_size, height, total_size ) );
-
-			mesh->SetBounds( bounds );
+			else
+			{
+				mesh = CreateMesh( m_key );
+			}
+			
+			mesh->SetBounds( m_bounds );
 			mesh->SetDirty();
 
 			m_renderDirty = false;
@@ -300,6 +293,9 @@ namespace dd
 		const int actual_vertices = Vertices + 1;
 		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
 
+		float max_height = std::numeric_limits<float>::min();
+		float min_height = std::numeric_limits<float>::max();
+
 		for( int z = 0; z < actual_vertices; ++z )
 		{
 			for( int x = 0; x < actual_vertices; ++x )
@@ -316,8 +312,16 @@ namespace dd
 				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
 
 				m_vertices[current].y = normalized_height * m_params.HeightRange;
+
+				max_height = dd::max( max_height, m_vertices[current].y );
+				min_height = dd::min( min_height, m_vertices[current].y );
 			}
 		}
+
+		m_position = glm::vec3( chunk_pos.x, 0, chunk_pos.y );
+
+		m_bounds.Min = glm::vec3( 0, min_height, 0 );
+		m_bounds.Max = glm::vec3( Vertices * actual_distance, max_height, Vertices * actual_distance );
 
 		for( int i = 0; i < FlapVertexCount; ++i )
 		{
@@ -390,9 +394,9 @@ namespace dd
 		m_dataDirty = true;
 	}
 
-	void TerrainChunk::CreateMesh( const TerrainChunkKey& key )
+	ddr::Mesh* TerrainChunk::CreateMesh( const TerrainChunkKey& key )
 	{
-		DD_PROFILE_START( TerrainChunk_CreateMesh );
+		DD_PROFILE_SCOPED( TerrainChunk_CreateMesh );
 
 		char name[ 128 ];
 		sprintf_s( name, 128, "%.2fx%.2f_%d", key.X, key.Y, key.LOD );
@@ -406,7 +410,7 @@ namespace dd
 		mesh->SetNormals( m_normalsBuffer );
 		mesh->SetIndices( m_indices );
 
-		DD_PROFILE_END();
+		return mesh;
 	}
 
 	void TerrainChunk::WriteHeightImage( const char* filename ) const

@@ -23,10 +23,11 @@ namespace dd
 {
 	class ICamera;
 	struct JobSystem;
+	struct BoundsComponent;
 	class MeshComponent;
 	class TerrainChunk;
 	class TerrainChunkComponent;
-	class TransformComponent;
+	struct TransformComponent;
 
 	struct TerrainChunkKey;
 
@@ -118,7 +119,7 @@ namespace dd
 
 		ddc::Entity CreateChunk( ddc::World& world, const TerrainChunkKey& key );
 
-		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, float delta_t );
+		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, BoundsComponent& bounds_cmp, TransformComponent& transform_cmp );
 		void UpdateTerrainChunks( const ddc::UpdateData& world, const Vector<TerrainChunkKey>& required );
 
 		void DestroyChunks( ddc::World& world );

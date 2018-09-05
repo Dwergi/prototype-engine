@@ -11,7 +11,7 @@
 
 namespace dd
 {
-	class TransformComponent
+	struct TransformComponent
 	{
 	public:
 

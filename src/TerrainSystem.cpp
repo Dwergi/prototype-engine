@@ -71,6 +71,8 @@ namespace dd
 	{
 		RequireWrite<TerrainChunkComponent>();
 		RequireWrite<MeshComponent>();
+		RequireWrite<BoundsComponent>();
+		RequireWrite<TransformComponent>();
 
 		Require<TerrainChunkComponent>();
 		Require<MeshComponent>();
@@ -158,15 +160,18 @@ namespace dd
 		}
 
 		dd::Buffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+		dd::Buffer<TransformComponent> transforms = data.Write<TransformComponent>();
+		dd::Buffer<BoundsComponent> bounds = data.Write<BoundsComponent>();
 		dd::Buffer<MeshComponent> meshes = data.Write<MeshComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			UpdateChunk( chunks[ i ], meshes[ i ], delta_t );
+			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ] );
 		}
 	}
 
-	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, float delta_t )
+	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, 
+		BoundsComponent& bounds_cmp, TransformComponent& transform_cmp )
 	{
 		if( m_params.UseDebugColours )
 		{
@@ -177,8 +182,10 @@ namespace dd
 			mesh_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 
-		chunk_cmp.Chunk->Update( m_jobSystem, delta_t );
+		chunk_cmp.Chunk->Update( m_jobSystem );
 		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
+		bounds_cmp.Local = chunk_cmp.Chunk->GetBounds();
+		transform_cmp.SetLocalPosition( chunk_cmp.Chunk->GetPosition() );
 	}
 
 	void TerrainSystem::GenerateTerrain( const ddc::UpdateData& data, const glm::ivec2 offset )
@@ -305,6 +312,7 @@ namespace dd
 		chunk_cmp->Chunk = chunk;
 
 		chunk->Generate();
+		chunk->Update( m_jobSystem );
 
 		return entity;
 	}

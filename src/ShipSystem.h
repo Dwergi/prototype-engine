@@ -16,8 +16,7 @@ namespace dd
 	class FPSCamera;
 	class InputBindings;
 	class ShipComponent;
-	class TransformComponent;
-
+	struct TransformComponent;
 
 	class ShipSystem : public ddc::System, public IDebugPanel
 	{

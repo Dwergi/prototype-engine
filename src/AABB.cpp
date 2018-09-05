@@ -36,6 +36,17 @@ namespace dd
 
 	}
 
+	void AABB::Clear()
+	{
+		Min = glm::vec3( FLT_MAX, FLT_MAX, FLT_MAX );
+		Max = glm::vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+	}
+
+	bool AABB::IsValid() const
+	{
+		return Min != glm::vec3( FLT_MAX, FLT_MAX, FLT_MAX ) || Max != glm::vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+	}
+
 	void AABB::Expand( const glm::vec3& pt )
 	{
 		Min = glm::min( Min, pt );

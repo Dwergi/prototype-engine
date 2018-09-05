@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "AABB.h"
 #include "MaterialHandle.h"
 #include "MeshHandle.h"
 #include "ShaderHandle.h"
@@ -49,7 +50,7 @@ namespace dd
 		void Generate();
 		void SetNoiseOffset( glm::vec2 origin );
 
-		void Update( JobSystem& job_system, float delta_t );
+		void Update( JobSystem& job_system );
 		void RenderUpdate( ddr::UniformStorage& uniforms );
 
 		void Destroy();
@@ -58,6 +59,8 @@ namespace dd
 		void WriteNormalImage( const char* filename ) const;
 
 		const TerrainChunkKey& GetKey() const { return m_key; }
+		AABB GetBounds() const { return m_bounds; }
+		glm::vec3 GetPosition() const { return m_position; }
 		
 		ddr::MeshHandle GetMesh() const { return m_mesh; }
 
@@ -84,6 +87,9 @@ namespace dd
 		bool m_dataDirty { false };
 		ddr::MeshHandle m_mesh;
 
+		glm::vec3 m_position;
+		AABB m_bounds;
+
 		glm::vec3 m_vertices[VertexCount];
 		Buffer<glm::vec3> m_verticesBuffer;
 
@@ -98,6 +104,6 @@ namespace dd
 		void UpdateVertices( glm::vec2 chunkPos );
 		void UpdateNormals();
 
-		void CreateMesh( const TerrainChunkKey& key );
+		ddr::Mesh* CreateMesh( const TerrainChunkKey& key );
 	};
 }

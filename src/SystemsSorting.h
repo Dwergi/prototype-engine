@@ -16,8 +16,8 @@ namespace ddc
 
 		System* m_system { nullptr };
 
-		std::vector<Edge> m_out;
 		std::vector<Edge> m_in;
+		std::vector<Edge> m_out;
 
 		std::shared_future<void> m_update;
 	};

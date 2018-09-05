@@ -17,6 +17,9 @@ namespace dd
 		AABB( const AABB& other );
 		~AABB();
 
+		void Clear();
+		bool IsValid() const;
+
 		//
 		// Expand the bounding box to contain the given point.
 		//
