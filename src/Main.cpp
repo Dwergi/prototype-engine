@@ -363,7 +363,7 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 	mesh_cmp->Colour = colour;
 
 	dd::BoundsComponent* bounds_cmp = world.Access<dd::BoundsComponent>( entity );
-	bounds_cmp->Local = ddr::Mesh::Get( mesh_h )->Bounds();
+	bounds_cmp->Local = ddr::Mesh::Get( mesh_h )->GetBoundBox();
 
 	world.AddTag( entity, ddc::Tag::Visible );
 

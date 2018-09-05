@@ -21,6 +21,7 @@ struct GLFWwindow;
 namespace ddr
 {
 	class ICamera;
+	class Mesh;
 	struct ShaderProgram;
 }
 
@@ -65,11 +66,14 @@ namespace dd
 		const Window& m_window;
 
 		bool m_select { false };
-		bool m_enabled { false };
+		bool m_enabled { true };
 		bool m_renderDebug { false };
 
 		ddc::Entity m_selectedMesh;
 		ddc::Entity m_focusedMesh;
+		ddc::Entity m_hitTestMesh;
+
+		float m_hitTestDistance;
 
 		ddr::ShaderHandle m_shader;
 		ddr::Texture m_idTexture;
@@ -95,6 +99,6 @@ namespace dd
 
 		void HandleInput( InputAction action, InputType type );
 
-		void RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, const MeshComponent& mesh_cmp, const TransformComponent& transform_cmp );
+		void RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, ddr::Mesh& mesh, const glm::mat4& transform );
 	};
 }

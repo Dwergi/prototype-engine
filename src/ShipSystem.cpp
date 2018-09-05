@@ -129,7 +129,7 @@ namespace dd
 		mesh->MakeUnitCube();
 		
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
-		mesh_h.Get()->SetBounds( bounds );* /
+		mesh_h.Get()->SetBoundBox( bounds );* /
 
 		MeshComponent* mesh_cmp = world.GetWritable<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_shipMesh;

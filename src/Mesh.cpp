@@ -432,6 +432,6 @@ namespace ddr
 		dd::AABB bounds;
 		bounds.Expand( glm::vec3( -1, -1, -1 ) );
 		bounds.Expand( glm::vec3( 1, 1, 1 ) );
-		SetBounds( bounds );
+		SetBoundBox( bounds );
 	}
 }

@@ -27,6 +27,8 @@ namespace ddr
 		void Destroy();
 
 		void SetData( const dd::IBuffer& buffer );
+		const dd::IBuffer& GetData() const { return m_buffer; }
+
 		int GetDataSize() const { return m_buffer.SizeBytes(); }
 	
 		void UpdateData();

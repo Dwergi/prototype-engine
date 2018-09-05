@@ -140,7 +140,7 @@ namespace dd
 		AABB bounds;
 		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
 		bounds.Expand( glm::vec3( 0.5, 1, 1 ) );
-		mesh->SetBounds( bounds );
+		mesh->SetBoundBox( bounds );
 	}
 
 	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::World& world )

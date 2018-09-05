@@ -15,6 +15,14 @@ ConstBuffer<T>::ConstBuffer() :
 }
 
 template <typename T>
+ConstBuffer<T>::ConstBuffer( const IBuffer& buffer ) :
+	IBuffer( sizeof( T ) )
+{
+	m_ptr = (T*) buffer.GetVoid();
+	m_count = buffer.SizeBytes() / m_elementSize;
+}
+
+template <typename T>
 ConstBuffer<T>::ConstBuffer( const T* ptr, int count ) :
 	IBuffer( sizeof( T ) )
 {
@@ -110,14 +118,6 @@ template <typename T>
 int ConstBuffer<T>::Size() const
 {
 	return m_count;
-}
-
-template <typename T>
-const T& ConstBuffer<T>::operator[]( int index ) const
-{
-	DD_ASSERT( index >= 0 && index < m_count );
-
-	return GetConst()[index];
 }
 
 template <typename T>
@@ -224,14 +224,6 @@ T* Buffer<T>::Release()
 	m_count = 0;
 
 	return ptr;
-}
-
-template <typename T>
-T& Buffer<T>::operator[]( int index ) const
-{
-	DD_ASSERT( index >= 0 && index < m_count );
-
-	return Get()[ index ];
 }
 
 template <typename T>

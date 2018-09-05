@@ -99,9 +99,6 @@
     <ClInclude Include="src\TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\BoundingBox.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\Recorder.h">
       <Filter>Properties</Filter>
     </ClInclude>
@@ -272,9 +269,6 @@
     </ClInclude>
     <ClInclude Include="src\DLL.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ISystem.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\RingBuffer.h">
       <Filter>Containers</Filter>
@@ -522,11 +516,11 @@
     <ClInclude Include="src\VisibilityComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\HitTest.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BoundingBox.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\Recorder.cpp">
       <Filter>Properties</Filter>
     </ClCompile>
@@ -902,6 +896,9 @@
     </ClCompile>
     <ClCompile Include="src\BoundsComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HitTest.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

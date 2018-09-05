@@ -399,7 +399,6 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name );
 		return false;
 	}
 

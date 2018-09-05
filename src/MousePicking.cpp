@@ -22,6 +22,8 @@
 #include "Window.h"
 #include "World.h"
 
+#include "HitTest.h"
+
 #include "glm/gtx/rotate_vector.hpp"
 
 #include "imgui/imgui.h"
@@ -30,7 +32,7 @@
 
 namespace dd
 {
-	MousePicking::MousePicking( const Window& window, const Input& input ) : 
+	MousePicking::MousePicking( const Window& window, const Input& input ) :
 		ddr::Renderer( "Mouse Picking" ),
 		m_window( window ),
 		m_input( input )
@@ -70,7 +72,7 @@ namespace dd
 
 		DD_ASSERT( (index * DownScalingFactor * DownScalingFactor) < m_lastIDBuffer.SizeBytes(), "Index out of range!" );
 
-		const int* base = reinterpret_cast<const int*>( m_lastIDBuffer.GetVoid() );
+		const int* base = reinterpret_cast<const int*>(m_lastIDBuffer.GetVoid());
 		return base[index];
 	}
 
@@ -83,7 +85,7 @@ namespace dd
 
 		DD_ASSERT( (index * DownScalingFactor * DownScalingFactor) < m_lastDepthBuffer.SizeBytes(), "Index out of range!" );
 
-		const float* base = reinterpret_cast<const float*>( m_lastDepthBuffer.GetVoid() );
+		const float* base = reinterpret_cast<const float*>(m_lastDepthBuffer.GetVoid());
 		return base[index];
 	}
 
@@ -115,75 +117,92 @@ namespace dd
 	void MousePicking::Render( const ddr::RenderData& data )
 	{
 		m_focusedMesh = ddc::Entity();
+		m_hitTestMesh = ddc::Entity();
 
-		if( m_enabled )
+		if( !m_enabled )
+			return;
+
+		if( m_previousSize != m_window.GetSize() )
 		{
-			if( m_previousSize != m_window.GetSize() )
+			m_framebuffer.Destroy();
+
+			m_lastIDBuffer.Delete();
+			m_idTexture.Destroy();
+
+			m_depthTexture.Destroy();
+			m_lastDepthBuffer.Delete();
+
+			CreateFrameBuffer( m_window.GetSize() );
+		}
+
+		m_framebuffer.BindDraw();
+		m_framebuffer.BindRead();
+
+		m_framebuffer.Clear();
+
+		ddr::ShaderProgram& shader = *ddr::ShaderProgram::Get( m_shader );
+		shader.Use( true );
+
+		ddr::UniformStorage& uniforms = data.Uniforms();
+		uniforms.Bind( shader );
+
+		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
+		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+		dd::Span<ddc::Entity> entities = data.Entities();
+
+		m_hitTestDistance = FLT_MAX;
+
+		for( size_t i = 0; i < data.Size(); ++i )
+		{
+			ddr::Mesh* mesh = ddr::Mesh::Get( meshes[i].Mesh );
+			if( mesh == nullptr )
+				continue;
+
+			RenderMesh( uniforms, shader, entities[i], *mesh, transforms[i].World );
+
+			float distance;
+			if( dd::HitTestMesh( GetScreenRay( data.Camera(), m_input.GetMousePosition() ), transforms[i].World, *mesh, distance ) )
 			{
-				m_framebuffer.Destroy();
-
-				m_lastIDBuffer.Delete();
-				m_idTexture.Destroy();
-
-				m_depthTexture.Destroy();
-				m_lastDepthBuffer.Delete();
-
-				CreateFrameBuffer( m_window.GetSize() );
-			}
-
-			m_framebuffer.BindDraw();
-			m_framebuffer.BindRead();
-
-			m_framebuffer.Clear();
-
-			ddr::ShaderProgram& shader = *ddr::ShaderProgram::Get( m_shader );
-			shader.Use( true );
-
-			ddr::UniformStorage& uniforms = data.Uniforms();
-			uniforms.Bind( shader );
-
-			ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
-			ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
-			dd::Span<ddc::Entity> entities = data.Entities();
-
-			for( size_t i = 0; i < data.Size(); ++i )
-			{
-				RenderMesh( uniforms, shader, entities[ i ], meshes[ i ], transforms[ i ] );
-			}
-
-			shader.Use( false );
-
-			m_framebuffer.UnbindRead();
-			m_framebuffer.UnbindDraw();
-
-			m_idTexture.GetData( m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT );
-			m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
-
-			m_position = m_input.GetMousePosition().Absolute;
-			m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
-			m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
-
-			ddc::Entity entity = data.World().GetEntity( m_handle );
-
-			if( entity.IsValid() )
-			{
-				m_focusedMesh = entity;
-			}
-			else
-			{
-				m_handle = -1;
-			}
-
-			if( m_focusedMesh.IsValid() )
-			{
-				if( m_select )
+				if( distance < m_hitTestDistance )
 				{
-					m_selectedMesh = m_focusedMesh;
+					m_hitTestMesh = entities[i];
+					m_hitTestDistance = distance;
 				}
 			}
-
-			m_select = false;
 		}
+
+		shader.Use( false );
+
+		m_framebuffer.UnbindRead();
+		m_framebuffer.UnbindDraw();
+
+		m_idTexture.GetData( m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT );
+		m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
+
+		m_position = m_input.GetMousePosition().Absolute;
+		m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
+		m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
+
+		ddc::Entity entity = data.World().GetEntity( m_handle );
+
+		if( entity.IsValid() )
+		{
+			m_focusedMesh = entity;
+		}
+		else
+		{
+			m_handle = -1;
+		}
+
+		if( m_focusedMesh.IsValid() )
+		{
+			if( m_select )
+			{
+				m_selectedMesh = m_focusedMesh;
+			}
+		}
+
+		m_select = false;
 	}
 
 	void MousePicking::RenderDebug( const ddr::RenderData& data )
@@ -195,12 +214,11 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, const MeshComponent& mesh_cmp, const TransformComponent& transform_cmp )
+	void MousePicking::RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, ddr::Mesh& mesh, const glm::mat4& transform )
 	{
 		uniforms.Set( "ID", (int) entity.ID );
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
-		mesh->Render( uniforms, shader, transform_cmp.World );
+		mesh.Render( uniforms, shader, transform );
 	}
 
 	void MousePicking::DrawDebugInternal( const ddc::World& world )
@@ -209,6 +227,9 @@ namespace dd
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
 		ImGui::Checkbox( "Render Debug", &m_renderDebug );
+
+		ImGui::Value( "Hit Test Mesh", m_hitTestMesh.ID );
+		ImGui::Value( "Hit Test Distance", m_hitTestDistance );
 
 		ImGui::Value( "Handle", m_handle );
 		ImGui::Value( "Position", m_position, "%.1f" );
@@ -219,7 +240,7 @@ namespace dd
 			if( m_focusedMesh.IsValid() )
 			{
 				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focusedMesh )->Mesh;
-				
+
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 

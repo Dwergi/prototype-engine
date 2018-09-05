@@ -57,12 +57,12 @@ namespace ddr
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
-		const dd::AABB& Bounds() const { return m_bounds; }
+		const dd::AABB& GetBoundBox() const { return m_bounds; }
 
 		//
 		// Set the bounds of this mesh.
 		//
-		void SetBounds( const dd::AABB& bounds ) { m_bounds = bounds; }
+		void SetBoundBox( const dd::AABB& bounds ) { m_bounds = bounds; }
 
 		//
 		// Set the positions that the mesh will use.
@@ -72,10 +72,22 @@ namespace ddr
 		void SetPositions( const dd::ConstBuffer<glm::vec3>& positions );
 
 		//
+		// Get the currently set buffer for positions.
+		// Not guaranteed to be valid.
+		//
+		dd::ConstBuffer<glm::vec3> GetPositions() const { return dd::ConstBuffer<glm::vec3>( m_vboPosition.GetData() ); }
+
+		//
 		// Set the index buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
 		void SetIndices( const dd::ConstBuffer<uint>& indices );
+
+		//
+		// Get the currently set buffer for indices.
+		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
+		//
+		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<glm::vec3>( m_vboIndex.GetData() ); }
 
 		//
 		// Set the normal buffer that the mesh will use.

@@ -252,7 +252,7 @@ namespace dd
 				mesh = CreateMesh( m_key );
 			}
 			
-			mesh->SetBounds( m_bounds );
+			mesh->SetBoundBox( m_bounds );
 			mesh->SetDirty();
 
 			m_renderDirty = false;

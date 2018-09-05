@@ -26,9 +26,6 @@ namespace dd
 		IBuffer( uint element_size );
 
 		int m_count { 0 };
-
-	private:
-
 		uint m_elementSize { 0 };
 	};
 
@@ -41,6 +38,7 @@ namespace dd
 	public:
 
 		ConstBuffer();
+		ConstBuffer( const IBuffer& buffer );
 		ConstBuffer( const T* ptr, int count );
 		ConstBuffer( const T* ptr, size_t count );
 		ConstBuffer( const ConstBuffer<T>& other );
@@ -50,8 +48,9 @@ namespace dd
 		ConstBuffer<T>& operator=( const ConstBuffer<T>& other );
 		ConstBuffer<T>& operator=( ConstBuffer<T>&& other );
 
-		const T& operator[]( int idx ) const;
 		const T& operator[]( size_t idx ) const;
+
+		bool IsValid() const { return m_ptr != nullptr; }
 
 		void Set( const T* ptr, int count );
 		const T* GetConst() const;
@@ -91,7 +90,6 @@ namespace dd
 		Buffer<T>& operator=( const Buffer<T>& other );
 		Buffer<T>& operator=( Buffer<T>&& other );
 
-		T& operator[]( int idx ) const;
 		T& operator[]( size_t idx ) const;
 
 		void Set( T* ptr, int count );

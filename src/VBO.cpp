@@ -115,7 +115,7 @@ namespace ddr
 
 	void VBO::UpdateData()
 	{
-		if( m_buffer.GetVoid() != nullptr )
+		if( m_buffer.IsValid() )
 		{
 			glNamedBufferData( m_id, m_buffer.SizeBytes(), NULL, m_usage );
 			CheckOGLError();
