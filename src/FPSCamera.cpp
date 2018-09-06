@@ -50,18 +50,14 @@ namespace dd
 			return;
 		}
 
-		// wrap the x direction
-		m_yaw = dd::wrap( yaw, 0.0f, 360.0f );
+		// wrap yaw
+		m_yaw = dd::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
-		// clamp the y direction
-		m_pitch = glm::clamp( pitch, -89.9f, 89.9f );
+		// clamp pitch to vertical up/down
+		const float max_pitch = glm::half_pi<float>() - 0.00001f;
+		m_pitch = glm::clamp( pitch, -max_pitch, max_pitch );
 
-		float yawRads = glm::radians( m_yaw );
-		float pitchRads = glm::radians( m_pitch );
-
-		m_direction = glm::vec3( std::cos( pitchRads ) * std::sin( yawRads ),
-			std::sin( pitchRads ),
-			std::cos( pitchRads ) * std::cos( yawRads ) );
+		m_direction = dd::directionFromPitchYaw( m_pitch, m_yaw );
 	}
 
 	glm::vec3 FPSCamera::GetDirection() const

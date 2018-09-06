@@ -15,15 +15,14 @@ namespace dd
 	}
 
 	Ray::Ray( const glm::vec3& origin, const glm::vec3& direction ) :
-		m_origin( origin ),
-		m_direction( direction )
+		m_origin( origin )
 	{
-		m_invDir = glm::vec3( 1.0f ) / m_direction;
+		SetDirection( direction );
 	}
 
 	void Ray::SetDirection( const glm::vec3& direction )
 	{
 		m_direction = glm::normalize( direction );
-		m_invDir = glm::vec3( 1.0f ) / m_direction;
+		m_invDir = glm::normalize( glm::vec3( 1.0f ) / m_direction );
 	}
 }

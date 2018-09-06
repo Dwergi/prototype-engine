@@ -87,8 +87,8 @@ namespace dd
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
 
-		ImGui::Value( "Yaw", m_camera.GetYaw(), "%.2f" );
-		ImGui::Value( "Pitch", m_camera.GetPitch(), "%.2f" );
+		ImGui::Value( "Yaw", glm::degrees( m_camera.GetYaw() ), "%.2f" );
+		ImGui::Value( "Pitch", glm::degrees( m_camera.GetPitch() ), "%.2f" );
 		
 		glm::vec3 position = m_camera.GetPosition();
 		ImGui::Value( "Position", position, "%.1f" );
@@ -121,11 +121,10 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( FreeCameraController_Update );
 
-		// rotate around up axis, ie. Y
 		float yaw = m_camera.GetYaw();
-		yaw += m_mouseDelta.x * TurnSpeed;
+		yaw += glm::radians( m_mouseDelta.x * TurnSpeed );
 
-		float y_delta = m_mouseDelta.y * TurnSpeed;
+		float y_delta = glm::radians( m_mouseDelta.y * TurnSpeed );
 
 		if( m_invert )
 			y_delta = -y_delta;
@@ -136,9 +135,7 @@ namespace dd
 		m_camera.SetRotation( yaw, pitch );
 
 		glm::vec3 direction = m_camera.GetDirection();
-
 		glm::vec3 up = glm::vec3( 0, 1, 0 );
-
 		glm::vec3 right = glm::normalize( glm::cross( direction, up ) );
 
 		glm::vec3 movement( 0, 0, 0 );

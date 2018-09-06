@@ -24,8 +24,8 @@ namespace dd
 
 		void SetRotation( float yaw, float pitch );
 
-		float GetYaw() const { return m_yaw; }
-		float GetPitch() const { return m_pitch; }
+		virtual float GetYaw() const override { return m_yaw; }
+		virtual float GetPitch() const override { return m_pitch; }
 
 		virtual glm::vec3 GetPosition() const override;
 		void SetPosition( const glm::vec3& pos );

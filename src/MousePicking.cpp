@@ -150,6 +150,11 @@ namespace dd
 		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
 		dd::Span<ddc::Entity> entities = data.Entities();
 
+		Ray ray = GetScreenRay( data.Camera(), m_input.GetMousePosition() );
+
+		m_cameraDir = data.Camera().GetDirection();
+		m_rayDir = ray.Direction();
+
 		m_hitTestDistance = FLT_MAX;
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -161,7 +166,7 @@ namespace dd
 			RenderMesh( uniforms, shader, entities[i], *mesh, transforms[i].World );
 
 			float distance;
-			if( dd::HitTestMesh( GetScreenRay( data.Camera(), m_input.GetMousePosition() ), transforms[i].World, *mesh, distance ) )
+			if( dd::HitTestMesh( ray, transforms[i].World, *mesh, distance ) )
 			{
 				if( distance < m_hitTestDistance )
 				{
@@ -228,6 +233,9 @@ namespace dd
 		ImGui::Checkbox( "Enabled", &m_enabled );
 		ImGui::Checkbox( "Render Debug", &m_renderDebug );
 
+		ImGui::Value( "Camera Dir", m_cameraDir );
+		ImGui::Value( "Ray Dir", m_rayDir );
+
 		ImGui::Value( "Hit Test Mesh", m_hitTestMesh.ID );
 		ImGui::Value( "Hit Test Distance", m_hitTestDistance );
 
@@ -240,6 +248,8 @@ namespace dd
 			if( m_focusedMesh.IsValid() )
 			{
 				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focusedMesh )->Mesh;
+
+				ImGui::Value( "Handle", m_focusedMesh.ID );
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
@@ -261,6 +271,8 @@ namespace dd
 			if( m_selectedMesh.IsValid() )
 			{
 				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_selectedMesh )->Mesh;
+
+				ImGui::Value( "Handle", m_selectedMesh.ID );
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
@@ -293,30 +305,25 @@ namespace dd
 
 	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const
 	{
-		glm::vec3 camera_dir( camera.GetDirection() );
-		glm::vec3 dir( camera_dir );
-		glm::vec3 up( 0, 1, 0 );
+		float width = (float) m_window.GetWidth();
+		float x_percent = (pos.Absolute.x - (width / 2)) / width;
+		float yaw = (camera.GetVerticalFOV() * camera.GetAspectRatio()) * x_percent;
 
-		{
-			float width = (float) m_window.GetWidth();
-			float x_percent = (pos.Absolute.x - (width / 2)) / width;
-			float hfov = camera.GetVerticalFOV() * camera.GetAspectRatio();
-			float x_angle = hfov * x_percent;
+		float height = (float) m_window.GetHeight();
+		float y_percent = (pos.Absolute.x - (height / 2)) / height;
+		float pitch = camera.GetVerticalFOV() * y_percent;
 
-			dir = glm::rotate( camera_dir, -x_angle, up );
-		}
+		yaw += glm::radians( camera.GetYaw() );
+		pitch += glm::radians( camera.GetPitch() );
 
-		{
-			float height = (float) m_window.GetHeight();
-			float y_percent = (pos.Absolute.x - (height / 2)) / height;
-			float vfov = camera.GetVerticalFOV();
-			float y_angle = vfov * y_percent;
+		glm::vec3 dir = dd::directionFromPitchYaw( pitch, yaw );
 
-			glm::vec3 right = glm::normalize( glm::cross( camera.GetDirection(), up ) );
+		float near_height = std::tanf( camera.GetVerticalFOV() ) * camera.GetNear();
+		float near_width = near_height * camera.GetAspectRatio();
 
-			dir = glm::rotate( dir, -y_angle, right );
-		}
+		glm::vec4 offset( near_width * x_percent, near_height * y_percent, 0, 0 );
+		offset = offset * camera.GetCameraMatrix();
 
-		return Ray( camera.GetPosition(), dir );
+		return Ray( camera.GetPosition() + offset.xyz, dir );
 	}
 }

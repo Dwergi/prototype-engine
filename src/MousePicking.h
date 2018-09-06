@@ -44,6 +44,7 @@ namespace dd
 
 		MousePicking( const Window& window, const Input& input );
 
+		ddc::Entity GetHitTestMesh() const { return m_hitTestMesh; }
 		ddc::Entity GetFocusedMesh() const { return m_focusedMesh; }
 		ddc::Entity GetSelectedMesh() const { return m_selectedMesh; }
 
@@ -87,6 +88,9 @@ namespace dd
 		glm::vec2 m_position;
 		int m_handle { 0 };
 		float m_depth { 0.0f };
+
+		glm::vec3 m_cameraDir;
+		glm::vec3 m_rayDir;
 
 		glm::ivec2 m_previousSize;
 

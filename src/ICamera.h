@@ -55,6 +55,16 @@ namespace ddr
 		virtual glm::vec3 GetPosition() const = 0;
 
 		//
+		// Get the yaw of the camera.
+		//
+		virtual float GetYaw() const = 0;
+
+		//
+		// Get the pitch of the camera.
+		//
+		virtual float GetPitch() const = 0;
+
+		//
 		// Get the view frustum of the camera.
 		//
 		virtual const ddr::Frustum& GetFrustum() const = 0;

@@ -134,6 +134,11 @@ namespace ddr
 			debugMultiplier.y = 1.5f;
 		}
 
+		if( entity == m_mousePicking.GetHitTestMesh() )
+		{
+			debugMultiplier.x = 1.5f;
+		}
+
 		if( m_debugHighlightFrustumMeshes )
 		{
 			debugMultiplier.x = 1.5f;

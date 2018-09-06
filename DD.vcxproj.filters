@@ -900,6 +900,9 @@
     <ClCompile Include="src\HitTest.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\Math_dd.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
