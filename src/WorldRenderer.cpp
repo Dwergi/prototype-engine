@@ -17,18 +17,13 @@
 #include "MousePicking.h"
 #include "LightComponent.h"
 #include "ParticleSystem.h"
+#include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "Window.h"
 #include "World.h"
-
-#include "GL/gl3w.h"
-
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 #include "imgui/imgui.h"
 
@@ -87,14 +82,14 @@ namespace ddr
 		delete m_uniforms;
 	}
 
-	void WorldRenderer::InitializeRenderer()
+	void WorldRenderer::InitializeRenderers( ddc::World& world )
 	{
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
 
 		for( ddr::Renderer* current : m_renderers )
 		{
-			current->RenderInit();
+			current->RenderInit( world );
 		}
 	}
 
@@ -333,7 +328,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, const ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
+	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
 	{
 		dd::Array<ddc::TypeID, ddc::MAX_COMPONENTS> components;
 		for( const ddc::DataRequirement* req : renderer.GetRequirements() )
@@ -358,7 +353,7 @@ namespace ddr
 		fn( renderer, data );
 	}
 
-	void WorldRenderer::Render( const ddc::World& world, const ddr::ICamera& camera )
+	void WorldRenderer::Render( ddc::World& world, const ddr::ICamera& camera )
 	{
 		ddr::Renderer* debug_render = nullptr;
 
@@ -427,9 +422,7 @@ namespace ddr
 		s_wireframe.UpdateUniforms( *m_uniforms );
 		s_fog.UpdateUniforms( *m_uniforms );
 
-		m_uniforms->Set( "View", camera.GetCameraMatrix() );
-		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
-
+		m_uniforms->Set( "ViewProjection", camera.GetProjectionMatrix() * camera.GetViewMatrix() );
 		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}
 

@@ -30,7 +30,8 @@ namespace dd
 	struct AABB;
 	class Input;
 	class InputBindings;
-	class MeshComponent;
+	struct MeshComponent;
+	struct RayComponent;
 	struct TransformComponent;
 	class Window;
 
@@ -44,17 +45,14 @@ namespace dd
 
 		MousePicking( const Window& window, const Input& input );
 
-		ddc::Entity GetFocusedMesh() const { return m_focusedMesh; }
-		ddc::Entity GetSelectedMesh() const { return m_selectedMesh; }
-
-		int GetEntityHandleAt( glm::vec2 mouse_pos ) const;
+		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
 
 		void BindActions( InputBindings& bindings );
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
-		virtual void RenderInit() override;
+		virtual void RenderInit( ddc::World& world ) override;
 		virtual void Render( const ddr::RenderData& data ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
@@ -68,12 +66,13 @@ namespace dd
 		bool m_select { false };
 		bool m_enabled { true };
 		bool m_renderDebug { false };
+		bool m_rayTest { true };
 
-		ddc::Entity m_selectedMesh;
-		ddc::Entity m_focusedMesh;
-		ddc::Entity m_hitTestMesh;
+		ddc::Entity m_selected;
+		ddc::Entity m_focused;
 
-		float m_hitTestDistance;
+		glm::vec2 m_position;
+		float m_depth { 0.0f };
 
 		ddr::ShaderHandle m_shader;
 		ddr::Texture m_idTexture;
@@ -84,9 +83,8 @@ namespace dd
 		Buffer<byte> m_lastIDBuffer;
 		Buffer<byte> m_lastDepthBuffer;
 
-		glm::vec2 m_position;
-		int m_handle { 0 };
-		float m_depth { 0.0f };
+		bool m_visualizeRay { false };
+		ddc::Entity m_previousRay;
 
 		glm::ivec2 m_previousSize;
 
@@ -94,11 +92,11 @@ namespace dd
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
-		Ray GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const;
-		void HitTestBounds( ddc::Entity entity, const AABB& mesh_cmp, const Ray& mouse_ray, float& nearest_distance );
+		Ray GetScreenRay( const ddr::ICamera& camera ) const;
 
 		void HandleInput( InputAction action, InputType type );
 
-		void RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, ddr::Mesh& mesh, const glm::mat4& transform );
+		ddc::Entity HitTestRender( const ddr::RenderData& data );
+		ddc::Entity HitTestRay( const ddr::RenderData& data );
 	};
 }

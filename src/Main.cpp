@@ -15,6 +15,7 @@
 #endif
 
 #include "BoundsComponent.h"
+#include "BoundsRenderer.h"
 #include "DebugUI.h"
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
@@ -37,7 +38,9 @@
 #include "Message.h"
 #include "MousePicking.h"
 #include "OctreeComponent.h"
+#include "OpenGL.h"
 #include "Random.h"
+#include "RayRenderer.h"
 #include "Recorder.h"
 #include "WorldRenderer.h"
 #include "FrameBuffer.h"
@@ -66,10 +69,8 @@
 
 #include "imgui/imgui.h"
 
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
-#include "GL/gl3w.h"
+
 
 #include "SFML/Network/UdpSocket.hpp"
 
@@ -419,6 +420,8 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
 		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
 
+		BindKeys( *s_input );
+
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
 		SceneGraphSystem* scene_graph = new SceneGraphSystem();
@@ -466,13 +469,17 @@ int GameMain()
 
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
 
+		ddr::BoundsRenderer* bounds_renderer = new ddr::BoundsRenderer();
+
+		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
+
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *terrain_system );
 		s_renderer->Register( *light_renderer );
 		s_renderer->Register( *particle_renderer );
 		s_renderer->Register( *mesh_renderer );
-
-		BindKeys( *s_input );
+		s_renderer->Register( *bounds_renderer );
+		s_renderer->Register( *ray_renderer );
 
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );
@@ -488,13 +495,14 @@ int GameMain()
 		debug_views.Add( particle_system );
 		debug_views.Add( terrain_system );
 		debug_views.Add( mesh_renderer );
+		debug_views.Add( bounds_renderer );
 
 		//debug_views.Add( s_debugConsole );
 		//debug_views.Add( s_shipSystem );
 
 		s_world->Initialize();
 
-		s_renderer->InitializeRenderer();
+		s_renderer->InitializeRenderers( *s_world );
 
 		CreateUnitCube();
 
@@ -532,9 +540,9 @@ int GameMain()
 		{
 			ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
 
-			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::translate( glm::vec3( 0.0f, 0.0f, -50.0f ) ) * glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console

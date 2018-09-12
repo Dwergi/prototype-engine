@@ -11,13 +11,12 @@
 #include "GLError.h"
 #include "Material.h"
 #include "MeshHandle.h"
+#include "OpenGL.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
 #include "WorldRenderer.h"
 
-#include "GL/gl3w.h"
 
-#include "glm/gtx/transform.hpp"
 
 namespace ddr
 {
@@ -28,51 +27,51 @@ namespace ddr
 	{
 		//  X    Y    Z     
 		// bottom
-		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	-1.0f ), 
-		glm::vec3( -1.0f,	-1.0f,	1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	1.0f ),
-		glm::vec3( -1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ), 
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
 				
 		// top			 
-		glm::vec3( -1.0f,	1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	1.0f,	1.0f ),
-		glm::vec3( 1.0f,	1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
 		glm::vec3( 1.0f,	1.0f,	1.0f ),
 		
 		// front
-		glm::vec3( -1.0f,	-1.0f,	1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	1.0f ),
-		glm::vec3( -1.0f,	1.0f,	1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	1.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
 		glm::vec3( 1.0f,	1.0f,	1.0f ),
-		glm::vec3( -1.0f,	1.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
 		
 		// back
-		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
 
 		// left
-		glm::vec3( -1.0f,	-1.0f,	1.0f ),
-		glm::vec3( -1.0f,	1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( -1.0f,	-1.0f,	1.0f ),
-		glm::vec3( -1.0f,	1.0f,	1.0f ),
-		glm::vec3( -1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
 
 		// right
-		glm::vec3( 1.0f,	-1.0f,	1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	1.0f,	-1.0f ),
-		glm::vec3( 1.0f,	-1.0f,	1.0f ),
-		glm::vec3( 1.0f,	1.0f,	-1.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
 		glm::vec3( 1.0f,	1.0f,	1.0f ),
 	};
 
@@ -339,6 +338,7 @@ namespace ddr
 
 		m_vboVertexColour.Bind();
 		m_vboVertexColour.SetData( colours );
+		m_vboVertexColour.Unbind();
 
 		m_vao.Unbind();
 	}

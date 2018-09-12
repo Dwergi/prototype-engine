@@ -149,7 +149,7 @@ namespace dd
 		AABB transformed;
 		for( int i = 0; i < 8; ++i )
 		{
-			glm::vec4 corner = glm::vec4( corners[i], 1.0f ) * transform + transform[3];
+			glm::vec4 corner = transform * glm::vec4( corners[i], 1.0f );
 			transformed.Expand( corner.xyz() );
 		}
 

@@ -52,6 +52,10 @@
 #include "RefCounter.h"
 #include "AngelScriptEngine.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 namespace dd
 {
 	const double M_PI = 3.14159265358979323846;

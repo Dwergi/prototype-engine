@@ -8,8 +8,7 @@
 #include "Shader.h"
 
 #include "File.h"
-
-#include "GL/gl3w.h"
+#include "OpenGL.h"
 
 namespace ddr
 {

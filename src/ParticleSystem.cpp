@@ -17,10 +17,6 @@
 #include "TransformComponent.h"
 
 #include "glm/gtx/norm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform.hpp"
-
-#include "GL/gl3w.h"
 
 #include "imgui/imgui.h"
 
@@ -87,7 +83,7 @@ namespace ddr
 		RequireTag( ddc::Tag::Visible );
 	}
 
-	void ParticleSystemRenderer::RenderInit()
+	void ParticleSystemRenderer::RenderInit( ddc::World& world )
 	{
 		dd::Vector<Shader*> shaders;
 
@@ -110,12 +106,12 @@ namespace ddr
 		shader->BindAttributeVec2( "Position", false );
 		s_vboParticle.Unbind();
 
-		m_vboPositions.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vboPositions.Bind();
-		m_vboPositions.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MaxParticles ) );
+		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboPosition.Bind();
+		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MaxParticles ) );
 		shader->BindAttributeVec3( "PositionInstanced", false );
 		shader->SetAttributeInstanced( "PositionInstanced" );
-		m_vboPositions.Unbind();
+		m_vboPosition.Unbind();
 
 		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboSizes.Bind();
@@ -241,6 +237,8 @@ namespace ddr
 		const ddc::World& world = data.World();
 
 		uniforms.Bind( *shader );
+		uniforms.Set( "View", camera.GetViewMatrix() );
+		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
 
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -281,7 +279,7 @@ namespace ddr
 				++index;
 			}
 
-			m_vboPositions.UpdateData();
+			m_vboPosition.UpdateData();
 			m_vboSizes.UpdateData();
 			m_vboColours.UpdateData();
 

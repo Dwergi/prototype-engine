@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "MousePicking.h"
+#include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -21,8 +22,8 @@
 
 #include "imgui/imgui.h"
 
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+
+
 #include "glm/gtc/type_ptr.hpp"
 
 namespace ddr
@@ -37,7 +38,7 @@ namespace ddr
 		Require<dd::TransformComponent>();
 	}
 
-	void MeshRenderer::RenderInit()
+	void MeshRenderer::RenderInit( ddc::World& world )
 	{
 		m_unitCube = Mesh::Find( "unitcube" );
 		if( !m_unitCube.IsValid() )
@@ -76,23 +77,16 @@ namespace ddr
 		
 		for( size_t i = 0; i < entities.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], data.Camera(), data.Uniforms() );
+			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], data.World(), data.Camera(), data.Uniforms() );
 		}
 	}
 
-	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-		const dd::BoundsComponent& bounds_cmp, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
+	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, 
+		const dd::TransformComponent& transform_cmp, const dd::BoundsComponent& bounds_cmp, 
+		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		Mesh* mesh = nullptr;
-
-		if( m_debugDrawBounds )
-		{
-			mesh = Mesh::Get( m_unitCube );
-		}
-		else
-		{
-			mesh = Mesh::Get( mesh_cmp.Mesh );
-		}
+		mesh = Mesh::Get( mesh_cmp.Mesh );
 
 		if( mesh == nullptr )
 		{
@@ -114,22 +108,14 @@ namespace ddr
 
 		++m_unculledMeshCount;
 
-		glm::mat4 transform = transform_cmp.World;
-
-		if( m_debugDrawBounds )
-		{
-			glm::vec3 scale = bounds_cmp.World.Max - bounds_cmp.World.Min;
-			transform = glm::translate( bounds_cmp.World.Center() ) * glm::scale( scale / 2.0f );
-		}
-
 		glm::vec4 debugMultiplier( 1, 1, 1, 1 );
 
-		if( entity == m_mousePicking.GetFocusedMesh() )
+		if( world.HasTag( entity, ddc::Tag::Focused ) )
 		{
 			debugMultiplier.z = 1.5f;
 		}
 
-		if( entity == m_mousePicking.GetSelectedMesh() )
+		if( world.HasTag( entity, ddc::Tag::Selected ) )
 		{
 			debugMultiplier.y = 1.5f;
 		}
@@ -154,7 +140,7 @@ namespace ddr
 
 		uniforms.Bind( *shader );
 
-		mesh->Render( uniforms, *shader, transform );
+		mesh->Render( uniforms, *shader, transform_cmp.World );
 
 		shader->Use( false );
 	}
@@ -163,8 +149,6 @@ namespace ddr
 	{
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );
-
-		ImGui::Checkbox( "Draw Bounds", &m_debugDrawBounds );
 
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );

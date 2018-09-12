@@ -63,11 +63,22 @@ namespace ddr
 
 		bool IsValid() const { return m_valid; }
 
+		void SetUniform( const char* name, const glm::mat3& mat );
+		void SetUniform( const char* name, const glm::mat4& mat );
+		void SetUniform( const char* name, const glm::vec2& vec );
+		void SetUniform( const char* name, const glm::vec3& vec );
+		void SetUniform( const char* name, const glm::vec4& vec );
+		void SetUniform( const char* name, int i );
+		void SetUniform( const char* name, bool b );
+		void SetUniform( const char* name, float flt );
+		void SetUniform( const char* name, const Texture& texture );
+
 		bool BindPositions();
 		bool BindNormals();
 		bool BindUVs();
 		bool BindVertexColours();
 
+		bool BindAttributeFloat( const char* name, uint components, bool normalized );
 		bool BindAttributeVec2( const char* name, bool normalized );
 		bool BindAttributeVec3( const char* name, bool normalized );
 		bool BindAttributeVec4( const char* name, bool normalized );
@@ -106,17 +117,5 @@ namespace ddr
 
 		ShaderLocation GetAttribute( const char* name ) const;
 		ShaderLocation GetUniform( const char* name ) const;
-
-		bool BindAttributeFloat( const char* name, uint components, bool normalized );
-
-		void SetUniform( const char* name, const glm::mat3& mat );
-		void SetUniform( const char* name, const glm::mat4& mat );
-		void SetUniform( const char* name, const glm::vec2& vec );
-		void SetUniform( const char* name, const glm::vec3& vec );
-		void SetUniform( const char* name, const glm::vec4& vec );
-		void SetUniform( const char* name, int i );
-		void SetUniform( const char* name, bool b );
-		void SetUniform( const char* name, float flt );
-		void SetUniform( const char* name, const Texture& texture );
 	};
 } 

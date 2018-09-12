@@ -7,12 +7,15 @@
 #include "PrecompiledHeader.h"
 #include "MousePicking.h"
 
+#include "BoundsComponent.h"
 #include "ICamera.h"
 #include "Input.h"
 #include "InputBindings.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "OpenGL.h"
 #include "ParticleSystemComponent.h"
+#include "RayComponent.h"
 #include "RenderData.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -28,8 +31,6 @@
 
 #include "imgui/imgui.h"
 
-#include "GL/gl3w.h"
-
 namespace dd
 {
 	MousePicking::MousePicking( const Window& window, const Input& input ) :
@@ -40,6 +41,7 @@ namespace dd
 		ddr::Renderer::RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
+		Require<dd::BoundsComponent>();
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
@@ -53,7 +55,6 @@ namespace dd
 		if( action == InputAction::SELECT_MESH && type == InputType::RELEASED )
 		{
 			m_select = true;
-			m_selectedMesh = ddc::Entity();
 		}
 
 		if( action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED )
@@ -63,7 +64,7 @@ namespace dd
 		}
 	}
 
-	int MousePicking::GetEntityHandleAt( glm::vec2 mouse_pos ) const
+	int MousePicking::GetEntityIDAt( glm::vec2 mouse_pos ) const
 	{
 		glm::ivec2 flipped = glm::ivec2( (int) mouse_pos.x, m_window.GetHeight() - (int) mouse_pos.y );
 
@@ -89,12 +90,15 @@ namespace dd
 		return base[index];
 	}
 
-	void MousePicking::RenderInit()
+	void MousePicking::RenderInit( ddc::World& world )
 	{
 		m_shader = ddr::ShaderProgram::Load( "picking" );
 
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
+
+		m_previousRay = world.CreateEntity();
+		world.Add<dd::RayComponent>( m_previousRay );
 	}
 
 	void MousePicking::CreateFrameBuffer( glm::ivec2 window_size )
@@ -116,12 +120,58 @@ namespace dd
 
 	void MousePicking::Render( const ddr::RenderData& data )
 	{
-		m_focusedMesh = ddc::Entity();
-		m_hitTestMesh = ddc::Entity();
-
 		if( !m_enabled )
 			return;
 
+		m_position = m_input.GetMousePosition().Absolute;
+
+		// do hit
+		ddc::Entity hit;
+		if( m_rayTest )
+		{
+			hit = HitTestRay( data );
+		}
+		else
+		{
+			hit = HitTestRender( data );
+		}
+
+		ddc::World& world = data.World();
+
+		// set focused
+		if( m_focused.IsValid() )
+		{
+			world.RemoveTag( m_focused, ddc::Tag::Focused );
+		}
+
+		m_focused = hit;
+
+		if( m_focused.IsValid() )
+		{
+			world.AddTag( m_focused, ddc::Tag::Focused );
+		}
+
+		// select
+		if( m_select )
+		{
+			if( m_selected.IsValid() )
+			{
+				world.RemoveTag( m_selected, ddc::Tag::Selected );
+			}
+
+			m_selected = hit;
+			
+			if( m_selected.IsValid() )
+			{
+				world.AddTag( m_focused, ddc::Tag::Selected );
+			}
+		}
+
+		m_select = false;
+	}
+
+	ddc::Entity MousePicking::HitTestRender( const ddr::RenderData& data )
+	{
 		if( m_previousSize != m_window.GetSize() )
 		{
 			m_framebuffer.Destroy();
@@ -148,9 +198,8 @@ namespace dd
 
 		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
 		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
 		dd::Span<ddc::Entity> entities = data.Entities();
-
-		m_hitTestDistance = FLT_MAX;
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
@@ -158,17 +207,8 @@ namespace dd
 			if( mesh == nullptr )
 				continue;
 
-			RenderMesh( uniforms, shader, entities[i], *mesh, transforms[i].World );
-
-			float distance;
-			if( dd::HitTestMesh( GetScreenRay( data.Camera(), m_input.GetMousePosition() ), transforms[i].World, *mesh, distance ) )
-			{
-				if( distance < m_hitTestDistance )
-				{
-					m_hitTestMesh = entities[i];
-					m_hitTestDistance = distance;
-				}
-			}
+			uniforms.Set( "ID", (int) entities[i].ID );
+			mesh->Render( uniforms, shader, transforms[i].World );
 		}
 
 		shader.Use( false );
@@ -179,30 +219,60 @@ namespace dd
 		m_idTexture.GetData( m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT );
 		m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
 
-		m_position = m_input.GetMousePosition().Absolute;
-		m_handle = GetEntityHandleAt( m_input.GetMousePosition().Absolute );
-		m_depth = GetDepthAt( m_input.GetMousePosition().Absolute );
+		int id = GetEntityIDAt( m_position );
+		m_depth = GetDepthAt( m_position );
 
-		ddc::Entity entity = data.World().GetEntity( m_handle );
+		ddc::Entity entity = data.World().GetEntity( id );
 
-		if( entity.IsValid() )
+		return entity;
+	}
+
+	ddc::Entity MousePicking::HitTestRay( const ddr::RenderData& data )
+	{
+		ddc::World& world = data.World();
+
+		if( m_visualizeRay )
 		{
-			m_focusedMesh = entity;
+			world.AddTag( m_previousRay, ddc::Tag::Visible );
 		}
 		else
 		{
-			m_handle = -1;
+			world.RemoveTag( m_previousRay, ddc::Tag::Visible );
 		}
 
-		if( m_focusedMesh.IsValid() )
+		dd::Ray screen_ray = GetScreenRay( data.Camera() );
+
+		ddc::Entity entity;
+		m_depth = FLT_MAX;
+
+		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
+		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
+		dd::Span<ddc::Entity> entities = data.Entities();
+
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			if( m_select )
+			ddr::Mesh* mesh = ddr::Mesh::Get( meshes[i].Mesh );
+			if( mesh == nullptr )
+				continue;
+
+			float distance;
+			if( dd::HitTestMesh( screen_ray, transforms[i].World, bounds[i].World, *mesh, distance ) )
 			{
-				m_selectedMesh = m_focusedMesh;
+				if( distance < m_depth )
+				{
+					entity = entities[i];
+					m_depth = distance;
+				}
 			}
 		}
 
-		m_select = false;
+		if( m_select )
+		{
+			world.Access<dd::RayComponent>( m_previousRay )->Ray = screen_ray;
+		}
+
+		return entity;
 	}
 
 	void MousePicking::RenderDebug( const ddr::RenderData& data )
@@ -214,37 +284,41 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::RenderMesh( ddr::UniformStorage& uniforms, ddr::ShaderProgram& shader, ddc::Entity entity, ddr::Mesh& mesh, const glm::mat4& transform )
-	{
-		uniforms.Set( "ID", (int) entity.ID );
-
-		mesh.Render( uniforms, shader, transform );
-	}
-
 	void MousePicking::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
+		ImGui::Checkbox( "Use Ray", &m_rayTest );
+
 		ImGui::Checkbox( "Render Debug", &m_renderDebug );
 
-		ImGui::Value( "Hit Test Mesh", m_hitTestMesh.ID );
-		ImGui::Value( "Hit Test Distance", m_hitTestDistance );
-
-		ImGui::Value( "Handle", m_handle );
+		ImGui::Value( "Handle", m_focused.ID );
 		ImGui::Value( "Position", m_position, "%.1f" );
 		ImGui::Value( "Depth", 1.0f / m_depth, "%.3f" );
 
+		if( ImGui::TreeNodeEx( "Ray", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
+		{
+			ImGui::Checkbox( "Visualize Ray", &m_visualizeRay );
+
+			const dd::RayComponent* ray_cmp = world.Get<dd::RayComponent>( m_previousRay );
+
+			ImGui::Value( "Ray Origin", ray_cmp->Ray.Origin() );
+			ImGui::Value( "Ray Dir", ray_cmp->Ray.Direction() );
+
+			ImGui::TreePop();
+		}
+
 		if( ImGui::TreeNodeEx( "Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			if( m_focusedMesh.IsValid() )
+			if( m_focused.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focusedMesh )->Mesh;
+				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focused )->Mesh;
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focusedMesh )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->GetLocalPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -258,14 +332,14 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Selected", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			if( m_selectedMesh.IsValid() )
+			if( m_selected.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_selectedMesh )->Mesh;
+				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_selected )->Mesh;
 
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
-				ImGui::Text( "Name: %s", name.c_str() );
+				ImGui::Value( "Name", name.c_str() );
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selectedMesh )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->GetLocalPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -278,45 +352,19 @@ namespace dd
 		}
 	}
 
-	void MousePicking::HitTestBounds( ddc::Entity entity, const AABB& bounds, const Ray& mouse_ray, float& nearest_distance )
+	//
+	// Unproject a point at the mouse coordinates at the near plane and at the far plane to get a world-space ray.
+	//
+	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera ) const
 	{
-		float distance;
-		if( bounds.IntersectsRay( mouse_ray, distance ) )
-		{
-			if( distance < nearest_distance )
-			{
-				nearest_distance = distance;
-				m_focusedMesh = entity;
-			}
-		}
-	}
+		glm::vec4 viewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
 
-	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, const MousePosition& pos ) const
-	{
-		glm::vec3 camera_dir( camera.GetDirection() );
-		glm::vec3 dir( camera_dir );
-		glm::vec3 up( 0, 1, 0 );
+		glm::vec3 win_near( m_position.x, m_window.GetHeight() - m_position.y, 0 );
+		glm::vec3 win_far( m_position.x, m_window.GetHeight() - m_position.y, 1 );
 
-		{
-			float width = (float) m_window.GetWidth();
-			float x_percent = (pos.Absolute.x - (width / 2)) / width;
-			float hfov = camera.GetVerticalFOV() * camera.GetAspectRatio();
-			float x_angle = hfov * x_percent;
+		glm::vec3 world_near = glm::unProject( win_near, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
+		glm::vec3 world_far = glm::unProject( world_far, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 
-			dir = glm::rotate( camera_dir, -x_angle, up );
-		}
-
-		{
-			float height = (float) m_window.GetHeight();
-			float y_percent = (pos.Absolute.x - (height / 2)) / height;
-			float vfov = camera.GetVerticalFOV();
-			float y_angle = vfov * y_percent;
-
-			glm::vec3 right = glm::normalize( glm::cross( camera.GetDirection(), up ) );
-
-			dir = glm::rotate( dir, -y_angle, right );
-		}
-
-		return Ray( camera.GetPosition(), dir );
+		return Ray( world_near, glm::normalize( world_far - world_near ) );
 	}
 }

@@ -8,8 +8,8 @@
 #include "Window.h"
 
 #include "GLError.h"
+#include "OpenGL.h"
 
-#include "GL/gl3w.h"
 #include "GLFW/glfw3.h"
 
 namespace dd

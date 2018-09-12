@@ -335,6 +335,7 @@
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\BoundsComponent.h" />
+    <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\ComponentBuffer.h" />
     <ClInclude Include="src\DataRequirement.h" />
@@ -349,6 +350,8 @@
     <ClInclude Include="src\FunctionView.h" />
     <ClInclude Include="src\HitTest.h" />
     <ClInclude Include="src\LightRenderer.h" />
+    <ClInclude Include="src\RayComponent.h" />
+    <ClInclude Include="src\RayRenderer.h" />
     <ClInclude Include="src\System.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
@@ -536,6 +539,7 @@
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundsComponent.cpp" />
+    <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\ComponentBuffer.cpp" />
@@ -573,6 +577,8 @@
     <ClCompile Include="src\ParticleSystemComponent.cpp" />
     <ClCompile Include="src\PlayerComponent.cpp" />
     <ClCompile Include="src\Ray.cpp" />
+    <ClCompile Include="src\RayComponent.cpp" />
+    <ClCompile Include="src\RayRenderer.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\SceneGraphSystem.cpp" />

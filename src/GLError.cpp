@@ -6,8 +6,7 @@
 
 #include "PrecompiledHeader.h"
 #include "GLError.h"
-
-#include "GL/gl3w.h"
+#include "OpenGL.h"
 
 namespace dd
 {

@@ -19,7 +19,9 @@ namespace ddc
 	enum class Tag : uint
 	{
 		None = 0,
-		Visible = 1
+		Visible = 1,
+		Focused = 2,
+		Selected = 3
 	};
 
 	struct System;
@@ -175,7 +177,7 @@ namespace ddc
 		//
 		// Does the given entity have the given tag?
 		//
-		bool HasTag( Entity e, Tag tag );
+		bool HasTag( Entity e, Tag tag ) const;
 
 		//
 		// Add the given tag to the given entity.

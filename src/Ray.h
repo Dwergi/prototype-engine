@@ -11,7 +11,10 @@ namespace dd
 	struct Ray
 	{
 		Ray();
+		Ray( const Ray& other );
 		Ray( const glm::vec3& origin, const glm::vec3& direction );
+
+		void operator=( const Ray& other );
 
 		glm::vec3 Direction() const { return m_direction; }
 		void SetDirection( const glm::vec3& direction );
@@ -23,8 +26,8 @@ namespace dd
 
 	private:
 
-		glm::vec3 m_direction;
 		glm::vec3 m_origin;
+		glm::vec3 m_direction;
 		glm::vec3 m_invDir;
 	};
 }

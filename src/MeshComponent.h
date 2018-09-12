@@ -12,7 +12,7 @@
 
 namespace dd
 {
-	class MeshComponent
+	struct MeshComponent
 	{
 	public: 
 

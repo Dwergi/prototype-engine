@@ -59,9 +59,10 @@ namespace dd
 		float yawRads = glm::radians( m_yaw );
 		float pitchRads = glm::radians( m_pitch );
 
-		m_direction = glm::vec3( std::cos( pitchRads ) * std::sin( yawRads ),
+		SetDirection( glm::vec3(
+			std::cos( pitchRads ) * std::sin( yawRads ),
 			std::sin( pitchRads ),
-			std::cos( pitchRads ) * std::cos( yawRads ) );
+			std::cos( pitchRads ) * std::cos( yawRads ) ) );
 	}
 
 	glm::vec3 FPSCamera::GetDirection() const
@@ -142,7 +143,7 @@ namespace dd
 			0.0f, 0.0f, m_near, 0.0f );
 	}
 
-	glm::mat4 FPSCamera::GetCameraMatrix() const
+	glm::mat4 FPSCamera::GetViewMatrix() const
 	{
 		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
 	}

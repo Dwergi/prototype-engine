@@ -3,8 +3,6 @@
 
 #include "OpenGL.h"
 
-#include "GL/gl3w.h"
-
 namespace ddr
 {
 	GLint VAO::GetCurrentVAO()

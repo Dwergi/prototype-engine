@@ -9,13 +9,12 @@
 
 #include "GLError.h"
 #include "ICamera.h"
+#include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "Texture.h"
 #include "Uniforms.h"
 #include "Window.h"
-
-#include "GL/gl3w.h"
 
 namespace ddr
 {

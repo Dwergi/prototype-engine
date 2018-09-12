@@ -14,7 +14,7 @@
 
 namespace dd
 {
-	class MeshComponent;
+	struct MeshComponent;
 	class MousePicking;
 	struct TransformComponent;
 	class Window;
@@ -36,14 +36,14 @@ namespace ddr
 		~WorldRenderer();
 
 		//
-		// Initialize the renderer.
+		// Initialize all registered renderers.
 		//
-		void InitializeRenderer();
+		void InitializeRenderers( ddc::World& world );
 
 		//
 		// Render all the registered renderers.
 		//
-		void Render( const ddc::World& world, const ddr::ICamera& camera );
+		void Render( ddc::World& world, const ddr::ICamera& camera );
 
 		void ShutdownRenderer() {}
 
@@ -105,7 +105,7 @@ namespace ddr
 		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		void CallRenderer( ddr::Renderer& renderer, const ddc::World& world, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn );
+		void CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

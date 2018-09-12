@@ -1,6 +1,7 @@
 #include "PrecompiledHeader.h"
 #include "HitTest.h"
 
+#include "AABB.h"
 #include "Mesh.h"
 #include "Ray.h"
 
@@ -25,7 +26,7 @@ namespace dd
 		return true;
 	}
 
-	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& mesh_transform, const ddr::Mesh& mesh, float& out_distance )
+	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& mesh_transform, const dd::AABB& bounds, const ddr::Mesh& mesh, float& out_distance )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();
 		const dd::ConstBuffer<uint>& indices = mesh.GetIndices();
@@ -35,18 +36,18 @@ namespace dd
 			return false;
 		}
 
-		AABB transform_bb = mesh.GetBoundBox().GetTransformed( mesh_transform );
-		if( !transform_bb.IntersectsRay( ray, out_distance ) )
+		if( !bounds.IntersectsRay( ray, out_distance ) )
 		{
 			return false;
 		}
 
 		// transform to mesh space
-		glm::vec3 origin = ray.Origin() - mesh_transform[3].xyz;
-		glm::mat3 rot = glm::mat3( mesh_transform[0].xyz, mesh_transform[1].xyz, mesh_transform[2].xyz );
-		glm::mat3 inv_rot = glm::inverse( rot );
-
-		glm::vec3 dir = ray.Direction() * inv_rot;
+		
+		glm::mat4 inv_transform = glm::inverse( mesh_transform );
+		
+		glm::vec3 origin = (inv_transform * glm::vec4( ray.Origin(), 1 )).xyz;
+		glm::vec3 dir = (inv_transform * glm::vec4( ray.Direction(), 0 )).xyz;
+		dir = glm::normalize( dir );
 
 		if( indices.IsValid() )
 		{

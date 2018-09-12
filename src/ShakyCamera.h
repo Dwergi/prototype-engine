@@ -78,7 +78,7 @@ namespace dd
 		// ICamera implementation
 		//
 		virtual glm::mat4 GetProjectionMatrix() const override;
-		virtual glm::mat4 GetCameraMatrix() const override;
+		virtual glm::mat4 GetViewMatrix() const override;
 		virtual float GetVerticalFOV() const override;
 		virtual float GetAspectRatio() const override;
 		virtual float GetNear() const override;

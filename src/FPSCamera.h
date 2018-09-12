@@ -46,7 +46,7 @@ namespace dd
 		void SetVerticalFOV( float vfov );
 
 		virtual glm::mat4 GetProjectionMatrix() const override;
-		virtual glm::mat4 GetCameraMatrix() const override;
+		virtual glm::mat4 GetViewMatrix() const override;
 
 		virtual const ddr::Frustum& GetFrustum() const override { return m_frustum; }
 

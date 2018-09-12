@@ -8,7 +8,7 @@
 #include "DebugUI.h"
 
 // GL3W/GLFW
-#include <GL/gl3w.h>
+#include "OpenGL.h"
 #include "GLFW/glfw3.h"
 #ifdef _WIN32
 #undef APIENTRY
@@ -403,7 +403,11 @@ namespace dd
 
 		ImGuiIO& io = ImGui::GetIO();
 
-		SetMousePosition( m_input->GetMousePosition().Absolute );
+		if( !m_input->IsMouseCaptured() )
+		{
+			SetMousePosition( m_input->GetMousePosition().Absolute );
+		}
+
 		SetFocused( m_window->IsFocused() );
 		UpdateDisplaySize();
 

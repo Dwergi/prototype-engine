@@ -22,7 +22,7 @@ namespace ddr
 		//
 		// Get the transformation matrix of the camera.
 		//
-		virtual glm::mat4 GetCameraMatrix() const = 0;
+		virtual glm::mat4 GetViewMatrix() const = 0;
 
 		//
 		// Get the vertical FOV of the camera in radians.

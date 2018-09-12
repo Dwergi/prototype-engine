@@ -19,10 +19,7 @@
 #include "TerrainParameters.h"
 #include "Uniforms.h"
 
-#include "GL/gl3w.h"
-
 #include "glm/gtc/noise.hpp"
-#include "glm/gtx/transform.hpp"
 
 #include "stb/stb_image_write.h"
 

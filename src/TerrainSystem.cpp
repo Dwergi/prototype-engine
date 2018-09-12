@@ -96,7 +96,7 @@ namespace dd
 		m_requiresRegeneration = true;
 	}
 
-	void TerrainSystem::RenderInit()
+	void TerrainSystem::RenderInit( ddc::World& world )
 	{
 		TerrainChunk::CreateRenderResources();
 	}
@@ -166,6 +166,15 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
+			if( m_draw )
+			{
+				data.World().AddTag( data.Entities()[i], ddc::Tag::Visible );
+			}
+			else 
+			{
+				data.World().RemoveTag( data.Entities()[i], ddc::Tag::Visible );
+			}
+
 			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ] );
 		}
 	}
@@ -349,6 +358,8 @@ namespace dd
 
 	void TerrainSystem::DrawDebugInternal( const ddc::World& world )
 	{
+		ImGui::Checkbox( "Draw", &m_draw );
+
 		ImGui::Value( "Chunks", (int) m_existing.size() );
 		ImGui::Value( "Active", m_active.Size() );
 

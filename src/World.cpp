@@ -237,7 +237,7 @@ namespace ddc
 		}
 	}
 
-	bool World::HasTag( Entity e, Tag tag )
+	bool World::HasTag( Entity e, Tag tag ) const
 	{
 		DD_ASSERT( IsAlive( e ) );
 		DD_ASSERT( tag != Tag::None );

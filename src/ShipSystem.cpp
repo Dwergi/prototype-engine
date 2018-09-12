@@ -22,8 +22,6 @@
 
 #include "imgui/imgui.h"
 
-#include "glm/gtx/transform.hpp"
-
 namespace dd
 {
 	float s_shipMesh[] = 

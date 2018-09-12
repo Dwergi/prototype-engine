@@ -10,8 +10,6 @@
 #include "FPSCamera.h"
 #include "InputBindings.h"
 
-#include "glm/gtx/transform.hpp"
-
 #include "imgui/imgui.h"
 
 namespace dd
@@ -182,7 +180,7 @@ namespace dd
 
 	void FreeCameraController::UpdateMouse( const MousePosition& pos )
 	{
-		m_mouseDelta = pos.GameDelta;
+		m_mouseDelta = pos.Delta;
 	}
 
 	void FreeCameraController::UpdateScroll( const MousePosition& pos )
@@ -191,9 +189,7 @@ namespace dd
 		
 		float degs = glm::degrees( vfov );
 
-		degs *= std::powf( 2.f, -pos.GameDelta.y * ZoomSpeed );
-
-		//degs += ZoomSpeed * -pos.DeltaY;
+		degs *= std::powf( 2.f, -pos.Delta.y * ZoomSpeed );
 		degs = glm::clamp( degs, 5.f, 89.f );
 
 		m_camera.SetVerticalFOV( glm::radians( degs ) );

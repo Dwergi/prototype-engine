@@ -8,6 +8,8 @@
 
 #include "GLError.h"
 
+#include "GL/gl3w.h"
+
 typedef int GLint;
 typedef unsigned int GLuint;
 typedef unsigned int GLenum;

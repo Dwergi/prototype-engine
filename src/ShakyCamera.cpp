@@ -7,7 +7,6 @@
 #include "imgui/imgui.h"
 
 #include "glm/gtc/noise.hpp"
-#include "glm/gtx/transform.hpp"
 
 namespace dd
 {
@@ -129,7 +128,7 @@ namespace dd
 		return m_sourceCamera.GetProjectionMatrix();
 	}
 
-	glm::mat4 ShakyCamera::GetCameraMatrix() const
+	glm::mat4 ShakyCamera::GetViewMatrix() const
 	{
 		glm::vec4 up( 0, 1, 0, 0 );
 		glm::mat4 rotation = glm::rotate( m_roll, glm::vec3( 0, 0, 1 ) );

@@ -9,8 +9,6 @@
 
 #include "GLError.h"
 
-#include "GL/gl3w.h"
-
 namespace ddr
 {
 	GLint VBO::GetCurrentVBO( GLenum m_target )

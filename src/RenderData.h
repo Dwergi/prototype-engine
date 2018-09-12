@@ -6,8 +6,10 @@
 
 #pragma once
 
+#include "ICamera.h"
 #include "ComponentBuffer.h"
 #include "Span.h"
+#include "Uniforms.h"
 
 namespace ddc
 {
@@ -18,9 +20,6 @@ namespace ddc
 
 namespace ddr
 {
-	class ICamera;
-	struct UniformStorage;
-
 	template <typename T>
 	struct RenderBuffer
 	{
@@ -60,10 +59,10 @@ namespace ddr
 	struct RenderData
 	{
 	public:
-		RenderData( const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+		RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
 			dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements );
 
-		const ddc::World& World() const { return m_world; }
+		ddc::World& World() const { return m_world; }
 		const ddr::ICamera& Camera() const { return m_camera; }
 
 		ddr::UniformStorage& Uniforms() const { return m_uniforms; }
@@ -86,7 +85,7 @@ namespace ddr
 		}
 
 	private:
-		const ddc::World& m_world;
+		ddc::World& m_world;
 		const ddr::ICamera& m_camera;
 		ddr::UniformStorage& m_uniforms;
 		dd::Span<ddc::Entity> m_entities;

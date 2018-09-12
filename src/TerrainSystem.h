@@ -24,7 +24,7 @@ namespace dd
 	class ICamera;
 	struct JobSystem;
 	struct BoundsComponent;
-	class MeshComponent;
+	struct MeshComponent;
 	class TerrainChunk;
 	class TerrainChunkComponent;
 	struct TransformComponent;
@@ -81,7 +81,7 @@ namespace dd
 		//
 		// Initialize render resources for the terrain system.
 		//
-		virtual void RenderInit() override;
+		virtual void RenderInit( ddc::World& world ) override;
 
 		//
 		// Update terrain chunks on the render thread.
@@ -100,6 +100,7 @@ namespace dd
 
 	private:
 		
+		bool m_draw { true };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 		int m_lodLevels { DefaultLODLevels };

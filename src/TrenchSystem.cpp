@@ -16,9 +16,6 @@
 #include "ShaderProgram.h"
 #include "World.h"
 
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 namespace dd
 {
 	const float TRENCH_CHUNK_LENGTH = 10.0f;

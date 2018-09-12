@@ -94,6 +94,9 @@
     <Filter Include="Entities">
       <UniqueIdentifier>{ee689d3c-b742-422d-9a3a-910f8d2d5092}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{dda37baf-e031-4586-bed1-3db9ec844c8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -456,17 +459,11 @@
     <ClInclude Include="src\IDebugPanel.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshRenderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="include\Remotery\lib\Remotery.h">
       <Filter>Includes\Remotery</Filter>
     </ClInclude>
     <ClInclude Include="src\ParticleSystem.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ParticleSystemComponent.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\Units.h">
       <Filter>Math</Filter>
@@ -501,13 +498,7 @@
     <ClInclude Include="src\System.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\WorldRenderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LightRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\BoundsComponent.h">
@@ -518,6 +509,27 @@
     </ClInclude>
     <ClInclude Include="src\HitTest.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundsRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LightRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WorldRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystemComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RayRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RayComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -843,17 +855,11 @@
     <ClCompile Include="src\IDebugPanel.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshRenderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="include\Remotery\lib\Remotery.c">
       <Filter>Includes\Remotery</Filter>
     </ClCompile>
     <ClCompile Include="src\ParticleSystem.cpp">
       <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ParticleSystemComponent.cpp">
-      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\Units.cpp">
       <Filter>Math</Filter>
@@ -888,17 +894,32 @@
     <ClCompile Include="src\UpdateData.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\WorldRenderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LightRenderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\BoundsComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\HitTest.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoundsRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorldRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystemComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RayRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RayComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

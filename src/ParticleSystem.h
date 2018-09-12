@@ -35,13 +35,13 @@ namespace ddr
 
 		ParticleSystemRenderer();
 
-		virtual void RenderInit() override;
+		virtual void RenderInit( ddc::World& world ) override;
 		virtual bool UsesAlpha() const override { return true; }
 		virtual void Render( const ddr::RenderData& data );
 
 	private:
 		glm::vec3 m_positions[ dd::MaxParticles ];
-		VBO m_vboPositions;
+		VBO m_vboPosition;
 
 		glm::vec2 m_sizes[ dd::MaxParticles ];
 		VBO m_vboSizes;

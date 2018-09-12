@@ -10,8 +10,7 @@
 #include "Texture.h"
 
 #include "GLError.h"
-
-#include "GL/gl3w.h"
+#include "OpenGL.h"
 
 namespace ddr
 {

@@ -13,7 +13,7 @@
 
 namespace ddr
 {
-	RenderData::RenderData( const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+	RenderData::RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
 		dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements  ) :
 		m_camera( camera ),
 		m_uniforms( uniforms ),

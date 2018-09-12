@@ -9,14 +9,11 @@
 
 #include "AABB.h"
 #include "ICamera.h"
+#include "OpenGL.h"
 #include "RenderData.h"
 #include "ShaderProgram.h"
 #include "Uniforms.h"
 #include "VAO.h"
-
-#include "GL/gl3w.h"
-
-#include "glm/gtx/transform.hpp"
 
 #include <cmath>
 
@@ -98,7 +95,7 @@ namespace ddr
 	{
 		UpdateFrustum( camera );
 
-		glm::mat4 camera_transform = camera.GetCameraMatrix();
+		glm::mat4 camera_transform = camera.GetViewMatrix();
 		if( m_dirty || m_transform != camera_transform )
 		{
 			m_transform = camera_transform;
