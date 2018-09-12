@@ -57,25 +57,26 @@ namespace dd
 			float shake = m_trauma * m_trauma;
 
 			float extraYaw = MaximumYaw * shake * glm::simplex( glm::vec2( m_time, m_seed ) );
-			float yaw = m_sourceCamera.GetYaw() + extraYaw;
-			m_yaw = glm::radians( dd::wrap( yaw, 0.0f, 360.0f ) );
+			float yaw = m_sourceCamera.GetYaw() + glm::radians( extraYaw );
+			m_yaw = dd::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
 			float extraPitch = MaximumPitch * shake * glm::simplex( glm::vec2( m_time, m_seed + 1 ) );
-			float pitch = m_sourceCamera.GetPitch() + extraPitch;
-			m_pitch = glm::radians( glm::clamp( pitch, -89.9f, 89.9f ) );
+			float pitch = m_sourceCamera.GetPitch() + glm::radians( extraPitch );
+
+			const float max_pitch = glm::half_pi<float>() - 0.00001f;
+
+			m_pitch = glm::clamp( pitch, -max_pitch, max_pitch );
 
 			m_roll = glm::radians( MaximumRoll * shake * glm::simplex( glm::vec2( m_time, m_seed + 2 ) ) );
 		}
 		else
 		{
-			m_yaw = glm::radians( m_sourceCamera.GetYaw() );
-			m_pitch = glm::radians( m_sourceCamera.GetPitch() );
+			m_yaw = m_sourceCamera.GetYaw();
+			m_pitch = m_sourceCamera.GetPitch();
 			m_roll = 0;
 		}
 
-		m_direction = glm::vec3( std::cos( m_pitch ) * std::sin( m_yaw ),
-			std::sin( m_pitch ),
-			std::cos( m_pitch ) * std::cos( m_yaw ) );
+		m_direction = dd::directionFromPitchYaw( m_pitch, m_yaw );
 
 		AddTrauma( -(delta_t * TraumaDecayRate) );
 
@@ -116,6 +117,16 @@ namespace dd
 	float ShakyCamera::GetFar() const
 	{
 		return m_sourceCamera.GetFar();
+	}
+
+	float ShakyCamera::GetYaw() const
+	{
+		return m_sourceCamera.GetYaw();
+	}
+
+	float ShakyCamera::GetPitch() const
+	{
+		return m_sourceCamera.GetPitch();
 	}
 
 	glm::vec3 ShakyCamera::GetPosition() const

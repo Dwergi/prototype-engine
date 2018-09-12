@@ -21,7 +21,6 @@ namespace dd
 		~Plane();
 		
 		glm::vec3 Normal() const;
-		glm::vec3 Origin() const;
 
 		float DistanceTo( const glm::vec3& point ) const;
 

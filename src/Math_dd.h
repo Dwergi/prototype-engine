@@ -1,5 +1,5 @@
 //
-// Math_dd.h - Min and max, for reasons.
+// Math_dd.h - Additional maths functions one might need.
 // Copyright (C) Sebastian Nordgren 
 // October 25th 2017
 //
@@ -33,4 +33,6 @@ namespace dd
 
 		return value;
 	}
+
+	glm::vec3 directionFromPitchYaw( float pitch, float yaw );
 }

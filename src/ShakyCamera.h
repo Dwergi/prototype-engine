@@ -83,6 +83,8 @@ namespace dd
 		virtual float GetAspectRatio() const override;
 		virtual float GetNear() const override;
 		virtual float GetFar() const override;
+		virtual float GetYaw() const override;
+		virtual float GetPitch() const override;
 		virtual glm::vec3 GetDirection() const override { return m_direction; }
 		virtual glm::vec3 GetPosition() const override;
 		virtual const ddr::Frustum& GetFrustum() const override { return m_frustum; }
