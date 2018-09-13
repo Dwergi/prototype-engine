@@ -32,7 +32,7 @@ namespace ddr
 			Sphere
 		};
 
-		DrawMode m_drawMode { Sphere };
+		DrawMode m_drawMode { DrawMode::None };
 		bool m_updateBuffers { false };
 		int m_subdivisions { 1 };
 

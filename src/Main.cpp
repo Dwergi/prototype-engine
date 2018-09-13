@@ -525,7 +525,7 @@ int GameMain()
 		// particle system
 		{
 			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundsComponent>();
-			//s_world->AddTag( entity, ddc::Tag::Visible );
+			s_world->AddTag( entity, ddc::Tag::Visible );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
 			transform->SetLocalPosition( glm::vec3( 10, 60, 10 ) );
@@ -542,18 +542,16 @@ int GameMain()
 		{
 			ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
 
-			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
-			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
-			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::translate( glm::vec3( 0.0f, 0.0f, -50.0f ) ) * glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
+			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::translate( glm::vec3( 0.0f, 0.0f, -50.0f ) ) * glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
 		}
 
 		// bounds
 		{
-			ddc::Entity entity = s_world->CreateEntity<dd::BoundsComponent>();
-			s_world->AddTag( entity, ddc::Tag::Visible );
+			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
 
-			dd::BoundsComponent* bounds = s_world->Access<dd::BoundsComponent>( entity );
-			bounds->WorldSphere = dd::BoundSphere( glm::vec3( 0, 30, 0 ), 5 );
+			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( 0, 30, 0 ) ) );
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console

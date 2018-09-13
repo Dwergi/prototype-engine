@@ -34,7 +34,7 @@ namespace dd
 	BoundSphere::BoundSphere( const AABB& aabb )
 	{
 		m_centre = aabb.Center();
-		m_radius = glm::length( aabb.Extents() );
+		m_radius = glm::length( aabb.Extents() ) / 2.0f;
 	}
 
 	bool BoundSphere::Contains( const glm::vec3& pt ) const

@@ -430,7 +430,7 @@ namespace ddr
 		//SetUVs( s_unitCubeUVsBuffer );
 
 		dd::AABB bounds;
-		bounds.Expand( glm::vec3( -1, -1, -1 ) );
+		bounds.Expand( glm::vec3( 0, 0, 0 ) );
 		bounds.Expand( glm::vec3( 1, 1, 1 ) );
 		SetBoundBox( bounds );
 	}
