@@ -10,25 +10,25 @@ namespace dd
 	// https://github.com/caosdoar/spheres/blob/master/src/spheres.cpp
 	static const float T = (1.0f + sqrt( 5.0f )) / 2.0f;
 
-	static std::vector<glm::vec3> s_basePosition =
+	static const std::vector<glm::vec3> s_basePosition =
 	{
-		glm::vec3( -1,  T, 0 ),
-		glm::vec3(  1,  T, 0 ),
-		glm::vec3( -1, -T, 0 ),
-		glm::vec3(  1, -T, 0 ),
+		glm::normalize( glm::vec3( -1,  T, 0 ) ),
+		glm::normalize( glm::vec3(  1,  T, 0 ) ),
+		glm::normalize( glm::vec3( -1, -T, 0 ) ),
+		glm::normalize( glm::vec3(  1, -T, 0 ) ),
 
-		glm::vec3( 0, -1,  T ),
-		glm::vec3( 0,  1,  T ),
-		glm::vec3( 0, -1, -T ),
-		glm::vec3( 0,  1, -T ),
+		glm::normalize( glm::vec3( 0, -1,  T ) ),
+		glm::normalize( glm::vec3( 0,  1,  T ) ),
+		glm::normalize( glm::vec3( 0, -1, -T ) ),
+		glm::normalize( glm::vec3( 0,  1, -T ) ),
 
-		glm::vec3(  T, 0, -1 ),
-		glm::vec3(  T, 0,  1 ),
-		glm::vec3( -T, 0, -1 ),
-		glm::vec3( -T, 0,  1 )
+		glm::normalize( glm::vec3(  T, 0, -1 ) ),
+		glm::normalize( glm::vec3(  T, 0,  1 ) ),
+		glm::normalize( glm::vec3( -T, 0, -1 ) ),
+		glm::normalize( glm::vec3( -T, 0,  1 ) )
 	};
 
-	static std::vector<uint> s_baseIndex =
+	static const std::vector<uint> s_baseIndex =
 	{
 		0, 11, 5,
 		0, 5, 1,
@@ -55,13 +55,8 @@ namespace dd
 		9, 8, 1
 	};
 
-	static bool s_baseNormalized = false;
-
-	static std::vector<glm::vec3> s_icosphere1Position;
-	static std::vector<uint> s_icosphere1Index;
-
-	static std::vector<glm::vec3> s_icosphere2Position;
-	static std::vector<uint> s_icosphere2Index;
+	static std::vector<std::vector<glm::vec3>> s_positionLODs = { s_basePosition };
+	static std::vector<std::vector<uint>> s_indexLODs = { s_baseIndex };
 
 	void NormalizePositions( std::vector<glm::vec3>& vec )
 	{
@@ -137,114 +132,69 @@ namespace dd
 		}
 	}
 
-	void InitializeCachedSpheres( int iterations )
+	void CalculateIcosphere( std::vector<glm::vec3>*& out_pos, std::vector<uint>*& out_idx, int iterations )
 	{
-		if( iterations >= 0 )
-		{
-			if( !s_baseNormalized )
-			{
-				NormalizePositions( s_basePosition );
-			}
-		}
-		
-		if( iterations >= 1 )
-		{
-			if( s_icosphere1Position.empty() )
-			{
-				Subdivide( s_basePosition, s_baseIndex,
-					s_icosphere1Position, s_icosphere1Index );
+		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
 
-				NormalizePositions( s_icosphere1Position );
-			}
-		}
-		
-		if( iterations >= 2 )
+		if( s_positionLODs.size() > iterations )
 		{
-			if( s_icosphere2Position.empty() )
-			{
-				Subdivide( s_icosphere1Position, s_icosphere1Index,
-					s_icosphere2Position, s_icosphere2Index );
-
-				NormalizePositions( s_icosphere2Position );
-			}
-		}
-	}
-
-	void CalculateIcosphere( std::vector<glm::vec3>& dst_pos, std::vector<uint>& dst_idx, int iterations )
-	{
-		if( iterations == 0 )
-		{
-			dst_pos = s_basePosition;
-			dst_idx = s_baseIndex;
-			return;
-		}
-		else if( iterations == 1 )
-		{
-			dst_pos = s_icosphere1Position;
-			dst_idx = s_icosphere1Index;
-			return;
-		}
-		else if( iterations == 2 )
-		{
-			dst_pos = s_icosphere2Position;
-			dst_idx = s_icosphere2Index;
+			out_pos = &s_positionLODs[iterations];
+			out_idx = &s_indexLODs[iterations];
 			return;
 		}
 
-		if( iterations > 2 )
+		std::vector<glm::vec3> src_pos;
+		std::vector<uint> src_idx;
+
+		size_t start = s_positionLODs.size() - 1;
+		for( size_t i = start; i < iterations; ++i )
 		{
-			std::vector<glm::vec3> src_pos = s_icosphere2Position;
-			std::vector<uint> src_idx = s_icosphere2Index;
+			src_pos = s_positionLODs.back();
+			src_idx = s_indexLODs.back();
 
-			for( int i = 2; i < iterations; ++i )
-			{
-				dst_pos.clear();
-				dst_idx.clear();
+			std::vector<glm::vec3>& dst_pos = s_positionLODs.emplace_back();
+			std::vector<uint>& dst_idx = s_indexLODs.emplace_back();
 
-				Subdivide( src_pos, src_idx, dst_pos, dst_idx );
-				NormalizePositions( dst_pos );
-
-				src_pos = dst_pos;
-				src_idx = dst_idx;
-			}
+			Subdivide( src_pos, src_idx, dst_pos, dst_idx );
+			NormalizePositions( dst_pos );
 		}
+
+		out_pos = &s_positionLODs[iterations];
+		out_idx = &s_indexLODs[iterations];
 	}
 
 	void MakeIcosphere( ddr::Mesh& mesh, int iterations )
 	{
-		InitializeCachedSpheres( iterations );
-
-		std::vector<glm::vec3> pos;
-		std::vector<uint> idx;
+		std::vector<glm::vec3>* pos = nullptr;
+		std::vector<uint>* idx = nullptr;
 		CalculateIcosphere( pos, idx, iterations );
 
-		dd::ConstBuffer<glm::vec3> positions( s_icosphere1Position.data(), s_icosphere1Position.size() );
+		dd::ConstBuffer<glm::vec3> positions(pos->data(),pos->size() );
 		mesh.SetPositions( positions );
 
-		dd::ConstBuffer<uint> indices( s_icosphere1Index.data(), s_icosphere1Index.size() );
+		dd::ConstBuffer<uint> indices( idx->data(), idx->size() );
 		mesh.SetIndices( indices );
 	}
 
 	void MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, int iterations )
 	{
-		InitializeCachedSpheres( iterations );
-
-		std::vector<glm::vec3> pos;
-		std::vector<uint> idx;
+		std::vector<glm::vec3>* pos = nullptr;
+		std::vector<uint>* idx = nullptr;
 		CalculateIcosphere( pos, idx, iterations );
 
 		positions.Bind();
-		positions.SetData( pos.data(), pos.size() );
+		positions.SetData(pos->data(),pos->size() );
 		positions.Unbind();
 
 		indices.Bind();
-		indices.SetData( idx.data(), idx.size() );
+		indices.SetData( idx->data(), idx->size() );
 		indices.Unbind();
 	}
 
 	void GetLineIndicesFromTriangles( const std::vector<uint>& src, std::vector<uint>& dest )
 	{
-		dest.clear();
+		DD_ASSERT( dest.empty() );
+
 		dest.reserve( src.size() * 2 );
 
 		for( int i = 0; i < src.size(); i += 3 )
@@ -266,17 +216,15 @@ namespace dd
 
 	void MakeIcosphereLines( ddr::VBO& positions, ddr::VBO& indices, int iterations )
 	{
-		InitializeCachedSpheres( iterations );
-		
-		std::vector<glm::vec3> pos;
-		std::vector<uint> idx;
+		std::vector<glm::vec3>* pos = nullptr;
+		std::vector<uint>* idx = nullptr;
 		CalculateIcosphere( pos, idx, iterations );
 
 		std::vector<uint> line_indices;
-		GetLineIndicesFromTriangles( idx, line_indices );
+		GetLineIndicesFromTriangles( *idx, line_indices );
 
 		positions.Bind();
-		positions.SetData( pos.data(), pos.size() );
+		positions.SetData( pos->data(),pos->size() );
 		positions.Unbind();
 
 		indices.Bind();
