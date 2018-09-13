@@ -193,7 +193,7 @@ namespace dd
 
 		chunk_cmp.Chunk->Update( m_jobSystem );
 		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
-		bounds_cmp.Local = chunk_cmp.Chunk->GetBounds();
+		bounds_cmp.LocalBox = chunk_cmp.Chunk->GetBounds();
 		transform_cmp.SetLocalPosition( chunk_cmp.Chunk->GetPosition() );
 	}
 

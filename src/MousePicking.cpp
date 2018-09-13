@@ -257,7 +257,7 @@ namespace dd
 				continue;
 
 			float distance;
-			if( dd::HitTestMesh( screen_ray, transforms[i].World, bounds[i].World, *mesh, distance ) )
+			if( dd::HitTestMesh( screen_ray, transforms[i].World, bounds[i].WorldSphere, bounds[i].WorldBox, *mesh, distance ) )
 			{
 				if( distance < m_depth )
 				{

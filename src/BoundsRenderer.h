@@ -1,3 +1,9 @@
+//
+// BoundsRenderer.h - A debug renderer for bounds.
+// Copyright (C) Sebastian Nordgren 
+// September 13th 2018
+//
+
 #pragma once
 
 #include "IDebugPanel.h"
@@ -20,6 +26,7 @@ namespace ddr
 	private:
 
 		bool m_draw { false };
+		int m_drawMode { 0 };
 
 		VAO m_vao;
 		VBO m_vboPosition;

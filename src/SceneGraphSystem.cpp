@@ -27,7 +27,7 @@ namespace dd
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
 			transforms[ i ].World = transforms[ i ].Local;
-			bounds[ i ].World = bounds[ i ].Local.GetTransformed( transforms[ i ].World );
+			bounds[ i ].WorldBox = bounds[ i ].LocalBox.GetTransformed( transforms[ i ].World );
 		}
 	}
 }

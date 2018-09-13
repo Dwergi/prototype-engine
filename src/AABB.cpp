@@ -105,6 +105,12 @@ namespace dd
 		return IntersectsRay( ray, distance );
 	}
 
+	bool AABB::IntersectsRay( const Ray& ray ) const
+	{
+		float ignored;
+		return IntersectsRay( ray, ignored );
+	}
+
 	bool AABB::IntersectsRay( const Ray& ray, float& distance ) const
 	{
 		glm::vec3 vMin = (Min - ray.Origin()) * ray.InverseDir();

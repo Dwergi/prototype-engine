@@ -101,7 +101,7 @@ namespace ddr
 		++m_meshCount;
 
 		// check if it intersects with the frustum
-		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.World ) )
+		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.WorldBox ) )
 		{
 			return;
 		}

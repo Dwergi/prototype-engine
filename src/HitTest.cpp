@@ -2,6 +2,7 @@
 #include "HitTest.h"
 
 #include "AABB.h"
+#include "BoundSphere.h"
 #include "Mesh.h"
 #include "Ray.h"
 
@@ -9,7 +10,9 @@
 
 namespace dd
 {
-	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& mesh_transform, const dd::AABB& bounds, const ddr::Mesh& mesh, float& out_distance )
+	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 
+		const dd::BoundSphere& bound_sphere, const dd::AABB& bound_box, 
+		const ddr::Mesh& mesh, float& out_distance )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();
 
@@ -18,14 +21,18 @@ namespace dd
 			return false;
 		}
 
-		float bb_distance;
-		if( !bounds.IntersectsRay( ray, bb_distance ) )
+		if( !bound_sphere.IntersectsRay( ray ) )
+		{
+
+		}
+
+		if( !bound_box.IntersectsRay( ray ) )
 		{
 			return false;
 		}
 
 		// transform to mesh space
-		glm::mat4 inv_transform = glm::inverse( mesh_transform );
+		glm::mat4 inv_transform = glm::inverse( transform );
 		
 		glm::vec3 origin = (inv_transform * glm::vec4( ray.Origin(), 1 )).xyz;
 		glm::vec3 dir = (inv_transform * glm::vec4( ray.Direction(), 0 )).xyz;

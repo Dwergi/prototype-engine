@@ -531,6 +531,10 @@
     <ClInclude Include="src\RayComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\BoundSphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Icosphere.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -924,6 +928,10 @@
     <ClCompile Include="src\Math_dd.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\BoundSphere.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Icosphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

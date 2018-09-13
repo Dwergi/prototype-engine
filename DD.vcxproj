@@ -335,6 +335,7 @@
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\BoundsComponent.h" />
+    <ClInclude Include="src\BoundSphere.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\ComponentBuffer.h" />
@@ -349,6 +350,7 @@
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
     <ClInclude Include="src\HitTest.h" />
+    <ClInclude Include="src\Icosphere.h" />
     <ClInclude Include="src\LightRenderer.h" />
     <ClInclude Include="src\RayComponent.h" />
     <ClInclude Include="src\RayRenderer.h" />
@@ -539,6 +541,7 @@
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundsComponent.cpp" />
+    <ClCompile Include="src\BoundSphere.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
@@ -551,6 +554,7 @@
     <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\HitTest.cpp" />
     <ClCompile Include="src\LightRenderer.cpp" />
+    <ClCompile Include="src\Icosphere.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Math_dd.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />

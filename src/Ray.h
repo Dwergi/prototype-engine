@@ -1,5 +1,5 @@
 //
-// Ray.h - A ray wrapper class.
+// Ray.h - A ray.
 // Copyright (C) Sebastian Nordgren 
 // April 24th 2017
 //
@@ -16,12 +16,20 @@ namespace dd
 
 		void operator=( const Ray& other );
 
-		glm::vec3 Direction() const { return m_direction; }
-		void SetDirection( const glm::vec3& direction );
-
+		//
+		// The origin of the ray.
+		//
 		glm::vec3 Origin() const { return m_origin; }
-		void SetOrigin( const glm::vec3& origin ) { m_origin = origin; }
 
+		//
+		// The normalized direction of the ray.
+		//
+		glm::vec3 Direction() const { return m_direction; }
+
+		//
+		// The component-wise inverse of the direction. 
+		// Note: Not actually normalized, nor necessarily valid floats - ie. may contain INFs or NaNs.
+		//
 		glm::vec3 InverseDir() const { return m_invDir; }
 
 	private:
@@ -29,5 +37,7 @@ namespace dd
 		glm::vec3 m_origin;
 		glm::vec3 m_direction;
 		glm::vec3 m_invDir;
+
+		void SetDirection( const glm::vec3& dir );
 	};
 }

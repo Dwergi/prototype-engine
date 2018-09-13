@@ -1,3 +1,9 @@
+//
+// BoundsRenderer.cpp - A debug renderer for bounds.
+// Copyright (C) Sebastian Nordgren 
+// September 13th 2018
+//
+
 #include "PrecompiledHeader.h"
 #include "BoundsRenderer.h"
 
@@ -31,15 +37,15 @@ namespace ddr
 	{
 		// bottom
 		0,1,	1,3,	3,2,	2,0,
-
 		// top
 		4,5,	5,7,	7,6,	6,4,
-
 		// corners
 		0,4,	1,5,	2,6,	3,7
 	};
 
 	static dd::ConstBuffer<uint> s_indicesBuffer( s_indices, sizeof( s_indices ) / sizeof( uint ) );
+
+
 
 	BoundsRenderer::BoundsRenderer() :
 		Renderer( "Bounds" )
@@ -125,7 +131,7 @@ namespace ddr
 
 			const dd::BoundsComponent& bb = bounds[i];
 
-			glm::mat4 model = glm::translate( bb.World.Min ) * glm::scale( bb.World.Max - bb.World.Min );
+			glm::mat4 model = glm::translate( bb.WorldBox.Min ) * glm::scale( bb.WorldBox.Max - bb.WorldBox.Min );
 
 			shader->SetUniform( "ModelViewProjection", view_projection * model );
 
@@ -145,5 +151,8 @@ namespace ddr
 	void BoundsRenderer::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::Checkbox( "Draw", &m_draw );
+
+		static const char* options = "Box\0Sphere\0";
+		ImGui::Combo( "Mode", &m_drawMode, options );
 	}
 }

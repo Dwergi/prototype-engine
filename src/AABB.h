@@ -18,12 +18,20 @@ namespace dd
 		~AABB();
 
 		void Clear();
+
+		//
+		// Is this a non-zero volume bounding box.
+		//
 		bool IsValid() const;
 
 		//
 		// Expand the bounding box to contain the given point.
 		//
 		void Expand( const glm::vec3& pt );
+
+		//
+		// Expand the bounding box to contain the given bounding box.
+		//
 		void Expand( const AABB& bounds );
 
 		bool Contains( const glm::vec3& pt ) const;
@@ -31,6 +39,7 @@ namespace dd
 
 		bool Intersects( const AABB& other ) const;
 		bool IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const;
+		bool IntersectsRay( const Ray& ray ) const;
 		bool IntersectsRay( const Ray& ray, float& distance ) const;
 
 		glm::vec3 Center() const { return (Min + Max) * 0.5f; }

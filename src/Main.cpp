@@ -364,7 +364,7 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 	mesh_cmp->Colour = colour;
 
 	dd::BoundsComponent* bounds_cmp = world.Access<dd::BoundsComponent>( entity );
-	bounds_cmp->Local = ddr::Mesh::Get( mesh_h )->GetBoundBox();
+	bounds_cmp->LocalBox = ddr::Mesh::Get( mesh_h )->GetBoundBox();
 
 	world.AddTag( entity, ddc::Tag::Visible );
 
@@ -529,7 +529,7 @@ int GameMain()
 			transform->SetLocalPosition( glm::vec3( 10, 60, 10 ) );
 
 			dd::BoundsComponent* bounds = s_world->Access<dd::BoundsComponent>( entity );
-			bounds->Local = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+			bounds->LocalBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
