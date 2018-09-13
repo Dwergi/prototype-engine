@@ -8,6 +8,7 @@
 #include "BoundsRenderer.h"
 
 #include "BoundsComponent.h"
+#include "Icosphere.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -45,8 +46,6 @@ namespace ddr
 
 	static dd::ConstBuffer<uint> s_indicesBuffer( s_indices, sizeof( s_indices ) / sizeof( uint ) );
 
-
-
 	BoundsRenderer::BoundsRenderer() :
 		Renderer( "Bounds" )
 	{
@@ -73,26 +72,51 @@ namespace ddr
 		m_vao.Bind();
 
 		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		
 		m_vboPosition.Bind();
 		shader->BindPositions();
 		m_vboPosition.Unbind();
 
-		m_vboPosition.SetData( s_cornersBuffer );
-
 		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vboIndex.Bind();
-		m_vboIndex.SetData( s_indicesBuffer );
-		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
 
 		shader->Use( false );
+
+		m_updateBuffers = true;
+	}
+
+	void BoundsRenderer::UpdateBuffers()
+	{
+		if( m_drawMode == DrawMode::Box )
+		{
+			m_vboPosition.Bind();
+			m_vboPosition.SetData( s_cornersBuffer );
+			m_vboPosition.Unbind();
+
+			m_vboIndex.Bind();
+			m_vboIndex.SetData( s_indicesBuffer );
+			m_vboIndex.Unbind();
+		}
+		else if( m_drawMode == DrawMode::Sphere )
+		{
+			dd::MakeIcosphereLines( m_vboPosition, m_vboIndex, m_subdivisions );
+		}
+
+		m_updateBuffers = false;
 	}
 
 	void BoundsRenderer::Render( const ddr::RenderData& data )
 	{
-		if( !m_draw )
+		if( m_drawMode == DrawMode::None )
+		{
 			return;
+		}
+
+		if( m_updateBuffers )
+		{
+			UpdateBuffers();
+		}
 
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -131,9 +155,18 @@ namespace ddr
 
 			const dd::BoundsComponent& bb = bounds[i];
 
-			glm::mat4 model = glm::translate( bb.WorldBox.Min ) * glm::scale( bb.WorldBox.Max - bb.WorldBox.Min );
+			if( m_drawMode == DrawMode::Box )
+			{
+				glm::mat4 model = glm::translate( bb.WorldBox.Min ) * glm::scale( bb.WorldBox.Max - bb.WorldBox.Min );
 
-			shader->SetUniform( "ModelViewProjection", view_projection * model );
+				shader->SetUniform( "ModelViewProjection", view_projection * model );
+			}
+			else if( m_drawMode == DrawMode::Sphere )
+			{
+				glm::mat4 model = glm::translate( bb.WorldSphere.Centre() ) * glm::scale( glm::vec3( bb.WorldSphere.Radius() ) );
+
+				shader->SetUniform( "ModelViewProjection", view_projection * model );
+			}
 
 			glDrawElements( GL_LINES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0 );
 		}
@@ -150,9 +183,24 @@ namespace ddr
 
 	void BoundsRenderer::DrawDebugInternal( const ddc::World& world )
 	{
-		ImGui::Checkbox( "Draw", &m_draw );
+		ImGui::SetWindowSize( ImVec2( 200, 120 ), ImGuiCond_Once );
 
-		static const char* options = "Box\0Sphere\0";
-		ImGui::Combo( "Mode", &m_drawMode, options );
+		static const char* options = "None\0Box\0Sphere\0";
+		
+		int drawMode = m_drawMode;
+		if( ImGui::Combo( "Mode", &drawMode, options ) )
+		{
+			m_drawMode = (DrawMode) drawMode;
+			m_updateBuffers = true;
+		}
+
+		if( ImGui::SliderInt( "Subdivisions", &m_subdivisions, 0, 6 ) )
+		{
+			m_updateBuffers = true;
+		}
+
+		int triangles = (m_vboIndex.GetDataSize() / sizeof(uint)) / 6;
+
+		ImGui::Value( "Triangles", triangles );
 	}
 }

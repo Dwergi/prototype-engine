@@ -15,7 +15,6 @@ namespace dd
 		const ddr::Mesh& mesh, float& out_distance )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();
-
 		if( !positions.IsValid() )
 		{
 			return false;
@@ -23,7 +22,7 @@ namespace dd
 
 		if( !bound_sphere.IntersectsRay( ray ) )
 		{
-
+			return false;
 		}
 
 		if( !bound_box.IntersectsRay( ray ) )

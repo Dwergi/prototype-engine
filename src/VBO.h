@@ -26,7 +26,11 @@ namespace ddr
 		void Create( GLenum target, GLenum usage );
 		void Destroy();
 
+		template <typename T>
+		void SetData( const T* ptr, size_t count ) { SetData( dd::ConstBuffer<T>( ptr, count ) ); }
+
 		void SetData( const dd::IBuffer& buffer );
+
 		const dd::IBuffer& GetData() const { return m_buffer; }
 
 		int GetDataSize() const { return m_buffer.SizeBytes(); }

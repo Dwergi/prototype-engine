@@ -534,7 +534,9 @@
     <ClInclude Include="src\BoundSphere.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Icosphere.h" />
+    <ClInclude Include="src\Icosphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -931,7 +933,12 @@
     <ClCompile Include="src\BoundSphere.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Icosphere.cpp" />
+    <ClCompile Include="src\Tests\IcosphereTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Icosphere.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

@@ -25,8 +25,16 @@ namespace ddr
 
 	private:
 
-		bool m_draw { false };
-		int m_drawMode { 0 };
+		enum DrawMode
+		{
+			None,
+			Box,
+			Sphere
+		};
+
+		DrawMode m_drawMode { Sphere };
+		bool m_updateBuffers { false };
+		int m_subdivisions { 1 };
 
 		VAO m_vao;
 		VBO m_vboPosition;
@@ -36,5 +44,7 @@ namespace ddr
 
 		virtual const char* GetDebugTitle() const override { return "Bounds"; }
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
+
+		void UpdateBuffers();
 	};
 }

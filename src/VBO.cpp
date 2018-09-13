@@ -125,6 +125,14 @@ namespace ddr
 
 	void VBO::SetData( const dd::IBuffer& buffer )
 	{
+		if( m_buffer.IsValid() )
+		{
+			glNamedBufferData( m_id, m_buffer.SizeBytes(), NULL, m_usage );
+			CheckOGLError();
+
+			m_buffer.ReleaseConst();
+		}
+
 		m_buffer.Set( (byte*) buffer.GetVoid(), buffer.SizeBytes() );
 
 		glNamedBufferData( m_id, buffer.SizeBytes(), buffer.GetVoid(), m_usage );

@@ -126,7 +126,6 @@ TEST_CASE( "[DenseMap] MeshComponent Assign" )
 	{
 		meshes[i] = dd::MeshComponent();
 		meshes[i].Colour = glm::vec4( i, i, i, i );
-		meshes[i].Hidden = i % 2;
 		a.Add( i, meshes[i] );
 	}
 
@@ -136,7 +135,5 @@ TEST_CASE( "[DenseMap] MeshComponent Assign" )
 	{
 		REQUIRE( b[i].Colour == a[i].Colour );
 		REQUIRE( b[i].Colour == meshes[i].Colour );
-		REQUIRE( b[i].Hidden == a[i].Hidden );
-		REQUIRE( b[i].Hidden == meshes[i].Hidden );
 	}
 }

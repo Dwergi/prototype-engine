@@ -52,8 +52,8 @@ struct TestSystem : ddc::System
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
-			const FirstComponent& cmp = read.Get( i );
-			write.Access( i ).SecondValue = cmp.FirstValue;
+			const FirstComponent& cmp = read[ i ];
+			write[ i ].SecondValue = cmp.FirstValue;
 		}
 	}
 };
@@ -76,8 +76,8 @@ struct DependentSystem : ddc::System
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
-			const SecondComponent& cmp = read.Get( i );
-			write.Access( i ).ThirdValue = cmp.SecondValue;
+			const SecondComponent& cmp = read[ i ];
+			write[ i ].ThirdValue = cmp.SecondValue;
 		}
 	}
 };
@@ -96,7 +96,7 @@ struct ReaderSystem : ddc::System
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
-			const ThirdComponent& cmp = read.Get( i );
+			const ThirdComponent& cmp = read[ i ];
 			int x = cmp.ThirdValue * cmp.ThirdValue;
 		}
 	}
@@ -118,8 +118,8 @@ struct OnlyReaderSystem : ddc::System
 
 		for( size_t i = 0; i < read1.Size(); ++i )
 		{
-			const FirstComponent& cmp1 = read1.Get( i );
-			const SecondComponent& cmp2 = read2.Get( i );
+			const FirstComponent& cmp1 = read1[ i ];
+			const SecondComponent& cmp2 = read2[ i ];
 			int x = cmp1.FirstValue * cmp2.SecondValue;
 		}
 	}
@@ -139,7 +139,8 @@ struct OnlyWriterSystem : ddc::System
 
 TEST_CASE( "EntityManager" )
 {
-	ddc::World world;
+	dd::JobSystem jobs( 1 );
+	ddc::World world( jobs );
 
 	ddc::Entity a = world.CreateEntity();
 	REQUIRE( a.ID == 0 );
@@ -165,7 +166,8 @@ TEST_CASE( "EntityManager" )
 
 TEST_CASE( "Component" )
 {
-	ddc::World world;
+	dd::JobSystem jobs( 0 ); 
+	ddc::World world( jobs );
 	ddc::Entity a = world.CreateEntity();
 
 	bool found = world.Has<FirstComponent>( a );
@@ -190,7 +192,8 @@ TEST_CASE( "Component" )
 
 TEST_CASE( "Update System" )
 {
-	ddc::World world;
+	dd::JobSystem jobs( 1 );
+	ddc::World world( jobs );
 
 	for( int i = 0; i < 8; ++i )
 	{
@@ -224,7 +227,8 @@ TEST_CASE( "Update System" )
 
 TEST_CASE( "Update With Discontinuity" )
 {
-	ddc::World world;
+	dd::JobSystem jobs( 1 );
+	ddc::World world( jobs );
 
 	for( int i = 0; i < 5; ++i )
 	{
@@ -267,7 +271,8 @@ TEST_CASE( "Update Multiple Systems" )
 	TestSystem a;
 	DependentSystem b;
 
-	ddc::World world;
+	dd::JobSystem jobs( 1 );
+	ddc::World world( jobs );
 	world.RegisterSystem( a );
 	world.RegisterSystem( b );
 
@@ -503,7 +508,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 1 ].m_system == &b );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world;
+		ddc::World world( jobsystem );
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
 
@@ -531,7 +536,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 2 ].m_system == &c );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world;
+		ddc::World world( jobsystem );
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
 
@@ -563,7 +568,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 3 ].m_system == &d );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world;
+		ddc::World world( jobsystem );
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
 		world.RegisterSystem( c );
@@ -579,7 +584,9 @@ TEST_CASE( "Full Update Loop" )
 	ReaderSystem c;
 
 	ddc::System* systems[] = { &a, &b, &c };
-	ddc::World world;
+	
+	dd::JobSystem jobsystem( 0u );
+	ddc::World world( jobsystem );
 
 	world.RegisterSystem( a );
 	world.RegisterSystem( b );

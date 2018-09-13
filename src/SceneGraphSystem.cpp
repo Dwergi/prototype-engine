@@ -26,8 +26,12 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			transforms[ i ].World = transforms[ i ].Local;
-			bounds[ i ].WorldBox = bounds[ i ].LocalBox.GetTransformed( transforms[ i ].World );
+			const glm::mat4& t = transforms[i].Local;
+			transforms[i].World = t;
+			bounds[i].WorldBox = bounds[i].LocalBox.GetTransformed( t );
+
+			bounds[i].LocalSphere = dd::BoundSphere( bounds[i].LocalBox );
+			bounds[i].WorldSphere = dd::BoundSphere( bounds[i].WorldBox );
 		}
 	}
 }

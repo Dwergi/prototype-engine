@@ -14,6 +14,7 @@ namespace ddr
 	{
 		Require<dd::TransformComponent>();
 		Require<ddr::LightComponent>();
+		RequireTag( ddc::Tag::Visible );
 	}
 
 	void LightRenderer::Render( const RenderData& data )

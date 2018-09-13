@@ -8,6 +8,7 @@
 
 #include "AABB.h"
 #include "MaterialHandle.h"
+#include "MeshHandle.h"
 #include "VAO.h"
 #include "VBO.h"
 

@@ -1,6 +1,7 @@
 #include "PrecompiledHeader.h"
 #include "catch2/catch.hpp"
 
+#include "JobSystem.h"
 #include "ScriptSystem.h"
 #include "ScriptComponent.h"
 #include "Span.h"
@@ -9,7 +10,8 @@
 
 TEST_CASE( "[ScriptSystem] Update Is Called" )
 {
-	ddc::World world;
+	dd::JobSystem jobsystem( 1 );
+	ddc::World world( jobsystem );
 	ddc::Entity entity = world.CreateEntity();
 
 	std::vector<ddc::Entity> entities;
