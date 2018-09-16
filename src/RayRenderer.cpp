@@ -10,17 +10,17 @@ namespace ddr
 	{
 		// direction
 		glm::vec3( 0, 0, 0 ),
-		glm::vec3( 0, 0, 100 ),
+		glm::vec3( 0, 0, 1 ),
 
 		// arrowhead
-		glm::vec3( 0, 0, 100 ),
-		glm::vec3( 0, 5, 95 ),
-		glm::vec3( 0, 0, 100 ),
-		glm::vec3( 0, -5, 95 ),
-		glm::vec3( 0, 0, 100 ),
-		glm::vec3( 5, 0, 95 ),
-		glm::vec3( 0, 0, 100 ),
-		glm::vec3( -5, 0, 95 )
+		glm::vec3( 0, 0, 1 ),
+		glm::vec3( 0, 0.05, 0.95 ),
+		glm::vec3( 0, 0, 1 ),
+		glm::vec3( 0, -0.05, 0.95 ),
+		glm::vec3( 0, 0, 1 ),
+		glm::vec3( 0.05, 0, 0.95 ),
+		glm::vec3( 0, 0, 1 ),
+		glm::vec3( -0.05, 0, 0.95 )
 	};
 
 	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, sizeof( s_lines ) / sizeof( glm::vec3 ) );
@@ -57,7 +57,6 @@ namespace ddr
 		shader->BindPositions();
 
 		m_vbo.Unbind();
-
 		m_vao.Unbind();
 
 		shader->Use( false );
@@ -93,7 +92,8 @@ namespace ddr
 
 		for( const dd::RayComponent& ray : data.Get<dd::RayComponent>() )
 		{
-			glm::mat4 model = TransformFromRay( ray.Ray );
+			float scale = ray.Length > 0 ? ray.Length : 100;
+			glm::mat4 model = TransformFromRay( ray.Ray ) * glm::scale( glm::vec3( scale ) );
 
 			shader->SetUniform( "ModelViewProjection", view_projection * model );
 
@@ -105,6 +105,4 @@ namespace ddr
 
 		shader->Use( false );
 	}
-
-
 }

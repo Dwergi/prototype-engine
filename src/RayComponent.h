@@ -9,6 +9,12 @@ namespace dd
 	{
 		Ray Ray;
 
+		//
+		// How long the ray should be. 
+		// Infinite if negative.
+		//
+		float Length; 
+
 		DD_COMPONENT;
 	};
 }

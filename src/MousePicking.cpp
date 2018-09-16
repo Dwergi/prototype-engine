@@ -269,7 +269,9 @@ namespace dd
 
 		if( m_select )
 		{
-			world.Access<dd::RayComponent>( m_previousRay )->Ray = screen_ray;
+			dd::RayComponent* ray = world.Access<dd::RayComponent>( m_previousRay );
+			ray->Ray = screen_ray;
+			ray->Length = m_depth;
 		}
 
 		return entity;
@@ -295,7 +297,7 @@ namespace dd
 
 		ImGui::Value( "Handle", m_focused.ID );
 		ImGui::Value( "Position", m_position, "%.1f" );
-		ImGui::Value( "Depth", 1.0f / m_depth, "%.3f" );
+		ImGui::Value( "Depth", m_depth, "%.3f" );
 
 		if( ImGui::TreeNodeEx( "Ray", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
