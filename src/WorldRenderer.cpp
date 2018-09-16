@@ -422,7 +422,8 @@ namespace ddr
 		s_wireframe.UpdateUniforms( *m_uniforms );
 		s_fog.UpdateUniforms( *m_uniforms );
 
-		m_uniforms->Set( "ViewProjection", camera.GetProjectionMatrix() * camera.GetViewMatrix() );
+		m_uniforms->Set( "View", camera.GetViewMatrix() );
+		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
 		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
 	}
 

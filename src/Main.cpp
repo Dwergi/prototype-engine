@@ -204,6 +204,43 @@ void Exit( InputAction action, InputType type )
 	}
 }
 
+void SetCameraPos( InputAction action, InputType type )
+{
+	if( type != InputType::RELEASED )
+		return;
+
+	s_fpsCamera->SetRotation( 0, 0 );
+
+	const glm::vec3 cube_pos( 10.5, 60.5, 10 );
+
+	switch( action )
+	{
+	case InputAction::CAMERA_POS_1:
+		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 0.5 ) );
+		break;
+
+	case InputAction::CAMERA_POS_2:
+		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 1 ) );
+		break;
+
+	case InputAction::CAMERA_POS_3:
+		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 2 ) );
+		break;
+
+	case InputAction::CAMERA_POS_4:
+		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 3 ) );
+		break;
+
+	case InputAction::DECREASE_DEPTH:
+		s_fpsCamera->SetPosition( s_fpsCamera->GetPosition() + glm::vec3( 0, 0, 1 ) );
+		break;
+
+	case InputAction::INCREASE_DEPTH:
+		s_fpsCamera->SetPosition( s_fpsCamera->GetPosition() - glm::vec3( 0, 0, 1 ) );
+		break;
+	}
+}
+
 void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 {
 	input.Update( delta_t );
@@ -291,6 +328,14 @@ void BindKeys( Input& input )
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
 	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
 	input.BindKey( 'E', InputAction::START_PARTICLE );
+
+	input.BindKey( '1', InputAction::CAMERA_POS_1 );
+	input.BindKey( '2', InputAction::CAMERA_POS_2 );
+	input.BindKey( '3', InputAction::CAMERA_POS_3 );
+	input.BindKey( '4', InputAction::CAMERA_POS_4 );
+
+	input.BindKey( Input::Key::HOME, InputAction::DECREASE_DEPTH );
+	input.BindKey( Input::Key::END, InputAction::INCREASE_DEPTH );
 }
 
 void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
@@ -419,6 +464,13 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
 		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
 		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
+		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_1, &SetCameraPos );
+		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_2, &SetCameraPos );
+		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_3, &SetCameraPos );
+		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_4, &SetCameraPos );
+
+		s_inputBindings->RegisterHandler( InputAction::INCREASE_DEPTH, &SetCameraPos );
+		s_inputBindings->RegisterHandler( InputAction::DECREASE_DEPTH, &SetCameraPos );
 
 		BindKeys( *s_input );
 
@@ -545,13 +597,14 @@ int GameMain()
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::translate( glm::vec3( 0.0f, 0.0f, -50.0f ) ) * glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
+
 		}
 
 		// bounds
 		{
 			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
 
-			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( 0, 30, 0 ) ) );
+			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 1, 1, 1 ), glm::translate( glm::vec3( 10, 60, 10 ) ) );
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console

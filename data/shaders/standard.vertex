@@ -9,7 +9,8 @@ flat out vec3 VertexNormal;
 
 uniform vec4 ObjectColour;
 uniform mat4 Model;
-uniform mat4 ViewProjection;
+uniform mat4 View;
+uniform mat4 Projection;
 uniform mat3 NormalMatrix;
 
 void main()
@@ -18,5 +19,5 @@ void main()
 	VertexColour = ObjectColour;
 	VertexNormal = NormalMatrix * Normal;
 
-	gl_Position = ViewProjection * Model * vec4( Position, 1 );
+	gl_Position = Projection * View * Model * vec4( Position, 1 );
 };

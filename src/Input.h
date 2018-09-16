@@ -44,6 +44,8 @@ namespace dd
 			ESCAPE = 256,
 			ENTER = 257,
 			TAB = 258,
+			HOME = 268,
+			END = 269,
 			CAPS_LOCK = 280,
 			PAUSE = 284,
 			F1 = 290,

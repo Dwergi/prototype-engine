@@ -28,7 +28,13 @@ namespace dd
 		ADD_MAJOR_TRAUMA,
 		TOGGLE_PICKING,
 		BREAK,
-		START_PARTICLE
+		START_PARTICLE,
+		CAMERA_POS_1, 
+		CAMERA_POS_2,
+		CAMERA_POS_3,
+		CAMERA_POS_4,
+		DECREASE_DEPTH,
+		INCREASE_DEPTH
 	};
 
 	enum class InputType : unsigned int

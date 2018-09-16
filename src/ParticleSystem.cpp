@@ -251,7 +251,7 @@ namespace ddr
 
 		for( const dd::ParticleSystemComponent& system : particle_systems )
 		{
-			memcpy( m_tempBuffer, system.m_particles, sizeof( dd::Particle ) * dd::MaxParticles );
+			memcpy( m_tempBuffer, system.m_particles, sizeof( dd::Particle ) * system.m_liveCount );
 
 			for( dd::Particle& p : m_tempBuffer )
 			{

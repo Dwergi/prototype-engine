@@ -220,10 +220,9 @@ namespace dd
 		m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
 
 		int id = GetEntityIDAt( m_position );
-		m_depth = GetDepthAt( m_position );
+		m_depth = (1.0f / GetDepthAt( glm::vec2( m_window.GetWidth() / 2, m_window.GetHeight() / 2 ) )) / 100.f;
 
 		ddc::Entity entity = data.World().GetEntity( id );
-
 		return entity;
 	}
 
