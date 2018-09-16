@@ -220,7 +220,7 @@ namespace dd
 		m_depthTexture.GetData( m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT );
 
 		int id = GetEntityIDAt( m_position );
-		m_depth = (1.0f / GetDepthAt( glm::vec2( m_window.GetWidth() / 2, m_window.GetHeight() / 2 ) )) / 100.f;
+		m_depth = (1.0f / GetDepthAt( m_position )) / 100.f;
 
 		ddc::Entity entity = data.World().GetEntity( id );
 		return entity;
@@ -364,7 +364,7 @@ namespace dd
 		glm::vec3 win_far( m_position.x, m_window.GetHeight() - m_position.y, 1 );
 
 		glm::vec3 world_near = glm::unProject( win_near, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
-		glm::vec3 world_far = glm::unProject( world_far, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
+		glm::vec3 world_far = glm::unProject( win_far, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 
 		return Ray( world_near, glm::normalize( world_far - world_near ) );
 	}

@@ -106,9 +106,9 @@ Assert s_assert;
 
 std::thread::id s_mainThread;
 
-#define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
+/*#define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
 
-/*TransformComponent* GetTransformComponent( EntityHandle entity )
+TransformComponent* GetTransformComponent( EntityHandle entity )
 {
 	return entity.Get<TransformComponent>().Write();
 }
@@ -356,7 +356,7 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
-void DrawDebugUI( const Vector<IDebugPanel*>& views, const ddc::World& world )
+void DrawDebugUI( const std::vector<IDebugPanel*>& views, const ddc::World& world )
 {
 	if( s_showDebugUI )
 	{
@@ -485,7 +485,7 @@ int GameMain()
 
 		s_fpsCamera = new FPSCamera( *s_window );
 		s_fpsCamera->SetPosition( glm::vec3( 0, 10, 0 ) );
-		s_fpsCamera->SetDirection( glm::vec3( 0, 0, 1 ) );
+		s_fpsCamera->SetRotation( 0, 0 );
 
 		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *s_inputBindings );
 		
@@ -526,8 +526,8 @@ int GameMain()
 		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 
 		s_renderer->Register( *mouse_picking );
-		s_renderer->Register( *terrain_system );
 		s_renderer->Register( *light_renderer );
+		s_renderer->Register( *terrain_system );
 		s_renderer->Register( *particle_renderer );
 		s_renderer->Register( *mesh_renderer );
 		s_renderer->Register( *bounds_renderer );
@@ -538,16 +538,23 @@ int GameMain()
 
 		//s_debugConsole = new DebugConsole( *s_scriptEngine );
 
-		Vector<IDebugPanel*> debug_views;
-		debug_views.Add( s_frameTimer );
-		debug_views.Add( s_renderer );
-		debug_views.Add( s_freeCamera );
-		debug_views.Add( mouse_picking );
-		debug_views.Add( s_shakyCamera );
-		debug_views.Add( particle_system );
-		debug_views.Add( terrain_system );
-		debug_views.Add( mesh_renderer );
-		debug_views.Add( bounds_renderer );
+		std::vector<IDebugPanel*> debug_views;
+		debug_views.push_back( s_frameTimer );
+		debug_views.push_back( s_renderer );
+		debug_views.push_back( s_freeCamera );
+		debug_views.push_back( mouse_picking );
+		debug_views.push_back( s_shakyCamera );
+		debug_views.push_back( particle_system );
+		debug_views.push_back( terrain_system );
+		debug_views.push_back( mesh_renderer );
+		debug_views.push_back( bounds_renderer );
+
+		std::sort( debug_views.begin(), debug_views.end(),
+			[]( const IDebugPanel* a, const IDebugPanel* b )
+			{
+				return strcmp( a->GetDebugTitle(), b->GetDebugTitle() ) < 0;
+			}
+		);
 
 		//debug_views.Add( s_debugConsole );
 		//debug_views.Add( s_shipSystem );

@@ -175,6 +175,8 @@ namespace ddr
 		uniforms.Set( "Texture", *m_texColour );
 		uniforms.Set( "DrawDepth", false );
 
+		uniforms.Bind( *shader );
+
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
 

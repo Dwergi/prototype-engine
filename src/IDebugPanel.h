@@ -36,6 +36,12 @@ namespace dd
 		//
 		void SetDebugOpen( bool value ) { m_debugOpen = value; }
 
+		//
+		// Get the display name of the debug panel.
+		// 
+		virtual const char* GetDebugTitle() const = 0;
+
+
 	private:
 
 		bool m_debugOpen;
@@ -44,6 +50,5 @@ namespace dd
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
 		virtual void DrawDebugInternal( const ddc::World& world ) = 0;
-		virtual const char* GetDebugTitle() const = 0;
 	};
 }
