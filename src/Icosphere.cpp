@@ -182,13 +182,8 @@ namespace dd
 		std::vector<uint>* idx = nullptr;
 		CalculateIcosphere( pos, idx, iterations );
 
-		positions.Bind();
 		positions.SetData(pos->data(),pos->size() );
-		positions.Unbind();
-
-		indices.Bind();
 		indices.SetData( idx->data(), idx->size() );
-		indices.Unbind();
 	}
 
 	void GetLineIndicesFromTriangles( const std::vector<uint>& src, std::vector<uint>& dest )
@@ -223,12 +218,10 @@ namespace dd
 		std::vector<uint> line_indices;
 		GetLineIndicesFromTriangles( *idx, line_indices );
 
-		positions.Bind();
-		positions.SetData( pos->data(),pos->size() );
-		positions.Unbind();
+		positions.SetData( pos->data(), pos->size() );
+		positions.CommitData();
 
-		indices.Bind();
 		indices.SetData( line_indices.data(), line_indices.size() );
-		indices.Unbind();
+		indices.CommitData();
 	}
 }

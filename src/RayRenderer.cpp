@@ -53,6 +53,7 @@ namespace ddr
 		m_vbo.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vbo.Bind();
 		m_vbo.SetData( s_linesBuffer );
+		m_vbo.CommitData();
 
 		shader->BindPositions();
 

@@ -24,7 +24,7 @@
 #include "FreeCameraController.h"
 #include "FSM.h"
 #include "FPSCamera.h"
-#include "GLError.h"
+#include "HitTestSystem.h"
 #include "IDebugPanel.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -492,7 +492,9 @@ int GameMain()
 		s_freeCamera = new FreeCameraController( *s_fpsCamera );
 		s_freeCamera->BindActions( *s_inputBindings );
 
-		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input );
+		HitTestSystem* hit_testing = new HitTestSystem();
+
+		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input, *hit_testing );
 		mouse_picking->BindActions( *s_inputBindings );
 
 		//ShipSystem ship_system( *s_shakyCam  );
@@ -514,6 +516,7 @@ int GameMain()
 		s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *scene_graph );
 		s_world->RegisterSystem( *particle_system );
+		s_world->RegisterSystem( *hit_testing );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 
@@ -548,6 +551,7 @@ int GameMain()
 		debug_views.push_back( terrain_system );
 		debug_views.push_back( mesh_renderer );
 		debug_views.push_back( bounds_renderer );
+		debug_views.push_back( hit_testing );
 
 		std::sort( debug_views.begin(), debug_views.end(),
 			[]( const IDebugPanel* a, const IDebugPanel* b )
@@ -616,7 +620,10 @@ int GameMain()
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 
+
+#ifndef _DEBUG
 		::ShowWindow( GetConsoleWindow(), SW_HIDE );
+#endif
 
 		while( !s_window->ShouldClose() )
 		{

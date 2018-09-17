@@ -19,7 +19,7 @@ namespace dd
 		SwarmSystem();
 		virtual ~SwarmSystem();
 
-		virtual void Update( const ddc::UpdateData& data, float dt ) override;
+		virtual void Update( const ddc::UpdateData& data ) override;
 
 		DD_BASIC_TYPE( SwarmSystem )
 

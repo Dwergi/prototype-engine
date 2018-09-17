@@ -29,7 +29,7 @@ namespace dd
 		TrenchSystem( const TrenchSystem& other ) = delete;
 		~TrenchSystem();
 
-		void Update( const ddc::UpdateData& data, float delta_t ) override;
+		void Update( const ddc::UpdateData& data ) override;
 		void CreateRenderResources();
 
 	private:

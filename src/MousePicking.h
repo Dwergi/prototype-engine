@@ -8,6 +8,7 @@
 
 #include "Entity.h"
 #include "FrameBuffer.h"
+#include "IAsyncHitTest.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
 #include "Renderer.h"
@@ -27,23 +28,25 @@ namespace ddr
 
 namespace dd
 {
+	struct IAsyncHitTest;
+	struct HitState;
+
 	struct AABB;
 	class Input;
 	class InputBindings;
 	struct MeshComponent;
+	struct MousePosition;
 	struct RayComponent;
 	struct TransformComponent;
 	class Window;
-
-	struct MousePosition;
-
+	
 	class MousePicking : public IDebugPanel, public ddr::Renderer
 	{
 	public:
 
 		static const int DownScalingFactor = 2;
 
-		MousePicking( const Window& window, const Input& input );
+		MousePicking( const Window& window, const Input& input, IAsyncHitTest& hit_test );
 
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
@@ -62,6 +65,7 @@ namespace dd
 
 		const Input& m_input;
 		const Window& m_window;
+		dd::IAsyncHitTest& m_hitTest;
 
 		bool m_select { false };
 		bool m_enabled { true };
@@ -85,6 +89,9 @@ namespace dd
 
 		bool m_visualizeRay { false };
 		ddc::Entity m_previousRay;
+
+		dd::HitState m_previousHitState;
+		const dd::HitState* m_hitState { nullptr };
 
 		glm::ivec2 m_previousSize;
 

@@ -94,8 +94,8 @@ namespace dd
 
 	bool AABB::Intersects( const AABB& other ) const
 	{
-		return glm::all( glm::lessThan( Min, other.Max ) ) && 
-			glm::all( glm::greaterThan( Max, other.Min ) );
+		return glm::all( glm::lessThanEqual( Min, other.Max ) ) && 
+			glm::all( glm::greaterThanEqual( Max, other.Min ) );
 	}
 
 	bool AABB::IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const

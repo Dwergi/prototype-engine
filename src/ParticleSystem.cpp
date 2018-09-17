@@ -103,12 +103,16 @@ namespace ddr
 		s_vboParticle.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		s_vboParticle.Bind();
 		s_vboParticle.SetData( dd::ConstBuffer<glm::vec2>( s_screenFacingQuadVertices, 6 ) );
+		s_vboParticle.CommitData();
+
 		shader->BindAttributeVec2( "Position", false );
 		s_vboParticle.Unbind();
 
 		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboPosition.Bind();
 		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MaxParticles ) );
+		m_vboPosition.CommitData();
+
 		shader->BindAttributeVec3( "PositionInstanced", false );
 		shader->SetAttributeInstanced( "PositionInstanced" );
 		m_vboPosition.Unbind();
@@ -116,6 +120,8 @@ namespace ddr
 		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboSizes.Bind();
 		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MaxParticles ) );
+		m_vboSizes.CommitData();
+
 		shader->BindAttributeVec2( "ScaleInstanced", false );
 		shader->SetAttributeInstanced( "ScaleInstanced" );
 		m_vboSizes.Unbind();
@@ -123,6 +129,8 @@ namespace ddr
 		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboColours.Bind();
 		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MaxParticles ) );
+		m_vboColours.CommitData();
+
 		shader->BindAttributeVec4( "ColourInstanced", false );
 		shader->SetAttributeInstanced( "ColourInstanced" );
 		m_vboColours.Unbind();
@@ -132,7 +140,7 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
+	void ParticleSystem::Update( const ddc::UpdateData& update_data )
 	{
 		dd::Buffer<dd::ParticleSystemComponent> particles = update_data.Write<dd::ParticleSystemComponent>();
 		dd::ConstBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
@@ -156,11 +164,11 @@ namespace ddr
 				system.m_age = system.m_lifetime;
 			}
 
-			UpdateLiveParticles( system, delta_t );
+			UpdateLiveParticles( system, update_data.Delta() );
 
 			if( system.m_age < system.m_lifetime )
 			{
-				EmitNewParticles( system, transforms[ i ].World, delta_t );
+				EmitNewParticles( system, transforms[ i ].World, update_data.Delta() );
 			}
 		}
 	}
@@ -279,9 +287,17 @@ namespace ddr
 				++index;
 			}
 
-			m_vboPosition.UpdateData();
-			m_vboSizes.UpdateData();
-			m_vboColours.UpdateData();
+			m_vboPosition.Bind();
+			m_vboPosition.CommitData();
+			m_vboPosition.Unbind();
+
+			m_vboSizes.Bind();
+			m_vboSizes.CommitData();
+			m_vboSizes.Unbind();
+
+			m_vboColours.Bind();
+			m_vboColours.CommitData();
+			m_vboColours.Unbind();
 
 			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, index );
 		}

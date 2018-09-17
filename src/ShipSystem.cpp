@@ -72,7 +72,7 @@ namespace dd
 		bindings.RegisterHandler( InputAction::BOOST, handle_input );
 	}
 	
-	void ShipSystem::Update( const ddc::UpdateData& data, float dt )
+	void ShipSystem::Update( const ddc::UpdateData& data )
 	{
 		if( !m_enabled )
 			return;

@@ -159,7 +159,7 @@ namespace dd
 		return entity;
 	}
 
-	void TrenchSystem::Update( const ddc::UpdateData& data, float delta_t )
+	void TrenchSystem::Update( const ddc::UpdateData& data )
 	{
 		/*// cache these here to avoid recalculating for all components
 		glm::vec3 player_pos = m_camera.GetPosition();

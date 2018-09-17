@@ -9,7 +9,9 @@ namespace ddc
 
 	struct UpdateData
 	{
-		UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+		UpdateData( ddc::World& world, float delta_t, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+
+		float Delta() const { return m_delta; }
 
 		ddc::World& World() const { return m_world; }
 
@@ -53,6 +55,7 @@ namespace ddc
 
 	private:
 
+		float m_delta;
 		ddc::World& m_world;
 		dd::Span<Entity> m_entities;
 		std::vector<ComponentBuffer> m_buffers;

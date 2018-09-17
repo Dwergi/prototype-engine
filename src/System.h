@@ -18,7 +18,7 @@ namespace ddc
 		const std::bitset<MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 		virtual void Initialize( World& world ) {}
-		virtual void Update( const UpdateData& data, float delta_t ) = 0;
+		virtual void Update( const UpdateData& data ) = 0;
 		virtual void Shutdown( World& world ) {}
 
 		int MaxPartitions() const { return m_partitions; }
@@ -31,7 +31,6 @@ namespace ddc
 		template <typename T>
 		void RequireWrite() { m_requirements.Add( new WriteRequirement<T>() ); }
 
-		template <typename T>
 		void RequireTag( Tag tag ) { m_tags.set( (uint) tag ); }
 
 		void SetPartitions( int count )

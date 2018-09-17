@@ -279,8 +279,8 @@ namespace ddc
 
 		dd::Span<Entity> entity_span( entities );
 
-		UpdateData data( *this, entity_span, system->GetRequirements() );
-		system->Update( data, delta_t );
+		UpdateData data( *this, delta_t, entity_span, system->GetRequirements() );
+		system->Update( data );
 
 		data.Commit();
 	}

@@ -19,7 +19,7 @@ namespace dd
 		RequireWrite<dd::BoundsComponent>();
 	}
 
-	void SceneGraphSystem::Update( const ddc::UpdateData& data, float dt )
+	void SceneGraphSystem::Update( const ddc::UpdateData& data )
 	{
 		dd::Buffer<dd::TransformComponent> transforms = data.Write<dd::TransformComponent>();
 		dd::Buffer<dd::BoundsComponent> bounds = data.Write<dd::BoundsComponent>();

@@ -36,6 +36,11 @@ namespace dd
 		BVHEntry& entry = m_entries[ index ];
 		entry.Bounds = bounds;
 
+		if( m_batch )
+		{
+			return index;
+		}
+
 		DD_ASSERT( m_buckets[ 0 ].Region == m_buckets[ 0 ].Bounds );
 
 		if( !m_buckets[ 0 ].Region.Contains( entry.Bounds ) )
@@ -78,7 +83,7 @@ namespace dd
 		}
 	}
 
-	void BVHTree::Remove( int handle )
+	void BVHTree::Remove( size_t handle )
 	{
 		if( IsFreeEntry( handle ) )
 		{
@@ -137,12 +142,12 @@ namespace dd
 		std::sort( m_freeEntries.begin(), m_freeEntries.end() );
 	}
 
-	Intersection BVHTree::IntersectsRay( const Ray& ray ) const
+	BVHIntersection BVHTree::IntersectsRay( const Ray& ray ) const
 	{
 		dd::Array<size_t, 64> stack;
 		stack.Add( 0 );
 
-		Intersection nearest;
+		BVHIntersection nearest;
 		nearest.Distance = FLT_MAX;
 		nearest.Handle = INVALID;
 
@@ -180,7 +185,58 @@ namespace dd
 			}
 		}
 
-		DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+
+		return nearest;
+	}
+
+	BVHIntersection BVHTree::IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const
+	{
+		dd::Array<size_t, 64> stack;
+		stack.Add( 0 );
+
+		BVHIntersection nearest;
+		nearest.Distance = FLT_MAX;
+		nearest.Handle = INVALID;
+
+		int buckets_tested = 0;
+
+		while( stack.Size() > 0 )
+		{
+			++buckets_tested;
+
+			const BVHBucket& bucket = m_buckets[stack.Pop()];
+
+			float bucket_distance;
+			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
+				bucket_distance < nearest.Distance )
+			{
+				if( bucket.IsLeaf() )
+				{
+					for( size_t e : bucket.Entries )
+					{
+						float entry_distance;
+						if( m_entries[e].Bounds.IntersectsRay( ray, entry_distance ) &&
+							entry_distance < nearest.Distance )
+						{
+							float actual_distance = fn( e );
+							if( actual_distance < nearest.Distance )
+							{
+								nearest.Handle = e;
+								nearest.Distance = actual_distance;
+							}
+						}
+					}
+				}
+				else
+				{
+					stack.Add( bucket.Left );
+					stack.Add( bucket.Right );
+				}
+			}
+		}
+
+		//DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return nearest;
 	}
@@ -221,7 +277,7 @@ namespace dd
 			}
 		}
 
-		DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return hit;
 	}
@@ -286,7 +342,6 @@ namespace dd
 		right.SplitAxis = split_axis;
 		right.Parent = parent_index;
 
-		DD_ASSERT( !left.Region.Intersects( right.Region ) );
 		DD_ASSERT( left.Region.Volume() > 0 );
 		DD_ASSERT( right.Region.Volume() > 0 );
 

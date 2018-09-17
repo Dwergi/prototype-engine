@@ -28,7 +28,7 @@ namespace dd
 		void BindActions( InputBindings& bindings );
 
 		virtual void Initialize( ddc::World& world ) override {}
-		virtual void Update( const ddc::UpdateData& data, float dt ) override;
+		virtual void Update( const ddc::UpdateData& data ) override;
 		virtual void Shutdown( ddc::World& world ) override;
 
 		void Enable( bool enabled ) { m_enabled = enabled; }

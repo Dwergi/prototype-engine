@@ -3,8 +3,9 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
+	UpdateData::UpdateData( ddc::World& world, float delta_t, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
 		m_world( world ),
+		m_delta( delta_t ),
 		m_entities( entities )
 	{
 		m_buffers.reserve( requirements.Size() );

@@ -14,14 +14,14 @@ namespace ddr
 	struct MeshHandle
 	{
 	public:
-		MeshHandle() : m_hash( 0 ) {}
+		MeshHandle() {}
 
-		bool IsValid() const { return m_hash != 0; }
+		bool IsValid() const { return m_id != ~0u; }
 
 		DD_BASIC_TYPE( MeshHandle )
 
 	private:
 		friend class Mesh;
-		uint64 m_hash;
+		size_t m_id { ~0u };
 	};
 }
