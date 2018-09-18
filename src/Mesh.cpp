@@ -7,8 +7,8 @@
 #include "PrecompiledHeader.h"
 #include "Mesh.h"
 
+#include "BVHTree.h"
 #include "ICamera.h"
-#include "GLError.h"
 #include "Material.h"
 #include "MeshHandle.h"
 #include "OpenGL.h"
@@ -16,12 +16,9 @@
 #include "Uniforms.h"
 #include "WorldRenderer.h"
 
-
-
 namespace ddr
 {
-	std::mutex Mesh::m_instanceMutex;
-	std::unordered_map<uint64, Mesh*> Mesh::m_instances;
+	std::vector<Mesh*> Mesh::m_instances;
 
 	static const glm::vec3 s_unitCubePositions[] =
 	{
@@ -186,15 +183,12 @@ namespace ddr
 
 	Mesh* Mesh::Get( MeshHandle handle )
 	{
-		std::lock_guard lock( m_instanceMutex );
-
-		auto it = m_instances.find( handle.m_hash );
-		if( it == m_instances.end() )
+		if( handle.m_id < m_instances.size() )
 		{
-			return nullptr;
+			return m_instances[handle.m_id];
 		}
 
-		return it->second;
+		return nullptr;
 	}
 
 	MeshHandle Mesh::Create( const char* name )
@@ -202,11 +196,9 @@ namespace ddr
 		MeshHandle mesh_h = Find( name );
 		if( !mesh_h.IsValid() )
 		{
-			std::lock_guard lock( m_instanceMutex );
+			mesh_h.m_id = m_instances.size();
 
-			mesh_h.m_hash = dd::HashString( name, strlen( name ) );
-
-			m_instances.insert( std::make_pair( mesh_h.m_hash, new Mesh( name ) ) );
+			m_instances.push_back( new Mesh( name ) );
 		}
 
 		return mesh_h;
@@ -217,16 +209,16 @@ namespace ddr
 		DD_ASSERT( name != nullptr );
 		DD_ASSERT( strlen( name ) > 0 );
 
-		uint64 hash = dd::HashString( name, strlen( name ) );
-
-		std::lock_guard lock( m_instanceMutex );
-
 		MeshHandle mesh_h;
 
-		auto it = m_instances.find( hash );
-		if( it != m_instances.end() )
+		for( size_t i = 0; i < m_instances.size(); ++i )
 		{
-			mesh_h.m_hash = hash;
+			if( m_instances[i] != nullptr && 
+				m_instances[i]->m_name == name )
+			{
+				mesh_h.m_id = i;
+				break;
+			}
 		}
 
 		return mesh_h;
@@ -237,10 +229,8 @@ namespace ddr
 		Mesh* mesh = Get( mesh_h );
 		if( mesh != nullptr )
 		{
-			std::lock_guard lock( m_instanceMutex );
-
-			delete mesh;
-			m_instances.erase( mesh_h.m_hash );
+			delete m_instances[ mesh_h.m_id ];
+			m_instances[mesh_h.m_id] = nullptr;
 		}
 	}
 
@@ -270,13 +260,9 @@ namespace ddr
 			m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		}
 
-		m_vao.Bind();
-
-		m_vboPosition.Bind();
 		m_vboPosition.SetData( positions );
-		m_vboPosition.Unbind();
-		
-		m_vao.Unbind();
+
+		SetDirty();
 	}
 
 	void Mesh::SetNormals( const dd::ConstBuffer<glm::vec3>& normals )
@@ -286,13 +272,9 @@ namespace ddr
 			m_vboNormal.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		}
 
-		m_vao.Bind();
-
-		m_vboNormal.Bind();
 		m_vboNormal.SetData( normals );
-		m_vboNormal.Unbind();
-		
-		m_vao.Unbind();
+
+		SetDirty();
 	}
 
 	void Mesh::SetIndices( const dd::ConstBuffer<uint>& indices )
@@ -302,13 +284,9 @@ namespace ddr
 			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
 		}
 
-		m_vao.Bind();
-
-		m_vboIndex.Bind();
 		m_vboIndex.SetData( indices );
-		m_vboIndex.Unbind();
 
-		m_vao.Unbind();
+		SetDirty();
 	}
 
 	void Mesh::SetUVs( const dd::ConstBuffer<glm::vec2>& uvs )
@@ -318,13 +296,9 @@ namespace ddr
 			m_vboUV.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		}
 
-		m_vao.Bind();
-
-		m_vboUV.Bind();
 		m_vboUV.SetData( uvs );
-		m_vboUV.Unbind();
 
-		m_vao.Unbind();
+		SetDirty();
 	}
 
 	void Mesh::SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours )
@@ -334,13 +308,9 @@ namespace ddr
 			m_vboVertexColour.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		}
 
-		m_vao.Bind();
-
-		m_vboVertexColour.Bind();
 		m_vboVertexColour.SetData( colours );
-		m_vboVertexColour.Unbind();
 
-		m_vao.Unbind();
+		SetDirty();
 	}
 
 	void Mesh::SetMaterial( MaterialHandle material )
@@ -350,11 +320,42 @@ namespace ddr
 
 	void Mesh::UpdateBuffers()
 	{
-		m_vboPosition.UpdateData();
-		m_vboNormal.UpdateData();
-		m_vboIndex.UpdateData();
-		m_vboUV.UpdateData();
-		m_vboVertexColour.UpdateData();
+		if( m_vboPosition.IsValid() )
+		{
+			m_vboPosition.Bind();
+			m_vboPosition.CommitData();
+			m_vboPosition.Unbind();
+		}
+
+		if( m_vboNormal.IsValid() )
+		{
+			m_vboNormal.Bind();
+			m_vboNormal.CommitData();
+			m_vboNormal.Unbind();
+		}
+
+		if( m_vboIndex.IsValid() )
+		{
+			m_vboIndex.Bind();
+			m_vboIndex.CommitData();
+			m_vboIndex.Unbind();
+		}
+		
+		if( m_vboUV.IsValid() )
+		{
+			m_vboUV.Bind();
+			m_vboUV.CommitData();
+			m_vboUV.Unbind();
+		}
+		
+		if( m_vboVertexColour.IsValid() )
+		{
+			m_vboVertexColour.Bind();
+			m_vboVertexColour.CommitData();
+			m_vboVertexColour.Unbind();
+		}
+
+		RebuildBVH();
 
 		m_dirty = false;
 	}
@@ -433,5 +434,55 @@ namespace ddr
 		bounds.Expand( glm::vec3( 0, 0, 0 ) );
 		bounds.Expand( glm::vec3( 1, 1, 1 ) );
 		SetBoundBox( bounds );
+	}
+
+	void Mesh::RebuildBVH()
+	{
+		if( m_bvh != nullptr )
+		{
+			delete m_bvh;
+		}
+
+		m_bvh = new dd::BVHTree();
+		m_bvh->StartBatch();
+
+		DD_TODO( "Create a mesh triangulator helper." );
+
+		const dd::ConstBuffer<glm::vec3>& positions = GetPositions();
+		const dd::ConstBuffer<uint>& indices = GetIndices();
+		if( indices.IsValid() )
+		{
+			for( int i = 0; i < indices.Size(); i += 3 )
+			{
+				glm::vec3 p0 = positions[indices[i + 0]];
+				glm::vec3 p1 = positions[indices[i + 1]];
+				glm::vec3 p2 = positions[indices[i + 2]];
+
+				dd::AABB bounds;
+				bounds.Expand( p0 );
+				bounds.Expand( p1 );
+				bounds.Expand( p2 );
+
+				m_bvh->Add( bounds );
+			}
+		}
+		else
+		{
+			for( int i = 0; i < positions.Size(); i += 3 )
+			{
+				glm::vec3 p0 = positions[i + 0];
+				glm::vec3 p1 = positions[i + 1];
+				glm::vec3 p2 = positions[i + 2];
+
+				dd::AABB bounds;
+				bounds.Expand( p0 );
+				bounds.Expand( p1 );
+				bounds.Expand( p2 );
+
+				m_bvh->Add( bounds );
+			}
+		}
+
+		m_bvh->EndBatch();
 	}
 }

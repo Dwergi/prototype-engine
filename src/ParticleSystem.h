@@ -60,7 +60,7 @@ namespace ddr
 		~ParticleSystem();
 
 		virtual void Initialize( ddc::World& ) override;
-		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
+		virtual void Update( const ddc::UpdateData& data ) override;
 		virtual void Shutdown( ddc::World& ) override {}
 
 		void BindActions( dd::InputBindings& input_bindings );

@@ -142,6 +142,7 @@ namespace ddr
 		m_vboVertex.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboVertex.Bind();
 		m_vboVertex.SetData( m_corners );
+		m_vboVertex.CommitData();
 
 		shader->BindPositions();
 		m_vboVertex.Unbind();
@@ -149,6 +150,7 @@ namespace ddr
 		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboIndex.Bind();
 		m_vboIndex.SetData( s_indexBuffer );
+		m_vboIndex.CommitData();
 		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
@@ -164,7 +166,7 @@ namespace ddr
 
 		if( m_dirty )
 		{
-			m_vboVertex.UpdateData();
+			m_vboVertex.CommitData();
 
 			m_dirty = false;
 		}

@@ -11,13 +11,15 @@
 
 namespace dd
 {
-	struct Intersection
+	struct BVHIntersection
 	{
 		size_t Handle;
 		float Distance;
 
 		bool IsValid() const { return Handle != -1; }
 	};
+
+	typedef std::function<float(size_t)> HitTestFn;
 
 	struct BVHTree
 	{
@@ -26,9 +28,10 @@ namespace dd
 
 		size_t Add( const AABB& bounds );
 
-		void Remove( int handle );
+		void Remove( size_t handle );
 
-		Intersection IntersectsRay( const Ray& ray ) const;
+		BVHIntersection IntersectsRay( const Ray& ray ) const;
+		BVHIntersection IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const;
 
 		bool WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const;
 
@@ -44,6 +47,9 @@ namespace dd
 		void CountBucketSplits( int& x, int& y, int& z ) const;
 		void EnsureAllBucketsEmpty() const;
 		int GetRebuildCount() const { return m_rebuildCount; }
+
+		void StartBatch() { m_batch = true; }
+		void EndBatch() { m_batch = false; RebuildTree(); }
 
 	private:
 
@@ -87,6 +93,7 @@ namespace dd
 		std::vector<size_t> m_freeEntries;
 		std::vector<size_t> m_freeBuckets;
 
+		bool m_batch { false };
 		int m_rebuildCount { 0 };
 
 		void RebuildTree();

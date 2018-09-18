@@ -15,6 +15,6 @@ namespace dd
 	public:
 		SceneGraphSystem();
 
-		virtual void Update( const ddc::UpdateData& data, float dt ) override;
+		virtual void Update( const ddc::UpdateData& data ) override;
 	};
 }

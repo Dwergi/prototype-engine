@@ -349,7 +349,10 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
+    <ClInclude Include="src\HitState.h" />
     <ClInclude Include="src\HitTest.h" />
+    <ClInclude Include="src\HitTestSystem.h" />
+    <ClInclude Include="src\IAsyncHitTest.h" />
     <ClInclude Include="src\Icosphere.h" />
     <ClInclude Include="src\LightRenderer.h" />
     <ClInclude Include="src\RayComponent.h" />
@@ -552,7 +555,9 @@
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
+    <ClCompile Include="src\HitState.cpp" />
     <ClCompile Include="src\HitTest.cpp" />
+    <ClCompile Include="src\HitTestSystem.cpp" />
     <ClCompile Include="src\LightRenderer.cpp" />
     <ClCompile Include="src\Icosphere.cpp" />
     <ClCompile Include="src\Material.cpp" />
@@ -585,6 +590,12 @@
     <ClCompile Include="src\RayComponent.cpp" />
     <ClCompile Include="src\RayRenderer.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
+    <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Tests\IcosphereTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

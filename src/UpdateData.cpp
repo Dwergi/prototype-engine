@@ -3,9 +3,10 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequest*>& requests ) :
+	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequest*>& requests, float delta_t ) :
 		m_world( world ),
-		m_entities( entities )
+		m_entities( entities ),
+		m_delta( delta_t )
 	{
 		m_buffers.reserve( requests.Size() );
 

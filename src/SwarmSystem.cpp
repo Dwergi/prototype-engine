@@ -44,7 +44,7 @@ namespace dd
 
 	}
 
-	void SwarmSystem::Update( const ddc::UpdateData& data, float dt )
+	void SwarmSystem::Update( const ddc::UpdateData& data )
 	{
 		DD_TODO( "Reimplement swarm system" );
 		/*float turn_multiplier = TurnSpeed * dt;

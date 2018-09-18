@@ -10,7 +10,7 @@
 
 TEST_CASE( "[ScriptSystem] Update Is Called" )
 {
-	dd::JobSystem jobsystem( 1 );
+	dd::JobSystem jobsystem( 0 );
 	ddc::World world( jobsystem );
 	ddc::Entity entity = world.CreateEntity();
 
@@ -20,7 +20,7 @@ TEST_CASE( "[ScriptSystem] Update Is Called" )
 	dd::Array<const ddc::DataRequest*, 1> reqs;
 	reqs.Add( new ddc::WriteRequirement<dd::ScriptComponent>() );
 
-	ddc::UpdateData data( world, dd::Span<ddc::Entity>( entities ), reqs );
+	ddc::UpdateData data( world, 0, dd::Span<ddc::Entity>( entities ), reqs );
 	
 	dd::ScriptComponent& script = world.Add<dd::ScriptComponent>( entity );
 	script.SetModule( dd::String32( "test_component" ) );

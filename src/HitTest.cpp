@@ -3,6 +3,7 @@
 
 #include "AABB.h"
 #include "BoundSphere.h"
+#include "BVHTree.h"
 #include "Mesh.h"
 #include "Ray.h"
 
@@ -30,48 +31,60 @@ namespace dd
 			return false;
 		}
 
+		const dd::BVHTree* bvh = mesh.GetBVH();
+		if( bvh == nullptr )
+		{
+			return false;
+		}
+
 		// transform to mesh space
 		glm::mat4 inv_transform = glm::inverse( transform );
-		
+
 		glm::vec3 origin = (inv_transform * glm::vec4( ray.Origin(), 1 )).xyz;
 		glm::vec3 dir = (inv_transform * glm::vec4( ray.Direction(), 0 )).xyz;
-		dir = glm::normalize( dir );
 
 		const dd::ConstBuffer<uint>& indices = mesh.GetIndices();
-
 		if( indices.IsValid() )
 		{
-			for( int i = 0; i < indices.Size(); i += 3 )
+			BVHIntersection intersection = 
+				bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &positions, &indices]( size_t tri )
 			{
-				glm::vec3 p0 = positions[indices[i + 0]];
-				glm::vec3 p1 = positions[indices[i + 1]];
-				glm::vec3 p2 = positions[indices[i + 2]];
-
-				glm::vec3 bary; 
-				if( glm::intersectRayTriangle( origin, dir, p0, p1, p2, bary ) )
-				{
-					// not actually barycentric for Z, in fact just a distance...
-					// Thanks GLM docs!
-					out_distance = bary.z;
-					return true;
-				}
-			}
-		}
-		else
-		{
-			for( int i = 0; i < positions.Size(); i += 3 )
-			{
-				glm::vec3 p0 = positions[i + 0];
-				glm::vec3 p1 = positions[i + 1];
-				glm::vec3 p2 = positions[i + 2];
+				glm::vec3 p0 = positions[indices[tri * 3 + 0]];
+				glm::vec3 p1 = positions[indices[tri * 3 + 1]];
+				glm::vec3 p2 = positions[indices[tri * 3 + 2]];
 
 				glm::vec3 bary;
 				if( glm::intersectRayTriangle( origin, dir, p0, p1, p2, bary ) )
 				{
-					out_distance = bary.z;
-					return true;
+					return bary.z;
 				}
-			}
+
+				return FLT_MAX;
+			} );
+
+			out_distance = intersection.Distance;
+			return true;
+		}
+		else
+		{
+			BVHIntersection intersection = 
+				bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &positions, &indices]( size_t tri )
+			{
+				glm::vec3 p0 = positions[tri * 3 + 0];
+				glm::vec3 p1 = positions[tri * 3 + 1];
+				glm::vec3 p2 = positions[tri * 3 + 2];
+
+				glm::vec3 bary;
+				if( glm::intersectRayTriangle( origin, dir, p0, p1, p2, bary ) )
+				{
+					return bary.z;
+				}
+
+				return FLT_MAX;
+			} );
+
+			out_distance = intersection.Distance;
+			return true;
 		}
 
 		return false;

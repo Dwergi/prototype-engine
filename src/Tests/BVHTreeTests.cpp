@@ -120,7 +120,7 @@ TEST_CASE( "[BVHTree] Intersects" )
 	float distance;
 	REQUIRE( entry_bb.IntersectsRay( ray, distance ) );
 
-	dd::Intersection hit = tree.IntersectsRay( ray );
+	dd::BVHIntersection hit = tree.IntersectsRay( ray );
 	REQUIRE( hit.IsValid() );
 	REQUIRE( hit.Handle == entry_h );
 	REQUIRE( hit.Distance == 5.0f );
@@ -143,7 +143,7 @@ TEST_CASE( "[BVHTree] Misses Root" )
 
 	dd::Ray ray( glm::vec3( 1000, 1000, 1000 ), glm::vec3( 0, 1, 0 ) );
 
-	dd::Intersection hit = tree.IntersectsRay( ray );
+	dd::BVHIntersection hit = tree.IntersectsRay( ray );
 	REQUIRE_FALSE( hit.IsValid() );
 }
 

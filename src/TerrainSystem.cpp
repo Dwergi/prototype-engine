@@ -129,7 +129,7 @@ namespace dd
 		}
 	}
 
-	void TerrainSystem::Update( const ddc::UpdateData& data, float delta_t )
+	void TerrainSystem::Update( const ddc::UpdateData& data )
 	{
 		ddc::World& world = data.World();
 

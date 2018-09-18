@@ -114,6 +114,7 @@ namespace ddr
 			m_vboFullscreen.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 			m_vboFullscreen.Bind();
 			m_vboFullscreen.SetData( s_fullScreenQuadBuffer );
+			m_vboFullscreen.CommitData();
 
 			shader->BindPositions();
 

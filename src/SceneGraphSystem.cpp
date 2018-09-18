@@ -19,7 +19,7 @@ namespace dd
 		OptionalWrite<dd::BoundsComponent>();
 	}
 
-	void SceneGraphSystem::Update( const ddc::UpdateData& data, float dt )
+	void SceneGraphSystem::Update( const ddc::UpdateData& data )
 	{
 		auto transforms = data.Write<dd::TransformComponent>();
 		auto bounds = data.Write<dd::BoundsComponent>();

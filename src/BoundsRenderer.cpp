@@ -92,10 +92,12 @@ namespace ddr
 		{
 			m_vboPosition.Bind();
 			m_vboPosition.SetData( s_cornersBuffer );
+			m_vboPosition.CommitData();
 			m_vboPosition.Unbind();
 
 			m_vboIndex.Bind();
 			m_vboIndex.SetData( s_indicesBuffer );
+			m_vboIndex.CommitData();
 			m_vboIndex.Unbind();
 		}
 		else if( m_drawMode == DrawMode::Sphere )

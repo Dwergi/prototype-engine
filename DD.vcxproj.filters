@@ -537,6 +537,15 @@
     <ClInclude Include="src\DataRequest.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\HitTestSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IAsyncHitTest.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HitState.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -938,6 +947,15 @@
     </ClCompile>
     <ClCompile Include="src\DataRequest.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HitTestSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HitState.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

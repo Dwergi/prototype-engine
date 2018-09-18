@@ -6,6 +6,12 @@
 
 #pragma once
 
+#ifdef _DEBUG
+#define PPK_ASSERT_ENABLED 1
+#else 
+#define PPK_ASSERT_ENABLED 0
+#endif
+
 #include "PP_Assert.h"
 
 // assert with a warning level
@@ -24,7 +30,11 @@
 #define DD_ASSERT_USED_FATAL PPK_ASSERT_USED_FATAL
 #define DD_ASSERT_USED_CUSTOM PPK_ASSERT_USED_CUSTOM
 
+#ifdef _DEBUG
 #define DD_DIAGNOSTIC( ... ) fprintf( stdout, __VA_ARGS__ );
+#else
+#define DD_DIAGNOSTIC( ... )
+#endif
 
 #define DD_STATIC_ASSERT PPK_STATIC_ASSERT
 

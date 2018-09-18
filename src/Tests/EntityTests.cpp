@@ -43,7 +43,7 @@ struct TestSystem : ddc::System
 		RequireWrite<SecondComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
+	virtual void Update( const ddc::UpdateData& data ) override
 	{
 		dd::ConstBuffer<FirstComponent> read = data.Read<FirstComponent>();
 		dd::Buffer<SecondComponent> write = data.Write<SecondComponent>();
@@ -67,7 +67,7 @@ struct DependentSystem : ddc::System
 		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
+	virtual void Update( const ddc::UpdateData& data ) override
 	{
 		dd::ConstBuffer<SecondComponent> read = data.Read<SecondComponent>();
 		dd::Buffer<ThirdComponent> write = data.Write<ThirdComponent>();
@@ -90,7 +90,7 @@ struct ReaderSystem : ddc::System
 		RequireRead<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
+	virtual void Update( const ddc::UpdateData& data ) override
 	{
 		dd::ConstBuffer<ThirdComponent> read = data.Read<ThirdComponent>();
 
@@ -111,7 +111,7 @@ struct OnlyReaderSystem : ddc::System
 		RequireWrite<SecondComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data, float delta_t ) override
+	virtual void Update( const ddc::UpdateData& data ) override
 	{
 		dd::ConstBuffer<FirstComponent> read1 = data.Read<FirstComponent>();
 		dd::ConstBuffer<SecondComponent> read2 = data.Read<SecondComponent>();
@@ -134,7 +134,7 @@ struct OnlyWriterSystem : ddc::System
 		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update( const ddc::UpdateData& data, float delta_t ) override {}
+	virtual void Update( const ddc::UpdateData& data ) override {}
 };
 
 TEST_CASE( "EntityManager" )

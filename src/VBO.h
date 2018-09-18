@@ -35,12 +35,14 @@ namespace ddr
 
 		int GetDataSize() const { return m_buffer.SizeBytes(); }
 	
-		void UpdateData();
+		void CommitData();
 
 		void Bind();
 		void Unbind();
 
 		bool IsValid() const { return m_id != OpenGL::InvalidID; }
+		bool IsBound() const;
+
 		GLuint ID() const { return m_id; }
 
 		VBO& operator=( const VBO& other );

@@ -15,6 +15,11 @@
 #include <memory>
 #include <unordered_map>
 
+namespace dd
+{
+	struct BVHTree;
+}
+
 namespace ddr
 {
 	class ICamera;
@@ -133,6 +138,8 @@ namespace ddr
 
 		void MakeUnitCube();
 
+		const dd::BVHTree* GetBVH() const { return m_bvh; }
+
 		~Mesh();
 
 		Mesh& operator=( const Mesh& ) = delete;
@@ -142,8 +149,7 @@ namespace ddr
 
 	private:
 
-		static std::mutex m_instanceMutex;
-		static std::unordered_map<uint64, Mesh*> m_instances;
+		static std::vector<Mesh*> m_instances;
 
 		bool m_dirty { false };
 		
@@ -160,8 +166,12 @@ namespace ddr
 		dd::String128 m_name;
 		dd::AABB m_bounds;
 
+		dd::BVHTree* m_bvh { nullptr };
+
 		Mesh( const char* name );
 
 		void BindToShader( ShaderProgram& shader );
+
+		void RebuildBVH();
 	};
 }

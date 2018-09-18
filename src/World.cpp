@@ -282,8 +282,8 @@ namespace ddc
 
 		dd::Span<Entity> entity_span( entities );
 
-		UpdateData data( *this, entity_span, system->GetRequests() );
-		system->Update( data, delta_t );
+		UpdateData data( *this, entity_span, system->GetRequests(), delta_t );
+		system->Update( data );
 
 		data.Commit();
 	}

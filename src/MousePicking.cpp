@@ -8,6 +8,7 @@
 #include "MousePicking.h"
 
 #include "BoundsComponent.h"
+#include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "Input.h"
 #include "InputBindings.h"
@@ -33,12 +34,14 @@
 
 namespace dd
 {
-	MousePicking::MousePicking( const Window& window, const Input& input ) :
+	MousePicking::MousePicking( const Window& window, const Input& input, IAsyncHitTest& hit_test ) :
 		ddr::Renderer( "Mouse Picking" ),
 		m_window( window ),
-		m_input( input )
+		m_input( input ),
+		m_hitTest( hit_test )
 	{
-		ddr::Renderer::RequireTag( ddc::Tag::Visible );
+		RequireTag( ddc::Tag::Visible );
+
 		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
 		Require<dd::BoundsComponent>();
@@ -241,6 +244,13 @@ namespace dd
 
 		dd::Ray screen_ray = GetScreenRay( data.Camera() );
 
+		if( m_hitState != nullptr )
+		{
+			m_previousHitState = *m_hitState;
+		}
+
+		m_hitState = &m_hitTest.ScheduleHitTest( screen_ray, 200 );
+
 		ddc::Entity entity;
 		m_depth = FLT_MAX;
 
@@ -293,10 +303,40 @@ namespace dd
 		ImGui::Checkbox( "Use Ray", &m_rayTest );
 
 		ImGui::Checkbox( "Render Debug", &m_renderDebug );
+	
+		ImGui::Value( "Mouse Pos", m_position, "%.0f" );
 
-		ImGui::Value( "Handle", m_focused.ID );
-		ImGui::Value( "Position", m_position, "%.1f" );
-		ImGui::Value( "Depth", m_depth, "%.3f" );
+		if( m_focused.IsValid() )
+		{
+			ImGui::Value( "Handle", m_focused.ID );
+			ImGui::Value( "Depth", m_depth, "%.3f" );
+		}
+		else
+		{
+			ImGui::Text( "Handle: <none>" );
+			ImGui::Text( "Depth: <none>" );
+		}
+
+
+		if( ImGui::TreeNodeEx( "Async", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
+		{
+			ImGui::Value( "Ray Origin", m_previousHitState.Ray().Origin() );
+			ImGui::Value( "Ray Dir", m_previousHitState.Ray().Direction() );
+
+			if( m_previousHitState.Entity().IsValid() )
+			{
+				ImGui::Value( "Handle", m_previousHitState.Entity().ID );
+				ImGui::Value( "Distance", m_previousHitState.Distance() );
+			}
+			else
+			{
+				ImGui::Text( "Handle: <none>" );
+				ImGui::Text( "Distance: <none>" );
+
+			}
+
+			ImGui::TreePop();
+		}
 
 		if( ImGui::TreeNodeEx( "Ray", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{

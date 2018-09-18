@@ -71,7 +71,7 @@ namespace dd
 		//
 		// Update the terrain system.
 		//
-		virtual void Update( const ddc::UpdateData& data, float delta_t ) override;
+		virtual void Update( const ddc::UpdateData& data ) override;
 
 		//
 		// Shut down the terrain system and destroy terrain chunk meshes.
