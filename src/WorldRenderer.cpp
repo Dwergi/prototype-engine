@@ -114,8 +114,6 @@ namespace ddr
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
-		ImGui::Checkbox( "Draw Axes", &m_debugDrawAxes );
-
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			ImGui::Checkbox( "Enabled", &s_wireframe.Enabled );
@@ -129,86 +127,6 @@ namespace ddr
 			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( s_wireframe.EdgeColour ) );
 
 			ImGui::DragFloat( "Max Distance", &s_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
-
-			ImGui::TreePop();
-		}
-
-		if( ImGui::TreeNodeEx( "Lighting", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			for( size_t i = 0; i < m_debugLights.size(); ++i )
-			{
-				dd::String64 lightLabel( "Light " );
-				char buffer[16];
-				_itoa_s( (int) i, buffer, 10 );
-				lightLabel += buffer;
-
-				DD_TODO( "Uncomment" );
-				/*ddc::Entity entity = m_debugLights[ i ];
-				dd::LightComponent& light = entity.Get<dd::LightComponent>();
-				dd::TransformComponent& transform = entity.Get<dd::TransformComponent>();
-
-				if( ImGui::TreeNodeEx( lightLabel.c_str(), ImGuiTreeNodeFlags_CollapsingHeader ) )
-				{
-					bool directional = light.IsDirectional;
-					if( ImGui::Checkbox( "Directional?", &directional ) )
-					{
-						light.IsDirectional = directional;
-					}
-					
-					glm::vec3 light_colour = light.Colour;
-					if( ImGui::ColorEdit3( "Colour", glm::value_ptr( light_colour ) ) )
-					{
-						light.Colour = light_colour;
-					}
-
-					float intensity = light.Intensity;
-					if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
-					{
-						light.Intensity = intensity;
-					}
-
-					float attenuation = light.Attenuation;
-					if( ImGui::DragFloat( "Attenuation", &attenuation, 0.01, 0, 1 ) )
-					{
-						light.Attenuation = attenuation;
-					}
-
-					glm::vec3 light_position = transform.GetLocalPosition();
-
-					const char* positionLabel = light.IsDirectional ? "Direction" : "Position";
-					if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
-					{
-						transform.SetLocalPosition( light_position );
-					}
-
-					float ambient = light.Ambient;
-					if( ImGui::SliderFloat( "Ambient", &ambient, 0.0f, 1.0f ) )
-					{
-						light.Ambient = ambient;
-					}
-
-					float specular = light.Specular;
-					if( ImGui::SliderFloat( "Specular", &specular, 0.0f, 1.0f ) )
-					{
-						light.Specular = specular;
-					}
-
-					if( ImGui::Button( "Delete" ) )
-					{
-						m_deleteLight = entity;
-					}
-
-					ImGui::TreePop();
-				}*/
-			}
-
-			if( m_debugLights.size() < 10 )
-			{
-				if( ImGui::Button( "Create Light" ) )
-				{
-					m_createLight = true;
-				}
-			}
 
 			ImGui::TreePop();
 		}
@@ -276,48 +194,7 @@ namespace ddr
 		}
 
 		m_debugMeshGridCreated = true;
-	}
-
-	ddc::Entity WorldRenderer::CreatePointLight( ddc::World& world )
-	{
-		glm::mat4 transform = glm::translate( glm::vec3( 0 ) ) * glm::scale( glm::vec3( 0.1f ) );
-		ddc::Entity entity = CreateMeshEntity( world, m_unitCube, glm::vec4( 1 ), transform );
-		dd::LightComponent& light = world.Add<dd::LightComponent>( entity );
-		light.Ambient = 0.01f;
-
-		return entity;
-	}
-
-	void WorldRenderer::UpdateDebugPointLights( ddc::World& world )
-	{
-		if( m_createLight )
-		{
-			CreatePointLight( world );
-			m_createLight = false;
-		}
-
-		if( m_deleteLight.IsValid() )
-		{
-			world.DestroyEntity( m_deleteLight );
-			m_deleteLight = ddc::Entity();
-		}
-
-		DD_TODO( "Uncomment" );
-		world.ForAllWithReadable<dd::MeshComponent, dd::LightComponent>( []( auto entity, auto mesh, auto light )
-		{
-			if( mesh.Write() != nullptr )
-			{
-				mesh.Colour = glm::vec4( light.Colour, 1);
-			}
-		} );
-	}*/
-
-	// TODO: Move to a debug renderer or something. 
-	/*CreateDebugMeshGrid( world );
-	UpdateDebugPointLights( world );
-
-	DD_TODO( "Uncomment" );
-	m_debugLights = world.FindAllWithWritable<dd::LightComponent, dd::TransformComponent>();*/
+	} */
 
 	void WorldRenderer::RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render )
 	{
@@ -331,7 +208,7 @@ namespace ddr
 	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
 	{
 		dd::Array<ddc::TypeID, ddc::MAX_COMPONENTS> components;
-		for( const ddc::DataRequirement* req : renderer.GetRequirements() )
+		for( const ddc::DataRequest* req : renderer.GetRequirements() )
 		{
 			components.Add( req->Component().ID );
 		}

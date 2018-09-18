@@ -4,12 +4,12 @@
 
 namespace ddc
 {
-	struct DataRequirement;
+	struct DataRequest;
 	struct World;
 
 	struct UpdateData
 	{
-		UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements );
+		UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequest*>& requests );
 
 		ddc::World& World() const { return m_world; }
 
@@ -18,35 +18,31 @@ namespace ddc
 		size_t Size() const { return m_entities.Size(); }
 
 		template <typename T>
-		dd::ConstBuffer<T> Read() const
+		ddc::ReadView<T> Read() const
 		{
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
 				if( buffer.Component() == T::Type )
 				{
 					DD_ASSERT( buffer.Usage() == DataUsage::Read );
-
-					return dd::ConstBuffer<T>( (const T*) buffer.Data(), buffer.Size() );
+					return ddc::ReadView<T>( buffer );
 				}
 			}
-
-			throw std::exception( "No read buffer found for component. Check your requirements!" );
+			throw std::exception( "No read buffer found for component. Check your requests!" );
 		}
 
 		template <typename T>
-		dd::Buffer<T> Write() const
+		ddc::WriteView<T> Write() const
 		{
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
 				if( buffer.Component() == T::Type )
 				{
 					DD_ASSERT( buffer.Usage() == DataUsage::Write );
-
-					return dd::Buffer<T>( (T*) buffer.Data(), buffer.Size() );
+					return ddc::WriteView<T>( buffer );
 				}
 			}
-
-			throw std::exception( "No write buffer found for component. Check your requirements!" );
+			throw std::exception( "No write buffer found for component. Check your requests!" );
 		}
 
 		void Commit();

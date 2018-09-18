@@ -159,10 +159,10 @@ namespace dd
 			m_previousOffset = origin;
 		}
 
-		dd::Buffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
-		dd::Buffer<TransformComponent> transforms = data.Write<TransformComponent>();
-		dd::Buffer<BoundsComponent> bounds = data.Write<BoundsComponent>();
-		dd::Buffer<MeshComponent> meshes = data.Write<MeshComponent>();
+		auto chunks = data.Write<TerrainChunkComponent>();
+		auto transforms = data.Write<TransformComponent>();
+		auto bounds = data.Write<BoundsComponent>();
+		auto meshes = data.Write<MeshComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
@@ -219,8 +219,8 @@ namespace dd
 	{
 		ddc::World& world = data.World();
 
-		dd::Buffer<MeshComponent> meshes = data.Write<MeshComponent>();
-		dd::Buffer<TerrainChunkComponent> chunks = data.Write<TerrainChunkComponent>();
+		auto meshes = data.Write<MeshComponent>();
+		auto chunks = data.Write<TerrainChunkComponent>();
 
 		dd::Span<ddc::Entity> entities = data.Entities();
 

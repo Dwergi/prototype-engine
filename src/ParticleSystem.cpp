@@ -134,8 +134,8 @@ namespace ddr
 
 	void ParticleSystem::Update( const ddc::UpdateData& update_data, float delta_t )
 	{
-		dd::Buffer<dd::ParticleSystemComponent> particles = update_data.Write<dd::ParticleSystemComponent>();
-		dd::ConstBuffer<dd::TransformComponent> transforms = update_data.Read<dd::TransformComponent>();
+		auto particles = update_data.Write<dd::ParticleSystemComponent>();
+		auto transforms = update_data.Read<dd::TransformComponent>();
 
 		for( size_t i = 0; i < particles.Size(); ++i )
 		{

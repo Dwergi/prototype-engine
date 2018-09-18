@@ -339,7 +339,7 @@
     <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\ComponentBuffer.h" />
-    <ClInclude Include="src\DataRequirement.h" />
+    <ClInclude Include="src\DataRequest.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\FPSCamera.h" />
@@ -546,7 +546,7 @@
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\ComponentBuffer.cpp" />
-    <ClCompile Include="src\DataRequirement.cpp" />
+    <ClCompile Include="src\DataRequest.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCamera.cpp" />
     <ClCompile Include="src\DoubleBuffer.cpp" />

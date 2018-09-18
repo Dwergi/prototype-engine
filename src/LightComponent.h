@@ -23,10 +23,10 @@ namespace ddr
 		LightComponent& operator=( LightComponent&& other );
 
 		glm::vec3 Colour;
-		float Intensity { 1.0f };
+		float Intensity { 5.0f };
 		float Ambient { 0.05f };
 		float Specular { 0.5f };
-		float Attenuation { 1.0f };
+		float Attenuation { 0.2f };
 		bool IsDirectional { false };
 
 		DD_COMPONENT;

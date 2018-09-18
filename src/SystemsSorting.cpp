@@ -134,7 +134,7 @@ namespace ddc
 		{
 			System* system = systems[sys];
 
-			for( const DataRequirement* req : system->GetRequirements() )
+			for( const DataRequest* req : system->GetRequests() )
 			{
 				if( req->Usage() == DataUsage::Write )
 				{
@@ -145,7 +145,7 @@ namespace ddc
 
 						System* other_system = systems[other];
 
-						for( const DataRequirement* other_req : other_system->GetRequirements() )
+						for( const DataRequest* other_req : other_system->GetRequests() )
 						{
 							if( other_req->Component().ID == req->Component().ID &&
 								other_req->Usage() == DataUsage::Read )

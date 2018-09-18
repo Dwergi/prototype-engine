@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "ICamera.h"
 #include "ComponentBuffer.h"
+#include "ICamera.h"
 #include "Span.h"
 #include "Uniforms.h"
 
 namespace ddc
 {
-	struct DataRequirement;
+	struct DataRequest;
 	struct Entity;
 	struct World;
 }
@@ -60,7 +60,7 @@ namespace ddr
 	{
 	public:
 		RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
-			dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequirement*>& requirements );
+			dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequest*>& requirements );
 
 		ddc::World& World() const { return m_world; }
 		const ddr::ICamera& Camera() const { return m_camera; }

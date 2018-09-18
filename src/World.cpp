@@ -266,20 +266,23 @@ namespace ddc
 		WaitForAllFutures( dependencies );
 
 		// filter entities that have the requirements
-		dd::Array<TypeID, MAX_COMPONENTS> components;
-		for( const DataRequirement* req : system->GetRequirements() )
+		dd::Array<TypeID, MAX_COMPONENTS> required;
+		for( const DataRequest* req : system->GetRequests() )
 		{
-			components.Add( req->Component().ID );
+			if( !req->Optional() )
+			{
+				required.Add( req->Component().ID );
+			}
 		}
 
 		const std::bitset<MAX_TAGS>& tags = system->GetRequiredTags();
 
 		std::vector<Entity> entities;
-		FindAllWith( components, tags, entities );
+		FindAllWith( required, tags, entities );
 
 		dd::Span<Entity> entity_span( entities );
 
-		UpdateData data( *this, entity_span, system->GetRequirements() );
+		UpdateData data( *this, entity_span, system->GetRequests() );
 		system->Update( data, delta_t );
 
 		data.Commit();

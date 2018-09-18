@@ -3,26 +3,46 @@
 
 namespace ddc
 {
-	ComponentBuffer::ComponentBuffer( dd::Span<Entity> entities, const World& world, const ComponentType& component, DataUsage usage, byte* storage ) :
-		m_component( component ),
-		m_usage( usage ),
-		m_storage( storage )
+	ComponentBuffer::ComponentBuffer( const World& world, dd::Span<Entity> entities, const DataRequest& req ) :
+		m_request( req )
 	{
-		DD_ASSERT( storage != nullptr );
-
 		m_count = entities.Size();
+		m_storage = req.Buffer() + entities.Offset();
 
-		size_t buffer_size = entities.Size() * m_component.Size;
+		if( req.Optional() )
+		{
+			m_exists.reserve( m_count );
+		}
+
 		byte* dest = m_storage;
 
-		for( size_t i = 0; i < entities.Size(); ++i )
+		for( size_t i = 0; i < m_count; ++i )
 		{
-			const void* src = world.GetComponent( entities[i], m_component.ID );
-			DD_ASSERT( src != nullptr );
+			const void* src = world.GetComponent( entities[i], req.Component().ID );
+			DD_ASSERT( req.Optional() || src != nullptr );
 
-			memcpy( dest, src, m_component.Size );
+			if( src != nullptr )
+			{
+				memcpy( dest, src, req.Component().Size );
 
-			dest += m_component.Size;
+				if( req.Optional() )
+				{
+					m_exists.push_back( true );
+				}
+			}
+			else
+			{
+				memset( dest, 0, req.Component().Size );
+
+				if( req.Optional() )
+				{
+					m_exists.push_back( false );
+				}
+			}
+
+			dest += req.Component().Size;
 		}
+
+		DD_ASSERT( m_exists.size() == 0 || req.Optional() );
 	}
 }

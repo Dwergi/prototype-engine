@@ -489,9 +489,6 @@
     <ClInclude Include="src\SystemsSorting.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataRequirement.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\UpdateData.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -536,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="src\Icosphere.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataRequest.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -894,9 +894,6 @@
     <ClCompile Include="src\SystemsSorting.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataRequirement.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\UpdateData.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -938,6 +935,9 @@
     </ClCompile>
     <ClCompile Include="src\Icosphere.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataRequest.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

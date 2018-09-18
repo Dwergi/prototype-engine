@@ -13,7 +13,7 @@
 #include "VAO.h"
 #include "VBO.h"
 #include "ParticleSystemComponent.h"
-#include "DataRequirement.h"
+#include "DataRequest.h"
 #include "UpdateData.h"
 
 namespace dd

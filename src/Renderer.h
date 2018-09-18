@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "DataRequirement.h"
+#include "DataRequest.h"
 #include "RenderData.h"
 
 namespace ddr
@@ -26,7 +26,7 @@ namespace ddr
 
 		virtual bool UsesAlpha() const { return false; }
 
-		const dd::IArray<const ddc::DataRequirement*>& GetRequirements() const { return m_requirements; }
+		const dd::IArray<const ddc::DataRequest*>& GetRequirements() const { return m_requirements; }
 		const std::bitset<ddc::MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 	protected:
@@ -37,7 +37,7 @@ namespace ddr
 		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
 
 	private:
-		dd::Array<const ddc::DataRequirement*, ddc::MAX_COMPONENTS> m_requirements;
+		dd::Array<const ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requirements;
 		std::bitset<ddc::MAX_TAGS> m_tags;
 
 		dd::String64 m_name;

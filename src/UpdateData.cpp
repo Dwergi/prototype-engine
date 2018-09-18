@@ -3,19 +3,17 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequirement*>& requirements ) :
+	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequest*>& requests ) :
 		m_world( world ),
 		m_entities( entities )
 	{
-		m_buffers.reserve( requirements.Size() );
+		m_buffers.reserve( requests.Size() );
 
 		size_t entity_offset = entities.Offset();
 
-		for( const DataRequirement* req : requirements )
+		for( const DataRequest* req : requests )
 		{
-			byte* storage = req->GetBuffer() + (entity_offset * req->Component().Size);
-
-			ComponentBuffer data_buffer( entities, world, req->Component(), req->Usage(), storage );
+			ComponentBuffer data_buffer( world, entities, *req );
 			m_buffers.push_back( data_buffer );
 		}
 	}

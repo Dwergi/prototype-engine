@@ -71,7 +71,6 @@ namespace ddr
 		ddc::Entity m_yAxis;
 		ddc::Entity m_zAxis;
 
-		std::vector<ddc::Entity> m_debugLights;
 		std::vector<ddr::Renderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
@@ -80,15 +79,11 @@ namespace ddr
 
 		bool m_debugDrawStandard { true };
 		bool m_debugDrawDepth { false };
-		bool m_debugDrawAxes { true };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_debugMeshGridCreated { false };
 		bool m_createDebugMeshGrid { false };
 		bool m_reloadShaders { false };
-	
-		ddc::Entity m_deleteLight;
-		bool m_createLight { false };
-
+		
 		MeshHandle m_unitCube;
 
 		ddr::UniformStorage* m_uniforms { nullptr };

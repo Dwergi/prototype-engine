@@ -17,7 +17,7 @@ TEST_CASE( "[ScriptSystem] Update Is Called" )
 	std::vector<ddc::Entity> entities;
 	entities.push_back( entity );
 
-	dd::Array<const ddc::DataRequirement*, 1> reqs;
+	dd::Array<const ddc::DataRequest*, 1> reqs;
 	reqs.Add( new ddc::WriteRequirement<dd::ScriptComponent>() );
 
 	ddc::UpdateData data( world, dd::Span<ddc::Entity>( entities ), reqs );

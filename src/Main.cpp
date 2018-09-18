@@ -548,6 +548,7 @@ int GameMain()
 		debug_views.push_back( terrain_system );
 		debug_views.push_back( mesh_renderer );
 		debug_views.push_back( bounds_renderer );
+		debug_views.push_back( light_renderer );
 
 		std::sort( debug_views.begin(), debug_views.end(),
 			[]( const IDebugPanel* a, const IDebugPanel* b )

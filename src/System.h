@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DataRequirement.h"
+#include "DataRequest.h"
 #include "UpdateData.h"
 
 namespace ddc
@@ -13,7 +13,7 @@ namespace ddc
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
-		const dd::IArray<const DataRequirement*>& GetRequirements() const { return m_requirements; }
+		const dd::IArray<const DataRequest*>& GetRequests() const { return m_requests; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 		const std::bitset<MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
@@ -26,10 +26,16 @@ namespace ddc
 	protected:
 
 		template <typename T>
-		void RequireRead() { m_requirements.Add( new ReadRequirement<T>() ); }
+		void RequireRead() { m_requests.Add( new ReadRequirement<T>() ); }
 
 		template <typename T>
-		void RequireWrite() { m_requirements.Add( new WriteRequirement<T>() ); }
+		void RequireWrite() { m_requests.Add( new WriteRequirement<T>() ); }
+
+		template <typename T>
+		void OptionalRead() { m_requests.Add( new ReadOptional<T>() ); }
+
+		template <typename T>
+		void OptionalWrite() { m_requests.Add( new WriteOptional<T>() ); }
 
 		template <typename T>
 		void RequireTag( Tag tag ) { m_tags.set( (uint) tag ); }
@@ -41,7 +47,7 @@ namespace ddc
 		}
 
 	private:
-		dd::Array<const DataRequirement*, MAX_COMPONENTS> m_requirements;
+		dd::Array<const DataRequest*, MAX_COMPONENTS> m_requests;
 		std::bitset<MAX_TAGS> m_tags;
 
 		dd::Array<const System*, 32> m_dependencies;
