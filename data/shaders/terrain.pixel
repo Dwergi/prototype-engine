@@ -23,7 +23,8 @@ uniform struct WireframeData
 	vec3 EdgeColour;
 	float EdgeWidth;
 	float MaxDistance;
-} Wireframe;
+}
+Wireframe;
 
 uniform struct MaterialData
 {
@@ -31,27 +32,32 @@ uniform struct MaterialData
 	float Specular;
 	float Diffuse;
 	float Ambient;
-} Material;
+}
+Material;
 
 #define MAX_LIGHTS 10
 
-uniform struct LightData {
+uniform struct LightData
+{
 	vec4 Position;
 	vec3 Colour;
 	float Intensity;
 	float AmbientStrength;
 	float SpecularStrength;
 	float Attenuation;
-} Lights[ MAX_LIGHTS ];
+}
+Lights[ MAX_LIGHTS ];
 
 uniform int LightCount;
 
 #define MAX_HEIGHTS 10
 
-uniform struct HeightLevel { 
+uniform struct HeightLevel
+{ 
 	vec3 Colour;
 	float Cutoff;
-} TerrainHeightLevels[ MAX_HEIGHTS ];
+}
+TerrainHeightLevels[ MAX_HEIGHTS ];
 
 uniform float TerrainMaxHeight;
 uniform int TerrainHeightCount;
@@ -61,7 +67,8 @@ uniform struct FogParameters
 	vec3 Colour;
 	float Distance;
 	bool Enabled;
-} Fog;
+}
+Fog;
 
 //
 // Gets the height colour based on TerrainHeightLevels.

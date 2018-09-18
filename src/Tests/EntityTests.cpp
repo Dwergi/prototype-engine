@@ -45,8 +45,8 @@ struct TestSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		dd::ConstBuffer<FirstComponent> read = data.Read<FirstComponent>();
-		dd::Buffer<SecondComponent> write = data.Write<SecondComponent>();
+		auto read = data.Read<FirstComponent>();
+		auto write = data.Write<SecondComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -69,8 +69,8 @@ struct DependentSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		dd::ConstBuffer<SecondComponent> read = data.Read<SecondComponent>();
-		dd::Buffer<ThirdComponent> write = data.Write<ThirdComponent>();
+		auto read = data.Read<SecondComponent>();
+		auto write = data.Write<ThirdComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -92,7 +92,7 @@ struct ReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		dd::ConstBuffer<ThirdComponent> read = data.Read<ThirdComponent>();
+		auto read = data.Read<ThirdComponent>();
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
@@ -113,8 +113,8 @@ struct OnlyReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		dd::ConstBuffer<FirstComponent> read1 = data.Read<FirstComponent>();
-		dd::ConstBuffer<SecondComponent> read2 = data.Read<SecondComponent>();
+		auto read1 = data.Read<FirstComponent>();
+		auto read2 = data.Read<SecondComponent>();
 
 		for( size_t i = 0; i < read1.Size(); ++i )
 		{

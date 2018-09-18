@@ -37,7 +37,7 @@ namespace ddr
 		bool m_frustumCull { true };
 		bool m_debugHighlightFrustumMeshes { false };
 
-		MeshHandle m_unitCube;
+		MeshHandle m_cube;
 		
 		const dd::MousePicking& m_mousePicking;
 

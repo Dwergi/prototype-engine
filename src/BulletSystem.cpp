@@ -74,7 +74,8 @@ namespace dd
 
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
-		mesh->Mesh = ddr::Mesh::Find( "unitcube" );
+		mesh->Mesh = ddr::Mesh::Find( "sphere" );
+
 		mesh->Colour = glm::vec4( m_colour, 1 );
 
 		dd::BoundsComponent* bounds;

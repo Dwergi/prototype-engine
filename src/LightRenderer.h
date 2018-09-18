@@ -7,10 +7,9 @@
 #pragma once
 
 #include "IDebugPanel.h"
+#include "MeshHandle.h"
 #include "Renderer.h"
 #include "ShaderHandle.h"
-#include "VAO.h"
-#include "VBO.h"
 
 namespace ddr
 {
@@ -25,9 +24,7 @@ namespace ddr
 
 	private:
 
-		VAO m_vao;
-		VBO m_vboPosition;
-		VBO m_vboIndex;
+		MeshHandle m_mesh;
 
 		ShaderHandle m_shader;
 

@@ -29,6 +29,29 @@
 
 namespace dd
 {
+	struct Wireframe
+	{
+		bool Enabled { false };
+
+		glm::vec3 Colour { 0, 1.0f, 0 };
+		float Width { 2.0f };
+
+		glm::vec3 EdgeColour { 0, 0, 0 };
+		float EdgeWidth { 0.5f };
+
+		float MaxDistance { 250.0f };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const
+		{
+			uniforms.Set( "Wireframe.Enabled", Enabled );
+			uniforms.Set( "Wireframe.Colour", Colour );
+			uniforms.Set( "Wireframe.Width", Width );
+			uniforms.Set( "Wireframe.EdgeColour", EdgeColour );
+			uniforms.Set( "Wireframe.EdgeWidth", EdgeWidth );
+			uniforms.Set( "Wireframe.MaxDistance", MaxDistance );
+		}
+	};
+
 	static glm::vec4 GetMeshColour( const TerrainChunkKey& key )
 	{
 		glm::vec4 colour( 0, 0, 0, 1 );
@@ -66,7 +89,7 @@ namespace dd
 	TerrainSystem::TerrainSystem( JobSystem& jobSystem ) :
 		ddc::System( "Terrain System" ),
 		ddr::Renderer( "Terrain" ),
-		m_jobSystem( jobSystem ),
+		m_jobsystem( jobSystem ),
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
 		RequireWrite<TerrainChunkComponent>();
@@ -76,6 +99,8 @@ namespace dd
 
 		Require<TerrainChunkComponent>();
 		Require<MeshComponent>();
+
+		m_wireframe = new Wireframe();
 
 		SetPartitions( 1 );
 	}
@@ -108,16 +133,13 @@ namespace dd
 
 	void TerrainSystem::Render( const ddr::RenderData& data )
 	{
+		DD_TODO( "Split this into a TerrainRenderer" );
+
 		ddr::UniformStorage& uniforms = data.Uniforms();
 
-		for( int i = 0; i < m_params.HeightLevelCount; ++i )
-		{
-			uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Colour" ).c_str(), m_params.HeightColours[ i ] );
-			uniforms.Set( ddr::GetArrayUniformName( "TerrainHeightLevels", i, "Cutoff" ).c_str(), m_params.HeightCutoffs[ i ] );
-		}
+		m_terrainParams.UpdateUniforms( uniforms );
 
-		uniforms.Set( "TerrainHeightCount", m_params.HeightLevelCount );
-		uniforms.Set( "TerrainMaxHeight", m_params.HeightRange );
+		m_wireframe->UpdateUniforms( uniforms );
 
 		ddr::RenderBuffer<TerrainChunkComponent> chunks = data.Get<TerrainChunkComponent>();
 		ddr::RenderBuffer<MeshComponent> meshes = data.Get<MeshComponent>();
@@ -149,7 +171,7 @@ namespace dd
 
 		DD_TODO( "Introduce Camera Component and use that here." );
 		glm::vec3 pos( 0.0f, 0.0f, 0.0f );
-		float chunk_size = TerrainChunk::Vertices * m_params.VertexDistance;
+		float chunk_size = TerrainChunk::Vertices * m_terrainParams.VertexDistance;
 
 		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );
 		if( m_previousOffset != origin )
@@ -182,7 +204,7 @@ namespace dd
 	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, 
 		BoundsComponent& bounds_cmp, TransformComponent& transform_cmp )
 	{
-		if( m_params.UseDebugColours )
+		if( m_terrainParams.UseDebugColours )
 		{
 			mesh_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetKey() );
 		}
@@ -191,7 +213,7 @@ namespace dd
 			mesh_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 
-		chunk_cmp.Chunk->Update( m_jobSystem );
+		chunk_cmp.Chunk->Update( m_jobsystem );
 		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 		bounds_cmp.LocalBox = chunk_cmp.Chunk->GetBounds();
 		transform_cmp.SetLocalPosition( chunk_cmp.Chunk->GetPosition() );
@@ -269,7 +291,7 @@ namespace dd
 
 		glm::ivec2 lod_offset( offset.x >> lod, offset.y >> lod );
 
-		const float vertex_distance = m_params.VertexDistance * (1 << lod);
+		const float vertex_distance = m_terrainParams.VertexDistance * (1 << lod);
 		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
 
 		const int halfChunks = ChunksPerDimension / 2;
@@ -317,11 +339,11 @@ namespace dd
 		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
 
 		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
-		TerrainChunk* chunk = new TerrainChunk( m_params, key );
+		TerrainChunk* chunk = new TerrainChunk( m_terrainParams, key );
 		chunk_cmp->Chunk = chunk;
 
 		chunk->Generate();
-		chunk->Update( m_jobSystem );
+		chunk->Update( m_jobsystem );
 
 		return entity;
 	}
@@ -363,44 +385,66 @@ namespace dd
 		ImGui::Value( "Chunks", (int) m_existing.size() );
 		ImGui::Value( "Active", m_active.Size() );
 
-		ImGui::Checkbox( "Debug Colours", &m_params.UseDebugColours );
+		ImGui::Checkbox( "Debug Colours", &m_terrainParams.UseDebugColours );
 
-		if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
+		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			SetLODLevels( m_lodLevels );
+			ImGui::Checkbox( "Enabled", &m_wireframe->Enabled );
+
+			ImGui::DragFloat( "Width", &m_wireframe->Width, 0.01f, 0.0f, 10.0f );
+
+			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe->Colour ) );
+
+			ImGui::DragFloat( "Edge Width", &m_wireframe->EdgeWidth, 0.01f, 0.0f, m_wireframe->Width );
+
+			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe->EdgeColour ) );
+
+			ImGui::DragFloat( "Max Distance", &m_wireframe->MaxDistance, 1.0f, 0.0f, 1000.0f );
+
+			ImGui::TreePop();
 		}
 
-		if( ImGui::DragFloat( "Vertex Distance", &m_params.VertexDistance, 0.05f, 0.01f, 2.0f ) )
+		if( ImGui::TreeNodeEx( "Parameters", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			m_requiresRegeneration = true;
-		}
+			if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
+			{
+				SetLODLevels( m_lodLevels );
+			}
 
-		if( ImGui::DragFloat( "Height Range", &m_params.HeightRange, 1.0f, 0.0f, 200.0f ) )
-		{
-			m_requiresRegeneration = true;
-		}
+			if( ImGui::DragFloat( "Vertex Distance", &m_terrainParams.VertexDistance, 0.05f, 0.01f, 2.0f ) )
+			{
+				m_requiresRegeneration = true;
+			}
 
-		if( ImGui::DragFloat( "Wavelength", &m_params.Wavelength, 1.0f, 1.0f, 512.0f ) )
-		{
-			m_requiresRegeneration = true;
-		}
+			if( ImGui::DragFloat( "Height Range", &m_terrainParams.HeightRange, 1.0f, 0.0f, 200.0f ) )
+			{
+				m_requiresRegeneration = true;
+			}
 
-		if( ImGui::DragFloat( "Seed", &m_params.Seed, 0.1f, 0.0f, 512.0f ) )
-		{
-			m_requiresRegeneration = true;
+			if( ImGui::DragFloat( "Wavelength", &m_terrainParams.Wavelength, 1.0f, 1.0f, 512.0f ) )
+			{
+				m_requiresRegeneration = true;
+			}
+
+			if( ImGui::DragFloat( "Seed", &m_terrainParams.Seed, 0.1f, 0.0f, 512.0f ) )
+			{
+				m_requiresRegeneration = true;
+			}
+
+			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Height Colours", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_params.HeightLevelCount; ++i )
+			for( int i = 0; i < m_terrainParams.HeightLevelCount; ++i )
 			{
 				char name[ 64 ];
 				snprintf( name, 64, "Height %d", i );
 
 				if( ImGui::TreeNodeEx( name, ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 				{
-					ImGui::ColorEdit3( "Colour", glm::value_ptr( m_params.HeightColours[i] ) );
-					ImGui::DragFloat( "Cutoff", &m_params.HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
+					ImGui::ColorEdit3( "Colour", glm::value_ptr( m_terrainParams.HeightColours[i] ) );
+					ImGui::DragFloat( "Cutoff", &m_terrainParams.HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
 
 					ImGui::TreePop();
 				}
@@ -410,12 +454,12 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_params.Octaves; ++i )
+			for( int i = 0; i < m_terrainParams.Octaves; ++i )
 			{
 				char name[64];
 				snprintf( name, 64, "Amplitude %d", i );
 
-				if( ImGui::DragFloat( name, &m_params.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
+				if( ImGui::DragFloat( name, &m_terrainParams.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
 				{
 					m_requiresRegeneration = true;
 				}
@@ -428,31 +472,31 @@ namespace dd
 		{
 			RandomFloat rng( 0.0f, 1.0f );
 
-			m_params.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
-			m_params.HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
-			m_params.Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
+			m_terrainParams.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
+			m_terrainParams.HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
+			m_terrainParams.Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
 
 			float max_amplitude = 1.0f;
-			for( int i = 0; i < m_params.Octaves; ++i )
+			for( int i = 0; i < m_terrainParams.Octaves; ++i )
 			{
 				float amplitude = glm::mix( 0.01f, max_amplitude, rng.Next() );
 
-				m_params.Amplitudes[i] = amplitude;
+				m_terrainParams.Amplitudes[i] = amplitude;
 
 				max_amplitude = amplitude;
 			}
 
-			for( int i = 0; i < m_params.HeightLevelCount; ++i )
+			for( int i = 0; i < m_terrainParams.HeightLevelCount; ++i )
 			{
-				m_params.HeightColours[i] = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
+				m_terrainParams.HeightColours[i] = glm::vec3( rng.Next(), rng.Next(), rng.Next() );
 			}
 
 			float previous_cutoff = 0.0f;
-			for( int i = 1; i < m_params.HeightLevelCount - 1; ++i )
+			for( int i = 1; i < m_terrainParams.HeightLevelCount - 1; ++i )
 			{
 				float cutoff = glm::mix( previous_cutoff, 1.0f, rng.Next() );
 
-				m_params.HeightCutoffs[i] = cutoff;
+				m_terrainParams.HeightCutoffs[i] = cutoff;
 
 				previous_cutoff = cutoff;
 			}

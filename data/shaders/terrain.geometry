@@ -12,7 +12,8 @@ out struct FragmentData
 	vec3 Position;
 	vec4 Colour;
 	vec3 WireframeDistance;
-} Fragment;
+}
+Fragment;
 
 flat out vec3 FragmentNormal;
 

@@ -109,7 +109,7 @@ namespace dd
 		TransformComponent* transform_cmp = world.GetWritable<TransformComponent>( entity );
 		transform_cmp->Local = transform;
 
-		ddr::ShaderHandle shader = ddr::ShaderProgram::Load( "standard" );
+		ddr::ShaderHandle shader = ddr::ShaderProgram::Load( "mesh" );
 		/ *shader.Get()->Use( true );
 		shader.Get()->BindAttributeFloat( "Position", 3, 6, 0, false );
 		shader.Get()->BindAttributeFloat( "Normal", 3, 6, 3, false );
@@ -123,8 +123,8 @@ namespace dd
 		m_shipMesh = ddr::Mesh::Create( "ship" );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_shipMesh );
-		mesh->SetMaterial( ddr::Material::Create( "standard" ) );
-		mesh->MakeUnitCube();
+		mesh->SetMaterial( ddr::Material::Create( "mesh" ) );
+		dd::MakeUnitCube( *mesh );
 		
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
 		mesh_h.Get()->SetBoundBox( bounds );* /

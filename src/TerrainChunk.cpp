@@ -30,7 +30,7 @@ namespace dd
 	ddr::MaterialHandle TerrainChunk::s_material;
 
 	TerrainChunk::TerrainChunk( const TerrainParameters& params, const TerrainChunkKey& key ) :
-		m_params( params ),
+		m_terrainParams( params ),
 		m_key( key )
 	{
 		m_verticesBuffer.Set( m_vertices, VertexCount );
@@ -161,7 +161,7 @@ namespace dd
 
 	void TerrainChunk::CreateRenderResources()
 	{
-		s_shader = ddr::ShaderProgram::Load( "standard" );
+		s_shader = ddr::ShaderProgram::Load( "terrain" );
 		s_material = ddr::Material::Create( "terrain" );
 
 		ddr::Material* material = ddr::Material::Get( s_material );
@@ -172,7 +172,7 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainChunk_Generate );
 
-		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
+		const float actual_distance = m_terrainParams.VertexDistance * (1 << m_key.LOD);
 		const int actual_vertices = Vertices + 1;
 		for( int z = 0; z < actual_vertices; ++z )
 		{
@@ -264,19 +264,19 @@ namespace dd
 	float TerrainChunk::GetHeight( float x, float y )
 	{
 		float height = 0;
-		float wavelength = m_params.Wavelength;
+		float wavelength = m_terrainParams.Wavelength;
 
 		float total_amplitude = 0;
 
-		for( int i = 0; i < m_params.Octaves; ++i )
+		for( int i = 0; i < m_terrainParams.Octaves; ++i )
 		{
 			float multiplier = 1.f / wavelength;
-			glm::vec3 coord( x * multiplier, y * multiplier, m_params.Seed );
+			glm::vec3 coord( x * multiplier, y * multiplier, m_terrainParams.Seed );
 
 			float noise = glm::simplex( coord );
-			height += noise * m_params.Amplitudes[i];
+			height += noise * m_terrainParams.Amplitudes[i];
 
-			total_amplitude += m_params.Amplitudes[i];
+			total_amplitude += m_terrainParams.Amplitudes[i];
 			wavelength /= 2;
 		}
 
@@ -288,7 +288,7 @@ namespace dd
 	{
 		glm::vec2 chunk_pos = origin + glm::vec2( m_key.X, m_key.Y );
 		const int actual_vertices = Vertices + 1;
-		const float actual_distance = m_params.VertexDistance * (1 << m_key.LOD);
+		const float actual_distance = m_terrainParams.VertexDistance * (1 << m_key.LOD);
 
 		float max_height = std::numeric_limits<float>::min();
 		float min_height = std::numeric_limits<float>::max();
@@ -308,7 +308,7 @@ namespace dd
 				float normalized_height = (1 + height) / 2;
 				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
 
-				m_vertices[current].y = normalized_height * m_params.HeightRange;
+				m_vertices[current].y = normalized_height * m_terrainParams.HeightRange;
 
 				max_height = dd::max( max_height, m_vertices[current].y );
 				min_height = dd::min( min_height, m_vertices[current].y );
@@ -419,7 +419,7 @@ namespace dd
 		{
 			for( int x = 0; x < actualVertices; ++x )
 			{
-				pixels[y * actualVertices + x] = (byte) ((m_vertices[y * actualVertices + x].y / m_params.HeightRange) * 255);
+				pixels[y * actualVertices + x] = (byte) ((m_vertices[y * actualVertices + x].y / m_terrainParams.HeightRange) * 255);
 			}
 		}
 

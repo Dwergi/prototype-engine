@@ -132,7 +132,7 @@ namespace ddr
 
 	void Frustum::CreateRenderData()
 	{
-		m_shader = ShaderProgram::Load( "standard" );
+		m_shader = ShaderProgram::Load( "mesh" );
 		ShaderProgram* shader = ShaderProgram::Get( m_shader );
 		shader->Use( true );
 

@@ -28,8 +28,8 @@ namespace dd
 	class TerrainChunk;
 	class TerrainChunkComponent;
 	struct TransformComponent;
-
 	struct TerrainChunkKey;
+	struct Wireframe;
 
 	class TerrainSystem : public ddc::System, public IDebugPanel, public ddr::Renderer
 	{
@@ -61,7 +61,7 @@ namespace dd
 		//
 		// Get the terrain parameters.
 		//
-		const TerrainParameters& GetTerrainParameters() const { return m_params; }
+		const TerrainParameters& GetTerrainParameters() const { return m_terrainParams; }
 		
 		//
 		// Initialize the terrain system.
@@ -107,8 +107,10 @@ namespace dd
 
 		glm::ivec2 m_previousOffset;
 
-		TerrainParameters m_params;
-		JobSystem& m_jobSystem;
+		TerrainParameters m_terrainParams;
+		JobSystem& m_jobsystem;
+
+		Wireframe* m_wireframe;
 
 		std::unordered_map<TerrainChunkKey, ddc::Entity> m_existing;
 		Vector<ddc::Entity> m_active;

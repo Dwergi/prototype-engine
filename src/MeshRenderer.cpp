@@ -13,6 +13,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
+#include "MeshUtils.h"
 #include "MousePicking.h"
 #include "OpenGL.h"
 #include "Shader.h"
@@ -21,8 +22,6 @@
 #include "Uniforms.h"
 
 #include "imgui/imgui.h"
-
-
 
 #include "glm/gtc/type_ptr.hpp"
 
@@ -40,17 +39,17 @@ namespace ddr
 
 	void MeshRenderer::RenderInit( ddc::World& world )
 	{
-		m_unitCube = Mesh::Find( "unitcube" );
-		if( !m_unitCube.IsValid() )
+		m_cube = Mesh::Find( "cube" );
+		if( !m_cube.IsValid() )
 		{
-			m_unitCube = Mesh::Create( "unitcube" );
+			m_cube = Mesh::Create( "cube" );
 
-			Mesh* mesh = Mesh::Get( m_unitCube );
+			Mesh* mesh = Mesh::Get( m_cube );
 
-			ShaderHandle shader_h = ShaderProgram::Load( "standard" );
+			ShaderHandle shader_h = ShaderProgram::Load( "mesh" );
 			ShaderProgram* shader = ShaderProgram::Get( shader_h );
 
-			MaterialHandle material_h = Material::Create( "standard" );
+			MaterialHandle material_h = Material::Create( "mesh" );
 			Material* material = Material::Get( material_h );
 			material->SetShader( shader_h );
 
@@ -58,7 +57,7 @@ namespace ddr
 
 			shader->Use( true );
 
-			mesh->MakeUnitCube();
+			dd::MakeUnitCube( *mesh );
 
 			shader->Use( false );
 		}

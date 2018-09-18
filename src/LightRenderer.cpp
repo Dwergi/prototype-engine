@@ -8,8 +8,9 @@
 #include "LightRenderer.h"
 
 #include "BoundsComponent.h"
-#include "Icosphere.h"
+#include "MeshUtils.h"
 #include "LightComponent.h"
+#include "Mesh.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
@@ -60,30 +61,10 @@ namespace ddr
 
 	void LightRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderProgram::Load( "line" );
+		m_shader = ShaderProgram::Load( "mesh" );
 		DD_ASSERT( m_shader.Valid() );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
-		DD_ASSERT( shader != nullptr );
-
-		shader->Use( true );
-
-		m_vao.Create();
-		m_vao.Bind();
-
-		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-
-		m_vboPosition.Bind();
-		shader->BindPositions();
-		m_vboPosition.Unbind();
-
-		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
-
-		dd::MakeIcosphereLines( m_vboPosition, m_vboIndex, 2 );
-
-		m_vao.Unbind();
-
-		shader->Use( false );
+		m_mesh = Mesh::Find( "sphere" );
 	}
 
 	void LightRenderer::Render( const RenderData& data )
@@ -114,11 +95,6 @@ namespace ddr
 
 			shader = ShaderProgram::Get( m_shader );
 			shader->Use( true );
-
-			m_vao.Bind();
-
-			m_vboPosition.Bind();
-			m_vboIndex.Bind();
 		}
 
 		for( size_t i = 0; i < light_count; ++i )
@@ -141,22 +117,17 @@ namespace ddr
 			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), light.Ambient );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), light.Specular );
 
-			if( m_drawBounds )
+			if( m_drawBounds && !light.IsDirectional )
 			{
 				shader->SetUniform( "Colour", glm::vec4( light.Colour, 1 ) );
-				shader->SetUniform( "ModelViewProjection", view_projection * transform.Local );
-
-				glDrawElements( GL_LINES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0 );
+				
+				ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
+				mesh->Render( uniforms, *shader, transform.Local );
 			}
 		}
 
 		if( m_drawBounds )
 		{
-			m_vboIndex.Unbind();
-			m_vboPosition.Unbind();
-
-			m_vao.Unbind();
-
 			shader->Use( false );
 
 			glDisable( GL_BLEND );
@@ -173,12 +144,15 @@ namespace ddr
 
 		for( size_t i = 0; i < m_debugLights.size(); ++i )
 		{
-			char buffer[ 16 ];
-			sprintf_s( buffer, "Light %llu", i );
-
-			ddc::Entity entity = m_debugLights[ i ];
+			ddc::Entity entity = m_debugLights[i];
 			ddr::LightComponent* light = world.Access<ddr::LightComponent>( entity );
 			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+
+			if( light == nullptr )
+				continue;
+
+			char buffer[ 16 ];
+			sprintf_s( buffer, "Light %llu", i );
 
 			if( ImGui::TreeNodeEx( buffer, ImGuiTreeNodeFlags_CollapsingHeader ) )
 			{

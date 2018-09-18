@@ -8,7 +8,7 @@
 #include "BoundsRenderer.h"
 
 #include "BoundsComponent.h"
-#include "Icosphere.h"
+#include "MeshUtils.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"

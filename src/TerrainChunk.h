@@ -79,7 +79,7 @@ namespace dd
 		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
 
-		const TerrainParameters& m_params;
+		const TerrainParameters& m_terrainParams;
 		TerrainChunkKey m_key;
 		
 		bool m_destroy { false };

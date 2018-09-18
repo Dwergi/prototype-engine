@@ -1,11 +1,172 @@
 #include "PrecompiledHeader.h"
-#include "Icosphere.h"
+#include "MeshUtils.h"
 
 #include "Mesh.h"
 #include "VBO.h"
 
 namespace dd
 {
+	static const glm::vec3 s_unitCubePositions[] =
+	{
+		//  X    Y    Z     
+		// bottom
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+
+		// top			 
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+
+		// front
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+
+		// back
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+
+		// left
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	0.0f,	0.0f ),
+		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	1.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+
+		// right
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	1.0f,	0.0f ),
+		glm::vec3( 1.0f,	1.0f,	1.0f ),
+	};
+
+	static dd::ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, sizeof( s_unitCubePositions ) / sizeof( glm::vec3 ) );
+
+	static const glm::vec3 s_unitCubeNormals[] =
+	{
+		// bottom
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+		glm::vec3( 0.0f, -1.0f, 0.0f ),
+
+		// top
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f, 1.0f, 0.0f ),
+
+		// front
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+		glm::vec3( 0.0f, 0.0f, 1.0f ),
+
+		// back
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+		glm::vec3( 0.0f, 0.0f, -1.0f ),
+
+		// left
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f, 0.0f, 0.0f ),
+
+		// right
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f, 0.0f, 0.0f )
+	};
+
+	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, sizeof( s_unitCubeNormals ) / sizeof( glm::vec3 ) );
+
+	static const glm::vec2 s_unitCubeUVs[] =
+	{
+		// U     V
+		// bottom
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+
+		// top
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// front
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// back
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+
+		// left
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+
+		// right
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 1.0f, 0.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 1.0f, 1.0f ),
+		glm::vec2( 0.0f, 0.0f ),
+		glm::vec2( 0.0f, 1.0f ),
+	};
+
+	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, sizeof( s_unitCubeUVs ) / sizeof( glm::vec2 ) );
+
 	// reference: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 	// https://github.com/caosdoar/spheres/blob/master/src/spheres.cpp
 	static const float T = (1.0f + sqrt( 5.0f )) / 2.0f;
@@ -174,6 +335,9 @@ namespace dd
 
 		dd::ConstBuffer<uint> indices( idx->data(), idx->size() );
 		mesh.SetIndices( indices );
+
+		dd::AABB bounds( glm::vec3( -1 ), glm::vec3( 1 ) );
+		mesh.SetBoundBox( bounds );
 	}
 
 	void MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, int iterations )
@@ -227,5 +391,17 @@ namespace dd
 		indices.SetData( line_indices.data(), line_indices.size() );
 		indices.CommitData();
 		indices.Unbind();
+	}
+
+	void MakeUnitCube( ddr::Mesh& mesh )
+	{
+		mesh.SetPositions( s_unitCubePositionsBuffer );
+		mesh.SetNormals( s_unitCubeNormalsBuffer );
+		//SetUVs( s_unitCubeUVsBuffer );
+
+		dd::AABB bounds;
+		bounds.Expand( glm::vec3( 0, 0, 0 ) );
+		bounds.Expand( glm::vec3( 1, 1, 1 ) );
+		mesh.SetBoundBox( bounds );
 	}
 }

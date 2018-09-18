@@ -6,6 +6,11 @@
 
 #pragma once
 
+namespace ddr
+{
+	struct UniformStorage;
+}
+
 namespace dd
 {
 	struct TerrainParameters
@@ -75,5 +80,7 @@ namespace dd
 		// Should the terrain chunks be visualized by their ID?
 		//
 		bool UseDebugColours { false };
+
+		void UpdateUniforms( ddr::UniformStorage& uniforms );
 	};
 }

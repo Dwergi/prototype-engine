@@ -136,8 +136,6 @@ namespace ddr
 		bool IsDirty() const { return m_dirty; }
 		void SetDirty() { m_dirty = true; }
 
-		void MakeUnitCube();
-
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
 
 		~Mesh();

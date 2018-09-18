@@ -448,9 +448,9 @@ namespace dd
 
 		std::sort( m_debugPanels.begin(), m_debugPanels.end(),
 			[]( const IDebugPanel* a, const IDebugPanel* b )
-		{
-			return strcmp( a->GetDebugTitle(), b->GetDebugTitle() ) < 0;
-		}
+			{
+				return strcmp( a->GetDebugTitle(), b->GetDebugTitle() ) < 0;
+			}
 		);
 	}
 

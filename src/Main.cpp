@@ -36,6 +36,7 @@
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "MeshRenderer.h"
+#include "MeshUtils.h"
 #include "Message.h"
 #include "MousePicking.h"
 #include "OctreeComponent.h"
@@ -69,9 +70,6 @@
 #include "DebugConsole.h"
 
 #include "imgui/imgui.h"
-
-
-
 
 #include "SFML/Network/UdpSocket.hpp"
 
@@ -335,19 +333,19 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 
 void CreateUnitCube()
 {
-	ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
+	ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
 	if( !unitCube.IsValid() )
 	{
-		unitCube = ddr::Mesh::Create( "unitcube" );
+		unitCube = ddr::Mesh::Create( "cube" );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( unitCube );
 		DD_ASSERT( mesh != nullptr );
 
-		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "standard" );
+		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
 		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
 		DD_ASSERT( shader != nullptr );
 
-		ddr::MaterialHandle material_h = ddr::Material::Create( "standard" );
+		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
 		ddr::Material* material = ddr::Material::Get( material_h );
 		DD_ASSERT( material != nullptr );
 
@@ -356,7 +354,36 @@ void CreateUnitCube()
 
 		shader->Use( true );
 
-		mesh->MakeUnitCube();
+		dd::MakeUnitCube( *mesh );
+
+		shader->Use( false );
+	}
+}
+
+void CreateUnitSphere()
+{
+	ddr::MeshHandle unitSphere = ddr::Mesh::Find( "sphere" );
+	if( !unitSphere.IsValid() )
+	{
+		unitSphere = ddr::Mesh::Create( "sphere" );
+
+		ddr::Mesh* mesh = ddr::Mesh::Get( unitSphere );
+		DD_ASSERT( mesh != nullptr );
+
+		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
+		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
+		DD_ASSERT( shader != nullptr );
+
+		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
+		ddr::Material* material = ddr::Material::Get( material_h );
+		DD_ASSERT( material != nullptr );
+
+		material->SetShader( shader_h );
+		mesh->SetMaterial( material_h );
+
+		shader->Use( true );
+
+		dd::MakeIcosphere( *mesh, 2 );
 
 		shader->Use( false );
 	}
@@ -476,9 +503,10 @@ int GameMain()
 
 		s_world->Initialize();
 
-		s_renderer->InitializeRenderers( *s_world );
-
 		CreateUnitCube();
+		CreateUnitSphere();
+
+		s_renderer->InitializeRenderers( *s_world );
 
 		// dir light
 		{
@@ -514,7 +542,7 @@ int GameMain()
 
 		// axes
 		{
-			ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
+			ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
 
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
@@ -524,7 +552,7 @@ int GameMain()
 
 		// bounds
 		{
-			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "unitcube" );
+			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
 
 			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 1, 1, 1 ), glm::translate( glm::vec3( 10, 60, 10 ) ) );
 		}

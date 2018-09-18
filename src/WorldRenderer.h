@@ -1,5 +1,5 @@
 //
-// Renderer.h - Master renderer class, coordinates all rendering.
+// WorldRenderer.h - Master renderer class, coordinates all rendering.
 // Copyright (C) Sebastian Nordgren 
 // April 14th 2016
 //
@@ -80,17 +80,14 @@ namespace ddr
 		bool m_debugDrawStandard { true };
 		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
-		bool m_debugMeshGridCreated { false };
-		bool m_createDebugMeshGrid { false };
 		bool m_reloadShaders { false };
 		
-		MeshHandle m_unitCube;
+		MeshHandle m_cube;
 
 		ddr::UniformStorage* m_uniforms { nullptr };
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
-		//void CreateDebugMeshGrid( ddc::World& world );
 		ddc::Entity CreatePointLight( ddc::World& world );
 		void UpdateDebugPointLights( ddc::World& world );
 

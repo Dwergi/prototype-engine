@@ -1,5 +1,5 @@
 //
-// Renderer.cpp - Master renderer class, coordinates all rendering.
+// WorldRenderer.cpp - Master renderer class, coordinates all rendering.
 // Copyright (C) Sebastian Nordgren 
 // April 14th 2016
 //
@@ -46,31 +46,6 @@ namespace ddr
 
 	Fog s_fog;
 
-	struct Wireframe
-	{
-		bool Enabled { false };
-
-		glm::vec3 Colour { 0, 1.0f, 0 };
-		float Width { 2.0f };
-
-		glm::vec3 EdgeColour { 0, 0, 0 };
-		float EdgeWidth { 0.5f };
-
-		float MaxDistance { 250.0f };
-
-		void UpdateUniforms( ddr::UniformStorage& uniforms ) const
-		{
-			uniforms.Set( "Wireframe.Enabled", Enabled );
-			uniforms.Set( "Wireframe.Colour", Colour );
-			uniforms.Set( "Wireframe.Width", Width );
-			uniforms.Set( "Wireframe.EdgeColour", EdgeColour );
-			uniforms.Set( "Wireframe.EdgeWidth", EdgeWidth );
-			uniforms.Set( "Wireframe.MaxDistance", MaxDistance );
-		}
-	};
-
-	Wireframe s_wireframe;
-
 	WorldRenderer::WorldRenderer( const dd::Window& window ) :
 		m_window( window )
 	{
@@ -114,23 +89,6 @@ namespace ddr
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
 
-		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			ImGui::Checkbox( "Enabled", &s_wireframe.Enabled );
-
-			ImGui::DragFloat( "Width", &s_wireframe.Width, 0.01f, 0.0f, 10.0f );
-
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( s_wireframe.Colour ) );
-
-			ImGui::DragFloat( "Edge Width", &s_wireframe.EdgeWidth, 0.01f, 0.0f, s_wireframe.Width );
-
-			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( s_wireframe.EdgeColour ) );
-
-			ImGui::DragFloat( "Max Distance", &s_wireframe.MaxDistance, 1.0f, 0.0f, 1000.0f );
-
-			ImGui::TreePop();
-		}
-
 		if( ImGui::TreeNodeEx( "Fog", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			ImGui::Checkbox( "Enabled", &s_fog.Enabled );
@@ -143,11 +101,6 @@ namespace ddr
 		if( ImGui::Button( "Reload Shaders" ) )
 		{
 			m_reloadShaders = true;
-		}
-
-		if( !m_debugMeshGridCreated && ImGui::Button( "Create Mesh Grid" ) )
-		{
-			m_createDebugMeshGrid = true;
 		}
 	}
 
@@ -176,25 +129,6 @@ namespace ddr
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
 	}
-
-	/*void WorldRenderer::CreateDebugMeshGrid( ddc::World& world )
-	{
-		if( m_debugMeshGridCreated || !m_createDebugMeshGrid )
-			return;
-
-		for( int x = -5; x < 5; ++x )
-		{
-			for( int y = -5; y < 5; ++y )
-			{
-				for( int z = -5; z < 5; ++z )
-				{
-					CreateMeshEntity( world, m_unitCube, glm::vec4( 0.5, 0.5, 0.5, 1 ), glm::translate( glm::vec3( 10.f * x, 10.f * y, 10.f * z ) ) );
-				}
-			}
-		}
-
-		m_debugMeshGridCreated = true;
-	} */
 
 	void WorldRenderer::RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render )
 	{
@@ -296,7 +230,6 @@ namespace ddr
 
 		SetRenderState();
 
-		s_wireframe.UpdateUniforms( *m_uniforms );
 		s_fog.UpdateUniforms( *m_uniforms );
 
 		m_uniforms->Set( "View", camera.GetViewMatrix() );

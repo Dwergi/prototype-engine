@@ -333,9 +333,6 @@
     <ClInclude Include="src\VBO.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\TerrainSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
     </ClInclude>
@@ -531,9 +528,6 @@
     <ClInclude Include="src\BoundSphere.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Icosphere.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\DataRequest.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -551,6 +545,12 @@
     </ClInclude>
     <ClInclude Include="src\HitResult.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainSystem.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshUtils.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -762,9 +762,6 @@
     <ClCompile Include="src\VBO.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\TerrainSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
     </ClCompile>
@@ -945,12 +942,6 @@
     <ClCompile Include="src\BoundSphere.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\IcosphereTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Icosphere.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\DataRequest.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -965,6 +956,18 @@
     </ClCompile>
     <ClCompile Include="src\HitResult.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainSystem.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainParameters.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\MeshUtilsTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

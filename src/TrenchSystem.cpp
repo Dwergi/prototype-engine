@@ -112,7 +112,7 @@ namespace dd
 
 	void TrenchSystem::CreateRenderResources()
 	{
-		m_shader = ddr::ShaderProgram::Load( "standard" );
+		m_shader = ddr::ShaderProgram::Load( "terrain" );
 		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
 		DD_ASSERT( shader != nullptr );
 
