@@ -19,6 +19,8 @@
 
 namespace dd
 {
+	static_assert(sizeof( HitHandle ) == sizeof( uint ));
+
 	HitTestSystem::HitTestSystem() : 
 		ddc::System( "Hit Testing" )
 	{
@@ -34,7 +36,7 @@ namespace dd
 
 	}
 
-	const HitState& HitTestSystem::ScheduleHitTest( const Ray& ray, float length )
+	HitHandle HitTestSystem::ScheduleHitTest( const Ray& ray, float length )
 	{
 		uint index = ~0u;
 		if( !m_free.empty() )
@@ -52,8 +54,46 @@ namespace dd
 
 		++m_scheduled;
 
-		m_hits[index] = HitState( ray, length );
-		return m_hits[index];
+		HitEntry& entry = m_hits[index];
+		entry.Handle.ID = index;
+		entry.Handle.Version++;
+		entry.Handle.Valid = true;
+		entry.Handle.Completed = false;
+		entry.State = HitResult( ray, length );
+
+		return entry.Handle;
+	}
+
+	bool HitTestSystem::FetchResult( HitHandle handle, HitResult& state )
+	{
+		DD_ASSERT( handle.ID < MAX_HITS );
+
+		HitEntry& entry = m_hits[handle.ID];
+
+		if( entry.Handle.Version == handle.Version &&
+			entry.Handle.Valid )
+		{
+			state = entry.State;
+			return true;
+		}
+
+		return false;
+	}
+
+	void HitTestSystem::ReleaseResult( HitHandle handle )
+	{
+		DD_ASSERT( handle.ID < MAX_HITS );
+
+		HitEntry& entry = m_hits[handle.ID];
+		if( entry.Handle.Valid )
+		{
+			entry.State = HitResult();
+			entry.Handle.Valid = false;
+
+			m_free.push_back( entry.Handle.ID );
+
+			++m_released;
+		}
 	}
 
 	bool HitTestEntity( const Ray& ray, const TransformComponent& transform, const BoundsComponent& bounds,
@@ -68,18 +108,6 @@ namespace dd
 
 	void HitTestSystem::Update( const ddc::UpdateData& data )
 	{
-		// clear out completed hit tests
-		for( uint i = 0; i < m_last; ++i )
-		{
-			if( m_hits[i].IsCompleted() )
-			{
-				m_hits[i] = HitState();
-				m_free.push_back( i );
-
-				++m_cleared;
-			}
-		}
-
 		auto transforms = data.Read<dd::TransformComponent>();
 		auto bounds = data.Read<dd::BoundsComponent>();
 		auto meshes = data.Read<dd::MeshComponent>();
@@ -87,26 +115,40 @@ namespace dd
 
 		for( uint i = 0; i < m_last; ++i )
 		{
-			if( m_hits[i].IsPending() )
+			HitEntry& entry = m_hits[i];
+			if( entry.IsPending() )
 			{
 				for( uint entity = 0; entity < entities.Size(); ++entity )
 				{
 					float out_distance = FLT_MAX;
-					if( HitTestEntity( m_hits[i].Ray(), transforms[entity], bounds[entity], meshes[entity], out_distance ) )
+					if( HitTestEntity( entry.State.Ray(), transforms[entity], bounds[entity], meshes[entity], out_distance ) )
 					{
-						m_hits[i].RegisterHit( out_distance, entities[entity] );
+						entry.State.RegisterHit( out_distance, entities[entity] );
 					}
 				}
 
-				m_hits[i].SetCompleted();
+				entry.Handle.Completed = true;
 
 				++m_executed;
 			}
 		}
 	}
 
+	std::vector<HitHandle> s_spamTests;
+
 	void SpamHitTests( IAsyncHitTest* async_hit_test, int count )
 	{
+		for( HitHandle handle : s_spamTests )
+		{
+			HitResult result;
+			bool found = async_hit_test->FetchResult( handle, result );
+			DD_ASSERT( found );
+
+			async_hit_test->ReleaseResult( handle );
+		}
+
+		s_spamTests.clear();
+
 		dd::RandomFloat rng_flt( 0, 1 );
 
 		for( int i = 0; i < count; ++i )
@@ -115,7 +157,9 @@ namespace dd
 			glm::vec3 dir( rng_flt.Next(), rng_flt.Next(), rng_flt.Next() );
 			dd::Ray ray( origin, dir );
 
-			async_hit_test->ScheduleHitTest( ray, rng_flt.Next() * 1000 );
+			HitHandle handle = async_hit_test->ScheduleHitTest( ray, rng_flt.Next() * 1000 );
+
+			s_spamTests.push_back( handle );
 		}
 	}
 
@@ -125,15 +169,9 @@ namespace dd
 
 		ImGui::Value( "Scheduled", m_scheduled );
 		ImGui::Value( "Executed", m_executed );
-		ImGui::Value( "Cleared", m_cleared );
+		ImGui::Value( "Cleared", m_released );
 		ImGui::Value( "Free", (uint) m_free.size() );
 		ImGui::Value( "Last", m_last );
-
-		DD_ASSERT( m_scheduled == m_executed );
-
-		m_scheduled = 0;
-		m_executed = 0;
-		m_cleared = 0;
 
 		SpamHitTests( this, m_hitTests );
 	}

@@ -90,8 +90,8 @@ namespace dd
 		bool m_visualizeRay { false };
 		ddc::Entity m_previousRay;
 
-		dd::HitState m_previousHitState;
-		const dd::HitState* m_hitState { nullptr };
+		dd::HitResult m_hitResult;
+		dd::HitHandle m_pendingHit;
 
 		glm::ivec2 m_previousSize;
 

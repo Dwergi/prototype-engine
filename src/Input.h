@@ -72,7 +72,7 @@ namespace dd
 		explicit Input( const Window& window );
 		~Input();
 
-		void Update( float delta_t );
+		void Update();
 		MousePosition GetMousePosition() const;
 		MousePosition GetScrollPosition() const;
 

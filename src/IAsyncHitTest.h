@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "HitState.h"
+#include "HitResult.h"
 
 namespace dd
 {
@@ -15,8 +15,18 @@ namespace dd
 		// 
 		// Start a hit test against the world with the given ray.
 		// Length is the maximum length that will be considered.
-		// Fetch results on the next frame after checking Completed().
+		// Fetch the current state using FetchState().
 		//
-		virtual const HitState& ScheduleHitTest( const Ray& ray, float length ) = 0;
+		virtual HitHandle ScheduleHitTest( const Ray& ray, float length ) = 0;
+
+		//
+		// Fetch the hit state of a given hit.
+		//
+		virtual bool FetchResult( HitHandle handle, HitResult& state ) = 0;
+
+		//
+		// Release the state pointed to by the handle, and invalidate the handle.
+		//
+		virtual void ReleaseResult( HitHandle handle ) = 0;
 	};
 }

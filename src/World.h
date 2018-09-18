@@ -209,13 +209,13 @@ namespace ddc
 			std::bitset<MAX_TAGS> Tags;
 		};
 
-		int m_count { 0 };
+		uint m_count { 0 };
 
 		dd::MessageQueue m_messages;
 		dd::JobSystem& m_jobsystem;
 
 		std::vector<EntityEntry> m_entities;
-		std::vector<int> m_free;
+		std::vector<uint> m_free;
 
 		std::vector<byte*> m_components;
 		
@@ -247,7 +247,7 @@ namespace ddc
 		std::bitset<MAX_COMPONENTS> mask;
 		mask.set( T::Type.ID, true );
 
-		for( int i = 0; i < m_count; ++i )
+		for( uint i = 0; i < m_count; ++i )
 		{
 			const EntityEntry& entry = m_entities[ i ];
 			if( IsAlive( entry.Entity ) )

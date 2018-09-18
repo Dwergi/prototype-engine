@@ -222,7 +222,7 @@ namespace ddc
 			required.set( type, true );
 		}
 
-		for( int i = 0; i < m_count; ++i )
+		for( uint i = 0; i < m_count; ++i )
 		{
 			const EntityEntry& entry = m_entities[ i ];
 

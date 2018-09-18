@@ -244,12 +244,21 @@ namespace dd
 
 		dd::Ray screen_ray = GetScreenRay( data.Camera() );
 
-		if( m_hitState != nullptr )
+		if( m_pendingHit.Valid )
 		{
-			m_previousHitState = *m_hitState;
+			HitResult result;
+			if( m_hitTest.FetchResult( m_pendingHit, result ) )
+			{
+				m_hitTest.ReleaseResult( m_pendingHit );
+				m_hitResult = result;
+				m_pendingHit.Valid = false;
+			}
 		}
 
-		m_hitState = &m_hitTest.ScheduleHitTest( screen_ray, 200 );
+		if( !m_pendingHit.Valid )
+		{
+			m_pendingHit = m_hitTest.ScheduleHitTest( screen_ray, 200 );
+		}
 
 		ddc::Entity entity;
 		m_depth = FLT_MAX;
@@ -320,13 +329,13 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Async", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 		{
-			ImGui::Value( "Ray Origin", m_previousHitState.Ray().Origin() );
-			ImGui::Value( "Ray Dir", m_previousHitState.Ray().Direction() );
+			ImGui::Value( "Ray Origin", m_hitResult.Ray().Origin() );
+			ImGui::Value( "Ray Dir", m_hitResult.Ray().Direction() );
 
-			if( m_previousHitState.Entity().IsValid() )
+			if( m_hitResult.Entity().IsValid() )
 			{
-				ImGui::Value( "Handle", m_previousHitState.Entity().ID );
-				ImGui::Value( "Distance", m_previousHitState.Distance() );
+				ImGui::Value( "Handle", m_hitResult.Entity().ID );
+				ImGui::Value( "Distance", m_hitResult.Distance() );
 			}
 			else
 			{

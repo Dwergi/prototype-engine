@@ -397,7 +397,7 @@ namespace dd
 		ImGui::GetIO().DisplayFramebufferScale = ImVec2( w > 0 ? ((float) display_w / w) : 0, h > 0 ? ((float) display_h / h) : 0 );
 	}
 
-	void DebugUI::Update( float delta_t )
+	void DebugUI::StartFrame( float delta_t )
 	{
 		DD_PROFILE_START( DebugUI_Update );
 
@@ -428,5 +428,14 @@ namespace dd
 		ImGui::NewFrame();
 
 		DD_PROFILE_END();
+
+		m_midFrame = true;
+	}
+
+	void DebugUI::EndFrame()
+	{
+		ImGui::Render();
+
+		m_midFrame = false;
 	}
 }

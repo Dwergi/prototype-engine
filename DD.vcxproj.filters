@@ -543,13 +543,13 @@
     <ClInclude Include="src\IAsyncHitTest.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\HitState.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\BulletComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\BulletSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HitResult.h">
       <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
@@ -960,10 +960,10 @@
     <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\HitState.cpp">
+    <ClCompile Include="src\BulletSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\BulletSystem.cpp">
+    <ClCompile Include="src\HitResult.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>

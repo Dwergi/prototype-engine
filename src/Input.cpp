@@ -64,7 +64,7 @@ namespace dd
 		m_bindings.Add( (int) btn, action );
 	}
 
-	void Input::Update( float delta_t )
+	void Input::Update()
 	{
 		double newX, newY;
 

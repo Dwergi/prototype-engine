@@ -20,7 +20,10 @@ namespace dd
 		DebugUI( Window& window, Input& input );
 		~DebugUI();
 
-		void Update( float delta_t );
+		void StartFrame( float delta_t );
+		void EndFrame();
+
+		bool IsMidFrame() const { return m_midFrame; }
 
 		bool CreateDeviceObjects();
 
@@ -38,6 +41,7 @@ namespace dd
 		static void RenderDrawLists( ImDrawData* draw_data );
 		void CreateFontsTexture();
 
+		bool m_midFrame { false };
 		bool m_focused { false };
 		Input* m_input { nullptr };
 		Window* m_window { nullptr };

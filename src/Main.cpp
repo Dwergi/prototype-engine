@@ -87,6 +87,8 @@ uint s_maxFPS = 60;
 bool s_showDebugUI = false;
 DebugUI* s_debugUI = nullptr;
 
+bool s_midWindow = false;
+
 Window* s_window = nullptr;
 Input* s_input = nullptr;
 
@@ -242,9 +244,11 @@ void SetCameraPos( InputAction action, InputType type )
 	}
 }
 
-void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
+void UpdateInput( Input& input, InputBindings& bindings )
 {
-	input.Update( delta_t );
+	DD_TODO( "Move this to an input system" );
+
+	input.Update();
 
 	// update input
 	Array<InputEvent, 64> events;
@@ -254,6 +258,8 @@ void UpdateInput( Input& input, InputBindings& bindings, float delta_t )
 
 void CheckAssert()
 {
+	DD_TODO( "Move this to DebugUI" );
+
 	if( s_assert.Open )
 	{
 		static dd::String256 s_message;
@@ -261,21 +267,33 @@ void CheckAssert()
 		s_message += s_assert.Message;
 
 		printf( s_message.c_str() );
+		OutputDebugStringA( s_message.c_str() );
 
 		s_input->CaptureMouse( false );
+
+		if( s_midWindow )
+		{
+			ImGui::End();
+		}
+
+		if( s_debugUI->IsMidFrame() )
+		{
+			s_debugUI->EndFrame();
+			s_window->Swap();
+		}
 
 		do
 		{
 			s_frameTimer->Update();
 
 			float delta_t = s_frameTimer->AppDelta();
-			UpdateInput( *s_input, *s_inputBindings, delta_t );
-			s_debugUI->Update( delta_t );
+			UpdateInput( *s_input, *s_inputBindings );
+
+			s_debugUI->StartFrame( delta_t );
 
 			DrawAssertDialog( s_window->GetSize(), s_assert );
 
-			ImGui::Render();
-
+			s_debugUI->EndFrame();
 			s_window->Swap();
 		} 
 		while( s_assert.Open );
@@ -360,6 +378,8 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 
 void DrawDebugUI( const std::vector<IDebugPanel*>& views, const ddc::World& world )
 {
+	DD_TODO( "Move this to DebugUI" );
+
 	if( s_showDebugUI )
 	{
 		if( ImGui::BeginMainMenuBar() )
@@ -392,7 +412,11 @@ void DrawDebugUI( const std::vector<IDebugPanel*>& views, const ddc::World& worl
 	{
 		if( debug_view->IsDebugPanelOpen() )
 		{
+			s_midWindow = true;
+
 			debug_view->DrawDebugPanel( world );
+
+			s_midWindow = false;
 		}
 	}
 
@@ -560,6 +584,7 @@ int GameMain()
 		debug_views.push_back( bounds_renderer );
 		debug_views.push_back( light_renderer );
 		debug_views.push_back( hit_testing );
+		debug_views.push_back( bullet_system );
 
 		std::sort( debug_views.begin(), debug_views.end(),
 			[]( const IDebugPanel* a, const IDebugPanel* b )
@@ -637,15 +662,13 @@ int GameMain()
 		{
 			DD_PROFILE_SCOPED( Frame );
 
-			CheckAssert();
-
 			s_frameTimer->SetMaxFPS( s_maxFPS );
 			s_frameTimer->Update();
 
 			float delta_t = s_frameTimer->GameDelta();
 
-			UpdateInput( *s_input, *s_inputBindings, delta_t );
-			s_debugUI->Update( delta_t );
+			UpdateInput( *s_input, *s_inputBindings );
+			s_debugUI->StartFrame( delta_t );
 
 			s_world->Update( delta_t );
 
@@ -654,10 +677,10 @@ int GameMain()
 			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
 		
 			DrawDebugUI( debug_views, *s_world );
+
 			s_renderer->Render( *s_world, *s_shakyCamera );
-
-			ImGui::Render();
-
+			
+			s_debugUI->EndFrame();
 			s_window->Swap();
 			
 			s_frameTimer->DelayFrame();

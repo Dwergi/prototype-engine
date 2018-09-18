@@ -351,7 +351,7 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
-    <ClInclude Include="src\HitState.h" />
+    <ClInclude Include="src\HitResult.h" />
     <ClInclude Include="src\HitTest.h" />
     <ClInclude Include="src\HitTestSystem.h" />
     <ClInclude Include="src\IAsyncHitTest.h" />
@@ -558,7 +558,7 @@
     <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
-    <ClCompile Include="src\HitState.cpp" />
+    <ClCompile Include="src\HitResult.cpp" />
     <ClCompile Include="src\HitTest.cpp" />
     <ClCompile Include="src\HitTestSystem.cpp" />
     <ClCompile Include="src\LightRenderer.cpp" />
