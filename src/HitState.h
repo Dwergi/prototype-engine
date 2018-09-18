@@ -14,6 +14,7 @@ namespace dd
 	struct HitState
 	{
 		HitState();
+		HitState( dd::Ray ray );
 		HitState( dd::Ray ray, float length );
 		HitState( const HitState& other );
 
@@ -23,6 +24,8 @@ namespace dd
 		bool IsValid() const { return m_status != Status::Invalid; }
 		bool IsPending() const { return m_status == Status::Pending; }
 		bool IsCompleted() const { return m_status == Status::Completed; }
+
+		void SetCompleted();
 
 		glm::vec3 Position() const
 		{
@@ -36,7 +39,6 @@ namespace dd
 		ddc::Entity Entity() const { return m_entity; }
 
 		void RegisterHit( float distance, ddc::Entity entity );
-		void SetCompleted();
 
 	private:
 
@@ -50,7 +52,7 @@ namespace dd
 		Status m_status { Status::Invalid };
 		float m_distance { FLT_MAX };
 		dd::Ray m_ray;
-		float m_length { 0 };
+		float m_length { FLT_MAX };
 		ddc::Entity m_entity;
 	};
 

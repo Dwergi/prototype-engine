@@ -19,7 +19,7 @@ namespace dd
 		virtual void Initialize( ddc::World& world ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
-		virtual const HitState& ScheduleHitTest( const Ray& ray, float length ) override;
+		virtual const HitState& ScheduleHitTest( const Ray& ray, float length = FLT_MAX ) override;
 
 	private:
 

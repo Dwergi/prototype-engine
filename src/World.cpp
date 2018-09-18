@@ -71,6 +71,9 @@ namespace ddc
 				entry.Entity.Alive = false;
 				entry.Entity.Destroy = false;
 				entry.Entity.Create = false;
+
+				entry.Ownership.reset();
+				entry.Tags.reset();
 			}
 
 			if( entry.Entity.Create )

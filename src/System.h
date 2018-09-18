@@ -1,3 +1,9 @@
+//
+// System.h - Base class for systems.
+// Copyright (C) Sebastian Nordgren 
+// September 18th 2018
+//
+
 #pragma once
 
 #include "DataRequest.h"

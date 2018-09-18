@@ -125,5 +125,7 @@ namespace dd
 		static void CharCallback( GLFWwindow* window, unsigned int c );
 
 		static InputType GetEventType( int action );
+
+		bool IsBound( int action ) const;
 	};
 }

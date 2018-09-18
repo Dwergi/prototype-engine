@@ -16,6 +16,7 @@
 
 #include "BoundsComponent.h"
 #include "BoundsRenderer.h"
+#include "BulletSystem.h"
 #include "DebugUI.h"
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
@@ -325,7 +326,8 @@ void BindKeys( Input& input )
 	input.BindKey( 'P', InputAction::TOGGLE_PICKING );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
-	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
+	//input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
+	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SHOOT );
 	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
 	input.BindKey( 'E', InputAction::START_PARTICLE );
 
@@ -468,7 +470,6 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_2, &SetCameraPos );
 		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_3, &SetCameraPos );
 		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_4, &SetCameraPos );
-
 		s_inputBindings->RegisterHandler( InputAction::INCREASE_DEPTH, &SetCameraPos );
 		s_inputBindings->RegisterHandler( InputAction::DECREASE_DEPTH, &SetCameraPos );
 
@@ -497,6 +498,11 @@ int GameMain()
 		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input, *hit_testing );
 		mouse_picking->BindActions( *s_inputBindings );
 
+		BulletSystem* bullet_system = new BulletSystem( *hit_testing );
+		bullet_system->DependsOn( *scene_graph );
+		bullet_system->DependsOn( *hit_testing );
+		bullet_system->BindActions( *s_inputBindings );
+
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
 		//s_shipSystem->BindActions( bindings );
@@ -517,6 +523,7 @@ int GameMain()
 		s_world->RegisterSystem( *scene_graph );
 		s_world->RegisterSystem( *particle_system );
 		s_world->RegisterSystem( *hit_testing );
+		s_world->RegisterSystem( *bullet_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 

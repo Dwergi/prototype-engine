@@ -1,3 +1,9 @@
+//
+// LightRenderer.h - Renderer that ensures that lights get passed to other renderers.
+// Copyright (C) Sebastian Nordgren 
+// September 18th 2018
+//
+
 #pragma once
 
 #include "IDebugPanel.h"

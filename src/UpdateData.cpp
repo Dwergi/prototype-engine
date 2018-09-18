@@ -29,35 +29,70 @@ namespace ddc
 			}
 
 			const byte* src = buffer.Data();
-			size_t copy_size = 0;
-			byte* dest_start = nullptr;
+			const size_t cmp_size = buffer.Component().Size;
 
 			for( Entity entity : m_entities )
 			{
 				void* dest = m_world.AccessComponent( entity, buffer.Component().ID );
+				DD_ASSERT( buffer.Optional() || dest != nullptr );
 
-				if( dest_start == nullptr )
+				if( dest != nullptr )
 				{
-					dest_start = (byte*) dest;
-				}
-				else if( dest != (dest_start + copy_size) )
-				{
-					// discontinuity, commit the copy
-					memcpy( dest_start, src, copy_size );
-
-					src += copy_size;
-					dest_start = (byte*) dest;
-					copy_size = 0;
+					memcpy( dest, src, cmp_size );
 				}
 
-				copy_size += buffer.Component().Size;
-			}
-
-			// final copy
-			if( copy_size > 0 )
-			{
-				memcpy( dest_start, src, copy_size );
+				src += cmp_size;
 			}
 		}
 	}
+
+	/*void CleverCopy( ComponentBuffer& buffer )
+	{
+		const byte* src = buffer.Data();
+		size_t copy_size = 0;
+		byte* dest_start = nullptr;
+
+		const size_t cmp_size = buffer.Component().Size;
+
+		for( Entity entity : m_entities )
+		{
+			void* dest = m_world.AccessComponent( entity, buffer.Component().ID );
+			DD_ASSERT( buffer.Optional() || dest != nullptr );
+
+			if( dest == nullptr )
+			{
+				if( copy_size > 0 )
+				{
+					memcpy( dest_start, src, copy_size );
+					src += copy_size + cmp_size;
+
+					dest_start = nullptr;
+					copy_size = 0;
+				}
+				continue;
+			}
+
+			if( dest_start == nullptr )
+			{
+				dest_start = (byte*) dest;
+			}
+			else if( dest != (dest_start + copy_size) )
+			{
+				// discontinuity, commit the copy
+				memcpy( dest_start, src, copy_size );
+
+				src += copy_size;
+				dest_start = (byte*) dest;
+				copy_size = 0;
+			}
+
+			copy_size += cmp_size;
+		}
+
+		// final copy
+		if( copy_size > 0 )
+		{
+			memcpy( dest_start, src, copy_size );
+		}
+	}*/
 }

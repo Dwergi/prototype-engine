@@ -99,6 +99,16 @@ namespace ddc
 		}
 
 		//
+		// Access a component from the given entity.
+		//
+		template <typename T>
+		bool Access( Entity entity, T*& cmp ) const
+		{
+			cmp = reinterpret_cast<T*>(AccessComponent( entity, T::Type.ID ));
+			return cmp != nullptr;
+		}
+
+		//
 		// Get a component from the given entity.
 		//
 		const void* GetComponent( Entity entity, TypeID id ) const;

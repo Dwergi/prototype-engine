@@ -68,7 +68,7 @@ namespace dd
 		dd::IAsyncHitTest& m_hitTest;
 
 		bool m_select { false };
-		bool m_enabled { true };
+		bool m_enabled { false };
 		bool m_renderDebug { false };
 		bool m_rayTest { true };
 

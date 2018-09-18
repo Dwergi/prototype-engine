@@ -7,7 +7,7 @@ namespace ddc
 	static const ddc::ComponentType Type
 
 #define DD_COMPONENT_CPP( TypeName ) DD_STATIC_ASSERT( std::is_copy_constructible_v<TypeName> && std::is_default_constructible_v<TypeName> ); \
-	void TypeName::Construct( void* ptr ) { new (ptr) TypeName; } \
+	void TypeName::Construct( void* ptr ) { new (ptr) TypeName(); } \
 	const ddc::ComponentType TypeName::Type( #TypeName, sizeof( TypeName ), &TypeName::Construct )
 
 	static const int MAX_ENTITIES = 1024;

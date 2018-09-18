@@ -337,6 +337,8 @@
     <ClInclude Include="src\BoundsComponent.h" />
     <ClInclude Include="src\BoundSphere.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
+    <ClInclude Include="src\BulletComponent.h" />
+    <ClInclude Include="src\BulletSystem.h" />
     <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\ComponentBuffer.h" />
     <ClInclude Include="src\DataRequest.h" />
@@ -547,6 +549,7 @@
     <ClCompile Include="src\BoundSphere.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\BulletSystem.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\ComponentBuffer.cpp" />
     <ClCompile Include="src\DataRequest.cpp" />

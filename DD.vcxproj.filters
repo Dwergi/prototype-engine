@@ -546,6 +546,12 @@
     <ClInclude Include="src\HitState.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="src\BulletComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BulletSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -955,6 +961,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\HitState.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BulletSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>

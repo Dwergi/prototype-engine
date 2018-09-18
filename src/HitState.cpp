@@ -13,6 +13,12 @@ namespace dd
 	{
 	}
 
+	HitState::HitState( dd::Ray ray ) :
+		m_status( Status::Pending ),
+		m_ray( ray )
+	{
+	}
+
 	HitState::HitState( dd::Ray ray, float length ) :
 		m_status( Status::Pending ),
 		m_ray( ray ),

@@ -38,18 +38,29 @@ namespace dd
 		glfwSetKeyCallback( m_glfwWindow, nullptr );
 	}
 
+	bool Input::IsBound( int key ) const
+	{
+		return m_bindings.Contains( key );
+	}
+
 	void Input::BindKey( char c, InputAction action )
 	{
+		DD_ASSERT( !IsBound( (int) c ) );
+
 		m_bindings.Add( (int) c, action );
 	}
 
 	void Input::BindKey( Key k, InputAction action )
 	{
+		DD_ASSERT( !IsBound( (int) k ) );
+
 		m_bindings.Add( (int) k, action );
 	}
 
 	void Input::BindMouseButton( MouseButton btn, InputAction action )
 	{
+		DD_ASSERT( !IsBound( (int) btn ) );
+
 		m_bindings.Add( (int) btn, action );
 	}
 
