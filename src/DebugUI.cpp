@@ -21,8 +21,11 @@
 
 #include "File.h"
 #include "GLError.h"
+#include "IDebugPanel.h"
 #include "Input.h"
 #include "Window.h"
+
+#include <algorithm>
 
 // Data
 static GLFWwindow*  g_Window = NULL;
@@ -437,5 +440,60 @@ namespace dd
 		ImGui::Render();
 
 		m_midFrame = false;
+	}
+
+	void DebugUI::RegisterDebugPanel( IDebugPanel& debug_panel )
+	{
+		m_debugPanels.push_back( &debug_panel );
+
+		std::sort( m_debugPanels.begin(), m_debugPanels.end(),
+			[]( const IDebugPanel* a, const IDebugPanel* b )
+		{
+			return strcmp( a->GetDebugTitle(), b->GetDebugTitle() ) < 0;
+		}
+		);
+	}
+
+	void DebugUI::RenderDebugPanels( const ddc::World& world )
+	{
+		if( !m_draw )
+			return;
+
+		if( ImGui::BeginMainMenuBar() )
+		{
+			if( ImGui::BeginMenu( "File" ) )
+			{
+				if( ImGui::MenuItem( "Exit" ) )
+				{
+					m_window->SetToClose();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if( ImGui::BeginMenu( "Views" ) )
+			{
+				for( IDebugPanel* debug_view : m_debugPanels )
+				{
+					debug_view->AddToMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMainMenuBar();
+		}
+
+		for( IDebugPanel* panel : m_debugPanels )
+		{
+			if( panel->IsDebugPanelOpen() )
+			{
+				m_midWindow = true;
+
+				panel->DrawDebugPanel( world );
+
+				m_midWindow = false;
+			}
+		}
 	}
 }

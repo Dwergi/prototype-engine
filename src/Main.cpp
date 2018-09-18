@@ -84,14 +84,9 @@ using namespace dd;
 extern uint s_maxFPS;
 uint s_maxFPS = 60;
 
-bool s_showDebugUI = false;
 DebugUI* s_debugUI = nullptr;
-
-bool s_midWindow = false;
-
 Window* s_window = nullptr;
 Input* s_input = nullptr;
-
 ShakyCamera* s_shakyCamera = nullptr;
 FPSCamera* s_fpsCamera = nullptr;
 FreeCameraController* s_freeCamera = nullptr;
@@ -109,68 +104,11 @@ Assert s_assert;
 
 std::thread::id s_mainThread;
 
-/*#define REGISTER_GLOBAL_VARIABLE( engine, var ) engine.RegisterGlobalVariable<decltype(var), var>( #var )
-
-TransformComponent* GetTransformComponent( EntityHandle entity )
-{
-	return entity.Get<TransformComponent>().Write();
-}
-
-ddc::Entity GetEntityHandle( uint id )
-{
-	return s_world->GetEntityHandle( id );
-}
-
-void RegisterGlobalScriptFunctions( AngelScriptEngine& script_engine )
-{
-	script_engine.RegisterFunction<decltype(&GetTransformComponent), &GetTransformComponent>( "GetTransformComponent" );
-	script_engine.RegisterFunction<decltype(&GetEntityHandle), &GetEntityHandle>( "GetEntityHandle" );
-
-	REGISTER_GLOBAL_VARIABLE( script_engine, s_maxFPS );
-}
-
-void RegisterGameTypes( EntityManager& entity_manager, AngelScriptEngine& scriptEngine )
-{
-	RegisterString( scriptEngine );
-
-	DD_REGISTER_POD( glm::vec3 );
-	TypeInfo* vec3Type = TypeInfo::AccessType<glm::vec3>();
-	vec3Type->RegisterScriptType<glm::vec3, true>();
-	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
-	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
-	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
-
-	DD_REGISTER_POD( glm::vec4 );
-	TypeInfo* vec4Type = TypeInfo::AccessType<glm::vec4>();
-	vec4Type->RegisterScriptType<glm::vec4, true>();
-	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
-	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
-	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
-	vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "w" );
-
-	DD_REGISTER_POD( glm::mat4 );
-
-	DD_REGISTER_TYPE( EntityHandle );
-	DD_REGISTER_TYPE( IComponent );
-	DD_REGISTER_TYPE( Message );
-	DD_REGISTER_TYPE( ddr::MeshHandle );
-
-	TypeInfo::RegisterComponent<TransformComponent>( "TransformComponent" );
-	TypeInfo::RegisterComponent<OctreeComponent>( "OctreeComponent" );
-	TypeInfo::RegisterComponent<SwarmAgentComponent>( "SwarmAgentComponent" );
-	TypeInfo::RegisterComponent<MeshComponent>( "MeshComponent" );
-	TypeInfo::RegisterComponent<ShipComponent>( "ShipComponent" );
-	TypeInfo::RegisterComponent<ScriptComponent>( "ScriptComponent" );
-	TypeInfo::RegisterComponent<LightComponent>( "LightComponent" );
-	TypeInfo::RegisterComponent<TerrainChunkComponent>( "TerrainChunkComponent" );
-}
-*/
-
 void ToggleConsole( InputAction action, InputType type )
 {
 	if( action == InputAction::TOGGLE_CONSOLE && type == InputType::RELEASED )
 	{
-		s_showDebugUI = true;
+		s_debugUI->EnableDraw( true );
 	}
 }
 
@@ -187,7 +125,7 @@ void ToggleDebugUI( InputAction action, InputType type )
 {
 	if( action == InputAction::TOGGLE_DEBUG_UI && type == InputType::RELEASED )
 	{
-		s_showDebugUI = !s_showDebugUI;
+		s_debugUI->EnableDraw( !s_debugUI->Draw() );
 	}
 }
 
@@ -271,7 +209,7 @@ void CheckAssert()
 
 		s_input->CaptureMouse( false );
 
-		if( s_midWindow )
+		if( s_debugUI->IsMidWindow() )
 		{
 			ImGui::End();
 		}
@@ -360,7 +298,7 @@ void BindKeys( Input& input )
 
 void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
 {
-	bool captureMouse = !s_showDebugUI;
+	bool captureMouse = !s_debugUI->Draw();
 	if( captureMouse != input.IsMouseCaptured() )
 	{
 		input.CaptureMouse( captureMouse );
@@ -374,53 +312,6 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	}
 
 	shaky_cam.Update( delta_t );
-}
-
-void DrawDebugUI( const std::vector<IDebugPanel*>& views, const ddc::World& world )
-{
-	DD_TODO( "Move this to DebugUI" );
-
-	if( s_showDebugUI )
-	{
-		if( ImGui::BeginMainMenuBar() )
-		{
-			if( ImGui::BeginMenu( "File" ) )
-			{
-				if( ImGui::MenuItem( "Exit" ) )
-				{
-					s_window->SetToClose();
-				}
-
-				ImGui::EndMenu();
-			}
-
-			if( ImGui::BeginMenu( "Views" ) )
-			{
-				for( IDebugPanel* debug_view : views )
-				{
-					debug_view->AddToMenu();
-				}
-
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMainMenuBar();
-		}
-	}
-
-	for( IDebugPanel* debug_view : views )
-	{
-		if( debug_view->IsDebugPanelOpen() )
-		{
-			s_midWindow = true;
-
-			debug_view->DrawDebugPanel( world );
-
-			s_midWindow = false;
-		}
-	}
-
-	s_frameTimer->DrawFPSCounter();
 }
 
 ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
@@ -570,31 +461,18 @@ int GameMain()
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );
 
-		//s_debugConsole = new DebugConsole( *s_scriptEngine );
-
-		std::vector<IDebugPanel*> debug_views;
-		debug_views.push_back( s_frameTimer );
-		debug_views.push_back( s_renderer );
-		debug_views.push_back( s_freeCamera );
-		debug_views.push_back( mouse_picking );
-		debug_views.push_back( s_shakyCamera );
-		debug_views.push_back( particle_system );
-		debug_views.push_back( terrain_system );
-		debug_views.push_back( mesh_renderer );
-		debug_views.push_back( bounds_renderer );
-		debug_views.push_back( light_renderer );
-		debug_views.push_back( hit_testing );
-		debug_views.push_back( bullet_system );
-
-		std::sort( debug_views.begin(), debug_views.end(),
-			[]( const IDebugPanel* a, const IDebugPanel* b )
-			{
-				return strcmp( a->GetDebugTitle(), b->GetDebugTitle() ) < 0;
-			}
-		);
-
-		//debug_views.Add( s_debugConsole );
-		//debug_views.Add( s_shipSystem );
+		s_debugUI->RegisterDebugPanel( *s_frameTimer );
+		s_debugUI->RegisterDebugPanel( *s_renderer );
+		s_debugUI->RegisterDebugPanel( *s_freeCamera );
+		s_debugUI->RegisterDebugPanel( *mouse_picking );
+		s_debugUI->RegisterDebugPanel( *s_shakyCamera );
+		s_debugUI->RegisterDebugPanel( *particle_system );
+		s_debugUI->RegisterDebugPanel( *terrain_system );
+		s_debugUI->RegisterDebugPanel( *mesh_renderer );
+		s_debugUI->RegisterDebugPanel( *bounds_renderer );
+		s_debugUI->RegisterDebugPanel( *light_renderer );
+		s_debugUI->RegisterDebugPanel( *hit_testing );
+		s_debugUI->RegisterDebugPanel( *bullet_system );
 
 		s_world->Initialize();
 
@@ -676,7 +554,8 @@ int GameMain()
 
 			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
 		
-			DrawDebugUI( debug_views, *s_world );
+			s_debugUI->RenderDebugPanels( *s_world );
+			s_frameTimer->DrawFPSCounter();
 
 			s_renderer->Render( *s_world, *s_shakyCamera );
 			
@@ -735,20 +614,6 @@ int main( int argc, char* argv[] )
 	{
 		File::SetDataRoot( "../../../data" );
 	}
-
-	/*TypeInfo::RegisterDefaultTypes();
-	DD_REGISTER_TYPE( CommandLine );
-
-	s_scriptEngine = new AngelScriptEngine();
-	DD_REGISTER_TYPE( AngelScriptEngine );
-
-	TypeInfo::SetScriptEngine( s_scriptEngine );
-
-	s_world = new ddc::World();
-	DD_REGISTER_TYPE( ddc::World );
-
-	RegisterGameTypes( *s_world, *s_scriptEngine );
-	RegisterGlobalScriptFunctions( *s_scriptEngine ); */
 
 #ifdef _TEST
 	return TestMain( argc, argv );
