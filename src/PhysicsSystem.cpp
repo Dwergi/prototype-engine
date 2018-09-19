@@ -55,9 +55,12 @@ namespace dd
 			float overshoot = plane.DistanceTo( pos ) - phys.Sphere.Radius;
 			if( overshoot < 0 )
 			{
+				float speed = glm::length( phys.Velocity );
+
 				// correct so that we're outside again
 				pos += -overshoot * plane.Normal();
-				phys.Velocity = glm::reflect( phys.Velocity, m_planeNormal ) * phys.Elasticity;
+				phys.Velocity = glm::reflect( glm::normalize( phys.Velocity ), plane.Normal() );
+				phys.Velocity *= speed * phys.Elasticity;
 			}
 		}
 	}
