@@ -7,15 +7,15 @@
 #include "PrecompiledHeader.h"
 #include "HitTestSystem.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
+#include "BoundsHelpers.h"
 #include "HitTest.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "Random.h"
 #include "TransformComponent.h"
 #include "World.h"
-
-#include "imgui/imgui.h"
 
 namespace dd
 {
@@ -25,8 +25,10 @@ namespace dd
 		ddc::System( "Hit Testing" )
 	{
 		RequireRead<dd::TransformComponent>();
-		RequireRead<dd::BoundsComponent>();
 		RequireRead<dd::MeshComponent>();
+
+		OptionalRead<dd::BoundBoxComponent>();
+		OptionalRead<dd::BoundSphereComponent>();
 
 		RequireTag( ddc::Tag::Visible );
 	}
@@ -96,20 +98,22 @@ namespace dd
 		}
 	}
 
-	bool HitTestEntity( const Ray& ray, const TransformComponent& transform, const BoundsComponent& bounds,
+	bool HitTestEntity( const Ray& ray, const TransformComponent& transform, const AABB& bound_box, const Sphere& bound_sphere,
 		const MeshComponent& mesh_cmp, float& out_distance )
 	{
 		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
 		if( mesh == nullptr )
 			return false;
 
-		return dd::HitTestMesh( ray, transform.World, bounds.WorldSphere, bounds.WorldBox, *mesh, out_distance );
+		return dd::HitTestMesh( ray, transform.Transform, bound_sphere, bound_box, *mesh, out_distance );
 	}
 
 	void HitTestSystem::Update( const ddc::UpdateData& data )
 	{
 		auto transforms = data.Read<dd::TransformComponent>();
-		auto bounds = data.Read<dd::BoundsComponent>();
+		auto bound_boxes = data.Read<dd::BoundBoxComponent>();
+		auto bound_spheres = data.Read<dd::BoundSphereComponent>();
+
 		auto meshes = data.Read<dd::MeshComponent>();
 		auto entities = data.Entities();
 
@@ -120,8 +124,15 @@ namespace dd
 			{
 				for( uint entity = 0; entity < entities.Size(); ++entity )
 				{
+					dd::AABB aabb;
+					dd::Sphere sphere;
+					if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( entity ), bound_spheres.Get( entity ), transforms[ i ].Transform, aabb, sphere ) )
+					{
+						continue;
+					}
+
 					float out_distance = FLT_MAX;
-					if( HitTestEntity( entry.State.Ray(), transforms[entity], bounds[entity], meshes[entity], out_distance ) )
+					if( HitTestEntity( entry.State.Ray(), transforms[entity], aabb, sphere, meshes[entity], out_distance ) )
 					{
 						entry.State.RegisterHit( out_distance, entities[entity] );
 					}

@@ -149,7 +149,7 @@ namespace dd
 		glm::mat4 transform = translate * scale;
 
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
-		transform_cmp->Local = transform;
+		transform_cmp->Transform = transform;
 
 		MeshComponent* mesh_cmp = world.Access<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;

@@ -56,23 +56,16 @@ namespace dd
 		// clamp pitch to vertical up/down
 		const float max_pitch = glm::half_pi<float>() - 0.00001f;
 		m_pitch = glm::clamp( pitch, -max_pitch, max_pitch );
-
-		m_direction = dd::directionFromPitchYaw( m_pitch, m_yaw );
 	}
 
 	glm::vec3 FPSCamera::GetDirection() const
 	{
-		return m_direction;
+		return dd::directionFromPitchYaw( m_pitch, m_yaw );
 	}
 
 	void FPSCamera::SetDirection( const glm::vec3& dir )
 	{
-		if( m_direction == dir )
-		{
-			return;
-		}
-
-		m_direction = glm::normalize( dir );
+		dd::pitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
 	}
 
 	float FPSCamera::GetNear() const
@@ -140,7 +133,7 @@ namespace dd
 
 	glm::mat4 FPSCamera::GetViewMatrix() const
 	{
-		return glm::lookAt( m_position, m_position + m_direction, glm::vec3( 0, 1, 0 ) );
+		return glm::lookAt( m_position, m_position + GetDirection(), glm::vec3( 0, 1, 0 ) );
 	}
 
 	void FPSCamera::Update( float delta_t )
@@ -154,7 +147,6 @@ namespace dd
 		m_aspectRatio = other.m_aspectRatio;
 		m_near = other.m_near;
 		m_far = other.m_far;
-		m_direction = other.m_direction;
 		m_position = other.m_position;
 	}
 }

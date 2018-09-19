@@ -13,7 +13,7 @@
 
 #include "AngelScriptEngine.h"
 
-#include "imgui/imgui.h"
+
 
 // script helpers
 namespace

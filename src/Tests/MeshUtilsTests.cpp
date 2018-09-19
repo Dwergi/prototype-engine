@@ -6,6 +6,5 @@
 
 TEST_CASE( "[Icosphere] 1 Iteration" )
 {
-	ddr::Mesh* mesh = nullptr;
-	dd::MakeIcosphere( *mesh, 1 );
+	
 }

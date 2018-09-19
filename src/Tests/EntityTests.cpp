@@ -107,8 +107,8 @@ struct OnlyReaderSystem : ddc::System
 	OnlyReaderSystem() :
 		System( "OnlyReaderSystem" )
 	{
-		RequireWrite<FirstComponent>();
-		RequireWrite<SecondComponent>();
+		RequireRead<FirstComponent>();
+		RequireRead<SecondComponent>();
 	}
 
 	virtual void Update( const ddc::UpdateData& data ) override
@@ -139,7 +139,7 @@ struct OnlyWriterSystem : ddc::System
 
 TEST_CASE( "EntityManager" )
 {
-	dd::JobSystem jobs( 1 );
+	dd::JobSystem jobs( 0 );
 	ddc::World world( jobs );
 
 	ddc::Entity a = world.CreateEntity();
@@ -192,7 +192,7 @@ TEST_CASE( "Component" )
 
 TEST_CASE( "Update System" )
 {
-	dd::JobSystem jobs( 1 );
+	dd::JobSystem jobs( 0 );
 	ddc::World world( jobs );
 
 	for( int i = 0; i < 8; ++i )
@@ -208,6 +208,7 @@ TEST_CASE( "Update System" )
 
 	TestSystem system;
 	world.RegisterSystem( system );
+	world.Initialize();
 
 	world.Update( 0 );
 
@@ -227,7 +228,7 @@ TEST_CASE( "Update System" )
 
 TEST_CASE( "Update With Discontinuity" )
 {
-	dd::JobSystem jobs( 1 );
+	dd::JobSystem jobs( 0 );
 	ddc::World world( jobs );
 
 	for( int i = 0; i < 5; ++i )
@@ -246,6 +247,7 @@ TEST_CASE( "Update With Discontinuity" )
 
 	TestSystem system;
 	world.RegisterSystem( system );
+	world.Initialize();
 
 	world.Update( 0 );
 
@@ -271,10 +273,11 @@ TEST_CASE( "Update Multiple Systems" )
 	TestSystem a;
 	DependentSystem b;
 
-	dd::JobSystem jobs( 1 );
+	dd::JobSystem jobs( 0 );
 	ddc::World world( jobs );
 	world.RegisterSystem( a );
 	world.RegisterSystem( b );
+	world.Initialize();
 
 	for( int i = 0; i < 4; ++i )
 	{
@@ -511,6 +514,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		ddc::World world( jobsystem );
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
+		world.Initialize();
 
 		world.Update( 0 );
 	}
@@ -539,6 +543,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		ddc::World world( jobsystem );
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
+		world.Initialize();
 
 		world.Update( 0 );
 	}
@@ -572,6 +577,7 @@ TEST_CASE( "Update With Tree Scheduling" )
 		world.RegisterSystem( a );
 		world.RegisterSystem( b );
 		world.RegisterSystem( c );
+		world.Initialize();
 
 		world.Update( 0 );
 	}
@@ -591,6 +597,7 @@ TEST_CASE( "Full Update Loop" )
 	world.RegisterSystem( a );
 	world.RegisterSystem( b );
 	world.RegisterSystem( c );
+	world.Initialize();
 
 	BENCHMARK( "Create Entities" )
 	{

@@ -15,13 +15,10 @@ namespace dd
 	{
 	public:
 
-		glm::mat4 Local;
-		glm::mat4 World;
+		glm::mat4 Transform;
 
-		void SetLocalPosition( glm::vec3 v ) { Local[ 3 ].xyz = v; }
-		glm::vec3 GetLocalPosition() const { return Local[ 3 ].xyz; }
-
-		glm::vec3 GetWorldPosition() const { return World[ 3 ].xyz; }
+		void SetPosition( glm::vec3 v ) { Transform[ 3 ].xyz = v; }
+		glm::vec3 GetPosition() const { return Transform[ 3 ].xyz; }
 
 		DD_COMPONENT;
 

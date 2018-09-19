@@ -2,7 +2,7 @@
 #include "PrecompiledHeader.h"
 #include "IDebugPanel.h"
 
-#include "imgui/imgui.h"
+
 
 namespace dd
 {

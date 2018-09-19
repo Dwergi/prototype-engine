@@ -5,6 +5,6 @@
 //
 
 #include "PrecompiledHeader.h"
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 
-DD_COMPONENT_CPP( dd::BoundsComponent );
+DD_COMPONENT_CPP( dd::BoundBoxComponent );

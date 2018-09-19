@@ -334,8 +334,10 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BinarySerializer.h" />
-    <ClInclude Include="src\BoundsComponent.h" />
-    <ClInclude Include="src\BoundSphere.h" />
+    <ClInclude Include="src\BoundBoxComponent.h" />
+    <ClInclude Include="src\BoundsHelpers.h" />
+    <ClInclude Include="src\Sphere.h" />
+    <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BulletComponent.h" />
     <ClInclude Include="src\BulletSystem.h" />
@@ -357,6 +359,8 @@
     <ClInclude Include="src\IAsyncHitTest.h" />
     <ClInclude Include="src\MeshUtils.h" />
     <ClInclude Include="src\LightRenderer.h" />
+    <ClInclude Include="src\PhysicsComponent.h" />
+    <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RayComponent.h" />
     <ClInclude Include="src\RayRenderer.h" />
     <ClInclude Include="src\System.h" />
@@ -545,8 +549,10 @@
     </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BinarySerializer.cpp" />
-    <ClCompile Include="src\BoundsComponent.cpp" />
-    <ClCompile Include="src\BoundSphere.cpp" />
+    <ClCompile Include="src\BoundBoxComponent.cpp" />
+    <ClCompile Include="src\BoundsHelpers.cpp" />
+    <ClCompile Include="src\Sphere.cpp" />
+    <ClCompile Include="src\BoundSphereComponent.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BulletSystem.cpp" />
@@ -588,12 +594,19 @@
     <ClCompile Include="src\MousePicking.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\ParticleSystemComponent.cpp" />
+    <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\PlayerComponent.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\RayComponent.cpp" />
     <ClCompile Include="src\RayRenderer.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
+    <ClCompile Include="src\Tests\FPSCameraTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

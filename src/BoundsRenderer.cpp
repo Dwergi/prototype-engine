@@ -7,13 +7,14 @@
 #include "PrecompiledHeader.h"
 #include "BoundsRenderer.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
+#include "BoundsHelpers.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
-
-#include "imgui/imgui.h"
+#include "TransformComponent.h"
 
 namespace ddr
 {
@@ -49,7 +50,9 @@ namespace ddr
 	BoundsRenderer::BoundsRenderer() :
 		Renderer( "Bounds" )
 	{
-		Require<dd::BoundsComponent>();
+		Require<dd::TransformComponent>();
+		Optional<dd::BoundBoxComponent>();
+		Optional<dd::BoundBoxComponent>();
 		RequireTag( ddc::Tag::Visible );
 	}
 
@@ -137,7 +140,10 @@ namespace ddr
 
 		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
 
-		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
+		auto transforms = data.Get<dd::TransformComponent>();
+		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
+		auto bound_spheres = data.Get<dd::BoundSphereComponent>();
+
 		const dd::Span<ddc::Entity>& entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -155,17 +161,22 @@ namespace ddr
 				shader->SetUniform( "Colour", glm::vec4( 1, 1, 1, 0.5 ) );
 			}
 
-			const dd::BoundsComponent& bb = bounds[i];
+			dd::AABB bound_box;
+			dd::Sphere bound_sphere;
+			if( !GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i].Transform, bound_box, bound_sphere ) )
+			{
+				continue;
+			}
 
 			if( m_drawMode == DrawMode::Box )
 			{
-				glm::mat4 model = glm::translate( bb.WorldBox.Min ) * glm::scale( bb.WorldBox.Max - bb.WorldBox.Min );
+				glm::mat4 model = glm::translate( bound_box.Min ) * glm::scale( bound_box.Max - bound_box.Min );
 
 				shader->SetUniform( "ModelViewProjection", view_projection * model );
 			}
 			else if( m_drawMode == DrawMode::Sphere )
 			{
-				glm::mat4 model = glm::translate( bb.WorldSphere.Centre() ) * glm::scale( glm::vec3( bb.WorldSphere.Radius() ) );
+				glm::mat4 model = glm::translate( bound_sphere.Centre ) * glm::scale( glm::vec3( bound_sphere.Radius ) );
 
 				shader->SetUniform( "ModelViewProjection", view_projection * model );
 			}

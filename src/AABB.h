@@ -8,6 +8,7 @@
 
 namespace dd
 {
+	struct Sphere;
 	struct Ray;
 
 	struct AABB
@@ -15,7 +16,7 @@ namespace dd
 		AABB();
 		AABB( glm::vec3 min, glm::vec3 max );
 		AABB( const AABB& other );
-		~AABB();
+		explicit AABB( const dd::Sphere& sphere );
 
 		void Clear();
 
@@ -37,7 +38,8 @@ namespace dd
 		bool Contains( const glm::vec3& pt ) const;
 		bool Contains( const AABB& other ) const;
 
-		bool Intersects( const AABB& other ) const;
+		bool Intersects( const Sphere& sphere ) const;
+		bool Intersects( const AABB& bb ) const;
 		bool IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const;
 		bool IntersectsRay( const Ray& ray ) const;
 		bool IntersectsRay( const Ray& ray, float& distance ) const;

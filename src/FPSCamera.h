@@ -77,7 +77,6 @@ namespace dd
 
 		ddr::Frustum m_frustum;
 
-		glm::vec3 m_direction;
 		glm::vec3 m_position;
 
 		// half vertical FOV in radians

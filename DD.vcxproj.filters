@@ -495,9 +495,6 @@
     <ClInclude Include="src\Renderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\BoundsComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\VisibilityComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -525,9 +522,6 @@
     <ClInclude Include="src\RayComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\BoundSphere.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\DataRequest.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -550,6 +544,24 @@
       <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshUtils.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundBoxComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundSphereComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoundsHelpers.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sphere.h">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
@@ -909,9 +921,6 @@
     <ClCompile Include="src\UpdateData.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\BoundsComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="src\HitTest.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -937,9 +946,6 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Math_dd.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BoundSphere.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\DataRequest.cpp">
@@ -968,6 +974,24 @@
     </ClCompile>
     <ClCompile Include="src\Tests\MeshUtilsTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\FPSCameraTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoundBoxComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoundSphereComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoundsHelpers.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sphere.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

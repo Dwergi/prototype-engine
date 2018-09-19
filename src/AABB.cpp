@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "AABB.h"
 
+#include "Sphere.h"
 #include "Ray.h"
 
 namespace dd
@@ -31,9 +32,10 @@ namespace dd
 
 	}
 
-	AABB::~AABB()
+	AABB::AABB( const dd::Sphere& sphere )
 	{
-
+		Min = sphere.Centre - glm::vec3( sphere.Radius );
+		Max = sphere.Centre + glm::vec3( sphere.Radius );
 	}
 
 	void AABB::Clear()
@@ -90,6 +92,13 @@ namespace dd
 			if( i & 0x1 )
 				corners[i].z = Max.z;
 		}
+	}
+
+	bool AABB::Intersects( const Sphere& sphere ) const
+	{
+		glm::vec3 closest = glm::clamp( sphere.Centre, Min, Max );
+
+		return glm::distance2( closest, sphere.Centre ) < sphere.Radius * sphere.Radius;
 	}
 
 	bool AABB::Intersects( const AABB& other ) const

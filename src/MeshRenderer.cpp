@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "MeshRenderer.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
@@ -21,10 +21,6 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 
-#include "imgui/imgui.h"
-
-#include "glm/gtc/type_ptr.hpp"
-
 namespace ddr
 {
 	MeshRenderer::MeshRenderer( const dd::MousePicking& mousePicking ) :
@@ -33,7 +29,7 @@ namespace ddr
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
-		Require<dd::BoundsComponent>();
+		Require<dd::BoundBoxComponent>();
 		Require<dd::TransformComponent>();
 	}
 
@@ -68,9 +64,9 @@ namespace ddr
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 
-		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
-		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
-		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
+		auto meshes = data.Get<dd::MeshComponent>();
+		auto bounds = data.Get<dd::BoundBoxComponent>();
+		auto transforms = data.Get<dd::TransformComponent>();
 
 		dd::Span<ddc::Entity> entities = data.Entities();
 		
@@ -81,16 +77,13 @@ namespace ddr
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, 
-		const dd::TransformComponent& transform_cmp, const dd::BoundsComponent& bounds_cmp, 
+		const dd::TransformComponent& transform_cmp, const dd::BoundBoxComponent& bounds_cmp, 
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		Mesh* mesh = nullptr;
 		mesh = Mesh::Get( mesh_cmp.Mesh );
 
-		if( mesh == nullptr )
-		{
-			return;
-		}
+		DD_ASSERT( mesh != nullptr, "Invalid mesh given!" );
 
 		if( mesh->IsDirty() )
 		{
@@ -99,8 +92,10 @@ namespace ddr
 
 		++m_meshCount;
 
+		dd::AABB world_bounds = bounds_cmp.BoundBox.GetTransformed( transform_cmp.Transform );
+
 		// check if it intersects with the frustum
-		if( m_frustumCull && !camera.GetFrustum().Intersects( bounds_cmp.WorldBox ) )
+		if( m_frustumCull && !camera.GetFrustum().Intersects( world_bounds ) )
 		{
 			return;
 		}
@@ -139,7 +134,7 @@ namespace ddr
 
 		uniforms.Bind( *shader );
 
-		mesh->Render( uniforms, *shader, transform_cmp.World );
+		mesh->Render( uniforms, *shader, transform_cmp.Transform );
 
 		shader->Use( false );
 	}

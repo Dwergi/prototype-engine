@@ -64,6 +64,8 @@ namespace ddc
 
 	void World::Update( float delta_t )
 	{
+		DD_ASSERT( m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!" );
+
 		for( EntityEntry& entry : m_entities )
 		{
 			if( entry.Entity.Destroy )

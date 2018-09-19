@@ -26,18 +26,21 @@ namespace ddr
 
 		virtual bool UsesAlpha() const { return false; }
 
-		const dd::IArray<const ddc::DataRequest*>& GetRequirements() const { return m_requirements; }
+		const dd::IArray<const ddc::DataRequest*>& GetRequirements() const { return m_requests; }
 		const std::bitset<ddc::MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 	protected:
 
 		template <typename T>
-		void Require() { m_requirements.Add( new ddc::ReadRequirement<T>() ); }
+		void Require() { m_requests.Add( new ddc::ReadRequirement<T>() ); }
+
+		template <typename T>
+		void Optional() { m_requests.Add( new ddc::ReadOptional<T>() ); }
 
 		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
 
 	private:
-		dd::Array<const ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requirements;
+		dd::Array<const ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requests;
 		std::bitset<ddc::MAX_TAGS> m_tags;
 
 		dd::String64 m_name;

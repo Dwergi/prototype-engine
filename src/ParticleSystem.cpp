@@ -18,7 +18,7 @@
 
 #include "glm/gtx/norm.hpp"
 
-#include "imgui/imgui.h"
+
 
 #include <algorithm>
 
@@ -168,7 +168,7 @@ namespace ddr
 
 			if( system.m_age < system.m_lifetime )
 			{
-				EmitNewParticles( system, transforms[ i ].World, update_data.Delta() );
+				EmitNewParticles( system, transforms[ i ].Transform, update_data.Delta() );
 			}
 		}
 	}
@@ -253,7 +253,7 @@ namespace ddr
 
 		s_vaoParticle.Bind();
 
-		ddr::RenderBuffer<dd::ParticleSystemComponent> particle_systems = data.Get<dd::ParticleSystemComponent>();
+		auto particle_systems = data.Get<dd::ParticleSystemComponent>();
 
 		glm::vec3 cam_pos = camera.GetPosition();
 

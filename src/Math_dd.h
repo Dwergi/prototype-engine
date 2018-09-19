@@ -35,4 +35,6 @@ namespace dd
 	}
 
 	glm::vec3 directionFromPitchYaw( float pitch, float yaw );
+
+	void pitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
 }

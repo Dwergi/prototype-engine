@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "LightRenderer.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 #include "MeshUtils.h"
 #include "LightComponent.h"
 #include "Mesh.h"
@@ -15,8 +15,6 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "OpenGL.h"
-
-#include "imgui/imgui.h"
 
 namespace ddr
 {
@@ -39,7 +37,7 @@ namespace ddr
 		light->IsDirectional = false;
 
 		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
-		transform->Local = glm::translate( glm::vec3( 0, 20, 0 ) ) * glm::scale( glm::vec3( 0.4 ) );
+		transform->Transform = glm::translate( glm::vec3( 0, 20, 0 ) ) * glm::scale( glm::vec3( 0.4 ) );
 
 		return entity;
 	}
@@ -104,7 +102,7 @@ namespace ddr
 
 			m_debugLights.push_back( entities[ i ] );
 
-			glm::vec4 position( transform.GetLocalPosition(), 1 );
+			glm::vec4 position( transform.GetPosition(), 1 );
 			if( light.IsDirectional )
 			{
 				position.w = 0;
@@ -122,7 +120,7 @@ namespace ddr
 				shader->SetUniform( "Colour", glm::vec4( light.Colour, 1 ) );
 				
 				ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
-				mesh->Render( uniforms, *shader, transform.Local );
+				mesh->Render( uniforms, *shader, transform.Transform );
 			}
 		}
 
@@ -180,12 +178,12 @@ namespace ddr
 					light->Attenuation = attenuation;
 				}
 
-				glm::vec3 light_position = transform->GetLocalPosition();
+				glm::vec3 light_position = transform->GetPosition();
 
 				const char* positionLabel = light->IsDirectional ? "Direction" : "Position";
 				if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
 				{
-					transform->SetLocalPosition( light_position );
+					transform->SetPosition( light_position );
 				}
 
 				float ambient = light->Ambient;

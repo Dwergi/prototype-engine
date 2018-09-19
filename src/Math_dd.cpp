@@ -9,4 +9,10 @@ namespace dd
 			glm::sin( pitch ),
 			glm::cos( pitch ) * glm::cos( yaw ) );
 	}
+
+	void pitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw )
+	{
+		pitch = asin( dir.y );
+		yaw = atan2( dir.x, dir.z );
+	}
 }

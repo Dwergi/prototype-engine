@@ -1,3 +1,9 @@
+//
+// ComponentBuffer.h
+// Copyright (C) Sebastian Nordgren 
+// September 19th 2018
+//
+
 #pragma once
 
 #include "DataRequest.h"
@@ -41,7 +47,7 @@ namespace ddc
 
 		const TComponent* Get( size_t i ) const
 		{
-			DD_ASSERT( i < m_count );
+			DD_ASSERT( i < Size() );
 			if( Has( i ) )
 			{
 				return At( i );
@@ -64,7 +70,7 @@ namespace ddc
 		const TComponent* end() const
 		{
 			DD_ASSERT( !Optional(), "Cannot iterate over optional buffers!" );
-			return At( m_count );
+			return At( Size() );
 		}
 
 	private:

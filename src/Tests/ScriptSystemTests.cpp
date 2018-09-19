@@ -13,15 +13,13 @@ TEST_CASE( "[ScriptSystem] Update Is Called" )
 	dd::JobSystem jobsystem( 0 );
 	ddc::World world( jobsystem );
 	ddc::Entity entity = world.CreateEntity();
+	dd::ScriptComponent& script = world.Add<dd::ScriptComponent>( entity );
+	script.SetModule( dd::String32( "test_component" ) );
 
-	std::vector<ddc::Entity> entities;
-	entities.push_back( entity );
+	ddc::Entity entities[] = { entity };
 
 	dd::Array<const ddc::DataRequest*, 1> reqs;
 	reqs.Add( new ddc::WriteRequirement<dd::ScriptComponent>() );
 
 	ddc::UpdateData data( world, dd::Span<ddc::Entity>( entities ), reqs, 0 );
-	
-	dd::ScriptComponent& script = world.Add<dd::ScriptComponent>( entity );
-	script.SetModule( dd::String32( "test_component" ) );
 }

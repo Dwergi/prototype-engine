@@ -71,17 +71,17 @@ namespace ddr
 		size_t Size() const { return m_entities.Size(); }
 
 		template <typename T>
-		ddr::RenderBuffer<T> Get() const
+		ddc::ReadView<T> Get() const
 		{
 			for( const ddc::ComponentBuffer& buffer : m_buffers )
 			{
 				if( buffer.Component() == T::Type )
 				{
-					return ddr::RenderBuffer<T>( buffer );
+					DD_ASSERT( buffer.Usage() == ddc::DataUsage::Read );
+					return ddc::ReadView<T>( buffer );
 				}
 			}
-
-			throw std::exception( "No read buffer found for component. Check your requirements!" );
+			throw std::exception( "No read buffer found for component. Check your requests!" );
 		}
 
 	private:

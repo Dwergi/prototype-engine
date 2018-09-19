@@ -14,7 +14,7 @@
 
 #endif
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 #include "BoundsRenderer.h"
 #include "BulletSystem.h"
 #include "DebugUI.h"
@@ -48,6 +48,8 @@
 #include "FrameBuffer.h"
 #include "ParticleSystem.h"
 #include "ParticleSystemComponent.h"
+#include "PhysicsComponent.h"
+#include "PhysicsSystem.h"
 #include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
@@ -69,7 +71,7 @@
 
 #include "DebugConsole.h"
 
-#include "imgui/imgui.h"
+
 
 #include "SFML/Network/UdpSocket.hpp"
 
@@ -194,8 +196,6 @@ void UpdateInput( Input& input, InputBindings& bindings )
 
 void CheckAssert()
 {
-	DD_TODO( "Move this to DebugUI" );
-
 	if( s_assert.Open )
 	{
 		static dd::String256 s_message;
@@ -314,17 +314,17 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 
 ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
 {
-	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundsComponent>();
+	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent>();
 
 	dd::TransformComponent* transform_cmp = world.Access<dd::TransformComponent>( entity );
-	transform_cmp->Local = transform;
+	transform_cmp->Transform = transform;
 
 	dd::MeshComponent* mesh_cmp = world.Access<dd::MeshComponent>( entity );
 	mesh_cmp->Mesh = mesh_h;
 	mesh_cmp->Colour = colour;
 
-	dd::BoundsComponent* bounds_cmp = world.Access<dd::BoundsComponent>( entity );
-	bounds_cmp->LocalBox = ddr::Mesh::Get( mesh_h )->GetBoundBox();
+	dd::BoundBoxComponent* bounds_cmp = world.Access<dd::BoundBoxComponent>( entity );
+	bounds_cmp->BoundBox = ddr::Mesh::Get( mesh_h )->GetBoundBox();
 
 	world.AddTag( entity, ddc::Tag::Visible );
 
@@ -419,8 +419,6 @@ int GameMain()
 
 		s_debugUI = new DebugUI( *s_window, *s_input );
 
-		SceneGraphSystem* scene_graph = new SceneGraphSystem();
-
 		//SwarmSystem swarm_system;
 
 		//TrenchSystem trench_system( *s_shakyCam  );
@@ -440,10 +438,11 @@ int GameMain()
 		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input, *hit_testing );
 		mouse_picking->BindActions( *s_inputBindings );
 
-		BulletSystem* bullet_system = new BulletSystem( *hit_testing );
-		bullet_system->DependsOn( *scene_graph );
+		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
 		bullet_system->DependsOn( *hit_testing );
 		bullet_system->BindActions( *s_inputBindings );
+
+		PhysicsSystem* physics_system = new PhysicsSystem();
 
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
@@ -451,21 +450,19 @@ int GameMain()
 		//s_shipSystem->CreateShip( *s_world );
 
 		TerrainSystem* terrain_system = new TerrainSystem( jobsystem );
-		terrain_system->DependsOn( *scene_graph );
 
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *s_inputBindings );
-		particle_system->DependsOn( *scene_graph );
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
 		s_world = new ddc::World( jobsystem );
 
-		s_world->RegisterSystem( *terrain_system );
-		s_world->RegisterSystem( *scene_graph );
+		//s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *particle_system );
 		s_world->RegisterSystem( *hit_testing );
 		s_world->RegisterSystem( *bullet_system );
+		s_world->RegisterSystem( *physics_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 
@@ -500,6 +497,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *light_renderer );
 		s_debugUI->RegisterDebugPanel( *hit_testing );
 		s_debugUI->RegisterDebugPanel( *bullet_system );
+		s_debugUI->RegisterDebugPanel( *physics_system );
 
 		s_world->Initialize();
 
@@ -521,12 +519,12 @@ int GameMain()
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
-			transform->Local[ 3 ].xyz = direction;
+			transform->Transform[ 3 ].xyz = direction;
 		}
 		
 		// particle system
 		{
-			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundsComponent>();
+			/*ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundsComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
@@ -537,7 +535,7 @@ int GameMain()
 
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->m_age = 0;
-			particle->m_lifetime = 1000;
+			particle->m_lifetime = 1000;*/
 		}
 
 		// axes
@@ -547,7 +545,6 @@ int GameMain()
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 0, 0, 1 ), glm::translate( glm::vec3( -50.0f, 0.0f, 0.0f ) ) * glm::scale( glm::vec3( 100, 0.05f, 0.05f ) ) );
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 1, 0, 1 ), glm::translate( glm::vec3( 0.0f, -50.0f, 0.0f ) ) * glm::scale( glm::vec3( 0.05f, 100, 0.05f ) ) );
 			CreateMeshEntity( *s_world, unitCube, glm::vec4( 0, 0, 1, 1 ), glm::translate( glm::vec3( 0.0f, 0.0f, -50.0f ) ) * glm::scale( glm::vec3( 0.05f, 0.05f, 100 ) ) );
-
 		}
 
 		// bounds
@@ -555,6 +552,15 @@ int GameMain()
 			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
 
 			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 1, 1, 1 ), glm::translate( glm::vec3( 10, 60, 10 ) ) );
+		}
+
+		// physics
+		{
+			ddc::Entity entity = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 1, 0, 1, 1 ),
+				glm::translate( glm::vec3( 0, 30, 0 ) ) * glm::scale( glm::vec3( 5 ) ) );
+			
+			dd::PhysicsComponent& physics = s_world->Add<dd::PhysicsComponent>( entity );
+			physics.Sphere.Radius = 5;
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
@@ -611,6 +617,10 @@ int GameMain()
 
 int TestMain( int argc, char* argv[] )
 {
+	s_scriptEngine = new AngelScriptEngine();
+	dd::TypeInfo::SetScriptEngine( s_scriptEngine );
+	dd::TypeInfo::RegisterDefaultTypes();
+
 	int iError = tests::RunTests( argc, argv );
 
 	if( iError != 0 )

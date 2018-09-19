@@ -11,6 +11,11 @@
 #include "InputAction.h"
 #include "System.h"
 
+namespace ddr
+{
+	class ICamera;
+}
+
 namespace dd
 {
 	struct IAsyncHitTest;
@@ -19,7 +24,7 @@ namespace dd
 
 	struct BulletSystem : ddc::System, IDebugPanel
 	{
-		BulletSystem( IAsyncHitTest& hit_test );
+		BulletSystem( ddr::ICamera& camera, IAsyncHitTest& hit_test );
 
 		void BindActions( InputBindings& bindings );
 
@@ -33,14 +38,13 @@ namespace dd
 		bool m_fireBullet { false };
 		int m_count { 0 };
 
-		glm::vec3 m_origin;
-		glm::vec3 m_direction;
 		float m_speed { 0 };
 		glm::vec3 m_colour;
 		float m_scale { 0 };
 		float m_intensity { 0 };
 		float m_attenuation { 0 };
 
+		ddr::ICamera& m_camera;
 		IAsyncHitTest& m_hitTest;
 
 		void HandleInput( InputAction action, InputType type );

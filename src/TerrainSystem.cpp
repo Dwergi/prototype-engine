@@ -7,7 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "TerrainSystem.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "MeshComponent.h"
@@ -23,7 +23,7 @@
 
 #include <algorithm>
 
-#include "imgui/imgui.h"
+
 
 #include "glm/gtc/type_ptr.hpp"
 
@@ -94,7 +94,7 @@ namespace dd
 	{
 		RequireWrite<TerrainChunkComponent>();
 		RequireWrite<MeshComponent>();
-		RequireWrite<BoundsComponent>();
+		RequireWrite<BoundBoxComponent>();
 		RequireWrite<TransformComponent>();
 
 		Require<TerrainChunkComponent>();
@@ -141,11 +141,10 @@ namespace dd
 
 		m_wireframe->UpdateUniforms( uniforms );
 
-		ddr::RenderBuffer<TerrainChunkComponent> chunks = data.Get<TerrainChunkComponent>();
-		ddr::RenderBuffer<MeshComponent> meshes = data.Get<MeshComponent>();
-		dd::Span<ddc::Entity> entities = data.Entities();
+		auto chunks = data.Get<TerrainChunkComponent>();
+		auto meshes = data.Get<MeshComponent>();
 
-		for( size_t i = 0; i < entities.Size(); ++i )
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
 			chunks[ i ].Chunk->RenderUpdate( data.Uniforms() );
 		}
@@ -183,7 +182,7 @@ namespace dd
 
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto transforms = data.Write<TransformComponent>();
-		auto bounds = data.Write<BoundsComponent>();
+		auto bounds = data.Write<BoundBoxComponent>();
 		auto meshes = data.Write<MeshComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -202,7 +201,7 @@ namespace dd
 	}
 
 	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, 
-		BoundsComponent& bounds_cmp, TransformComponent& transform_cmp )
+		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp )
 	{
 		if( m_terrainParams.UseDebugColours )
 		{
@@ -215,8 +214,8 @@ namespace dd
 
 		chunk_cmp.Chunk->Update( m_jobsystem );
 		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
-		bounds_cmp.LocalBox = chunk_cmp.Chunk->GetBounds();
-		transform_cmp.SetLocalPosition( chunk_cmp.Chunk->GetPosition() );
+		bounds_cmp.BoundBox = chunk_cmp.Chunk->GetBounds();
+		transform_cmp.SetPosition( chunk_cmp.Chunk->GetPosition() );
 	}
 
 	void TerrainSystem::GenerateTerrain( const ddc::UpdateData& data, const glm::ivec2 offset )
@@ -332,11 +331,11 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundsComponent>();
+		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundBoxComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
-		transform_cmp->SetLocalPosition( glm::vec3( key.X, 0, key.Y ) );
+		transform_cmp->SetPosition( glm::vec3( key.X, 0, key.Y ) );
 
 		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
 		TerrainChunk* chunk = new TerrainChunk( m_terrainParams, key );

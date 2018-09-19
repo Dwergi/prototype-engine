@@ -7,28 +7,26 @@
 #include "PrecompiledHeader.h"
 #include "BulletSystem.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
 #include "BulletComponent.h"
 #include "IAsyncHitTest.h"
+#include "ICamera.h"
 #include "InputBindings.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
 
-#include "imgui/imgui.h"
-
 DD_COMPONENT_CPP( dd::BulletComponent );
 
 namespace dd
 {
-	BulletSystem::BulletSystem( IAsyncHitTest& hit_test ) :
+	BulletSystem::BulletSystem( ddr::ICamera& camera, IAsyncHitTest& hit_test ) :
 		ddc::System( "Bullets" ),
+		m_camera( camera ),
 		m_hitTest( hit_test )
 	{
-		m_direction = glm::vec3( 1, 0, 0 );
 		m_speed = 20;
-		m_origin = glm::vec3( 0, 30, 0 );
 		m_colour = glm::vec3( 1, 0, 0 );
 		m_intensity = 0.5f;
 		m_scale = 0.1f;
@@ -59,18 +57,18 @@ namespace dd
 	
 	void BulletSystem::FireBullet( ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundsComponent, ddr::LightComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, ddr::LightComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform;
 		world.Access( entity, transform );
 
-		transform->Local = glm::scale( glm::vec3( m_scale ) );
-		transform->SetLocalPosition( m_origin );
+		transform->Transform = glm::scale( glm::vec3( m_scale ) );
+		transform->SetPosition( m_camera.GetPosition() );
 
 		dd::BulletComponent* bullet;
 		world.Access( entity, bullet );
-		bullet->Velocity = glm::normalize( m_direction ) * m_speed;
+		bullet->Velocity = m_camera.GetDirection() * m_speed;
 
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
@@ -78,9 +76,9 @@ namespace dd
 
 		mesh->Colour = glm::vec4( m_colour, 1 );
 
-		dd::BoundsComponent* bounds;
+		dd::BoundBoxComponent* bounds;
 		world.Access( entity, bounds );
-		bounds->LocalBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
+		bounds->BoundBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
 
 		ddr::LightComponent* light;
 		world.Access( entity, light );
@@ -124,10 +122,10 @@ namespace dd
 				continue;
 			}
 
-			glm::vec3 start_pos = transforms[ i ].GetLocalPosition();
+			glm::vec3 start_pos = transforms[ i ].GetPosition();
 			glm::vec3 end_pos = start_pos + bullet.Velocity * delta_t;
 			
-			transforms[ i ].SetLocalPosition( end_pos );
+			transforms[ i ].SetPosition( end_pos );
 
 			// hit test for bullet hit location
 			if( bullet.PendingHit.Completed )
@@ -164,8 +162,6 @@ namespace dd
 		ImGui::Value( "Count", m_count );
 
 		ImGui::DragFloat( "Scale", &m_scale, 0.01f, 0, 10, "%.1f" );
-		ImGui::DragFloat3( "Origin", glm::value_ptr( m_origin ), 0.1, -100, 100, "%.1f" );
-		ImGui::DragFloat3( "Direction", glm::value_ptr( m_direction ), 0.001, -1, 1, "%.3f" );
 		ImGui::DragFloat( "Speed", &m_speed, 1, 0, 1000, "%.0f" );
 
 		ImGui::ColorEdit3( "Colour", glm::value_ptr( m_colour ) );

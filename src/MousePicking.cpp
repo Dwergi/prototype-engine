@@ -7,7 +7,9 @@
 #include "PrecompiledHeader.h"
 #include "MousePicking.h"
 
-#include "BoundsComponent.h"
+#include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
+#include "BoundsHelpers.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "Input.h"
@@ -30,8 +32,6 @@
 
 #include "glm/gtx/rotate_vector.hpp"
 
-#include "imgui/imgui.h"
-
 namespace dd
 {
 	MousePicking::MousePicking( const Window& window, const Input& input, IAsyncHitTest& hit_test ) :
@@ -44,7 +44,8 @@ namespace dd
 
 		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
-		Require<dd::BoundsComponent>();
+		Optional<dd::BoundBoxComponent>();
+		Optional<dd::BoundSphereComponent>();
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
@@ -199,9 +200,8 @@ namespace dd
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		uniforms.Bind( shader );
 
-		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
-		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
-		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
+		auto meshes = data.Get<dd::MeshComponent>();
+		auto transforms = data.Get<dd::TransformComponent>();
 		dd::Span<ddc::Entity> entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -211,7 +211,7 @@ namespace dd
 				continue;
 
 			uniforms.Set( "ID", (int) entities[i].ID );
-			mesh->Render( uniforms, shader, transforms[i].World );
+			mesh->Render( uniforms, shader, transforms[i].Transform );
 		}
 
 		shader.Use( false );
@@ -263,9 +263,11 @@ namespace dd
 		ddc::Entity entity;
 		m_depth = FLT_MAX;
 
-		ddr::RenderBuffer<dd::MeshComponent> meshes = data.Get<dd::MeshComponent>();
-		ddr::RenderBuffer<dd::TransformComponent> transforms = data.Get<dd::TransformComponent>();
-		ddr::RenderBuffer<dd::BoundsComponent> bounds = data.Get<dd::BoundsComponent>();
+		auto meshes = data.Get<dd::MeshComponent>();
+		auto transforms = data.Get<dd::TransformComponent>();
+		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
+		auto bound_spheres = data.Get<dd::BoundSphereComponent>();
+
 		dd::Span<ddc::Entity> entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -274,8 +276,15 @@ namespace dd
 			if( mesh == nullptr )
 				continue;
 
+			dd::AABB box;
+			dd::Sphere sphere;
+			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ].Transform, box, sphere ) )
+			{
+				continue;
+			}
+
 			float distance;
-			if( dd::HitTestMesh( screen_ray, transforms[i].World, bounds[i].WorldSphere, bounds[i].WorldBox, *mesh, distance ) )
+			if( dd::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance ) )
 			{
 				if( distance < m_depth )
 				{
@@ -368,7 +377,7 @@ namespace dd
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Text( "Name: %s", name.c_str() );
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->GetPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -389,7 +398,7 @@ namespace dd
 				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
 				ImGui::Value( "Name", name.c_str() );
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->GetLocalPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->GetPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else

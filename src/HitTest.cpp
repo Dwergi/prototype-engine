@@ -2,7 +2,7 @@
 #include "HitTest.h"
 
 #include "AABB.h"
-#include "BoundSphere.h"
+#include "Sphere.h"
 #include "BVHTree.h"
 #include "Mesh.h"
 #include "Ray.h"
@@ -12,7 +12,7 @@
 namespace dd
 {
 	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 
-		const dd::BoundSphere& bound_sphere, const dd::AABB& bound_box, 
+		const dd::Sphere& bound_sphere, const dd::AABB& bound_box, 
 		const ddr::Mesh& mesh, float& out_distance )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();

@@ -20,7 +20,7 @@
 #include "TransformComponent.h"
 #include "World.h"
 
-#include "imgui/imgui.h"
+
 
 namespace dd
 {
@@ -151,7 +151,7 @@ namespace dd
 	{
 		glm::vec3 current_velocity = ship.Velocity;
 		float current_speed = glm::length( current_velocity );
-		glm::vec3 current_position = transform.GetLocalPosition();
+		glm::vec3 current_position = transform.GetPosition();
 		bool boosting = false;
 
 		glm::vec3 other_modifiers = glm::vec3( 0, 0, 0 );
@@ -199,7 +199,7 @@ namespace dd
 
 		ship.Velocity = current_velocity;
 
-		transform.SetLocalPosition( current_position + delta_v + other_modifiers );
+		transform.SetPosition( current_position + delta_v + other_modifiers );
 
 		// move camera after the ship
 		m_nextCameraPos = m_camera.GetPosition() + delta_v + other_modifiers;

@@ -35,11 +35,8 @@ namespace dd
 		bool IsMidFrame() const { return m_midFrame; }
 		bool IsMidWindow() const { return m_midWindow; }
 
-		bool CreateDeviceObjects();
-
 		void SetFocused( bool focused );
 		void SetMousePosition( glm::vec2 pos );
-		void UpdateDisplaySize();
 
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
 		void RenderDebugPanels( const ddc::World& world );
@@ -50,9 +47,11 @@ namespace dd
 		static void CharCallback( GLFWwindow* window, unsigned int c );
 
 	private:
-
 		static void RenderDrawLists( ImDrawData* draw_data );
+
+		bool CreateDeviceObjects();
 		void CreateFontsTexture();
+		void UpdateDisplaySize();
 
 		std::vector<IDebugPanel*> m_debugPanels;
 
