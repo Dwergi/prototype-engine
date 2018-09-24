@@ -60,15 +60,15 @@ namespace ddr
 	{
 	public:
 		RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
-			dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequest*>& requirements );
+			const std::vector<ddc::Entity>& entities, const dd::IArray<const ddc::DataRequest*>& requirements );
 
 		ddc::World& World() const { return m_world; }
 		const ddr::ICamera& Camera() const { return m_camera; }
 
 		ddr::UniformStorage& Uniforms() const { return m_uniforms; }
 
-		const dd::Span<ddc::Entity> Entities() const { return m_entities; }
-		size_t Size() const { return m_entities.Size(); }
+		const std::vector<ddc::Entity>& Entities() const { return m_entities; }
+		size_t Size() const { return m_entities.size(); }
 
 		template <typename T>
 		ddc::ReadView<T> Get() const
@@ -88,7 +88,7 @@ namespace ddr
 		ddc::World& m_world;
 		const ddr::ICamera& m_camera;
 		ddr::UniformStorage& m_uniforms;
-		dd::Span<ddc::Entity> m_entities;
+		std::vector<ddc::Entity> m_entities;
 
 		std::vector<ddc::ComponentBuffer> m_buffers;
 	};

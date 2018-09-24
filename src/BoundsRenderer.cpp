@@ -144,7 +144,7 @@ namespace ddr
 		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
 		auto bound_spheres = data.Get<dd::BoundSphereComponent>();
 
-		const dd::Span<ddc::Entity>& entities = data.Entities();
+		auto entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{

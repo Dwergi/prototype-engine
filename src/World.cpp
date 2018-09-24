@@ -270,27 +270,60 @@ namespace ddc
 	{
 		WaitForAllFutures( dependencies );
 
-		// filter entities that have the requirements
-		dd::Array<TypeID, MAX_COMPONENTS> required;
+		ddc::UpdateData update( *this, delta_t );
+
+		// get names
+		dd::Array<dd::String16, 8> names;
 		for( const DataRequest* req : system->GetRequests() )
 		{
-			if( !req->Optional() )
+			bool found = false;
+			for( const dd::String& name : names )
 			{
-				required.Add( req->Component().ID );
+				if( name == req->Name() )
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				names.Add( req->Name() );
 			}
 		}
 
-		const std::bitset<MAX_TAGS>& tags = system->GetRequiredTags();
+		update.ReserveData( names.Size() );
 
-		std::vector<Entity> entities;
-		FindAllWith( required, tags, entities );
+		// for each name filter requests
+		for( const dd::String& name : names )
+		{
+			dd::Array<TypeID, MAX_COMPONENTS> required;
+			dd::Array<const DataRequest*, MAX_COMPONENTS> requests;
+			for( const DataRequest* req : system->GetRequests() )
+			{
+				if( name == req->Name() )
+				{
+					if( !req->Optional() )
+					{
+						required.Add( req->Component().ID );
+					}
 
-		dd::Span<Entity> entity_span( entities );
+					requests.Add( req );
+				}
+			}
 
-		UpdateData data( *this, entity_span, system->GetRequests(), delta_t );
-		system->Update( data );
+			const std::bitset<MAX_TAGS>& tags = system->GetRequiredTags();
 
-		data.Commit();
+			// find entities with requirements
+			std::vector<Entity> entities;
+			FindAllWith( required, tags, entities );
+
+			update.AddData( entities, requests, name.c_str() );
+		}
+		
+		system->Update( update );
+
+		update.Commit();
 	}
 
 	std::vector<std::shared_future<void>> GetFutures( SystemNode& s, std::vector<SystemNode>& systems )

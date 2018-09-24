@@ -34,6 +34,9 @@ namespace dd
 		return value;
 	}
 
+	bool IsNaN( glm::vec3 v );
+	bool IsInf( glm::vec3 v );
+
 	glm::vec3 directionFromPitchYaw( float pitch, float yaw );
 
 	void pitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );

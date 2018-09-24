@@ -3,11 +3,11 @@
 
 namespace ddc
 {
-	ComponentBuffer::ComponentBuffer( const World& world, dd::Span<Entity> entities, const DataRequest& req ) :
+	ComponentBuffer::ComponentBuffer( const World& world, const std::vector<Entity>& entities, const DataRequest& req ) :
 		m_request( req )
 	{
-		m_count = entities.Size();
-		m_storage = req.Buffer() + entities.Offset();
+		m_count = entities.size();
+		m_storage = req.Buffer();
 
 		if( req.Optional() )
 		{

@@ -32,10 +32,10 @@ namespace ddr
 	protected:
 
 		template <typename T>
-		void Require() { m_requests.Add( new ddc::ReadRequirement<T>() ); }
+		void Require() { m_requests.Add( new ddc::ReadRequirement<T>( nullptr ) ); }
 
 		template <typename T>
-		void Optional() { m_requests.Add( new ddc::ReadOptional<T>() ); }
+		void Optional() { m_requests.Add( new ddc::ReadOptional<T>( nullptr ) ); }
 
 		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
 

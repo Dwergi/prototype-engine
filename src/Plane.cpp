@@ -22,6 +22,12 @@ namespace dd
 
 	}
 
+	Plane::Plane( const glm::vec3& point, const glm::vec3& normal )
+	{
+		m_plane.xyz = glm::normalize( normal );
+		m_plane.w = -glm::dot( normal, point );
+	}
+
 	Plane::Plane( float a, float b, float c, float d )
 	{
 		glm::vec3 normal( a, b, c );
@@ -44,12 +50,6 @@ namespace dd
 		m_plane.w = -glm::dot( normal, pt2 );
 	}
 
-	Plane::Plane( const glm::vec3& point, const glm::vec3& normal )
-	{
-		m_plane.xyz = glm::normalize( normal );
-		m_plane.w = -glm::dot( normal, point );
-	}
-
 	Plane::Plane( const Plane& other )
 		: m_plane( other.m_plane )
 	{
@@ -61,13 +61,15 @@ namespace dd
 
 	}
 
-	glm::vec3 Plane::Normal() const
-	{
-		return m_plane.xyz();
-	}
-
 	float Plane::DistanceTo( const glm::vec3& point ) const
 	{
 		return glm::dot( m_plane.xyz(), point ) + m_plane.w;
+	}
+
+	Plane Plane::GetTransformed( const glm::mat4& transform ) const
+	{
+		glm::vec3 origin = (transform * glm::vec4( Origin(), 1 )).xyz;
+		glm::vec3 normal = glm::normalize( glm::vec3( (transform * glm::vec4( Normal(), 0 )).xyz ) );
+		return Plane( origin, normal );
 	}
 }

@@ -1,5 +1,5 @@
 //
-// PhysicsComponent.h
+// PhysicsSphereComponent.h
 // Copyright (C) Sebastian Nordgren 
 // September 19th 2018
 //
@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	struct PhysicsComponent
+	struct PhysicsSphereComponent
 	{
 		glm::vec3 Velocity;
 		glm::vec3 Acceleration;
@@ -18,6 +18,8 @@ namespace dd
 		float Mass { 1.0 };
 		float Elasticity { 1.0 };
 		Sphere Sphere;
+
+		bool Resting { false };
 
 		DD_COMPONENT;
 	};

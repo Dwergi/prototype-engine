@@ -73,7 +73,7 @@ namespace ddr
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 
-		size_t light_count = entities.Size();
+		size_t light_count = data.Size();
 		if( light_count > 10 )
 		{
 			DD_ASSERT( light_count <= 10 );

@@ -33,16 +33,34 @@ namespace ddc
 	protected:
 
 		template <typename T>
-		void RequireRead() { m_requests.Add( new ReadRequirement<T>() ); }
+		void RequireRead( const char* name = nullptr ) 
+		{ 
+			CheckDuplicates( T::Type, DataUsage::Read, DataCardinality::Required, name );
+			m_requests.Add( new ReadRequirement<T>( name ) );
+		}
 
 		template <typename T>
-		void RequireWrite() { m_requests.Add( new WriteRequirement<T>() ); }
+		void RequireWrite( const char* name = nullptr ) 
+		{
+			CheckDuplicates( T::Type, DataUsage::Write, DataCardinality::Required, name );
+			m_requests.Add( new WriteRequirement<T>( name ) );
+		}
 
 		template <typename T>
-		void OptionalRead() { m_requests.Add( new ReadOptional<T>() ); }
+		void OptionalRead( const char* name = nullptr )
+		{
+			CheckDuplicates( T::Type, DataUsage::Read, DataCardinality::Optional, name );
+			m_requests.Add( new ReadOptional<T>( name ) );
+		}
 
 		template <typename T>
-		void OptionalWrite() { m_requests.Add( new WriteOptional<T>() ); }
+		void OptionalWrite( const char* name = nullptr )
+		{
+			CheckDuplicates( T::Type, DataUsage::Write, DataCardinality::Optional, name );
+			m_requests.Add( new WriteOptional<T>( name ) );
+		}
+
+		bool CheckDuplicates( const ComponentType& component, DataUsage usage, DataCardinality cardinality, const char* name ) const;
 
 		void RequireTag( Tag tag ) { m_tags.set( (uint) tag ); }
 
@@ -57,7 +75,7 @@ namespace ddc
 		std::bitset<MAX_TAGS> m_tags;
 
 		dd::Array<const System*, 32> m_dependencies;
-		dd::String64 m_name;
+		dd::String32 m_name;
 
 		const static int MAX_PARTITIONS = 8;
 		int m_partitions { MAX_PARTITIONS };

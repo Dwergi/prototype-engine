@@ -150,9 +150,10 @@ namespace dd
 		}
 	}
 
-	void TerrainSystem::Update( const ddc::UpdateData& data )
+	void TerrainSystem::Update( const ddc::UpdateData& update )
 	{
-		ddc::World& world = data.World();
+		ddc::World& world = update.World();
+		const ddc::DataBuffer& data = update.Data();
 
 		if( m_requiresRegeneration )
 		{
@@ -175,7 +176,7 @@ namespace dd
 		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );
 		if( m_previousOffset != origin )
 		{
-			GenerateTerrain( data, origin );
+			GenerateTerrain( world, data, origin );
 
 			m_previousOffset = origin;
 		}
@@ -189,11 +190,11 @@ namespace dd
 		{
 			if( m_draw )
 			{
-				data.World().AddTag( data.Entities()[i], ddc::Tag::Visible );
+				world.AddTag( data.Entities()[i], ddc::Tag::Visible );
 			}
 			else 
 			{
-				data.World().RemoveTag( data.Entities()[i], ddc::Tag::Visible );
+				world.RemoveTag( data.Entities()[i], ddc::Tag::Visible );
 			}
 
 			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ] );
@@ -218,7 +219,7 @@ namespace dd
 		transform_cmp.SetPosition( chunk_cmp.Chunk->GetPosition() );
 	}
 
-	void TerrainSystem::GenerateTerrain( const ddc::UpdateData& data, const glm::ivec2 offset )
+	void TerrainSystem::GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset )
 	{
 		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
 			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
@@ -233,17 +234,15 @@ namespace dd
 			GenerateLODLevel( lod, required_chunks, offset );
 		}
 
-		UpdateTerrainChunks( data, required_chunks );
+		UpdateTerrainChunks( world, data, required_chunks );
 	}
 
-	void TerrainSystem::UpdateTerrainChunks( const ddc::UpdateData& data, const Vector<TerrainChunkKey>& required_chunks )
+	void TerrainSystem::UpdateTerrainChunks( ddc::World& world, const ddc::DataBuffer& data, const Vector<TerrainChunkKey>& required_chunks )
 	{
-		ddc::World& world = data.World();
-
 		auto meshes = data.Write<MeshComponent>();
 		auto chunks = data.Write<TerrainChunkComponent>();
 
-		dd::Span<ddc::Entity> entities = data.Entities();
+		auto entities = data.Entities();
 
 		m_existing.clear();
 

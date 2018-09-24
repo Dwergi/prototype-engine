@@ -23,8 +23,6 @@ namespace dd
 	private:
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 		
-		glm::vec3 m_planeOrigin;
-		glm::vec3 m_planeNormal;
 		glm::vec3 m_gravity;
 	};
 }

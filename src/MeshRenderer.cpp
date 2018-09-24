@@ -68,9 +68,9 @@ namespace ddr
 		auto bounds = data.Get<dd::BoundBoxComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
 
-		dd::Span<ddc::Entity> entities = data.Entities();
+		auto entities = data.Entities();
 		
-		for( size_t i = 0; i < entities.Size(); ++i )
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
 			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], data.World(), data.Camera(), data.Uniforms() );
 		}
@@ -93,7 +93,8 @@ namespace ddr
 		++m_meshCount;
 
 		dd::AABB world_bounds = bounds_cmp.BoundBox.GetTransformed( transform_cmp.Transform );
-
+		DD_ASSERT( world_bounds.IsValid() );
+		
 		// check if it intersects with the frustum
 		if( m_frustumCull && !camera.GetFrustum().Intersects( world_bounds ) )
 		{

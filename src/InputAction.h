@@ -34,7 +34,8 @@ namespace dd
 		CAMERA_POS_3,
 		CAMERA_POS_4,
 		DECREASE_DEPTH,
-		INCREASE_DEPTH
+		INCREASE_DEPTH,
+		RESET_PHYSICS
 	};
 
 	enum class InputType : unsigned int

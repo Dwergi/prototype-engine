@@ -8,6 +8,8 @@ namespace ddr
 
 namespace dd
 {
+	void MakeQuad( ddr::Mesh& mesh );
+	
 	void MakeUnitCube( ddr::Mesh& mesh );
 
 	void MakeIcosphere( ddr::Mesh& mesh, int iterations );

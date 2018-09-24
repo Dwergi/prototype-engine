@@ -202,7 +202,7 @@ namespace dd
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
-		dd::Span<ddc::Entity> entities = data.Entities();
+		auto entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
@@ -268,7 +268,7 @@ namespace dd
 		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
 		auto bound_spheres = data.Get<dd::BoundSphereComponent>();
 
-		dd::Span<ddc::Entity> entities = data.Entities();
+		auto entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{

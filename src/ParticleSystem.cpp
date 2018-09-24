@@ -140,10 +140,12 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void ParticleSystem::Update( const ddc::UpdateData& update_data )
+	void ParticleSystem::Update( const ddc::UpdateData& update )
 	{
-		auto particles = update_data.Write<dd::ParticleSystemComponent>();
-		auto transforms = update_data.Read<dd::TransformComponent>();
+		const ddc::DataBuffer& data = update.Data();
+
+		auto particles = data.Write<dd::ParticleSystemComponent>();
+		auto transforms = data.Read<dd::TransformComponent>();
 
 		for( size_t i = 0; i < particles.Size(); ++i )
 		{
@@ -164,11 +166,11 @@ namespace ddr
 				system.m_age = system.m_lifetime;
 			}
 
-			UpdateLiveParticles( system, update_data.Delta() );
+			UpdateLiveParticles( system, update.Delta() );
 
 			if( system.m_age < system.m_lifetime )
 			{
-				EmitNewParticles( system, transforms[ i ].Transform, update_data.Delta() );
+				EmitNewParticles( system, transforms[ i ].Transform, update.Delta() );
 			}
 		}
 	}

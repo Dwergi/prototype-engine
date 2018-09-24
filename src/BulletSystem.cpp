@@ -90,19 +90,21 @@ namespace dd
 		m_fireBullet = false;
 	}
 
-	void BulletSystem::Update( const ddc::UpdateData& data )
+	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
-		ddc::World& world = data.World();
+		ddc::World& world = update.World();
 
 		if( m_fireBullet )
 		{
 			FireBullet( world );
 		}
 
+		const ddc::DataBuffer& data = update.Data();
+
 		auto bullets = data.Write<dd::BulletComponent>();
 		auto transforms = data.Write<dd::TransformComponent>();
 
-		float delta_t = data.Delta();
+		float delta_t = update.Delta();
 
 		m_count = (int) data.Size();
 

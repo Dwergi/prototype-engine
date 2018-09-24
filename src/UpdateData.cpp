@@ -3,47 +3,93 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData( ddc::World& world, dd::Span<Entity> entities, const dd::IArray<const DataRequest*>& requests, float delta_t ) :
+	UpdateData::UpdateData( ddc::World& world, float delta_t ) :
 		m_world( world ),
-		m_entities( entities ),
 		m_delta( delta_t )
 	{
-		m_buffers.reserve( requests.Size() );
+	}
 
-		size_t entity_offset = entities.Offset();
+	void UpdateData::ReserveData( size_t buffers )
+	{
+		m_dataBuffers.reserve( buffers );
+	}
 
-		for( const DataRequest* req : requests )
+	void UpdateData::AddData( const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name )
+	{
+		DataBuffer buffer( m_world, entities, requests, name );
+		m_dataBuffers.push_back( buffer );
+	}
+
+	const DataBuffer& UpdateData::Data( const char* name ) const
+	{
+		dd::String16 str;
+		if( name != nullptr )
 		{
-			ComponentBuffer data_buffer( world, entities, *req );
-			m_buffers.push_back( data_buffer );
+			str = name;
 		}
+
+		for( const DataBuffer& data_buffer : m_dataBuffers )
+		{
+			if( data_buffer.Name() == str )
+			{
+				return data_buffer;
+			}
+		}
+		throw std::exception( "No DataBuffer found for given name!" );
 	}
 
 	void UpdateData::Commit()
 	{
-		for( ComponentBuffer& buffer : m_buffers )
+		for( const DataBuffer& data_buffer : m_dataBuffers )
 		{
-			if( buffer.Usage() != DataUsage::Write )
+			for( const ComponentBuffer& buffer : data_buffer.ComponentBuffers() )
 			{
-				continue;
-			}
-
-			const byte* src = buffer.Data();
-			const size_t cmp_size = buffer.Component().Size;
-
-			for( Entity entity : m_entities )
-			{
-				void* dest = m_world.AccessComponent( entity, buffer.Component().ID );
-				DD_ASSERT( buffer.Optional() || dest != nullptr );
-
-				if( dest != nullptr )
+				if( buffer.Usage() != DataUsage::Write )
 				{
-					memcpy( dest, src, cmp_size );
+					continue;
 				}
 
-				src += cmp_size;
+				const byte* src = buffer.Data();
+				const size_t cmp_size = buffer.Component().Size;
+
+				for( Entity entity : data_buffer.Entities() )
+				{
+					void* dest = m_world.AccessComponent( entity, buffer.Component().ID );
+					if( dest != nullptr )
+					{
+						memcpy( dest, src, cmp_size );
+					}
+
+					src += cmp_size;
+				}
 			}
 		}
+	}
+
+	DataBuffer::DataBuffer( ddc::World& world, const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name ) :
+		m_entities( entities )
+	{
+		if( name != nullptr )
+		{
+			m_name = name;
+		}
+
+		m_buffers.reserve( requests.Size() );
+
+		for( const DataRequest* req : requests )
+		{
+			DD_ASSERT( req->Name() == m_name );
+
+			ComponentBuffer component_buffer( world, entities, *req );
+			m_buffers.push_back( component_buffer );
+		}
+	}
+
+	DataBuffer::DataBuffer( const DataBuffer& other ) :
+		m_name( other.m_name ),
+		m_entities( other.m_entities ),
+		m_buffers( other.m_buffers )
+	{
 	}
 
 	/*void CleverCopy( ComponentBuffer& buffer )

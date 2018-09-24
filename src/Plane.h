@@ -20,9 +20,11 @@ namespace dd
 		Plane( const Plane& other );
 		~Plane();
 		
-		glm::vec3 Normal() const;
+		glm::vec3 Normal() const { return m_plane.xyz(); }
+		glm::vec3 Origin() const { return Normal() * m_plane.w; }
 
 		float DistanceTo( const glm::vec3& point ) const;
+		Plane GetTransformed( const glm::mat4& transform ) const;
 
 	private:
 

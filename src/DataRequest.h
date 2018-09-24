@@ -20,6 +20,13 @@ namespace ddc
 		Write
 	};
 
+	enum class DataCardinality
+	{
+		Invalid,
+		Required,
+		Optional
+	};
+
 	struct System;
 
 	struct DataRequest
@@ -29,25 +36,29 @@ namespace ddc
 		virtual ~DataRequest() { delete[] m_buffer; }
 
 		byte* Buffer() const { return m_buffer; }
-		bool Optional() const { return m_optional; }
+		const dd::String& Name() const { return m_name; }
+		DataCardinality Cardinality() const { return m_cardinality; }
+		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
 		DataUsage Usage() const { return m_usage; }
 		const ComponentType& Component() const { return *m_component; }
 
 	protected:
-		DataRequest( const ComponentType& component, DataUsage usage, bool optional );
+		DataRequest( const ComponentType& component, DataUsage usage, DataCardinality cardinality, const char* name );
 
 	private:
 		const ComponentType* m_component { nullptr };
 		DataUsage m_usage { DataUsage::Invalid };
-		bool m_optional { false };
+		DataCardinality m_cardinality { DataCardinality::Invalid };
+
+		dd::String16 m_name;
 		byte* m_buffer { nullptr };
 	};
 
 	template <typename TComponent>
 	struct ReadRequirement : DataRequest
 	{
-		ReadRequirement() :
-			DataRequest( TComponent::Type, DataUsage::Read, false )
+		ReadRequirement( const char* name ) :
+			DataRequest( TComponent::Type, DataUsage::Read, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -55,8 +66,8 @@ namespace ddc
 	template <typename TComponent>
 	struct WriteRequirement : DataRequest
 	{
-		WriteRequirement() :
-			DataRequest( TComponent::Type, DataUsage::Write, false )
+		WriteRequirement( const char* name ) :
+			DataRequest( TComponent::Type, DataUsage::Write, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -64,8 +75,8 @@ namespace ddc
 	template <typename TComponent>
 	struct ReadOptional : DataRequest
 	{
-		ReadOptional() :
-			DataRequest( TComponent::Type, DataUsage::Read, true )
+		ReadOptional( const char* name ) :
+			DataRequest( TComponent::Type, DataUsage::Read, DataCardinality::Optional, name )
 		{
 		}
 	};
@@ -73,8 +84,8 @@ namespace ddc
 	template <typename TComponent>
 	struct WriteOptional : DataRequest
 	{
-		WriteOptional() :
-			DataRequest( TComponent::Type, DataUsage::Write, true )
+		WriteOptional( const char* name ) :
+			DataRequest( TComponent::Type, DataUsage::Write, DataCardinality::Optional, name )
 		{
 		}
 	};

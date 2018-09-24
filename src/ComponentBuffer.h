@@ -13,10 +13,11 @@ namespace ddc
 {
 	struct ComponentBuffer
 	{
-		ComponentBuffer( const World& world, dd::Span<Entity> entities, const DataRequest& req );
+		ComponentBuffer( const World& world, const std::vector<Entity>& entities, const DataRequest& req );
 
 		const ComponentType& Component() const { return m_request.Component(); }
 		DataUsage Usage() const { return m_request.Usage(); }
+		const dd::String& Name() const { return m_request.Name(); }
 
 		size_t Size() const { return m_count; }
 		byte* Data() const { return m_storage; }

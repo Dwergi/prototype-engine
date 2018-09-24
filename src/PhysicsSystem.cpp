@@ -9,11 +9,13 @@
 
 #include "Mesh.h"
 #include "MeshComponent.h"
-#include "PhysicsComponent.h"
+#include "PhysicsPlaneComponent.h"
+#include "PhysicsSphereComponent.h"
 #include "Plane.h"
 #include "TransformComponent.h"
 
-DD_COMPONENT_CPP( dd::PhysicsComponent );
+DD_COMPONENT_CPP( dd::PhysicsSphereComponent );
+DD_COMPONENT_CPP( dd::PhysicsPlaneComponent );
 
 namespace dd
 {
@@ -21,11 +23,12 @@ namespace dd
 		ddc::System( "Physics" )
 	{
 		m_gravity = glm::vec3( 0, -9.81, 0 );
-		m_planeOrigin = glm::vec3( 0, 0, 0 );
-		m_planeNormal = glm::vec3( 0, 1, 0 );
 
-		RequireWrite<dd::TransformComponent>();
-		RequireWrite<dd::PhysicsComponent>();
+		RequireWrite<dd::TransformComponent>( "spheres" );
+		RequireWrite<dd::PhysicsSphereComponent>( "spheres" );
+
+		RequireRead<dd::TransformComponent>( "planes" );
+		RequireRead<dd::PhysicsPlaneComponent>( "planes" );
 	}
 
 	void PhysicsSystem::Initialize( ddc::World& world )
@@ -33,42 +36,64 @@ namespace dd
 		
 	}
 
-	void PhysicsSystem::Update( const ddc::UpdateData& data )
+	void PhysicsSystem::Update( const ddc::UpdateData& update )
 	{
-		float delta_t = data.Delta();
+		float delta_t = update.Delta();
 
-		auto transforms = data.Write<dd::TransformComponent>();
-		auto physics = data.Write<dd::PhysicsComponent>();
+		const ddc::DataBuffer& spheres = update.Data( "spheres" );
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		auto spheres_transforms = spheres.Write<dd::TransformComponent>();
+		auto spheres_physics = spheres.Write<dd::PhysicsSphereComponent>();
+
+		const ddc::DataBuffer& planes = update.Data( "planes" );
+		
+		auto planes_transforms = planes.Read<dd::TransformComponent>();
+		auto planes_physics = planes.Read<dd::PhysicsPlaneComponent>();
+
+		for( size_t s = 0; s < spheres.Size(); ++s )
 		{
-			dd::PhysicsComponent& phys = physics[ i ];
+			dd::PhysicsSphereComponent& phys = spheres_physics[s];
+			
+			if( phys.Resting )
+				continue;
+
 			phys.Acceleration = m_gravity;
 			phys.Velocity += phys.Acceleration * delta_t;
 
-			glm::vec3 pos = transforms[ i ].GetPosition();
+			dd::TransformComponent& transform = spheres_transforms[s];
+
+			glm::vec3 pos = transform.GetPosition();
 			pos += phys.Velocity * delta_t;
 
-			transforms[ i ].SetPosition( pos );
-
-			Plane plane( m_planeOrigin, m_planeNormal );
-			float overshoot = plane.DistanceTo( pos ) - phys.Sphere.Radius;
-			if( overshoot < 0 )
+			for( size_t p = 0; p < planes.Size(); ++p )
 			{
-				float speed = glm::length( phys.Velocity );
+				const dd::PhysicsPlaneComponent& phys_plane = planes_physics[p];
+				dd::Plane plane = phys_plane.Plane.GetTransformed( planes_transforms[p].Transform );
 
-				// correct so that we're outside again
-				pos += -overshoot * plane.Normal();
-				phys.Velocity = glm::reflect( glm::normalize( phys.Velocity ), plane.Normal() );
-				phys.Velocity *= speed * phys.Elasticity;
+				float penetration = plane.DistanceTo( pos ) - phys.Sphere.Radius;
+				if( penetration < 0 )
+				{
+					float speed = glm::length( phys.Velocity );
+
+					// correct so that we're outside again
+					pos += -penetration * plane.Normal();
+					phys.Velocity = glm::reflect( glm::normalize( phys.Velocity ), plane.Normal() );
+					phys.Velocity *= speed * phys.Elasticity * phys_plane.Elasticity;
+
+					if( glm::length2( phys.Velocity ) < 0.01f )
+					{
+						phys.Velocity = glm::vec3( 0 );
+						phys.Resting = true;
+					}
+				}
 			}
+
+			transform.SetPosition( pos );
 		}
 	}
 
 	void PhysicsSystem::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::DragFloat3( "Gravity", glm::value_ptr( m_gravity ) );
-		ImGui::DragFloat3( "Plane Origin", glm::value_ptr( m_planeOrigin ) );
-		ImGui::DragFloat3( "Plane Normal", glm::value_ptr( m_planeNormal ) );
 	}
 }

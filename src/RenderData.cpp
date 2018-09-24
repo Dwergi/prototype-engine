@@ -14,7 +14,7 @@
 namespace ddr
 {
 	RenderData::RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
-		dd::Span<ddc::Entity> entities, const dd::IArray<const ddc::DataRequest*>& requests  ) :
+		const std::vector<ddc::Entity>& entities, const dd::IArray<const ddc::DataRequest*>& requests  ) :
 		m_camera( camera ),
 		m_uniforms( uniforms ),
 		m_entities( entities ),
@@ -22,11 +22,9 @@ namespace ddr
 	{
 		m_buffers.reserve( requests.Size() );
 
-		size_t entity_offset = entities.Offset();
-
 		for( const ddc::DataRequest* req : requests )
 		{
-			byte* storage = req->Buffer() + (entity_offset * req->Component().Size);
+			byte* storage = req->Buffer();
 
 			ddc::ComponentBuffer buffer( world, entities, *req );
 			m_buffers.push_back( buffer );

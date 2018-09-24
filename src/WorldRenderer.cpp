@@ -157,7 +157,7 @@ namespace ddr
 			return;
 		}
 
-		dd::Span<ddc::Entity> entity_span( entities );
+		auto entity_span( entities );
 
 		RenderData data( world, camera, *m_uniforms, entity_span, renderer.GetRequirements() );
 

@@ -48,9 +48,9 @@
 #include "FrameBuffer.h"
 #include "ParticleSystem.h"
 #include "ParticleSystemComponent.h"
-#include "PhysicsComponent.h"
+#include "PhysicsPlaneComponent.h"
+#include "PhysicsSphereComponent.h"
 #include "PhysicsSystem.h"
-#include "SceneGraphSystem.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
 #include "ShakyCamera.h"
@@ -277,13 +277,14 @@ void BindKeys( Input& input )
 	input.BindKey( ' ', InputAction::UP );
 	input.BindKey( 'R', InputAction::ADD_MINOR_TRAUMA );
 	input.BindKey( 'T', InputAction::ADD_MAJOR_TRAUMA );
-	input.BindKey( 'P', InputAction::TOGGLE_PICKING );
+	//input.BindKey( 'P', InputAction::TOGGLE_PICKING );
 	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
 	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
 	//input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
 	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SHOOT );
 	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
 	input.BindKey( 'E', InputAction::START_PARTICLE );
+	input.BindKey( 'P', InputAction::RESET_PHYSICS );
 
 	input.BindKey( '1', InputAction::CAMERA_POS_1 );
 	input.BindKey( '2', InputAction::CAMERA_POS_2 );
@@ -389,6 +390,35 @@ void CreateUnitSphere()
 	}
 }
 
+void CreateQuad()
+{
+	ddr::MeshHandle quad = ddr::Mesh::Find( "quad" );
+	if( !quad.IsValid() )
+	{
+		quad = ddr::Mesh::Create( "quad" );
+
+		ddr::Mesh* mesh = ddr::Mesh::Get( quad );
+		DD_ASSERT( mesh != nullptr );
+
+		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
+		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
+		DD_ASSERT( shader != nullptr );
+
+		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
+		ddr::Material* material = ddr::Material::Get( material_h );
+		DD_ASSERT( material != nullptr );
+
+		material->SetShader( shader_h );
+		mesh->SetMaterial( material_h );
+
+		shader->Use( true );
+
+		dd::MakeQuad( *mesh );
+
+		shader->Use( false );
+	}
+}
+
 int GameMain()
 {
 	DD_PROFILE_INIT();
@@ -425,8 +455,8 @@ int GameMain()
 		//trench_system.CreateRenderResources();
 
 		s_fpsCamera = new FPSCamera( *s_window );
-		s_fpsCamera->SetPosition( glm::vec3( 0, 10, 0 ) );
-		s_fpsCamera->SetRotation( 0, 0 );
+		s_fpsCamera->SetPosition( glm::vec3( 0, 20, 0 ) );
+		s_fpsCamera->SetRotation( 0, glm::radians( -30.0f ) );
 
 		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *s_inputBindings );
 		
@@ -439,7 +469,7 @@ int GameMain()
 		mouse_picking->BindActions( *s_inputBindings );
 
 		PhysicsSystem* physics_system = new PhysicsSystem();
-
+		
 		//ShipSystem ship_system( *s_shakyCam  );
 		//s_shipSystem = &ship_system;
 		//s_shipSystem->BindActions( bindings );
@@ -504,6 +534,7 @@ int GameMain()
 
 		CreateUnitCube();
 		CreateUnitSphere();
+		CreateQuad();
 
 		s_renderer->InitializeRenderers( *s_world );
 
@@ -557,11 +588,39 @@ int GameMain()
 
 		// physics
 		{
-			ddc::Entity entity = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 1, 0, 1, 1 ),
-				glm::translate( glm::vec3( 0, 30, 0 ) ) * glm::scale( glm::vec3( 5 ) ) );
+			ddc::Entity ball = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 1, 0, 1, 1 ),
+				glm::translate( glm::vec3( 0, 60, 0 ) ) * glm::scale( glm::vec3( 5 ) ) );
 			
-			dd::PhysicsComponent& physics = s_world->Add<dd::PhysicsComponent>( entity );
-			physics.Sphere.Radius = 5;
+			dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( ball );
+			physics_sphere.Sphere.Radius = 5;
+			physics_sphere.Elasticity = 0.5f;
+
+			float plane_size = 1000;
+
+			glm::mat4 transform = glm::translate( glm::vec3( -plane_size / 2, 10, -plane_size / 2 ) ) *
+				glm::rotate( glm::radians( 2.0f ), glm::vec3( 1, 0, 0 ) ) *
+				glm::scale( glm::vec3( plane_size ) );
+
+			ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.3, 1, 0.3, 1 ), transform );
+			s_world->AddTag( plane, ddc::Tag::Static );
+
+			dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
+			physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+			physics_plane.Elasticity = 0.95f;
+
+			ddc::World* world = s_world;
+			s_inputBindings->RegisterHandler( InputAction::RESET_PHYSICS, [ball, world]( InputAction action, InputType type )
+			{
+				if( type == InputType::RELEASED )
+				{
+					dd::TransformComponent* transform = world->Access<dd::TransformComponent>( ball );
+					transform->SetPosition( glm::vec3( 0, 60, 0 ) );
+
+					dd::PhysicsSphereComponent* sphere = world->Access<dd::PhysicsSphereComponent>( ball );
+					sphere->Velocity = glm::vec3( 0, 0, 0 );
+					sphere->Resting = false;
+				}
+			} );
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console

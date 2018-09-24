@@ -117,13 +117,13 @@ namespace dd
 
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 
-		void GenerateTerrain( const ddc::UpdateData& world, const glm::ivec2 offset );
+		void GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset );
 		void GenerateLODLevel( int lodLevel, Vector<TerrainChunkKey>& toGenerate, glm::ivec2 offset );
 
 		ddc::Entity CreateChunk( ddc::World& world, const TerrainChunkKey& key );
 
 		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp );
-		void UpdateTerrainChunks( const ddc::UpdateData& world, const Vector<TerrainChunkKey>& required );
+		void UpdateTerrainChunks( ddc::World& world, const ddc::DataBuffer& data, const Vector<TerrainChunkKey>& required );
 
 		void DestroyChunks( ddc::World& world );
 	};

@@ -22,14 +22,14 @@ namespace dd
 		: Min( other.Min ),
 		Max( other.Max )
 	{
-
+		
 	}
 
 	AABB::AABB( glm::vec3 min, glm::vec3 max )
 		: Min( min ),
 		Max( max )
 	{
-
+		DD_ASSERT( IsValid() );
 	}
 
 	AABB::AABB( const dd::Sphere& sphere )
@@ -46,19 +46,28 @@ namespace dd
 
 	bool AABB::IsValid() const
 	{
-		return Min != glm::vec3( FLT_MAX, FLT_MAX, FLT_MAX ) || Max != glm::vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+		return !(dd::IsNaN( Min ) ||
+			dd::IsNaN( Max ) ||
+			dd::IsInf( Min ) || 
+			dd::IsInf( Max ) || 
+			Min == glm::vec3( FLT_MAX, FLT_MAX, FLT_MAX ) || 
+			Max == glm::vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX ) );
 	}
 
 	void AABB::Expand( const glm::vec3& pt )
 	{
 		Min = glm::min( Min, pt );
 		Max = glm::max( Max, pt );
+
+		DD_ASSERT( IsValid() );
 	}
 
 	void AABB::Expand( const AABB& bounds )
 	{
 		Min = glm::min( Min, bounds.Min );
 		Max = glm::max( Max, bounds.Max );
+
+		DD_ASSERT( IsValid() );
 	}
 
 	float AABB::Volume() const

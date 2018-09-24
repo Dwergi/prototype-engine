@@ -3,6 +3,16 @@
 
 namespace dd
 {
+	bool IsNaN( glm::vec3 v )
+	{
+		return glm::isnan( v.x ) || glm::isnan( v.y ) || glm::isnan( v.z );
+	}
+
+	bool IsInf( glm::vec3 v )
+	{
+		return glm::isinf( v.x ) || glm::isinf( v.y ) || glm::isinf( v.z );
+	}
+
 	glm::vec3 directionFromPitchYaw( float pitch, float yaw )
 	{
 		return glm::vec3( glm::cos( pitch ) * glm::sin( yaw ),

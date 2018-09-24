@@ -108,8 +108,10 @@ namespace dd
 		return dd::HitTestMesh( ray, transform.Transform, bound_sphere, bound_box, *mesh, out_distance );
 	}
 
-	void HitTestSystem::Update( const ddc::UpdateData& data )
+	void HitTestSystem::Update( const ddc::UpdateData& update )
 	{
+		const ddc::DataBuffer& data = update.Data();
+
 		auto transforms = data.Read<dd::TransformComponent>();
 		auto bound_boxes = data.Read<dd::BoundBoxComponent>();
 		auto bound_spheres = data.Read<dd::BoundSphereComponent>();
@@ -122,7 +124,7 @@ namespace dd
 			HitEntry& entry = m_hits[i];
 			if( entry.IsPending() )
 			{
-				for( uint entity = 0; entity < entities.Size(); ++entity )
+				for( uint entity = 0; entity < data.Size(); ++entity )
 				{
 					dd::AABB aabb;
 					dd::Sphere sphere;
