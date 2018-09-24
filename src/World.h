@@ -3,6 +3,7 @@
 #include "ComponentType.h"
 #include "Entity.h"
 #include "FunctionView.h"
+#include "IDebugPanel.h"
 #include "MessageQueue.h"
 #include "SystemsSorting.h"
 
@@ -22,13 +23,14 @@ namespace ddc
 		None = 0,
 		Visible = 1,
 		Focused = 2,
-		Selected = 3
+		Selected = 3,
+		Static = 4
 	};
 
 	struct System;
 	struct SystemNode;
 
-	struct World
+	struct World : dd::IDebugPanel
 	{
 		World( dd::JobSystem& jobsystem );
 
@@ -92,10 +94,10 @@ namespace ddc
 		//
 		// Access a component from the given entity.
 		//
-		template <typename T> 
+		template <typename T>
 		T* Access( Entity entity ) const
 		{
-			return reinterpret_cast<T*>( AccessComponent( entity, T::Type.ID ) );
+			return reinterpret_cast<T*>(AccessComponent( entity, T::Type.ID ));
 		}
 
 		//
@@ -147,7 +149,7 @@ namespace ddc
 		template <typename T>
 		T& Add( Entity entity )
 		{
-			return *reinterpret_cast<T*>( AddComponent( entity, T::Type.ID ) );
+			return *reinterpret_cast<T*>(AddComponent( entity, T::Type.ID ));
 		}
 
 		//
@@ -196,9 +198,11 @@ namespace ddc
 		void AddTag( Entity e, Tag tag );
 
 		//
-		// Remove the given tag from the given enitty.
+		// Remove the given tag from the given entity.
 		//
 		void RemoveTag( Entity e, Tag tag );
+
+		virtual const char* GetDebugTitle() const override { return "World"; }
 
 	private:
 
@@ -218,12 +222,16 @@ namespace ddc
 		std::vector<uint> m_free;
 
 		std::vector<byte*> m_components;
-		
+
 		std::vector<System*> m_systems;
 		std::vector<SystemNode> m_orderedSystems;
 
+		bool m_drawSystemsGraph { false };
+
 		void UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t );
 		void UpdateSystemsWithTreeScheduling( float delta_t );
+
+		virtual void DrawDebugInternal( const ddc::World& world ) override;
 	};
 
 	using ExpandType = int[];

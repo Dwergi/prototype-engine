@@ -438,10 +438,6 @@ int GameMain()
 		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input, *hit_testing );
 		mouse_picking->BindActions( *s_inputBindings );
 
-		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
-		bullet_system->DependsOn( *hit_testing );
-		bullet_system->BindActions( *s_inputBindings );
-
 		PhysicsSystem* physics_system = new PhysicsSystem();
 
 		//ShipSystem ship_system( *s_shakyCam  );
@@ -451,10 +447,12 @@ int GameMain()
 
 		TerrainSystem* terrain_system = new TerrainSystem( jobsystem );
 
+		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
+		bullet_system->DependsOn( *hit_testing );
+		bullet_system->BindActions( *s_inputBindings );
+
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *s_inputBindings );
-
-		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
 		s_world = new ddc::World( jobsystem );
 
@@ -465,6 +463,8 @@ int GameMain()
 		s_world->RegisterSystem( *physics_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
+
+		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
 		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
 
@@ -498,6 +498,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *hit_testing );
 		s_debugUI->RegisterDebugPanel( *bullet_system );
 		s_debugUI->RegisterDebugPanel( *physics_system );
+		s_debugUI->RegisterDebugPanel( *s_world );
 
 		s_world->Initialize();
 

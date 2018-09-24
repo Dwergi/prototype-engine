@@ -22,6 +22,7 @@ namespace ddc
 		const dd::IArray<const DataRequest*>& GetRequests() const { return m_requests; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 		const std::bitset<MAX_TAGS>& GetRequiredTags() const { return m_tags; }
+		const char* GetName() const { return m_name.c_str(); }
 
 		virtual void Initialize( World& world ) {}
 		virtual void Update( const UpdateData& data ) = 0;

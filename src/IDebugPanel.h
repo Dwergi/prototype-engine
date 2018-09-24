@@ -22,7 +22,6 @@ namespace dd
 		IDebugPanel() :
 			m_debugOpen( false )
 		{
-
 		}
 
 		void DrawDebugPanel( const ddc::World& world );
