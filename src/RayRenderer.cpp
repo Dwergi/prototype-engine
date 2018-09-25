@@ -1,6 +1,13 @@
+//
+// RayRenderer.cpp - Renderer for RayComponent.
+// Copyright (C) Sebastian Nordgren 
+// September 25th 2018
+//
+
 #include "PrecompiledHeader.h"
 #include "RayRenderer.h"
 
+#include "ColourComponent.h"
 #include "RayComponent.h"
 #include "ShaderProgram.h"
 
@@ -30,6 +37,7 @@ namespace ddr
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::RayComponent>();
+		Optional<dd::ColourComponent>();
 	}
 
 	RayRenderer::~RayRenderer()
@@ -68,6 +76,13 @@ namespace ddr
 		glm::vec3 dir = ray.Direction();
 
 		glm::vec3 right = glm::normalize( glm::cross( dir, glm::vec3( 0, 1, 0 ) ) );
+
+		// degenerate case of vector pointing up
+		if( dd::IsNaN( right ) )
+		{
+			right = glm::vec3( 0, 0, 1 );
+		}
+		
 		glm::vec3 up = glm::normalize( glm::cross( dir, right ) );
 
 		return glm::mat4(
@@ -89,10 +104,23 @@ namespace ddr
 
 		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
 
-		shader->SetUniform( "Colour", glm::vec4( 1, 1, 0, 1 ) );
+		auto rays = data.Get<dd::RayComponent>();
+		auto colours = data.Get<dd::ColourComponent>();
 
-		for( const dd::RayComponent& ray : data.Get<dd::RayComponent>() )
+		for( size_t i = 0; i < data.Size(); ++i )
 		{
+			const dd::RayComponent& ray = rays[ i ];
+
+			glm::vec4 clr( 1 );
+
+			const dd::ColourComponent* colour = colours.Get( i );
+			if( colour != nullptr )
+			{
+				clr = colour->Colour;
+			}
+
+			shader->SetUniform( "Colour", clr );
+
 			float scale = ray.Length > 0 ? ray.Length : 100;
 			glm::mat4 model = TransformFromRay( ray.Ray ) * glm::scale( glm::vec3( scale ) );
 

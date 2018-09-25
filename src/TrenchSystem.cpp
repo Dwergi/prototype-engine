@@ -7,6 +7,7 @@
 #include "PrecompiledHeader.h"
 #include "TrenchSystem.h"
 
+#include "ColourComponent.h"
 #include "ICamera.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -142,7 +143,7 @@ namespace dd
 
 	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<TransformComponent, MeshComponent>();
+		ddc::Entity entity = world.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
 
 		glm::mat4 scale = glm::scale( glm::vec3( TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH ) );
 		glm::mat4 translate = glm::translate( position );
@@ -153,7 +154,9 @@ namespace dd
 
 		MeshComponent* mesh_cmp = world.Access<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;
-		mesh_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
+
+		ColourComponent* colour_cmp = world.Access<ColourComponent>( entity );
+		colour_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
 
 		world.AddTag( entity, ddc::Tag::Visible );
 		return entity;

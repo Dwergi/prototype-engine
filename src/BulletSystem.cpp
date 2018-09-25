@@ -9,6 +9,7 @@
 
 #include "BoundBoxComponent.h"
 #include "BulletComponent.h"
+#include "ColourComponent.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "InputBindings.h"
@@ -57,7 +58,7 @@ namespace dd
 	
 	void BulletSystem::FireBullet( ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, ddr::LightComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, ddr::LightComponent, dd::ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform;
@@ -74,7 +75,9 @@ namespace dd
 		world.Access( entity, mesh );
 		mesh->Mesh = ddr::Mesh::Find( "sphere" );
 
-		mesh->Colour = glm::vec4( m_colour, 1 );
+		dd::ColourComponent* colour;
+		world.Access( entity, colour );
+		colour->Colour = glm::vec4( m_colour, 1 );
 
 		dd::BoundBoxComponent* bounds;
 		world.Access( entity, bounds );

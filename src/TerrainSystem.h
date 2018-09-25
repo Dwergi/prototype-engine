@@ -24,6 +24,7 @@ namespace dd
 	class ICamera;
 	struct JobSystem;
 	struct BoundBoxComponent;
+	struct ColourComponent;
 	struct MeshComponent;
 	class TerrainChunk;
 	class TerrainChunkComponent;
@@ -122,7 +123,8 @@ namespace dd
 
 		ddc::Entity CreateChunk( ddc::World& world, const TerrainChunkKey& key );
 
-		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp );
+		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, BoundBoxComponent& bounds_cmp, 
+			TransformComponent& transform_cmp, ColourComponent& colour_cmp );
 		void UpdateTerrainChunks( ddc::World& world, const ddc::DataBuffer& data, const Vector<TerrainChunkKey>& required );
 
 		void DestroyChunks( ddc::World& world );

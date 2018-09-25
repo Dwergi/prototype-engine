@@ -336,6 +336,7 @@
     <ClInclude Include="src\BinarySerializer.h" />
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
+    <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
@@ -422,6 +423,7 @@
     <ClInclude Include="src\RefCounter.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
+    <ClInclude Include="src\Triangulator.h" />
     <ClInclude Include="src\VisibilityComponent.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
@@ -551,6 +553,7 @@
     <ClCompile Include="src\BinarySerializer.cpp" />
     <ClCompile Include="src\BoundBoxComponent.cpp" />
     <ClCompile Include="src\BoundsHelpers.cpp" />
+    <ClCompile Include="src\ColourComponent.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
@@ -620,6 +623,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Triangulator.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />

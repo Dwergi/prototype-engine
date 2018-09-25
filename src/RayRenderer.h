@@ -1,3 +1,9 @@
+//
+// RayRenderer.h - Renderer for RayComponent.
+// Copyright (C) Sebastian Nordgren 
+// September 25th 2018
+//
+
 #pragma once
 
 #include "Renderer.h"

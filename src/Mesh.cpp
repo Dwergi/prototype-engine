@@ -13,6 +13,7 @@
 #include "MeshHandle.h"
 #include "OpenGL.h"
 #include "ShaderProgram.h"
+#include "Triangulator.h"
 #include "Uniforms.h"
 #include "WorldRenderer.h"
 
@@ -273,41 +274,20 @@ namespace ddr
 		m_bvh = new dd::BVHTree();
 		m_bvh->StartBatch();
 
-		DD_TODO( "Create a mesh triangulator helper." );
-
 		const dd::ConstBuffer<glm::vec3>& positions = GetPositions();
 		const dd::ConstBuffer<uint>& indices = GetIndices();
-		if( indices.IsValid() )
+
+		dd::ConstTriangulator triangulator( positions, indices );
+		for( size_t i = 0; i < triangulator.Size(); ++i )
 		{
-			for( int i = 0; i < indices.Size(); i += 3 )
-			{
-				glm::vec3 p0 = positions[indices[i + 0]];
-				glm::vec3 p1 = positions[indices[i + 1]];
-				glm::vec3 p2 = positions[indices[i + 2]];
+			dd::ConstTriangle tri = triangulator[ i ];
 
-				dd::AABB bounds;
-				bounds.Expand( p0 );
-				bounds.Expand( p1 );
-				bounds.Expand( p2 );
+			dd::AABB bounds;
+			bounds.Expand( tri.p0 );
+			bounds.Expand( tri.p1 );
+			bounds.Expand( tri.p2 );
 
-				m_bvh->Add( bounds );
-			}
-		}
-		else
-		{
-			for( int i = 0; i < positions.Size(); i += 3 )
-			{
-				glm::vec3 p0 = positions[i + 0];
-				glm::vec3 p1 = positions[i + 1];
-				glm::vec3 p2 = positions[i + 2];
-
-				dd::AABB bounds;
-				bounds.Expand( p0 );
-				bounds.Expand( p1 );
-				bounds.Expand( p2 );
-
-				m_bvh->Add( bounds );
-			}
+			m_bvh->Add( bounds );
 		}
 
 		m_bvh->EndBatch();

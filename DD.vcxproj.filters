@@ -564,6 +564,12 @@
     <ClInclude Include="src\System.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="src\Triangulator.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColourComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -992,6 +998,12 @@
     </ClCompile>
     <ClCompile Include="src\System.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Triangulator.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColourComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

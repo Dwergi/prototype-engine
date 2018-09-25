@@ -1,7 +1,14 @@
+//
+// MeshUtils.cpp - Various utilities to make meshes of various shapes.
+// Copyright (C) Sebastian Nordgren 
+// September 25th 2018
+//
+
 #include "PrecompiledHeader.h"
 #include "MeshUtils.h"
 
 #include "Mesh.h"
+#include "Triangulator.h"
 #include "VBO.h"
 
 namespace dd
@@ -218,12 +225,39 @@ namespace dd
 
 	static std::vector<std::vector<glm::vec3>> s_positionLODs = { s_basePosition };
 	static std::vector<std::vector<uint>> s_indexLODs = { s_baseIndex };
+	static std::vector<std::vector<glm::vec3>> s_normalLODs;
 
 	void NormalizePositions( std::vector<glm::vec3>& vec )
 	{
 		for( glm::vec3& v : vec )
 		{
 			v = glm::normalize( v );
+		}
+	}
+	
+	void CalculateNormals( const std::vector<glm::vec3>& positions, const std::vector<uint>& indices, std::vector<glm::vec3>& out_normals )
+	{
+		DD_ASSERT( out_normals.empty() );
+		out_normals.resize( positions.size() );
+
+		ConstTriangulator triangulator( positions, indices );
+
+		for( size_t i = 0; i < triangulator.Size(); ++i )
+		{
+			ConstTriangle tri = triangulator[ i ];
+			glm::vec3 a = tri.p1 - tri.p0;
+			glm::vec3 b = tri.p2 - tri.p0;
+
+			glm::vec3 normal = glm::normalize( glm::cross( a, b ) );
+
+			out_normals[tri.i0] += normal;
+			out_normals[tri.i1] += normal;
+			out_normals[tri.i2] += normal;
+		}
+
+		for( size_t i = 0; i < out_normals.size(); ++i )
+		{
+			out_normals[ i ] = glm::normalize( out_normals[i] );
 		}
 	}
 
@@ -293,42 +327,55 @@ namespace dd
 		}
 	}
 
-	void CalculateIcosphere( std::vector<glm::vec3>*& out_pos, std::vector<uint>*& out_idx, int iterations )
+	void CalculateIcosphere( std::vector<glm::vec3>*& out_pos, std::vector<uint>*& out_idx, std::vector<glm::vec3>*& out_normals, int iterations )
 	{
 		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
+
+		if( s_normalLODs.empty() )
+		{
+			std::vector<glm::vec3>& normals = s_normalLODs.emplace_back();
+			CalculateNormals( s_basePosition, s_baseIndex, normals );
+		}
 
 		if( s_positionLODs.size() > iterations )
 		{
 			out_pos = &s_positionLODs[iterations];
 			out_idx = &s_indexLODs[iterations];
+			out_normals = &s_normalLODs[iterations];
 			return;
 		}
 
 		std::vector<glm::vec3> src_pos;
 		std::vector<uint> src_idx;
+		std::vector<glm::vec3> src_norm;
 
 		size_t start = s_positionLODs.size() - 1;
 		for( size_t i = start; i < iterations; ++i )
 		{
 			src_pos = s_positionLODs.back();
 			src_idx = s_indexLODs.back();
+			src_norm = s_normalLODs.back();
 
 			std::vector<glm::vec3>& dst_pos = s_positionLODs.emplace_back();
 			std::vector<uint>& dst_idx = s_indexLODs.emplace_back();
+			std::vector<glm::vec3>& dst_norm = s_normalLODs.emplace_back();
 
 			Subdivide( src_pos, src_idx, dst_pos, dst_idx );
 			NormalizePositions( dst_pos );
+			CalculateNormals( dst_pos, dst_idx, dst_norm );
 		}
 
 		out_pos = &s_positionLODs[iterations];
 		out_idx = &s_indexLODs[iterations];
+		out_normals = &s_normalLODs[iterations];
 	}
 
 	void MakeIcosphere( ddr::Mesh& mesh, int iterations )
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
-		CalculateIcosphere( pos, idx, iterations );
+		std::vector<glm::vec3>* norm = nullptr;
+		CalculateIcosphere( pos, idx, norm, iterations );
 
 		dd::ConstBuffer<glm::vec3> positions(pos->data(),pos->size() );
 		mesh.SetPositions( positions );
@@ -336,18 +383,23 @@ namespace dd
 		dd::ConstBuffer<uint> indices( idx->data(), idx->size() );
 		mesh.SetIndices( indices );
 
+		dd::ConstBuffer<glm::vec3> normals( norm->data(), norm->size() );
+		mesh.SetNormals( normals );
+
 		dd::AABB bounds( glm::vec3( -1 ), glm::vec3( 1 ) );
 		mesh.SetBoundBox( bounds );
 	}
 
-	void MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, int iterations )
+	void MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, ddr::VBO& normals, int iterations )
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
-		CalculateIcosphere( pos, idx, iterations );
+		std::vector<glm::vec3>* norm = nullptr;
+		CalculateIcosphere( pos, idx, norm, iterations );
 
-		positions.SetData(pos->data(),pos->size() );
+		positions.SetData(pos->data(), pos->size() );
 		indices.SetData( idx->data(), idx->size() );
+		normals.SetData( norm->data(), norm->size() );
 	}
 
 	void GetLineIndicesFromTriangles( const std::vector<uint>& src, std::vector<uint>& dest )
@@ -377,7 +429,8 @@ namespace dd
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
-		CalculateIcosphere( pos, idx, iterations );
+		std::vector<glm::vec3>* norm = nullptr;
+		CalculateIcosphere( pos, idx, norm, iterations );
 
 		std::vector<uint> line_indices;
 		GetLineIndicesFromTriangles( *idx, line_indices );
@@ -406,11 +459,11 @@ namespace dd
 	}
 
 	static const glm::vec3 s_quadPositions[] = {
-		glm::vec3( 0.0f,	0.0f,	0.0f ),
-		glm::vec3( 0.0f,	0.0f,	1.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 0.0f,	0.0f,	1.0f ),
+		glm::vec3( -1.0f,	0.0f,	-1.0f ),
+		glm::vec3( -1.0f,	0.0f,	1.0f ),
+		glm::vec3( 1.0f,	0.0f,	-1.0f ),
+		glm::vec3( 1.0f,	0.0f,	-1.0f ),
+		glm::vec3( -1.0f,	0.0f,	1.0f ),
 		glm::vec3( 1.0f,	0.0f,	1.0f )
 	};
 
@@ -433,7 +486,7 @@ namespace dd
 		mesh.SetNormals( s_quadNormalsBuffer );
 
 		dd::AABB bounds;
-		bounds.Expand( glm::vec3( 0, 0, 0 ) );
+		bounds.Expand( glm::vec3( -1, 0, -1 ) );
 		bounds.Expand( glm::vec3( 1, 0, 1 ) );
 		mesh.SetBoundBox( bounds );
 	}

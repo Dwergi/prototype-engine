@@ -8,6 +8,7 @@
 #include "MeshRenderer.h"
 
 #include "BoundBoxComponent.h"
+#include "ColourComponent.h"
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
@@ -31,6 +32,7 @@ namespace ddr
 		Require<dd::MeshComponent>();
 		Require<dd::BoundBoxComponent>();
 		Require<dd::TransformComponent>();
+		Require<dd::ColourComponent>();
 	}
 
 	void MeshRenderer::RenderInit( ddc::World& world )
@@ -64,20 +66,45 @@ namespace ddr
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 
+		if( m_depthTest )
+		{
+			// depth test
+			glEnable( GL_DEPTH_TEST );
+			glDepthFunc( GL_GREATER );
+			glClipControl( GL_LOWER_LEFT, GL_ZERO_TO_ONE );
+		}
+		else
+		{
+			glDisable( GL_DEPTH_TEST );
+		}
+
+		// backface culling
+		if( m_backfaceCulling )
+		{
+			glEnable( GL_CULL_FACE );
+			glFrontFace( GL_CCW );
+			glCullFace( GL_BACK );
+		}
+		else
+		{
+			glDisable( GL_CULL_FACE );
+		}
+
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto bounds = data.Get<dd::BoundBoxComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
+		auto colours = data.Get<dd::ColourComponent>();
 
 		auto entities = data.Entities();
 		
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], data.World(), data.Camera(), data.Uniforms() );
+			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], colours[i], data.World(), data.Camera(), data.Uniforms() );
 		}
 	}
 
-	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, 
-		const dd::TransformComponent& transform_cmp, const dd::BoundBoxComponent& bounds_cmp, 
+	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp, 
+		const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp,
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		Mesh* mesh = nullptr;
@@ -130,7 +157,7 @@ namespace ddr
 
 		material->UpdateUniforms( uniforms );
 
-		glm::vec4 colour = mesh_cmp.Colour * debugMultiplier;
+		glm::vec4 colour = colour_cmp.Colour * debugMultiplier;
 		uniforms.Set( "ObjectColour", colour );
 
 		uniforms.Bind( *shader );
@@ -147,5 +174,8 @@ namespace ddr
 
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
+
+		ImGui::Checkbox( "Backface Culling", &m_backfaceCulling );
+		ImGui::Checkbox( "Depth Test", &m_depthTest );
 	}
 }

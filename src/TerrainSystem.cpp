@@ -8,6 +8,7 @@
 #include "TerrainSystem.h"
 
 #include "BoundBoxComponent.h"
+#include "ColourComponent.h"
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "MeshComponent.h"
@@ -96,6 +97,7 @@ namespace dd
 		RequireWrite<MeshComponent>();
 		RequireWrite<BoundBoxComponent>();
 		RequireWrite<TransformComponent>();
+		RequireWrite<ColourComponent>();
 
 		Require<TerrainChunkComponent>();
 		Require<MeshComponent>();
@@ -185,6 +187,7 @@ namespace dd
 		auto transforms = data.Write<TransformComponent>();
 		auto bounds = data.Write<BoundBoxComponent>();
 		auto meshes = data.Write<MeshComponent>();
+		auto colours = data.Write<ColourComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
@@ -197,20 +200,20 @@ namespace dd
 				world.RemoveTag( data.Entities()[i], ddc::Tag::Visible );
 			}
 
-			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ] );
+			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ], colours[ i ] );
 		}
 	}
 
 	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, 
-		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp )
+		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp, ColourComponent& colour_cmp )
 	{
 		if( m_terrainParams.UseDebugColours )
 		{
-			mesh_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetKey() );
+			colour_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetKey() );
 		}
 		else
 		{
-			mesh_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
+			colour_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 
 		chunk_cmp.Chunk->Update( m_jobsystem );
@@ -330,7 +333,7 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundBoxComponent>();
+		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
