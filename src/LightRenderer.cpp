@@ -34,7 +34,7 @@ namespace ddr
 		ddr::LightComponent* light = world.Access<ddr::LightComponent>( entity );
 		light->Ambient = 0.01f;
 		light->Colour = glm::vec3( 1, 1, 1 );
-		light->IsDirectional = false;
+		light->LightType = LightType::Point;
 
 		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
 		transform->Transform = glm::translate( glm::vec3( 0, 20, 0 ) ) * glm::scale( glm::vec3( 0.4 ) );
@@ -85,15 +85,6 @@ namespace ddr
 		m_debugLights.clear();
 
 		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
-		ShaderProgram* shader = nullptr;
-		if( m_drawBounds )
-		{
-			glEnable( GL_BLEND );
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-			shader = ShaderProgram::Get( m_shader );
-			shader->Use( true );
-		}
 
 		for( size_t i = 0; i < light_count; ++i )
 		{
@@ -103,11 +94,7 @@ namespace ddr
 			m_debugLights.push_back( entities[ i ] );
 
 			glm::vec4 position( transform.GetPosition(), 1 );
-			if( light.IsDirectional )
-			{
-				position.w = 0;
-			}
-
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Type" ).c_str(), (int) light.LightType );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), light.Colour );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), light.Intensity );
@@ -115,20 +102,10 @@ namespace ddr
 			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), light.Ambient );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), light.Specular );
 
-			if( m_drawBounds && !light.IsDirectional )
-			{
-				shader->SetUniform( "Colour", glm::vec4( light.Colour, 1 ) );
-				
-				ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
-				mesh->Render( uniforms, *shader, transform.Transform );
-			}
-		}
-
-		if( m_drawBounds )
-		{
-			shader->Use( false );
-
-			glDisable( GL_BLEND );
+			glm::vec4 direction = transform.Transform * glm::vec4( glm::vec3( 0, 0, 1 ), 0 );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "Direction" ).c_str(), direction.xyz );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "CosInnerAngle" ).c_str(), glm::cos( light.InnerAngle ) );
+			uniforms.Set( GetArrayUniformName( "Lights", i, "CosOuterAngle" ).c_str(), glm::cos( light.OuterAngle ) );
 		}
 
 		UpdateDebugPointLights( data.World() );
@@ -137,8 +114,6 @@ namespace ddr
 	void LightRenderer::DrawDebugInternal( const ddc::World& world )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 400 ), ImGuiCond_FirstUseEver );
-
-		ImGui::Checkbox( "Draw Bounds", &m_drawBounds );
 
 		for( size_t i = 0; i < m_debugLights.size(); ++i )
 		{
@@ -154,48 +129,53 @@ namespace ddr
 
 			if( ImGui::TreeNodeEx( buffer, ImGuiTreeNodeFlags_CollapsingHeader ) )
 			{
-				bool directional = light->IsDirectional;
-				if( ImGui::Checkbox( "Directional?", &directional ) )
+				static const char* c_lightTypes = "Directional\0Point\0Spot\0";
+				int lightType = (int) light->LightType;
+					
+				if( ImGui::Combo( "Type", &lightType, c_lightTypes ) )
 				{
-					light->IsDirectional = directional;
+					light->LightType = (LightType) lightType;
 				}
-
+				
 				glm::vec3 light_colour = light->Colour;
 				if( ImGui::ColorEdit3( "Colour", glm::value_ptr( light_colour ) ) )
 				{
 					light->Colour = light_colour;
 				}
 
-				float intensity = light->Intensity;
-				if( ImGui::DragFloat( "Intensity", &intensity, 0.01, 0, 100 ) )
-				{
-					light->Intensity = intensity;
-				}
-
-				float attenuation = light->Attenuation;
-				if( ImGui::DragFloat( "Attenuation", &attenuation, 0.001, 0.001, 1 ) )
-				{
-					light->Attenuation = attenuation;
-				}
+				ImGui::DragFloat( "Intensity", &light->Intensity, 0.01, 0, 100 );
+				ImGui::DragFloat( "Attenuation", &light->Attenuation, 0.001, 0.001, 1 );
 
 				glm::vec3 light_position = transform->GetPosition();
 
-				const char* positionLabel = light->IsDirectional ? "Direction" : "Position";
+				const char* positionLabel = light->LightType == LightType::Directional ? "Direction" : "Position";
 				if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
 				{
 					transform->SetPosition( light_position );
 				}
 
-				float ambient = light->Ambient;
-				if( ImGui::SliderFloat( "Ambient", &ambient, 0.0f, 1.0f ) )
+				ImGui::SliderFloat( "Ambient", &light->Ambient, 0, 1 );
+				ImGui::SliderFloat( "Specular", &light->Specular, 0, 1 );
+
+				glm::vec3 light_direction = glm::vec3( (transform->Transform * glm::vec4( glm::vec3( 0, 0, 1 ), 0 )).xyz );
+				if( ImGui::DragFloat3( "Direction", glm::value_ptr( light_direction ), 0.0025, -1, 1 ) )
 				{
-					light->Ambient = ambient;
+					transform->Transform = dd::TransformFromOriginDir( transform->GetPosition(), glm::normalize( light_direction ) );
 				}
 
-				float specular = light->Specular;
-				if( ImGui::SliderFloat( "Specular", &specular, 0.0f, 1.0f ) )
+				float outer_angle = glm::degrees( light->OuterAngle );
+				if( ImGui::SliderFloat( "Outer Angle", &outer_angle, 0, 89 ) )
 				{
-					light->Specular = specular;
+					light->OuterAngle = glm::radians( outer_angle );
+				}
+
+				float inner_angle = glm::degrees( glm::min( light->InnerAngle, light->OuterAngle ) );
+				ImGui::SliderFloat( "Inner Angle", &inner_angle, 0, outer_angle );
+				inner_angle = glm::radians( inner_angle );
+
+				if( light->InnerAngle != inner_angle )
+				{
+					light->InnerAngle = inner_angle;
 				}
 
 				if( ImGui::Button( "Delete" ) )

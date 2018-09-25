@@ -29,6 +29,7 @@ namespace dd
 
 		RequireRead<dd::TransformComponent>( "planes" );
 		RequireRead<dd::PhysicsPlaneComponent>( "planes" );
+		RequireTag( ddc::Tag::Static, "planes" );
 	}
 
 	void PhysicsSystem::Initialize( ddc::World& world )
@@ -65,6 +66,8 @@ namespace dd
 			glm::vec3 pos = transform.GetPosition();
 			pos += phys.Velocity * delta_t;
 
+			bool contacting = false;
+
 			for( size_t p = 0; p < planes.Size(); ++p )
 			{
 				const dd::PhysicsPlaneComponent& phys_plane = planes_physics[p];
@@ -80,12 +83,14 @@ namespace dd
 					phys.Velocity = glm::reflect( glm::normalize( phys.Velocity ), plane.Normal() );
 					phys.Velocity *= speed * phys.Elasticity * phys_plane.Elasticity;
 
-					if( glm::length2( phys.Velocity ) < 0.01f )
-					{
-						phys.Velocity = glm::vec3( 0 );
-						phys.Resting = true;
-					}
+					contacting = true;
 				}
+			}
+
+			if( contacting && glm::length2( phys.Velocity ) < 0.001f )
+			{
+				phys.Velocity = glm::vec3( 0 );
+				phys.Resting = true;
 			}
 
 			transform.SetPosition( pos );

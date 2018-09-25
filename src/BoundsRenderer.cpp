@@ -198,10 +198,10 @@ namespace ddr
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 120 ), ImGuiCond_Once );
 
-		static const char* options = "None\0Box\0Sphere\0";
+		static const char* c_drawModes = "None\0Box\0Sphere\0";
 		
 		int drawMode = m_drawMode;
-		if( ImGui::Combo( "Mode", &drawMode, options ) )
+		if( ImGui::Combo( "Mode", &drawMode, c_drawModes ) )
 		{
 			m_drawMode = (DrawMode) drawMode;
 			m_updateBuffers = true;

@@ -312,7 +312,7 @@ namespace ddc
 				}
 			}
 
-			const std::bitset<MAX_TAGS>& tags = system->GetRequiredTags();
+			std::bitset<MAX_TAGS> tags = system->GetRequiredTags( name.c_str() );
 
 			// find entities with requirements
 			std::vector<Entity> entities;

@@ -85,6 +85,7 @@ namespace dd
 
 		ddr::LightComponent* light;
 		world.Access( entity, light );
+		light->LightType = ddr::LightType::Point;
 		light->Ambient = 0;
 		light->Intensity = m_intensity;
 		light->Colour = m_colour;

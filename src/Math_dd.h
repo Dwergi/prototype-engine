@@ -11,6 +11,8 @@ namespace dd
 #undef min
 #undef max
 
+	struct Ray;
+
 	template <typename T>
 	T min( T a, T b )
 	{
@@ -37,7 +39,10 @@ namespace dd
 	bool IsNaN( glm::vec3 v );
 	bool IsInf( glm::vec3 v );
 
-	glm::vec3 directionFromPitchYaw( float pitch, float yaw );
+	glm::mat4 TransformFromOriginDir( const glm::vec3& origin, const glm::vec3& direction );
+	glm::mat4 TransformFromRay( const dd::Ray& ray );
 
-	void pitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
+	glm::vec3 DirectionFromPitchYaw( float pitch, float yaw );
+
+	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
 }

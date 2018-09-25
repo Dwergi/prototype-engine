@@ -26,8 +26,12 @@ Material;
 
 uniform struct LightData 
 {
+	int Type; // 0 = directional, 1 = point, 2 = spot
 	vec4 Position;
+	vec3 Direction;
 	vec3 Colour;
+	float CosInnerAngle;
+	float CosOuterAngle;
 	float Intensity;
 	float AmbientStrength;
 	float SpecularStrength;
@@ -57,18 +61,32 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 
 	float attenuation = 1.0;
 
-	// directional lights
-	if( light.Position.w == 0.0 )
+	if( light.Type == 0 )
 	{
-		lightDir = normalize( light.Position.xyz );
+		// directional lights
 		attenuation = 1.0; 
 	}
-	else
+	else if( light.Type == 1 )
 	{
+		// point lights
 		vec3 fragmentToLight = light.Position.xyz - fragPosition;
 		lightDir = normalize( fragmentToLight );
 		float distanceToLight = length( fragmentToLight );
 		attenuation = 1.0 / (1.0 + light.Attenuation * (distanceToLight * distanceToLight) );
+	}
+	else if( light.Type == 2 )
+	{
+		// spot lights
+		vec3 fragmentToLight = light.Position.xyz - fragPosition;
+		lightDir = normalize( fragmentToLight );
+
+		float theta = dot( lightDir, -light.Direction );
+		float epsilon = light.CosInnerAngle - light.CosOuterAngle;
+		float intensity = clamp( (theta - light.CosOuterAngle) / epsilon, 0.0, 1.0 );
+
+		float distanceToLight = length( fragmentToLight );
+		attenuation = 1.0 / (1.0 + light.Attenuation * (distanceToLight * distanceToLight) );
+		attenuation *= intensity;
 	}
 
 	float diffAmount = max( dot( fragNormal, lightDir ), 0.0 );

@@ -60,12 +60,12 @@ namespace dd
 
 	glm::vec3 FPSCamera::GetDirection() const
 	{
-		return dd::directionFromPitchYaw( m_pitch, m_yaw );
+		return dd::DirectionFromPitchYaw( m_pitch, m_yaw );
 	}
 
 	void FPSCamera::SetDirection( const glm::vec3& dir )
 	{
-		dd::pitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
+		dd::PitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
 	}
 
 	float FPSCamera::GetNear() const

@@ -76,7 +76,7 @@ namespace dd
 			m_roll = 0;
 		}
 
-		m_direction = dd::directionFromPitchYaw( m_pitch, m_yaw );
+		m_direction = dd::DirectionFromPitchYaw( m_pitch, m_yaw );
 
 		AddTrauma( -(delta_t * TraumaDecayRate) );
 

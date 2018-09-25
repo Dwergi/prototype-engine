@@ -32,8 +32,6 @@ namespace ddr
 		ddc::Entity m_deleteLight;
 		std::vector<ddc::Entity> m_debugLights;
 
-		bool m_drawBounds { false };
-
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 
 		void UpdateDebugPointLights( ddc::World& world );

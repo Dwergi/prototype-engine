@@ -31,6 +31,7 @@ namespace dd
 		OptionalRead<dd::BoundSphereComponent>();
 
 		RequireTag( ddc::Tag::Visible );
+		RequireTag( ddc::Tag::Static );
 	}
 
 	void HitTestSystem::Initialize( ddc::World& world )

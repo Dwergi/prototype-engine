@@ -25,10 +25,10 @@ TEST_CASE( "[FPSCamera] Direction to Pitch/Yaw" )
 			float pitch_rad = glm::radians( p );
 			float yaw_rad = glm::radians( y );
 
-			glm::vec3 dir = dd::directionFromPitchYaw( pitch_rad, yaw_rad );
+			glm::vec3 dir = dd::DirectionFromPitchYaw( pitch_rad, yaw_rad );
 
 			float calc_pitch, calc_yaw;
-			dd::pitchYawFromDirection( dir, calc_pitch, calc_yaw );
+			dd::PitchYawFromDirection( dir, calc_pitch, calc_yaw );
 
 			REQUIRE( almostEqualRads( calc_pitch, pitch_rad ) );
 			REQUIRE( almostEqualRads( calc_yaw, yaw_rad ) );

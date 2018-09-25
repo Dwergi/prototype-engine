@@ -71,27 +71,6 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	glm::mat4 TransformFromRay( const dd::Ray& ray )
-	{
-		glm::vec3 dir = ray.Direction();
-
-		glm::vec3 right = glm::normalize( glm::cross( dir, glm::vec3( 0, 1, 0 ) ) );
-
-		// degenerate case of vector pointing up
-		if( dd::IsNaN( right ) )
-		{
-			right = glm::vec3( 0, 0, 1 );
-		}
-		
-		glm::vec3 up = glm::normalize( glm::cross( dir, right ) );
-
-		return glm::mat4(
-			glm::vec4( right, 0 ),
-			glm::vec4( up, 0 ),
-			glm::vec4( dir, 0 ),
-			glm::vec4( ray.Origin(), 1 ) );
-	}
-
 	void RayRenderer::Render( const ddr::RenderData& data )
 	{
 		ShaderProgram* shader = ShaderProgram::Get( m_shader );

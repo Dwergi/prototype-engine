@@ -25,4 +25,47 @@ namespace ddc
 
 		return true;
 	}
+
+	void System::RequireTag( ddc::Tag tag, const char* name )
+	{
+		dd::String16 str;
+		if( name != nullptr )
+		{
+			str = name;
+		}
+
+		for( TagRequest& req : m_tags )
+		{
+			if( req.Name == str )
+			{
+				req.Tags.set( (uint) tag );
+				return;
+			}
+		}
+
+		TagRequest req;
+		req.Tags.set( (uint) tag );
+		req.Name = str;
+
+		m_tags.Add( req );
+	}
+
+	std::bitset<MAX_TAGS> System::GetRequiredTags( const char* name ) const
+	{
+		dd::String16 str;
+		if( name != nullptr )
+		{
+			str = name;
+		}
+
+		for( TagRequest& req : m_tags )
+		{
+			if( req.Name == str )
+			{
+				return req.Tags;
+			}
+		}
+
+		return std::bitset<MAX_TAGS>();
+	}
 }
