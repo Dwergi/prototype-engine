@@ -2,14 +2,12 @@
 
 layout( location = 0 ) in vec3 Position;
 
-out struct VertexData
+out struct FragmentData
 {
 	vec3 Position;
 	vec4 Colour;
 } 
-Vertex;
-
-flat out vec3 FlatPosition;
+Fragment;
 
 uniform vec4 ObjectColour;
 uniform mat4 Model;
@@ -18,10 +16,8 @@ uniform mat4 Projection;
 
 void main()
 {
-	Vertex.Position = vec3( Model * vec4( Position, 1 ) );	
-	Vertex.Colour = ObjectColour;
-
-	FlatPosition = Vertex.Position;
+	Fragment.Position = (Model * vec4( Position, 1 )).xyz;
+	Fragment.Colour = ObjectColour;
 
 	gl_Position = Projection * View * Model * vec4( Position, 1 );
-};
+}

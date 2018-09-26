@@ -10,8 +10,6 @@ in struct FragmentData
 	vec3 Barycentric;
 } Fragment;
 
-flat in vec3 FragmentNormal;
-
 uniform bool DrawStandard;
 uniform mat4 View;
 
@@ -171,6 +169,10 @@ vec4 CalculateWireframe( vec3 barycentric, vec3 wireColour, float wireWidth, vec
 
 void main()
 {
+	vec3 xTangent = dFdx( Fragment.Position );
+    vec3 yTangent = dFdy( Fragment.Position );
+    vec3 fragmentNormal = normalize( cross( xTangent, yTangent ) );
+
 	vec3 toView = View[ 3 ].xyz - Fragment.Position;
 	float viewDistance = length( toView );
 
@@ -193,11 +195,10 @@ void main()
 			fragmentColour *= GetTerrainHeightColour( Fragment.Position.y / TerrainMaxHeight );
 		}
 
-		vec3 normal = normalize( FragmentNormal );
 		vec3 viewDir = normalize( toView );
 		for( int i = 0; i < LightCount; ++i )
 		{
-			finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, normal, Fragment.Position, viewDir );
+			finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, fragmentNormal, Fragment.Position, viewDir );
 		}
 		
 		vec3 gamma = vec3( 1.0 / 2.2 );

@@ -10,8 +10,6 @@ in struct VertexData
 }
 Vertex[];
 
-flat in vec3 FlatPosition[];
-
 out struct FragmentData
 {
 	vec3 Position;
@@ -20,34 +18,24 @@ out struct FragmentData
 }
 Fragment;
 
-flat out vec3 FragmentNormal;
-
 void main()
 {
-	vec3 a = FlatPosition[1] - FlatPosition[0];
-	vec3 b = FlatPosition[2] - FlatPosition[0];
-
-	vec3 normal = normalize( cross( a, b ) );
-
 	gl_Position = gl_in[0].gl_Position;
 	Fragment.Position = Vertex[0].Position;
 	Fragment.Colour = Vertex[0].Colour;
 	Fragment.Barycentric = vec3( 1, 0, 0 );
-	FragmentNormal = normal;
 	EmitVertex();
 
 	gl_Position = gl_in[1].gl_Position;
 	Fragment.Position = Vertex[1].Position;
 	Fragment.Colour = Vertex[1].Colour;
 	Fragment.Barycentric = vec3( 0, 1, 0 );
-	FragmentNormal = normal;
 	EmitVertex();
 
 	gl_Position = gl_in[2].gl_Position;
 	Fragment.Position = Vertex[2].Position;
 	Fragment.Colour = Vertex[2].Colour;
 	Fragment.Barycentric = vec3( 0, 0, 1 );
-	FragmentNormal = normal;
 	EmitVertex();
 
 	EndPrimitive();

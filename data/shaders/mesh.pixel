@@ -9,8 +9,6 @@ in struct FragmentData
 }
 Fragment;
 
-flat in vec3 FragmentNormal;
-
 uniform mat4 View;
 
 uniform struct MaterialData
@@ -106,9 +104,13 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 
 void main()
 {
+	vec3 xTangent = dFdx( Fragment.Position );
+    vec3 yTangent = dFdy( Fragment.Position );
+    vec3 fragmentNormal = normalize( cross( xTangent, yTangent ) );
+
 	if( DrawNormals )
 	{
-		Colour = vec4( FragmentNormal, 1 );
+		Colour = vec4( fragmentNormal, 1 );
 		return;
 	}
 
@@ -128,11 +130,10 @@ void main()
 	
 	vec3 fragmentColour = Fragment.Colour.rgb;
 
-	vec3 normal = normalize( FragmentNormal );
 	vec3 viewDir = normalize( toView );
 	for( int i = 0; i < LightCount; ++i )
 	{
-		finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, normal, Fragment.Position, viewDir );
+		finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, fragmentNormal, Fragment.Position, viewDir );
 	}
 	
 	vec3 gamma = vec3( 1.0 / 2.2 );
