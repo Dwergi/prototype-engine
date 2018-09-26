@@ -49,6 +49,8 @@ uniform struct FogParameters
 }
 Fog;
 
+uniform bool DrawNormals;
+
 //
 // Apply a single light to the pixel. 
 // Deals with both directional and point lights.
@@ -104,6 +106,12 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 
 void main()
 {
+	if( DrawNormals )
+	{
+		Colour = vec4( FragmentNormal, 1 );
+		return;
+	}
+
 	vec3 toView = View[ 3 ].xyz - Fragment.Position;
 	float viewDistance = length( toView );
 

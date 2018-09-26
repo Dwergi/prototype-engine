@@ -30,7 +30,7 @@ namespace ddr
 		glm::vec3( -0.05, 0, 0.95 )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, sizeof( s_lines ) / sizeof( glm::vec3 ) );
+	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, dd::ArrayLength( s_lines ) );
 
 	RayRenderer::RayRenderer() :
 		Renderer( "Ray" )

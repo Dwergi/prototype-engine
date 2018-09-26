@@ -90,6 +90,9 @@ namespace ddr
 			glDisable( GL_CULL_FACE );
 		}
 
+		ddr::UniformStorage& uniforms = data.Uniforms();
+		uniforms.Set( "DrawNormals", m_drawNormals );
+
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto bounds = data.Get<dd::BoundBoxComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
@@ -99,7 +102,7 @@ namespace ddr
 		
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], colours[i], data.World(), data.Camera(), data.Uniforms() );
+			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], colours[i], data.World(), data.Camera(), uniforms );
 		}
 	}
 
@@ -177,5 +180,7 @@ namespace ddr
 
 		ImGui::Checkbox( "Backface Culling", &m_backfaceCulling );
 		ImGui::Checkbox( "Depth Test", &m_depthTest );
+
+		ImGui::Checkbox( "Draw Normals", &m_drawNormals );
 	}
 }

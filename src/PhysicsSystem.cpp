@@ -59,7 +59,8 @@ namespace dd
 				continue;
 
 			phys.Acceleration = m_gravity;
-			phys.Velocity += phys.Acceleration * delta_t;
+			
+			glm::vec3 velocity = phys.Velocity + phys.Acceleration * delta_t;
 
 			dd::TransformComponent& transform = spheres_transforms[s];
 
@@ -76,22 +77,26 @@ namespace dd
 				float penetration = plane.DistanceTo( pos ) - phys.Sphere.Radius;
 				if( penetration < 0 )
 				{
-					float speed = glm::length( phys.Velocity );
+					float speed = glm::length( velocity );
+
+					glm::vec3 plane_normal = plane.Normal();
 
 					// correct so that we're outside again
-					pos += -penetration * plane.Normal();
-					phys.Velocity = glm::reflect( glm::normalize( phys.Velocity ), plane.Normal() );
-					phys.Velocity *= speed * phys.Elasticity * phys_plane.Elasticity;
+					pos += -penetration * plane_normal;
+					velocity = glm::reflect( glm::normalize( velocity ), plane_normal );
+					velocity *= speed * phys.Elasticity * phys_plane.Elasticity;
 
 					contacting = true;
 				}
 			}
 
-			if( contacting && glm::length2( phys.Velocity ) < 0.001f )
+			if( contacting && glm::length2( phys.Velocity ) < 0.1f )
 			{
-				phys.Velocity = glm::vec3( 0 );
+				velocity = glm::vec3( 0 );
 				phys.Resting = true;
 			}
+
+			phys.Velocity = velocity;
 
 			transform.SetPosition( pos );
 		}

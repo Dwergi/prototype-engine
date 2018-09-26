@@ -41,6 +41,7 @@ namespace ddr
 
 		bool m_depthTest { true };
 		bool m_backfaceCulling { true };
+		bool m_drawNormals { false };
 
 		MeshHandle m_cube;
 		

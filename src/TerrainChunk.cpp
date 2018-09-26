@@ -221,7 +221,9 @@ namespace dd
 				[this]()
 			{
 				UpdateVertices( m_noiseOffset ); 
-				UpdateNormals();
+
+				DD_TODO( "Do I need normals or is geometry shader better?" );
+				//UpdateNormals();
 
 				m_dataDirty = false;
 				m_renderDirty = true;

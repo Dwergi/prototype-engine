@@ -66,6 +66,12 @@ namespace dd
 	void* PointerAdd( void* base, uint64 offset );
 	const void* PointerAdd( const void* base, uint64 offset );
 
+	template <typename T, size_t Size>
+	size_t ArrayLength( const T( &arr )[Size] )
+	{
+		return Size;
+	}
+
 	template <typename T>
 	T pop_front( std::vector<T>& vec )
 	{

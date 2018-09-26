@@ -7,7 +7,7 @@ in struct FragmentData
 {
 	vec3 Position;
 	vec4 Colour;
-	vec3 WireframeDistance;
+	vec3 Barycentric;
 } Fragment;
 
 flat in vec3 FragmentNormal;
@@ -138,7 +138,7 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 // Calculate the colour of a pixel in wireframe mode by finding the minimum distance to an edge,
 // and adding an edge of a different colour.
 //
-vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth, vec3 edgeColour, float edgeWidth, float viewDistance, float maxDistance )
+vec4 CalculateWireframe( vec3 barycentric, vec3 wireColour, float wireWidth, vec3 edgeColour, float edgeWidth, float viewDistance, float maxDistance )
 {
 	vec4 colour = vec4( 0.0 );
 
@@ -148,8 +148,8 @@ vec4 CalculateWireframe( vec3 triangle, vec3 wireColour, float wireWidth, vec3 e
 	wireWidth = mix( wireWidth, 0.0, viewDistance / maxDistance );
 	edgeWidth = mix( edgeWidth, 0.0, viewDistance / maxDistance );
 
-	vec3 d = fwidth( triangle );
-	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, triangle );
+	vec3 d = fwidth( barycentric );
+	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, barycentric );
 	float t = min( min( tdist.x, tdist.y ), tdist.z );
 
 	float edge_ratio = edgeWidth / wireWidth;
@@ -207,7 +207,7 @@ void main()
 
 	if( Wireframe.Enabled )
 	{
-		vec4 wireColour = CalculateWireframe( Fragment.WireframeDistance, Wireframe.Colour, Wireframe.Width, 
+		vec4 wireColour = CalculateWireframe( Fragment.Barycentric, Wireframe.Colour, Wireframe.Width, 
 			Wireframe.EdgeColour, Wireframe.EdgeWidth, viewDistance, Wireframe.MaxDistance );
 
 		finalColour = mix( finalColour, wireColour, wireColour.a );

@@ -25,61 +25,61 @@ namespace dd
 	{
 		//  X  Y  Z       
 		// bottom
-		glm::vec3( 0.5f,0.0f,0.0f ),   
-		glm::vec3( -0.5f,0.0f,0.0f ),  
-		glm::vec3( -0.5f,0.0f,1.0f ),  
-		glm::vec3( 0.5f,0.0f,1.0f ),   
-		glm::vec3( 0.5f,0.0f,0.0f ),   
-		glm::vec3( -0.5f,0.0f,1.0f ),  
+		glm::vec3( 0.5f,	0.0f,	0.0f ),   
+		glm::vec3( -0.5f,	0.0f,	0.0f ),  
+		glm::vec3( -0.5f,	0.0f,	1.0f ),  
+		glm::vec3( 0.5f,	0.0f,	1.0f ),   
+		glm::vec3( 0.5f,	0.0f,	0.0f ),   
+		glm::vec3( -0.5f,	0.0f,	1.0f ),  
 
 		// left
-		glm::vec3( -0.5f,1.0f,0.0f ),
-		glm::vec3( -0.5f,0.0f,1.0f ),
-		glm::vec3( -0.5f,0.0f,0.0f ),
-		glm::vec3( -0.5f,1.0f,1.0f ),
-		glm::vec3( -0.5f,0.0f,1.0f ),
-		glm::vec3( -0.5f,1.0f,0.0f ),
+		glm::vec3( -0.5f,	1.0f,	0.0f ),
+		glm::vec3( -0.5f,	0.0f,	1.0f ),
+		glm::vec3( -0.5f,	0.0f,	0.0f ),
+		glm::vec3( -0.5f,	1.0f,	1.0f ),
+		glm::vec3( -0.5f,	0.0f	,1.0f ),
+		glm::vec3( -0.5f,	1.0f,	0.0f ),
 
 		// right
-		glm::vec3( 0.5f,0.0f,0.0f ),
-		glm::vec3( 0.5f,0.0f,1.0f ),
-		glm::vec3( 0.5f,1.0f,0.0f ),
-		glm::vec3( 0.5f,1.0f,0.0f ),
-		glm::vec3( 0.5f,0.0f,1.0f ),
-		glm::vec3( 0.5f,1.0f,1.0f ),
+		glm::vec3( 0.5f,	0.0f,	0.0f ),
+		glm::vec3( 0.5f,	0.0f,	1.0f ),
+		glm::vec3( 0.5f,	1.0f,	0.0f ),
+		glm::vec3( 0.5f,	1.0f,	0.0f ),
+		glm::vec3( 0.5f,	0.0f,	1.0f ),
+		glm::vec3( 0.5f,	1.0f,	1.0f ),
 	};
 
-	static const ConstBuffer<glm::vec3> s_trenchChunkPositionBuffer( s_trenchChunkPositions, sizeof( s_trenchChunkPositions ) / sizeof( glm::vec3 ) );
+	static const ConstBuffer<glm::vec3> s_trenchChunkPositionBuffer( s_trenchChunkPositions, ArrayLength( s_trenchChunkPositions ) );
 
 	static const glm::vec3 s_trenchChunkNormals[] =
 	{
 		// X	Y     Z
 		// bottom
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
-		glm::vec3( 0.0f, 1.0f, 0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3( 0.0f,	1.0f,	0.0f ),
 
 		// left
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
-		glm::vec3( 1.0f, 0.0f, 0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3( 1.0f,	0.0f,	0.0f ),
 
 		// right
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
-		glm::vec3( -1.0f, 0.0f, 0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3( -1.0f,	0.0f,	0.0f ),
 	};
 
-	static const ConstBuffer<glm::vec3> s_trenchChunkNormalBuffer( s_trenchChunkNormals, sizeof( s_trenchChunkNormals ) / sizeof( glm::vec3 ) );
+	static const ConstBuffer<glm::vec3> s_trenchChunkNormalBuffer( s_trenchChunkNormals, ArrayLength( s_trenchChunkNormals ) );
 
 	/*
 	DATA:

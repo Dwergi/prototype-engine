@@ -65,7 +65,7 @@ namespace dd
 		glm::vec3( 1.0f,	1.0f,	1.0f ),
 	};
 
-	static dd::ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, sizeof( s_unitCubePositions ) / sizeof( s_unitCubePositions[0] ) );
+	static dd::ConstBuffer<glm::vec3> s_unitCubePositionsBuffer( s_unitCubePositions, ArrayLength( s_unitCubePositions ) );
 
 	static const glm::vec3 s_unitCubeNormals[] =
 	{
@@ -118,7 +118,7 @@ namespace dd
 		glm::vec3( 1.0f, 0.0f, 0.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, sizeof( s_unitCubeNormals ) / sizeof( s_unitCubeNormals[0] ) );
+	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, ArrayLength( s_unitCubeNormals ) );
 
 	static const glm::vec2 s_unitCubeUVs[] =
 	{
@@ -172,7 +172,7 @@ namespace dd
 		glm::vec2( 0.0f, 1.0f ),
 	};
 
-	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, sizeof( s_unitCubeUVs ) / sizeof( s_unitCubeUVs[0] ) );
+	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, ArrayLength( s_unitCubeUVs ) );
 
 	// reference: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 	// https://github.com/caosdoar/spheres/blob/master/src/spheres.cpp
@@ -331,6 +331,7 @@ namespace dd
 	{
 		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
 
+		DD_TODO( "Are normals really necessary?" );
 		if( s_normalLODs.empty() )
 		{
 			std::vector<glm::vec3>& normals = s_normalLODs.emplace_back();
@@ -450,7 +451,7 @@ namespace dd
 	{
 		mesh.SetPositions( s_unitCubePositionsBuffer );
 		mesh.SetNormals( s_unitCubeNormalsBuffer );
-		//SetUVs( s_unitCubeUVsBuffer );
+		mesh.SetUVs( s_unitCubeUVsBuffer );
 
 		dd::AABB bounds;
 		bounds.Expand( glm::vec3( 0, 0, 0 ) );
@@ -467,7 +468,7 @@ namespace dd
 		glm::vec3( 1.0f,	0.0f,	1.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_quadPositionsBuffer( s_quadPositions, sizeof( s_quadPositions ) / sizeof( s_quadPositions[0] ) );
+	static const dd::ConstBuffer<glm::vec3> s_quadPositionsBuffer( s_quadPositions, ArrayLength( s_quadPositions ) );
 
 	static const glm::vec3 s_quadNormals[] = {
 		glm::vec3( 0.0f,	1.0f,	0.0f ),
@@ -478,7 +479,7 @@ namespace dd
 		glm::vec3( 0.0f,	1.0f,	0.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_quadNormalsBuffer( s_quadNormals, sizeof( s_quadNormals ) / sizeof( s_quadNormals[0] ) );
+	static const dd::ConstBuffer<glm::vec3> s_quadNormalsBuffer( s_quadNormals, ArrayLength( s_quadNormals ) );
 
 	void MakeQuad( ddr::Mesh& mesh )
 	{
