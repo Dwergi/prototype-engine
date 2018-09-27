@@ -76,21 +76,21 @@ namespace dd
 		m_scrollPosition = m_tempScrollPosition;
 		m_tempScrollPosition.Delta = glm::vec2();
 
-		m_currentEvents.Swap( m_pendingEvents );
-		m_pendingEvents.Clear();
+		m_currentKeyEvents = m_pendingKeyEvents;
+		m_pendingKeyEvents.Clear();
+
+		m_currentMouseEvents = m_pendingMouseEvents;
+		m_pendingMouseEvents.Clear();
 	}
 
-	bool Input::GetKeyEvents( IArray<InputEvent>& events ) const
+	void Input::GetKeyEvents( IArray<InputEvent>& events ) const
 	{
-		for( int i = 0; i < m_currentEvents.Size(); ++i )
-		{
-			if( events.Size() == events.Capacity() )
-				return false;
+		events = m_currentKeyEvents;
+	}
 
-			events.Push( m_currentEvents[i] );
-		}
-
-		return true;
+	void Input::GetMouseEvents( IArray<InputEvent>& events ) const
+	{
+		events = m_currentMouseEvents;
 	}
 
 	InputType Input::GetEventType( int action )
@@ -130,9 +130,10 @@ namespace dd
 
 		if( event_type != InputType::NONE && event_action != InputAction::NONE )
 		{
-			InputEvent& new_event = m_pInstance->m_pendingEvents.Allocate();
+			InputEvent new_event;
 			new_event.Action = event_action;
 			new_event.Type = event_type;
+			m_pInstance->m_pendingKeyEvents.Add( new_event );
 		}
 
 		// we didn't handle it, maybe someone else will
@@ -149,9 +150,10 @@ namespace dd
 
 		if( event_type != InputType::NONE && event_action != InputAction::NONE )
 		{
-			InputEvent& new_event = m_pInstance->m_pendingEvents.Allocate();
+			InputEvent new_event;
 			new_event.Action = event_action;
 			new_event.Type = event_type;
+			m_pInstance->m_pendingMouseEvents.Add( new_event );
 		}
 
 		for( GLFWmousebuttonfun fn : m_pInstance->m_mouseButtonCallbacks )

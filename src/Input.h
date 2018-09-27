@@ -79,10 +79,8 @@ namespace dd
 		void CaptureMouse( bool capture );
 		bool IsMouseCaptured() const { return m_mouseCaptured; }
 
-		// get all key events received in the last update
-		// returns true if the output array successfully contained all of them
-		// otherwise fills the array with Capacity() events and returns false
-		bool GetKeyEvents( IArray<InputEvent>& out ) const;
+		void GetKeyEvents( IArray<InputEvent>& out ) const;
+		void GetMouseEvents( IArray<InputEvent>& out ) const;
 
 		void BindKey( char c, InputAction action );
 		void BindKey( Key k, InputAction action );
@@ -108,8 +106,13 @@ namespace dd
 
 		bool m_mouseCaptured;
 
-		Vector<InputEvent> m_pendingEvents;
-		Vector<InputEvent> m_currentEvents;
+		static const int MAX_EVENTS = 32;
+
+		Array<InputEvent, MAX_EVENTS> m_pendingKeyEvents;
+		Array<InputEvent, MAX_EVENTS> m_currentKeyEvents;
+
+		Array<InputEvent, MAX_EVENTS> m_pendingMouseEvents;
+		Array<InputEvent, MAX_EVENTS> m_currentMouseEvents;
 
 		Vector<KeyboardCallbackFunction> m_keyboardCallbacks;
 		Vector<MouseButtonCallbackFunction> m_mouseButtonCallbacks;

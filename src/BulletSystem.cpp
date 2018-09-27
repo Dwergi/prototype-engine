@@ -27,7 +27,7 @@ namespace dd
 		m_camera( camera ),
 		m_hitTest( hit_test )
 	{
-		m_speed = 20;
+		m_speed = 50;
 		m_colour = glm::vec3( 1, 0, 0 );
 		m_intensity = 0.5f;
 		m_scale = 0.1f;

@@ -188,9 +188,19 @@ void UpdateInput( Input& input, InputBindings& bindings )
 	input.Update();
 
 	// update input
-	Array<InputEvent, 64> events;
-	input.GetKeyEvents( events );
-	bindings.Dispatch( events );
+	if( !ImGui::GetIO().WantCaptureKeyboard )
+	{
+		Array<InputEvent, 64> events;
+		input.GetKeyEvents( events );
+		bindings.Dispatch( events );
+	}
+
+	if( !ImGui::GetIO().WantCaptureMouse )
+	{
+		Array<InputEvent, 64> events;
+		input.GetMouseEvents( events );
+		bindings.Dispatch( events );
+	}
 }
 
 void CheckAssert()
