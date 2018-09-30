@@ -4,7 +4,7 @@
 // April 13th 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "Mesh.h"
 
 #include "BVHTree.h"

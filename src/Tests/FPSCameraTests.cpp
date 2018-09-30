@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "catch2/catch.hpp"
 
 #include "Math_dd.h"

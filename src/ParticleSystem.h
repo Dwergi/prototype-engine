@@ -18,8 +18,8 @@
 
 namespace dd
 {
-	class ICamera;
-	class InputBindings;
+	struct ICamera;
+	struct InputBindings;
 }
 
 namespace ddc
@@ -40,16 +40,16 @@ namespace ddr
 		virtual void Render( const ddr::RenderData& data );
 
 	private:
-		glm::vec3 m_positions[ dd::MaxParticles ];
+		glm::vec3 m_positions[ dd::MAX_PARTICLES ];
 		VBO m_vboPosition;
 
-		glm::vec2 m_sizes[ dd::MaxParticles ];
+		glm::vec2 m_sizes[ dd::MAX_PARTICLES ];
 		VBO m_vboSizes;
 
-		glm::vec4 m_colours[ dd::MaxParticles ];
+		glm::vec4 m_colours[ dd::MAX_PARTICLES ];
 		VBO m_vboColours;
 
-		dd::Particle m_tempBuffer[ dd::MaxParticles ];
+		dd::Particle m_tempBuffer[ dd::MAX_PARTICLES ];
 	};
 
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
@@ -72,7 +72,7 @@ namespace ddr
 
 	private:
 
-		int CurrentMaxParticles { 1000 };
+		int CurrentMAX_PARTICLES { 1000 };
 
 		bool m_killAllParticles { false };
 		bool m_startEmitting { false };

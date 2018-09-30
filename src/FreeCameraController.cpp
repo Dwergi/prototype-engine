@@ -4,13 +4,11 @@
 // April 12th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "FreeCameraController.h"
 
 #include "FPSCamera.h"
 #include "InputBindings.h"
-
-
 
 namespace dd
 {

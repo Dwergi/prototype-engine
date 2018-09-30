@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ScriptSystem.h"
 
 #include "ScriptComponent.h"

@@ -10,10 +10,8 @@ namespace ddr
 {
 	struct Frustum;
 
-	class ICamera
+	struct ICamera
 	{
-	public:
-
 		//
 		// Get the projection matrix of the camera.
 		//

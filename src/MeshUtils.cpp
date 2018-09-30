@@ -4,7 +4,7 @@
 // September 25th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "MeshUtils.h"
 
 #include "Mesh.h"
@@ -331,7 +331,6 @@ namespace dd
 	{
 		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
 
-		DD_TODO( "Are normals really necessary?" );
 		if( s_normalLODs.empty() )
 		{
 			std::vector<glm::vec3>& normals = s_normalLODs.emplace_back();

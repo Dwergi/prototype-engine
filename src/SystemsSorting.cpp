@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "SystemsSorting.h"
 
 #include "System.h"
@@ -147,7 +147,7 @@ namespace ddc
 
 						for( const DataRequest* other_req : other_system->GetRequests() )
 						{
-							if( other_req->Component().ID == req->Component().ID &&
+							if( other_req->Component().ComponentID() == req->Component().ComponentID() &&
 								other_req->Usage() == DataUsage::Read )
 							{
 								SystemNode::Edge edge;

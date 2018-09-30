@@ -4,7 +4,7 @@
 // September 13th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "BoundBoxComponent.h"
 
-DD_COMPONENT_CPP( dd::BoundBoxComponent );
+DD_TYPE_CPP( dd::BoundBoxComponent );

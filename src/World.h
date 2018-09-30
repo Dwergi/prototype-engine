@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ComponentType.h"
+
 #include "Entity.h"
 #include "FunctionView.h"
 #include "IDebugPanel.h"
@@ -24,7 +24,8 @@ namespace ddc
 		Visible = 1,
 		Focused = 2,
 		Selected = 3,
-		Static = 4
+		Static = 4,
+		Dynamic = 5
 	};
 
 	struct System;
@@ -89,7 +90,7 @@ namespace ddc
 		//
 		// Access a component from the given entity by type ID.
 		//
-		void* AccessComponent( Entity entity, TypeID id ) const;
+		void* AccessComponent( Entity entity, dd::ComponentID id ) const;
 
 		//
 		// Access a component from the given entity.
@@ -97,7 +98,9 @@ namespace ddc
 		template <typename T>
 		T* Access( Entity entity ) const
 		{
-			return reinterpret_cast<T*>(AccessComponent( entity, T::Type.ID ));
+			const dd::TypeInfo* type = DD_TYPE( T );
+
+			return reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
 		}
 
 		//
@@ -106,14 +109,16 @@ namespace ddc
 		template <typename T>
 		bool Access( Entity entity, T*& cmp ) const
 		{
-			cmp = reinterpret_cast<T*>(AccessComponent( entity, T::Type.ID ));
+			const dd::TypeInfo* type = DD_TYPE( T );
+
+			cmp = reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
 			return cmp != nullptr;
 		}
 
 		//
 		// Get a component from the given entity.
 		//
-		const void* GetComponent( Entity entity, TypeID id ) const;
+		const void* GetComponent( Entity entity, dd::ComponentID id ) const;
 
 		//
 		// Get a component from the given entity.
@@ -121,13 +126,15 @@ namespace ddc
 		template <typename T>
 		const T* Get( Entity entity ) const
 		{
-			return reinterpret_cast<const T*>(GetComponent( entity, T::Type.ID ));
+			const dd::TypeInfo* type = DD_TYPE( T );
+
+			return reinterpret_cast<const T*>(GetComponent( entity, type->ComponentID() ));
 		}
 
 		//
 		// Does the given entity have a component of the given type ID?
 		//
-		bool HasComponent( Entity entity, TypeID id ) const;
+		bool HasComponent( Entity entity, dd::ComponentID id ) const;
 
 		//
 		// Does the given entity have a component of the given type?
@@ -135,13 +142,15 @@ namespace ddc
 		template <typename T>
 		bool Has( Entity entity ) const
 		{
-			return HasComponent( entity, T::Type.ID );
+			const dd::TypeInfo* type = DD_TYPE( T );
+
+			return HasComponent( entity, type->ComponentID() );
 		}
 
 		//
 		// Add a component to the given entity of the given type ID.
 		//
-		void* AddComponent( Entity entity, TypeID id );
+		void* AddComponent( Entity entity, dd::ComponentID id );
 
 		//
 		// Add a component to the given entity of the given type.
@@ -149,13 +158,15 @@ namespace ddc
 		template <typename T>
 		T& Add( Entity entity )
 		{
-			return *reinterpret_cast<T*>(AddComponent( entity, T::Type.ID ));
+			const dd::TypeInfo* type = DD_TYPE( T );
+
+			return *reinterpret_cast<T*>(AddComponent( entity, type->ComponentID() ));
 		}
 
 		//
 		// Remove a component from the given entity of the given type ID.
 		//
-		void RemoveComponent( Entity entity, TypeID id );
+		void RemoveComponent( Entity entity, dd::ComponentID id );
 
 		//
 		// Remove a component from the given entity of the given type.
@@ -178,7 +189,7 @@ namespace ddc
 		//
 		// Find all entities with the given type IDs and return them in the given vector.
 		//
-		void FindAllWith( const dd::IArray<TypeID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const;
+		void FindAllWith( const dd::IArray<dd::ComponentID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const;
 
 
 		//
@@ -252,8 +263,9 @@ namespace ddc
 	template <typename T>
 	void World::ForAllWith( std::function<void( Entity, T& )> fn ) const
 	{
+		const dd::TypeInfo* type = DD_TYPE( T );
 		std::bitset<MAX_COMPONENTS> mask;
-		mask.set( T::Type.ID, true );
+		mask.set( type->ComponentID(), true );
 
 		for( uint i = 0; i < m_count; ++i )
 		{

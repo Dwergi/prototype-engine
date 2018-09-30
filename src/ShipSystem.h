@@ -14,7 +14,7 @@
 namespace dd
 {
 	class FPSCamera;
-	class InputBindings;
+	struct InputBindings;
 	class ShipComponent;
 	struct TransformComponent;
 

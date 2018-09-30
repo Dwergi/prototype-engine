@@ -4,7 +4,7 @@
 // January 14th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "TerrainParameters.h"
 
 #include "OpenGL.h"
@@ -12,7 +12,7 @@
 
 namespace dd
 {
-	void TerrainParameters::UpdateUniforms( ddr::UniformStorage& uniforms )
+	void TerrainParameters::UpdateUniforms( ddr::UniformStorage& uniforms ) const
 	{
 		for( int i = 0; i < HeightLevelCount; ++i )
 		{

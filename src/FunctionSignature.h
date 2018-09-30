@@ -11,7 +11,7 @@
 
 namespace dd
 {
-	class TypeInfo;
+	struct TypeInfo;
 
 	class FunctionSignature
 	{

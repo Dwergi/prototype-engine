@@ -4,7 +4,7 @@
 // September 18th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "LightRenderer.h"
 
 #include "BoundBoxComponent.h"
@@ -22,19 +22,19 @@ namespace ddr
 		ddr::Renderer( "Lights" )
 	{
 		Require<dd::TransformComponent>();
-		Require<ddr::LightComponent>();
+		Require<dd::LightComponent>();
 		RequireTag( ddc::Tag::Visible );
 	}
 
 	ddc::Entity CreatePointLight( ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, ddr::LightComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::LightComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
-		ddr::LightComponent* light = world.Access<ddr::LightComponent>( entity );
+		dd::LightComponent* light = world.Access<dd::LightComponent>( entity );
 		light->Ambient = 0.01f;
 		light->Colour = glm::vec3( 1, 1, 1 );
-		light->LightType = LightType::Point;
+		light->LightType = dd::LightType::Point;
 
 		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
 		transform->Transform = glm::translate( glm::vec3( 0, 20, 0 ) ) * glm::scale( glm::vec3( 0.4 ) );
@@ -67,7 +67,7 @@ namespace ddr
 
 	void LightRenderer::Render( const RenderData& data )
 	{
-		auto lights = data.Get<ddr::LightComponent>();
+		auto lights = data.Get<dd::LightComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
 		auto entities = data.Entities();
 
@@ -88,7 +88,7 @@ namespace ddr
 
 		for( size_t i = 0; i < light_count; ++i )
 		{
-			const ddr::LightComponent& light = lights[ i ];
+			const dd::LightComponent& light = lights[ i ];
 			const dd::TransformComponent& transform = transforms[ i ];
 
 			m_debugLights.push_back( entities[ i ] );
@@ -118,7 +118,7 @@ namespace ddr
 		for( size_t i = 0; i < m_debugLights.size(); ++i )
 		{
 			ddc::Entity entity = m_debugLights[i];
-			ddr::LightComponent* light = world.Access<ddr::LightComponent>( entity );
+			dd::LightComponent* light = world.Access<dd::LightComponent>( entity );
 			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
 
 			if( light == nullptr )
@@ -134,7 +134,7 @@ namespace ddr
 					
 				if( ImGui::Combo( "Type", &lightType, c_lightTypes ) )
 				{
-					light->LightType = (LightType) lightType;
+					light->LightType = (dd::LightType) lightType;
 				}
 				
 				glm::vec3 light_colour = light->Colour;
@@ -148,7 +148,7 @@ namespace ddr
 
 				glm::vec3 light_position = transform->GetPosition();
 
-				const char* positionLabel = light->LightType == LightType::Directional ? "Direction" : "Position";
+				const char* positionLabel = light->LightType == dd::LightType::Directional ? "Direction" : "Position";
 				if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
 				{
 					transform->SetPosition( light_position );

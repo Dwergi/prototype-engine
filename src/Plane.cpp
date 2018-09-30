@@ -4,18 +4,13 @@
 // November 4th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "Plane.h"
 
-#include <cmath>
+DD_TYPE_CPP( dd::Plane );
 
 namespace dd
 {
-	Plane::Plane()
-	{
-
-	}
-
 	Plane::Plane( const glm::vec4& params )
 		: Plane( params.x, params.y, params.z, params.w )
 	{
@@ -24,8 +19,8 @@ namespace dd
 
 	Plane::Plane( const glm::vec3& point, const glm::vec3& normal )
 	{
-		m_plane.xyz = glm::normalize( normal );
-		m_plane.w = -glm::dot( normal, point );
+		Parameters.xyz = glm::normalize( normal );
+		Parameters.w = -glm::dot( normal, point );
 	}
 
 	Plane::Plane( float a, float b, float c, float d )
@@ -35,8 +30,8 @@ namespace dd
 		float len = glm::length( normal );
 		normal /= len;
 
-		m_plane.xyz = normal;
-		m_plane.w = d / len;
+		Parameters.xyz = normal;
+		Parameters.w = d / len;
 	}
 
 	Plane::Plane( const glm::vec3& pt1, const glm::vec3& pt2, const glm::vec3& pt3 )
@@ -46,24 +41,19 @@ namespace dd
 
 		glm::vec3 normal = glm::normalize( glm::cross( diff2, diff1 ) );
 		
-		m_plane.xyz = normal;
-		m_plane.w = -glm::dot( normal, pt2 );
+		Parameters.xyz = normal;
+		Parameters.w = -glm::dot( normal, pt2 );
 	}
 
 	Plane::Plane( const Plane& other )
-		: m_plane( other.m_plane )
-	{
-
-	}
-
-	Plane::~Plane()
+		: Parameters( other.Parameters )
 	{
 
 	}
 
 	float Plane::DistanceTo( const glm::vec3& point ) const
 	{
-		return glm::dot( m_plane.xyz(), point ) + m_plane.w;
+		return glm::dot( Parameters.xyz(), point ) + Parameters.w;
 	}
 
 	Plane Plane::GetTransformed( const glm::mat4& transform ) const

@@ -15,7 +15,7 @@ namespace ddc
 	{
 		ComponentBuffer( const World& world, const std::vector<Entity>& entities, const DataRequest& req );
 
-		const ComponentType& Component() const { return m_request.Component(); }
+		const dd::TypeInfo& Component() const { return m_request.Component(); }
 		DataUsage Usage() const { return m_request.Usage(); }
 		const dd::String& Name() const { return m_request.Name(); }
 

@@ -21,7 +21,7 @@ struct GLFWwindow;
 
 namespace ddr
 {
-	class ICamera;
+	struct ICamera;
 	class Mesh;
 	struct ShaderProgram;
 }
@@ -32,8 +32,8 @@ namespace dd
 	struct HitState;
 
 	struct AABB;
-	class Input;
-	class InputBindings;
+	struct IInputSource;
+	struct InputBindings;
 	struct MeshComponent;
 	struct MousePosition;
 	struct RayComponent;
@@ -46,7 +46,7 @@ namespace dd
 
 		static const int DownScalingFactor = 2;
 
-		MousePicking( const Window& window, const Input& input, IAsyncHitTest& hit_test );
+		MousePicking( const Window& window, const IInputSource& input, IAsyncHitTest& hit_test );
 
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
@@ -63,7 +63,7 @@ namespace dd
 
 	private:
 
-		const Input& m_input;
+		const IInputSource& m_input;
 		const Window& m_window;
 		dd::IAsyncHitTest& m_hitTest;
 

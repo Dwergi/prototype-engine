@@ -1,4 +1,10 @@
-#include "PrecompiledHeader.h"
+//
+// ComponentBuffer.cpp
+// Copyright (C) Sebastian Nordgren 
+// September 19th 2018
+//
+
+#include "PCH.h"
 #include "ComponentBuffer.h"
 
 namespace ddc
@@ -14,16 +20,17 @@ namespace ddc
 			m_exists.reserve( m_count );
 		}
 
+		size_t component_size = req.Component().Size();
 		byte* dest = m_storage;
 
 		for( size_t i = 0; i < m_count; ++i )
 		{
-			const void* src = world.GetComponent( entities[i], req.Component().ID );
+			const void* src = world.GetComponent( entities[i], req.Component().ComponentID() );
 			DD_ASSERT( req.Optional() || src != nullptr );
 
 			if( src != nullptr )
 			{
-				memcpy( dest, src, req.Component().Size );
+				memcpy( dest, src, component_size );
 
 				if( req.Optional() )
 				{
@@ -32,7 +39,7 @@ namespace ddc
 			}
 			else
 			{
-				memset( dest, 0, req.Component().Size );
+				memset( dest, 0, component_size );
 
 				if( req.Optional() )
 				{
@@ -40,7 +47,7 @@ namespace ddc
 				}
 			}
 
-			dest += req.Component().Size;
+			dest += component_size;
 		}
 
 		DD_ASSERT( m_exists.size() == 0 || req.Optional() );

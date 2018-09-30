@@ -108,9 +108,6 @@
     <ClInclude Include="src\OctreeComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\PrecompiledHeader.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\ScopedTimer.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -137,9 +134,6 @@
     </ClInclude>
     <ClInclude Include="src\SwarmSystem.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vector4.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Vector.h">
       <Filter>Containers</Filter>
@@ -222,9 +216,6 @@
     <ClInclude Include="src\Tests\TestTypes.h">
       <Filter>Tests</Filter>
     </ClInclude>
-    <ClInclude Include="src\RefCounter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
     <ClInclude Include="src\DebugConsole.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -296,9 +287,6 @@
     </ClInclude>
     <ClInclude Include="src\PlayerComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input.h">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="src\InputAction.h">
       <Filter>Input</Filter>
@@ -489,9 +477,6 @@
     <ClInclude Include="src\Renderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\VisibilityComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\HitTest.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -570,15 +555,27 @@
     <ClInclude Include="src\ColourComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\InputSystem.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLFWInputSource.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IInputSource.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PCH.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TerrainRenderer.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
       <Filter>Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PrecompiledHeader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\TypeInfo.cpp">
       <Filter>Types</Filter>
     </ClCompile>
@@ -614,9 +611,6 @@
     </ClCompile>
     <ClCompile Include="src\SwarmSystem.cpp">
       <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vector4.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\Hash.cpp">
       <Filter>Containers</Filter>
@@ -740,12 +734,6 @@
     </ClCompile>
     <ClCompile Include="src\tests\FunctionTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\JobSystemTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input.cpp">
-      <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="src\InputBindings.cpp">
       <Filter>Input</Filter>
@@ -1004,6 +992,31 @@
     </ClCompile>
     <ClCompile Include="src\ColourComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\GLFWInputSource.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PCH.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsPlaneComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsSphereComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BulletComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OctreeComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainRenderer.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshHandle.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace dd
 
 namespace ddr
 {
-	class ICamera;
+	struct ICamera;
 	struct MeshHandle;
 	struct ShaderProgram;
 	struct UniformStorage;

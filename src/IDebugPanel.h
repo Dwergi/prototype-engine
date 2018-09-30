@@ -15,7 +15,7 @@ namespace ddc
 
 namespace dd
 {
-	class IDebugPanel
+	struct IDebugPanel
 	{
 	public:
 

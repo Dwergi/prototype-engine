@@ -6,14 +6,17 @@
 
 #pragma once
 
-#include "ComponentType.h"
-
 namespace dd
 {
 	struct ColourComponent
 	{
 		glm::vec4 Colour;
 
-		DD_COMPONENT;
+		DD_CLASS( dd::ColourComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::ColourComponent, Colour );
+		}
 	};
 }

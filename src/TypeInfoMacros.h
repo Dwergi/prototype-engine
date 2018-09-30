@@ -11,63 +11,50 @@
 
 #define UNREFERENCED(P) (P)
 
-// Introspection macros
-#define DD_REGISTER_TYPE( TypeName ) \
-	dd::TypeInfo::RegisterType<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
+// TypeInfo macros
+#define DD_REGISTER_CLASS( TypeName ) dd::TypeInfo::RegisterType<TypeName>( #TypeName )
 
-#define DD_REGISTER_POD( TypeName ) \
-	dd::TypeInfo::RegisterPOD<dd::RemoveQualifiers<TypeName>::type>( #TypeName )
+#define DD_REGISTER_POD( TypeName ) dd::TypeInfo::RegisterPOD<TypeName>( #TypeName )
 
-#define DD_REGISTER_CONTAINER( Container, Containing ) \
-	dd::TypeInfo::RegisterContainer<dd::RemoveQualifiers<Container<Containing>>::type>( #Container, DD_TYPE( Containing ) )
+#define DD_REGISTER_CONTAINER( Container, Containing ) dd::TypeInfo::RegisterContainer<dd::RemoveQualifiers<Container<Containing>>::type, Containing>( #Container )
 
-#define DD_TYPE( TypeName ) \
-	dd::TypeInfo::GetType<dd::RemoveQualifiers<TypeName>::type>()
+#define DD_TYPE( TypeName ) dd::TypeInfo::GetType<TypeName>()
 
-#define DD_TYPE_OF( Object ) \
-	dd::TypeInfo::GetType<dd::RemoveQualifiers<decltype( Object )>::type>()
+#define DD_TYPE_OF( Object ) dd::TypeInfo::GetType<dd::RemoveQualifiers<decltype(Object)>::type>()
 
-#define DD_TYPE_OF_MEMBER( TypeName, MemberName ) \
-	dd::TypeInfo::GetType<dd::RemoveQualifiers<dd::StripMemberness<decltype( &TypeName::MemberName )>::type>::type>()
+#define DD_TYPE_OF_MEMBER( TypeName, MemberName ) dd::TypeInfo::GetType<dd::RemoveQualifiers<dd::StripMemberness<decltype(&TypeName::MemberName)>::type>::type>()
 
-#define DD_OFFSET_OF( TypeName, MemberName ) \
-	((unsigned int) (&((((TypeName*) nullptr))->MemberName)))
+#define DD_OFFSET_OF( TypeName, MemberName ) ((unsigned int) (&((((TypeName*) nullptr))->MemberName)))
 
-#define DD_TYPE_STR( NameString ) \
-	dd::TypeInfo::GetType( NameString )
+#define DD_TYPE_STR( NameString ) dd::TypeInfo::GetType( NameString )
 
-#define DD_BEGIN_TYPE( TypeName ) \
-	static void RegisterMembers( dd::TypeInfo* typeInfo ) { \
+#define DD_CLASS( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo )
 
-#define DD_SCRIPT_OBJECT( TypeName ) \
-	dd::RefCounter m_refCount; \
-	DD_BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptType<TypeName, false>();
+#define DD_COMPONENT() typeInfo->RegisterComponent()
 
-#define DD_SCRIPT_STRUCT( TypeName ) \
-	DD_BEGIN_TYPE( TypeName ) \
-	typeInfo->RegisterScriptType<TypeName, true>();
+#define DD_REGISTER_PARENT( TypeName, ParentType ) dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
 
-#define DD_REGISTER_PARENT( TypeName, ParentType ) \
-	dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
+#define DD_PARENT( ParentType ) typeInfo->RegisterParentType<ParentType>()
 
-#define DD_PARENT( ParentType ) \
-	typeInfo->RegisterParentType<ParentType>();
+#define DD_MEMBER( TypeName, MemberName ) typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName )
 
-#define DD_MEMBER( TypeName, MemberName ) \
-	typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName );
+#define DD_METHOD( TypeName, MethodName ) typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
 
-#define DD_METHOD( TypeName, MethodName ) \
-	typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName );
+#define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
 
-#define DD_END_TYPE }
+#define DD_FUNCTION( FN ) dd::BuildFunction<decltype( &FN ), &FN>( &FN )
 
-#define DD_BASIC_TYPE( TypeName ) \
-	static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
+#define DD_CONCAT_IMPL( A, B ) A##B
 
-// Use this to create a function object to a template function with a comma in the type parameters, eg. add<int, float>
-// Required because it doesn't end up matching the signature of DD_FUNCTION otherwise.
-#define TEMPLATE_FUNCTION( ... ) DD_FUNCTION( __VA_ARGS__ )
+#define DD_CONCAT( A, B ) DD_CONCAT_IMPL( A, B )
 
-#define DD_FUNCTION( FN ) \
-	dd::BuildFunction<decltype( &FN ), &FN>( &FN )
+#define DD_CONCAT_NAMESPACE( A, B ) DD_CONCAT_IMPL( DD_CONCAT_IMPL( A, :: ), B )
+
+#define DD_ENUM( TypeName ) template <> void RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
+
+#define DD_ENUM_OPTION( TypeName, OptionName ) typeInfo->RegisterEnumOption( DD_CONCAT_NAMESPACE( TypeName, OptionName ), #OptionName )
+
+#define DD_TYPE_CPP( TypeName ) static dd::ClassRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
+
+#define DD_ENUM_CPP( TypeName ) static dd::EnumRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName ); \
+	template <> void dd::RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )

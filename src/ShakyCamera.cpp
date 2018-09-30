@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ShakyCamera.h"
 
 #include "FPSCamera.h"
@@ -56,18 +56,18 @@ namespace dd
 		{
 			float shake = m_trauma * m_trauma;
 
-			float extraYaw = MaximumYaw * shake * glm::simplex( glm::vec2( m_time, m_seed ) );
+			float extraYaw = MaximumYaw * shake * glm::simplex( glm::vec2( m_time, Seed ) );
 			float yaw = m_sourceCamera.GetYaw() + glm::radians( extraYaw );
 			m_yaw = dd::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
-			float extraPitch = MaximumPitch * shake * glm::simplex( glm::vec2( m_time, m_seed + 1 ) );
+			float extraPitch = MaximumPitch * shake * glm::simplex( glm::vec2( m_time, Seed + 1 ) );
 			float pitch = m_sourceCamera.GetPitch() + glm::radians( extraPitch );
 
 			const float max_pitch = glm::half_pi<float>() - 0.00001f;
 
 			m_pitch = glm::clamp( pitch, -max_pitch, max_pitch );
 
-			m_roll = glm::radians( MaximumRoll * shake * glm::simplex( glm::vec2( m_time, m_seed + 2 ) ) );
+			m_roll = glm::radians( MaximumRoll * shake * glm::simplex( glm::vec2( m_time, Seed + 2 ) ) );
 		}
 		else
 		{

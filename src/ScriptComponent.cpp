@@ -4,14 +4,7 @@
 // October 29th 2017
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ScriptComponent.h"
 
-DD_COMPONENT_CPP( dd::ScriptComponent );
-
-namespace dd
-{
-	ScriptComponent::ScriptComponent()
-	{
-	}
-}
+DD_TYPE_CPP( dd::ScriptComponent );

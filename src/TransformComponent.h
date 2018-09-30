@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
-#include "Vector4.h"
-
 namespace dd
 {
 	struct TransformComponent
@@ -20,8 +17,13 @@ namespace dd
 		void SetPosition( glm::vec3 v ) { Transform[ 3 ].xyz = v; }
 		glm::vec3 GetPosition() const { return Transform[ 3 ].xyz; }
 
-		DD_COMPONENT;
+		ALIGNED_ALLOCATORS( 16 );
 
-		ALIGNED_ALLOCATORS( 16 )
+		DD_CLASS( dd::TransformComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::TransformComponent, Transform );
+		}
 	};
 }

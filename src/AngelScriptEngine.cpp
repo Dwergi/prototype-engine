@@ -4,7 +4,7 @@
 // August 6th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "AngelScriptEngine.h"
 
 #include "angelscript/add_on/scriptmath/scriptmath.h"

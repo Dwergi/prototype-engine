@@ -35,32 +35,32 @@ namespace ddc
 		template <typename T>
 		void RequireRead( const char* name = nullptr ) 
 		{ 
-			CheckDuplicates( T::Type, DataUsage::Read, DataCardinality::Required, name );
+			CheckDuplicates( DD_TYPE( T ), DataUsage::Read, DataCardinality::Required, name );
 			m_requests.Add( new ReadRequirement<T>( name ) );
 		}
 
 		template <typename T>
 		void RequireWrite( const char* name = nullptr ) 
 		{
-			CheckDuplicates( T::Type, DataUsage::Write, DataCardinality::Required, name );
+			CheckDuplicates( DD_TYPE( T ), DataUsage::Write, DataCardinality::Required, name );
 			m_requests.Add( new WriteRequirement<T>( name ) );
 		}
 
 		template <typename T>
 		void OptionalRead( const char* name = nullptr )
 		{
-			CheckDuplicates( T::Type, DataUsage::Read, DataCardinality::Optional, name );
+			CheckDuplicates( DD_TYPE( T ), DataUsage::Read, DataCardinality::Optional, name );
 			m_requests.Add( new ReadOptional<T>( name ) );
 		}
 
 		template <typename T>
 		void OptionalWrite( const char* name = nullptr )
 		{
-			CheckDuplicates( T::Type, DataUsage::Write, DataCardinality::Optional, name );
+			CheckDuplicates( DD_TYPE( T ), DataUsage::Write, DataCardinality::Optional, name );
 			m_requests.Add( new WriteOptional<T>( name ) );
 		}
 
-		bool CheckDuplicates( const ComponentType& component, DataUsage usage, DataCardinality cardinality, const char* name ) const;
+		bool CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const;
 
 		void RequireTag( Tag tag, const char* name = nullptr );
 

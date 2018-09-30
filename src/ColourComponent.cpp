@@ -4,7 +4,7 @@
 // September 25th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ColourComponent.h"
 
-DD_COMPONENT_CPP( dd::ColourComponent );
+DD_TYPE_CPP( dd::ColourComponent );

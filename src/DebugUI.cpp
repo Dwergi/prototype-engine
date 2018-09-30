@@ -4,7 +4,7 @@
 // October 6th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "DebugUI.h"
 
 // GL3W/GLFW
@@ -17,12 +17,10 @@
 #include <GLFW/glfw3native.h>
 #endif
 
-
-
 #include "File.h"
 #include "GLError.h"
 #include "IDebugPanel.h"
-#include "Input.h"
+#include "GLFWInputSource.h"
 #include "Window.h"
 
 #include <algorithm>
@@ -290,7 +288,7 @@ namespace dd
 		return true;
 	}
 
-	DebugUI::DebugUI( Window& window, Input& input )
+	DebugUI::DebugUI( Window& window, GLFWInputSource& input )
 	{
 		m_input = &input;
 		m_window = &window;

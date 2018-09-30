@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
-
 namespace dd
 {
 	class PlayerComponent
@@ -17,9 +15,9 @@ namespace dd
 		PlayerComponent() {}
 		virtual ~PlayerComponent() {}
 
-		DD_COMPONENT;
-
-		DD_BEGIN_TYPE( PlayerComponent )
-		DD_END_TYPE
+		DD_CLASS( dd::PlayerComponent )
+		{
+			DD_COMPONENT();
+		}
 	};
 }

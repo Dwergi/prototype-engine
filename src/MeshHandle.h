@@ -18,7 +18,7 @@ namespace ddr
 
 		bool IsValid() const { return m_id != ~0u; }
 
-		DD_BASIC_TYPE( MeshHandle )
+		DD_BASIC_TYPE( MeshHandle );
 
 	private:
 		friend class Mesh;

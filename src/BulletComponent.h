@@ -1,6 +1,11 @@
+//
+// PhysicsPlaneComponent.h
+// Copyright (C) Sebastian Nordgren 
+// September 19th 2018
+//
+
 #pragma once
 
-#include "ComponentType.h"
 #include "HitResult.h"
 
 namespace dd
@@ -17,6 +22,15 @@ namespace dd
 		
 		HitHandle PendingHit; 
 		
-		DD_COMPONENT;
+		DD_CLASS( dd::BulletComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::BulletComponent, Velocity );
+			DD_MEMBER( dd::BulletComponent, HitPosition );
+			DD_MEMBER( dd::BulletComponent, Age );
+			DD_MEMBER( dd::BulletComponent, Lifetime );
+			DD_MEMBER( dd::BulletComponent, PendingHit );
+		}
 	};
 }

@@ -39,21 +39,12 @@ namespace dd
 		//
 		// Register type T to be handled by value or by reference.
 		//
-		template <typename T, bool>
+		template <typename T>
 		struct RegisterTypeForwarder
 		{
 			static void Register( dd::AngelScriptEngine* ptr )
 			{
 				ptr->RegisterObject<T>();
-			}
-		};
-
-		template <typename T>
-		struct RegisterTypeForwarder<T, true>
-		{
-			static void Register( dd::AngelScriptEngine* ptr )
-			{
-				ptr->RegisterStruct<T>();
 			}
 		};
 
@@ -106,36 +97,14 @@ namespace dd
 		}
 	}
 
-	template <typename T, bool byValue>
+	template <typename T>
 	void AngelScriptEngine::RegisterType()
 	{
-		ASInternal::RegisterTypeForwarder<T, byValue>::Register( this );
+		ASInternal::RegisterTypeForwarder<T>::Register( this );
 	}
 	
 	template <typename T>
 	void AngelScriptEngine::RegisterObject()
-	{
-		const TypeInfo* typeInfo = DD_TYPE( T );
-		DD_ASSERT( typeInfo->IsRegistered() );
-
-		int res = m_engine->RegisterObjectType( typeInfo->Name().c_str(), 0, asOBJ_REF );
-		DD_ASSERT( res >= 0 );
-
-		String32 strSig( typeInfo->Name().c_str() );
-		strSig += "@ Factory()";
-
-		res = m_engine->RegisterObjectBehaviour( typeInfo->Name().c_str(), asBEHAVE_FACTORY, strSig.c_str(), asFUNCTION( ASInternal::Factory<T> ), asCALL_CDECL );
-		DD_ASSERT( res >= 0 );
-
-		res = m_engine->RegisterObjectBehaviour( typeInfo->Name().c_str(), asBEHAVE_ADDREF, "void Increment()", asMETHOD( RefCounter, Increment ), asCALL_THISCALL );
-		DD_ASSERT( res >= 0 );
-
-		res = m_engine->RegisterObjectBehaviour( typeInfo->Name().c_str(), asBEHAVE_RELEASE, "void Decrement()", asMETHOD( RefCounter, Decrement ), asCALL_THISCALL );
-		DD_ASSERT( res >= 0 );
-	}
-
-	template <typename T>
-	void AngelScriptEngine::RegisterStruct()
 	{
 		const TypeInfo* typeInfo = DD_TYPE( T );
 		DD_ASSERT( typeInfo->IsRegistered() );

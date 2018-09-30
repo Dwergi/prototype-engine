@@ -1,22 +1,21 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "DataRequest.h"
-
-#include "ComponentType.h"
-#include "System.h"
 
 namespace ddc
 {
-	DataRequest::DataRequest( const ComponentType& component, DataUsage usage, DataCardinality cardinality, const char* name ) :
-		m_component( &component ),
+	DataRequest::DataRequest( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) :
+		m_component( component ),
 		m_usage( usage ),
 		m_cardinality( cardinality )
 	{
+		DD_ASSERT( component != nullptr );
+
 		if( name != nullptr )
 		{
 			m_name = name;
 		}
 
-		m_buffer = new byte[ component.Size * MAX_ENTITIES ];
+		m_buffer = new byte[ component->Size() * MAX_ENTITIES ];
 	}
 
 	DataRequest::DataRequest( const DataRequest& other )

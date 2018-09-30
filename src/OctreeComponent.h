@@ -17,8 +17,11 @@ namespace dd
 
 		OctreeComponent() {}
 
-		DD_BEGIN_TYPE( OctreeComponent )
-			DD_MEMBER( OctreeComponent, Entry )
-		DD_END_TYPE
+		DD_CLASS( dd::OctreeComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::OctreeComponent, Entry );
+		}
 	};
 }

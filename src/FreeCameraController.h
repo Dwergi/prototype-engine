@@ -7,12 +7,12 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Input.h"
+#include "IInputSource.h"
 
 namespace dd
 {
 	class FPSCamera;
-	class InputBindings;
+	struct InputBindings;
 
 	class FreeCameraController : public IDebugPanel
 	{

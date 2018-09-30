@@ -4,7 +4,7 @@
 // February 12th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 
 #include "CommandLine.h"
 
@@ -15,6 +15,7 @@
 #endif
 
 #include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
 #include "BoundsRenderer.h"
 #include "BulletSystem.h"
 #include "ColourComponent.h"
@@ -27,11 +28,13 @@
 #include "FreeCameraController.h"
 #include "FSM.h"
 #include "FPSCamera.h"
+#include "GLFWInputSource.h"
 #include "HitTestSystem.h"
 #include "IDebugPanel.h"
-#include "Input.h"
+#include "IInputSource.h"
 #include "InputBindings.h"
-#include "jobsystem.h"
+#include "InputSystem.h"
+#include "JobSystem.h"
 #include "LightComponent.h"
 #include "LightRenderer.h"
 #include "Material.h"
@@ -63,6 +66,7 @@
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "TerrainChunkComponent.h"
+#include "TerrainRenderer.h"
 #include "TerrainSystem.h"
 #include "Texture.h"
 #include "Timer.h"
@@ -85,7 +89,7 @@ uint s_maxFPS = 60;
 
 DebugUI* s_debugUI = nullptr;
 Window* s_window = nullptr;
-Input* s_input = nullptr;
+InputSystem* s_input = nullptr;
 ShakyCamera* s_shakyCamera = nullptr;
 FPSCamera* s_fpsCamera = nullptr;
 FreeCameraController* s_freeCamera = nullptr;
@@ -94,7 +98,7 @@ AngelScriptEngine* s_scriptEngine = nullptr;
 FrameTimer* s_frameTimer = nullptr;
 ShipSystem* s_shipSystem = nullptr;
 FSM* s_fsm = nullptr;
-InputBindings* s_inputBindings = nullptr;
+InputBindings* input_bindings = nullptr;
 DebugConsole* s_debugConsole = nullptr;
 
 ddr::WorldRenderer* s_renderer = nullptr;
@@ -181,28 +185,6 @@ void SetCameraPos( InputAction action, InputType type )
 	}
 }
 
-void UpdateInput( Input& input, InputBindings& bindings )
-{
-	DD_TODO( "Move this to an input system" );
-
-	input.Update();
-
-	// update input
-	if( !ImGui::GetIO().WantCaptureKeyboard )
-	{
-		Array<InputEvent, 64> events;
-		input.GetKeyEvents( events );
-		bindings.Dispatch( events );
-	}
-
-	if( !ImGui::GetIO().WantCaptureMouse )
-	{
-		Array<InputEvent, 64> events;
-		input.GetMouseEvents( events );
-		bindings.Dispatch( events );
-	}
-}
-
 void CheckAssert()
 {
 	if( s_assert.Open )
@@ -214,7 +196,7 @@ void CheckAssert()
 		printf( s_message.c_str() );
 		OutputDebugStringA( s_message.c_str() );
 
-		s_input->CaptureMouse( false );
+		s_input->Source().CaptureMouse( false );
 
 		if( s_debugUI->IsMidWindow() )
 		{
@@ -232,7 +214,8 @@ void CheckAssert()
 			s_frameTimer->Update();
 
 			float delta_t = s_frameTimer->AppDelta();
-			UpdateInput( *s_input, *s_inputBindings );
+
+			s_input->Update( delta_t );
 
 			s_debugUI->StartFrame( delta_t );
 
@@ -274,48 +257,18 @@ pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char*
 	return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 }
 
-void BindKeys( Input& input )
-{
-	input.BindKey( Input::Key::F1, InputAction::TOGGLE_FREECAM );
-	input.BindKey( Input::Key::F2, InputAction::TOGGLE_CONSOLE );
-	input.BindKey( Input::Key::ESCAPE, InputAction::TOGGLE_DEBUG_UI );
-	input.BindKey( 'W', InputAction::FORWARD );
-	input.BindKey( 'S', InputAction::BACKWARD );
-	input.BindKey( 'A', InputAction::LEFT );
-	input.BindKey( 'D', InputAction::RIGHT );
-	input.BindKey( ' ', InputAction::UP );
-	input.BindKey( 'R', InputAction::ADD_MINOR_TRAUMA );
-	input.BindKey( 'T', InputAction::ADD_MAJOR_TRAUMA );
-	//input.BindKey( 'P', InputAction::TOGGLE_PICKING );
-	input.BindKey( Input::Key::LCTRL, InputAction::DOWN );
-	input.BindKey( Input::Key::LSHIFT, InputAction::BOOST );
-	//input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SELECT_MESH );
-	input.BindMouseButton( Input::MouseButton::LEFT, InputAction::SHOOT );
-	input.BindKey( Input::Key::PAUSE, InputAction::BREAK );
-	input.BindKey( 'E', InputAction::START_PARTICLE );
-	input.BindKey( 'P', InputAction::RESET_PHYSICS );
-
-	input.BindKey( '1', InputAction::CAMERA_POS_1 );
-	input.BindKey( '2', InputAction::CAMERA_POS_2 );
-	input.BindKey( '3', InputAction::CAMERA_POS_3 );
-	input.BindKey( '4', InputAction::CAMERA_POS_4 );
-
-	input.BindKey( Input::Key::HOME, InputAction::DECREASE_DEPTH );
-	input.BindKey( Input::Key::END, InputAction::INCREASE_DEPTH );
-}
-
-void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Input& input, float delta_t )
+void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, InputSystem& input, float delta_t )
 {
 	bool captureMouse = !s_debugUI->Draw();
-	if( captureMouse != input.IsMouseCaptured() )
+	if( captureMouse != input.Source().IsMouseCaptured() )
 	{
-		input.CaptureMouse( captureMouse );
+		input.Source().CaptureMouse( captureMouse );
 	}
 
 	if( captureMouse )
 	{
-		free_cam.UpdateMouse( input.GetMousePosition() );
-		free_cam.UpdateScroll( input.GetScrollPosition() );
+		free_cam.UpdateMouse( input.Source().GetMousePosition() );
+		free_cam.UpdateScroll( input.Source().GetScrollPosition() );
 		free_cam.Update( delta_t );
 	}
 
@@ -436,6 +389,7 @@ ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 
 	ddc::Entity entity = CreateMeshEntity( *s_world, mesh_h, colour,
 		glm::translate( translation ) * glm::rotate( glm::radians( 45.0f ), glm::vec3( 0, 1, 0 ) ) * glm::scale( glm::vec3( size ) ) );
+	s_world->AddTag( entity, ddc::Tag::Dynamic );
 
 	dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( entity );
 	physics_sphere.Sphere.Radius = size;
@@ -449,6 +403,11 @@ int GameMain()
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME( "Main" );
 
+	dd::TypeInfo::SetScriptEngine( new dd::AngelScriptEngine() );
+
+	dd::TypeInfo::RegisterDefaultTypes();
+	dd::TypeInfo::RegisterQueuedTypes();
+
 	unsigned int threads = std::thread::hardware_concurrency();
 	JobSystem jobsystem( threads - 1 );
 
@@ -456,23 +415,25 @@ int GameMain()
 
 	{
 		s_window = new Window( glm::ivec2( 1920, 1080 ), "DD" );
-		s_input = new Input( *s_window );
 
-		s_inputBindings = new InputBindings();
-		s_inputBindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
-		s_inputBindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
-		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
-		s_inputBindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
-		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_1, &SetCameraPos );
-		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_2, &SetCameraPos );
-		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_3, &SetCameraPos );
-		s_inputBindings->RegisterHandler( InputAction::CAMERA_POS_4, &SetCameraPos );
-		s_inputBindings->RegisterHandler( InputAction::INCREASE_DEPTH, &SetCameraPos );
-		s_inputBindings->RegisterHandler( InputAction::DECREASE_DEPTH, &SetCameraPos );
+		GLFWInputSource* input_source = new GLFWInputSource( *s_window );
 
-		BindKeys( *s_input );
+		InputBindings* input_bindings = new InputBindings();
+		input_bindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
+		input_bindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
+		input_bindings->RegisterHandler( InputAction::EXIT, &Exit );
+		input_bindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_1, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_2, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_3, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_4, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::INCREASE_DEPTH, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::DECREASE_DEPTH, &SetCameraPos );
 
-		s_debugUI = new DebugUI( *s_window, *s_input );
+		s_input = new InputSystem( *input_source, *input_bindings );
+		s_input->BindKeys();
+
+		s_debugUI = new DebugUI( *s_window, *input_source );
 
 		//SwarmSystem swarm_system;
 
@@ -483,15 +444,15 @@ int GameMain()
 		s_fpsCamera->SetPosition( glm::vec3( 0, 20, 0 ) );
 		s_fpsCamera->SetRotation( 0, 0 );
 
-		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *s_inputBindings );
+		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *input_bindings );
 		
 		s_freeCamera = new FreeCameraController( *s_fpsCamera );
-		s_freeCamera->BindActions( *s_inputBindings );
+		s_freeCamera->BindActions( *input_bindings );
 
 		HitTestSystem* hit_testing = new HitTestSystem();
 
-		MousePicking* mouse_picking = new MousePicking( *s_window, *s_input, *hit_testing );
-		mouse_picking->BindActions( *s_inputBindings );
+		MousePicking* mouse_picking = new MousePicking( *s_window, *input_source, *hit_testing );
+		mouse_picking->BindActions( *input_bindings );
 
 		PhysicsSystem* physics_system = new PhysicsSystem();
 		
@@ -504,10 +465,10 @@ int GameMain()
 
 		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
 		bullet_system->DependsOn( *hit_testing );
-		bullet_system->BindActions( *s_inputBindings );
+		bullet_system->BindActions( *input_bindings );
 
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
-		particle_system->BindActions( *s_inputBindings );
+		particle_system->BindActions( *input_bindings );
 
 		s_world = new ddc::World( jobsystem );
 
@@ -529,9 +490,11 @@ int GameMain()
 
 		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 
+		ddr::TerrainRenderer* terrain_renderer = new ddr::TerrainRenderer( terrain_system->GetTerrainParameters() );
+
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *light_renderer );
-		s_renderer->Register( *terrain_system );
+		s_renderer->Register( *terrain_renderer );
 		s_renderer->Register( *particle_renderer );
 		s_renderer->Register( *mesh_renderer );
 		s_renderer->Register( *bounds_renderer );
@@ -565,11 +528,11 @@ int GameMain()
 
 		// dir light
 		{
-			ddc::Entity entity = s_world->CreateEntity<ddr::LightComponent, dd::TransformComponent>();
+			ddc::Entity entity = s_world->CreateEntity<dd::LightComponent, dd::TransformComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
 
-			ddr::LightComponent* light = s_world->Access<ddr::LightComponent>( entity );
-			light->LightType = ddr::LightType::Directional;
+			dd::LightComponent* light = s_world->Access<dd::LightComponent>( entity );
+			light->LightType = dd::LightType::Directional;
 			light->Colour = glm::vec3( 1, 1, 1 );
 			light->Intensity = 0.7;
 
@@ -579,11 +542,11 @@ int GameMain()
 		}
 
 		{
-			ddc::Entity entity = s_world->CreateEntity<ddr::LightComponent, dd::TransformComponent>();
+			ddc::Entity entity = s_world->CreateEntity<dd::LightComponent, dd::TransformComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
 
-			ddr::LightComponent* light = s_world->Access<ddr::LightComponent>( entity );
-			light->LightType = ddr::LightType::Point;
+			dd::LightComponent* light = s_world->Access<dd::LightComponent>( entity );
+			light->LightType = dd::LightType::Point;
 			light->Colour = glm::vec3( 1, 1, 1 );
 			light->Intensity = 3;
 			light->Ambient = 0.01;
@@ -608,8 +571,8 @@ int GameMain()
 			bounds->LocalBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
-			particle->m_age = 0;
-			particle->m_lifetime = 1000;*/
+			particle->Age = 0;
+			particle->Lifetime = 1000;*/
 		}
 
 		// axes
@@ -662,17 +625,55 @@ int GameMain()
 		{
 			float sphere_size = 3;
 			
-			dd::Array<glm::vec3, 3> ball_positions;
-			ball_positions.Add( glm::vec3( -20, 60, -30 ) );
-			ball_positions.Add( glm::vec3( 0, 60, 40 ) );
-			ball_positions.Add( glm::vec3( 20, 60, -20 ) );
+			dd::Array<glm::vec3, 2> ball_positions;
+			ball_positions.Add( glm::vec3( 0, 60, -30 ) );
+			ball_positions.Add( glm::vec3( 0, 60, 30 ) );
 
-			dd::Array<ddc::Entity, 3> balls;
+			dd::Array<ddc::Entity, 2> balls;
 			balls.Add( CreateBall( ball_positions[0], glm::vec4( 0.2, 0.2, 0.8, 1 ), sphere_size ) );
-			balls.Add( CreateBall( ball_positions[1], glm::vec4( 0.95, 0.95, 0.95, 1 ), sphere_size ) );
-			balls.Add( CreateBall( ball_positions[2], glm::vec4( 0.8, 0.2, 0.8, 1 ), sphere_size ) );
+			balls.Add( CreateBall( ball_positions[1], glm::vec4( 0.8, 0.2, 0.8, 1 ), sphere_size ) );
 
-			float plane_size = 100;
+			{
+				float static_sphere_size = 100;
+
+				{
+					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, 0 ) ) *
+						glm::scale( glm::vec3( static_sphere_size ) );
+
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					s_world->AddTag( sphere, ddc::Tag::Static );
+
+					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Elasticity = 0.95f;
+				}
+
+				{
+					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, -static_sphere_size * 1.3f ) ) *
+						glm::scale( glm::vec3( static_sphere_size ) );
+
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					s_world->AddTag( sphere, ddc::Tag::Static );
+
+					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Elasticity = 0.95f;
+				}
+
+				{
+					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, static_sphere_size * 1.3f ) ) *
+						glm::scale( glm::vec3( static_sphere_size ) );
+
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					s_world->AddTag( sphere, ddc::Tag::Static );
+
+					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Elasticity = 0.95f;
+				}
+			}
+
+			/*float plane_size = 100;
 
 			{
 				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
@@ -698,10 +699,10 @@ int GameMain()
 				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
 				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
 				physics_plane.Elasticity = 0.95f;
-			}
+			}*/
 
 			ddc::World* world = s_world;
-			s_inputBindings->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )
+			input_bindings->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )
 			{
 				if( type == InputType::RELEASED )
 				{
@@ -734,7 +735,7 @@ int GameMain()
 
 			float delta_t = s_frameTimer->GameDelta();
 
-			UpdateInput( *s_input, *s_inputBindings );
+			s_input->Update( delta_t );
 			s_debugUI->StartFrame( delta_t );
 
 			s_world->Update( delta_t );

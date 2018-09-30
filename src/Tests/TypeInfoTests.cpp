@@ -4,7 +4,7 @@
 // March 23rd 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "catch2/catch.hpp"
 
 #include "TestTypes.h"
@@ -15,16 +15,17 @@ namespace Test
 	{
 		uint DerivedThing;
 
-		DD_BEGIN_TYPE( DerivedStruct )
-			DD_PARENT( SimpleStruct )
-			DD_MEMBER( DerivedStruct, DerivedThing )
-		DD_END_TYPE
+		DD_CLASS( dd::DerivedStruct )
+		{
+			DD_PARENT( dd::SimpleStruct );
+			DD_MEMBER( dd::DerivedStruct, DerivedThing );
+		}
 	};
 }
 
 TEST_CASE( "[TypeInfo] Find" )
 {
-	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_CLASS( Test::SimpleStruct );
 
 	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
@@ -39,7 +40,7 @@ TEST_CASE( "[TypeInfo] Find" )
 
 TEST_CASE( "[TypeInfo] Namespace" )
 {
-	DD_REGISTER_TYPE( Test::SimpleStruct );
+	DD_REGISTER_CLASS( Test::SimpleStruct );
 
 	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
@@ -58,8 +59,8 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 TEST_CASE( "[TypeInfo] Derived" )
 {
-	DD_REGISTER_TYPE( Test::SimpleStruct );
-	DD_REGISTER_TYPE( Test::DerivedStruct );
+	DD_REGISTER_CLASS( Test::SimpleStruct );
+	DD_REGISTER_CLASS( Test::DerivedStruct );
 
 	const dd::TypeInfo* type = DD_TYPE( Test::DerivedStruct );
 	REQUIRE( type != nullptr );

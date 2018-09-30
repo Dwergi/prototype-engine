@@ -4,7 +4,7 @@
 // September 19th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "BoundSphereComponent.h"
 
-DD_COMPONENT_CPP( dd::BoundSphereComponent );
+DD_TYPE_CPP( dd::BoundSphereComponent );

@@ -4,7 +4,7 @@
 // September 16th 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "BinarySerializer.h"
 
 namespace dd
@@ -52,7 +52,7 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 
-		if( type->IsPOD() )
+		if( type->GetCategory() == Category::POD )
 		{
 			stream.Write( var.Data(), type->Size() );
 			return true;
@@ -112,7 +112,7 @@ namespace dd
 				++index;
 			}
 		}
-		else if( type->IsContainer() )
+		else if( type->GetCategory() == Category::Container )
 		{
 			uint size = type->ContainerSize( var.Data() );
 			m_stream.WritePOD( size );
@@ -137,7 +137,7 @@ namespace dd
 	{
 		const TypeInfo* type = var.Type();
 
-		if( type->IsPOD() )
+		if( type->GetCategory() == Category::POD )
 		{
 			stream.Read( var.Data(), type->Size() );
 			return true;
@@ -192,7 +192,7 @@ namespace dd
 				++index;
 			}
 		}
-		else if( type->IsContainer() )
+		else if( type->GetCategory() == Category::Container )
 		{
 			// delete and new the container to empty it
 			type->PlacementDelete( var.Data() );

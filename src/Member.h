@@ -8,7 +8,7 @@
 
 namespace dd
 {
-	class TypeInfo;
+	struct TypeInfo;
 
 	class Member
 	{
@@ -41,6 +41,6 @@ namespace dd
 		const TypeInfo* m_typeInfo;
 		const TypeInfo* m_parent;
 		
-		friend class TypeInfo;
+		friend struct TypeInfo;
 	};
 }

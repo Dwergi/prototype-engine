@@ -4,7 +4,7 @@
 // July 16th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ParticleSystem.h"
 
 #include "ICamera.h"
@@ -110,7 +110,7 @@ namespace ddr
 
 		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboPosition.Bind();
-		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MaxParticles ) );
+		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MAX_PARTICLES ) );
 		m_vboPosition.CommitData();
 
 		shader->BindAttributeVec3( "PositionInstanced", false );
@@ -119,7 +119,7 @@ namespace ddr
 
 		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboSizes.Bind();
-		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MaxParticles ) );
+		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MAX_PARTICLES ) );
 		m_vboSizes.CommitData();
 
 		shader->BindAttributeVec2( "ScaleInstanced", false );
@@ -128,7 +128,7 @@ namespace ddr
 
 		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboColours.Bind();
-		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MaxParticles ) );
+		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MAX_PARTICLES ) );
 		m_vboColours.CommitData();
 
 		shader->BindAttributeVec4( "ColourInstanced", false );
@@ -153,9 +153,9 @@ namespace ddr
 				
 			if( m_killAllParticles )
 			{
-				for( size_t i = 0; i < dd::MaxParticles; ++i )
+				for( size_t i = 0; i < dd::MAX_PARTICLES; ++i )
 				{
-					dd::Particle& particle = system.m_particles[i];
+					dd::Particle& particle = system.Particles[i];
 
 					if( particle.Alive() )
 					{
@@ -163,12 +163,12 @@ namespace ddr
 					}
 				}
 
-				system.m_age = system.m_lifetime;
+				system.Age = system.Lifetime;
 			}
 
 			UpdateLiveParticles( system, update.Delta() );
 
-			if( system.m_age < system.m_lifetime )
+			if( system.Age < system.Lifetime )
 			{
 				EmitNewParticles( system, transforms[ i ].Transform, update.Delta() );
 			}
@@ -177,9 +177,9 @@ namespace ddr
 
 	void ParticleSystem::UpdateLiveParticles( dd::ParticleSystemComponent& system, float delta_t )
 	{
-		for( size_t particle_index = 0; particle_index < system.m_liveCount; ++particle_index )
+		for( size_t particle_index = 0; particle_index < system.LiveCount; ++particle_index )
 		{
-			dd::Particle& particle = system.m_particles[particle_index];
+			dd::Particle& particle = system.Particles[particle_index];
 
 			if( particle.Alive() )
 			{
@@ -187,7 +187,7 @@ namespace ddr
 
 				if( !particle.Alive() )
 				{
-					--system.m_liveCount;
+					--system.LiveCount;
 					continue;
 				}
 
@@ -202,21 +202,21 @@ namespace ddr
 
 	void ParticleSystem::EmitNewParticles( dd::ParticleSystemComponent& system, const glm::mat4& transform, float delta_t )
 	{
-		system.m_emissionAccumulator += system.m_emissionRate * delta_t;
-		int toEmit = (int) system.m_emissionAccumulator;
+		system.EmissionAccumulator += system.EmissionRate * delta_t;
+		int toEmit = (int) system.EmissionAccumulator;
 
-		system.m_emissionAccumulator = system.m_emissionAccumulator - toEmit;
+		system.EmissionAccumulator = system.EmissionAccumulator - toEmit;
 
 		int emitted = 0;
 
-		for( int i = 0; i < dd::MaxParticles; ++i )
+		for( int i = 0; i < dd::MAX_PARTICLES; ++i )
 		{
-			if( emitted >= toEmit || system.m_liveCount > CurrentMaxParticles )
+			if( emitted >= toEmit || system.LiveCount > CurrentMAX_PARTICLES )
 			{
 				break;
 			}
 
-			dd::Particle& particle = system.m_particles[ i ];
+			dd::Particle& particle = system.Particles[ i ];
 
 			if( !particle.Alive() )
 			{
@@ -224,14 +224,14 @@ namespace ddr
 
 				glm::mat3 rotation( transform[ 0 ].xyz, transform[ 1 ].xyz, transform[ 2 ].xyz );
 
-				glm::vec3 velocity = glm::mix( system.m_minVelocity, system.m_maxVelocity, glm::vec3( system.m_rng.Next(), system.m_rng.Next(), system.m_rng.Next() ) );
+				glm::vec3 velocity = glm::mix( system.MinVelocity, system.MaxVelocity, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) );
 				particle.Velocity = velocity * rotation;
-				particle.Size = glm::mix( system.m_minSize, system.m_maxSize, glm::vec2( system.m_rng.Next(), system.m_rng.Next() ) );
-				particle.Lifetime = glm::mix( system.m_minLifetime, system.m_maxLifetime, system.m_rng.Next() );
+				particle.Size = glm::mix( system.MinSize, system.MaxSize, glm::vec2( system.RNG.Next(), system.RNG.Next() ) );
+				particle.Lifetime = glm::mix( system.MinLifetime, system.MaxLifetime, system.RNG.Next() );
 				particle.Age = 0;
-				particle.Colour = glm::vec4( glm::mix( system.m_minColour, system.m_maxColour, glm::vec3( system.m_rng.Next(), system.m_rng.Next(), system.m_rng.Next() ) ), 1 );
+				particle.Colour = glm::vec4( glm::mix( system.MinColour, system.MaxColour, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) ), 1 );
 
-				++system.m_liveCount;
+				++system.LiveCount;
 				++emitted;
 			}
 		}
@@ -261,14 +261,14 @@ namespace ddr
 
 		for( const dd::ParticleSystemComponent& system : particle_systems )
 		{
-			memcpy( m_tempBuffer, system.m_particles, sizeof( dd::Particle ) * system.m_liveCount );
+			memcpy( m_tempBuffer, system.Particles, sizeof( dd::Particle ) * system.LiveCount );
 
 			for( dd::Particle& p : m_tempBuffer )
 			{
 				p.Distance = p.Alive() ? glm::distance2( p.Position, cam_pos ) : -1;
 			}
 
-			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MaxParticles], 
+			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MAX_PARTICLES], 
 				[]( const dd::Particle& a, const dd::Particle& b )
 			{
 				return a.Distance > b.Distance;
@@ -313,7 +313,7 @@ namespace ddr
 
 	void ParticleSystem::DrawDebugInternal( const ddc::World& world )
 	{
-		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MaxParticles );
+		ImGui::SliderInt( "Max Particles", &CurrentMAX_PARTICLES, 0, dd::MAX_PARTICLES );
 
 		if( m_selected == nullptr )
 		{
@@ -323,47 +323,47 @@ namespace ddr
 
 		if( ImGui::Button( "Start" ) )
 		{
-			m_selected->m_age = 0;
+			m_selected->Age = 0;
 		}
 
-		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->m_lifetime, 0, 300 );
+		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->Lifetime, 0, 300 );
 		
 		{
-			float max_emission_rate = CurrentMaxParticles / m_selected->m_maxLifetime; // any higher and we can end up saturating the buffer
+			float max_emission_rate = CurrentMAX_PARTICLES / m_selected->MaxLifetime; // any higher and we can end up saturating the buffer
 
-			ImGui::SliderFloat( "Emission Rate", &m_selected->m_emissionRate, 0.f, max_emission_rate );
+			ImGui::SliderFloat( "Emission Rate", &m_selected->EmissionRate, 0.f, max_emission_rate );
 		}
 
 		if( ImGui::TreeNodeEx( "Lifetime", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::SliderFloat( "Min", &m_selected->m_minLifetime, 0, m_selected->m_maxLifetime );
-			ImGui::SliderFloat( "Max", &m_selected->m_maxLifetime, m_selected->m_minLifetime, 10 );
+			ImGui::SliderFloat( "Min", &m_selected->MinLifetime, 0, m_selected->MaxLifetime );
+			ImGui::SliderFloat( "Max", &m_selected->MaxLifetime, m_selected->MinLifetime, 10 );
 
 			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Colour", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::DragFloatRange2( "R", &m_selected->m_minColour.r, &m_selected->m_maxColour.r, 0.001f, 0, 1 );
-			ImGui::DragFloatRange2( "G", &m_selected->m_minColour.g, &m_selected->m_maxColour.g, 0.001f, 0, 1 );
-			ImGui::DragFloatRange2( "B", &m_selected->m_minColour.b, &m_selected->m_maxColour.b, 0.001f, 0, 1 );
+			ImGui::DragFloatRange2( "R", &m_selected->MinColour.r, &m_selected->MaxColour.r, 0.001f, 0, 1 );
+			ImGui::DragFloatRange2( "G", &m_selected->MinColour.g, &m_selected->MaxColour.g, 0.001f, 0, 1 );
+			ImGui::DragFloatRange2( "B", &m_selected->MinColour.b, &m_selected->MaxColour.b, 0.001f, 0, 1 );
 
 			ImGui::TreePop();
 		}
 		
 		if( ImGui::TreeNodeEx( "Velocity", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::DragFloatRange2( "X", &m_selected->m_minVelocity.x, &m_selected->m_maxVelocity.x, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Y", &m_selected->m_minVelocity.y, &m_selected->m_maxVelocity.y, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Z", &m_selected->m_minVelocity.z, &m_selected->m_maxVelocity.z, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "X", &m_selected->MinVelocity.x, &m_selected->MaxVelocity.x, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Y", &m_selected->MinVelocity.y, &m_selected->MaxVelocity.y, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Z", &m_selected->MinVelocity.z, &m_selected->MaxVelocity.z, 0.1f, -50, 50, "%.1f" );
 
 			ImGui::TreePop();
 		}
 
 		if( ImGui::TreeNodeEx( "Size", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			ImGui::DragFloatRange2( "X", &m_selected->m_minSize.x, &m_selected->m_maxSize.x, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Y", &m_selected->m_minSize.y, &m_selected->m_maxSize.y, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "X", &m_selected->MinSize.x, &m_selected->MaxSize.x, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2( "Y", &m_selected->MinSize.y, &m_selected->MaxSize.y, 0.1f, -50, 50, "%.1f" );
 
 			ImGui::TreePop();
 		}

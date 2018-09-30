@@ -1,3 +1,9 @@
+//
+// UpdateData.h
+// Copyright (C) Sebastian Nordgren 
+// September 19th 2018
+//
+
 #pragma once
 
 #include "ComponentBuffer.h"
@@ -21,9 +27,11 @@ namespace ddc
 		template <typename T>
 		ddc::ReadView<T> Read() const
 		{
+			const dd::TypeInfo* type = DD_TYPE( T );
+
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
-				if( buffer.Component() == T::Type &&
+				if( buffer.Component() == *type &&
 					buffer.Usage() == DataUsage::Read )
 				{
 					return ddc::ReadView<T>( buffer );
@@ -35,9 +43,11 @@ namespace ddc
 		template <typename T>
 		ddc::WriteView<T> Write() const
 		{
+			const dd::TypeInfo* type = DD_TYPE( T );
+
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
-				if( buffer.Component() == T::Type &&
+				if( buffer.Component() == *type &&
 					buffer.Usage() == DataUsage::Write )
 				{
 					return ddc::WriteView<T>( buffer );
@@ -47,6 +57,8 @@ namespace ddc
 		}
 
 	private:
+
+		static const int MAX_BUFFERS = 16;
 
 		dd::String16 m_name;
 		std::vector<Entity> m_entities;
@@ -58,7 +70,6 @@ namespace ddc
 		UpdateData( ddc::World& world, float delta_t );
 		UpdateData( const UpdateData& other ) = delete;
 
-		void ReserveData( size_t buffers );
 		void AddData( const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name );
 
 		float Delta() const { return m_delta; }
@@ -68,6 +79,8 @@ namespace ddc
 		void Commit();
 
 	private:
+
+		static const int MAX_BUFFERS = 16;
 
 		float m_delta { 0 };
 		ddc::World& m_world;

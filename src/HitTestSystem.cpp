@@ -4,7 +4,7 @@
 // September 17th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "HitTestSystem.h"
 
 #include "BoundBoxComponent.h"

@@ -4,7 +4,7 @@
 // September 18th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "BulletSystem.h"
 
 #include "BoundBoxComponent.h"
@@ -17,8 +17,6 @@
 #include "MeshComponent.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
-
-DD_COMPONENT_CPP( dd::BulletComponent );
 
 namespace dd
 {
@@ -58,7 +56,7 @@ namespace dd
 	
 	void BulletSystem::FireBullet( ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, ddr::LightComponent, dd::ColourComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform;
@@ -83,9 +81,9 @@ namespace dd
 		world.Access( entity, bounds );
 		bounds->BoundBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
 
-		ddr::LightComponent* light;
+		dd::LightComponent* light;
 		world.Access( entity, light );
-		light->LightType = ddr::LightType::Point;
+		light->LightType = dd::LightType::Point;
 		light->Ambient = 0;
 		light->Intensity = m_intensity;
 		light->Colour = m_colour;

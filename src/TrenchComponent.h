@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
-
 namespace dd
 {
 	class TrenchComponent
@@ -16,11 +14,11 @@ namespace dd
 
 		glm::vec3 Direction;
 
-		TrenchComponent() { }
+		DD_CLASS( dd::TrenchComponent )
+		{
+			DD_COMPONENT();
 
-		DD_COMPONENT;
-
-		DD_SCRIPT_OBJECT( TrenchComponent )
-		DD_END_TYPE
+			DD_MEMBER( dd::TrenchComponent, Direction );
+		}
 	};
 }

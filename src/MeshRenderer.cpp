@@ -4,7 +4,7 @@
 // July 17th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "MeshRenderer.h"
 
 #include "BoundBoxComponent.h"

@@ -7,10 +7,8 @@
 #pragma once
 
 #include "DenseMap.h"
-#include "Array.h"
+#include "IInputSource.h"
 #include "Vector.h"
-
-#include "InputAction.h"
 
 struct GLFWwindow;
 
@@ -18,73 +16,29 @@ namespace dd
 {
 	class Window;
 
-	struct MousePosition
+	struct GLFWInputSource : IInputSource
 	{
-		glm::vec2 Delta;
-		glm::vec2 Absolute;
-
-		MousePosition() {}
-	};
-	
-	struct InputEvent
-	{
-		InputAction Action;
-		InputType Type;
-	};
-	//===================================================================================
-
-	class Input
-	{
-	public:
-
-		// special keys that can't be typed as characters
-		// these map to GLFW_KEY values
-		enum class Key : int
-		{
-			ESCAPE = 256,
-			ENTER = 257,
-			TAB = 258,
-			HOME = 268,
-			END = 269,
-			CAPS_LOCK = 280,
-			PAUSE = 284,
-			F1 = 290,
-			F2 = 291,
-			LSHIFT = 340,
-			LCTRL = 341,
-			LALT = 342
-		};
-
-		enum class MouseButton : int
-		{
-			LEFT = 0,
-			RIGHT = 1,
-			MIDDLE = 2,
-			BUTTON_4 = 3,
-			BUTTON_5 = 4
-		};
-
 		typedef void( *KeyboardCallbackFunction )(GLFWwindow*, int, int, int, int);
 		typedef void( *MouseButtonCallbackFunction )(GLFWwindow*, int, int, int);
 		typedef void( *ScrollCallbackFunction )(GLFWwindow*, double, double);
 		typedef void( *CharacterCallbackFunction )(GLFWwindow*, unsigned int);
 
-		explicit Input( const Window& window );
-		~Input();
+		explicit GLFWInputSource( const Window& window );
+		~GLFWInputSource();
 
-		void Update();
-		MousePosition GetMousePosition() const;
-		MousePosition GetScrollPosition() const;
+		virtual void UpdateInput() override;
+		virtual MousePosition GetMousePosition() const override;
+		virtual MousePosition GetScrollPosition() const override;
 
-		void CaptureMouse( bool capture );
-		bool IsMouseCaptured() const { return m_mouseCaptured; }
+		virtual void CaptureMouse( bool capture ) override;
+		virtual bool IsMouseCaptured() const override { return m_mouseCaptured; }
 
-		void GetKeyEvents( IArray<InputEvent>& out ) const;
-		void GetMouseEvents( IArray<InputEvent>& out ) const;
+		virtual void GetKeyEvents( IArray<InputEvent>& out ) const override;
+		virtual void GetMouseEvents( IArray<InputEvent>& out ) const override;
 
-		void BindKey( char c, InputAction action );
-		void BindKey( Key k, InputAction action );
-		void BindMouseButton( MouseButton btn, InputAction action );
+		virtual void BindKey( char c, InputAction action ) override;
+		virtual void BindKey( Key k, InputAction action ) override;
+		virtual void BindMouseButton( MouseButton btn, InputAction action ) override;
 
 		// these shouldn't be used by default, mainly used by imgui
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );
@@ -121,7 +75,7 @@ namespace dd
 
 		DenseMap<int, InputAction> m_bindings;
 
-		static Input* m_pInstance;
+		static GLFWInputSource* m_pInstance;
 		static void KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods );
 		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
 		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );

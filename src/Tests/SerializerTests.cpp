@@ -4,7 +4,7 @@
 // September 10th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "catch2/catch.hpp"
 
 #include "JSONSerializer.h"
@@ -15,8 +15,8 @@ using namespace dd;
 /*
 TEST_CASE( "[Serialization] Serialize to JSON" )
 {
-	DD_REGISTER_TYPE( Test::SimpleStruct );
-	DD_REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_CLASS( Test::SimpleStruct );
+	DD_REGISTER_CLASS( Test::NestedStruct );
 
 	String256 out;
 	WriteStream stream( out );
@@ -306,8 +306,8 @@ TEST_CASE( "[Deserialization] POD From JSON" )
 
 TEST_CASE( "[Deserialization] Structs from JSON" )
 {
-	DD_REGISTER_TYPE( Test::SimpleStruct );
-	DD_REGISTER_TYPE( Test::NestedStruct );
+	DD_REGISTER_CLASS( Test::SimpleStruct );
+	DD_REGISTER_CLASS( Test::NestedStruct );
 
 	byte in[2048];
 	ReadStream stream( in, 2048 );

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "ShipSystem.h"
 
 #include "FPSCamera.h"

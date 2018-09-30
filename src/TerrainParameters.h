@@ -81,6 +81,9 @@ namespace dd
 		//
 		bool UseDebugColours { false };
 
-		void UpdateUniforms( ddr::UniformStorage& uniforms );
+		//
+		// Update the uniforms that map to the terrain parameters.
+		//
+		void UpdateUniforms( ddr::UniformStorage& uniforms ) const;
 	};
 }

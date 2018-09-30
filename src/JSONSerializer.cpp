@@ -4,7 +4,7 @@
 // September 10th 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "JSONSerializer.h"
 
 #include "arduinojson/ArduinoJson.h"
@@ -112,11 +112,11 @@ namespace dd
 		const TypeInfo* type = var.Type();
 		DD_ASSERT( type->IsRegistered() );
 
-		if( type->IsPOD() )
+		if( type->GetCategory() == Category::POD )
 		{
 			return GetPODVariant( var, buffer );
 		}
-		else if( type->IsContainer() )
+		else if( type->GetCategory() == Category::Container )
 		{
 			return GetArrayVariant( var, buffer );
 		}
@@ -277,11 +277,11 @@ namespace dd
 			var.GetValue<SharedString>() = variant.as<const char*>();
 			return true;
 		}
-		else if( type->IsContainer() )
+		else if( type->GetCategory() == Category::Container )
 		{
 			return SetArrayFromVariant( var, variant );
 		}
-		else if( type->IsPOD() )
+		else if( type->GetCategory() == Category::POD )
 		{
 			return SetPODFromVariant( var, variant );
 		}

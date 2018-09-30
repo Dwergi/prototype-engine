@@ -59,7 +59,7 @@ namespace dd
 	template <typename T>
 	inline void PODCopy( void* dest, const void* src )
 	{
-		std::memcpy( dest, src, sizeof( T ) );
+		memcpy( dest, src, sizeof( T ) );
 	}
 
 	template <typename T>
@@ -71,7 +71,7 @@ namespace dd
 	template <typename T>
 	inline void PODPlacementCopy( void* data, const void* src )
 	{
-		std::memcpy( data, src, sizeof( T ) );
+		memcpy( data, src, sizeof( T ) );
 	}
 
 	template <typename T>
@@ -86,7 +86,7 @@ namespace dd
 	inline void PODNewCopy( void** dest, const void* src )
 	{
 		*dest = malloc( sizeof( T ) );
-		std::memcpy( *dest, src, sizeof( T ) );
+		memcpy( *dest, src, sizeof( T ) );
 	}
 
 	template <typename T>

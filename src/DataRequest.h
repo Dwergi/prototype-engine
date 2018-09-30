@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
 #include "Entity.h"
 
 #include <bitset>
@@ -40,13 +39,13 @@ namespace ddc
 		DataCardinality Cardinality() const { return m_cardinality; }
 		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
 		DataUsage Usage() const { return m_usage; }
-		const ComponentType& Component() const { return *m_component; }
+		const dd::TypeInfo& Component() const { return *m_component; }
 
 	protected:
-		DataRequest( const ComponentType& component, DataUsage usage, DataCardinality cardinality, const char* name );
+		DataRequest( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name );
 
 	private:
-		const ComponentType* m_component { nullptr };
+		const dd::TypeInfo* m_component { nullptr };
 		DataUsage m_usage { DataUsage::Invalid };
 		DataCardinality m_cardinality { DataCardinality::Invalid };
 
@@ -58,7 +57,7 @@ namespace ddc
 	struct ReadRequirement : DataRequest
 	{
 		ReadRequirement( const char* name ) :
-			DataRequest( TComponent::Type, DataUsage::Read, DataCardinality::Required, name )
+			DataRequest( DD_TYPE( TComponent ), DataUsage::Read, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -67,7 +66,7 @@ namespace ddc
 	struct WriteRequirement : DataRequest
 	{
 		WriteRequirement( const char* name ) :
-			DataRequest( TComponent::Type, DataUsage::Write, DataCardinality::Required, name )
+			DataRequest( DD_TYPE( TComponent ), DataUsage::Write, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -76,7 +75,7 @@ namespace ddc
 	struct ReadOptional : DataRequest
 	{
 		ReadOptional( const char* name ) :
-			DataRequest( TComponent::Type, DataUsage::Read, DataCardinality::Optional, name )
+			DataRequest( DD_TYPE( TComponent ), DataUsage::Read, DataCardinality::Optional, name )
 		{
 		}
 	};
@@ -85,7 +84,7 @@ namespace ddc
 	struct WriteOptional : DataRequest
 	{
 		WriteOptional( const char* name ) :
-			DataRequest( TComponent::Type, DataUsage::Write, DataCardinality::Optional, name )
+			DataRequest( DD_TYPE( TComponent ), DataUsage::Write, DataCardinality::Optional, name )
 		{
 		}
 	};

@@ -14,7 +14,7 @@ namespace dd
 
 	namespace ASInternal
 	{
-		template <typename T, bool>
+		template <typename T>
 		struct RegisterTypeForwarder;
 	}
 
@@ -100,7 +100,7 @@ namespace dd
 		// 
 		// Register a type with the script system.
 		// 
-		template <typename T, bool byValue>
+		template <typename T>
 		void RegisterType();
 
 		template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
@@ -128,7 +128,7 @@ namespace dd
 
 	private:
 
-		template <typename T, bool>
+		template <typename T>
 		friend struct ASInternal::RegisterTypeForwarder;
 
 		asIScriptEngine* m_engine;
@@ -149,9 +149,6 @@ namespace dd
 
 		template <typename T>
 		void RegisterObject();
-
-		template <typename T>
-		void RegisterStruct();
 
 		String256 LoadSource( const char* module ) const;
 	};

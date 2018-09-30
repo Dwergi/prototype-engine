@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include "ComponentType.h"
-
-namespace ddr
+namespace dd
 {
 	enum class LightType
 	{
@@ -16,6 +14,8 @@ namespace ddr
 		Point,
 		Spot
 	};
+
+	DD_ENUM( dd::LightType );
 
 	class LightComponent
 	{
@@ -32,6 +32,18 @@ namespace ddr
 
 		LightType LightType { LightType::Directional };
 
-		DD_COMPONENT;
+		DD_CLASS( dd::LightComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::LightComponent, Colour );
+			DD_MEMBER( dd::LightComponent, Intensity );
+			DD_MEMBER( dd::LightComponent, Ambient );
+			DD_MEMBER( dd::LightComponent, Specular );
+			DD_MEMBER( dd::LightComponent, Attenuation );
+			DD_MEMBER( dd::LightComponent, InnerAngle );
+			DD_MEMBER( dd::LightComponent, OuterAngle );
+			DD_MEMBER( dd::LightComponent, LightType );
+		}
 	};
 }

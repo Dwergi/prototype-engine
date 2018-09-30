@@ -6,24 +6,19 @@
 
 #pragma once
 
-#include "ComponentType.h"
 #include "TerrainChunkKey.h"
 
 namespace dd
 {
 	class TerrainChunk;
 
-	class TerrainChunkComponent
+	struct TerrainChunkComponent
 	{
-	public:
-
-		TerrainChunkComponent();
-		TerrainChunkComponent( const TerrainChunkComponent& other );
-
 		TerrainChunk* Chunk { nullptr };
 
-		DD_COMPONENT;
-
-		DD_BASIC_TYPE( TerrainChunkComponent )
+		DD_CLASS( dd::TerrainChunkComponent )
+		{
+			DD_COMPONENT();
+		}
 	};
 }

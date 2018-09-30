@@ -4,7 +4,7 @@
 // November 2nd 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 
 #include "catch2/catch.hpp"
 
@@ -19,9 +19,9 @@ struct TestMessage : public dd::Message
 {
 	uint Payload;
 
-	DD_BEGIN_TYPE( TestMessage )
-		DD_PARENT( dd::Message )
-	DD_END_TYPE
+	DD_CLASS( dd::TestMessage )
+		DD_PARENT( dd::dd::Message )
+	}
 };
 
 dd::Message* Received;
@@ -40,8 +40,8 @@ void TestFunction2( dd::Message* msg )
 
 TEST_CASE( "[MessageSystem]" )
 {
-	DD_REGISTER_TYPE( dd::Message );
-	DD_REGISTER_TYPE( TestMessage );
+	DD_REGISTER_CLASS( dd::Message );
+	DD_REGISTER_CLASS( TestMessage );
 
 	dd::MessageQueue system;
 	Received = nullptr;

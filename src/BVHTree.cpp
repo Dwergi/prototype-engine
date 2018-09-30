@@ -4,7 +4,7 @@
 // June 15th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "BVHTree.h"
 
 #include "AABB.h"

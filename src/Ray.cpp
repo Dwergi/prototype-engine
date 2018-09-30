@@ -4,8 +4,10 @@
 // April 24th 2017
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "Ray.h"
+
+DD_TYPE_CPP( dd::Ray );
 
 namespace dd
 {

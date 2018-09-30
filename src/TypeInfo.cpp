@@ -5,16 +5,24 @@
 // Significantly influenced by Randy Gaul (http://RandyGaul.net)
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "TypeInfo.h"
 
 namespace dd
 {
-	std::unordered_map<SharedString, TypeInfo*> TypeInfo::sm_typeMap;
-
+	std::unordered_map<String64, TypeInfo*>* TypeInfo::sm_typeMap = nullptr;
+	std::vector<std::function<void()>>* TypeInfo::sm_registrations = nullptr;
 	bool TypeInfo::sm_defaultsRegistered = false;
 
+	uint8 TypeInfo::sm_maxComponentID = 0;
 	AngelScriptEngine* TypeInfo::sm_scriptEngine = nullptr;
+
+	struct DefaultTypeRegistration
+	{
+		DefaultTypeRegistration() { dd::TypeInfo::RegisterDefaultTypes(); }
+	};
+
+	static DefaultTypeRegistration sm_defaults;
 
 	void FindNamespace( const char* name, String& nameSpace, String& typeName )
 	{
@@ -45,6 +53,15 @@ namespace dd
 
 	TypeInfo::TypeInfo()
 	{
+		if( sm_typeMap == nullptr )
+		{
+			sm_typeMap = new std::unordered_map<String64, TypeInfo*>();
+		}
+
+		if( sm_registrations == nullptr )
+		{
+			sm_registrations = new std::vector<std::function<void()>>();
+		}
 	}
 
 	void TypeInfo::Init( const char* name, uint size )
@@ -81,21 +98,17 @@ namespace dd
 
 	const TypeInfo* TypeInfo::GetType( const char* typeName )
 	{
-		return GetType( SharedString( typeName ) );
+		return GetType( String64( typeName ) );
 	}
 
 	const TypeInfo* TypeInfo::GetType( const String& typeName )
 	{
-		return GetType( SharedString( typeName ) );
-	}
-
-	const TypeInfo* TypeInfo::GetType( const SharedString& typeName )
-	{
-		DD_ASSERT( sm_typeMap.find( typeName ) != sm_typeMap.end() );
-
-		auto it = sm_typeMap.find( typeName );
-		if( it == sm_typeMap.end() )
+		auto it = sm_typeMap->find( typeName );
+		if( it == sm_typeMap->end() )
+		{
+			DD_ASSERT( false );
 			return nullptr;
+		}
 
 		return it->second;
 	}
@@ -115,6 +128,31 @@ namespace dd
 		return false;
 	}
 
+	void TypeInfo::RegisterComponent()
+	{
+		m_componentID = sm_maxComponentID;
+
+		++sm_maxComponentID;
+	}
+
+	const TypeInfo* TypeInfo::GetComponent( dd::ComponentID id )
+	{
+		DD_TODO( "Maybe worth caching component types separately?" );
+
+		const TypeInfo* current = TypeInfo::Head();
+		while( current != nullptr )
+		{
+			if( current->ComponentID() == id )
+			{
+				return current;
+			}
+
+			current = current->Next();
+		}
+
+		return nullptr;
+	}
+
 	String128 TypeInfo::FullTypeName() const
 	{
 		String128 fullName;
@@ -123,6 +161,11 @@ namespace dd
 		fullName += m_name.c_str();
 
 		return fullName;
+	}
+
+	bool TypeInfo::operator==( const TypeInfo& other ) const
+	{
+		return this == &other;
 	}
 
 	void TypeInfo::RegisterDefaultTypes()
@@ -148,31 +191,62 @@ namespace dd
 
 		DD_REGISTER_POD( bool );
 
-		DD_REGISTER_TYPE( dd::String );
+		DD_REGISTER_CLASS( dd::String );
 
-		DD_REGISTER_TYPE( dd::String8 );
+		DD_REGISTER_CLASS( dd::String8 );
 		DD_REGISTER_PARENT( dd::String8, dd::String );
 
-		DD_REGISTER_TYPE( dd::String16 );
+		DD_REGISTER_CLASS( dd::String16 );
 		DD_REGISTER_PARENT( dd::String16, dd::String );
 
-		DD_REGISTER_TYPE( dd::String32 );
+		DD_REGISTER_CLASS( dd::String32 );
 		DD_REGISTER_PARENT( dd::String32, dd::String );
 		
-		DD_REGISTER_TYPE( dd::String64 );
+		DD_REGISTER_CLASS( dd::String64 );
 		DD_REGISTER_PARENT( dd::String64, dd::String );
 		
-		DD_REGISTER_TYPE( dd::String128 );
+		DD_REGISTER_CLASS( dd::String128 );
 		DD_REGISTER_PARENT( dd::String128, dd::String );
 
-		DD_REGISTER_TYPE( dd::String256 );
+		DD_REGISTER_CLASS( dd::String256 );
 		DD_REGISTER_PARENT( dd::String256, dd::String );
 
-		DD_REGISTER_TYPE( dd::SharedString );
+		DD_REGISTER_CLASS( dd::SharedString );
+
+		TypeInfo* vec2Type = DD_REGISTER_POD( glm::vec2 );
+		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::x>( "x" );
+		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::y>( "y" );
+
+		TypeInfo* vec3Type = DD_REGISTER_POD( glm::vec3 );
+		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
+		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
+		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
+
+		TypeInfo* vec4Type = DD_REGISTER_POD( glm::vec4 );
+		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
+		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
+		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
+		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "w" );
+
+		DD_REGISTER_POD( glm::mat3 );
+		DD_REGISTER_POD( glm::mat4 );
 	}
 
 	void TypeInfo::SetScriptEngine( AngelScriptEngine* scriptEngine )
 	{
 		sm_scriptEngine = scriptEngine;
+	}
+
+	void TypeInfo::QueueRegistration( std::function<void()> fn )
+	{
+		sm_registrations->push_back( fn );
+	}
+
+	void TypeInfo::RegisterQueuedTypes()
+	{
+		for( auto fn : *sm_registrations )
+		{
+			fn();
+		}
 	}
 }

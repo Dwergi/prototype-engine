@@ -4,7 +4,7 @@
 // April 14th 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "MeshComponent.h"
 
-DD_COMPONENT_CPP( dd::MeshComponent );
+DD_TYPE_CPP( dd::MeshComponent );

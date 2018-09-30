@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "TransformComponent.h"
 
-DD_COMPONENT_CPP( dd::TransformComponent );
+DD_TYPE_CPP( dd::TransformComponent );

@@ -29,28 +29,28 @@ namespace dd
 		typedef std::conditional<std::is_copy_assignable<T>::value, T, EmptyType<T>>::type CopyAssignType;
 
 		New = SetFunc<std::is_default_constructible<T>::value, void* (*)(), &dd::New<DefaultCtorType>>::Get();
-		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void (*)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
 		Copy = SetFunc<std::is_copy_assignable<T>::value, void (*)(void*, const void*), &dd::Copy<CopyAssignType>>::Get();
 		Delete = dd::Delete<T>;
+		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void( *)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
 		PlacementCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void*, const void*), &dd::PlacementCopy<CopyCtorType>>::Get();
 		PlacementDelete = dd::PlacementDelete<T>;
 		NewCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void**, const void*), &dd::NewCopy<CopyCtorType>>::Get();
 	}
 
 	template <typename T>
-	const TypeInfo* TypeInfo::RegisterType( const char* name )
+	TypeInfo* TypeInfo::RegisterType( const char* name )
 	{
-		DD_ASSERT( sm_defaultsRegistered );
-
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
+
+		typeInfo->m_category = Category::Class;
 
 		typeInfo->Init( name, sizeof( T ) );
 
 		typeInfo->RegisterFunctions<T>();
 
-		sm_typeMap.insert( std::make_pair( SharedString( name ), typeInfo ) );
+		sm_typeMap->insert( std::make_pair( String64( name ), typeInfo ) );
 
 		// register pointer and references as well
 		{
@@ -58,30 +58,26 @@ namespace dd
 			ptrName += "*";
 			TypeInfo* ptrInfo = AccessType<T*>();
 			ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
-			sm_typeMap.insert( std::make_pair( SharedString( ptrName ), ptrInfo ) );
+			sm_typeMap->insert( std::make_pair( String32( ptrName ), ptrInfo ) );
 
 			String64 refName( name );
 			refName += "&";
 			TypeInfo* refInfo = AccessType<T&>();
 			refInfo->Init( refName.c_str(), sizeof( T& ) );
-			sm_typeMap.insert( std::make_pair( SharedString( refName ), refInfo ) );
+			sm_typeMap->insert( std::make_pair( String32( refName ), refInfo ) );
 		}
-
-		T::RegisterMembers( typeInfo );
 
 		return typeInfo;
 	}
 
 	template <typename T>
-	const TypeInfo* TypeInfo::RegisterPOD( const char* name )
+	TypeInfo* TypeInfo::RegisterPOD( const char* name )
 	{
-		DD_ASSERT( sm_defaultsRegistered );
-
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
-		typeInfo->m_isPOD = true;
+		typeInfo->m_category = Category::POD;
 
 		typeInfo->Init( name, sizeof( T ) );
 
@@ -93,29 +89,34 @@ namespace dd
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
 
-		sm_typeMap.insert( std::make_pair( SharedString( name ), typeInfo ) );
+		sm_typeMap->insert( std::make_pair( String32( name ), typeInfo ) );
 		
-		RegisterContainer<Vector<T>, T>( "dd::Vector", typeInfo );
+		RegisterContainer<Vector<T>, T>( "dd::Vector" );
 
 		return typeInfo;
 	}
 
 	template <typename TContainer, typename TItem>
-	const TypeInfo* TypeInfo::RegisterContainer( const char* container, const TypeInfo* containing )
+	TypeInfo* TypeInfo::RegisterContainer( const char* container )
 	{
-		DD_ASSERT( sm_defaultsRegistered );
-
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<TContainer>());
 		if( typeInfo->IsRegistered() )
+		{
 			return typeInfo;
+		}
+
+		const TypeInfo* itemType = GetType<TItem>();
+		DD_ASSERT( itemType->IsRegistered() );
+
+		typeInfo->m_category = Category::Container;
 
 		String64 finalName( container );
 		finalName += "<";
-		finalName += containing->Name().c_str();
+		finalName += itemType->Name().c_str();
 		finalName += ">";
 
 		typeInfo->Init( finalName.c_str(), sizeof( TContainer ) );
-		typeInfo->m_containedType = containing;
+		typeInfo->m_containedType = itemType;
 
 		typeInfo->RegisterFunctions<TContainer>();
 
@@ -123,28 +124,33 @@ namespace dd
 		typeInfo->ElementAt = dd::ElementAt<TContainer>;
 		typeInfo->InsertElement = dd::InsertElement<TContainer, TItem>;
 
-		sm_typeMap.insert( std::make_pair( SharedString( finalName ), typeInfo ) );
+		sm_typeMap->insert( std::make_pair( String32( finalName ), typeInfo ) );
 
 		return typeInfo;
 	}
 
-	template <typename TComponent>
-	const TypeInfo* TypeInfo::RegisterComponent( const char* typeName )
+	template <typename TEnum>
+	TypeInfo* TypeInfo::RegisterEnum( const char* name )
 	{
-		static_assert(std::is_base_of_v<IComponent, TComponent>, "Component type must be derived from IComponent!");
-		static_assert(std::is_assignable_v<TComponent, TComponent>, "Component type must be assignable to itself!");
+		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<TEnum>());
+		if( typeInfo->IsRegistered() )
+		{
+			return typeInfo;
+		}
 
-		TypeInfo* typeInfo = const_cast<TypeInfo*>( RegisterType<RemoveQualifiers<TComponent>::type>( typeName ) );
-		typeInfo->m_component = true;
+		typeInfo->m_category = Category::Enum;
 
-		String128 poolTypeName( typeInfo->Name().c_str() );
-		poolTypeName += "Pool";
-		RegisterType<TComponent::Pool>( poolTypeName.c_str() );
+		typeInfo->Init( name, sizeof( TEnum ) );
 
-		String128 doubleBufferName( "dd::DoubleBuffer<" );
-		doubleBufferName += typeName;
-		doubleBufferName += ">";
-		TypeInfo::RegisterType<DoubleBuffer<typename TComponent::Pool>>( doubleBufferName.c_str() );
+		typeInfo->New = PODNew<TEnum>;
+		typeInfo->Copy = PODCopy<TEnum>;
+		typeInfo->NewCopy = PODNewCopy<TEnum>;
+		typeInfo->Delete = PODDelete<TEnum>;
+		typeInfo->PlacementNew = PODPlacementNew<TEnum>;
+		typeInfo->PlacementDelete = PODPlacementDelete<TEnum>;
+		typeInfo->PlacementCopy = PODPlacementCopy<TEnum>;
+
+		sm_typeMap->insert( std::make_pair( String32( name ), typeInfo ) );
 
 		return typeInfo;
 	}
@@ -163,7 +169,6 @@ namespace dd
 	template <typename FnType, FnType Fn>
 	void TypeInfo::RegisterMethod( const char* name )
 	{
-		DD_ASSERT( sm_defaultsRegistered );
 		DD_ASSERT( IsRegistered() );
 
 		Method& m = m_methods.Allocate();
@@ -180,9 +185,9 @@ namespace dd
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
 	void TypeInfo::RegisterMember( const char* name )
 	{
-		const TypeInfo* typeInfo = TypeInfo::GetType<TProp>();
+		DD_ASSERT( IsRegistered() );
 
-		DD_ASSERT( sm_defaultsRegistered );
+		const TypeInfo* typeInfo = TypeInfo::GetType<TProp>();
 		DD_ASSERT( typeInfo->IsRegistered() );
 
 		Member& member = m_members.Allocate();
@@ -197,7 +202,23 @@ namespace dd
 		}
 	}
 
-	template <typename T, bool byValue>
+	template <typename T>
+	void RegisterEnumOptions( dd::TypeInfo* typeInfo )
+	{
+		DD_ASSERT( false, "Enum options being registered for non-existent enum!" );
+	}
+
+	template <typename TEnum>
+	void TypeInfo::RegisterEnumOption( TEnum value, const char* name )
+	{
+		DD_ASSERT( IsRegistered() );
+
+		EnumOption& option = m_enumOptions.Allocate();
+		option.Value = (int) value;
+		option.Name = name;
+	}
+
+	template <typename T>
 	void TypeInfo::RegisterScriptType()
 	{
 		DD_ASSERT( sm_scriptEngine != nullptr );
@@ -206,7 +227,7 @@ namespace dd
 		{
 			m_scriptObject = true;
 
-			sm_scriptEngine->RegisterType<T, byValue>();
+			sm_scriptEngine->RegisterType<T>();
 		}
 	}
 }

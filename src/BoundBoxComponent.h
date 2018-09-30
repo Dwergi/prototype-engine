@@ -7,18 +7,19 @@
 #pragma once
 
 #include "AABB.h"
-#include "ComponentType.h"
+
 
 namespace dd
 {
 	struct BoundBoxComponent
 	{
-		DD_COMPONENT;
-
 		AABB BoundBox;
 
-		DD_BEGIN_TYPE( BoundBoxComponent )
-			DD_MEMBER( BoundBoxComponent, BoundBox )
-		DD_END_TYPE
+		DD_CLASS( dd::BoundBoxComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::BoundBoxComponent, BoundBox );
+		}
 	};
 }

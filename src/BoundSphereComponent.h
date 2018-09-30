@@ -7,14 +7,18 @@
 #pragma once
 
 #include "Sphere.h"
-#include "ComponentType.h"
 
 namespace dd
 {
 	struct BoundSphereComponent
 	{
-		DD_COMPONENT;
-
 		Sphere BoundSphere;
+
+		DD_CLASS( dd::BoundSphereComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::BoundSphereComponent, BoundSphere );
+		}
 	};
 }

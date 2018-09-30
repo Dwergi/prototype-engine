@@ -4,7 +4,7 @@
 // June 1st 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "catch2/catch.hpp"
 
 #include "AngelScriptEngine.h"
@@ -52,8 +52,8 @@ struct AngelScriptTest
 	static bool FunctionRetCalled;
 	static bool FunctionArgCalled;
 
-	DD_SCRIPT_OBJECT( AngelScriptTest )
-	DD_END_TYPE
+	DD_CLASS( dd::AngelScriptTest )
+	}
 };
 
 bool AngelScriptTest::FunctionCalled = false;
@@ -81,7 +81,7 @@ namespace Test
 
 TEST_CASE( "[AngelScript] Register Class" )
 {
-	DD_REGISTER_TYPE( AngelScriptTest );
+	DD_REGISTER_CLASS( AngelScriptTest );
 
 	dd::AngelScriptEngine engine;
 

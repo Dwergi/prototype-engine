@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ComponentType.h"
+
 
 namespace dd
 {
@@ -30,9 +30,18 @@ namespace dd
 		// The number of seconds to recharge to full boost.
 		float BoostMaximum { 0 };
 
-		DD_COMPONENT;
+		DD_CLASS( dd::ShipComponent )
+		{
+			DD_COMPONENT();
 
-		DD_SCRIPT_OBJECT( ShipComponent )
-		DD_END_TYPE
+			DD_MEMBER( dd::ShipComponent, Velocity );
+			DD_MEMBER( dd::ShipComponent, MaximumSpeed );
+			DD_MEMBER( dd::ShipComponent, MinimumSpeed );
+			DD_MEMBER( dd::ShipComponent, Acceleration );
+			DD_MEMBER( dd::ShipComponent, BoostFactor );
+			DD_MEMBER( dd::ShipComponent, BoostRemaining );
+			DD_MEMBER( dd::ShipComponent, BoostRechargeRate );
+			DD_MEMBER( dd::ShipComponent, BoostMaximum );
+		}
 	};
 };

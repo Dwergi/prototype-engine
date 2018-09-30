@@ -14,7 +14,7 @@
 
 namespace ddr
 {
-	class ICamera;
+	struct ICamera;
 }
 
 namespace dd

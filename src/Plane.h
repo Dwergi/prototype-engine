@@ -12,22 +12,25 @@ namespace dd
 	{
 	public:
 
-		Plane();
+		Plane() {}
 		Plane( const glm::vec4& params );
 		Plane( const glm::vec3& point, const glm::vec3& normal );
 		Plane( float a, float b, float c, float d );
 		Plane( const glm::vec3& pt1, const glm::vec3& pt2, const glm::vec3& pt3 );
 		Plane( const Plane& other );
-		~Plane();
 		
-		glm::vec3 Normal() const { return m_plane.xyz(); }
-		glm::vec3 Origin() const { return Normal() * m_plane.w; }
+		glm::vec3 Normal() const { return Parameters.xyz(); }
+		glm::vec3 Origin() const { return Normal() * Parameters.w; }
 
 		float DistanceTo( const glm::vec3& point ) const;
 		Plane GetTransformed( const glm::mat4& transform ) const;
 
-	private:
+		glm::vec4 Parameters;
 
-		glm::vec4 m_plane;
+		DD_CLASS( dd::Plane )
+		{
+			DD_COMPONENT();
+			DD_MEMBER( dd::Plane, Parameters );
+		}
 	};
 }

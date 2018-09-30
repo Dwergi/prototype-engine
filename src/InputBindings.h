@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include "Input.h"
+#include "IInputSource.h"
 
 #include <functional>
 
 namespace dd
 {
-	class InputBindings
+	struct InputBindings
 	{
-	public:
-
 		typedef std::function<void( InputAction, InputType )> InputHandler;
 		
 		InputBindings();

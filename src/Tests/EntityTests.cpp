@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "World.h"
 
 #include "ComponentBuffer.h"
@@ -11,28 +11,33 @@
 
 struct FirstComponent
 {
-	DD_COMPONENT;
-
 	int FirstValue { -100 };
+
+	DD_CLASS( FirstComponent )
+	{
+		DD_COMPONENT();
+	}
 };
 
 struct SecondComponent
 {
-	DD_COMPONENT;
-
 	int SecondValue { 0 };
+
+	DD_CLASS( SecondComponent )
+	{
+		DD_COMPONENT();
+	}
 };
 
 struct ThirdComponent
 {
-	DD_COMPONENT;
-
 	int ThirdValue { 0 };
+	
+	DD_CLASS( ThirdComponent )
+	{
+		DD_COMPONENT();
+	}
 };
-
-DD_COMPONENT_CPP( FirstComponent );
-DD_COMPONENT_CPP( SecondComponent );
-DD_COMPONENT_CPP( ThirdComponent );
 
 struct TestSystem : ddc::System
 {

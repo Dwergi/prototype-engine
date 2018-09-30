@@ -7,7 +7,6 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Renderer.h"
 #include "System.h"
 #include "TerrainChunkKey.h"
 #include "TerrainParameters.h"
@@ -21,18 +20,18 @@ namespace ddr
 
 namespace dd
 {
-	class ICamera;
+	struct ICamera;
 	struct JobSystem;
 	struct BoundBoxComponent;
 	struct ColourComponent;
 	struct MeshComponent;
 	class TerrainChunk;
-	class TerrainChunkComponent;
+	struct TerrainChunkComponent;
 	struct TransformComponent;
 	struct TerrainChunkKey;
 	struct Wireframe;
 
-	class TerrainSystem : public ddc::System, public IDebugPanel, public ddr::Renderer
+	class TerrainSystem : public ddc::System, public IDebugPanel
 	{
 	public:
 
@@ -62,7 +61,7 @@ namespace dd
 		//
 		// Get the terrain parameters.
 		//
-		const TerrainParameters& GetTerrainParameters() const { return m_terrainParams; }
+		const TerrainParameters& GetTerrainParameters() const { return m_params; }
 		
 		//
 		// Initialize the terrain system.
@@ -78,16 +77,6 @@ namespace dd
 		// Shut down the terrain system and destroy terrain chunk meshes.
 		//
 		virtual void Shutdown( ddc::World& world ) override;
-
-		//
-		// Initialize render resources for the terrain system.
-		//
-		virtual void RenderInit( ddc::World& world ) override;
-
-		//
-		// Update terrain chunks on the render thread.
-		//
-		virtual void Render( const ddr::RenderData& data ) override;
 
 		//
 		// Save the heightmaps of the terrain chunks generated.
@@ -108,10 +97,9 @@ namespace dd
 
 		glm::ivec2 m_previousOffset;
 
-		TerrainParameters m_terrainParams;
 		JobSystem& m_jobsystem;
 
-		Wireframe* m_wireframe;
+		TerrainParameters m_params;
 
 		std::unordered_map<TerrainChunkKey, ddc::Entity> m_existing;
 		Vector<ddc::Entity> m_active;

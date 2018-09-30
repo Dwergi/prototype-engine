@@ -4,7 +4,7 @@
 // September 25th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "RayRenderer.h"
 
 #include "ColourComponent.h"

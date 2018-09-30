@@ -13,7 +13,7 @@
 
 namespace ddr
 {
-	class ICamera;
+	struct ICamera;
 	class Texture;
 	struct UniformStorage;
 

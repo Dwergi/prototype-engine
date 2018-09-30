@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include "ComponentType.h"
 #include "Random.h"
 #include "Units.h"
 
 namespace dd
 {
-	static const int MaxParticles = 1024;
+	static const int MAX_PARTICLES = 1024;
 
 	struct Particle
 	{
@@ -29,34 +28,62 @@ namespace dd
 
 	struct ParticleSystemComponent 
 	{
-		DD_COMPONENT;
-
 		ParticleSystemComponent();
 
-		uint m_seed { ~0u };
-		dd::RandomFloat m_rng;
+		uint Seed { ~0u };
 
 		// in seconds
-		float m_minLifetime;
-		float m_maxLifetime;
-		float m_lifetime { 3 };
+		float MinLifetime;
+		float MaxLifetime;
+		
+		float Lifetime { 3 };
+		float Age { 3 };
 
 		// metres per second
-		glm::vec3 m_minVelocity; 
-		glm::vec3 m_maxVelocity;
+		glm::vec3 MinVelocity; 
+		glm::vec3 MaxVelocity;
 		
-		glm::vec3 m_minColour;
-		glm::vec3 m_maxColour;
+		glm::vec3 MinColour;
+		glm::vec3 MaxColour;
 
-		glm::vec2 m_maxSize;
-		glm::vec2 m_minSize;
+		glm::vec2 MinSize;
+		glm::vec2 MaxSize;
 
-		size_t m_liveCount { 0 };
-		Particle m_particles[MaxParticles];
+		size_t LiveCount { 0 };
 
-		float m_age { 3 };	// in seconds
+		float EmissionRate { 200.0 }; // particles per second
+		
+		// Non-serialized properties
+		dd::RandomFloat RNG;
 
-		float m_emissionRate { 200.0 }; // particles per second
-		float m_emissionAccumulator { 0 }; // fractional particles that were not emitted last tick
+		float EmissionAccumulator { 0 }; // fractional particles that were not emitted last tick
+
+		Particle Particles[MAX_PARTICLES];
+
+		DD_CLASS( dd::ParticleSystemComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::ParticleSystemComponent, Seed );
+
+			DD_MEMBER( dd::ParticleSystemComponent, MinLifetime );
+			DD_MEMBER( dd::ParticleSystemComponent, MaxLifetime );
+
+			DD_MEMBER( dd::ParticleSystemComponent, Lifetime );
+			DD_MEMBER( dd::ParticleSystemComponent, Age );
+
+			DD_MEMBER( dd::ParticleSystemComponent, MinVelocity );
+			DD_MEMBER( dd::ParticleSystemComponent, MaxVelocity );
+
+			DD_MEMBER( dd::ParticleSystemComponent, MinColour );
+			DD_MEMBER( dd::ParticleSystemComponent, MaxColour );
+
+			DD_MEMBER( dd::ParticleSystemComponent, MinSize );
+			DD_MEMBER( dd::ParticleSystemComponent, MaxSize );
+
+			DD_MEMBER( dd::ParticleSystemComponent, LiveCount );
+
+			DD_MEMBER( dd::ParticleSystemComponent, EmissionRate );
+		}
 	};
 }

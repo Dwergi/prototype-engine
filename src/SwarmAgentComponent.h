@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
-#include "Vector4.h"
 #include "AABBOctree.h"
 
 namespace dd
@@ -19,14 +17,12 @@ namespace dd
 		glm::vec3 Velocity;
 		OctreeEntry OctreeHandle;
 
-		SwarmAgentComponent();
-		virtual ~SwarmAgentComponent();
+		DD_CLASS( dd::SwarmAgentComponent )
+		{
+			DD_COMPONENT();
 
-		DD_COMPONENT;
-
-		DD_SCRIPT_OBJECT( SwarmAgentComponent )
-			DD_MEMBER( SwarmAgentComponent, Velocity )
-			DD_MEMBER( SwarmAgentComponent, OctreeHandle )
-		DD_END_TYPE
+			DD_MEMBER( dd::SwarmAgentComponent, Velocity );
+			DD_MEMBER( dd::SwarmAgentComponent, OctreeHandle );
+		}
 	};
 }

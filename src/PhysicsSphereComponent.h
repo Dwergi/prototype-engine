@@ -21,6 +21,16 @@ namespace dd
 
 		bool Resting { false };
 
-		DD_COMPONENT;
+		DD_CLASS( dd::PhysicsSphereComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::PhysicsSphereComponent, Velocity );
+			DD_MEMBER( dd::PhysicsSphereComponent, Acceleration );
+			DD_MEMBER( dd::PhysicsSphereComponent, Mass );
+			DD_MEMBER( dd::PhysicsSphereComponent, Elasticity );
+			DD_MEMBER( dd::PhysicsSphereComponent, Sphere );
+			DD_MEMBER( dd::PhysicsSphereComponent, Resting );
+		}
 	};
 }

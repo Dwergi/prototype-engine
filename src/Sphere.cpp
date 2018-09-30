@@ -4,13 +4,15 @@
 // September 13th 2018
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "Sphere.h"
 
 #include "AABB.h"
 #include "Ray.h"
 
 #include <glm/gtx/intersect.hpp>
+
+DD_TYPE_CPP( dd::Sphere );
 
 namespace dd
 {

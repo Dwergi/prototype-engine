@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "ComponentType.h"
 #include "Plane.h"
 
 namespace dd
@@ -16,6 +15,12 @@ namespace dd
 		Plane Plane;
 		float Elasticity { 1.0f };
 
-		DD_COMPONENT;
+		DD_CLASS( dd::PhysicsPlaneComponent )
+		{
+			DD_COMPONENT();
+
+			DD_MEMBER( dd::PhysicsPlaneComponent, Plane );
+			DD_MEMBER( dd::PhysicsPlaneComponent, Elasticity );
+		}
 	};
 }

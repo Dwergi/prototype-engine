@@ -32,6 +32,13 @@ namespace dd
 		//
 		glm::vec3 InverseDir() const { return m_invDir; }
 
+		DD_CLASS( dd::Ray )
+		{
+			DD_METHOD( dd::Ray, Origin );
+			DD_METHOD( dd::Ray, Direction );
+			DD_METHOD( dd::Ray, InverseDir );
+		}
+
 	private:
 
 		glm::vec3 m_origin;

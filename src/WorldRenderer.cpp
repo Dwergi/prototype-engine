@@ -4,7 +4,7 @@
 // April 14th 2016
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "WorldRenderer.h"
 
 #include "AABB.h"
@@ -141,10 +141,10 @@ namespace ddr
 
 	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
 	{
-		dd::Array<ddc::TypeID, ddc::MAX_COMPONENTS> components;
+		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> components;
 		for( const ddc::DataRequest* req : renderer.GetRequirements() )
 		{
-			components.Add( req->Component().ID );
+			components.Add( req->Component().ComponentID() );
 		}
 
 		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();

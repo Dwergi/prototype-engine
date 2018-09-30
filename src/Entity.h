@@ -8,6 +8,10 @@
 
 namespace ddc
 {
+	static const int MAX_ENTITIES = 1024;
+	static const int MAX_COMPONENTS = 255;
+	static const int MAX_TAGS = 32;
+
 	struct Entity
 	{
 		friend struct World;

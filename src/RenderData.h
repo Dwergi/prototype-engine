@@ -73,9 +73,11 @@ namespace ddr
 		template <typename T>
 		ddc::ReadView<T> Get() const
 		{
+			const dd::TypeInfo* type = DD_TYPE( T );
+
 			for( const ddc::ComponentBuffer& buffer : m_buffers )
 			{
-				if( buffer.Component() == T::Type )
+				if( &buffer.Component() == type )
 				{
 					DD_ASSERT( buffer.Usage() == ddc::DataUsage::Read );
 					return ddc::ReadView<T>( buffer );

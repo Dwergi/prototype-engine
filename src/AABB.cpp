@@ -4,11 +4,13 @@
 // November 2nd 2015
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "AABB.h"
 
 #include "Sphere.h"
 #include "Ray.h"
+
+DD_TYPE_CPP( dd::AABB );
 
 namespace dd
 {

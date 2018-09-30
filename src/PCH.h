@@ -49,7 +49,6 @@
 #include "Globals.h"
 
 //#include "Serialization.h"
-#include "RefCounter.h"
 #include "AngelScriptEngine.h"
 
 #include <glm/gtc/matrix_transform.hpp>

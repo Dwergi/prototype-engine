@@ -1,4 +1,4 @@
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "World.h"
 
 #include "JobSystem.h"
@@ -8,9 +8,6 @@
 
 namespace ddc
 {
-	ComponentType* ComponentType::Types[MAX_COMPONENTS] = { nullptr };
-	int ComponentType::Count = 0;
-
 	DD_STATIC_ASSERT( sizeof( Entity ) <= sizeof( uint ) + sizeof( uint ) );
 
 	static void WaitForAllFutures( std::vector<std::shared_future<void>>& futures )
@@ -33,11 +30,12 @@ namespace ddc
 	World::World( dd::JobSystem& jobsystem ) :
 		m_jobsystem( jobsystem )
 	{
-		m_components.resize( ComponentType::Count );
-		for( int i = 0; i < ComponentType::Count; ++i )
+		m_components.resize( dd::TypeInfo::ComponentCount() );
+
+		for( dd::ComponentID i = 0; i < m_components.size(); ++i )
 		{
-			const ComponentType* type = ComponentType::Types[i];
-			size_t buffer_size = type->Size * MAX_ENTITIES;
+			const dd::TypeInfo* type = dd::TypeInfo::GetComponent( i );
+			size_t buffer_size = type->Size() * MAX_ENTITIES;
 
 			m_components[i] = new byte[buffer_size];
 			memset( m_components[i], 0, buffer_size );
@@ -158,8 +156,10 @@ namespace ddc
 			(entry.Entity.Alive || entry.Entity.Create);
 	}
 
-	bool World::HasComponent( Entity entity, TypeID id ) const
+	bool World::HasComponent( Entity entity, dd::ComponentID id ) const
 	{
+		DD_ASSERT( id != dd::INVALID_COMPONENT );
+
 		if( !IsAlive( entity ) )
 		{
 			return false;
@@ -168,7 +168,7 @@ namespace ddc
 		return m_entities[entity.ID].Ownership.test( id );
 	}
 
-	void* World::AddComponent( Entity entity, TypeID id )
+	void* World::AddComponent( Entity entity, dd::ComponentID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
@@ -180,31 +180,34 @@ namespace ddc
 		void* ptr = AccessComponent( entity, id );
 		DD_ASSERT( ptr != nullptr );
 
-		ComponentType::Types[id]->Construct( ptr );
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id ); 
+		type->PlacementNew( ptr );
 		return ptr;
 	}
 
-	void* World::AccessComponent( Entity entity, TypeID id ) const
+	void* World::AccessComponent( Entity entity, dd::ComponentID id ) const
 	{
 		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
 		}
 
-		return m_components[id] + (entity.ID * ComponentType::Types[id]->Size);
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id );
+		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	const void* World::GetComponent( Entity entity, TypeID id ) const
+	const void* World::GetComponent( Entity entity, dd::ComponentID id ) const
 	{
 		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
 		}
-
-		return m_components[id] + (entity.ID * ComponentType::Types[id]->Size);
+		
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id );
+		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	void World::RemoveComponent( Entity entity, TypeID id )
+	void World::RemoveComponent( Entity entity, dd::ComponentID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
@@ -216,10 +219,10 @@ namespace ddc
 		}
 	}
 
-	void World::FindAllWith( const dd::IArray<TypeID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const
+	void World::FindAllWith( const dd::IArray<dd::ComponentID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const
 	{
 		std::bitset<MAX_COMPONENTS> required;
-		for( TypeID& type : components )
+		for( dd::ComponentID& type : components )
 		{
 			required.set( type, true );
 		}
@@ -292,12 +295,10 @@ namespace ddc
 			}
 		}
 
-		update.ReserveData( names.Size() );
-
 		// for each name filter requests
 		for( const dd::String& name : names )
 		{
-			dd::Array<TypeID, MAX_COMPONENTS> required;
+			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
 			dd::Array<const DataRequest*, MAX_COMPONENTS> requests;
 			for( const DataRequest* req : system->GetRequests() )
 			{
@@ -305,7 +306,7 @@ namespace ddc
 				{
 					if( !req->Optional() )
 					{
-						required.Add( req->Component().ID );
+						required.Add( req->Component().ComponentID() );
 					}
 
 					requests.Add( req );

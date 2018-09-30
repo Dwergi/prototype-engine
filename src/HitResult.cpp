@@ -4,8 +4,10 @@
 // September 17th 2017
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "HitResult.h"
+
+DD_TYPE_CPP( dd::HitHandle );
 
 namespace dd
 {

@@ -8,7 +8,7 @@
 namespace dd
 {
 	class FPSCamera;
-	class InputBindings;
+	struct InputBindings;
 
 	class ShakyCamera : public IDebugPanel, public ddr::ICamera
 	{
@@ -67,7 +67,7 @@ namespace dd
 		//
 		// Set the seed value.
 		//
-		void SetSeed( float seed ) { m_seed = seed; }
+		void SetSeed( float seed ) { Seed = seed; }
 
 		//
 		// IDebugDraw implementation
@@ -97,7 +97,7 @@ namespace dd
 
 		const FPSCamera& m_sourceCamera;
 
-		float m_seed { 0 };
+		float Seed { 0 };
 		float m_trauma { 0 };
 		float m_time { 0 };
 

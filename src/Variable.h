@@ -26,7 +26,7 @@ Purpose       :
 
 namespace dd
 {
-	class TypeInfo;
+	struct TypeInfo;
 	class Member;
 
 	class Variable

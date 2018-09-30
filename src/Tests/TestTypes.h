@@ -20,14 +20,15 @@ namespace Test
 
 		bool operator==( const SimpleStruct& other ) const;
 
-		DD_BEGIN_TYPE( SimpleStruct )
-			DD_MEMBER( SimpleStruct, Int )
-			DD_MEMBER( SimpleStruct, Str )
-			DD_MEMBER( SimpleStruct, Flt )
-			DD_MEMBER( SimpleStruct, Vec )
-			DD_METHOD( SimpleStruct, Double )
-			DD_METHOD( SimpleStruct, Multiply )
-		DD_END_TYPE
+		DD_CLASS( dd::SimpleStruct )
+		{
+			DD_MEMBER( dd::SimpleStruct, Int );
+			DD_MEMBER( dd::SimpleStruct, Str );
+			DD_MEMBER( dd::SimpleStruct, Flt );
+			DD_MEMBER( dd::SimpleStruct, Vec );
+			DD_METHOD( dd::SimpleStruct, Double );
+			DD_METHOD( dd::SimpleStruct, Multiply );
+		}
 	};
 
 	struct NestedStruct
@@ -35,9 +36,10 @@ namespace Test
 		SimpleStruct Nested;
 		int SecondInt;
 
-		DD_BEGIN_TYPE( NestedStruct )
-			DD_MEMBER( NestedStruct, Nested )
-			DD_MEMBER( NestedStruct, SecondInt )
-		DD_END_TYPE
+		DD_CLASS( dd::NestedStruct )
+		{
+			DD_MEMBER( dd::NestedStruct, Nested );
+			DD_MEMBER( dd::NestedStruct, SecondInt );
+		}
 	};
 }

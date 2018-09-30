@@ -13,13 +13,13 @@
 
 namespace ddr
 {
-	class ICamera;
+	struct ICamera;
 }
 
 namespace dd
 {
 	struct IAsyncHitTest;
-	class InputBindings;
+	struct InputBindings;
 	struct HitState;
 
 	struct BulletSystem : ddc::System, IDebugPanel

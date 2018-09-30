@@ -4,8 +4,8 @@
 // August 6th 2015
 //
 
-#include "PrecompiledHeader.h"
-#include "Input.h"
+#include "PCH.h"
+#include "GLFWInputSource.h"
 
 #include "Window.h"
 
@@ -13,9 +13,9 @@
 
 namespace dd
 {
-	Input* Input::m_pInstance = nullptr;
+	GLFWInputSource* GLFWInputSource::m_pInstance = nullptr;
 
-	Input::Input( const Window& window )
+	GLFWInputSource::GLFWInputSource( const Window& window )
 	{
 		DD_ASSERT( m_pInstance == nullptr );
 
@@ -30,7 +30,7 @@ namespace dd
 		glfwSetCharCallback( m_glfwWindow, &CharCallback );
 	}
 
-	Input::~Input()
+	GLFWInputSource::~GLFWInputSource()
 	{
 		DD_ASSERT( m_pInstance == this );
 
@@ -38,33 +38,33 @@ namespace dd
 		glfwSetKeyCallback( m_glfwWindow, nullptr );
 	}
 
-	bool Input::IsBound( int key ) const
+	bool GLFWInputSource::IsBound( int key ) const
 	{
 		return m_bindings.Contains( key );
 	}
 
-	void Input::BindKey( char c, InputAction action )
+	void GLFWInputSource::BindKey( char c, InputAction action )
 	{
 		DD_ASSERT( !IsBound( (int) c ) );
 
 		m_bindings.Add( (int) c, action );
 	}
 
-	void Input::BindKey( Key k, InputAction action )
+	void GLFWInputSource::BindKey( Key k, InputAction action )
 	{
 		DD_ASSERT( !IsBound( (int) k ) );
 
 		m_bindings.Add( (int) k, action );
 	}
 
-	void Input::BindMouseButton( MouseButton btn, InputAction action )
+	void GLFWInputSource::BindMouseButton( MouseButton btn, InputAction action )
 	{
 		DD_ASSERT( !IsBound( (int) btn ) );
 
 		m_bindings.Add( (int) btn, action );
 	}
 
-	void Input::Update()
+	void GLFWInputSource::UpdateInput()
 	{
 		double newX, newY;
 
@@ -83,17 +83,17 @@ namespace dd
 		m_pendingMouseEvents.Clear();
 	}
 
-	void Input::GetKeyEvents( IArray<InputEvent>& events ) const
+	void GLFWInputSource::GetKeyEvents( IArray<InputEvent>& events ) const
 	{
 		events = m_currentKeyEvents;
 	}
 
-	void Input::GetMouseEvents( IArray<InputEvent>& events ) const
+	void GLFWInputSource::GetMouseEvents( IArray<InputEvent>& events ) const
 	{
 		events = m_currentMouseEvents;
 	}
 
-	InputType Input::GetEventType( int action )
+	InputType GLFWInputSource::GetEventType( int action )
 	{
 		if( action == GLFW_PRESS )
 			return InputType::PRESSED;
@@ -104,17 +104,17 @@ namespace dd
 		return InputType::NONE;
 	}
 
-	MousePosition Input::GetMousePosition() const
+	MousePosition GLFWInputSource::GetMousePosition() const
 	{
 		return m_mousePosition;
 	}
 
-	MousePosition Input::GetScrollPosition() const
+	MousePosition GLFWInputSource::GetScrollPosition() const
 	{
 		return m_scrollPosition;
 	}
 
-	void Input::CaptureMouse( bool capture )
+	void GLFWInputSource::CaptureMouse( bool capture )
 	{
 		if( m_mouseCaptured != capture )
 		{
@@ -123,7 +123,7 @@ namespace dd
 		}
 	}
 
-	void Input::KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
+	void GLFWInputSource::KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
 	{
 		InputType event_type = GetEventType( action );
 		InputAction event_action = m_pInstance->m_bindings.Contains( key ) ? m_pInstance->m_bindings[key] : InputAction::NONE;
@@ -143,7 +143,7 @@ namespace dd
 		}
 	}
 
-	void Input::MouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
+	void GLFWInputSource::MouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
 	{
 		InputType event_type = GetEventType( action );
 		InputAction event_action = m_pInstance->m_bindings.Contains( button ) ? m_pInstance->m_bindings[button] : InputAction::NONE;
@@ -162,7 +162,7 @@ namespace dd
 		}
 	}
 
-	void Input::ScrollCallback( GLFWwindow* window, double xOffset, double yOffset )
+	void GLFWInputSource::ScrollCallback( GLFWwindow* window, double xOffset, double yOffset )
 	{
 		m_pInstance->m_tempScrollPosition.Delta = glm::vec2( (float) xOffset, (float) yOffset );
 		m_pInstance->m_tempScrollPosition.Absolute += glm::vec2( (float) xOffset, (float) yOffset );
@@ -173,7 +173,7 @@ namespace dd
 		}
 	}
 
-	void Input::CharCallback( GLFWwindow* window, unsigned int c )
+	void GLFWInputSource::CharCallback( GLFWwindow* window, unsigned int c )
 	{
 		for( GLFWcharfun fn : m_pInstance->m_charCallbacks )
 		{
@@ -181,42 +181,42 @@ namespace dd
 		}
 	}
 
-	void Input::AddKeyboardCallback( KeyboardCallbackFunction cb )
+	void GLFWInputSource::AddKeyboardCallback( KeyboardCallbackFunction cb )
 	{
 		m_keyboardCallbacks.Add( cb );
 	}
 
-	void Input::AddMouseCallback( MouseButtonCallbackFunction cb )
+	void GLFWInputSource::AddMouseCallback( MouseButtonCallbackFunction cb )
 	{
 		m_mouseButtonCallbacks.Add( cb );
 	}
 
-	void Input::AddScrollCallback( ScrollCallbackFunction cb )
+	void GLFWInputSource::AddScrollCallback( ScrollCallbackFunction cb )
 	{
 		m_scrollCallbacks.Add( cb );
 	}
 
-	void Input::AddCharCallback( CharacterCallbackFunction cb )
+	void GLFWInputSource::AddCharCallback( CharacterCallbackFunction cb )
 	{
 		m_charCallbacks.Add( cb );
 	}
 
-	void Input::RemoveKeyboardCallback( KeyboardCallbackFunction cb )
+	void GLFWInputSource::RemoveKeyboardCallback( KeyboardCallbackFunction cb )
 	{
 		m_keyboardCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveMouseCallback( MouseButtonCallbackFunction cb )
+	void GLFWInputSource::RemoveMouseCallback( MouseButtonCallbackFunction cb )
 	{
 		m_mouseButtonCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveScrollCallback( ScrollCallbackFunction cb )
+	void GLFWInputSource::RemoveScrollCallback( ScrollCallbackFunction cb )
 	{
 		m_scrollCallbacks.RemoveItem( cb );
 	}
 
-	void Input::RemoveCharCallback( CharacterCallbackFunction cb )
+	void GLFWInputSource::RemoveCharCallback( CharacterCallbackFunction cb )
 	{
 		m_charCallbacks.RemoveItem( cb );
 	}

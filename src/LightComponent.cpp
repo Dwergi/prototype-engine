@@ -4,7 +4,14 @@
 // October 29th 2017
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "LightComponent.h"
 
-DD_COMPONENT_CPP( ddr::LightComponent );
+DD_TYPE_CPP( dd::LightComponent );
+
+DD_ENUM_CPP( dd::LightType )
+{
+	DD_ENUM_OPTION( dd::LightType, Directional );
+	DD_ENUM_OPTION( dd::LightType, Point );
+	DD_ENUM_OPTION( dd::LightType, Spot );
+};

@@ -4,7 +4,7 @@
 // April 26th 2017
 //
 
-#include "PrecompiledHeader.h"
+#include "PCH.h"
 #include "MousePicking.h"
 
 #include "BoundBoxComponent.h"
@@ -12,7 +12,7 @@
 #include "BoundsHelpers.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
-#include "Input.h"
+#include "IInputSource.h"
 #include "InputBindings.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
@@ -34,7 +34,7 @@
 
 namespace dd
 {
-	MousePicking::MousePicking( const Window& window, const Input& input, IAsyncHitTest& hit_test ) :
+	MousePicking::MousePicking( const Window& window, const IInputSource& input, IAsyncHitTest& hit_test ) :
 		ddr::Renderer( "Mouse Picking" ),
 		m_window( window ),
 		m_input( input ),
