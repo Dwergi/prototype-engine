@@ -7,19 +7,40 @@
 #include "PCH.h"
 #include "Triangulator.h"
 
+#include "Mesh.h"
+
 namespace dd
 {
+	Triangulator::Triangulator( ddr::Mesh& mesh ) 
+	{
+		dd::Buffer<glm::vec3> positions = mesh.AccessPositions();
+		DD_ASSERT( positions.IsValid() );
+		
+		m_positions = positions.Access();
+
+		dd::ConstBuffer<uint> indices = mesh.GetIndices();
+		if( indices.IsValid() )
+		{
+			m_indices = indices.Get();
+			m_size = indices.Size() / 3;
+		}
+		else
+		{
+			m_size = positions.Size() / 3;
+		}
+	}
+
 	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos ) :
 		m_size( pos.Size() / 3 )
 	{
-		m_positions = pos.Get();
+		m_positions = pos.Access();
 	}
 
 	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx ) :
 		m_size( idx.Size() / 3 )
 	{
-		m_positions = pos.Get();
-		m_indices = idx.GetConst();
+		m_positions = pos.Access();
+		m_indices = idx.Get();
 	}
 
 	Triangulator::Triangulator( std::vector<glm::vec3>& pos ) :
@@ -53,17 +74,36 @@ namespace dd
 		return tri;
 	}
 
+	ConstTriangulator::ConstTriangulator( const ddr::Mesh& mesh )
+	{
+		dd::ConstBuffer<glm::vec3> positions = mesh.GetPositions();
+		DD_ASSERT( positions.IsValid() );
+
+		m_positions = positions.Get();
+
+		dd::ConstBuffer<uint> indices = mesh.GetIndices();
+		if( indices.IsValid() )
+		{
+			m_indices = indices.Get();
+			m_size = indices.Size() / 3;
+		}
+		else
+		{
+			m_size = mesh.GetPositions().Size() / 3;
+		}
+	}
+
 	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos ) :
 		m_size( pos.Size() / 3 )
 	{
-		m_positions = pos.GetConst();
+		m_positions = pos.Get();
 	}
 
 	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx ) :
 		m_size( idx.Size() / 3 )
 	{
-		m_positions = pos.GetConst();
-		m_indices = idx.GetConst();
+		m_positions = pos.Get();
+		m_indices = idx.Get();
 	}
 
 	ConstTriangulator::ConstTriangulator( const std::vector<glm::vec3>& pos ) : 

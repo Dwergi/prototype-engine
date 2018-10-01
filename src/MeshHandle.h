@@ -9,7 +9,7 @@
 
 namespace ddr
 {
-	class Mesh;
+	struct Mesh;
 
 	struct MeshHandle
 	{
@@ -21,7 +21,7 @@ namespace ddr
 		DD_BASIC_TYPE( MeshHandle );
 
 	private:
-		friend class Mesh;
+		friend struct Mesh;
 		size_t m_id { ~0u };
 	};
 }

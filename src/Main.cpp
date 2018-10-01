@@ -388,12 +388,16 @@ ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 	ddr::MeshHandle mesh_h = ddr::Mesh::Find( "sphere" );
 
 	ddc::Entity entity = CreateMeshEntity( *s_world, mesh_h, colour,
-		glm::translate( translation ) * glm::rotate( glm::radians( 45.0f ), glm::vec3( 0, 1, 0 ) ) * glm::scale( glm::vec3( size ) ) );
+		glm::translate( translation ) * 
+		glm::rotate( glm::radians( 45.0f ), glm::vec3( 0, 1, 0 ) ) * 
+		glm::scale( glm::vec3( size ) ) );
+
 	s_world->AddTag( entity, ddc::Tag::Dynamic );
 
 	dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( entity );
-	physics_sphere.Sphere.Radius = size;
+	physics_sphere.Sphere.Radius = 1.0f;
 	physics_sphere.Elasticity = 1.0f;
+	physics_sphere.Mass = 1.0f;
 
 	return entity;
 }
@@ -633,7 +637,7 @@ int GameMain()
 			balls.Add( CreateBall( ball_positions[0], glm::vec4( 0.2, 0.2, 0.8, 1 ), sphere_size ) );
 			balls.Add( CreateBall( ball_positions[1], glm::vec4( 0.8, 0.2, 0.8, 1 ), sphere_size ) );
 
-			{
+			/*{
 				float static_sphere_size = 100;
 
 				{
@@ -644,7 +648,7 @@ int GameMain()
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 					physics_sphere.Elasticity = 0.95f;
 				}
 
@@ -656,7 +660,7 @@ int GameMain()
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 					physics_sphere.Elasticity = 0.95f;
 				}
 
@@ -668,12 +672,12 @@ int GameMain()
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), static_sphere_size );
+					physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 					physics_sphere.Elasticity = 0.95f;
 				}
-			}
+			}*/
 
-			/*float plane_size = 100;
+			float plane_size = 100;
 
 			{
 				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
@@ -699,7 +703,7 @@ int GameMain()
 				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
 				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
 				physics_plane.Elasticity = 0.95f;
-			}*/
+			}
 
 			ddc::World* world = s_world;
 			input_bindings->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )

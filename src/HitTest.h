@@ -2,7 +2,7 @@
 
 namespace ddr
 {
-	class Mesh;
+	struct Mesh;
 }
 
 namespace dd

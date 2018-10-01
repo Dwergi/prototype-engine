@@ -38,30 +38,54 @@ namespace dd
 		glfwSetKeyCallback( m_glfwWindow, nullptr );
 	}
 
-	bool GLFWInputSource::IsBound( int key ) const
+	bool GLFWInputSource::FindBinding( int key, uint8 mods, InputBinding& binding ) const
 	{
-		return m_bindings.Contains( key );
+		for( InputBinding& b : m_bindings )
+		{
+			if( b.Key == key )
+			{
+				binding = b;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
-	void GLFWInputSource::BindKey( char c, InputAction action )
+	bool GLFWInputSource::IsBound( int key, uint8 mods = 0 ) const
 	{
-		DD_ASSERT( !IsBound( (int) c ) );
-
-		m_bindings.Add( (int) c, action );
+		InputBinding binding;
+		return FindBinding( key, mods, binding );
 	}
 
-	void GLFWInputSource::BindKey( Key k, InputAction action )
+	void GLFWInputSource::BindKey( InputAction action, char ch, uint8 mods )
 	{
-		DD_ASSERT( !IsBound( (int) k ) );
+		DD_ASSERT( !IsBound( (int) ch, mods ) );
 
-		m_bindings.Add( (int) k, action );
+		InputBinding& binding = m_bindings.Allocate();
+		binding.Key = (int) ch;
+		binding.Action = action;
+		binding.Modifiers = mods;
 	}
 
-	void GLFWInputSource::BindMouseButton( MouseButton btn, InputAction action )
+	void GLFWInputSource::BindKey( InputAction action, Key key, uint8 mods )
 	{
-		DD_ASSERT( !IsBound( (int) btn ) );
+		DD_ASSERT( !IsBound( (int) key, mods ) );
 
-		m_bindings.Add( (int) btn, action );
+		InputBinding& binding = m_bindings.Allocate();
+		binding.Key = (int) key;
+		binding.Action = action;
+		binding.Modifiers = mods;
+	}
+
+	void GLFWInputSource::BindMouseButton( InputAction action, MouseButton btn, uint8 mods )
+	{
+		DD_ASSERT( !IsBound( (int) btn, mods ) );
+
+		InputBinding& binding = m_bindings.Allocate();
+		binding.Key = (int) btn;
+		binding.Action = action;
+		binding.Modifiers = mods;
 	}
 
 	void GLFWInputSource::UpdateInput()
@@ -125,14 +149,12 @@ namespace dd
 
 	void GLFWInputSource::KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
 	{
-		InputType event_type = GetEventType( action );
-		InputAction event_action = m_pInstance->m_bindings.Contains( key ) ? m_pInstance->m_bindings[key] : InputAction::NONE;
-
-		if( event_type != InputType::NONE && event_action != InputAction::NONE )
+		InputBinding binding;
+		if( m_pInstance->FindBinding( key, mods, binding ) )
 		{
 			InputEvent new_event;
-			new_event.Action = event_action;
-			new_event.Type = event_type;
+			new_event.Action = binding.Action;
+			new_event.Type = GetEventType( action );
 			m_pInstance->m_pendingKeyEvents.Add( new_event );
 		}
 
@@ -145,14 +167,12 @@ namespace dd
 
 	void GLFWInputSource::MouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
 	{
-		InputType event_type = GetEventType( action );
-		InputAction event_action = m_pInstance->m_bindings.Contains( button ) ? m_pInstance->m_bindings[button] : InputAction::NONE;
-
-		if( event_type != InputType::NONE && event_action != InputAction::NONE )
+		InputBinding binding;
+		if( m_pInstance->FindBinding( action, mods, binding ) )
 		{
 			InputEvent new_event;
-			new_event.Action = event_action;
-			new_event.Type = event_type;
+			new_event.Action = binding.Action;
+			new_event.Type = GetEventType( action );
 			m_pInstance->m_pendingMouseEvents.Add( new_event );
 		}
 

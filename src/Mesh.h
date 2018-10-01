@@ -30,10 +30,8 @@ namespace ddr
 	//
 	// A mesh asset.
 	//
-	class Mesh
+	struct Mesh
 	{
-	public:
-
 		//
 		// Create (or retrieve) a handle to a mesh with the given name.
 		//
@@ -81,6 +79,12 @@ namespace ddr
 		// Get the currently set buffer for positions.
 		// Not guaranteed to be valid.
 		//
+		dd::Buffer<glm::vec3> AccessPositions() const { return dd::Buffer<glm::vec3>( m_vboPosition.GetData() ); }
+
+		//
+		// Get the currently set buffer for positions.
+		// Not guaranteed to be valid.
+		//
 		dd::ConstBuffer<glm::vec3> GetPositions() const { return dd::ConstBuffer<glm::vec3>( m_vboPosition.GetData() ); }
 
 		//
@@ -93,7 +97,7 @@ namespace ddr
 		// Get the currently set buffer for indices.
 		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
 		//
-		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<glm::vec3>( m_vboIndex.GetData() ); }
+		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<uint>( m_vboIndex.GetData() ); }
 
 		//
 		// Set the normal buffer that the mesh will use.

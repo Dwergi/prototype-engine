@@ -79,6 +79,8 @@ namespace dd
 
 		return value;
 	}
+
+	bool DebuggerAttached();
 }
 
 namespace ImGui

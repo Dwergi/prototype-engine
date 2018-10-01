@@ -23,6 +23,7 @@ namespace dd
 		void SetPaused( bool paused ) { m_paused = paused; }
 
 		void SetMaxFPS( uint max_fps ) { m_maxFPS = max_fps; }
+		uint GetMaxFPS() const { return m_maxFPS; }
 
 		float GameDelta() const { return m_gameDelta; }
 		float AppDelta() const { return m_appDelta; }

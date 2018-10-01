@@ -42,14 +42,14 @@ template <typename T>
 ConstBuffer<T>::ConstBuffer( const ConstBuffer<T>& other ) :
 	IBuffer( sizeof( T ) )
 {
-	Set( other.GetConst(), other.Size() );
+	Set( other.Get(), other.Size() );
 }
 
 template <typename T>
 ConstBuffer<T>::ConstBuffer( ConstBuffer<T>&& other ) :
 	IBuffer( sizeof( T ) )
 {
-	Set( other.GetConst(), other.Size() );
+	Set( other.Get(), other.Size() );
 
 	other.m_ptr = nullptr;
 	other.m_count = 0;
@@ -63,7 +63,7 @@ ConstBuffer<T>::~ConstBuffer()
 template <typename T>
 ConstBuffer<T>& ConstBuffer<T>::operator=( const ConstBuffer<T>& other )
 {
-	Set( other.GetConst(), other.Size() );
+	Set( other.Get(), other.Size() );
 
 	return *this;
 }
@@ -71,7 +71,7 @@ ConstBuffer<T>& ConstBuffer<T>::operator=( const ConstBuffer<T>& other )
 template <typename T>
 ConstBuffer<T>& ConstBuffer<T>::operator=( ConstBuffer<T>&& other )
 {
-	Set( other.GetConst(), other.Size() );
+	Set( other.Get(), other.Size() );
 	other.ReleaseConst();
 
 	return *this;
@@ -87,7 +87,7 @@ void ConstBuffer<T>::Set( const T* ptr, int count )
 }
 
 template <typename T>
-const T* ConstBuffer<T>::GetConst() const
+const T* ConstBuffer<T>::Get() const
 {
 	return static_cast<const T*>(m_ptr);
 }
@@ -95,7 +95,7 @@ const T* ConstBuffer<T>::GetConst() const
 template <typename T>
 const T* ConstBuffer<T>::ReleaseConst()
 {
-	const T* ptr = GetConst();
+	const T* ptr = Get();
 
 	m_ptr = nullptr;
 	m_count = 0;
@@ -125,7 +125,7 @@ const T& ConstBuffer<T>::operator[]( size_t index ) const
 {
 	DD_ASSERT( index < m_count );
 
-	return GetConst()[ index ];
+	return Get()[ index ];
 }
 
 template <typename T>
@@ -150,6 +150,13 @@ Buffer<T>::Buffer()
 }
 
 template <typename T>
+Buffer<T>::Buffer( const IBuffer& buffer )
+{
+	m_ptr = (T*) buffer.GetVoid();
+	m_count = buffer.SizeBytes() / m_elementSize;
+}
+
+template <typename T>
 Buffer<T>::Buffer( T* ptr, int count ) :
 	ConstBuffer( ptr, count )
 {
@@ -166,13 +173,13 @@ Buffer<T>::Buffer( T* ptr, size_t count ) :
 template <typename T>
 Buffer<T>::Buffer( const Buffer<T>& other )
 {
-	Set( other.Get(), other.Size() );
+	Set( other.Access(), other.Size() );
 }
 
 template <typename T>
 Buffer<T>::Buffer( Buffer<T>&& other )
 {
-	Set( other.Get(), other.Size() );
+	Set( other.Access(), other.Size() );
 
 	other.m_ptr = nullptr;
 	other.m_count = 0;
@@ -186,7 +193,7 @@ Buffer<T>::~Buffer()
 template <typename T>
 Buffer<T>& Buffer<T>::operator=( const Buffer<T>& other )
 {
-	Set( other.Get(), other.Size() );
+	Set( other.Access(), other.Size() );
 
 	return *this;
 }
@@ -194,7 +201,7 @@ Buffer<T>& Buffer<T>::operator=( const Buffer<T>& other )
 template <typename T>
 Buffer<T>& Buffer<T>::operator=( Buffer<T>&& other )
 {
-	Set( other.Get(), other.Size() );
+	Set( other.Access(), other.Size() );
 	other.Release();
 
 	return *this;
@@ -210,7 +217,7 @@ void Buffer<T>::Set( T* ptr, int count )
 }
 
 template <typename T>
-T* Buffer<T>::Get() const
+T* Buffer<T>::Access() const
 {
 	return (T*) m_ptr;
 }
@@ -218,7 +225,7 @@ T* Buffer<T>::Get() const
 template <typename T>
 T* Buffer<T>::Release()
 {
-	T* ptr = Get();
+	T* ptr = Access();
 
 	m_ptr = nullptr;
 	m_count = 0;
@@ -231,7 +238,7 @@ T& Buffer<T>::operator[]( size_t index ) const
 {
 	DD_ASSERT( index < m_count );
 
-	return Get()[ index ];
+	return Access()[ index ];
 }
 
 

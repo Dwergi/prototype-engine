@@ -27,29 +27,43 @@ namespace dd
 		~BVHTree();
 
 		size_t Add( const AABB& bounds );
-
 		void Remove( size_t handle );
 
 		BVHIntersection IntersectsRay( const Ray& ray ) const;
 		BVHIntersection IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const;
 
 		bool WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const;
+		bool WithinBounds( const Sphere& sphere, std::vector<size_t>& outHits ) const;
 
 		AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
-
 		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
 
 		size_t GetEntryCount() const { return m_entries.size() - m_freeEntries.size(); }
-
 		size_t GetBucketCount() const { return m_buckets.size() - m_freeBuckets.size(); }
+
+		//
+		// Reserve a number of entries to avoid allocations.
+		// 
+		void Reserve( size_t count )
+		{
+			m_entries.reserve( count );
+			m_buckets.reserve( count * 2 );
+		}
+
+		//
+		// Start a batch operation, which will prevent the tree from being rebuilt.
+		//
+		void StartBatch() { m_batch = true; }
+
+		//
+		// End a batch and force the tree to rebuild.
+		//
+		void EndBatch() { m_batch = false; RebuildTree(); }
 
 		// diagnostics
 		void CountBucketSplits( int& x, int& y, int& z ) const;
 		void EnsureAllBucketsEmpty() const;
 		int GetRebuildCount() const { return m_rebuildCount; }
-
-		void StartBatch() { m_batch = true; }
-		void EndBatch() { m_batch = false; RebuildTree(); }
 
 	private:
 

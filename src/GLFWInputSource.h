@@ -36,9 +36,9 @@ namespace dd
 		virtual void GetKeyEvents( IArray<InputEvent>& out ) const override;
 		virtual void GetMouseEvents( IArray<InputEvent>& out ) const override;
 
-		virtual void BindKey( char c, InputAction action ) override;
-		virtual void BindKey( Key k, InputAction action ) override;
-		virtual void BindMouseButton( MouseButton btn, InputAction action ) override;
+		virtual void BindKey( InputAction action, char ch, uint8 mods = 0 ) override;
+		virtual void BindKey( InputAction action, Key key, uint8 mods = 0 ) override;
+		virtual void BindMouseButton( InputAction action, MouseButton btn, uint8 mods = 0 ) override;
 
 		// these shouldn't be used by default, mainly used by imgui
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );
@@ -73,7 +73,7 @@ namespace dd
 		Vector<ScrollCallbackFunction> m_scrollCallbacks;
 		Vector<CharacterCallbackFunction> m_charCallbacks;
 
-		DenseMap<int, InputAction> m_bindings;
+		Vector<InputBinding> m_bindings;
 
 		static GLFWInputSource* m_pInstance;
 		static void KeyboardCallback( GLFWwindow* window, int key, int scancode, int action, int mods );
@@ -83,6 +83,7 @@ namespace dd
 
 		static InputType GetEventType( int action );
 
-		bool IsBound( int action ) const;
+		bool IsBound( int key, uint8 mods ) const;
+		bool FindBinding( int key, uint8 mods, InputBinding& binding ) const;
 	};
 }

@@ -23,6 +23,7 @@ namespace dd
 		bool Contains( const glm::vec3& pt ) const;
 
 		bool Intersects( const Sphere& sphere ) const;
+		bool Intersects( const AABB& aabb ) const;
 
 		bool IntersectsRay( const Ray& ray ) const;
 		bool IntersectsRay( const Ray& ray, glm::vec3& out_position, glm::vec3& out_normal ) const;

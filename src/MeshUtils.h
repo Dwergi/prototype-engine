@@ -8,7 +8,7 @@
 
 namespace ddr
 {
-	class Mesh;
+	struct Mesh;
 	class VBO;
 }
 

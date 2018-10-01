@@ -6,6 +6,11 @@
 
 #pragma once
 
+namespace ddr
+{
+	struct Mesh;
+}
+
 namespace dd
 {
 	struct Triangle
@@ -32,6 +37,8 @@ namespace dd
 
 	struct Triangulator
 	{
+		Triangulator( ddr::Mesh& mesh );
+
 		Triangulator( const dd::Buffer<glm::vec3>& pos );
 		Triangulator( const dd::Buffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx );
 
@@ -46,7 +53,7 @@ namespace dd
 
 		glm::vec3* m_positions { nullptr };
 		const uint* m_indices { nullptr };
-		const size_t m_size { 0 };
+		size_t m_size { 0 };
 	};
 
 	struct ConstTriangle
@@ -79,6 +86,8 @@ namespace dd
 
 	struct ConstTriangulator
 	{
+		ConstTriangulator( const ddr::Mesh& mesh );
+
 		ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos );
 		ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx );
 
@@ -93,6 +102,6 @@ namespace dd
 
 		const glm::vec3* m_positions { nullptr };
 		const uint* m_indices { nullptr };
-		const size_t m_size { 0 };
+		size_t m_size { 0 };
 	};
 }

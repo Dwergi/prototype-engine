@@ -38,6 +38,14 @@ namespace dd
 		BUTTON_5 = 4
 	};
 
+	enum Modifiers : uint8
+	{
+		NONE = 0,
+		SHIFT = 1 << 0,
+		CTRL = 1 << 1,
+		ALT = 1 << 2
+	};
+
 	struct MousePosition
 	{
 		glm::vec2 Delta;
@@ -52,6 +60,13 @@ namespace dd
 		InputType Type;
 	};
 
+	struct InputBinding
+	{
+		int Key;
+		uint8 Modifiers;
+		InputAction Action;
+	};
+
 	struct IInputSource
 	{
 		virtual void UpdateInput() = 0;
@@ -64,8 +79,8 @@ namespace dd
 		virtual void GetKeyEvents( IArray<InputEvent>& out ) const = 0;
 		virtual void GetMouseEvents( IArray<InputEvent>& out ) const = 0;
 
-		virtual void BindKey( char c, InputAction action ) = 0;
-		virtual void BindKey( Key k, InputAction action ) = 0;
-		virtual void BindMouseButton( MouseButton btn, InputAction action ) = 0;
+		virtual void BindKey( InputAction action, char ch, uint8 mods = 0 ) = 0;
+		virtual void BindKey( InputAction action, Key key, uint8 mods = 0 ) = 0;
+		virtual void BindMouseButton( InputAction action, MouseButton btn, uint8 mods = 0 ) = 0;
 	};
 }

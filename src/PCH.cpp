@@ -18,6 +18,18 @@ namespace dd
 	{
 		return (const void*) ((size_t) base + offset);
 	}
+
+#ifdef _MSC_VER
+	bool DebuggerAttached()
+	{
+		return IsDebuggerPresent();
+	}
+#else
+	bool DebuggerAttached()
+	{
+		return false;
+	}
+#endif
 }
 
 namespace ImGui

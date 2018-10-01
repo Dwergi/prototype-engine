@@ -42,31 +42,30 @@ namespace dd
 
 	void InputSystem::BindKeys()
 	{
-		m_source.BindKey( Key::F1, InputAction::TOGGLE_FREECAM );
-		m_source.BindKey( Key::F2, InputAction::TOGGLE_CONSOLE );
-		m_source.BindKey( Key::ESCAPE, InputAction::TOGGLE_DEBUG_UI );
-		m_source.BindKey( 'W', InputAction::FORWARD );
-		m_source.BindKey( 'S', InputAction::BACKWARD );
-		m_source.BindKey( 'A', InputAction::LEFT );
-		m_source.BindKey( 'D', InputAction::RIGHT );
-		m_source.BindKey( ' ', InputAction::UP );
-		m_source.BindKey( 'R', InputAction::ADD_MINOR_TRAUMA );
-		m_source.BindKey( 'T', InputAction::ADD_MAJOR_TRAUMA );
-		//m_source.BindKey( 'P', InputAction::TOGGLE_PICKING );
-		m_source.BindKey( Key::LCTRL, InputAction::DOWN );
-		m_source.BindKey( Key::LSHIFT, InputAction::BOOST );
-		//m_source.BindMouseButton( MouseButton::LEFT, InputAction::SELECT_MESH );
-		m_source.BindMouseButton( MouseButton::LEFT, InputAction::SHOOT );
-		m_source.BindKey( Key::PAUSE, InputAction::BREAK );
-		m_source.BindKey( 'E', InputAction::START_PARTICLE );
-		m_source.BindKey( 'P', InputAction::RESET_PHYSICS );
+		m_source.BindKey( InputAction::TOGGLE_FREECAM,		Key::F1 );
+		m_source.BindKey( InputAction::TOGGLE_CONSOLE,		Key::F2 );
+		m_source.BindKey( InputAction::TOGGLE_DEBUG_UI,		Key::ESCAPE );
+		m_source.BindKey( InputAction::FORWARD,				'W' );
+		m_source.BindKey( InputAction::BACKWARD,			'S' );
+		m_source.BindKey( InputAction::LEFT,				'A' );
+		m_source.BindKey( InputAction::RIGHT,				'D' );
+		m_source.BindKey( InputAction::UP,					' ' );
+		m_source.BindKey( InputAction::ADD_MINOR_TRAUMA,	'R' );
+		m_source.BindKey( InputAction::ADD_MAJOR_TRAUMA,	'T' );
+		//m_source.BindKeyInputAction::TOGGLE_PICKING,		'P' );		
+		m_source.BindKey( InputAction::DOWN,				Key::LCTRL );
+		m_source.BindKey( InputAction::BOOST,				Key::LSHIFT );
+		m_source.BindKey( InputAction::BREAK,				Key::PAUSE );
+		m_source.BindKey( InputAction::START_PARTICLE,		'E' );
+		m_source.BindKey( InputAction::RESET_PHYSICS,		'P' );
+		m_source.BindKey( InputAction::CAMERA_POS_1,		'1' );
+		m_source.BindKey( InputAction::CAMERA_POS_2,		'2' );
+		m_source.BindKey( InputAction::CAMERA_POS_3,		'3' );
+		m_source.BindKey( InputAction::CAMERA_POS_4,		'4' );
+		m_source.BindKey( InputAction::DECREASE_DEPTH,		Key::HOME );
+		m_source.BindKey( InputAction::INCREASE_DEPTH,		Key::END );
 
-		m_source.BindKey( '1', InputAction::CAMERA_POS_1 );
-		m_source.BindKey( '2', InputAction::CAMERA_POS_2 );
-		m_source.BindKey( '3', InputAction::CAMERA_POS_3 );
-		m_source.BindKey( '4', InputAction::CAMERA_POS_4 );
-
-		m_source.BindKey( Key::HOME, InputAction::DECREASE_DEPTH );
-		m_source.BindKey( Key::END, InputAction::INCREASE_DEPTH );
+		//m_source.BindMouseButton( InputAction::SELECT_MESH, MouseButton::LEFT );
+		m_source.BindMouseButton( InputAction::SELECT_MESH, MouseButton::LEFT );
 	}
 }

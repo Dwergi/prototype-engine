@@ -35,12 +35,12 @@ namespace dd
 
 	const char* String::c_str() const
 	{
-		return m_buffer.GetConst();
+		return m_buffer.Get();
 	}
 
 	char* String::data()
 	{
-		return m_buffer.Get();
+		return m_buffer.Access();
 	}
 
 	bool String::w_str( const Buffer<wchar_t>& buffer ) const
@@ -49,7 +49,7 @@ namespace dd
 			return false;
 
 		size_t count;
-		return mbstowcs_s( &count, buffer.Get(), buffer.Size() / 4, m_buffer.Get(), m_length ) > 0;
+		return mbstowcs_s( &count, buffer.Access(), buffer.Size() / 4, m_buffer.Get(), m_length ) > 0;
 	}
 
 	bool String::Equals( const char* other, int length, bool caseless ) const
@@ -252,7 +252,7 @@ namespace dd
 
 		Resize( length );
 
-		memcpy( m_buffer.Get(), data, length );
+		memcpy( m_buffer.Access(), data, length );
 		m_length = length;
 
 		NullTerminate();
@@ -297,7 +297,7 @@ namespace dd
 		// check if we could fit in the local array
 		if( (m_length + 1) < m_stack.Size() )
 		{
-			memcpy( m_stack.Get(), m_buffer.Get(), m_length );
+			memcpy( m_stack.Access(), m_buffer.Get(), m_length );
 
 			void* ptr = m_buffer.Release();
 			delete[] ptr;
@@ -309,7 +309,7 @@ namespace dd
 
 			m_buffer.Set( new char[m_length + 1], m_length + 1 );
 
-			memcpy( m_buffer.Get(), old_buffer, m_length );
+			memcpy( m_buffer.Access(), old_buffer, m_length );
 
 			delete[] old_buffer;
 		}

@@ -20,9 +20,21 @@ namespace dd
 	}
 
 	template <typename T>
+	T min( T a, T b, T c )
+	{
+		return dd::min( a, dd::min( b, c ) );
+	}
+
+	template <typename T>
 	T max( T a, T b )
 	{
 		return a >= b ? a : b;
+	}
+
+	template <typename T>
+	T max( T a, T b, T c )
+	{
+		return dd::max( a, dd::max( b, c ) );
 	}
 
 	template <typename T>

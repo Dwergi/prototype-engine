@@ -38,9 +38,9 @@ namespace dd
 	public:
 
 		ConstBuffer();
-		ConstBuffer( const IBuffer& buffer );
 		ConstBuffer( const T* ptr, int count );
 		ConstBuffer( const T* ptr, size_t count );
+		explicit ConstBuffer( const IBuffer& buffer );
 		ConstBuffer( const ConstBuffer<T>& other );
 		ConstBuffer( ConstBuffer<T>&& other );
 		virtual ~ConstBuffer();
@@ -53,7 +53,7 @@ namespace dd
 		bool IsValid() const { return m_ptr != nullptr; }
 
 		void Set( const T* ptr, int count );
-		const T* GetConst() const;
+		const T* Get() const;
 		virtual const void* GetVoid() const override { return m_ptr; }
 
 		const T* ReleaseConst();
@@ -65,8 +65,8 @@ namespace dd
 		bool operator==( const ConstBuffer<T>& other ) const;
 		bool operator!=( const ConstBuffer<T>& other ) const;
 
-		const T* begin() const { return GetConst(); }
-		const T* end() const { return GetConst() + Size(); }
+		const T* begin() const { return Get(); }
+		const T* end() const { return Get() + Size(); }
 
 	protected:
 		const T* m_ptr { nullptr };
@@ -83,6 +83,7 @@ namespace dd
 		Buffer();
 		Buffer( T* ptr, int count );
 		Buffer( T* ptr, size_t count );
+		explicit Buffer( const IBuffer& buffer );
 		Buffer( const Buffer<T>& other );
 		Buffer( Buffer<T>&& other );
 		virtual ~Buffer();
@@ -93,15 +94,15 @@ namespace dd
 		T& operator[]( size_t idx ) const;
 
 		void Set( T* ptr, int count );
-		T* Get() const;
+		T* Access() const;
 
 		T* Release();
 
 		bool operator==( const Buffer<T>& other ) const;
 		bool operator!=( const Buffer<T>& other ) const;
 
-		T* begin() const { return Get(); }
-		T* end() const { return Get() + Size(); }
+		T* begin() const { return Access(); }
+		T* end() const { return Access() + Size(); }
 	};
 
 	#include "Buffer.inl"

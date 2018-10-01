@@ -22,7 +22,7 @@ struct GLFWwindow;
 namespace ddr
 {
 	struct ICamera;
-	class Mesh;
+	struct Mesh;
 	struct ShaderProgram;
 }
 

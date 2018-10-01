@@ -241,7 +241,7 @@ namespace dd
 		return nearest;
 	}
 
-	bool BVHTree::WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const
+	bool BVHTree::WithinBounds( const AABB& bounds, std::vector<size_t>& out_hits ) const
 	{
 		int buckets_tested = 0;
 
@@ -264,7 +264,47 @@ namespace dd
 					{
 						if( m_entries[ e ].Bounds.Intersects( bounds ) )
 						{
-							outHits.push_back( e );
+							out_hits.push_back( e );
+							hit = true;
+						}
+					}
+				}
+				else
+				{
+					stack.Add( bucket.Left );
+					stack.Add( bucket.Right );
+				}
+			}
+		}
+
+		//DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+
+		return hit;
+	}
+
+	bool BVHTree::WithinBounds( const Sphere& sphere, std::vector<size_t>& out_hits ) const
+	{
+		int buckets_tested = 0;
+
+		dd::Array<size_t, 64> stack;
+		stack.Add( 0 );
+
+		bool hit = false;
+
+		while( stack.Size() > 0 )
+		{
+			++buckets_tested;
+
+			const BVHBucket& bucket = m_buckets[stack.Pop()];
+			if( bucket.Bounds.Intersects( sphere ) )
+			{
+				if( bucket.IsLeaf() )
+				{
+					for( size_t e : bucket.Entries )
+					{
+						if( m_entries[e].Bounds.Intersects( sphere ) )
+						{
+							out_hits.push_back( e );
 							hit = true;
 						}
 					}

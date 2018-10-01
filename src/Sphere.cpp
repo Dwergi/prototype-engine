@@ -49,6 +49,13 @@ namespace dd
 		return (glm::length( sphere.Centre - Centre ) + sphere.Radius) <= Radius;
 	}
 
+	bool Sphere::Intersects( const AABB& aabb ) const
+	{
+		glm::vec3 closest = glm::clamp( Centre, aabb.Min, aabb.Max );
+
+		return glm::distance2( closest, Centre ) < Radius * Radius;
+	}
+
 	bool Sphere::IntersectsRay( const Ray& ray ) const
 	{
 		glm::vec3 pos, normal;
@@ -63,8 +70,10 @@ namespace dd
 	Sphere Sphere::GetTransformed( const glm::mat4& t ) const
 	{
 		glm::vec4 centre = t * glm::vec4( Centre, 1 );
-		glm::vec4 radius = t * glm::vec4( Radius, Radius, Radius, 0 );
+		glm::vec4 x = t * glm::vec4( Radius, 0, 0, 0 );
+		glm::vec4 y = t * glm::vec4( 0, Radius, 0, 0 );
+		glm::vec4 z = t * glm::vec4( 0, 0, Radius, 0 );
 
-		return Sphere( glm::vec3( centre.xyz ), dd::max( radius.x, dd::max( radius.y, radius.z ) ) );
+		return Sphere( glm::vec3( centre.xyz ), std::sqrt( dd::max( glm::length2( x ), glm::length2( y ), glm::length2( z ) ) ) );
 	}
 }

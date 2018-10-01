@@ -35,9 +35,16 @@ namespace dd
 	void FrameTimer::Update()
 	{
 		m_targetDelta = 1.0f / m_maxFPS;
+
 		m_lastFrameTime = m_currentFrameTime;
 		m_currentFrameTime = m_timer.Time();
+		
 		m_appDelta = m_currentFrameTime - m_lastFrameTime;
+
+		if( m_appDelta > 1.0f && dd::DebuggerAttached() )
+		{
+			m_appDelta = m_targetDelta;
+		}
 
 		if( !m_paused )
 		{
@@ -49,7 +56,9 @@ namespace dd
 		++m_currentSlidingFrame;
 
 		if( m_currentSlidingFrame >= SLIDING_WINDOW_SIZE )
+		{
 			m_currentSlidingFrame = 0;
+		}
 
 		float total_time = 0;
 		for( float f : m_frameTimes )
