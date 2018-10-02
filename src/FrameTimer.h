@@ -21,6 +21,10 @@ namespace dd
 		void DelayFrame();
 
 		void SetPaused( bool paused ) { m_paused = paused; }
+		bool IsPaused() const { return m_paused; }
+
+		void SetTimeScale( float scale ) { m_timeScale = scale; }
+		float GetTimeScale() const { return m_timeScale; }
 
 		void SetMaxFPS( uint max_fps ) { m_maxFPS = max_fps; }
 		uint GetMaxFPS() const { return m_maxFPS; }
@@ -52,6 +56,7 @@ namespace dd
 		float m_appDelta { 0.0f };
 		float m_deltaWithoutDelay { 0.0f };
 		float m_slidingDelta { 0.0f };
+		float m_timeScale { 1.0f };
 		uint m_maxFPS { 0 };
 		bool m_drawCompact { true };
 		bool m_paused { false };

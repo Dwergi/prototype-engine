@@ -141,11 +141,11 @@ void ToggleDebugUI( InputAction action, InputType type )
 	}
 }
 
-void TriggerAssert( InputAction action, InputType type )
+void PauseGame( InputAction action, InputType type )
 {
-	if( action == InputAction::BREAK && type == InputType::RELEASED )
+	if( action == InputAction::PAUSE && type == InputType::RELEASED )
 	{
-		DD_ASSERT( false );
+		s_frameTimer->SetPaused( !s_frameTimer->IsPaused() );
 	}
 }
 
@@ -191,6 +191,21 @@ void SetCameraPos( InputAction action, InputType type )
 	case InputAction::INCREASE_DEPTH:
 		s_fpsCamera->SetPosition( s_fpsCamera->GetPosition() - glm::vec3( 0, 0, 1 ) );
 		break;
+	}
+}
+
+void SetTimeScale( InputAction action, InputType type )
+{
+	if( action == InputAction::TIME_SCALE_DOWN && type == InputType::RELEASED )
+	{
+		float time_scale = s_frameTimer->GetTimeScale();
+		s_frameTimer->SetTimeScale( time_scale * 0.9f );
+	}
+
+	if( action == InputAction::TIME_SCALE_UP && type == InputType::RELEASED )
+	{
+		float time_scale = s_frameTimer->GetTimeScale();
+		s_frameTimer->SetTimeScale( time_scale * 1.1f );
 	}
 }
 
@@ -436,16 +451,18 @@ int GameMain()
 		input_source->SetMode( InputMode::GAME );
 
 		InputBindings* input_bindings = new InputBindings();
-		input_bindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
-		input_bindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
-		input_bindings->RegisterHandler( InputAction::EXIT, &Exit );
-		input_bindings->RegisterHandler( InputAction::BREAK, &TriggerAssert );
-		input_bindings->RegisterHandler( InputAction::CAMERA_POS_1, &SetCameraPos );
-		input_bindings->RegisterHandler( InputAction::CAMERA_POS_2, &SetCameraPos );
-		input_bindings->RegisterHandler( InputAction::CAMERA_POS_3, &SetCameraPos );
-		input_bindings->RegisterHandler( InputAction::CAMERA_POS_4, &SetCameraPos );
-		input_bindings->RegisterHandler( InputAction::INCREASE_DEPTH, &SetCameraPos );
-		input_bindings->RegisterHandler( InputAction::DECREASE_DEPTH, &SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::TOGGLE_FREECAM,	&ToggleFreeCam );
+		input_bindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI,	&ToggleDebugUI );
+		input_bindings->RegisterHandler( InputAction::EXIT,				&Exit );
+		input_bindings->RegisterHandler( InputAction::PAUSE,			&PauseGame );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_1,		&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_2,		&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_3,		&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::CAMERA_POS_4,		&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::INCREASE_DEPTH,	&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::DECREASE_DEPTH,	&SetCameraPos );
+		input_bindings->RegisterHandler( InputAction::TIME_SCALE_DOWN,	&SetTimeScale );
+		input_bindings->RegisterHandler( InputAction::TIME_SCALE_UP,	&SetTimeScale );
 
 		s_input = new InputSystem( *input_source, *input_bindings );
 		s_input->BindKeys();
@@ -751,16 +768,17 @@ int GameMain()
 			s_frameTimer->SetMaxFPS( s_maxFPS );
 			s_frameTimer->Update();
 
-			float delta_t = s_frameTimer->GameDelta();
+			float game_delta_t = s_frameTimer->GameDelta();
+			float app_delta_t = s_frameTimer->AppDelta();
 
-			s_input->Update( delta_t );
-			s_debugUI->StartFrame( delta_t );
+			s_input->Update( app_delta_t );
+			s_debugUI->StartFrame( s_frameTimer->AppDelta() );
 
-			s_world->Update( delta_t );
+			s_world->Update( game_delta_t );
 
 			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 
-			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, delta_t );
+			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, app_delta_t );
 		
 			s_debugUI->RenderDebugPanels( *s_world );
 			s_frameTimer->DrawFPSCounter();

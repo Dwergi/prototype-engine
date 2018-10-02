@@ -48,7 +48,11 @@ namespace dd
 
 		if( !m_paused )
 		{
-			m_gameDelta = m_appDelta;
+			m_gameDelta = m_appDelta * m_timeScale;
+		}
+		else
+		{
+			m_gameDelta = 0;
 		}
 
 		// update sliding window
@@ -95,6 +99,8 @@ namespace dd
 		ImGui::Value( "FPS: ", 1.0f / m_slidingDelta, "%.1f" );
 		ImGui::Text( "Frame Time: %.1fms", m_deltaWithoutDelay * 1000.f );
 		ImGui::Text( "Sliding Time: %.1fms", m_slidingDelta * 1000.0f );
+
+		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
 		
 		if( ImGui::TreeNodeEx( "Frame Times", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{

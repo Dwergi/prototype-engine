@@ -18,6 +18,8 @@ namespace dd
 		ESCAPE		= 256,
 		ENTER		= 257,
 		TAB			= 258,
+		PAGE_UP		= 266,
+		PAGE_DOWN	= 267,
 		HOME		= 268,
 		END			= 269,
 		CAPS_LOCK	= 280,

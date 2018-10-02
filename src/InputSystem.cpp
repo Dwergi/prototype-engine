@@ -55,7 +55,6 @@ namespace dd
 		m_source.BindKey( InputAction::ADD_MAJOR_TRAUMA,	'T'			);
 		m_source.BindKey( InputAction::DOWN,				Key::LCTRL	);
 		m_source.BindKey( InputAction::BOOST,				Key::LSHIFT	);
-		m_source.BindKey( InputAction::BREAK,				Key::PAUSE	);
 		m_source.BindKey( InputAction::START_PARTICLE,		'E'			);
 		m_source.BindKey( InputAction::CAMERA_POS_1,		'1'			);
 		m_source.BindKey( InputAction::CAMERA_POS_2,		'2'			);
@@ -65,6 +64,9 @@ namespace dd
 		m_source.BindKey( InputAction::INCREASE_DEPTH,		Key::END	);
 		m_source.BindKey( InputAction::RESET_PHYSICS,		'P',			InputMode::GAME );
 		m_source.BindKey( InputAction::TOGGLE_PICKING,		'P',			InputMode::DEBUG );
+		m_source.BindKey( InputAction::PAUSE,				Key::PAUSE	);
+		m_source.BindKey( InputAction::TIME_SCALE_DOWN,		Key::PAGE_DOWN );
+		m_source.BindKey( InputAction::TIME_SCALE_UP,		Key::PAGE_UP );
 																	   
 		//m_source.BindKey( InputAction::TOGGLE_CONSOLE, Key::F2, InputMode::DEBUG );
 
