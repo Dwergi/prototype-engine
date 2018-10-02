@@ -40,18 +40,25 @@ namespace dd
 		m_input( input ),
 		m_hitTest( hit_test )
 	{
-		RequireTag( ddc::Tag::Visible );
-
 		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
+	
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
+
+		RequireTag( ddc::Tag::Visible );
+		RequireTag( ddc::Tag::Dynamic );
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
 	{
-		bindings.RegisterHandler( InputAction::SELECT_MESH, [this]( InputAction action, InputType type ) { HandleInput( action, type ); } );
-		bindings.RegisterHandler( InputAction::TOGGLE_PICKING, [this]( InputAction action, InputType type ) { HandleInput( action, type ); } );
+		auto handler = [this]( InputAction action, InputType type )
+		{
+			HandleInput( action, type );
+		};
+
+		bindings.RegisterHandler( InputAction::SELECT_MESH,	handler );
+		bindings.RegisterHandler( InputAction::TOGGLE_PICKING,	handler );
 	}
 
 	void MousePicking::HandleInput( InputAction action, InputType type )
@@ -64,7 +71,7 @@ namespace dd
 		if( action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED )
 		{
 			m_enabled = !m_enabled;
-			IDebugPanel::SetDebugOpen( m_enabled );
+			IDebugPanel::SetDebugPanelOpen( true );
 		}
 	}
 
@@ -260,8 +267,8 @@ namespace dd
 			m_pendingHit = m_hitTest.ScheduleHitTest( screen_ray, 200 );
 		}
 
-		ddc::Entity entity;
-		m_depth = FLT_MAX;
+		ddc::Entity entity = m_hitResult.Entity();
+		m_depth = m_hitResult.Distance();
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();

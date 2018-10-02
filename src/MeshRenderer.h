@@ -15,8 +15,9 @@ namespace dd
 {
 	struct BoundBoxComponent;
 	struct ColourComponent;
+	struct JobSystem;
 	struct MeshComponent; 
-	class MousePicking;
+	struct MousePicking;
 	struct TransformComponent;
 }
 
@@ -26,7 +27,7 @@ namespace ddr
 	{
 	public:
 
-		MeshRenderer( const dd::MousePicking& m_mousePicking );
+		MeshRenderer( const dd::MousePicking& mouse_picking, dd::JobSystem& job_system );
 
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void Render( const ddr::RenderData& render_data ) override;
@@ -46,6 +47,7 @@ namespace ddr
 		MeshHandle m_cube;
 		
 		const dd::MousePicking& m_mousePicking;
+		dd::JobSystem& m_jobsystem;
 
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp, 

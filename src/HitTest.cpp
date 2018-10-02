@@ -46,6 +46,8 @@ namespace dd
 
 		dd::ConstTriangulator triangulator( mesh );
 
+		DD_ASSERT( triangulator.Size() > 0 );
+
 		BVHIntersection intersection = 
 			bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &triangulator]( size_t tri )
 		{

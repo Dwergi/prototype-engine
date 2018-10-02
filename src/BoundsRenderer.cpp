@@ -10,6 +10,7 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
+#include "InputBindings.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
 #include "Shader.h"
@@ -52,13 +53,33 @@ namespace ddr
 	{
 		Require<dd::TransformComponent>();
 		Optional<dd::BoundBoxComponent>();
-		Optional<dd::BoundBoxComponent>();
+		Optional<dd::BoundSphereComponent>();
 		RequireTag( ddc::Tag::Visible );
 	}
 
 	BoundsRenderer::~BoundsRenderer()
 	{
 
+	}
+
+	void BoundsRenderer::BindKeys( dd::InputBindings& bindings )
+	{
+		auto handler = [this]( dd::InputAction action, dd::InputType type )
+		{
+			if( type == dd::InputType::RELEASED )
+			{
+				int mode = (int) m_drawMode;
+				++mode;
+
+				if( mode > 2 )
+					mode = 0;
+
+				m_drawMode = (DrawMode) mode;
+				m_updateBuffers = true;
+			}
+		};
+
+		bindings.RegisterHandler( dd::InputAction::TOGGLE_BOUNDS, handler );
 	}
 	
 	void BoundsRenderer::RenderInit( ddc::World& world )
@@ -200,7 +221,7 @@ namespace ddr
 
 		static const char* c_drawModes = "None\0Box\0Sphere\0";
 		
-		int drawMode = m_drawMode;
+		int drawMode = (int) m_drawMode;
 		if( ImGui::Combo( "Mode", &drawMode, c_drawModes ) )
 		{
 			m_drawMode = (DrawMode) drawMode;

@@ -20,8 +20,6 @@
 #include "TransformComponent.h"
 #include "World.h"
 
-
-
 namespace dd
 {
 	float s_shipMesh[] = 
@@ -51,25 +49,29 @@ namespace dd
 		ddc::System( "Ship System" ),
 		m_camera( camera )
 	{
-		m_inputs.Add( InputAction::FORWARD, false );
-		m_inputs.Add( InputAction::BACKWARD, false );
-		m_inputs.Add( InputAction::LEFT, false );
-		m_inputs.Add( InputAction::RIGHT, false );
-		m_inputs.Add( InputAction::UP, false );
-		m_inputs.Add( InputAction::DOWN, false );
-		m_inputs.Add( InputAction::BOOST, false );
+		m_inputs.Add( InputAction::FORWARD,		false );
+		m_inputs.Add( InputAction::BACKWARD,	false );
+		m_inputs.Add( InputAction::LEFT,		false );
+		m_inputs.Add( InputAction::RIGHT,		false );
+		m_inputs.Add( InputAction::UP,			false );
+		m_inputs.Add( InputAction::DOWN,		false );
+		m_inputs.Add( InputAction::BOOST,		false );
 	}
 
 	void ShipSystem::BindActions( InputBindings& bindings )
 	{
-		auto handle_input = std::bind( &ShipSystem::HandleInput, std::ref( *this ), std::placeholders::_1, std::placeholders::_2 );
-		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
-		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
-		bindings.RegisterHandler( InputAction::LEFT, handle_input );
-		bindings.RegisterHandler( InputAction::RIGHT, handle_input );
-		bindings.RegisterHandler( InputAction::UP, handle_input );
-		bindings.RegisterHandler( InputAction::DOWN, handle_input );
-		bindings.RegisterHandler( InputAction::BOOST, handle_input );
+		auto handle_input = [this]( InputAction action, InputType type )
+		{
+			HandleInput( action, type );
+		};
+
+		bindings.RegisterHandler( InputAction::FORWARD,		handle_input );
+		bindings.RegisterHandler( InputAction::BACKWARD,	handle_input );
+		bindings.RegisterHandler( InputAction::LEFT,		handle_input );
+		bindings.RegisterHandler( InputAction::RIGHT,		handle_input );
+		bindings.RegisterHandler( InputAction::UP,			handle_input );
+		bindings.RegisterHandler( InputAction::DOWN,		handle_input );
+		bindings.RegisterHandler( InputAction::BOOST,		handle_input );
 	}
 	
 	void ShipSystem::Update( const ddc::UpdateData& data )

@@ -34,7 +34,7 @@ namespace dd
 
 		if( bound_sphere != nullptr )
 		{
-			sphere = bound_sphere->BoundSphere;
+			sphere = bound_sphere->Sphere;
 		}
 
 		if( aabb.IsValid() && sphere.IsValid() )

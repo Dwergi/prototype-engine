@@ -18,7 +18,6 @@ namespace dd
 		InputSystem( IInputSource& source, InputBindings& bindings );
 
 		void Update( float delta_t );
-
 		void BindKeys();
 
 		IInputSource& Source() { return m_source; }

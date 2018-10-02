@@ -30,30 +30,46 @@ namespace dd
 		}
 	}
 
-	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos ) :
-		m_size( pos.Size() / 3 )
+	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos )
 	{
 		m_positions = pos.Access();
+		m_size = pos.Size() / 3;
 	}
 
-	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx ) :
-		m_size( idx.Size() / 3 )
+	Triangulator::Triangulator( const dd::Buffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx )
 	{
-		m_positions = pos.Access();
-		m_indices = idx.Get();
+		if( idx.IsValid() )
+		{
+			m_positions = pos.Access();
+			m_indices = idx.Get();
+			m_size = idx.Size() / 3;
+		}
+		else
+		{
+			m_positions = pos.Access();
+			m_size = pos.Size() / 3;
+		}
 	}
 
-	Triangulator::Triangulator( std::vector<glm::vec3>& pos ) :
-		m_size( pos.size() / 3 )
+	Triangulator::Triangulator( std::vector<glm::vec3>& pos )
 	{
 		m_positions = pos.data();
+		m_size = pos.size() / 3;
 	}
 
-	Triangulator::Triangulator( std::vector<glm::vec3>& pos, const std::vector<uint>& idx ) : 
-		m_size( idx.size() / 3 )
+	Triangulator::Triangulator( std::vector<glm::vec3>& pos, const std::vector<uint>& idx )
 	{
-		m_positions = pos.data();
-		m_indices = idx.data();
+		if( !idx.empty() )
+		{
+			m_positions = pos.data();
+			m_indices = idx.data();
+			m_size = idx.size() / 3;
+		}
+		else
+		{
+			m_positions = pos.data();
+			m_size = pos.size() / 3;
+		}
 	}
 
 	Triangle Triangulator::operator[]( size_t i ) const
@@ -93,30 +109,46 @@ namespace dd
 		}
 	}
 
-	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos ) :
-		m_size( pos.Size() / 3 )
+	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos )
 	{
 		m_positions = pos.Get();
+		m_size = pos.Size() / 3;
 	}
 
-	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx ) :
-		m_size( idx.Size() / 3 )
+	ConstTriangulator::ConstTriangulator( const dd::ConstBuffer<glm::vec3>& pos, const dd::ConstBuffer<uint>& idx )
 	{
-		m_positions = pos.Get();
-		m_indices = idx.Get();
+		if( idx.IsValid() )
+		{
+			m_positions = pos.Get();
+			m_indices = idx.Get();
+			m_size = idx.Size() / 3;
+		}
+		else
+		{
+			m_positions = pos.Get();
+			m_size = pos.Size() / 3;
+		}
 	}
 
-	ConstTriangulator::ConstTriangulator( const std::vector<glm::vec3>& pos ) : 
-		m_size( pos.size() / 3 )
+	ConstTriangulator::ConstTriangulator( const std::vector<glm::vec3>& pos )
 	{
 		m_positions = pos.data();
+		m_size = pos.size() / 3;
 	}
 
-	ConstTriangulator::ConstTriangulator( const std::vector<glm::vec3>& pos, const std::vector<uint>& idx ) :
-		m_size( idx.size() / 3 )
+	ConstTriangulator::ConstTriangulator( const std::vector<glm::vec3>& pos, const std::vector<uint>& idx )
 	{
-		m_positions = pos.data();
-		m_indices = idx.data();
+		if( !idx.empty() )
+		{
+			m_positions = pos.data();
+			m_indices = idx.data();
+			m_size = idx.size() / 3;
+		}
+		else
+		{
+			m_positions = pos.data();
+			m_size = pos.size() / 3;
+		}
 	}
 
 	ConstTriangle ConstTriangulator::operator[]( size_t i ) const

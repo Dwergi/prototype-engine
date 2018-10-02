@@ -36,9 +36,12 @@ namespace dd
 		virtual void GetKeyEvents( IArray<InputEvent>& out ) const override;
 		virtual void GetMouseEvents( IArray<InputEvent>& out ) const override;
 
-		virtual void BindKey( InputAction action, char ch, uint8 mods = 0 ) override;
-		virtual void BindKey( InputAction action, Key key, uint8 mods = 0 ) override;
-		virtual void BindMouseButton( InputAction action, MouseButton btn, uint8 mods = 0 ) override;
+		virtual void BindKey( InputAction action, char ch, uint8 modes = InputMode::ALL, uint8 modifiers = 0 ) override;
+		virtual void BindKey( InputAction action, Key key, uint8 modes = InputMode::ALL, uint8 modifiers = 0 ) override;
+		virtual void BindMouseButton( InputAction action, MouseButton btn, uint8 modes = InputMode::ALL, uint8 modifiers = 0 ) override;
+
+		virtual void SetMode( uint8 mode ) override { m_mode = mode; }
+		virtual uint8 GetMode() const override { return m_mode; }
 
 		// these shouldn't be used by default, mainly used by imgui
 		void AddKeyboardCallback( KeyboardCallbackFunction cb );
@@ -53,12 +56,13 @@ namespace dd
 
 	private:
 
-		GLFWwindow* m_glfwWindow;
+		GLFWwindow* m_glfwWindow { nullptr };
 		MousePosition m_mousePosition;
 		MousePosition m_scrollPosition;
 		MousePosition m_tempScrollPosition;
+		uint8 m_mode { InputMode::NONE };
 
-		bool m_mouseCaptured;
+		bool m_mouseCaptured { false };
 
 		static const int MAX_EVENTS = 32;
 
@@ -83,7 +87,7 @@ namespace dd
 
 		static InputType GetEventType( int action );
 
-		bool IsBound( int key, uint8 mods ) const;
-		bool FindBinding( int key, uint8 mods, InputBinding& binding ) const;
+		bool IsBound( int key, uint8 modes, uint8 modifiers ) const;
+		bool FindBinding( int key, uint8 modes, uint8 modifiers, InputBinding& binding ) const;
 	};
 }

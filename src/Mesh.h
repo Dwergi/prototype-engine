@@ -18,6 +18,7 @@
 namespace dd
 {
 	struct BVHTree;
+	struct JobSystem;
 }
 
 namespace ddr
@@ -130,7 +131,7 @@ namespace ddr
 		//
 		// Send updated mesh data to the GPU from the same place it currently is.
 		//
-		void UpdateBuffers();
+		void UpdateBuffers( dd::JobSystem& jobsystem );
 
 		//
 		// Get the name of this mesh.

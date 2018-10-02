@@ -44,7 +44,9 @@ namespace dd
 
 		// don't allow enqueuing after stopping the pool
 		if( m_stop )
-			DD_ASSERT( "Scheduled job on stopped JobSystem" );
+		{
+			DD_ASSERT( false, "Scheduled job on stopped JobSystem" );
+		}
 
 		auto task = std::make_shared< std::packaged_task<return_type()> >(
 			std::bind( std::forward<F>( f ), std::forward<Args>( args )... )

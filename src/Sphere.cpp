@@ -1,5 +1,5 @@
 //
-// BoundSphere.cpp - A bounding sphere.
+// Sphere.cpp - A bounding sphere.
 // Copyright (C) Sebastian Nordgren 
 // September 13th 2018
 //

@@ -25,8 +25,6 @@
 #include "Window.h"
 #include "World.h"
 
-
-
 namespace ddr
 {
 
@@ -141,16 +139,19 @@ namespace ddr
 
 	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
 	{
-		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> components;
+		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for( const ddc::DataRequest* req : renderer.GetRequirements() )
 		{
-			components.Add( req->Component().ComponentID() );
+			if( !req->Optional() )
+			{
+				required.Add( req->Component().ComponentID() );
+			}
 		}
 
 		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();
 
 		std::vector<ddc::Entity> entities;
-		world.FindAllWith( components, tags, entities );
+		world.FindAllWith( required, tags, entities );
 
 		if( entities.size() == 0 )
 		{

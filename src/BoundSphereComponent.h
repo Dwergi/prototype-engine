@@ -12,13 +12,13 @@ namespace dd
 {
 	struct BoundSphereComponent
 	{
-		Sphere BoundSphere;
+		Sphere Sphere;
 
 		DD_CLASS( dd::BoundSphereComponent )
 		{
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::BoundSphereComponent, BoundSphere );
+			DD_MEMBER( dd::BoundSphereComponent, Sphere );
 		}
 	};
 }

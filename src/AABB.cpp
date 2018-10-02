@@ -157,7 +157,7 @@ namespace dd
 			tMax = dd::min( tMax, dd::max( vMin.z, vMax.z ) );
 		}
 
-		if( tMax > max( tMin, 0.0f ) )
+		if( tMax >= dd::max( tMin, 0.0f ) )
 		{
 			distance = tMin;
 			return true;

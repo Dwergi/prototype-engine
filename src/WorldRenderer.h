@@ -15,7 +15,7 @@
 namespace dd
 {
 	struct MeshComponent;
-	class MousePicking;
+	struct MousePicking;
 	struct TransformComponent;
 	class Window;
 }

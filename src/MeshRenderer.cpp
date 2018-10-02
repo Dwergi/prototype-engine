@@ -24,9 +24,10 @@
 
 namespace ddr
 {
-	MeshRenderer::MeshRenderer( const dd::MousePicking& mousePicking ) :
+	MeshRenderer::MeshRenderer( const dd::MousePicking& mouse_picking, dd::JobSystem& jobsystem ) :
 		ddr::Renderer( "Meshes" ),
-		m_mousePicking( mousePicking )
+		m_mousePicking( mouse_picking ),
+		m_jobsystem( jobsystem )
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
@@ -117,7 +118,7 @@ namespace ddr
 
 		if( mesh->IsDirty() )
 		{
-			mesh->UpdateBuffers();
+			mesh->UpdateBuffers( m_jobsystem );
 		}
 
 		++m_meshCount;

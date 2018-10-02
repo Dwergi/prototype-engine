@@ -40,7 +40,7 @@ namespace dd
 	struct TransformComponent;
 	class Window;
 	
-	class MousePicking : public IDebugPanel, public ddr::Renderer
+	struct MousePicking : public IDebugPanel, public ddr::Renderer
 	{
 	public:
 

@@ -35,7 +35,7 @@ namespace dd
 		//
 		// Change the open status of this menu.
 		//
-		void SetDebugOpen( bool value ) { m_debugOpen = value; }
+		void SetDebugPanelOpen( bool value ) { m_debugOpen = value; }
 
 		//
 		// Get the display name of the debug panel.

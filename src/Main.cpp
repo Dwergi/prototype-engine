@@ -128,6 +128,15 @@ void ToggleDebugUI( InputAction action, InputType type )
 {
 	if( action == InputAction::TOGGLE_DEBUG_UI && type == InputType::RELEASED )
 	{
+		if( s_input->Source().GetMode() == InputMode::DEBUG )
+		{
+			s_input->Source().SetMode( InputMode::GAME );
+		}
+		else
+		{
+			s_input->Source().SetMode( InputMode::DEBUG );
+		}
+
 		s_debugUI->EnableDraw( !s_debugUI->Draw() );
 	}
 }
@@ -394,6 +403,9 @@ ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 
 	s_world->AddTag( entity, ddc::Tag::Dynamic );
 
+	dd::BoundSphereComponent& bound_sphere = s_world->Add<dd::BoundSphereComponent>( entity );
+	bound_sphere.Sphere.Radius = 1.0f;
+
 	dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( entity );
 	physics_sphere.Sphere.Radius = 1.0f;
 	physics_sphere.Elasticity = 1.0f;
@@ -413,7 +425,7 @@ int GameMain()
 	dd::TypeInfo::RegisterQueuedTypes();
 
 	unsigned int threads = std::thread::hardware_concurrency();
-	JobSystem jobsystem( threads - 1 );
+	dd::JobSystem* jobsystem = new JobSystem( threads - 1 );
 
 	s_mainThread = std::this_thread::get_id();
 
@@ -421,6 +433,7 @@ int GameMain()
 		s_window = new Window( glm::ivec2( 1920, 1080 ), "DD" );
 
 		GLFWInputSource* input_source = new GLFWInputSource( *s_window );
+		input_source->SetMode( InputMode::GAME );
 
 		InputBindings* input_bindings = new InputBindings();
 		input_bindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
@@ -465,7 +478,7 @@ int GameMain()
 		//s_shipSystem->BindActions( bindings );
 		//s_shipSystem->CreateShip( *s_world );
 
-		TerrainSystem* terrain_system = new TerrainSystem( jobsystem );
+		TerrainSystem* terrain_system = new TerrainSystem( *jobsystem );
 
 		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
 		bullet_system->DependsOn( *hit_testing );
@@ -474,7 +487,7 @@ int GameMain()
 		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
 		particle_system->BindActions( *input_bindings );
 
-		s_world = new ddc::World( jobsystem );
+		s_world = new ddc::World( *jobsystem );
 
 		//s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *particle_system );
@@ -486,11 +499,12 @@ int GameMain()
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
-		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking );
+		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking, *jobsystem );
 
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
 
 		ddr::BoundsRenderer* bounds_renderer = new ddr::BoundsRenderer();
+		bounds_renderer->BindKeys( *input_bindings );
 
 		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 

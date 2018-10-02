@@ -1,5 +1,5 @@
 //
-// BoundSphere.h - A bounding sphere.
+// Sphere.h - A bounding sphere.
 // Copyright (C) Sebastian Nordgren 
 // September 13th 2018
 //

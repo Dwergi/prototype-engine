@@ -12,6 +12,11 @@
 #include "VAO.h"
 #include "VBO.h"
 
+namespace dd
+{
+	struct InputBindings;
+}
+
 namespace ddr
 {
 	struct BoundsRenderer : ddr::Renderer, dd::IDebugPanel
@@ -19,13 +24,15 @@ namespace ddr
 		BoundsRenderer();
 		~BoundsRenderer();
 
+		void BindKeys( dd::InputBindings& bindings );
+
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void Render( const ddr::RenderData& data ) override;
 		virtual bool UsesAlpha() const { return true; }
 
 	private:
 
-		enum DrawMode
+		enum class DrawMode
 		{
 			None,
 			Box,

@@ -9,6 +9,7 @@
 
 #include "BVHTree.h"
 #include "ICamera.h"
+#include "JobSystem.h"
 #include "Material.h"
 #include "MeshHandle.h"
 #include "OpenGL.h"
@@ -158,7 +159,7 @@ namespace ddr
 		m_material = material;
 	}
 
-	void Mesh::UpdateBuffers()
+	void Mesh::UpdateBuffers( dd::JobSystem& jobsystem )
 	{
 		if( m_vboPosition.IsValid() )
 		{
@@ -195,7 +196,12 @@ namespace ddr
 			m_vboVertexColour.Unbind();
 		}
 
-		RebuildBVH();
+		if( m_bvh != nullptr )
+		{
+			delete m_bvh;
+		}
+
+		jobsystem.Schedule( [this]() { RebuildBVH(); } );
 
 		m_dirty = false;
 	}
@@ -266,10 +272,7 @@ namespace ddr
 
 	void Mesh::RebuildBVH()
 	{
-		if( m_bvh != nullptr )
-		{
-			delete m_bvh;
-		}
+		DD_ASSERT( m_bvh == nullptr );
 
 		m_bvh = new dd::BVHTree();
 		m_bvh->StartBatch();
