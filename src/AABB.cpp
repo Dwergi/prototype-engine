@@ -48,10 +48,10 @@ namespace dd
 
 	bool AABB::IsValid() const
 	{
-		return !(dd::IsNaN( Min ) ||
-			dd::IsNaN( Max ) ||
-			dd::IsInf( Min ) || 
-			dd::IsInf( Max ) || 
+		return !(ddm::IsNaN( Min ) ||
+			ddm::IsNaN( Max ) ||
+			ddm::IsInf( Min ) || 
+			ddm::IsInf( Max ) || 
 			Min == glm::vec3( FLT_MAX, FLT_MAX, FLT_MAX ) || 
 			Max == glm::vec3( -FLT_MAX, -FLT_MAX, -FLT_MAX ) );
 	}
@@ -141,23 +141,23 @@ namespace dd
 
 		if( ray.Direction().x != 0.0f )
 		{
-			tMin = dd::min( vMin.x, vMax.x );
-			tMax = dd::max( vMin.x, vMax.x );
+			tMin = ddm::min( vMin.x, vMax.x );
+			tMax = ddm::max( vMin.x, vMax.x );
 		}
 
 		if( ray.Direction().y != 0.0f )
 		{
-			tMin = dd::max( tMin, dd::min( vMin.y, vMax.y ) );
-			tMax = dd::min( tMax, dd::max( vMin.y, vMax.y ) );
+			tMin = ddm::max( tMin, ddm::min( vMin.y, vMax.y ) );
+			tMax = ddm::min( tMax, ddm::max( vMin.y, vMax.y ) );
 		}
 
 		if( ray.Direction().z != 0.0f )
 		{
-			tMin = dd::max( tMin, dd::min( vMin.z, vMax.z ) );
-			tMax = dd::min( tMax, dd::max( vMin.z, vMax.z ) );
+			tMin = ddm::max( tMin, ddm::min( vMin.z, vMax.z ) );
+			tMax = ddm::min( tMax, ddm::max( vMin.z, vMax.z ) );
 		}
 
-		if( tMax >= dd::max( tMin, 0.0f ) )
+		if( tMax >= ddm::max( tMin, 0.0f ) )
 		{
 			distance = tMin;
 			return true;

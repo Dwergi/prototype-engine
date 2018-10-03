@@ -42,7 +42,7 @@
 #include "MeshComponent.h"
 #include "MeshRenderer.h"
 #include "MeshUtils.h"
-#include "Message.h"
+#include "MessageQueue.h"
 #include "MousePicking.h"
 #include "OctreeComponent.h"
 #include "OpenGL.h"
@@ -53,6 +53,7 @@
 #include "FrameBuffer.h"
 #include "ParticleSystem.h"
 #include "ParticleSystemComponent.h"
+#include "ParticleSystemRenderer.h"
 #include "PhysicsPlaneComponent.h"
 #include "PhysicsSphereComponent.h"
 #include "PhysicsSystem.h"
@@ -501,7 +502,7 @@ int GameMain()
 		bullet_system->DependsOn( *hit_testing );
 		bullet_system->BindActions( *input_bindings );
 
-		ddr::ParticleSystem* particle_system = new ddr::ParticleSystem();
+		dd::ParticleSystem* particle_system = new dd::ParticleSystem();
 		particle_system->BindActions( *input_bindings );
 
 		s_world = new ddc::World( *jobsystem );
@@ -756,10 +757,7 @@ int GameMain()
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		pempek::assert::implementation::setAssertHandler( OnAssert ); 
-
-#ifndef _DEBUG
 		::ShowWindow( GetConsoleWindow(), SW_HIDE );
-#endif
 
 		while( !s_window->ShouldClose() )
 		{

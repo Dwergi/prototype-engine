@@ -220,7 +220,7 @@ namespace dd
 	template <typename TKey, typename TValue>
 	void DenseMap<TKey, TValue>::Grow()
 	{
-		Resize( dd::max( DefaultSize, m_data.Size() * 2 ) );
+		Resize( ddm::max( DefaultSize, m_data.Size() * 2 ) );
 	}
 
 	template <typename TKey, typename TValue>

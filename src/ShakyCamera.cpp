@@ -58,7 +58,7 @@ namespace dd
 
 			float extraYaw = MaximumYaw * shake * glm::simplex( glm::vec2( m_time, Seed ) );
 			float yaw = m_sourceCamera.GetYaw() + glm::radians( extraYaw );
-			m_yaw = dd::wrap( yaw, 0.0f, glm::two_pi<float>() );
+			m_yaw = ddm::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
 			float extraPitch = MaximumPitch * shake * glm::simplex( glm::vec2( m_time, Seed + 1 ) );
 			float pitch = m_sourceCamera.GetPitch() + glm::radians( extraPitch );
@@ -76,7 +76,7 @@ namespace dd
 			m_roll = 0;
 		}
 
-		m_direction = dd::DirectionFromPitchYaw( m_pitch, m_yaw );
+		m_direction = ddm::DirectionFromPitchYaw( m_pitch, m_yaw );
 
 		AddTrauma( -(delta_t * TraumaDecayRate) );
 

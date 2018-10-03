@@ -165,7 +165,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>false</ConformanceMode>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
@@ -339,6 +339,7 @@
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
@@ -410,9 +411,8 @@
     <ClInclude Include="src\Memory.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshComponent.h" />
-    <ClInclude Include="src\Message.h" />
     <ClInclude Include="src\MessageQueue.h" />
-    <ClInclude Include="src\MessageTypes.h" />
+    <ClInclude Include="src\MessageType.h" />
     <ClInclude Include="src\AABBOctree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\Plane.h" />
@@ -558,6 +558,7 @@
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\MeshHandle.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
+    <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
     <ClCompile Include="src\Sphere.cpp" />

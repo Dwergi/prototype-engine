@@ -8,10 +8,13 @@
 
 namespace dd
 {
+	struct Ray;
+}
+
+namespace ddm
+{
 #undef min
 #undef max
-
-	struct Ray;
 
 	template <typename T>
 	T min( T a, T b )
@@ -22,7 +25,7 @@ namespace dd
 	template <typename T>
 	T min( T a, T b, T c )
 	{
-		return dd::min( a, dd::min( b, c ) );
+		return ddm::min( a, ddm::min( b, c ) );
 	}
 
 	template <typename T>
@@ -34,7 +37,7 @@ namespace dd
 	template <typename T>
 	T max( T a, T b, T c )
 	{
-		return dd::max( a, dd::max( b, c ) );
+		return ddm::max( a, ddm::max( b, c ) );
 	}
 
 	template <typename T>
@@ -57,4 +60,6 @@ namespace dd
 	glm::vec3 DirectionFromPitchYaw( float pitch, float yaw );
 
 	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
+
+	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 );
 }

@@ -30,7 +30,8 @@ namespace dd
 		m_entity( other.m_entity ),
 		m_ray( other.m_ray ),
 		m_length( other.m_length ),
-		m_distance( other.m_distance )
+		m_distance( other.m_distance ),
+		m_normal( other.m_normal )
 	{
 	}
 
@@ -40,13 +41,15 @@ namespace dd
 		m_ray = other.m_ray;
 		m_length = other.m_length;
 		m_distance = other.m_distance;
+		m_normal = other.m_normal;
 	}
 
-	void HitResult::RegisterHit( float distance, ddc::Entity entity )
+	void HitResult::RegisterHit( float distance, glm::vec3 normal, ddc::Entity entity )
 	{
 		if( distance < m_length && distance < m_distance )
 		{
 			m_distance = distance;
+			m_normal = normal;
 			m_entity = entity;
 		}
 	}

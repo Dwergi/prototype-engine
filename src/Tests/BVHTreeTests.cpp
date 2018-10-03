@@ -167,8 +167,8 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 	int x, y, z;
 	tree.CountBucketSplits( x, y, z );
 
-	int most = dd::max( x, dd::max( y, z ) );
-	int least = dd::min( x, dd::min( y, z ) );
+	int most = ddm::max( x, ddm::max( y, z ) );
+	int least = ddm::min( x, ddm::min( y, z ) );
 
 	REQUIRE( (size_t) (most - least) < (tree.GetBucketCount() / 10) );
 

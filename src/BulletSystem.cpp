@@ -15,6 +15,7 @@
 #include "InputBindings.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
+#include "MessageQueue.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
 
@@ -122,6 +123,20 @@ namespace dd
 					m_hitTest.ReleaseResult( bullet.PendingHit );
 				}
 
+				if( bullet.HitPosition != glm::vec3( 0 ) )
+				{
+					dd::BulletHitMessage payload;
+					payload.Position = bullet.HitPosition;
+					payload.SurfaceNormal = bullet.HitNormal;
+					payload.Velocity = bullet.Velocity;
+
+					dd::Message msg;
+					msg.Type = dd::MessageType::BulletHit;
+					msg.SetPayload( payload );
+
+					world.Messages().Send( msg );
+				}
+
 				world.DestroyEntity( data.Entities()[i] );
 				continue;
 			}
@@ -149,9 +164,10 @@ namespace dd
 				if( m_hitTest.FetchResult( bullet.PendingHit, result ) )
 				{
 					bullet.HitPosition = result.Position();
+					bullet.HitNormal = result.Normal();
 
 					float hit_lifetime = result.Distance() / glm::length( bullet.Velocity );
-					bullet.Lifetime = dd::min( bullet.Lifetime, hit_lifetime );
+					bullet.Lifetime = ddm::min( bullet.Lifetime, hit_lifetime );
 
 					bullet.PendingHit.Completed = true;
 				}

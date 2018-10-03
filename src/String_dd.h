@@ -186,7 +186,7 @@ namespace dd
 		DD_ASSERT( start <= m_length );
 		DD_ASSERT( count >= 0 );
 
-		count = dd::min( m_length - start, count );
+		count = ddm::min( m_length - start, count );
 
 		InplaceString<Size> substring;
 		substring.SetString( m_buffer.Get() + start, count );

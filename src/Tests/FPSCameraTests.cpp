@@ -7,8 +7,8 @@
 
 bool almostEqualRads( float a, float b )
 {
-	a = dd::wrap( a, 0.0f, glm::pi<float>() );
-	b = dd::wrap( b, 0.0f, glm::pi<float>() );
+	a = ddm::wrap( a, 0.0f, glm::pi<float>() );
+	b = ddm::wrap( b, 0.0f, glm::pi<float>() );
 
 	return abs( a - b ) < 0.001;
 }
@@ -25,10 +25,10 @@ TEST_CASE( "[FPSCamera] Direction to Pitch/Yaw" )
 			float pitch_rad = glm::radians( p );
 			float yaw_rad = glm::radians( y );
 
-			glm::vec3 dir = dd::DirectionFromPitchYaw( pitch_rad, yaw_rad );
+			glm::vec3 dir = ddm::DirectionFromPitchYaw( pitch_rad, yaw_rad );
 
 			float calc_pitch, calc_yaw;
-			dd::PitchYawFromDirection( dir, calc_pitch, calc_yaw );
+			ddm::PitchYawFromDirection( dir, calc_pitch, calc_yaw );
 
 			REQUIRE( almostEqualRads( calc_pitch, pitch_rad ) );
 			REQUIRE( almostEqualRads( calc_yaw, yaw_rad ) );

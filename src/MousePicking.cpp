@@ -291,7 +291,8 @@ namespace dd
 			}
 
 			float distance;
-			if( dd::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance ) )
+			glm::vec3 normal;
+			if( dd::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance, normal ) )
 			{
 				if( distance < m_depth )
 				{

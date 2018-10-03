@@ -181,14 +181,14 @@ namespace dd
 
 		if( m_inputs[InputAction::BOOST] && ship.BoostRemaining > 0 )
 		{
-			float boost_amount = dd::min( ship.BoostRemaining, delta_t );
+			float boost_amount = ddm::min( ship.BoostRemaining, delta_t );
 			current_velocity *= 1.0f + (ship.Acceleration * ship.BoostFactor * boost_amount);
 			ship.BoostRemaining -= boost_amount;
 			boosting = true;
 		}
 		else
 		{
-			ship.BoostRemaining = dd::min( ship.BoostRemaining + (1.0f / ship.BoostRechargeRate) * delta_t, ship.BoostMaximum );
+			ship.BoostRemaining = ddm::min( ship.BoostRemaining + (1.0f / ship.BoostRechargeRate) * delta_t, ship.BoostMaximum );
 		}
 
 		float speed = glm::length( current_velocity );

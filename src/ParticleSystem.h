@@ -7,19 +7,13 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Renderer.h"
 #include "System.h"
-#include "ShaderHandle.h"
-#include "VAO.h"
-#include "VBO.h"
-#include "ParticleSystemComponent.h"
-#include "DataRequest.h"
-#include "UpdateData.h"
 
 namespace dd
 {
 	struct ICamera;
 	struct InputBindings;
+	struct ParticleSystemComponent;
 }
 
 namespace ddc
@@ -27,35 +21,10 @@ namespace ddc
 	struct UpdateData;
 }
 
-namespace ddr
+namespace dd
 {
-	struct ParticleSystemRenderer : ddr::Renderer
-	{
-	public:
-
-		ParticleSystemRenderer();
-
-		virtual void RenderInit( ddc::World& world ) override;
-		virtual bool UsesAlpha() const override { return true; }
-		virtual void Render( const ddr::RenderData& data );
-
-	private:
-		glm::vec3 m_positions[ dd::MAX_PARTICLES ];
-		VBO m_vboPosition;
-
-		glm::vec2 m_sizes[ dd::MAX_PARTICLES ];
-		VBO m_vboSizes;
-
-		glm::vec4 m_colours[ dd::MAX_PARTICLES ];
-		VBO m_vboColours;
-
-		dd::Particle m_tempBuffer[ dd::MAX_PARTICLES ];
-	};
-
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
 	{
-	public:
-
 		ParticleSystem();
 		~ParticleSystem();
 
@@ -72,17 +41,30 @@ namespace ddr
 
 	private:
 
-		int CurrentMAX_PARTICLES { 1000 };
+		typedef uint ParticleID;
+
+		struct SpawnRequest
+		{
+			ParticleID Particle;
+			glm::vec3 Position;
+			glm::vec3 Normal;
+		};
+
+		int CurrentMaxParticles { 1000 };
 
 		bool m_killAllParticles { false };
 		bool m_startEmitting { false };
 
 		dd::ParticleSystemComponent* m_selected { nullptr };
 
+		std::vector<SpawnRequest> m_pendingSpawns;
+
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );
 		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const glm::mat4& transform, float delta_t );
+
+		void OnBulletHitMessage( dd::Message msg );
 	};
 }

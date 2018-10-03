@@ -74,6 +74,6 @@ namespace dd
 		glm::vec4 y = t * glm::vec4( 0, Radius, 0, 0 );
 		glm::vec4 z = t * glm::vec4( 0, 0, Radius, 0 );
 
-		return Sphere( glm::vec3( centre.xyz ), std::sqrt( dd::max( glm::length2( x ), glm::length2( y ), glm::length2( z ) ) ) );
+		return Sphere( glm::vec3( centre.xyz ), std::sqrt( ddm::max( glm::length2( x ), glm::length2( y ), glm::length2( z ) ) ) );
 	}
 }

@@ -312,8 +312,8 @@ namespace dd
 
 				m_vertices[current].y = normalized_height * m_terrainParams.HeightRange;
 
-				max_height = dd::max( max_height, m_vertices[current].y );
-				min_height = dd::min( min_height, m_vertices[current].y );
+				max_height = ddm::max( max_height, m_vertices[current].y );
+				min_height = ddm::min( min_height, m_vertices[current].y );
 			}
 		}
 

@@ -51,7 +51,7 @@ namespace dd
 		}
 
 		// wrap yaw
-		m_yaw = dd::wrap( yaw, 0.0f, glm::two_pi<float>() );
+		m_yaw = ddm::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
 		// clamp pitch to vertical up/down
 		const float max_pitch = glm::half_pi<float>() - 0.00001f;
@@ -60,12 +60,12 @@ namespace dd
 
 	glm::vec3 FPSCamera::GetDirection() const
 	{
-		return dd::DirectionFromPitchYaw( m_pitch, m_yaw );
+		return ddm::DirectionFromPitchYaw( m_pitch, m_yaw );
 	}
 
 	void FPSCamera::SetDirection( const glm::vec3& dir )
 	{
-		dd::PitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
+		ddm::PitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
 	}
 
 	float FPSCamera::GetNear() const

@@ -3,7 +3,7 @@
 
 #include "Ray.h"
 
-namespace dd
+namespace ddm
 {
 	bool IsNaN( glm::vec3 v )
 	{
@@ -20,12 +20,12 @@ namespace dd
 		glm::vec3 right = glm::normalize( glm::cross( dir, glm::vec3( 0, 1, 0 ) ) );
 
 		// degenerate case of vector pointing up
-		if( dd::IsNaN( right ) )
+		if( ddm::IsNaN( right ) )
 		{
 			right = glm::vec3( 0, 0, 1 );
 		}
 
-		glm::vec3 up = glm::normalize( glm::cross( dir, right ) );
+		glm::vec3 up = glm::cross( dir, right );
 
 		return glm::mat4(
 			glm::vec4( right, 0 ),
@@ -50,5 +50,14 @@ namespace dd
 	{
 		pitch = asin( dir.y );
 		yaw = atan2( dir.x, dir.z );
+	}
+
+	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 )
+	{
+		glm::vec3 a = p1 - p0;
+		glm::vec3 b = p2 - p0;
+
+		glm::vec3 normal = glm::normalize( glm::cross( a, b ) );
+		return normal;
 	}
 }

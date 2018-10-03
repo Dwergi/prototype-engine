@@ -12,9 +12,22 @@
 
 namespace dd
 {
+	Message::Message()
+	{
+		memset( m_payload, 0, PAYLOAD_SIZE );
+	}
+
+	Message::Message( const Message& other )
+	{
+		Type = other.Type;
+		m_payloadType = other.m_payloadType;
+
+		memcpy( m_payload, other.m_payload, PAYLOAD_SIZE );
+	}
+
 	MessageQueue::MessageQueue()
 		: m_nextHandlerID( 0 ),
-		m_pendingMessages( new Vector<Message*>, new Vector<Message*> )
+		m_pendingMessages( new Vector<Message>, new Vector<Message> )
 	{
 
 	}
@@ -24,20 +37,20 @@ namespace dd
 
 	}
 
-	MessageSubscription MessageQueue::Subscribe( MessageID message_type, std::function<void( Message* )> handler )
+	MessageSubscription MessageQueue::Subscribe( MessageType type, std::function<void( Message )> handler )
 	{
 		std::lock_guard lock( m_mutex );
 
 		MessageSubscription new_token;
 		new_token.Handler = m_nextHandlerID++;
-		new_token.MessageID = message_type;
+		new_token.Type = type;
 
-		Vector<HandlerID>* existing = m_subscribers.Find( MessageID( message_type ) );
+		Vector<MessageHandlerID>* existing = m_subscribers.Find( MessageType( type ) );
 		
 		if( existing == nullptr )
 		{
-			m_subscribers.Add( message_type, Vector<HandlerID>() );
-			existing = m_subscribers.Find( message_type );
+			m_subscribers.Add( type, Vector<MessageHandlerID>() );
+			existing = m_subscribers.Find( type );
 		}
 
 		existing->Add( new_token.Handler );
@@ -52,7 +65,7 @@ namespace dd
 
 		m_handlers.Remove( token.Handler );
 
-		Vector<HandlerID>* subs = m_subscribers.Find( token.MessageID );
+		Vector<MessageHandlerID>* subs = m_subscribers.Find( token.Type );
 
 		if( subs == nullptr )
 			return;
@@ -67,23 +80,23 @@ namespace dd
 		}
 	}
 
-	void MessageQueue::Send( Message* message )
+	void MessageQueue::Send( Message message )
 	{
 		std::lock_guard lock( m_mutex );
 
 		m_pendingMessages.Write().Add( message );
 	}
 
-	void MessageQueue::Dispatch( Message* message ) const
+	void MessageQueue::Dispatch( const Message& message ) const
 	{
-		Vector<HandlerID>* subs = m_subscribers.Find( message->Type );
+		Vector<MessageHandlerID>* subs = m_subscribers.Find( message.Type );
 
 		if( subs == nullptr )
 			return;
 
-		for( HandlerID handler : *subs )
+		for( MessageHandlerID handler : *subs )
 		{
-			std::function<void(Message*)>* fn = m_handlers.Find( handler );
+			std::function<void(Message)>* fn = m_handlers.Find( handler );
 			if( fn != nullptr )
 			{
 				(*fn)(message);
@@ -91,7 +104,7 @@ namespace dd
 		}
 	}
 
-	void MessageQueue::Update( float dt )
+	void MessageQueue::Update()
 	{
 		{
 			std::lock_guard lock( m_mutex );
@@ -99,7 +112,7 @@ namespace dd
 			m_pendingMessages.Swap();
 		}
 
-		for( Message* message : m_pendingMessages.Read() )
+		for( const Message& message : m_pendingMessages.Read() )
 		{
 			Dispatch( message );
 		}
@@ -107,19 +120,14 @@ namespace dd
 		m_pendingMessages.Write().Clear();
 	}
 
-	int MessageQueue::GetSubscriberCount( MessageID message_type ) const
+	int MessageQueue::GetSubscriberCount( MessageType type ) const
 	{
-		Vector<HandlerID>* subs = m_subscribers.Find( message_type );
+		Vector<MessageHandlerID>* subs = m_subscribers.Find( type );
 
 		if( subs == nullptr )
 			return 0;
 
 		return subs->Size();
-	}
-
-	int MessageQueue::GetTotalSubscriberCount() const
-	{
-		return m_handlers.Size();
 	}
 
 	int MessageQueue::GetPendingMessageCount() const

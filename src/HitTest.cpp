@@ -14,7 +14,7 @@ namespace dd
 {
 	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 
 		const dd::Sphere& bound_sphere, const dd::AABB& bound_box, 
-		const ddr::Mesh& mesh, float& out_distance )
+		const ddr::Mesh& mesh, float& out_distance, glm::vec3& out_normal )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();
 		if( !positions.IsValid() )
@@ -49,13 +49,16 @@ namespace dd
 		DD_ASSERT( triangulator.Size() > 0 );
 
 		BVHIntersection intersection = 
-			bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &triangulator]( size_t tri )
+			bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( size_t i )
 		{
-			dd::ConstTriangle triangle = triangulator[tri];
+			dd::ConstTriangle tri = triangulator[i];
 
 			glm::vec3 bary;
-			if( glm::intersectRayTriangle( origin, dir, triangle.p0, triangle.p1, triangle.p2, bary ) )
+			if( glm::intersectRayTriangle( origin, dir, tri.p0, tri.p1, tri.p2, bary ) )
 			{
+				glm::vec3 normal = (transform * glm::vec4( ddm::NormalFromTriangle( tri.p0, tri.p1, tri.p2 ), 0 )).xyz;
+				out_normal = glm::normalize( normal );
+
 				return bary.z;
 			}
 

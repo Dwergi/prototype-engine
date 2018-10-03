@@ -46,18 +46,24 @@ namespace dd
 			return m_ray.Origin() + m_ray.Direction() * m_distance;
 		}
 
+		glm::vec3 Normal() const
+		{
+			return m_normal;
+		}
+
 		dd::Ray Ray() const { return m_ray; }
 		float Length() const { return m_length; }
 		float Distance() const { return m_distance; }
 		ddc::Entity Entity() const { return m_entity; }
 
-		void RegisterHit( float distance, ddc::Entity entity );
+		void RegisterHit( float distance, glm::vec3 normal, ddc::Entity entity );
 
 	private:
 
 		float m_distance { FLT_MAX };
 		dd::Ray m_ray;
 		float m_length { FLT_MAX };
+		glm::vec3 m_normal;
 		ddc::Entity m_entity;
 	};
 

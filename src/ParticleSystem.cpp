@@ -1,5 +1,5 @@
 //
-// ParticleSystem.cpp - A particle emitter.
+// ParticleSystem.cpp - A particle system.
 // Copyright (C) Sebastian Nordgren 
 // July 16th 2018
 //
@@ -7,45 +7,21 @@
 #include "PCH.h"
 #include "ParticleSystem.h"
 
-#include "ICamera.h"
+#include "BoundBoxComponent.h"
+#include "BulletComponent.h"
+#include "ParticleSystemComponent.h"
+#include "DataRequest.h"
 #include "InputBindings.h"
-#include "OpenGL.h"
-#include "RenderData.h"
-#include "Shader.h"
-#include "ShaderProgram.h"
-#include "Uniforms.h"
+#include "ParticleSystemComponent.h"
 #include "TransformComponent.h"
+#include "UpdateData.h"
 
 #include "glm/gtx/norm.hpp"
 
-
-
 #include <algorithm>
 
-namespace ddr
+namespace dd
 {
-	static const glm::vec2 s_screenFacingQuadVertices[] = {
-		glm::vec2( -0.5f,	-0.5f	),
-		glm::vec2( 0.5f,	-0.5f	),
-		glm::vec2( -0.5f,	0.5f	),
-		glm::vec2( -0.5f,	0.5f	),
-		glm::vec2( 0.5f,	-0.5f	),
-		glm::vec2( 0.5f,	0.5f	)
-	};
-
-	static const glm::vec2 s_screenFacingQuadUVs[] = {
-		glm::vec2( 0,	0 ),
-		glm::vec2( 1,	0 ),
-		glm::vec2( 0,	1 ),
-		glm::vec2( 0,	1 ),
-		glm::vec2( 1,	0 ),
-		glm::vec2( 1,	1 )
-	};
-
-	static VAO s_vaoParticle;
-	static VBO s_vboParticle;
-	static ShaderHandle s_shaderParticle;
-
 	static const glm::vec3 s_gravity( 0, -9.81, 0 );
 
 	ParticleSystem::ParticleSystem() :
@@ -62,7 +38,7 @@ namespace ddr
 
 	void ParticleSystem::Initialize( ddc::World& world )
 	{
-		
+		world.Messages().Subscribe( dd::MessageType::BulletHit, [this]( Message msg ) { OnBulletHitMessage( msg ); } );
 	}
 	
 	void ParticleSystem::BindActions( dd::InputBindings& bindings )
@@ -76,73 +52,20 @@ namespace ddr
 		} );
 	}
 
-	ParticleSystemRenderer::ParticleSystemRenderer() : 
-		ddr::Renderer( "Particle Systems" )
+	void ParticleSystem::OnBulletHitMessage( dd::Message msg )
 	{
-		Require<dd::ParticleSystemComponent>();
-		RequireTag( ddc::Tag::Visible );
+		dd::BulletHitMessage payload = msg.GetPayload<dd::BulletHitMessage>();
+		SpawnRequest req;
+		req.Position = payload.Position;
+		req.Normal = payload.SurfaceNormal;
+
+		m_pendingSpawns.push_back( req );
 	}
-
-	void ParticleSystemRenderer::RenderInit( ddc::World& world )
-	{
-		dd::Vector<Shader*> shaders;
-
-		if( !s_shaderParticle.Valid() )
-		{
-			s_shaderParticle = ShaderProgram::Load( "particle" );
-		}
-
-		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
-		DD_ASSERT( shader != nullptr );
-
-		shader->Use( true );
-
-		s_vaoParticle.Create();
-		s_vaoParticle.Bind();
-
-		s_vboParticle.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		s_vboParticle.Bind();
-		s_vboParticle.SetData( dd::ConstBuffer<glm::vec2>( s_screenFacingQuadVertices, 6 ) );
-		s_vboParticle.CommitData();
-
-		shader->BindAttributeVec2( "Position", false );
-		s_vboParticle.Unbind();
-
-		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vboPosition.Bind();
-		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MAX_PARTICLES ) );
-		m_vboPosition.CommitData();
-
-		shader->BindAttributeVec3( "PositionInstanced", false );
-		shader->SetAttributeInstanced( "PositionInstanced" );
-		m_vboPosition.Unbind();
-
-		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vboSizes.Bind();
-		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MAX_PARTICLES ) );
-		m_vboSizes.CommitData();
-
-		shader->BindAttributeVec2( "ScaleInstanced", false );
-		shader->SetAttributeInstanced( "ScaleInstanced" );
-		m_vboSizes.Unbind();
-
-		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vboColours.Bind();
-		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MAX_PARTICLES ) );
-		m_vboColours.CommitData();
-
-		shader->BindAttributeVec4( "ColourInstanced", false );
-		shader->SetAttributeInstanced( "ColourInstanced" );
-		m_vboColours.Unbind();
-
-		s_vaoParticle.Unbind();
-
-		shader->Use( false );
-	}
-
+	
 	void ParticleSystem::Update( const ddc::UpdateData& update )
 	{
 		const ddc::DataBuffer& data = update.Data();
+		ddc::World& world = update.World();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();
@@ -168,11 +91,44 @@ namespace ddr
 
 			UpdateLiveParticles( system, update.Delta() );
 
+			system.Age += update.Delta();
+
 			if( system.Age < system.Lifetime )
 			{
 				EmitNewParticles( system, transforms[ i ].Transform, update.Delta() );
 			}
 		}
+
+		for( const SpawnRequest& req : m_pendingSpawns )
+		{
+			ddc::Entity entity = world.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
+			world.AddTag( entity, ddc::Tag::Visible );
+
+			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+
+			DD_TODO( "I have literally no idea why this works and TransformFromOriginDir doesn't. Fuck matrix math." );
+			glm::mat4 lookAt = glm::lookAt( req.Position, req.Position - req.Normal, glm::vec3( 0, 1, 0 ) );
+			lookAt[3].xyz = req.Position;
+			transform->Transform = lookAt;
+
+			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
+			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+
+			dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
+			particle->Age = 0;
+			particle->MinLifetime = 0.1;
+			particle->MaxLifetime = 0.2;
+			particle->MinColour = glm::vec3( 0.7, 0, 0 );
+			particle->MaxColour = glm::vec3( 1.0, 1.0, 0 );
+			particle->EmissionRate = 2000;
+			particle->MinSize = glm::vec2( 0.1, 0.1 );
+			particle->MaxSize = glm::vec2( 0.2, 0.2 );
+			particle->MinVelocity = glm::vec3( 0, 0, 5 );
+			particle->MaxVelocity = glm::vec3( 5, 5, 7 );
+			particle->Lifetime = 0.1;
+		}
+
+		m_pendingSpawns.clear();
 	}
 
 	void ParticleSystem::UpdateLiveParticles( dd::ParticleSystemComponent& system, float delta_t )
@@ -211,7 +167,7 @@ namespace ddr
 
 		for( int i = 0; i < dd::MAX_PARTICLES; ++i )
 		{
-			if( emitted >= toEmit || system.LiveCount > CurrentMAX_PARTICLES )
+			if( emitted >= toEmit || system.LiveCount > CurrentMaxParticles )
 			{
 				break;
 			}
@@ -237,83 +193,9 @@ namespace ddr
 		}
 	}
 
-	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
-	{
-		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
-		shader->Use( true );
-
-		ddr::UniformStorage& uniforms = data.Uniforms();
-		const ddr::ICamera& camera = data.Camera();
-		const ddc::World& world = data.World();
-
-		uniforms.Bind( *shader );
-		uniforms.Set( "View", camera.GetViewMatrix() );
-		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
-
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-		s_vaoParticle.Bind();
-
-		auto particle_systems = data.Get<dd::ParticleSystemComponent>();
-
-		glm::vec3 cam_pos = camera.GetPosition();
-
-		for( const dd::ParticleSystemComponent& system : particle_systems )
-		{
-			memcpy( m_tempBuffer, system.Particles, sizeof( dd::Particle ) * system.LiveCount );
-
-			for( dd::Particle& p : m_tempBuffer )
-			{
-				p.Distance = p.Alive() ? glm::distance2( p.Position, cam_pos ) : -1;
-			}
-
-			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MAX_PARTICLES], 
-				[]( const dd::Particle& a, const dd::Particle& b )
-			{
-				return a.Distance > b.Distance;
-			} );
-
-			int index = 0;
-			for( const dd::Particle& particle : m_tempBuffer )
-			{
-				if( !particle.Alive() )
-				{
-					break;
-				}
-
-				m_positions[ index ] = particle.Position;
-				m_colours[ index ] = particle.Colour;
-				m_sizes[ index ] = particle.Size;
-
-				++index;
-			}
-
-			m_vboPosition.Bind();
-			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
-
-			m_vboSizes.Bind();
-			m_vboSizes.CommitData();
-			m_vboSizes.Unbind();
-
-			m_vboColours.Bind();
-			m_vboColours.CommitData();
-			m_vboColours.Unbind();
-
-			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, index );
-		}
-
-		s_vaoParticle.Unbind();
-
-		glDisable( GL_BLEND );
-
-		shader->Use( false );
-	}
-
 	void ParticleSystem::DrawDebugInternal( const ddc::World& world )
 	{
-		ImGui::SliderInt( "Max Particles", &CurrentMAX_PARTICLES, 0, dd::MAX_PARTICLES );
+		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES );
 
 		if( m_selected == nullptr )
 		{
@@ -329,7 +211,7 @@ namespace ddr
 		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->Lifetime, 0, 300 );
 		
 		{
-			float max_emission_rate = CurrentMAX_PARTICLES / m_selected->MaxLifetime; // any higher and we can end up saturating the buffer
+			float max_emission_rate = CurrentMaxParticles / m_selected->MaxLifetime; // any higher and we can end up saturating the buffer
 
 			ImGui::SliderFloat( "Emission Rate", &m_selected->EmissionRate, 0.f, max_emission_rate );
 		}

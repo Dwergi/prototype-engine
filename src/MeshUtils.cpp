@@ -245,10 +245,8 @@ namespace dd
 		for( size_t i = 0; i < triangulator.Size(); ++i )
 		{
 			ConstTriangle tri = triangulator[ i ];
-			glm::vec3 a = tri.p1 - tri.p0;
-			glm::vec3 b = tri.p2 - tri.p0;
-
-			glm::vec3 normal = glm::normalize( glm::cross( a, b ) );
+			
+			glm::vec3 normal = ddm::NormalFromTriangle( tri.p0, tri.p1, tri.p2 );
 
 			out_normals[tri.i0] += normal;
 			out_normals[tri.i1] += normal;
@@ -263,8 +261,8 @@ namespace dd
 
 	uint64 GetKey( uint a, uint b )
 	{
-		uint64 low = min( a, b );
-		uint64 high = max( a, b );
+		uint64 low = ddm::min( a, b );
+		uint64 high = ddm::max( a, b );
 
 		uint64 key = (low << 32) + high;
 		return key;

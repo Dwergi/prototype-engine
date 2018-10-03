@@ -160,7 +160,7 @@ namespace ddr
 				glm::vec3 light_direction = glm::vec3( (transform->Transform * glm::vec4( glm::vec3( 0, 0, 1 ), 0 )).xyz );
 				if( ImGui::DragFloat3( "Direction", glm::value_ptr( light_direction ), 0.0025, -1, 1 ) )
 				{
-					transform->Transform = dd::TransformFromOriginDir( transform->GetPosition(), glm::normalize( light_direction ) );
+					transform->Transform = ddm::TransformFromOriginDir( transform->GetPosition(), glm::normalize( light_direction ) );
 				}
 
 				float outer_angle = glm::degrees( light->OuterAngle );

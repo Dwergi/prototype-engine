@@ -98,6 +98,8 @@ namespace ddc
 		{
 			s.m_update = std::shared_future<void>();
 		}
+
+		m_messages.Update();
 	}
 
 	void World::RegisterSystem( System& system )

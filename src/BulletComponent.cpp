@@ -7,4 +7,5 @@
 #include "PCH.h"
 #include "BulletComponent.h"
 
+DD_TYPE_CPP( dd::BulletHitMessage );
 DD_TYPE_CPP( dd::BulletComponent );

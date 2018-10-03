@@ -270,12 +270,6 @@
     <ClInclude Include="src\MessageQueue.h">
       <Filter>Messaging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Message.h">
-      <Filter>Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MessageTypes.h">
-      <Filter>Messaging</Filter>
-    </ClInclude>
     <ClInclude Include="src\AngelScriptEngine.h">
       <Filter>Script\AngelScript</Filter>
     </ClInclude>
@@ -570,6 +564,10 @@
     <ClInclude Include="src\TerrainRenderer.h">
       <Filter>Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="src\MessageType.h">
+      <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystemRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1018,6 +1016,7 @@
     <ClCompile Include="src\MeshHandle.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="src\ParticleSystemRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

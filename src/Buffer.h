@@ -40,6 +40,14 @@ namespace dd
 		ConstBuffer();
 		ConstBuffer( const T* ptr, int count );
 		ConstBuffer( const T* ptr, size_t count );
+
+		template <size_t Size>
+		explicit ConstBuffer( const T( arr )[Size] ) : IBuffer( sizeof( T ) )
+		{
+			m_ptr = arr;
+			m_size = (int) Size 
+		}
+
 		explicit ConstBuffer( const IBuffer& buffer );
 		ConstBuffer( const ConstBuffer<T>& other );
 		ConstBuffer( ConstBuffer<T>&& other );
@@ -83,6 +91,10 @@ namespace dd
 		Buffer();
 		Buffer( T* ptr, int count );
 		Buffer( T* ptr, size_t count );
+
+		template <size_t Size>
+		explicit Buffer( T( arr )[Size] ) : ConstBuffer( arr ) {}
+
 		explicit Buffer( const IBuffer& buffer );
 		Buffer( const Buffer<T>& other );
 		Buffer( Buffer<T>&& other );

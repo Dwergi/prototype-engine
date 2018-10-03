@@ -1,4 +1,3 @@
-
 //
 // MessageQueue.h - A pub/sub style messaging system.
 // Copyright (C) Sebastian Nordgren 
@@ -8,8 +7,7 @@
 #pragma once
 
 #include "DoubleBuffer.h"
-#include "Message.h"
-#include "MessageTypes.h"
+#include "MessageType.h"
 
 #include <mutex>
 
@@ -17,13 +15,34 @@ namespace dd
 {
 	struct MessageSubscription;
 
-	class MessageQueue
+	typedef uint MessageID;
+	typedef int MessageHandlerID;
+
+	struct Message
 	{
-	public:
+		MessageType Type { MessageType::Unknown };
 
-		typedef int HandlerID;
-		typedef int MessageID;
+		Message();
+		Message( const Message& other );
 
+		template <typename T>
+		void SetPayload( const T& payload );
+
+		template <typename T>
+		const T& GetPayload() const;
+
+		DD_BASIC_TYPE( Message )
+
+	private:
+		
+		static const size_t PAYLOAD_SIZE = 64;
+
+		byte m_payload[PAYLOAD_SIZE];
+		const TypeInfo* m_payloadType { nullptr };
+	};
+
+	struct MessageQueue
+	{
 		MessageQueue();
 		~MessageQueue();
 
@@ -31,7 +50,7 @@ namespace dd
 		// Subscribe to a given message with the given handler.
 		// If you ever want to unsubscribe, you must keep the returned token.
 		//
-		MessageSubscription Subscribe( MessageID message_type, std::function<void(Message*)> handler );
+		MessageSubscription Subscribe( MessageType type, std::function<void(Message)> handler );
 
 		//
 		// Unsubscribe the given token. 
@@ -41,22 +60,22 @@ namespace dd
 		//
 		// Send a message. The message must be derived from the Message struct.
 		//
-		void Send( Message* message );
+		void Send( Message message );
 
 		//
 		// Actually send messages in order of arrival.
 		//
-		void Update( float dt );
+		void Update();
 
 		//
 		// Get the number of subscribers to the given message type.
 		//
-		int GetSubscriberCount( MessageID message_type ) const;
+		int GetSubscriberCount( MessageType type ) const;
 
 		//
 		// Get the total number of subscribers.
 		//
-		int GetTotalSubscriberCount() const;
+		int GetTotalSubscriberCount() const { return m_handlers.Size(); }
 
 		//
 		// Get the number of pending messages.
@@ -67,21 +86,37 @@ namespace dd
 
 		std::mutex m_mutex;
 
-		DenseMap<MessageID, Vector<HandlerID>> m_subscribers;
-		DenseMap<HandlerID, std::function<void( Message* )>> m_handlers;
-		DoubleBuffer<Vector<Message*>> m_pendingMessages;
+		DenseMap<MessageType, Vector<MessageHandlerID>> m_subscribers;
+		DenseMap<MessageHandlerID, std::function<void(Message)>> m_handlers;
+		DoubleBuffer<Vector<Message>> m_pendingMessages;
 
-		HandlerID m_nextHandlerID;
+		MessageHandlerID m_nextHandlerID;
 
-		void Dispatch( Message* message ) const;
+		void Dispatch( const Message& message ) const;
 	};
 
 	struct MessageSubscription
 	{
 	private:
-		int MessageID;
-		int Handler;
+		MessageType Type;
+		MessageHandlerID Handler;
 
-		friend class MessageQueue;
+		friend struct MessageQueue;
 	};
+
+	template <typename T>
+	void Message::SetPayload( const T& payload )
+	{
+		static_assert(sizeof( T ) <= PAYLOAD_SIZE);
+		m_payloadType = DD_TYPE( T );
+		memcpy( m_payload, &payload, sizeof( T ) );
+	}
+
+	template <typename T>
+	const T& Message::GetPayload() const
+	{
+		DD_ASSERT( m_payloadType == DD_TYPE( T ) );
+
+		return *reinterpret_cast<const T*>(m_payload);
+	}
 }
