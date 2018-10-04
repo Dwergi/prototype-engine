@@ -737,6 +737,34 @@ int GameMain()
 				physics_plane.Elasticity = 0.95f;
 			}
 
+			{
+				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
+					glm::rotate( glm::radians( 90.0f ), glm::vec3( 0, 1, 0 ) ) *
+					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
+					glm::scale( glm::vec3( plane_size ) );
+
+				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.8, 0.8, 0.2, 1 ), transform );
+				s_world->AddTag( plane, ddc::Tag::Static );
+
+				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
+				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+				physics_plane.Elasticity = 0.95f;
+			}
+
+			{
+				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
+					glm::rotate( glm::radians( -90.0f ), glm::vec3( 0, 1, 0 ) ) *
+					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
+					glm::scale( glm::vec3( plane_size ) );
+
+				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.2, 0.2, 0.8, 1 ), transform );
+				s_world->AddTag( plane, ddc::Tag::Static );
+
+				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
+				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+				physics_plane.Elasticity = 0.95f;
+			}
+
 			ddc::World* world = s_world;
 			input_bindings->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )
 			{
