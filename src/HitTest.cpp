@@ -54,12 +54,8 @@ namespace ddm
 		}
 
 		glm::vec3 position, normal;
-		if( !bound_sphere.IntersectsRay( ray, position, normal ) )
-		{
-			return false;
-		}
-
-		if( glm::distance2( ray.Origin(), position ) > (ray.Length() * ray.Length()) )
+		if( !bound_sphere.IntersectsRay( ray, position, normal ) || 
+			glm::distance2( ray.Origin(), position ) > (ray.Length() * ray.Length()) )
 		{
 			return false;
 		}
@@ -103,7 +99,7 @@ namespace ddm
 			return FLT_MAX;
 		} );
 
-		if( intersection.IsValid() )
+		if( intersection.IsValid() && intersection.Distance < ray.Length() )
 		{
 			out_distance = intersection.Distance;
 			return true;
