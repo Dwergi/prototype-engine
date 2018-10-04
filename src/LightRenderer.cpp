@@ -76,7 +76,6 @@ namespace ddr
 		size_t light_count = data.Size();
 		if( light_count > 10 )
 		{
-			DD_ASSERT( light_count <= 10 );
 			light_count = 10;
 		}
 

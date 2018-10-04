@@ -31,7 +31,7 @@ namespace dd
 		Sphere GetTransformed( const glm::mat4& t ) const;
 
 		glm::vec3 Centre;
-		float Radius;
+		float Radius { 0.0f };
 
 		DD_CLASS( dd::Sphere )
 		{

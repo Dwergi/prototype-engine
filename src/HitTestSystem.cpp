@@ -39,7 +39,7 @@ namespace dd
 
 	}
 
-	HitHandle HitTestSystem::ScheduleHitTest( const Ray& ray, float length )
+	HitHandle HitTestSystem::ScheduleHitTest( const Ray& ray )
 	{
 		uint index = ~0u;
 		if( !m_free.empty() )
@@ -62,7 +62,7 @@ namespace dd
 		entry.Handle.Version++;
 		entry.Handle.Valid = true;
 		entry.Handle.Completed = false;
-		entry.State = HitResult( ray, length );
+		entry.State = HitResult( ray );
 
 		return entry.Handle;
 	}
@@ -117,18 +117,10 @@ namespace dd
 			{
 				for( uint e = 0; e < data.Size(); ++e )
 				{
-					dd::AABB aabb;
-					dd::Sphere sphere;
-					if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( e ), bound_spheres.Get( e ), transforms[ i ].Transform, aabb, sphere ) )
-					{
-						continue;
-					}
-
 					float out_distance = FLT_MAX;
 					glm::vec3 out_normal;
 
-					ddr::Mesh* mesh = ddr::Mesh::Get( meshes[e].Mesh );
-					if( dd::HitTestMesh( entry.State.Ray(), transforms[e].Transform, sphere, aabb, *mesh, out_distance, out_normal ) )
+					if( ddm::HitTestMesh( entry.State.Ray(), meshes[e], transforms[e], bound_spheres.Get( e ), bound_boxes.Get( e ), out_distance, out_normal ) )
 					{
 						entry.State.RegisterHit( out_distance, out_normal, entities[e] );
 					}
@@ -162,9 +154,9 @@ namespace dd
 		{
 			glm::vec3 origin( rng_flt.Next() * 100, rng_flt.Next() * 100, rng_flt.Next() * 100 );
 			glm::vec3 dir( rng_flt.Next(), rng_flt.Next(), rng_flt.Next() );
-			dd::Ray ray( origin, dir );
+			dd::Ray ray( origin, dir, rng_flt.Next() * 1000 );
 
-			HitHandle handle = async_hit_test->ScheduleHitTest( ray, rng_flt.Next() * 1000 );
+			HitHandle handle = async_hit_test->ScheduleHitTest( ray );
 
 			s_spamTests.push_back( handle );
 		}

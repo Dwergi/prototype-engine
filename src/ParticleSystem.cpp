@@ -107,8 +107,13 @@ namespace dd
 			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
 
 			DD_TODO( "I have literally no idea why this works and TransformFromOriginDir doesn't. Fuck matrix math." );
-			glm::mat4 lookAt = glm::lookAt( req.Position, req.Position - req.Normal, glm::vec3( 0, 1, 0 ) );
+
+			glm::vec3 up( 0, 1, 0 );
+			glm::mat4 lookAt = glm::lookAt( req.Position, req.Position - req.Normal, up );
 			lookAt[3].xyz = req.Position;
+
+			DD_ASSERT( !ddm::IsNaN( lookAt[0] ) );
+
 			transform->Transform = lookAt;
 
 			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
@@ -182,6 +187,9 @@ namespace dd
 
 				glm::vec3 velocity = glm::mix( system.MinVelocity, system.MaxVelocity, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) );
 				particle.Velocity = velocity * rotation;
+
+				DD_ASSERT( !ddm::IsNaN( particle.Velocity ) );
+
 				particle.Size = glm::mix( system.MinSize, system.MaxSize, glm::vec2( system.RNG.Next(), system.RNG.Next() ) );
 				particle.Lifetime = glm::mix( system.MinLifetime, system.MaxLifetime, system.RNG.Next() );
 				particle.Age = 0;

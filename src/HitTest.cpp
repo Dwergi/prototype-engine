@@ -1,17 +1,48 @@
+//
+// HitTest.cpp - Utilities for hit testing things.
+// Copyright (C) Sebastian Nordgren 
+// September 18th 2018
+//
+
 #include "PCH.h"
 #include "HitTest.h"
 
 #include "AABB.h"
-#include "Sphere.h"
+#include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
+#include "BoundsHelpers.h"
 #include "BVHTree.h"
 #include "Mesh.h"
+#include "MeshComponent.h"
 #include "Ray.h"
+#include "Sphere.h"
+#include "TransformComponent.h"
 #include "Triangulator.h"
 
 #include <glm/gtx/intersect.hpp>
 
-namespace dd
+namespace ddm
 {
+	bool HitTestMesh( const dd::Ray& ray, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+		const dd::BoundSphereComponent* bsphere_cmp, const dd::BoundBoxComponent* bbox_cmp,
+		float& out_distance, glm::vec3& out_normal )
+	{
+		dd::AABB aabb;
+		dd::Sphere sphere;
+		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform, aabb, sphere ) )
+		{
+			return false;
+		}
+
+		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
+		if( mesh == nullptr )
+		{
+			return false;
+		}
+
+		return ddm::HitTestMesh( ray, transform_cmp.Transform, sphere, aabb, *mesh, out_distance, out_normal );
+	}
+
 	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 
 		const dd::Sphere& bound_sphere, const dd::AABB& bound_box, 
 		const ddr::Mesh& mesh, float& out_distance, glm::vec3& out_normal )
@@ -22,12 +53,19 @@ namespace dd
 			return false;
 		}
 
-		if( !bound_sphere.IntersectsRay( ray ) )
+		glm::vec3 position, normal;
+		if( !bound_sphere.IntersectsRay( ray, position, normal ) )
 		{
 			return false;
 		}
 
-		if( !bound_box.IntersectsRay( ray ) )
+		if( glm::distance2( ray.Origin(), position ) > (ray.Length() * ray.Length()) )
+		{
+			return false;
+		}
+
+		float distance;
+		if( !bound_box.IntersectsRay( ray, distance ) || distance > ray.Length() )
 		{
 			return false;
 		}
@@ -48,7 +86,7 @@ namespace dd
 
 		DD_ASSERT( triangulator.Size() > 0 );
 
-		BVHIntersection intersection = 
+		dd::BVHIntersection intersection = 
 			bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( size_t i )
 		{
 			dd::ConstTriangle tri = triangulator[i];
@@ -65,9 +103,11 @@ namespace dd
 			return FLT_MAX;
 		} );
 
-		out_distance = intersection.Distance;
-		return true;
-	
+		if( intersection.IsValid() )
+		{
+			out_distance = intersection.Distance;
+			return true;
+		}
 
 		return false;
 	}

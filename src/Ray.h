@@ -12,7 +12,7 @@ namespace dd
 	{
 		Ray();
 		Ray( const Ray& other );
-		Ray( const glm::vec3& origin, const glm::vec3& direction );
+		Ray( const glm::vec3& origin, const glm::vec3& direction, float length = FLT_MAX );
 
 		void operator=( const Ray& other );
 
@@ -25,6 +25,16 @@ namespace dd
 		// The normalized direction of the ray.
 		//
 		glm::vec3 Direction() const { return m_direction; }
+
+		//
+		// The length of the ray.
+		//
+		float Length() const { return m_length; }
+
+		//
+		// Does this ray have a length set?
+		//
+		bool HasLength() const { return m_length != FLT_MAX; }
 
 		//
 		// The component-wise inverse of the direction. 
@@ -43,6 +53,8 @@ namespace dd
 
 		glm::vec3 m_origin;
 		glm::vec3 m_direction;
+		float m_length;
+
 		glm::vec3 m_invDir;
 
 		void SetDirection( const glm::vec3& dir );

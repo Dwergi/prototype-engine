@@ -18,9 +18,11 @@ namespace ddr
 
 namespace dd
 {
+	struct BulletComponent;
 	struct IAsyncHitTest;
 	struct InputBindings;
 	struct HitState;
+	struct TransformComponent;
 
 	struct BulletSystem : ddc::System, IDebugPanel
 	{
@@ -49,6 +51,8 @@ namespace dd
 
 		void HandleInput( InputAction action, InputType type );
 		void FireBullet( ddc::World& world );
+		void KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet );
+		bool HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos );
 
 		virtual void DrawDebugInternal( const ddc::World& world ) override;
 	};

@@ -130,6 +130,8 @@ namespace ddr
 
 			for( dd::Particle& p : m_tempBuffer )
 			{
+				DD_ASSERT( !ddm::IsNaN( p.Position ) );
+				
 				p.Distance = p.Alive() ? glm::distance2( p.Position, cam_pos ) : -1;
 			}
 

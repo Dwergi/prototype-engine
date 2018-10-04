@@ -19,12 +19,14 @@ namespace dd
 	Ray::Ray( const Ray& other ) :
 		m_origin( other.m_origin ),
 		m_direction( other.m_direction ),
-		m_invDir( other.m_invDir )
+		m_invDir( other.m_invDir ),
+		m_length( other.m_length )
 	{
 	}
 
-	Ray::Ray( const glm::vec3& origin, const glm::vec3& direction ) :
-		m_origin( origin )
+	Ray::Ray( const glm::vec3& origin, const glm::vec3& direction, float length ) :
+		m_origin( origin ),
+		m_length( length )
 	{
 		SetDirection( direction );
 	}
@@ -34,6 +36,7 @@ namespace dd
 		m_origin = other.m_origin;
 		m_direction = other.m_direction;
 		m_invDir = other.m_invDir;
+		m_length = other.m_length;
 	}
 
 	void Ray::SetDirection( const glm::vec3& direction )

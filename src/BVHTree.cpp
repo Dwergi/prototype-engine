@@ -161,7 +161,8 @@ namespace dd
 
 			float bucket_distance;
 			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
-				bucket_distance < nearest.Distance )
+				bucket_distance < nearest.Distance &&
+				bucket_distance < ray.Length() )
 			{
 				if( bucket.IsLeaf() )
 				{
@@ -209,7 +210,8 @@ namespace dd
 
 			float bucket_distance;
 			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
-				bucket_distance < nearest.Distance )
+				bucket_distance < nearest.Distance && 
+				bucket_distance < ray.Length() )
 			{
 				if( bucket.IsLeaf() )
 				{

@@ -15,9 +15,9 @@ namespace dd
 		// 
 		// Start a hit test against the world with the given ray.
 		// Length is the maximum length that will be considered.
-		// Fetch the current state using FetchState().
+		// Fetch the current state using FetchResult().
 		//
-		virtual HitHandle ScheduleHitTest( const Ray& ray, float length ) = 0;
+		virtual HitHandle ScheduleHitTest( const Ray& ray ) = 0;
 
 		//
 		// Fetch the hit state of a given hit.

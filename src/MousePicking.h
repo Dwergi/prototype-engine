@@ -99,7 +99,7 @@ namespace dd
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
-		Ray GetScreenRay( const ddr::ICamera& camera ) const;
+		Ray GetScreenRay( const ddr::ICamera& camera, float length ) const;
 
 		void HandleInput( InputAction action, InputType type );
 

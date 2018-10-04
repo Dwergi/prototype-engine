@@ -8,8 +8,10 @@
 #include "BulletSystem.h"
 
 #include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
 #include "BulletComponent.h"
 #include "ColourComponent.h"
+#include "HitTest.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "InputBindings.h"
@@ -32,8 +34,14 @@ namespace dd
 		m_scale = 0.1f;
 		m_attenuation = 0.1f;
 
-		RequireWrite<dd::BulletComponent>();
-		RequireWrite<dd::TransformComponent>();
+		RequireWrite<dd::BulletComponent>( "bullets" );
+		RequireWrite<dd::TransformComponent>( "bullets" );
+		
+		RequireRead<dd::MeshComponent>( "dynamic_meshes" );
+		RequireRead<dd::TransformComponent>( "dynamic_meshes" );
+		OptionalRead<dd::BoundBoxComponent>( "dynamic_meshes" );
+		OptionalRead<dd::BoundSphereComponent>( "dynamic_meshes" );
+		RequireTag( ddc::Tag::Dynamic, "dynamic_meshes" );
 	}
 
 	void BulletSystem::HandleInput( InputAction action, InputType type )
@@ -57,7 +65,7 @@ namespace dd
 	
 	void BulletSystem::FireBullet( ddc::World& world )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform;
@@ -78,9 +86,13 @@ namespace dd
 		world.Access( entity, colour );
 		colour->Colour = glm::vec4( m_colour, 1 );
 
-		dd::BoundBoxComponent* bounds;
-		world.Access( entity, bounds );
-		bounds->BoundBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
+		dd::BoundSphereComponent* bsphere;
+		world.Access( entity, bsphere );
+		bsphere->Sphere.Radius = 1.0f;
+
+		dd::BoundBoxComponent* bbox;
+		world.Access( entity, bbox );
+		bbox->BoundBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
 
 		dd::LightComponent* light;
 		world.Access( entity, light );
@@ -93,6 +105,59 @@ namespace dd
 		m_fireBullet = false;
 	}
 
+	void BulletSystem::KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet )
+	{
+		if( bullet.PendingHit.Valid )
+		{
+			m_hitTest.ReleaseResult( bullet.PendingHit );
+		}
+
+		if( glm::length2( bullet.HitPosition ) > 0 )
+		{
+			dd::BulletHitMessage payload;
+			payload.Position = bullet.HitPosition;
+			payload.SurfaceNormal = bullet.HitNormal;
+			payload.Velocity = bullet.Velocity;
+
+			dd::Message msg;
+			msg.Type = dd::MessageType::BulletHit;
+			msg.SetPayload( payload );
+
+			world.Messages().Send( msg );
+		}
+
+		world.DestroyEntity( entity );
+	}
+
+	bool BulletSystem::HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& bullet_transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos )
+	{
+		auto mesh_cmps = meshes.Read<dd::MeshComponent>();
+		auto mesh_transforms = meshes.Read<dd::TransformComponent>();
+		auto mesh_bboxes = meshes.Read<dd::BoundBoxComponent>();
+		auto mesh_bspheres = meshes.Read<dd::BoundSphereComponent>();
+
+		glm::vec3 initial_pos = bullet_transform.GetPosition();
+		dd::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * delta_t ) );
+
+		for( size_t i = 0; i < meshes.Size(); ++i )
+		{
+			float hit_distance;
+			glm::vec3 hit_normal;
+
+			if( ddm::HitTestMesh( ray, mesh_cmps[i], mesh_transforms[i], mesh_bspheres.Get( i ), mesh_bboxes.Get( i ), hit_distance, hit_normal ) )
+			{
+				bullet.HitPosition = initial_pos + glm::normalize( bullet.Velocity ) * hit_distance;
+				bullet.HitNormal = hit_normal;
+				DD_ASSERT( glm::length2( bullet.HitNormal ) > 0.01f );
+
+				bullet.Lifetime = bullet.Age;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
 		ddc::World& world = update.World();
@@ -102,49 +167,38 @@ namespace dd
 			FireBullet( world );
 		}
 
-		const ddc::DataBuffer& data = update.Data();
+		const ddc::DataBuffer& dynamic_meshes = update.Data( "dynamic_meshes" );
+		const ddc::DataBuffer& bullet_data = update.Data( "bullets" );
 
-		auto bullets = data.Write<dd::BulletComponent>();
-		auto transforms = data.Write<dd::TransformComponent>();
+		auto bullets = bullet_data.Write<dd::BulletComponent>();
+		auto bullet_transforms = bullet_data.Write<dd::TransformComponent>();
 
 		float delta_t = update.Delta();
 
-		m_count = (int) data.Size();
+		m_count = (int) bullet_data.Size();
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		for( size_t i = 0; i < bullet_data.Size(); ++i )
 		{
 			dd::BulletComponent& bullet = bullets[ i ];
 			bullet.Age += delta_t;
 
 			if( bullet.Age >= bullet.Lifetime )
 			{
-				if( bullet.PendingHit.Valid )
-				{
-					m_hitTest.ReleaseResult( bullet.PendingHit );
-				}
-
-				if( bullet.HitPosition != glm::vec3( 0 ) )
-				{
-					dd::BulletHitMessage payload;
-					payload.Position = bullet.HitPosition;
-					payload.SurfaceNormal = bullet.HitNormal;
-					payload.Velocity = bullet.Velocity;
-
-					dd::Message msg;
-					msg.Type = dd::MessageType::BulletHit;
-					msg.SetPayload( payload );
-
-					world.Messages().Send( msg );
-				}
-
-				world.DestroyEntity( data.Entities()[i] );
+				KillBullet( world, bullet_data.Entities()[i], bullet );
 				continue;
 			}
 
-			glm::vec3 start_pos = transforms[ i ].GetPosition();
-			glm::vec3 end_pos = start_pos + bullet.Velocity * delta_t;
-			
-			transforms[ i ].SetPosition( end_pos );
+			dd::TransformComponent& bullet_transform = bullet_transforms[i];
+
+			// check dynamic meshes
+			glm::vec3 initial_pos = bullet_transform.GetPosition();
+			glm::vec3 new_pos;
+			if( !HitTestDynamicMeshes( bullet, bullet_transform, dynamic_meshes, delta_t, new_pos ) )
+			{
+				new_pos = initial_pos + bullet.Velocity * delta_t;
+			}
+
+			bullet_transform.SetPosition( new_pos );
 
 			// hit test for bullet hit location
 			if( bullet.PendingHit.Completed )
@@ -154,20 +208,23 @@ namespace dd
 
 			if( !bullet.PendingHit.Valid )
 			{
-				dd::Ray ray( start_pos, bullet.Velocity );
-				bullet.PendingHit = m_hitTest.ScheduleHitTest( ray, glm::length( bullet.Velocity * bullet.Lifetime ) );
+				dd::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * bullet.Lifetime ) );
+				bullet.PendingHit = m_hitTest.ScheduleHitTest( ray );
 			}
 			else
 			{
 				HitResult result;
-
 				if( m_hitTest.FetchResult( bullet.PendingHit, result ) )
 				{
-					bullet.HitPosition = result.Position();
-					bullet.HitNormal = result.Normal();
+					if( result.Distance() < FLT_MAX )
+					{
+						bullet.HitPosition = result.Position();
+						bullet.HitNormal = result.Normal();
+						DD_ASSERT( glm::length2( bullet.HitNormal ) > 0.01f );
 
-					float hit_lifetime = result.Distance() / glm::length( bullet.Velocity );
-					bullet.Lifetime = ddm::min( bullet.Lifetime, hit_lifetime );
+						float hit_lifetime = result.Distance() / glm::length( bullet.Velocity );
+						bullet.Lifetime = ddm::min( bullet.Lifetime, hit_lifetime );
+					}
 
 					bullet.PendingHit.Completed = true;
 				}

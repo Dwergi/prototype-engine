@@ -52,6 +52,7 @@ namespace ddm
 	}
 
 	bool IsNaN( glm::vec3 v );
+	bool IsNaN( glm::vec4 v );
 	bool IsInf( glm::vec3 v );
 
 	glm::mat4 TransformFromOriginDir( const glm::vec3& origin, const glm::vec3& direction );

@@ -36,7 +36,6 @@ namespace dd
 	{
 		HitResult();
 		HitResult( dd::Ray ray );
-		HitResult( dd::Ray ray, float length );
 		HitResult( const HitResult& other );
 
 		void operator=( const HitResult& other );
@@ -52,7 +51,6 @@ namespace dd
 		}
 
 		dd::Ray Ray() const { return m_ray; }
-		float Length() const { return m_length; }
 		float Distance() const { return m_distance; }
 		ddc::Entity Entity() const { return m_entity; }
 
@@ -62,7 +60,6 @@ namespace dd
 
 		float m_distance { FLT_MAX };
 		dd::Ray m_ray;
-		float m_length { FLT_MAX };
 		glm::vec3 m_normal;
 		ddc::Entity m_entity;
 	};

@@ -249,8 +249,6 @@ namespace dd
 			world.RemoveTag( m_previousRay, ddc::Tag::Visible );
 		}
 
-		dd::Ray screen_ray = GetScreenRay( data.Camera() );
-
 		if( m_pendingHit.Valid )
 		{
 			HitResult result;
@@ -259,16 +257,24 @@ namespace dd
 				m_hitTest.ReleaseResult( m_pendingHit );
 				m_hitResult = result;
 				m_pendingHit.Valid = false;
+				m_pendingHit.Completed = true;
 			}
 		}
 
+		float length = 200;
+		if( m_pendingHit.Completed )
+		{
+			length = m_hitResult.Distance();
+		}
+
+		dd::Ray screen_ray = GetScreenRay( data.Camera(), length );
+
 		if( !m_pendingHit.Valid )
 		{
-			m_pendingHit = m_hitTest.ScheduleHitTest( screen_ray, 200 );
+			m_pendingHit = m_hitTest.ScheduleHitTest( screen_ray );
 		}
 
 		ddc::Entity entity = m_hitResult.Entity();
-		m_depth = m_hitResult.Distance();
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
@@ -292,7 +298,7 @@ namespace dd
 
 			float distance;
 			glm::vec3 normal;
-			if( dd::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance, normal ) )
+			if( ddm::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance, normal ) )
 			{
 				if( distance < m_depth )
 				{
@@ -422,7 +428,7 @@ namespace dd
 	//
 	// Unproject a point at the mouse coordinates at the near plane and at the far plane to get a world-space ray.
 	//
-	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera ) const
+	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, float length ) const
 	{
 		glm::vec4 viewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
 
@@ -432,6 +438,6 @@ namespace dd
 		glm::vec3 world_near = glm::unProject( win_near, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 		glm::vec3 world_far = glm::unProject( win_far, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 
-		return Ray( world_near, glm::normalize( world_far - world_near ) );
+		return Ray( world_near, glm::normalize( world_far - world_near ), length );
 	}
 }

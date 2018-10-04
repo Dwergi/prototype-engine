@@ -10,6 +10,11 @@ namespace ddm
 		return glm::isnan( v.x ) || glm::isnan( v.y ) || glm::isnan( v.z );
 	}
 
+	bool IsNaN( glm::vec4 v )
+	{
+		return glm::isnan( v.x ) || glm::isnan( v.y ) || glm::isnan( v.z ) || glm::isnan( v.w );;
+	}
+
 	bool IsInf( glm::vec3 v )
 	{
 		return glm::isinf( v.x ) || glm::isinf( v.y ) || glm::isinf( v.z );
