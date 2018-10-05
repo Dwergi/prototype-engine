@@ -20,7 +20,7 @@ namespace dd
 		virtual void Update( const ddc::UpdateData& data ) override;
 
 		virtual HitHandle ScheduleHitTest( const Ray& ray ) override;
-		virtual bool FetchResult( HitHandle handle, HitResult& state ) override;
+		virtual bool FetchResult( HitHandle handle, HitResult& result ) override;
 		virtual void ReleaseResult( HitHandle handle ) override;
 
 	private:
@@ -30,9 +30,10 @@ namespace dd
 		struct HitEntry
 		{
 			HitHandle Handle;
-			HitResult State;
+			HitResult Result;
 
 			bool IsPending() const { return Handle.Valid && !Handle.Completed; }
+			bool IsCompleted() const { return Handle.Valid && Handle.Completed; }
 		};
 
 		HitEntry m_hits[MAX_HITS];
@@ -46,6 +47,6 @@ namespace dd
 
 		// Inherited via IDebugPanel
 		virtual const char* GetDebugTitle() const override { return "Hit Testing"; }
-		virtual void DrawDebugInternal( const ddc::World & world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }

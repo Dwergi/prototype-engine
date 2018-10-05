@@ -24,7 +24,7 @@ namespace dd
 		{
 		}
 
-		void DrawDebugPanel( const ddc::World& world );
+		void DrawDebugPanel( ddc::World& world );
 		void AddToMenu();
 
 		//
@@ -50,6 +50,6 @@ namespace dd
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
-		virtual void DrawDebugInternal( const ddc::World& world ) = 0;
+		virtual void DrawDebugInternal( ddc::World& world ) = 0;
 	};
 }

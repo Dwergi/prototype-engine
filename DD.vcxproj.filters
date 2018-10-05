@@ -571,6 +571,9 @@
     <ClInclude Include="src\EntityPrototype.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\EntityVisualizer.h">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1022,6 +1025,9 @@
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityVisualizer.cpp">
+      <Filter>DebugUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

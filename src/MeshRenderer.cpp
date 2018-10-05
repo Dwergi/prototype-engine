@@ -171,7 +171,7 @@ namespace ddr
 		shader->Use( false );
 	}
 
-	void MeshRenderer::DrawDebugInternal( const ddc::World& world )
+	void MeshRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );

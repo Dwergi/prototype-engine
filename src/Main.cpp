@@ -24,6 +24,7 @@
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
 #include "EntityPrototype.h"
+#include "EntityVisualizer.h"
 #include "File.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
@@ -438,7 +439,6 @@ int GameMain()
 
 	dd::TypeInfo::SetScriptEngine( new dd::AngelScriptEngine() );
 
-	dd::TypeInfo::RegisterDefaultTypes();
 	dd::TypeInfo::RegisterQueuedTypes();
 
 	unsigned int threads = std::thread::hardware_concurrency();
@@ -540,6 +540,8 @@ int GameMain()
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );
 
+		dd::EntityVisualizer* entity_visualizer = new dd::EntityVisualizer();
+
 		s_debugUI->RegisterDebugPanel( *s_frameTimer );
 		s_debugUI->RegisterDebugPanel( *s_renderer );
 		s_debugUI->RegisterDebugPanel( *s_freeCamera );
@@ -554,6 +556,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *bullet_system );
 		s_debugUI->RegisterDebugPanel( *physics_system );
 		s_debugUI->RegisterDebugPanel( *s_world );
+		s_debugUI->RegisterDebugPanel( *entity_visualizer );
 
 		s_world->Initialize();
 
@@ -578,6 +581,7 @@ int GameMain()
 			transform->Transform[ 3 ].xyz = direction;
 		}
 
+		// point light
 		{
 			ddc::Entity entity = s_world->CreateEntity<dd::LightComponent, dd::TransformComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
@@ -598,18 +602,19 @@ int GameMain()
 		
 		// particle system
 		{
-			/*ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundsComponent>();
+			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
+			s_world->AddTag( entity, ddc::Tag::Dynamic );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
-			transform->SetLocalPosition( glm::vec3( 10, 60, 10 ) );
+			transform->SetPosition( glm::vec3( 10, 60, 10 ) );
 
-			dd::BoundsComponent* bounds = s_world->Access<dd::BoundsComponent>( entity );
-			bounds->LocalBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+			dd::BoundBoxComponent* bounds = s_world->Access<dd::BoundBoxComponent>( entity );
+			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
-			particle->Lifetime = 1000;*/
+			particle->Lifetime = 1000;
 		}
 
 		// axes

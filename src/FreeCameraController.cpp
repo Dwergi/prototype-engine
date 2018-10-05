@@ -77,7 +77,7 @@ namespace dd
 			*state = false;
 	}
 
-	void FreeCameraController::DrawDebugInternal( const ddc::World& world )
+	void FreeCameraController::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiSetCond_FirstUseEver );
 

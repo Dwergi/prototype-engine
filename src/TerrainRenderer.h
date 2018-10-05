@@ -46,6 +46,6 @@ namespace ddr
 		const dd::TerrainParameters& m_params;
 		Wireframe* m_wireframe { nullptr };
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }

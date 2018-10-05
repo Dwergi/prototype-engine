@@ -6,7 +6,7 @@
 
 namespace dd
 {
-	void IDebugPanel::DrawDebugPanel( const ddc::World& world )
+	void IDebugPanel::DrawDebugPanel( ddc::World& world )
 	{
 		ImGui::SetNextWindowPos( ImVec2( 30, 30 ), ImGuiSetCond_FirstUseEver );
 

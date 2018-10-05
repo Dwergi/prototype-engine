@@ -53,7 +53,7 @@ namespace ddr
 			const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp, 
 			const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }
 	};
 }

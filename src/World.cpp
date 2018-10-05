@@ -417,7 +417,7 @@ namespace ddc
 		}
 	}
 
-	void World::DrawDebugInternal( const ddc::World& world )
+	void World::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::Checkbox( "Systems Graph", &m_drawSystemsGraph );
 

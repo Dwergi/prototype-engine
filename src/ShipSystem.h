@@ -52,6 +52,6 @@ namespace dd
 
 		void CreateShip( ddc::World& world );
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }

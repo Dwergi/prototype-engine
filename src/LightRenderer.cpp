@@ -110,7 +110,7 @@ namespace ddr
 		UpdateDebugPointLights( data.World() );
 	}
 
-	void LightRenderer::DrawDebugInternal( const ddc::World& world )
+	void LightRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 400 ), ImGuiCond_FirstUseEver );
 

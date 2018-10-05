@@ -22,7 +22,7 @@ namespace dd
 		//
 		// Fetch the hit state of a given hit.
 		//
-		virtual bool FetchResult( HitHandle handle, HitResult& state ) = 0;
+		virtual bool FetchResult( HitHandle handle, HitResult& result ) = 0;
 
 		//
 		// Release the state pointed to by the handle, and invalidate the handle.

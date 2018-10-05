@@ -170,6 +170,8 @@ namespace dd
 
 	void TypeInfo::RegisterDefaultTypes()
 	{
+		DD_ASSERT( !sm_defaultsRegistered );
+
 		sm_defaultsRegistered = true;
 
 		// integers
@@ -187,8 +189,6 @@ namespace dd
 		DD_REGISTER_POD( float );
 		DD_REGISTER_POD( double );
 		
-		DD_REGISTER_POD( char* );
-
 		DD_REGISTER_POD( bool );
 
 		DD_REGISTER_CLASS( dd::String );
@@ -213,23 +213,23 @@ namespace dd
 
 		DD_REGISTER_CLASS( dd::SharedString );
 
-		TypeInfo* vec2Type = DD_REGISTER_POD( glm::vec2 );
+		TypeInfo* vec2Type = DD_REGISTER_CLASS( glm::vec2 );
 		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::x>( "x" );
 		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::y>( "y" );
 
-		TypeInfo* vec3Type = DD_REGISTER_POD( glm::vec3 );
+		TypeInfo* vec3Type = DD_REGISTER_CLASS( glm::vec3 );
 		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
-		TypeInfo* vec4Type = DD_REGISTER_POD( glm::vec4 );
+		TypeInfo* vec4Type = DD_REGISTER_CLASS( glm::vec4 );
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::x>( "x" );
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::y>( "y" );
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "w" );
 
-		DD_REGISTER_POD( glm::mat3 );
-		DD_REGISTER_POD( glm::mat4 );
+		DD_REGISTER_CLASS( glm::mat3 );
+		DD_REGISTER_CLASS( glm::mat4 );
 	}
 
 	void TypeInfo::SetScriptEngine( AngelScriptEngine* scriptEngine )

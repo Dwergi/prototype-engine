@@ -82,7 +82,7 @@ namespace ddr
 		m_framebuffer.RenderInit();
 	}
 
-	void WorldRenderer::DrawDebugInternal( const ddc::World& world )
+	void WorldRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
 		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );

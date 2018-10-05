@@ -91,7 +91,7 @@ namespace dd
 
 	protected:
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 
 	private:
 

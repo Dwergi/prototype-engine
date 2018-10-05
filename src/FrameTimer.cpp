@@ -90,7 +90,7 @@ namespace dd
 		}
 	}
 
-	void FrameTimer::DrawDebugInternal( const ddc::World& world )
+	void FrameTimer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
 

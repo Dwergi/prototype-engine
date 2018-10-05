@@ -208,8 +208,8 @@ namespace dd
 		DD_ASSERT( false, "Enum options being registered for non-existent enum!" );
 	}
 
-	template <typename TEnum>
-	void TypeInfo::RegisterEnumOption( TEnum value, const char* name )
+	template <typename T>
+	void TypeInfo::RegisterEnumOption( T value, const char* name )
 	{
 		DD_ASSERT( IsRegistered() );
 

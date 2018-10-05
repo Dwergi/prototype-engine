@@ -201,7 +201,7 @@ namespace dd
 		}
 	}
 
-	void ParticleSystem::DrawDebugInternal( const ddc::World& world )
+	void ParticleSystem::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES );
 

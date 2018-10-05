@@ -326,7 +326,7 @@ namespace dd
 		} );
 	}
 
-	void TerrainSystem::DrawDebugInternal( const ddc::World& world )
+	void TerrainSystem::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::Checkbox( "Draw", &m_draw );
 

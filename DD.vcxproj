@@ -338,6 +338,7 @@
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\EntityPrototype.h" />
+    <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
@@ -557,6 +558,7 @@
     <ClCompile Include="src\BulletComponent.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
+    <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\MeshHandle.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />

@@ -70,7 +70,7 @@ namespace ddr
 		}
 	}
 
-	void TerrainRenderer::DrawDebugInternal( const ddc::World& world )
+	void TerrainRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{

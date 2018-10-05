@@ -62,21 +62,20 @@ namespace dd
 		entry.Handle.Version++;
 		entry.Handle.Valid = true;
 		entry.Handle.Completed = false;
-		entry.State = HitResult( ray );
+		entry.Result = HitResult( ray );
 
 		return entry.Handle;
 	}
 
-	bool HitTestSystem::FetchResult( HitHandle handle, HitResult& state )
+	bool HitTestSystem::FetchResult( HitHandle handle, HitResult& result )
 	{
 		DD_ASSERT( handle.ID < MAX_HITS );
 
 		HitEntry& entry = m_hits[handle.ID];
 
-		if( entry.Handle.Version == handle.Version &&
-			entry.Handle.Valid )
+		if( entry.Handle.Version == handle.Version && entry.IsCompleted() )
 		{
-			state = entry.State;
+			result = entry.Result;
 			return true;
 		}
 
@@ -90,8 +89,9 @@ namespace dd
 		HitEntry& entry = m_hits[handle.ID];
 		if( entry.Handle.Valid )
 		{
-			entry.State = HitResult();
+			entry.Result = HitResult();
 			entry.Handle.Valid = false;
+			entry.Handle.Completed = false;
 
 			m_free.push_back( entry.Handle.ID );
 
@@ -120,9 +120,9 @@ namespace dd
 					float out_distance = FLT_MAX;
 					glm::vec3 out_normal;
 
-					if( ddm::HitTestMesh( entry.State.Ray(), meshes[e], transforms[e], bound_spheres.Get( e ), bound_boxes.Get( e ), out_distance, out_normal ) )
+					if( ddm::HitTestMesh( entry.Result.Ray(), meshes[e], transforms[e], bound_spheres.Get( e ), bound_boxes.Get( e ), out_distance, out_normal ) )
 					{
-						entry.State.RegisterHit( out_distance, out_normal, entities[e] );
+						entry.Result.RegisterHit( out_distance, out_normal, entities[e] );
 					}
 				}
 
@@ -162,7 +162,7 @@ namespace dd
 		}
 	}
 
-	void HitTestSystem::DrawDebugInternal( const ddc::World& world )
+	void HitTestSystem::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SliderInt( "Hit Tests", &m_hitTests, 0, MAX_HITS / 2 );
 

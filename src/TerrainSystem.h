@@ -104,7 +104,7 @@ namespace dd
 		std::unordered_map<TerrainChunkKey, ddc::Entity> m_existing;
 		Vector<ddc::Entity> m_active;
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 
 		void GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset );
 		void GenerateLODLevel( int lodLevel, Vector<TerrainChunkKey>& toGenerate, glm::ivec2 offset );

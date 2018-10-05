@@ -21,7 +21,7 @@ namespace dd
 		virtual const char* GetDebugTitle() const override { return "Physics"; }
 
 	private:
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 		
 		glm::vec3 m_gravity;
 	};

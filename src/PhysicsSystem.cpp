@@ -305,7 +305,7 @@ namespace dd
 		}
 	}
 
-	void PhysicsSystem::DrawDebugInternal( const ddc::World& world )
+	void PhysicsSystem::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::DragFloat3( "Gravity", glm::value_ptr( m_gravity ) );
 	}

@@ -256,7 +256,7 @@ namespace ddc
 		void UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t );
 		void UpdateSystemsWithTreeScheduling( float delta_t );
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 
 	using ExpandType = int[];

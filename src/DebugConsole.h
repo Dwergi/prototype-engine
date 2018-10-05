@@ -22,7 +22,7 @@ namespace dd
 		virtual const char* GetDebugTitle() const override { return "Console"; }
 
 	protected:
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 
 	private:
 

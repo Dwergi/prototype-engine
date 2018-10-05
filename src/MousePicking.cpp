@@ -40,9 +40,9 @@ namespace dd
 		m_input( input ),
 		m_hitTest( hit_test )
 	{
-		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
 	
+		Optional<dd::MeshComponent>();
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
 
@@ -251,23 +251,14 @@ namespace dd
 
 		if( m_pendingHit.Valid )
 		{
-			HitResult result;
-			if( m_hitTest.FetchResult( m_pendingHit, result ) )
+			if( m_hitTest.FetchResult( m_pendingHit, m_hitResult ) )
 			{
 				m_hitTest.ReleaseResult( m_pendingHit );
-				m_hitResult = result;
-				m_pendingHit.Valid = false;
-				m_pendingHit.Completed = true;
+				m_pendingHit = dd::HitHandle();
 			}
 		}
 
-		float length = 200;
-		if( m_pendingHit.Completed )
-		{
-			length = m_hitResult.Distance();
-		}
-
-		dd::Ray screen_ray = GetScreenRay( data.Camera(), length );
+		dd::Ray screen_ray = GetScreenRay( data.Camera(), 1000.f );
 
 		if( !m_pendingHit.Valid )
 		{
@@ -275,6 +266,7 @@ namespace dd
 		}
 
 		ddc::Entity entity = m_hitResult.Entity();
+		m_depth = m_hitResult.Distance();
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
@@ -285,10 +277,6 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			ddr::Mesh* mesh = ddr::Mesh::Get( meshes[i].Mesh );
-			if( mesh == nullptr )
-				continue;
-
 			dd::AABB box;
 			dd::Sphere sphere;
 			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ].Transform, box, sphere ) )
@@ -296,15 +284,37 @@ namespace dd
 				continue;
 			}
 
-			float distance;
-			glm::vec3 normal;
-			if( ddm::HitTestMesh( screen_ray, transforms[i].Transform, sphere, box, *mesh, distance, normal ) )
+			float distance = FLT_MAX;
+
+			const dd::MeshComponent* mesh_cmp = meshes.Get( i );
+			if( mesh_cmp != nullptr )
 			{
-				if( distance < m_depth )
+				ddr::Mesh* mesh = ddr::Mesh::Get( meshes[ i ].Mesh );
+				if( mesh == nullptr )
+					continue;
+
+				glm::vec3 normal;
+				ddm::HitTestMesh( screen_ray, transforms[ i ].Transform, sphere, box, *mesh, distance, normal );
+			}
+			else
+			{
+				float bbox_dist = FLT_MAX;
+				box.IntersectsRay( screen_ray, bbox_dist );
+				
+				float bsphere_dist = FLT_MAX;
+				glm::vec3 bsphere_pos, bsphere_normal;
+				if( sphere.IntersectsRay( screen_ray, bsphere_pos, bsphere_normal ) )
 				{
-					entity = entities[i];
-					m_depth = distance;
+					bsphere_dist = glm::distance( screen_ray.Origin(), bsphere_pos );
 				}
+
+				distance = ddm::min( bbox_dist, bsphere_dist );
+			}
+
+			if( distance < m_depth )
+			{
+				m_depth = distance;
+				entity = entities[ i ];
 			}
 		}
 
@@ -327,7 +337,7 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::DrawDebugInternal( const ddc::World& world )
+	void MousePicking::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, ImGui::GetIO().DisplaySize.y - 100 ), ImGuiSetCond_FirstUseEver );
 
@@ -386,18 +396,26 @@ namespace dd
 		{
 			if( m_focused.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_focused )->Mesh;
+				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_focused );
+				if( mesh_cmp != nullptr )
+				{
+					ddr::MeshHandle mesh_h = mesh_cmp->Mesh;
 
-				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
-				ImGui::Text( "Name: %s", name.c_str() );
+					const String& name = ddr::Mesh::Get( mesh_h )->GetName();
+					ImGui::Text( "Mesh: %s", name.c_str() );
+				}
+				else
+				{
+					ImGui::TextUnformatted( "Mesh: <none>" );
+				}
 
 				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->GetPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Text( "Name: <none>" );
-				ImGui::Text( "Position: <none>" );
+				ImGui::TextUnformatted( "Mesh: <none>" );
+				ImGui::TextUnformatted( "Position: <none>" );
 			}
 
 			ImGui::TreePop();
@@ -407,18 +425,26 @@ namespace dd
 		{
 			if( m_selected.IsValid() )
 			{
-				ddr::MeshHandle mesh_h = world.Get<MeshComponent>( m_selected )->Mesh;
+				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_selected );
+				if( mesh_cmp != nullptr )
+				{
+					ddr::MeshHandle mesh_h = mesh_cmp->Mesh;
 
-				const String& name = ddr::Mesh::Get( mesh_h )->GetName();
-				ImGui::Value( "Name", name.c_str() );
+					const String& name = ddr::Mesh::Get( mesh_h )->GetName();
+					ImGui::Text( "Mesh: %s", name.c_str() );
+				}
+				else
+				{
+					ImGui::TextUnformatted( "Mesh: <none>" );
+				}
 
 				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->GetPosition();
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
 			{
-				ImGui::Text( "Name: <none>" );
-				ImGui::Text( "Position: <none>" );
+				ImGui::TextUnformatted( "Mesh: <none>" );
+				ImGui::TextUnformatted( "Position: <none>" );
 			}
 
 			ImGui::TreePop();

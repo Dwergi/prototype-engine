@@ -215,7 +215,7 @@ namespace ddr
 		glDisable( GL_BLEND );
 	}
 
-	void BoundsRenderer::DrawDebugInternal( const ddc::World& world )
+	void BoundsRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 120 ), ImGuiCond_Once );
 

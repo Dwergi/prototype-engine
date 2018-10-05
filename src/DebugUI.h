@@ -39,7 +39,7 @@ namespace dd
 		void SetMousePosition( glm::vec2 pos );
 
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
-		void RenderDebugPanels( const ddc::World& world );
+		void RenderDebugPanels( ddc::World& world );
 
 		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
 		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );

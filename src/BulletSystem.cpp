@@ -232,7 +232,7 @@ namespace dd
 		}
 	}
 
-	void BulletSystem::DrawDebugInternal( const ddc::World& world )
+	void BulletSystem::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 300 ), ImGuiCond_FirstUseEver );
 

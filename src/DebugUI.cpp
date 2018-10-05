@@ -452,7 +452,7 @@ namespace dd
 		);
 	}
 
-	void DebugUI::RenderDebugPanels( const ddc::World& world )
+	void DebugUI::RenderDebugPanels( ddc::World& world )
 	{
 		if( !m_draw )
 			return;

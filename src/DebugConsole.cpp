@@ -142,7 +142,7 @@ namespace dd
 		m_scrollToBottom = true;
 	}
 
-	void DebugConsole::DrawDebugInternal( const ddc::World& world )
+	void DebugConsole::DrawDebugInternal( ddc::World& world )
 	{
 		DD_PROFILE_START( DebugConsole_Draw );
 

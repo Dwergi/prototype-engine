@@ -54,8 +54,8 @@ namespace dd
 		inline bool IsRegistered() const { return m_size != 0; }
 
 		inline Category GetCategory() const { return m_category; }
+		
 		inline bool IsComponent() const { return m_componentID != INVALID_COMPONENT; }
-
 		inline dd::ComponentID ComponentID() const { return m_componentID; }
 
 		bool IsDerivedFrom( const TypeInfo* type ) const;
@@ -76,6 +76,7 @@ namespace dd
 
 		template <typename T>
 		void RegisterEnumOption( T value, const char* name );
+		const Vector<EnumOption>& GetEnumOptions() const { return m_enumOptions; }
 
 		//
 		// Creation and deletion through a TypeInfo object.

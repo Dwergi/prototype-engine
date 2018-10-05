@@ -50,7 +50,7 @@ namespace ddr
 		ShaderHandle m_shader;
 
 		virtual const char* GetDebugTitle() const override { return "Bounds"; }
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 
 		void UpdateBuffers();
 	};

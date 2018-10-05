@@ -54,6 +54,6 @@ namespace dd
 		void KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet );
 		bool HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos );
 
-		virtual void DrawDebugInternal( const ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }
