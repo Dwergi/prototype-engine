@@ -23,6 +23,7 @@
 #include "DebugUI.h"
 #include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
+#include "EntityPrototype.h"
 #include "File.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
@@ -709,7 +710,9 @@ int GameMain()
 				}
 			}*/
 
+
 			float plane_size = 100;
+			ddc::EntityPrototype phys_plane_proto( "physics_plane" );
 
 			{
 				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
@@ -722,6 +725,8 @@ int GameMain()
 				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
 				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
 				physics_plane.Elasticity = 0.95f;
+
+				phys_plane_proto.CreateFromEntity( plane, *s_world );
 			}
 
 			{
@@ -729,12 +734,12 @@ int GameMain()
 					glm::rotate( glm::radians( -45.0f ), glm::vec3( 1, 0, 0 ) ) *
 					glm::scale( glm::vec3( plane_size ) );
 
-				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.8, 0.2, 0.2, 1 ), transform );
-				s_world->AddTag( plane, ddc::Tag::Static );
+				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
+				clr->Colour = glm::vec4( 0.8, 0.2, 0.2, 1 );
 
-				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
-				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
-				physics_plane.Elasticity = 0.95f;
+				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
+				transform_cmp->Transform = transform;
 			}
 
 			{
@@ -743,12 +748,12 @@ int GameMain()
 					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
 					glm::scale( glm::vec3( plane_size ) );
 
-				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.8, 0.8, 0.2, 1 ), transform );
-				s_world->AddTag( plane, ddc::Tag::Static );
+				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
+				clr->Colour = glm::vec4( 0.8, 0.8, 0.2, 1 );
 
-				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
-				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
-				physics_plane.Elasticity = 0.95f;
+				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
+				transform_cmp->Transform = transform;
 			}
 
 			{
@@ -757,12 +762,12 @@ int GameMain()
 					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
 					glm::scale( glm::vec3( plane_size ) );
 
-				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.2, 0.2, 0.8, 1 ), transform );
-				s_world->AddTag( plane, ddc::Tag::Static );
+				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
+				clr->Colour = glm::vec4( 0.2, 0.2, 0.8, 1 );
 
-				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
-				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
-				physics_plane.Elasticity = 0.95f;
+				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
+				transform_cmp->Transform = transform;
 			}
 
 			ddc::World* world = s_world;

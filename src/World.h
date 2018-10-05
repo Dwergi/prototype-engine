@@ -28,6 +28,8 @@ namespace ddc
 		Dynamic = 5
 	};
 
+	typedef std::bitset<MAX_TAGS> TagBits;
+
 	struct System;
 	struct SystemNode;
 
@@ -131,6 +133,8 @@ namespace ddc
 			return reinterpret_cast<const T*>(GetComponent( entity, type->ComponentID() ));
 		}
 
+		void GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const;
+
 		//
 		// Does the given entity have a component of the given type ID?
 		//
@@ -189,7 +193,7 @@ namespace ddc
 		//
 		// Find all entities with the given type IDs and return them in the given vector.
 		//
-		void FindAllWith( const dd::IArray<dd::ComponentID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const;
+		void FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const;
 
 
 		//
@@ -213,6 +217,16 @@ namespace ddc
 		//
 		void RemoveTag( Entity e, Tag tag );
 
+		//
+		// Set all of an entity's tags at once.
+		//
+		void SetAllTags( Entity e, TagBits tags );
+
+		//
+		// Get a copy of all the tags the entity has.
+		//
+		TagBits GetAllTags( Entity e ) const;
+
 		virtual const char* GetDebugTitle() const override { return "World"; }
 
 	private:
@@ -221,7 +235,7 @@ namespace ddc
 		{
 			Entity Entity;
 			std::bitset<MAX_COMPONENTS> Ownership;
-			std::bitset<MAX_TAGS> Tags;
+			TagBits Tags;
 		};
 
 		uint m_count { 0 };

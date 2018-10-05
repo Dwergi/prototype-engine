@@ -221,21 +221,34 @@ namespace ddc
 		}
 	}
 
-	void World::FindAllWith( const dd::IArray<dd::ComponentID>& components, const std::bitset<MAX_TAGS>& tags, std::vector<Entity>& outEntities ) const
+	void World::GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const
+	{
+		DD_ASSERT( IsAlive( entity ) );
+
+		for( dd::ComponentID i = 0; i < MAX_COMPONENTS; ++i )
+		{
+			if( m_entities[ entity.ID ].Ownership.test( i ) )
+			{
+				components.Add( i );
+			}
+		}
+	}
+
+	void World::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const
 	{
 		std::bitset<MAX_COMPONENTS> required;
-		for( dd::ComponentID& type : components )
+		for( dd::ComponentID type : components )
 		{
 			required.set( type, true );
 		}
 
-		for( uint i = 0; i < m_count; ++i )
+		for( dd::ComponentID i = 0; i < m_count; ++i )
 		{
 			const EntityEntry& entry = m_entities[ i ];
 
 			if( IsAlive( entry.Entity ) )
 			{
-				std::bitset<MAX_TAGS> entity_tags = tags & entry.Tags;
+				TagBits entity_tags = tags & entry.Tags;
 				std::bitset<MAX_COMPONENTS> entity_components = required & m_entities[i].Ownership;
 
 				if( entity_components.count() == required.count() && 
@@ -269,6 +282,20 @@ namespace ddc
 		DD_ASSERT( tag != Tag::None );
 
 		m_entities[ e.ID ].Tags.reset( (uint) tag );
+	}
+
+	void World::SetAllTags( Entity e, TagBits tags )
+	{
+		DD_ASSERT( IsAlive( e ) );
+
+		m_entities[ e.ID ].Tags = tags;
+	}
+
+	TagBits World::GetAllTags( Entity e ) const
+	{
+		DD_ASSERT( IsAlive( e ) );
+
+		return m_entities[ e.ID ].Tags;
 	}
 
 	void World::UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t )
@@ -315,7 +342,7 @@ namespace ddc
 				}
 			}
 
-			std::bitset<MAX_TAGS> tags = system->GetRequiredTags( name.c_str() );
+			TagBits tags = system->GetRequiredTags( name.c_str() );
 
 			// find entities with requirements
 			std::vector<Entity> entities;

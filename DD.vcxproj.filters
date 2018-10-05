@@ -568,6 +568,9 @@
       <Filter>Messaging</Filter>
     </ClInclude>
     <ClInclude Include="src\ParticleSystemRenderer.h" />
+    <ClInclude Include="src\EntityPrototype.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1017,6 +1020,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
+    <ClCompile Include="src\EntityPrototype.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
