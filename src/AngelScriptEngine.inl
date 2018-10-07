@@ -109,7 +109,7 @@ namespace dd
 		const TypeInfo* typeInfo = DD_TYPE( T );
 		DD_ASSERT( typeInfo->IsRegistered() );
 
-		String64 objType( ReplacePointer( typeInfo->Name().c_str() ) );
+		String64 objType( ReplacePointer( typeInfo->Name() ) );
 
 		int res = m_engine->RegisterObjectType( objType.c_str(), sizeof( T ), asOBJ_VALUE | asGetTypeTraits<T>() );
 		DD_ASSERT( res >= 0, "Failed to register struct '%s'!", typeInfo->Name().c_str() );
@@ -144,7 +144,7 @@ namespace dd
 		const TypeInfo* propType = DD_TYPE( TProp );
 
 		String128 signature;
-		signature += ReplacePointer( propType->Name().c_str() );
+		signature += ReplacePointer( propType->Name() );
 		signature += " ";
 		signature += name;
 
@@ -161,7 +161,7 @@ namespace dd
 		DD_ASSERT( typeInfo != nullptr );
 
 		String128 signature;
-		signature += ReplacePointer( typeInfo->Name().c_str() );
+		signature += ReplacePointer( typeInfo->Name() );
 		signature += " ";
 		signature += name;
 
@@ -185,7 +185,7 @@ namespace dd
 	{
 		String256 signature( GetFunctionSignatureString( method_name, method ) );
 
-		String64 className( ReplacePointer( method.Signature()->GetContext()->Name().c_str() ) );
+		String64 className( ReplacePointer( method.Signature()->GetContext()->Name() ) );
 
 		int res = m_engine->RegisterObjectMethod( className.c_str(), signature.c_str(), asSMethodPtr<sizeof(FnType)>::Convert( FnPtr ), asCALL_THISCALL );
 		DD_ASSERT( res >= 0, "Failed to register method \'%s\' for class \'%s\'!", signature.c_str(), className.c_str() );

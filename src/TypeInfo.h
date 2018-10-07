@@ -9,6 +9,8 @@
 
 #include <unordered_map>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace dd
 {
 	typedef uint8 ComponentID;
@@ -26,7 +28,7 @@ namespace dd
 		int Value;
 	};
 
-	enum class Category
+	enum class TypeKind
 	{
 		Class,
 		POD,
@@ -53,7 +55,7 @@ namespace dd
 
 		inline bool IsRegistered() const { return m_size != 0; }
 
-		inline Category GetCategory() const { return m_category; }
+		inline TypeKind GetTypeKind() const { return m_typeKind; }
 		
 		inline bool IsComponent() const { return m_componentID != INVALID_COMPONENT; }
 		inline dd::ComponentID ComponentID() const { return m_componentID; }
@@ -144,6 +146,12 @@ namespace dd
 		static const TypeInfo* GetComponent( dd::ComponentID id );
 		static size_t ComponentCount() { return sm_maxComponentID; }
 
+		template <typename T>
+		void WriteToJSON( const T& t, nlohmann::json& json ) const { WriteToJSONInternal( &t, json ); }
+
+		template <typename T>
+		void ReadFromJSON( T& t, const nlohmann::json& json ) const { ReadFromJSONInternal( &t, json ); }
+
 	private:
 
 		String8 m_namespace;
@@ -153,7 +161,7 @@ namespace dd
 
 		bool m_scriptObject { false };
 		
-		Category m_category;
+		TypeKind m_typeKind;
 		
 		dd::ComponentID m_componentID { INVALID_COMPONENT };
 
@@ -174,6 +182,11 @@ namespace dd
 
 		template <typename T>
 		void RegisterFunctions();
+
+		void RegisterMemberInternal( const char* name, const TypeInfo* memberType, uintptr_t offset );
+
+		void WriteToJSONInternal( const void* p, nlohmann::json& json ) const;
+		void ReadFromJSONInternal( void* p, const nlohmann::json& json ) const;
 	};
 
 	template <typename T>

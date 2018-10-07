@@ -28,7 +28,7 @@ namespace dd
 		//
 		// The byte offset of this member relative to its parent class.
 		//
-		uint64 Offset() const;
+		uintptr_t Offset() const;
 
 		//
 		// The name of this member.
@@ -37,7 +37,7 @@ namespace dd
 
 	private:
 		String32 m_name;
-		uint64 m_offset;
+		uintptr_t m_offset;
 		const TypeInfo* m_typeInfo;
 		const TypeInfo* m_parent;
 		

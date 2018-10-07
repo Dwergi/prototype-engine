@@ -21,4 +21,6 @@ namespace dd
 			DD_MEMBER( dd::BoundSphereComponent, Sphere );
 		}
 	};
+
+	DD_SERIALIZABLE( dd::BoundSphereComponent );
 }

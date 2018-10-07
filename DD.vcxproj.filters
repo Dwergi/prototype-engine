@@ -31,9 +31,6 @@
     <Filter Include="Script">
       <UniqueIdentifier>{11e0d14b-e6f4-40dd-9b8e-afe2cacc3d00}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Serialization">
-      <UniqueIdentifier>{7eb4d0ac-91be-4912-8f53-b90ac3bc0db9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DebugUI">
       <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
     </Filter>
@@ -73,9 +70,6 @@
     <Filter Include="Networking">
       <UniqueIdentifier>{96ea3d00-f897-4b95-be6c-dcf3fa40176c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\ArduinoJSON">
-      <UniqueIdentifier>{42f68baa-971f-4e9d-9926-980613074687}</UniqueIdentifier>
-    </Filter>
     <Filter Include="File">
       <UniqueIdentifier>{27d6d938-19b2-489f-bccb-1ac1423dffd3}</UniqueIdentifier>
     </Filter>
@@ -96,6 +90,12 @@
     </Filter>
     <Filter Include="Renderers">
       <UniqueIdentifier>{dda37baf-e031-4586-bed1-3db9ec844c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\nlohmann">
+      <UniqueIdentifier>{265b6ce4-a786-48c0-8306-41cd03eee487}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\fmt">
+      <UniqueIdentifier>{9d6d39d5-6e90-4949-8c7f-50276126f17b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -189,17 +189,8 @@
     <ClInclude Include="src\TypeInfoHelpers.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="src\JSONSerializer.h">
-      <Filter>Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Serialization.h">
-      <Filter>Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="src\Random.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Stream.h">
-      <Filter>Serialization</Filter>
     </ClInclude>
     <ClInclude Include="src\Buffer.h">
       <Filter>Containers</Filter>
@@ -332,12 +323,6 @@
     </ClInclude>
     <ClInclude Include="src\Socket.h">
       <Filter>Networking</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BinarySerializer.h">
-      <Filter>Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="include\arduinojson\ArduinoJson.h">
-      <Filter>Includes\ArduinoJSON</Filter>
     </ClInclude>
     <ClInclude Include="src\File.h">
       <Filter>File</Filter>
@@ -574,6 +559,36 @@
     <ClInclude Include="src\EntityVisualizer.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
+    <ClInclude Include="include\nlohmann\json.hpp">
+      <Filter>Includes\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\color.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\core.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\format.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\format-inl.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\ostream.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\posix.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\printf.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\ranges.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\time.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -640,14 +655,8 @@
     <ClCompile Include="src\FunctionSignature.cpp">
       <Filter>Types</Filter>
     </ClCompile>
-    <ClCompile Include="src\JSONSerializer.cpp">
-      <Filter>Serialization</Filter>
-    </ClCompile>
     <ClCompile Include="src\Random.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Stream.cpp">
-      <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="src\DebugUI.cpp">
       <Filter>DebugUI</Filter>
@@ -786,9 +795,6 @@
     </ClCompile>
     <ClCompile Include="src\Socket.cpp">
       <Filter>Networking</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BinarySerializer.cpp">
-      <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
       <Filter>Tests</Filter>
@@ -1028,6 +1034,12 @@
     </ClCompile>
     <ClCompile Include="src\EntityVisualizer.cpp">
       <Filter>DebugUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\fmt\src\format.cc">
+      <Filter>Includes\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="include\fmt\src\posix.cc">
+      <Filter>Includes\fmt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

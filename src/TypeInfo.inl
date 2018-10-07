@@ -44,7 +44,7 @@ namespace dd
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
-		typeInfo->m_category = Category::Class;
+		typeInfo->m_typeKind = TypeKind::Class;
 
 		typeInfo->Init( name, sizeof( T ) );
 
@@ -77,7 +77,7 @@ namespace dd
 		if( typeInfo->IsRegistered() )
 			return typeInfo;
 
-		typeInfo->m_category = Category::POD;
+		typeInfo->m_typeKind = TypeKind::POD;
 
 		typeInfo->Init( name, sizeof( T ) );
 
@@ -108,7 +108,7 @@ namespace dd
 		const TypeInfo* itemType = GetType<TItem>();
 		DD_ASSERT( itemType->IsRegistered() );
 
-		typeInfo->m_category = Category::Container;
+		typeInfo->m_typeKind = TypeKind::Container;
 
 		String64 finalName( container );
 		finalName += "<";
@@ -138,7 +138,7 @@ namespace dd
 			return typeInfo;
 		}
 
-		typeInfo->m_category = Category::Enum;
+		typeInfo->m_typeKind = TypeKind::Enum;
 
 		typeInfo->Init( name, sizeof( TEnum ) );
 
@@ -187,14 +187,11 @@ namespace dd
 	{
 		DD_ASSERT( IsRegistered() );
 
-		const TypeInfo* typeInfo = TypeInfo::GetType<TProp>();
-		DD_ASSERT( typeInfo->IsRegistered() );
+		const TypeInfo* memberType = TypeInfo::GetType<TProp>();
+		DD_ASSERT( memberType->IsRegistered() );
 
-		Member& member = m_members.Allocate();
-		member.m_name = name;
-		member.m_typeInfo = typeInfo;
-		member.m_parent = this;
-		member.m_offset = (uint64) (&(((TClass*) nullptr)->*MemberPtr));
+		uintptr_t offset = (uintptr_t) (&(((TClass*) nullptr)->*MemberPtr));
+		RegisterMemberInternal( name, memberType, offset );
 
 		if( m_scriptObject && sm_scriptEngine != nullptr )
 		{

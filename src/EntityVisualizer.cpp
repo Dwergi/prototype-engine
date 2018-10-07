@@ -1,6 +1,13 @@
+//
+// EntityVisualizer.cpp - Visualizes the data of the currently selected entity in ImGui.
+// Copyright (C) Sebastian Nordgren 
+// October 7th 2018
+//
+
 #include "PCH.h"
 #include "EntityVisualizer.h"
 
+#include "InputBindings.h"
 #include "World.h"
 
 #include <imgui/imgui.h>
@@ -11,7 +18,7 @@ namespace dd
 	{
 		if( var.Type() == DD_TYPE( float ) )
 		{
-			ImGui::DragFloat( name.c_str(), &var.GetValue<float>() );
+			ImGui::DragFloat( name.c_str(), &var.GetValue<float>(), 0.001f );
 		}
 		else if( var.Type() == DD_TYPE( int ) )
 		{
@@ -30,9 +37,12 @@ namespace dd
 		const Vector<EnumOption>& options = var.Type()->GetEnumOptions();
 
 		String32 selected;
-		if( current >= 0 && current < options.Size() )
+		for( const EnumOption& o : options )
 		{
-			selected = options[ current ].Name;
+			if( current == o.Value )
+			{
+				selected = o.Name;
+			}
 		}
 
 		if( ImGui::BeginCombo( name.c_str(), selected.c_str() ) )
@@ -54,7 +64,7 @@ namespace dd
 
 	static void AddContainer( const String& name, Variable& var )
 	{
-		if( ImGui::TreeNode( name.c_str() ) )
+		if( ImGui::TreeNodeEx( name.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			const TypeInfo* typeInfo = var.Type();
 
@@ -81,7 +91,7 @@ namespace dd
 
 	static void AddClass( const String& name, Variable& var )
 	{
-		if( ImGui::TreeNode( name.c_str() ) )
+		if( ImGui::TreeNodeEx( name.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
 			for( const dd::Member& member : var.Type()->Members() )
 			{
@@ -94,22 +104,23 @@ namespace dd
 
 	static void AddVariable( const String& name, Variable& var )
 	{
-		switch( var.Type()->GetCategory() )
+		switch( var.Type()->GetTypeKind() )
 		{
-		case dd::Category::POD:
+		case dd::TypeKind::POD:
 			AddValue( name, var );
 			break;
 
-		case dd::Category::Class:
+		case dd::TypeKind::Class:
 			AddClass( name, var );
 			break;
 
-		case dd::Category::Enum:
+		case dd::TypeKind::Enum:
 			AddEnum( name, var );
 			break;
 
-		case dd::Category::Container:
+		case dd::TypeKind::Container:
 			AddContainer( name, var );
+			break;
 		}
 	}
 
@@ -139,5 +150,16 @@ namespace dd
 				}
 			}
 		}
+	}
+
+	void EntityVisualizer::BindActions( InputBindings& bindings )
+	{
+		bindings.RegisterHandler( InputAction::TOGGLE_ENTITY_DATA, [this]( InputAction a, InputType t )
+		{
+			if( t == InputType::RELEASED )
+			{
+				SetDebugPanelOpen( !IsDebugPanelOpen() );
+			}
+		} );
 	}
 }

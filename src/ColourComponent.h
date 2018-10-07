@@ -19,4 +19,6 @@ namespace dd
 			DD_MEMBER( dd::ColourComponent, Colour );
 		}
 	};
+
+	DD_SERIALIZABLE( dd::ColourComponent );
 }

@@ -27,19 +27,19 @@ namespace dd
 	private:
 
 		char				m_inputBuf[256];
-		Vector<String128>	m_items;
+		std::vector<std::string> m_items;
 		bool				m_scrollToBottom { false };
-		Vector<String128>	m_history;
+		std::vector<std::string> m_history;
 		int					m_historyPos { -1 };   // -1: new line, 0..History.Size-1 browsing history.
-		Vector<String64>	m_commands;
+		std::vector<std::string> m_commands;
 		AngelScriptEngine&  m_scriptEngine;
 
 		int TextEditCallback( ImGuiTextEditCallbackData* data );
-		void AddLog( const char* fmt, ... );
-		void ExecCommand( const String& command_line );
+		void AddLog( std::string msg );
+		void ExecCommand( std::string command_line );
 		void ClearLog();
 		void ListFunctions();
-		void EvaluateScript( const String& script );
+		void EvaluateScript( std::string script );
 		void ListVariables();
 	};
 }

@@ -58,3 +58,7 @@
 
 #define DD_ENUM_CPP( TypeName ) static dd::EnumRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName ); \
 	template <> void dd::RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
+
+#define DD_SERIALIZABLE( TypeName ) \
+	static void to_json( nlohmann::json& j, const TypeName& obj ) { dd::TypeInfo::GetType<TypeName>()->WriteToJSON( obj, j ); } \
+	static void from_json( const nlohmann::json& j, TypeName& obj ) { dd::TypeInfo::GetType<TypeName>()->ReadFromJSON( obj, j ); }

@@ -7,48 +7,44 @@
 #include "PCH.h"
 #include "DebugConsole.h"
 
+#include "AngelScriptEngine.h"
 #include "TransformComponent.h"
 
-#include "JsonSerializer.h"
-
-#include "AngelScriptEngine.h"
-
-
+#include <fmt/format.h>
 
 // script helpers
 namespace
 {
-	dd::String256 s_scriptOutput;
-	dd::WriteStream s_stream( s_scriptOutput );
+	fmt::memory_buffer s_buffer;
 
 	void grabInt( int v )
 	{
-		s_stream.WriteFormat( "%d", v );
+		fmt::format_to( s_buffer, "{}", v );
 	}
 
 	void grabUint( uint v )
 	{
-		s_stream.WriteFormat( "%u", v );
+		fmt::format_to( s_buffer, "{}", v );
 	}
 
 	void grabBool( bool v )
 	{
-		s_stream.Write( v ? "true" : "false" );
+		fmt::format_to( s_buffer, "{}", v );
 	}
 
 	void grabFloat( float v )
 	{
-		s_stream.WriteFormat( "%f", v );
+		fmt::format_to( s_buffer, "{}", v );
 	}
 
 	void grabDouble( double v )
 	{
-		s_stream.WriteFormat( "%lf", v );
+		fmt::format_to( s_buffer, "{}", v );
 	}
 
 	void grabString( const dd::String& str )
 	{
-		s_stream.Write( str );
+		fmt::format_to( s_buffer, "{}", str.c_str() );
 	}
 
 	void grab()
@@ -59,7 +55,7 @@ namespace
 
 namespace dd
 {
-	void RegisterScriptCommands( AngelScriptEngine& scriptEngine, Vector<String64>& commands )
+	void RegisterScriptCommands( AngelScriptEngine& scriptEngine, std::vector<std::string>& commands )
 	{
 		asIScriptEngine* engine = scriptEngine.GetInternalEngine();
 
@@ -69,7 +65,7 @@ namespace dd
 
 			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
 			if( func->GetName()[0] != '_' )
-				commands.Add( String64( func->GetName() ) );
+				commands.push_back( func->GetName() );
 		}
 
 		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
@@ -77,7 +73,7 @@ namespace dd
 			const char* name;
 			int res = engine->GetGlobalPropertyByIndex( i, &name );
 			if( res >= 0 )
-				commands.Add( String64( name ) );
+				commands.push_back( name );
 		}
 	}
 
@@ -102,11 +98,11 @@ namespace dd
 		m_inputBuf[0] = 0;
 		m_historyPos = -1;
 
-		m_commands.Add( String64( "Help" ) );
-		m_commands.Add( String64( "History" ) );
-		m_commands.Add( String64( "Clear" ) );
-		m_commands.Add( String64( "Functions" ) );
-		m_commands.Add( String64( "Variables" ) );
+		m_commands.push_back( "Help" );
+		m_commands.push_back( "History" );
+		m_commands.push_back( "Clear" );
+		m_commands.push_back( "Functions" );
+		m_commands.push_back( "Variables" );
 
 		RegisterConsoleHelpers( m_scriptEngine );
 		RegisterScriptCommands( m_scriptEngine, m_commands );
@@ -116,28 +112,19 @@ namespace dd
 	{
 		ClearLog();
 
-		m_history.Clear();
+		m_history.clear();
 	}
 
 	void DebugConsole::ClearLog()
 	{
-		m_items.Clear();
+		m_items.clear();
 
 		m_scrollToBottom = true;
 	}
 
-	void DebugConsole::AddLog( const char* fmt, ... )
+	void DebugConsole::AddLog( std::string log )
 	{
-		const int ArraySize = 1024;
-		static thread_local char buf[ArraySize];
-
-		va_list args;
-		va_start( args, fmt );
-		vsnprintf( buf, ArraySize, fmt, args );
-		buf[ArraySize - 1] = 0;
-		va_end( args );
-
-		m_items.Add( String128( buf ) );
+		m_items.push_back( log );
 
 		m_scrollToBottom = true;
 	}
@@ -168,9 +155,9 @@ namespace dd
 		}
 
 		ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 4, 1 ) ); // Tighten spacing
-		for( int i = 0; i < m_items.Size(); i++ )
+		for( int i = 0; i < m_items.size(); i++ )
 		{
-			String& item = m_items[i];
+			std::string& item = m_items[i];
 			if( !filter.PassFilter( item.c_str() ) )
 				continue;
 
@@ -210,7 +197,7 @@ namespace dd
 			*input_end = 0;
 
 			if( m_inputBuf != nullptr )
-				ExecCommand( String256( m_inputBuf ) );
+				ExecCommand( m_inputBuf );
 
 			m_inputBuf[0] = 0;
 		}
@@ -227,46 +214,53 @@ namespace dd
 		DD_PROFILE_END();
 	}
 
-	void DebugConsole::ExecCommand( const String& command_line )
+	static bool EqualsCaseless( std::string a, std::string b )
 	{
-		AddLog( "# %s\n", command_line.c_str() );
+		return _strcmpi( a.c_str(), b.c_str() ) == 0;
+	}
+
+	void DebugConsole::ExecCommand( std::string command_line )
+	{
+		AddLog( fmt::format( "# {}\n", command_line.c_str() ) );
 
 		// Insert into history. First find match and delete it so it can be pushed to the back. This isn't trying to be smart or optimal.
 		m_historyPos = -1;
-		for( int i = m_history.Size() - 1; i >= 0; --i )
+		for( size_t i = m_history.size() - 1; i >= 0; --i )
 		{
-			if( m_history[i].EqualsCaseless( command_line ) )
+			if( EqualsCaseless( m_history[i], command_line ) )
 			{
-				m_history.Remove( i );
+				m_history.erase( m_history.begin() + i );
 				break;
 			}
 		}
 
-		m_history.Add( command_line );
+		m_history.push_back( command_line );
 
 		// Process command
-		if( command_line.EqualsCaseless( "Clear" ) )
+		if( EqualsCaseless( command_line, "Clear" ) )
 		{
 			ClearLog();
 		}
-		else if( command_line.EqualsCaseless( "Help" ) )
+		else if( EqualsCaseless( command_line, "Help" ) )
 		{
 			AddLog( "Commands:" );
-			for( int i = 0; i < m_commands.Size(); ++i )
-				AddLog( "- %s", m_commands[i].c_str() );
+			for( int i = 0; i < m_commands.size(); ++i )
+			{
+				AddLog( fmt::format( "{:>3} - {}", i, m_commands[i] ) );
+			}
 		}
-		else if( command_line.EqualsCaseless( "History" ) )
+		else if( EqualsCaseless( command_line, "History" ) )
 		{
-			int history_start = m_history.Size() >= 10 ? m_history.Size() - 10 : 0;
+			size_t history_start = m_history.size() >= 10 ? m_history.size() - 10 : 0;
 
-			for( int i = history_start; i < m_history.Size(); ++i )
-				AddLog( "%3d: %s\n", i, m_history[i].c_str() );
+			for( size_t i = history_start; i < m_history.size(); ++i )
+				AddLog( fmt::format( "{:>3} - {}\n", i, m_history[i] ) );
 		}
-		else if( command_line.EqualsCaseless( "Functions" ) )
+		else if( EqualsCaseless( command_line, "Functions" ) )
 		{
 			ListFunctions();
 		}
-		else if( command_line.EqualsCaseless( "Variables" ) )
+		else if( EqualsCaseless( command_line, "Variables" ) )
 		{
 			ListVariables();
 		}
@@ -276,24 +270,19 @@ namespace dd
 		}
 	}
 
-	void DebugConsole::EvaluateScript( const String& script )
+	void DebugConsole::EvaluateScript( std::string script )
 	{
 		// add our grab commands
-		String256 completeString( "_grab(" );
-		completeString += script;
-		completeString += ")";
+		std::string completeString = fmt::format( "_grab({})", script );
 
 		// reset output buffer
-		s_scriptOutput.Clear();
-		s_stream.Reset();
-
-		String256 errors;
+		std::string errors;
 
 		// pass to AngelScript to evaluate 
 		if( m_scriptEngine.Evaluate( completeString, errors ) )
-			AddLog( "\t%s\n", s_scriptOutput.c_str() );
+			AddLog( fmt::format( "\t{}\n", errors ) );
 		else
-			AddLog( "\tScript error: %s!", errors.c_str() );
+			AddLog( fmt::format( "\tScript error: {}!", errors.c_str() ) );
 	}
 
 	void DebugConsole::ListFunctions()
@@ -307,7 +296,7 @@ namespace dd
 
 			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
 			if( func->GetName()[0] != '_' )
-				AddLog( "\t- %s\n", func->GetDeclaration() );
+				AddLog( fmt::format( "\t- {}\n", func->GetDeclaration() ) );
 		}
 	}
 
@@ -331,11 +320,11 @@ namespace dd
 
 				if( strlen( scope ) > 0 )
 				{
-					AddLog( "\t- %s %s::%s\n", type_declaration, scope, name );
+					AddLog( fmt::format( "\t- {} {}::{}\n", type_declaration, scope, name ) );
 				}
 				else
 				{
-					AddLog( "\t- %s %s\n", type_declaration, name );
+					AddLog( fmt::format( "\t- {} {}\n", type_declaration, name ) );
 				}
 			}
 		}
@@ -350,7 +339,7 @@ namespace dd
 		{
 			// Example of TEXT COMPLETION
 
-			String256 buffer( data->Buf );
+			std::string buffer( data->Buf );
 
 			int last_index = data->CursorPos;
 			int first_index = last_index;
@@ -366,23 +355,23 @@ namespace dd
 
 			int word_length = last_index - first_index;
 
-			String64 word = buffer.Substring( first_index, word_length );
+			std::string word = buffer.substr( first_index, word_length );
 
 			// Build a list of candidates
-			Vector<String64> candidates;
-			for( int i = 0; i < m_commands.Size(); ++i )
+			std::vector<std::string> candidates;
+			for( int i = 0; i < m_commands.size(); ++i )
 			{
-				String64 substring = m_commands[i].Substring( 0, word_length );
-				if( substring.EqualsCaseless( word ) )
-					candidates.Add( m_commands[i] );
+				std::string substring = m_commands[i].substr( 0, word_length );
+				if( EqualsCaseless( substring, word ) )
+					candidates.push_back( m_commands[i] );
 			}
 
-			if( candidates.Size() == 0 )
+			if( candidates.size() == 0 )
 			{
 				// No match
-				AddLog( "No match for \"%s\"!\n", buffer.c_str() );
+				AddLog( fmt::format( "No match for \"{}\"!\n", buffer ) );
 			}
-			else if( candidates.Size() == 1 )
+			else if( candidates.size() == 1 )
 			{
 				// Single match. Delete the beginning of the word and replace it entirely so we've got nice casing
 				data->DeleteChars( first_index, word_length );
@@ -398,7 +387,7 @@ namespace dd
 					bool all_match = true;
 					char test_char;
 
-					for( int c = 0; c < candidates.Size(); ++c )
+					for( int c = 0; c < candidates.size(); ++c )
 					{
 						char candidate_char = candidates[c][max_match_length];
 						if( c == 0 )
@@ -422,14 +411,14 @@ namespace dd
 				{
 					data->DeleteChars( first_index, last_index - first_index );
 
-					String64 match = candidates[0].Substring( 0, max_match_length );
+					std::string match = candidates[0].substr( 0, max_match_length );
 					data->InsertChars( data->CursorPos, match.c_str() );
 				}
 
 				// List matches
 				AddLog( "Possible matches:\n" );
-				for( int i = 0; i < candidates.Size(); i++ )
-					AddLog( "- %s\n", candidates[i].c_str() );
+				for( int i = 0; i < candidates.size(); ++i )
+					AddLog( fmt::format( "- {}\n", candidates[i].c_str() ) );
 			}
 
 			break;
@@ -441,7 +430,7 @@ namespace dd
 			if( data->EventKey == ImGuiKey_UpArrow )
 			{
 				if( m_historyPos == -1 )
-					m_historyPos = m_history.Size() - 1;
+					m_historyPos = (int) (m_history.size() - 1);
 				else if( m_historyPos > 0 )
 					m_historyPos--;
 			}
@@ -449,7 +438,7 @@ namespace dd
 			{
 				if( m_historyPos != -1 )
 				{
-					if( ++m_historyPos >= (int) m_history.Size() )
+					if( ++m_historyPos >= (int) m_history.size() )
 						m_historyPos = -1;
 				}
 			}

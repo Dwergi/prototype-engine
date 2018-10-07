@@ -13,8 +13,9 @@
 
 #include <direct.h>
 
+#include <fmt/format.h>
+
 #include "File.h"
-#include "Stream.h"
 
 namespace dd
 {
@@ -127,14 +128,6 @@ namespace dd
 		return nullptr;
 	}
 
-	void AngelScriptEngine::SetOutput( String* output )
-	{
-		if( output != nullptr )
-			m_output = new WriteStream( *output );
-		else
-			delete m_output;
-	}
-
 	void AngelScriptEngine::MessageCallback( const asSMessageInfo* msg )
 	{
 		const char* type = "ERR";
@@ -145,11 +138,11 @@ namespace dd
 
 		if( m_output == nullptr )
 		{
-			printf( "%s (%d, %d): %s - %s\n\n", msg->section, msg->row, msg->col, type, msg->message );
+			fmt::print( "{} ({}, {}): {} - {}\n", msg->section, msg->row, msg->col, type, msg->message );
 		}
 		else
 		{
-			m_output->WriteFormat( "%s (%d, %d): %s - %s\n", msg->section, msg->row, msg->col, type, msg->message );
+			*m_output = fmt::format( "{} ({}, {}): {} - {}\n", msg->section, msg->row, msg->col, type, msg->message );
 		}
 	}
 
@@ -170,13 +163,13 @@ namespace dd
 		m_engine = nullptr;
 	}
 
-	bool AngelScriptEngine::Evaluate( const String& script, String& output )
+	bool AngelScriptEngine::Evaluate( std::string script, std::string& output )
 	{
-		SetOutput( &output );
+		m_output = &output;
 
 		int r = ExecuteString( m_engine, script.c_str(), m_engine->GetModule( "console", asGM_CREATE_IF_NOT_EXISTS ), nullptr );
 
-		SetOutput( nullptr );
+		m_output = nullptr;
 
 		if( r < 0 )
 		{
@@ -193,35 +186,32 @@ namespace dd
 	String256 AngelScriptEngine::GetFunctionSignatureString( const char* name, const Function& fn )
 	{
 		const FunctionSignature* sig = fn.Signature();
-		String256 signature;
 
+		String64 ret_type( "void" );
 		if( sig->GetRet() != nullptr )
-			signature += ReplacePointer( sig->GetRet()->Name().c_str() );
-		else
-			signature += "void";
+		{
+			ret_type = ReplacePointer( sig->GetRet()->Name() );
+		}
 
-		signature += " ";
-		signature += name;
-
-		signature += "(";
+		std::string sig_str = fmt::format( "{} {}(", ret_type.c_str(), name );
 
 		uint argCount = sig->ArgCount();
 		for( uint i = 0; i < argCount; ++i )
 		{
-			signature += ReplacePointer( sig->GetArg( i )->Name().c_str() );
+			sig_str.append( ReplacePointer( sig->GetArg( i )->Name() ).c_str() );
 
 			if( i < (argCount - 1) )
-				signature += ",";
+				sig_str.append( "," );
 		}
 
-		signature += ")";
+		sig_str.append( ")" );
 
-		return signature;
+		return String256( sig_str.c_str() );
 	}
 
-	String64 AngelScriptEngine::ReplacePointer( const char* type )
+	String64 AngelScriptEngine::ReplacePointer( const String& typeName )
 	{
-		String64 result( type );
+		String64 result( typeName );
 		result.ReplaceAll( '*', '@' );
 
 		return result;
@@ -231,17 +221,12 @@ namespace dd
 	{
 		DD_ASSERT( module != nullptr );
 
-		String256 filename;
-		filename += "as/";
-		filename += module;
-		filename += ".as";
+		std::string filename = fmt::format( "as/{}.as", module );
 
-		std::unique_ptr<File> file = File::OpenDataFile( filename, File::Mode::Read );
+		std::unique_ptr<File> file = File::OpenDataFile( filename.c_str(), File::Mode::Read );
 		if( file == nullptr )
 		{
-			String256 error;
-			error += "Failed to load file containing module from path: ";
-			error += filename;
+			std::string error = fmt::format( "Failed to load file containing module from path: {}", filename );
 
 			m_engine->WriteMessage( module, 0, 0, asMSGTYPE_ERROR, error.c_str() );
 			return String256();
@@ -262,11 +247,11 @@ namespace dd
 		return source;
 	}
 
-	bool AngelScriptEngine::LoadFile( const char* module, String& output )
+	bool AngelScriptEngine::LoadFile( const char* module, std::string& output )
 	{
 		DD_ASSERT( module != nullptr );
 
-		SetOutput( &output );
+		m_output = &output;
 
 		dd::String256 strSource( LoadSource( module ) );
 
@@ -282,7 +267,7 @@ namespace dd
 			}
 		}
 
-		SetOutput( nullptr );
+		m_output = nullptr;
 
 		return r >= 0;
 	}

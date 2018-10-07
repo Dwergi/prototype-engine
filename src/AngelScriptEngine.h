@@ -112,9 +112,9 @@ namespace dd
 		template <typename T, T& Variable>
 		void RegisterGlobalVariable( const char* name );
 
-		bool Evaluate( const String& script, String& output );
+		bool Evaluate( std::string script, std::string& output );
 
-		bool LoadFile( const char* module, String& output );
+		bool LoadFile( const char* module, std::string& output );
 		
 		bool IsModuleLoaded( const char* module ) const;
 
@@ -132,12 +132,10 @@ namespace dd
 		friend struct ASInternal::RegisterTypeForwarder;
 
 		asIScriptEngine* m_engine;
-		WriteStream* m_output = nullptr;
-
-		void SetOutput( String* output );
+		std::string* m_output = nullptr;
 
 		void MessageCallback( const asSMessageInfo* msg );
-		static String64 ReplacePointer( const char* typeName );
+		static String64 ReplacePointer( const String& typeName );
 
 		static String256 GetFunctionSignatureString( const char* name, const Function& fn );
 

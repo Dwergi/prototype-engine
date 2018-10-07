@@ -83,6 +83,8 @@
 
 #include <chrono>
 #include <thread>
+
+#include <nlohmann/json.hpp>
 //---------------------------------------------------------------------------
 
 using namespace dd;
@@ -541,6 +543,7 @@ int GameMain()
 		s_frameTimer->SetMaxFPS( s_maxFPS );
 
 		dd::EntityVisualizer* entity_visualizer = new dd::EntityVisualizer();
+		entity_visualizer->BindActions( *input_bindings );
 
 		s_debugUI->RegisterDebugPanel( *s_frameTimer );
 		s_debugUI->RegisterDebugPanel( *s_renderer );

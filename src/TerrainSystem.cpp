@@ -16,15 +16,12 @@
 #include "OpenGL.h"
 #include "Random.h"
 #include "RenderData.h"
-#include "Stream.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 
 #include <algorithm>
-
-
 
 #include "glm/gtc/type_ptr.hpp"
 

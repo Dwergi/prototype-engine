@@ -55,7 +55,7 @@ namespace dd
 		m_source.BindKey( InputAction::ADD_MAJOR_TRAUMA,	'T'			);
 		m_source.BindKey( InputAction::DOWN,				Key::LCTRL	);
 		m_source.BindKey( InputAction::BOOST,				Key::LSHIFT	);
-		m_source.BindKey( InputAction::START_PARTICLE,		'E'			);
+		m_source.BindKey( InputAction::TOGGLE_ENTITY_DATA,	'E',			InputMode::DEBUG );
 		m_source.BindKey( InputAction::CAMERA_POS_1,		'1'			);
 		m_source.BindKey( InputAction::CAMERA_POS_2,		'2'			);
 		m_source.BindKey( InputAction::CAMERA_POS_3,		'3'			);
