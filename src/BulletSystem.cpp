@@ -71,8 +71,9 @@ namespace dd
 		dd::TransformComponent* transform;
 		world.Access( entity, transform );
 
-		transform->Transform = glm::scale( glm::vec3( m_scale ) );
-		transform->SetPosition( m_camera.GetPosition() );
+		transform->Scale = glm::vec3( m_scale );
+		transform->Position = m_camera.GetPosition();
+		transform->Update();
 
 		dd::BulletComponent* bullet;
 		world.Access( entity, bullet );
@@ -136,7 +137,7 @@ namespace dd
 		auto mesh_bboxes = meshes.Read<dd::BoundBoxComponent>();
 		auto mesh_bspheres = meshes.Read<dd::BoundSphereComponent>();
 
-		glm::vec3 initial_pos = bullet_transform.GetPosition();
+		glm::vec3 initial_pos = bullet_transform.Position;
 		dd::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * delta_t ) );
 
 		for( size_t i = 0; i < meshes.Size(); ++i )
@@ -191,14 +192,15 @@ namespace dd
 			dd::TransformComponent& bullet_transform = bullet_transforms[i];
 
 			// check dynamic meshes
-			glm::vec3 initial_pos = bullet_transform.GetPosition();
+			glm::vec3 initial_pos = bullet_transform.Position;
 			glm::vec3 new_pos;
 			if( !HitTestDynamicMeshes( bullet, bullet_transform, dynamic_meshes, delta_t, new_pos ) )
 			{
 				new_pos = initial_pos + bullet.Velocity * delta_t;
 			}
 
-			bullet_transform.SetPosition( new_pos );
+			bullet_transform.Position = new_pos;
+			bullet_transform.Update();
 
 			// hit test for bullet hit location
 			if( bullet.PendingHit.Completed )

@@ -123,13 +123,15 @@ namespace dd
 
 		float remainder_t = delta_t * (1 - hit_time);
 
-		transform.SetPosition( moving_interp.Centre + velocity * remainder_t );
+		transform.Position = moving_interp.Centre + velocity * remainder_t;
+		transform.Update();
+
 		physics.Velocity = velocity;
 	}
 
 	static bool IntersectStaticPlanes( const ddc::DataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
-		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform );
+		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
 		auto transforms = static_planes.Read<dd::TransformComponent>();
 		auto physics = static_planes.Read<dd::PhysicsPlaneComponent>();
@@ -137,7 +139,7 @@ namespace dd
 		for( size_t p = 0; p < static_planes.Size(); ++p )
 		{
 			const dd::PhysicsPlaneComponent& phys_plane = physics[p];
-			dd::Plane static_plane = phys_plane.Plane.GetTransformed( transforms[p].Transform );
+			dd::Plane static_plane = phys_plane.Plane.GetTransformed( transforms[p].Transform() );
 
 			float hit_time = 0;
 			if( IntersectMovingSpherePlane( moving_sphere, static_plane, moving_physics.Velocity * delta_t, hit_time ) )
@@ -156,7 +158,7 @@ namespace dd
 
 	static bool IntersectStaticSpheres( const ddc::DataBuffer& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
-		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform );
+		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
 		auto transforms = static_spheres.Read<dd::TransformComponent>();
 		auto physics = static_spheres.Read<dd::PhysicsSphereComponent>();
@@ -165,7 +167,7 @@ namespace dd
 		{
 			const dd::PhysicsSphereComponent& static_physics = physics[s];
 
-			dd::Sphere static_sphere = static_physics.Sphere.GetTransformed( transforms[s].Transform );
+			dd::Sphere static_sphere = static_physics.Sphere.GetTransformed( transforms[s].Transform() );
 
 			float hit_time = 0;
 			if( IntersectMovingSphereSphere( moving_sphere, static_sphere, moving_physics.Velocity * delta_t, glm::vec3( 0 ), hit_time ) )
@@ -194,7 +196,7 @@ namespace dd
 		dd::PhysicsSphereComponent& a_physics = dynamic_sphere_physics[a_index];
 		dd::TransformComponent& a_transform = dynamic_sphere_transforms[a_index];
 
-		dd::Sphere a_sphere = a_physics.Sphere.GetTransformed( a_transform.Transform );
+		dd::Sphere a_sphere = a_physics.Sphere.GetTransformed( a_transform.Transform() );
 		glm::vec3 a_displacement = a_physics.Velocity * delta_t;
 
 		dd::Sphere a_expanded = a_sphere;
@@ -211,7 +213,7 @@ namespace dd
 			dd::PhysicsSphereComponent& b_physics = dynamic_sphere_physics[b_index];
 			dd::TransformComponent& b_transform = dynamic_sphere_transforms[b_index];
 
-			dd::Sphere b_sphere = b_physics.Sphere.GetTransformed( b_transform.Transform );
+			dd::Sphere b_sphere = b_physics.Sphere.GetTransformed( b_transform.Transform() );
 
 			glm::vec3 b_displacement = b_physics.Velocity * delta_t;
 
@@ -241,8 +243,11 @@ namespace dd
 				// offset positions by remainder of delta
 				float remainder_t = delta_t * (1 - hit_time);
 
-				a_transform.SetPosition( a_interp.Centre + a_physics.Velocity * remainder_t );
-				b_transform.SetPosition( b_interp.Centre + b_physics.Velocity * remainder_t );
+				a_transform.Position = a_interp.Centre + a_physics.Velocity * remainder_t;
+				a_transform.Update();
+
+				b_transform.Position = b_interp.Centre + b_physics.Velocity * remainder_t;
+				b_transform.Update();
 
 				return true;
 			}
@@ -271,7 +276,7 @@ namespace dd
 
 		for( size_t i = 0; i < dynamic_spheres.Size(); ++i )
 		{
-			AddSphereToBVH( bvh, dynamic_sphere_physics[i].Sphere, dynamic_sphere_physics[i].Velocity, dynamic_sphere_transforms[i].Transform );
+			AddSphereToBVH( bvh, dynamic_sphere_physics[i].Sphere, dynamic_sphere_physics[i].Velocity, dynamic_sphere_transforms[i].Transform() );
 		}
 
 		bvh.EndBatch();
@@ -295,7 +300,8 @@ namespace dd
 
 			if( !collision )
 			{
-				ds_transform.SetPosition( ds_transform.GetPosition() + ds_physics.Velocity * delta_t );
+				ds_transform.Position = ds_transform.Position + ds_physics.Velocity * delta_t;
+				ds_transform.Update();
 			}
 			else if( glm::length2( ds_physics.Velocity ) < 0.05f )
 			{

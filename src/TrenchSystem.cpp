@@ -145,12 +145,10 @@ namespace dd
 	{
 		ddc::Entity entity = world.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
 
-		glm::mat4 scale = glm::scale( glm::vec3( TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH, TRENCH_CHUNK_LENGTH ) );
-		glm::mat4 translate = glm::translate( position );
-		glm::mat4 transform = translate * scale;
-
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
-		transform_cmp->Transform = transform;
+		transform_cmp->Position = position;
+		transform_cmp->Scale = glm::vec3( TRENCH_CHUNK_LENGTH );
+		transform_cmp->Update();
 
 		MeshComponent* mesh_cmp = world.Access<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;
@@ -165,7 +163,7 @@ namespace dd
 	void TrenchSystem::Update( const ddc::UpdateData& data )
 	{
 		/*// cache these here to avoid recalculating for all components
-		glm::vec3 player_pos = m_camera.GetPosition();
+		glm::vec3 player_pos = m_camera.Position;
 
 		int chunk_index = (int) (player_pos / (m_trenchDirection * TRENCH_CHUNK_LENGTH)).z;
 		

@@ -29,7 +29,7 @@ namespace ddm
 	{
 		dd::AABB aabb;
 		dd::Sphere sphere;
-		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform, aabb, sphere ) )
+		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform(), aabb, sphere ) )
 		{
 			return false;
 		}
@@ -40,7 +40,7 @@ namespace ddm
 			return false;
 		}
 
-		return ddm::HitTestMesh( ray, transform_cmp.Transform, sphere, aabb, *mesh, out_distance, out_normal );
+		return ddm::HitTestMesh( ray, transform_cmp.Transform(), sphere, aabb, *mesh, out_distance, out_normal );
 	}
 
 	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 

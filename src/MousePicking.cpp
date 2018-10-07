@@ -218,7 +218,7 @@ namespace dd
 				continue;
 
 			uniforms.Set( "ID", (int) entities[i].ID );
-			mesh->Render( uniforms, shader, transforms[i].Transform );
+			mesh->Render( uniforms, shader, transforms[i].Transform() );
 		}
 
 		shader.Use( false );
@@ -279,7 +279,7 @@ namespace dd
 		{
 			dd::AABB box;
 			dd::Sphere sphere;
-			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ].Transform, box, sphere ) )
+			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ].Transform(), box, sphere ) )
 			{
 				continue;
 			}
@@ -294,7 +294,7 @@ namespace dd
 					continue;
 
 				glm::vec3 normal;
-				ddm::HitTestMesh( screen_ray, transforms[ i ].Transform, sphere, box, *mesh, distance, normal );
+				ddm::HitTestMesh( screen_ray, transforms[ i ].Transform(), sphere, box, *mesh, distance, normal );
 			}
 			else
 			{
@@ -409,7 +409,7 @@ namespace dd
 					ImGui::TextUnformatted( "Mesh: <none>" );
 				}
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->GetPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_focused )->Position;
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else
@@ -438,7 +438,7 @@ namespace dd
 					ImGui::TextUnformatted( "Mesh: <none>" );
 				}
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->GetPosition();
+				glm::vec3 mesh_pos = world.Get<TransformComponent>( m_selected )->Position;
 				ImGui::Value( "Position", mesh_pos, "%.2f" );
 			}
 			else

@@ -163,7 +163,9 @@ namespace dd
 		chunk_cmp.Chunk->Update( m_jobsystem );
 		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 		bounds_cmp.BoundBox = chunk_cmp.Chunk->GetBounds();
-		transform_cmp.SetPosition( chunk_cmp.Chunk->GetPosition() );
+
+		transform_cmp.Position = chunk_cmp.Chunk->GetPosition();
+		transform_cmp.Update();
 	}
 
 	void TerrainSystem::GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset )
@@ -281,7 +283,8 @@ namespace dd
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
-		transform_cmp->SetPosition( glm::vec3( key.X, 0, key.Y ) );
+		transform_cmp->Position = glm::vec3( key.X, 0, key.Y );
+		transform_cmp->Update();
 
 		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
 		TerrainChunk* chunk = new TerrainChunk( m_params, key );

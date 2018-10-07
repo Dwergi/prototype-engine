@@ -37,7 +37,9 @@ namespace ddr
 		light->LightType = dd::LightType::Point;
 
 		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
-		transform->Transform = glm::translate( glm::vec3( 0, 20, 0 ) ) * glm::scale( glm::vec3( 0.4 ) );
+		transform->Position = glm::vec3( 0, 20, 0 );
+		transform->Scale = glm::vec3( 0.4 );
+		transform->Update();
 
 		return entity;
 	}
@@ -92,7 +94,7 @@ namespace ddr
 
 			m_debugLights.push_back( entities[ i ] );
 
-			glm::vec4 position( transform.GetPosition(), 1 );
+			glm::vec4 position( transform.Position, 1 );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Type" ).c_str(), (int) light.LightType );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), light.Colour );
@@ -101,7 +103,7 @@ namespace ddr
 			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), light.Ambient );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), light.Specular );
 
-			glm::vec4 direction = transform.Transform * glm::vec4( glm::vec3( 0, 0, 1 ), 0 );
+			glm::vec4 direction = transform.Transform() * glm::vec4( glm::vec3( 0, 0, 1 ), 0 );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Direction" ).c_str(), direction.xyz );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "CosInnerAngle" ).c_str(), glm::cos( light.InnerAngle ) );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "CosOuterAngle" ).c_str(), glm::cos( light.OuterAngle ) );
@@ -145,21 +147,16 @@ namespace ddr
 				ImGui::DragFloat( "Intensity", &light->Intensity, 0.01, 0, 100 );
 				ImGui::DragFloat( "Attenuation", &light->Attenuation, 0.001, 0.001, 1 );
 
-				glm::vec3 light_position = transform->GetPosition();
-
 				const char* positionLabel = light->LightType == dd::LightType::Directional ? "Direction" : "Position";
-				if( ImGui::DragFloat3( positionLabel, glm::value_ptr( light_position ) ) )
-				{
-					transform->SetPosition( light_position );
-				}
+				ImGui::DragFloat3( positionLabel, glm::value_ptr( transform->Position ) );
 
 				ImGui::SliderFloat( "Ambient", &light->Ambient, 0, 1 );
 				ImGui::SliderFloat( "Specular", &light->Specular, 0, 1 );
 
-				glm::vec3 light_direction = glm::vec3( (transform->Transform * glm::vec4( glm::vec3( 0, 0, 1 ), 0 )).xyz );
+				glm::vec3 light_direction = glm::rotate( transform->Rotation, glm::vec4( 0, 0, 1, 1 ) ).xyz;
 				if( ImGui::DragFloat3( "Direction", glm::value_ptr( light_direction ), 0.0025, -1, 1 ) )
 				{
-					transform->Transform = ddm::TransformFromOriginDir( transform->GetPosition(), glm::normalize( light_direction ) );
+					transform->Rotation = glm::rotation( glm::vec3( 0, 0, 1 ), glm::normalize( light_direction ) );
 				}
 
 				float outer_angle = glm::degrees( light->OuterAngle );

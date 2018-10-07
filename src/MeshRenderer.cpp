@@ -123,7 +123,7 @@ namespace ddr
 
 		++m_meshCount;
 
-		dd::AABB world_bounds = bounds_cmp.BoundBox.GetTransformed( transform_cmp.Transform );
+		dd::AABB world_bounds = bounds_cmp.BoundBox.GetTransformed( transform_cmp.Transform() );
 		DD_ASSERT( world_bounds.IsValid() );
 		
 		// check if it intersects with the frustum
@@ -166,7 +166,7 @@ namespace ddr
 
 		uniforms.Bind( *shader );
 
-		mesh->Render( uniforms, *shader, transform_cmp.Transform );
+		mesh->Render( uniforms, *shader, transform_cmp.Transform() );
 
 		shader->Use( false );
 	}

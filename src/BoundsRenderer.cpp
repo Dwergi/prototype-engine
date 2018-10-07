@@ -184,7 +184,7 @@ namespace ddr
 
 			dd::AABB bound_box;
 			dd::Sphere bound_sphere;
-			if( !GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i].Transform, bound_box, bound_sphere ) )
+			if( !GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i].Transform(), bound_box, bound_sphere ) )
 			{
 				continue;
 			}

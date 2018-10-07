@@ -12,10 +12,21 @@ namespace dd
 	{
 	public:
 
-		glm::mat4 Transform;
+		glm::vec3 Position;
+		glm::quat Rotation;
+		glm::vec3 Scale { 1.0f };
 
-		void SetPosition( glm::vec3 v ) { Transform[ 3 ].xyz = v; }
-		glm::vec3 GetPosition() const { return Transform[ 3 ].xyz; }
+		const glm::mat4& Transform() const
+		{
+			DD_ASSERT( m_transform == CalculateTransform() );
+			return m_transform;
+		}
+
+		void Update()
+		{
+			Rotation = glm::normalize( Rotation );
+			m_transform = CalculateTransform();
+		}
 
 		ALIGNED_ALLOCATORS( 16 );
 
@@ -23,7 +34,18 @@ namespace dd
 		{
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::TransformComponent, Transform );
+			DD_MEMBER( dd::TransformComponent, Position );
+			DD_MEMBER( dd::TransformComponent, Rotation );
+			DD_MEMBER( dd::TransformComponent, Scale );
+		}
+
+	private:
+
+		glm::mat4 m_transform;
+
+		glm::mat4 CalculateTransform() const
+		{
+			return glm::translate( Position ) * glm::toMat4( Rotation ) * glm::scale( Scale );
 		}
 	};
 }

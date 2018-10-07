@@ -241,6 +241,12 @@ namespace dd
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::z>( "z" );
 		vec4Type->RegisterMember<glm::vec4, float, &glm::vec4::w>( "w" );
 
+		TypeInfo* quatType = DD_REGISTER_CLASS( glm::quat );
+		quatType->RegisterMember<glm::quat, float, &glm::quat::x>( "x" );
+		quatType->RegisterMember<glm::quat, float, &glm::quat::y>( "y" );
+		quatType->RegisterMember<glm::quat, float, &glm::quat::z>( "z" );
+		quatType->RegisterMember<glm::quat, float, &glm::quat::w>( "w" );
+
 		TypeInfo* mat3Type = DD_REGISTER_CLASS( glm::mat3 );
 		mat3Type->RegisterMemberInternal( "x", vec3Type, 0 );
 		mat3Type->RegisterMemberInternal( "y", vec3Type, (uintptr_t) vec3Type->Size() );

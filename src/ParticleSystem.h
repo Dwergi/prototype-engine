@@ -14,15 +14,8 @@ namespace dd
 	struct ICamera;
 	struct InputBindings;
 	struct ParticleSystemComponent;
-}
+	struct TransformComponent;
 
-namespace ddc
-{
-	struct UpdateData;
-}
-
-namespace dd
-{
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
 	{
 		ParticleSystem();
@@ -63,7 +56,7 @@ namespace dd
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );
-		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const glm::mat4& transform, float delta_t );
+		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const dd::TransformComponent& transform, float delta_t );
 
 		void OnBulletHitMessage( dd::Message msg );
 	};

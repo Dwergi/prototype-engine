@@ -153,7 +153,7 @@ namespace dd
 	{
 		glm::vec3 current_velocity = ship.Velocity;
 		float current_speed = glm::length( current_velocity );
-		glm::vec3 current_position = transform.GetPosition();
+		glm::vec3 current_position = transform.Position;
 		bool boosting = false;
 
 		glm::vec3 other_modifiers = glm::vec3( 0, 0, 0 );
@@ -201,7 +201,8 @@ namespace dd
 
 		ship.Velocity = current_velocity;
 
-		transform.SetPosition( current_position + delta_v + other_modifiers );
+		transform.Position = current_position + delta_v + other_modifiers;
+		transform.Update();
 
 		// move camera after the ship
 		m_nextCameraPos = m_camera.GetPosition() + delta_v + other_modifiers;

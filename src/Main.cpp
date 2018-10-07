@@ -304,12 +304,15 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
-ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, const glm::mat4& transform )
+ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, glm::vec3 pos, glm::quat rot, glm::vec3 scale )
 {
 	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 
 	dd::TransformComponent* transform_cmp = world.Access<dd::TransformComponent>( entity );
-	transform_cmp->Transform = transform;
+	transform_cmp->Position = pos;
+	transform_cmp->Scale = scale;
+	transform_cmp->Rotation = rot;
+	transform_cmp->Update();
 
 	dd::MeshComponent* mesh_cmp = world.Access<dd::MeshComponent>( entity );
 	mesh_cmp->Mesh = mesh_h;
@@ -417,9 +420,9 @@ ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 	ddr::MeshHandle mesh_h = ddr::Mesh::Find( "sphere" );
 
 	ddc::Entity entity = CreateMeshEntity( *s_world, mesh_h, colour,
-		glm::translate( translation ) * 
-		glm::rotate( glm::radians( 45.0f ), glm::vec3( 0, 1, 0 ) ) * 
-		glm::scale( glm::vec3( size ) ) );
+		translation,
+		glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 0, 1, 0 ) ),
+		glm::vec3( size ) );
 
 	s_world->AddTag( entity, ddc::Tag::Dynamic );
 
@@ -581,7 +584,8 @@ int GameMain()
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
 			glm::vec3 direction( 0.5, 0.4, -0.3 );
-			transform->Transform[ 3 ].xyz = direction;
+			transform->Position = direction;
+			transform->Update();
 		}
 
 		// point light
@@ -599,8 +603,9 @@ int GameMain()
 			light->OuterAngle = glm::radians( 45.f );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
-			transform->Transform = glm::translate( glm::vec3( 0, 30, 0 ) ) * 
-				glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) );
+			transform->Position = glm::vec3( 0, 30, 0 );
+			transform->Rotation = glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) );
+			transform->Update();
 		}
 		
 		// particle system
@@ -610,7 +615,8 @@ int GameMain()
 			s_world->AddTag( entity, ddc::Tag::Dynamic );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
-			transform->SetPosition( glm::vec3( 10, 60, 10 ) );
+			transform->Position = glm::vec3( 10, 60, 10 );
+			transform->Update();
 
 			dd::BoundBoxComponent* bounds = s_world->Access<dd::BoundBoxComponent>( entity );
 			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
@@ -723,11 +729,7 @@ int GameMain()
 			ddc::EntityPrototype phys_plane_proto( "physics_plane" );
 
 			{
-				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
-					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
-					glm::scale( glm::vec3( plane_size ) );
-
-				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.2, 0.8, 0.2, 1 ), transform );
+				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.2, 0.8, 0.2, 1 ), glm::vec3( 0 ), glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ), glm::vec3( plane_size ) );
 				s_world->AddTag( plane, ddc::Tag::Static );
 
 				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
@@ -738,44 +740,37 @@ int GameMain()
 			}
 
 			{
-				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
-					glm::rotate( glm::radians( -45.0f ), glm::vec3( 1, 0, 0 ) ) *
-					glm::scale( glm::vec3( plane_size ) );
-
 				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.8, 0.2, 0.2, 1 );
 
 				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
-				transform_cmp->Transform = transform;
+				transform_cmp->Rotation = glm::angleAxis( glm::radians( -45.0f ), glm::vec3( 1, 0, 0 ) );
+				transform_cmp->Update();
 			}
 
 			{
-				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
-					glm::rotate( glm::radians( 90.0f ), glm::vec3( 0, 1, 0 ) ) *
-					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
-					glm::scale( glm::vec3( plane_size ) );
-
 				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.8, 0.8, 0.2, 1 );
 
 				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
-				transform_cmp->Transform = transform;
+				transform_cmp->Rotation = glm::angleAxis( glm::radians( 90.0f ), glm::vec3( 0, 1, 0 ) ) *
+					glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) );
+
+				transform_cmp->Update();
 			}
 
 			{
-				glm::mat4 transform = glm::translate( glm::vec3( 0, 0, 0 ) ) *
-					glm::rotate( glm::radians( -90.0f ), glm::vec3( 0, 1, 0 ) ) *
-					glm::rotate( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ) *
-					glm::scale( glm::vec3( plane_size ) );
-
 				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.2, 0.2, 0.8, 1 );
 
 				dd::TransformComponent* transform_cmp = s_world->Access<dd::TransformComponent>( plane );
-				transform_cmp->Transform = transform;
+				transform_cmp->Rotation = glm::angleAxis( glm::radians( -90.0f ), glm::vec3( 0, 1, 0 ) ) *
+					glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) );
+
+				transform_cmp->Update();
 			}
 
 			ddc::World* world = s_world;
@@ -786,7 +781,8 @@ int GameMain()
 					for( size_t i = 0; i < balls.Size(); ++i )
 					{
 						dd::TransformComponent* transform = world->Access<dd::TransformComponent>( balls[i] );
-						transform->SetPosition( ball_positions[i] );
+						transform->Position = ball_positions[i];
+						transform->Update();
 
 						dd::PhysicsSphereComponent* sphere = world->Access<dd::PhysicsSphereComponent>( balls[i] );
 						sphere->Velocity = glm::vec3( 0, 0, 0 );

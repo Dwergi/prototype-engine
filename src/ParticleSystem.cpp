@@ -95,7 +95,7 @@ namespace dd
 
 			if( system.Age < system.Lifetime )
 			{
-				EmitNewParticles( system, transforms[ i ].Transform, update.Delta() );
+				EmitNewParticles( system, transforms[ i ], update.Delta() );
 			}
 		}
 
@@ -105,11 +105,9 @@ namespace dd
 			world.AddTag( entity, ddc::Tag::Visible );
 
 			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
-
-			glm::mat4 rotation( glm::rotation( req.Normal, glm::vec3( 0, 0, 1 ) ) );
-			rotation[3].xyz = req.Position;
-
-			transform->Transform = rotation;
+			transform->Rotation = glm::rotation( req.Normal, glm::vec3( 0, 0, 1 ) );
+			transform->Position = req.Position;
+			transform->Update();
 
 			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
 			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
@@ -156,7 +154,7 @@ namespace dd
 		}
 	}
 
-	void ParticleSystem::EmitNewParticles( dd::ParticleSystemComponent& system, const glm::mat4& transform, float delta_t )
+	void ParticleSystem::EmitNewParticles( dd::ParticleSystemComponent& system, const dd::TransformComponent& transform, float delta_t )
 	{
 		system.EmissionAccumulator += system.EmissionRate * delta_t;
 		int toEmit = (int) system.EmissionAccumulator;
@@ -176,12 +174,10 @@ namespace dd
 
 			if( !particle.Alive() )
 			{
-				particle.Position = transform[ 3 ].xyz;
-
-				glm::mat3 rotation( transform[ 0 ].xyz, transform[ 1 ].xyz, transform[ 2 ].xyz );
+				particle.Position = transform.Position;
 
 				glm::vec3 velocity = glm::mix( system.MinVelocity, system.MaxVelocity, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) );
-				particle.Velocity = velocity * rotation;
+				particle.Velocity = velocity * transform.Rotation;
 
 				DD_ASSERT( !ddm::IsNaN( particle.Velocity ) );
 

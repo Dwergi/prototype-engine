@@ -78,9 +78,9 @@ namespace dd
 
 			// find all entries within the search radius
 			AABB bounds;
-			bounds.Expand( transform_read->GetPosition() );
-			bounds.Expand( transform_read->GetPosition() + glm::vec3(  SearchRadius, SearchRadius, SearchRadius ) );
-			bounds.Expand( transform_read->GetPosition() + glm::vec3( -SearchRadius, -SearchRadius, -SearchRadius ) );
+			bounds.Expand( transform_read->Position );
+			bounds.Expand( transform_read->Position + glm::vec3(  SearchRadius, SearchRadius, SearchRadius ) );
+			bounds.Expand( transform_read->Position + glm::vec3( -SearchRadius, -SearchRadius, -SearchRadius ) );
 			
 			octree_read.GetAllIntersecting( bounds, temp_entries );
 
@@ -102,7 +102,7 @@ namespace dd
 				DD_ASSERT( other_transform != nullptr );
 
 				velocity += (*other_cmp)->Velocity;
-				centre += other_transform->GetPosition();
+				centre += other_transform->Position;
 
 				++count;
 			}
@@ -116,7 +116,7 @@ namespace dd
 				centre /= count;
 
 				// create velocity towards centre of swarm
-				glm::vec3 dir_centre = centre - transform_read->GetPosition();
+				glm::vec3 dir_centre = centre - transform_read->Position;
 
 				velocity = glm::mix( velocity, dir_centre, CentreWeight );
 				velocity *= turn_multiplier;
@@ -134,8 +134,8 @@ namespace dd
 				cmp_write->Velocity = cmp_read.Velocity; // just keep velocity the same
 			}
 
-			transform_write->SetPosition( transform_read->GetPosition() + (cmp_write->Velocity * dt) );
-			cmp_write->OctreeHandle = octree_write.Add( transform_write->GetPosition() );
+			transform_write->SetPosition( transform_read->Position + (cmp_write->Velocity * dt) );
+			cmp_write->OctreeHandle = octree_write.Add( transform_write->Position );
 		}*/
 	}
 }
