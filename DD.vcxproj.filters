@@ -589,6 +589,12 @@
     <ClInclude Include="include\fmt\include\fmt\time.h">
       <Filter>Includes\fmt</Filter>
     </ClInclude>
+    <ClInclude Include="src\PhysicsRigidBodyComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsBase.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1040,6 +1046,12 @@
     </ClCompile>
     <ClCompile Include="include\fmt\src\posix.cc">
       <Filter>Includes\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsRigidBodyComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsBase.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

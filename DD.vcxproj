@@ -350,7 +350,9 @@
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
+    <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
+    <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
@@ -583,7 +585,9 @@
     <ClCompile Include="src\MeshHandle.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
+    <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
+    <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />
