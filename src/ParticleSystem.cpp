@@ -106,15 +106,10 @@ namespace dd
 
 			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
 
-			DD_TODO( "I have literally no idea why this works and TransformFromOriginDir doesn't. Fuck matrix math." );
+			glm::mat4 rotation( glm::rotation( req.Normal, glm::vec3( 0, 0, 1 ) ) );
+			rotation[3].xyz = req.Position;
 
-			glm::vec3 up( 0, 1, 0 );
-			glm::mat4 lookAt = glm::lookAt( req.Position, req.Position - req.Normal, up );
-			lookAt[3].xyz = req.Position;
-
-			DD_ASSERT( !ddm::IsNaN( lookAt[0] ) );
-
-			transform->Transform = lookAt;
+			transform->Transform = rotation;
 
 			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
 			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
