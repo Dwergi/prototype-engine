@@ -142,6 +142,13 @@ namespace dd
 		return *this;
 	}
 
+	String& String::operator+=( const std::string& other )
+	{
+		Append( other.c_str(), (uint) other.length() );
+
+		return *this;
+	}
+
 	int String::Find( const char* other, int offset ) const
 	{
 		DD_ASSERT( m_buffer.Get() != nullptr );

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "RemoveQualifiers.h"
+#include "JSON.h"
 
 #define UNREFERENCED(P) (P)
 
@@ -60,5 +61,5 @@
 	template <> void dd::RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
 
 #define DD_SERIALIZABLE( TypeName ) \
-	static void to_json( nlohmann::json& j, const TypeName& obj ) { dd::TypeInfo::GetType<TypeName>()->WriteToJSON( obj, j ); } \
-	static void from_json( const nlohmann::json& j, TypeName& obj ) { dd::TypeInfo::GetType<TypeName>()->ReadFromJSON( obj, j ); }
+	static void to_json( nlohmann::json& j, const TypeName& obj ) { dd::JSON::Write( Variable( obj ), j ); } \
+	static void from_json( const nlohmann::json& j, TypeName& obj ) { dd::JSON::Read( Variable( obj ), j ); }

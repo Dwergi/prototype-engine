@@ -97,6 +97,9 @@
     <Filter Include="Includes\fmt">
       <UniqueIdentifier>{9d6d39d5-6e90-4949-8c7f-50276126f17b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="JSON">
+      <UniqueIdentifier>{9e9437c3-6054-4e4e-a162-f654ac86e1fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -595,6 +598,9 @@
     <ClInclude Include="src\PhysicsBase.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\JSON.h">
+      <Filter>JSON</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1052,6 +1058,9 @@
     </ClCompile>
     <ClCompile Include="src\PhysicsBase.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSON.cpp">
+      <Filter>JSON</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

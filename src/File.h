@@ -6,37 +6,30 @@
 
 #pragma once
 
+#include <filesystem>
+
 namespace dd
 {
-	class File
+	struct File
 	{
-	public:
+		File( std::string path );
 
-		enum class Mode
-		{
-			Read,
-			Write
-		};
-		
-		// Create a file from the given path, rooted at the data root.
-		// The file must be deleted by the caller.
-		static std::unique_ptr<File> OpenDataFile( const char* path, Mode mode );
-		static std::unique_ptr<File> OpenDataFile( const String& path, Mode mode );
+		std::string Path() const { return m_path.native_string(); }
 
-		int Read( byte* buffer, uint size );
-		int Write( const byte* buffer, uint size );
+		bool Read( std::string& dst ) const;
+		bool Read( byte* dst, size_t length ) const;
 
-		int Size() const;
+		bool Write( const std::string& src ) const;
+		bool Write( const byte* src, size_t length ) const;
 
-		static void SetDataRoot( const char* root );
-		static const char* GetDataRoot();
+		size_t Size() const { return std::filesystem::file_size( m_path ); }
 
-		~File();
+		static void SetDataRoot( std::string root );
+		static std::string GetDataRoot() { return s_dataRoot.native_string(); }
 
 	private:
+		std::filesystem::path m_path;
 
-		File( std::FILE* handle );
-
-		std::FILE* m_fileHandle;
+		static std::filesystem::path s_dataRoot;
 	};
 }

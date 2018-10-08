@@ -30,6 +30,7 @@ namespace dd
 		String& operator+=( const String& other );
 		String& operator+=( const char* other );
 		String& operator+=( char other );
+		String& operator+=( const std::string& other );
 
 		void Append( const char* other, int length );
 

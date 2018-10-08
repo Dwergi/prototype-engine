@@ -349,6 +349,7 @@
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
@@ -582,6 +583,7 @@
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\MeshHandle.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />

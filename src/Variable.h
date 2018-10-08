@@ -29,9 +29,8 @@ namespace dd
 	struct TypeInfo;
 	class Member;
 
-	class Variable
+	struct Variable
 	{
-	public:
 		Variable();
 		Variable( const TypeInfo* typeInfo, void* data );
 		Variable( Variable var, const Member& member );

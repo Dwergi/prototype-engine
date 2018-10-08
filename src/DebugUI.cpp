@@ -322,12 +322,13 @@ namespace dd
 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
 
-		std::unique_ptr<File> file = File::OpenDataFile( "fonts\\Roboto-Medium.ttf", File::Mode::Read );
-		int size = file->Size();
-		byte* buffer = new byte[ size ];
-		file->Read( buffer, size );
+		File file = File( "fonts\\Roboto-Medium.ttf" );
 
-		io.Fonts->AddFontFromMemoryTTF( buffer, size, 16.0f );
+		size_t size = file.Size();
+		byte* buffer = new byte[ size ];
+		file.Read( buffer, size );
+
+		io.Fonts->AddFontFromMemoryTTF( buffer, (int) size, 16.0f );
 
 		//io.Fonts->AddFontDefault();
 

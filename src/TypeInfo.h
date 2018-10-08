@@ -9,8 +9,6 @@
 
 #include <unordered_map>
 
-#include <nlohmann/json_fwd.hpp>
-
 namespace dd
 {
 	typedef uint8 ComponentID;
@@ -146,12 +144,6 @@ namespace dd
 		static const TypeInfo* GetComponent( dd::ComponentID id );
 		static size_t ComponentCount() { return sm_maxComponentID; }
 
-		template <typename T>
-		void WriteToJSON( const T& t, nlohmann::json& json ) const { WriteToJSONInternal( &t, json ); }
-
-		template <typename T>
-		void ReadFromJSON( T& t, const nlohmann::json& json ) const { ReadFromJSONInternal( &t, json ); }
-
 	private:
 
 		String8 m_namespace;
@@ -184,9 +176,6 @@ namespace dd
 		void RegisterFunctions();
 
 		void RegisterMemberInternal( const char* name, const TypeInfo* memberType, uintptr_t offset );
-
-		void WriteToJSONInternal( const void* p, nlohmann::json& json ) const;
-		void ReadFromJSONInternal( void* p, const nlohmann::json& json ) const;
 	};
 
 	template <typename T>

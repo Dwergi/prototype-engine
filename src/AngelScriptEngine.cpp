@@ -217,50 +217,40 @@ namespace dd
 		return result;
 	}
 
-	String256 AngelScriptEngine::LoadSource( const char* module ) const
+	String256 AngelScriptEngine::LoadSource( const char* mod ) const
 	{
-		DD_ASSERT( module != nullptr );
+		DD_ASSERT( mod != nullptr );
 
-		std::string filename = fmt::format( "as/{}.as", module );
+		std::string filename = fmt::format( "as/{}.as", mod );
 
-		std::unique_ptr<File> file = File::OpenDataFile( filename.c_str(), File::Mode::Read );
-		if( file == nullptr )
+		File file( filename );
+
+		std::string source;
+		if( !file.Read( source ) )
 		{
 			std::string error = fmt::format( "Failed to load file containing module from path: {}", filename );
 
-			m_engine->WriteMessage( module, 0, 0, asMSGTYPE_ERROR, error.c_str() );
+			m_engine->WriteMessage( mod, 0, 0, asMSGTYPE_ERROR, error.c_str() );
 			return String256();
 		}
 
-		char buffer[2048];
-		String256 source;
-
-		int read = 0;
-		while( (read = file->Read( (byte*) buffer, 2048 )) == 2048 )
-		{
-			source.Append( buffer, 2048 );
-		}
-
-		// copy the last chunk
-		source.Append( buffer, (uint) read );
-
-		return source;
+		return String256( source.c_str() );
 	}
 
-	bool AngelScriptEngine::LoadFile( const char* module, std::string& output )
+	bool AngelScriptEngine::LoadFile( const char* mod, std::string& output )
 	{
-		DD_ASSERT( module != nullptr );
+		DD_ASSERT( mod != nullptr );
 
 		m_output = &output;
 
-		dd::String256 strSource( LoadSource( module ) );
+		dd::String256 strSource( LoadSource( mod ) );
 
 		CScriptBuilder builder;
-		int r = builder.StartNewModule( m_engine, module );
+		int r = builder.StartNewModule( m_engine, mod );
 
 		if( r >= 0 )
 		{
-			r = builder.AddSectionFromMemory( module, strSource.c_str(), strSource.Length() );
+			r = builder.AddSectionFromMemory( mod, strSource.c_str(), strSource.Length() );
 			if( r >= 0 )
 			{
 				r = builder.BuildModule();
@@ -272,18 +262,18 @@ namespace dd
 		return r >= 0;
 	}
 
-	bool AngelScriptEngine::IsModuleLoaded( const char* module ) const
+	bool AngelScriptEngine::IsModuleLoaded( const char* mod ) const
 	{
-		asIScriptModule* mod = m_engine->GetModule( module );
-		return mod != nullptr;
+		asIScriptModule* asMod = m_engine->GetModule( mod );
+		return asMod != nullptr;
 	}
 
-	AngelScriptObject* AngelScriptEngine::GetScriptObject( const char* module, const char* className )
+	AngelScriptObject* AngelScriptEngine::GetScriptObject( const char* mod, const char* className )
 	{
-		asIScriptModule* mod = m_engine->GetModule( module );
-		if( module != nullptr )
+		asIScriptModule* asMod = m_engine->GetModule( mod );
+		if( asMod != nullptr )
 		{
-			asITypeInfo* typeInfo = mod->GetTypeInfoByDecl( className );
+			asITypeInfo* typeInfo = asMod->GetTypeInfoByDecl( className );
 			if( typeInfo != nullptr )
 			{
 				String256 factoryName;
@@ -315,12 +305,12 @@ namespace dd
 		return nullptr;
 	}
 
-	AngelScriptFunction* AngelScriptEngine::GetFunction( const char* module, const char* functionSig )
+	AngelScriptFunction* AngelScriptEngine::GetFunction( const char* mod, const char* functionSig )
 	{
-		asIScriptModule* mod = m_engine->GetModule( module );
-		if( module != nullptr )
+		asIScriptModule* asMod = m_engine->GetModule( mod );
+		if( asMod != nullptr )
 		{
-			asIScriptFunction* func = mod->GetFunctionByDecl( functionSig );
+			asIScriptFunction* func = asMod->GetFunctionByDecl( functionSig );
 			if( func != nullptr )
 			{
 				return new AngelScriptFunction( this, func, nullptr );

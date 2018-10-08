@@ -104,21 +104,14 @@ namespace ddr
 
 	bool Shader::LoadFile( const dd::String& path, dd::String& outSource )
 	{
-		std::unique_ptr<dd::File> file = dd::File::OpenDataFile( path, dd::File::Mode::Read );
-		if( file == nullptr )
+		dd::File file( path.c_str() );
+		std::string read;
+		if( !file.Read( read ) )
 		{
 			return false;
 		}
 
-		char buffer[2048];
-		int read = 0;
-		while( (read = file->Read( (byte*) buffer, 2048 )) == 2048 )
-		{
-			outSource.Append( buffer, 2048 );
-		}
-
-		outSource.Append( buffer, (uint) read );
-
+		outSource += read;
 		return true;
 	}
 

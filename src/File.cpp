@@ -7,13 +7,13 @@
 #include "PCH.h"
 #include "File.h"
 
-#include <filesystem>
+#include <fstream>
 
 namespace dd
 {
-	static String128 s_dataRoot;
+	std::filesystem::path File::s_dataRoot;
 
-	void File::SetDataRoot( const char* root )
+	void File::SetDataRoot( std::string root )
 	{
 		std::filesystem::path path( root );
 
@@ -23,73 +23,69 @@ namespace dd
 			return; // don't set an invalid data root
 		}
 
-		s_dataRoot = root;
+		s_dataRoot = path.string();
 	}
 
-	const char* File::GetDataRoot()
+	File::File( std::string path )
 	{
-		return s_dataRoot.c_str();
+		DD_ASSERT( !std::filesystem::is_directory( path ) );
+
+		m_path = s_dataRoot;
+		m_path.append( path );
 	}
 
-	std::unique_ptr<File> File::OpenDataFile( const char* path, Mode mode )
+	bool File::Read( byte* buffer, size_t length ) const
 	{
-		return OpenDataFile( String256( path ), mode );
-	}
-
-	std::unique_ptr<File> File::OpenDataFile( const String& path, Mode mode )
-	{
-		String256 fullpath( s_dataRoot );
-		fullpath += '/';
-		fullpath += path;
-
-		std::FILE* file_handle;
-		errno_t error = fopen_s( &file_handle, fullpath.c_str(), (mode == Mode::Read ? "rb" : "wb") );
-		if( error != 0 )
-			return nullptr;
-
-		return std::unique_ptr<File>( new File( file_handle ) );
-	}
-
-	int File::Size() const
-	{
-		std::fseek( m_fileHandle, 0L, SEEK_END );
-		int size = std::ftell( m_fileHandle );
-		std::rewind( m_fileHandle );
-		return size;
-	}
-
-	int File::Read( byte* buffer, uint size )
-	{
-		DD_ASSERT( buffer != nullptr );
-
-		size_t read = std::fread( buffer, sizeof( byte ), size, m_fileHandle );
-		if( read < size )
+		if( length < Size() )
 		{
-			if( !std::feof( m_fileHandle ) )
-			{
-				return -1;
-			}
+			return false;
 		}
 
-		return (int) read;
+		std::ifstream stream( m_path );
+		if( stream.bad() )
+		{
+			return false;
+		}
+
+		stream.read( reinterpret_cast<char*>( buffer ), length );
+		return true;
 	}
 
-	int File::Write( const byte* buffer, uint size )
+	bool File::Read( std::string& dst ) const
 	{
-		DD_ASSERT( buffer != nullptr );
+		std::ifstream stream( m_path );
+		if( stream.bad() )
+		{
+			return false;
+		}
 
-		return 0;
+		dst.reserve( Size() );
+		stream.read( dst.data(), dst.capacity() );
+
+		return true;
 	}
 
-	File::~File()
+	bool File::Write( const std::string& src ) const
 	{
-		DD_ASSERT( m_fileHandle != NULL );
+		std::ofstream stream( m_path );
+		if( stream.bad() )
+		{
+			return false;
+		}
 
-		std::fclose( m_fileHandle );
+		stream << src;
+		return true;
 	}
 
-	File::File( std::FILE* handle )
-		: m_fileHandle( handle )
+	bool File::Write( const byte* buffer, size_t length ) const
 	{
+		std::ofstream stream( m_path );
+		if( stream.bad() )
+		{
+			return false;
+		}
+
+		stream.write( reinterpret_cast<const char*>( buffer ), length );
+		return true;
 	}
 }
