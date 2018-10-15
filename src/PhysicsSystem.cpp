@@ -114,19 +114,21 @@ namespace dd
 	static void ReflectVelocity( dd::PhysicsSphereComponent& physics, dd::TransformComponent& transform, const dd::Sphere& sphere, 
 		const glm::vec3& normal, float delta_t, float hit_time, float elasticity )
 	{
-		dd::Sphere moving_interp = sphere;
-		moving_interp.Centre += physics.Velocity * (delta_t * hit_time);
+		glm::vec3 velocity = physics.Momentum / physics.Mass;
 
-		float speed = glm::length( physics.Velocity );
-		glm::vec3 velocity = glm::reflect( physics.Velocity / speed, normal );
+		dd::Sphere moving_interp = sphere;
+		moving_interp.Centre += velocity * (delta_t * hit_time);
+
+		float speed = glm::length( velocity );
+		velocity = glm::reflect( velocity / speed, normal );
 		velocity *= speed * elasticity;
+
+		physics.Momentum = velocity * physics.Mass;
 
 		float remainder_t = delta_t * (1 - hit_time);
 
 		transform.Position = moving_interp.Centre + velocity * remainder_t;
 		transform.Update();
-
-		physics.Velocity = velocity;
 	}
 
 	static bool IntersectStaticPlanes( const ddc::DataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
@@ -140,9 +142,10 @@ namespace dd
 		{
 			const dd::PhysicsPlaneComponent& phys_plane = physics[p];
 			dd::Plane static_plane = phys_plane.Plane.GetTransformed( transforms[p].Transform() );
+			glm::vec3 velocity = moving_physics.Momentum / moving_physics.Mass;
 
 			float hit_time = 0;
-			if( IntersectMovingSpherePlane( moving_sphere, static_plane, moving_physics.Velocity * delta_t, hit_time ) )
+			if( IntersectMovingSpherePlane( moving_sphere, static_plane, velocity * delta_t, hit_time ) )
 			{
 				if( hit_time < 0 || hit_time > 1 )
 					continue;
@@ -169,8 +172,10 @@ namespace dd
 
 			dd::Sphere static_sphere = static_physics.Sphere.GetTransformed( transforms[s].Transform() );
 
+			glm::vec3 velocity = moving_physics.Momentum / moving_physics.Mass;
+
 			float hit_time = 0;
-			if( IntersectMovingSphereSphere( moving_sphere, static_sphere, moving_physics.Velocity * delta_t, glm::vec3( 0 ), hit_time ) )
+			if( IntersectMovingSphereSphere( moving_sphere, static_sphere, velocity * delta_t, glm::vec3( 0 ), hit_time ) )
 			{
 				if( hit_time < 0 || hit_time > 1 )
 					continue;
@@ -197,7 +202,9 @@ namespace dd
 		dd::TransformComponent& a_transform = dynamic_sphere_transforms[a_index];
 
 		dd::Sphere a_sphere = a_physics.Sphere.GetTransformed( a_transform.Transform() );
-		glm::vec3 a_displacement = a_physics.Velocity * delta_t;
+
+		glm::vec3 a_velocity = a_physics.Momentum / a_physics.Mass;
+		glm::vec3 a_displacement = a_velocity * delta_t;
 
 		dd::Sphere a_expanded = a_sphere;
 		a_expanded.Radius += glm::length( a_displacement );
@@ -215,7 +222,8 @@ namespace dd
 
 			dd::Sphere b_sphere = b_physics.Sphere.GetTransformed( b_transform.Transform() );
 
-			glm::vec3 b_displacement = b_physics.Velocity * delta_t;
+			glm::vec3 b_velocity = b_physics.Momentum / b_physics.Mass;
+			glm::vec3 b_displacement = b_velocity * delta_t;
 
 			float hit_time = 0;
 			if( IntersectMovingSphereSphere( a_sphere, b_sphere, a_displacement, b_displacement, hit_time ) )
@@ -229,24 +237,27 @@ namespace dd
 				dd::Sphere b_interp = b_sphere;
 				b_interp.Centre += b_displacement * hit_time;
 
-				glm::vec3 a_initial = a_physics.Velocity;
-				glm::vec3 b_initial = b_physics.Velocity;
-
-				DD_ASSERT( a_physics.Mass > 0 && b_physics.Mass > 0 );
-
 				float a_mass = a_physics.Mass;
 				float b_mass = b_physics.Mass;
+				DD_ASSERT( a_mass > 0 && b_mass > 0 );
 
-				a_physics.Velocity = a_initial * (a_mass - b_mass) + 2.0f * (b_mass * b_initial) / (a_mass + b_mass);
-				b_physics.Velocity = b_initial * (b_mass - a_mass) + 2.0f * (a_mass * a_initial) / (a_mass + b_mass);
+				glm::vec3 a_initial = a_velocity;
+				glm::vec3 b_initial = b_velocity;
+
+				// https://en.wikipedia.org/wiki/Elastic_collision
+				a_velocity = (a_initial * (a_mass - b_mass) + (2.0f * b_mass * b_initial)) / (a_mass + b_mass);
+				b_velocity = (b_initial * (b_mass - a_mass) + (2.0f * a_mass * a_initial)) / (a_mass + b_mass);
+
+				a_physics.Momentum = a_velocity * a_mass;
+				b_physics.Momentum = b_velocity * b_mass;
 
 				// offset positions by remainder of delta
 				float remainder_t = delta_t * (1 - hit_time);
 
-				a_transform.Position = a_interp.Centre + a_physics.Velocity * remainder_t;
+				a_transform.Position = a_interp.Centre + a_velocity * remainder_t;
 				a_transform.Update();
 
-				b_transform.Position = b_interp.Centre + b_physics.Velocity * remainder_t;
+				b_transform.Position = b_interp.Centre + b_velocity * remainder_t;
 				b_transform.Update();
 
 				return true;
@@ -276,7 +287,9 @@ namespace dd
 
 		for( size_t i = 0; i < dynamic_spheres.Size(); ++i )
 		{
-			AddSphereToBVH( bvh, dynamic_sphere_physics[i].Sphere, dynamic_sphere_physics[i].Velocity, dynamic_sphere_transforms[i].Transform() );
+			glm::vec3 velocity = dynamic_sphere_physics[i].Momentum / dynamic_sphere_physics[i].Mass;
+
+			AddSphereToBVH( bvh, dynamic_sphere_physics[i].Sphere, velocity, dynamic_sphere_transforms[i].Transform() );
 		}
 
 		bvh.EndBatch();
@@ -289,8 +302,7 @@ namespace dd
 
 			// calculate universal parameters
 			dd::TransformComponent& ds_transform = dynamic_sphere_transforms[sphere_idx];
-			ds_physics.Acceleration = m_gravity;
-			ds_physics.Velocity += ds_physics.Acceleration * delta_t;
+			ds_physics.Momentum += m_gravity * ds_physics.Mass * delta_t;
 
 			// hit tests
 			bool collision = false;
@@ -298,14 +310,16 @@ namespace dd
 			collision |= IntersectStaticSpheres( static_spheres, ds_physics, ds_transform, delta_t );
 			collision |= DynamicSpheresCollisions( dynamic_sphere_transforms, dynamic_sphere_physics, bvh, sphere_idx, delta_t );
 
+			glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
+
 			if( !collision )
 			{
-				ds_transform.Position = ds_transform.Position + ds_physics.Velocity * delta_t;
+				ds_transform.Position = ds_transform.Position + velocity * delta_t;
 				ds_transform.Update();
 			}
-			else if( glm::length2( ds_physics.Velocity ) < 0.05f )
+			else if( glm::length2( ds_physics.Momentum ) < 0.05f )
 			{
-				ds_physics.Velocity = glm::vec3( 0 );
+				ds_physics.Momentum = glm::vec3( 0 );
 				ds_physics.Resting = true;
 			}
 		}

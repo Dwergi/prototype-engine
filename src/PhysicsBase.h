@@ -10,8 +10,6 @@ namespace dd
 {
 	struct PhysicsBase
 	{
-		glm::vec3 Velocity;
-		glm::vec3 Acceleration;
 		glm::vec3 Momentum;
 
 		float Mass { 1.0f };
@@ -21,8 +19,6 @@ namespace dd
 
 		DD_CLASS( dd::PhysicsBase )
 		{
-			DD_MEMBER( dd::PhysicsBase, Velocity );
-			DD_MEMBER( dd::PhysicsBase, Acceleration );
 			DD_MEMBER( dd::PhysicsBase, Momentum );
 			DD_MEMBER( dd::PhysicsBase, Mass );
 			DD_MEMBER( dd::PhysicsBase, Elasticity );

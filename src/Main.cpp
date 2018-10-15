@@ -790,7 +790,7 @@ int GameMain()
 						transform->Update();
 
 						dd::PhysicsSphereComponent* sphere = world->Access<dd::PhysicsSphereComponent>( balls[i] );
-						sphere->Velocity = glm::vec3( 0, 0, 0 );
+						sphere->Momentum = glm::vec3( 0, 0, 0 );
 						sphere->Resting = false;
 					}
 				}
