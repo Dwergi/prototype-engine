@@ -437,6 +437,7 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\TerrainRenderer.h" />
+    <ClInclude Include="src\TerrainTile.h" />
     <ClInclude Include="src\Triangulator.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
@@ -643,6 +644,7 @@
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />
+    <ClCompile Include="src\TerrainTile.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

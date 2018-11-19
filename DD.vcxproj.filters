@@ -601,6 +601,9 @@
     <ClInclude Include="src\JSON.h">
       <Filter>JSON</Filter>
     </ClInclude>
+    <ClInclude Include="src\TerrainTile.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1061,6 +1064,9 @@
     </ClCompile>
     <ClCompile Include="src\JSON.cpp">
       <Filter>JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerrainTile.cpp">
+      <Filter>Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

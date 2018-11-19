@@ -14,7 +14,7 @@ namespace dd
 	{
 		File( std::string path );
 
-		std::string Path() const { return m_path.native_string(); }
+		std::string Path() const { return m_path.string(); }
 
 		bool Read( std::string& dst ) const;
 		bool Read( byte* dst, size_t length ) const;
@@ -25,7 +25,7 @@ namespace dd
 		size_t Size() const { return std::filesystem::file_size( m_path ); }
 
 		static void SetDataRoot( std::string root );
-		static std::string GetDataRoot() { return s_dataRoot.native_string(); }
+		static std::string GetDataRoot() { return s_dataRoot.string(); }
 
 	private:
 		std::filesystem::path m_path;

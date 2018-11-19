@@ -19,17 +19,18 @@
 #include "BoundsRenderer.h"
 #include "BulletSystem.h"
 #include "ColourComponent.h"
+#include "DDAssertHelpers.h"
 #include "DebugConsole.h"
 #include "DebugUI.h"
-#include "DDAssertHelpers.h"
 #include "DoubleBuffer.h"
 #include "EntityPrototype.h"
 #include "EntityVisualizer.h"
 #include "File.h"
+#include "FPSCamera.h"
+#include "FrameBuffer.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
 #include "FSM.h"
-#include "FPSCamera.h"
 #include "GLFWInputSource.h"
 #include "HitTestSystem.h"
 #include "IDebugPanel.h"
@@ -48,18 +49,16 @@
 #include "MousePicking.h"
 #include "OctreeComponent.h"
 #include "OpenGL.h"
-#include "Random.h"
-#include "RayRenderer.h"
-#include "Recorder.h"
-#include "WorldRenderer.h"
-#include "FrameBuffer.h"
 #include "ParticleSystem.h"
 #include "ParticleSystemComponent.h"
 #include "ParticleSystemRenderer.h"
 #include "PhysicsPlaneComponent.h"
 #include "PhysicsSphereComponent.h"
 #include "PhysicsSystem.h"
+#include "Random.h"
 #include "RayComponent.h"
+#include "RayRenderer.h"
+#include "Recorder.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
 #include "ShakyCamera.h"
@@ -71,6 +70,7 @@
 #include "TerrainChunkComponent.h"
 #include "TerrainRenderer.h"
 #include "TerrainSystem.h"
+#include "TerrainTile.h"
 #include "Texture.h"
 #include "Timer.h"
 #include "TransformComponent.h"
@@ -78,6 +78,7 @@
 #include "Uniforms.h"
 #include "Window.h"
 #include "World.h"
+#include "WorldRenderer.h"
 
 #include "SFML/Network/UdpSocket.hpp"
 
@@ -452,6 +453,11 @@ int GameMain()
 	s_mainThread = std::this_thread::get_id();
 
 	{
+		{
+			dd::TerrainTile* tile = new dd::TerrainTile();
+			tile->Initialize();
+		}
+
 		s_window = new Window( glm::ivec2( 1920, 1080 ), "DD" );
 
 		GLFWInputSource* input_source = new GLFWInputSource( *s_window );
@@ -723,7 +729,6 @@ int GameMain()
 					physics_sphere.Elasticity = 0.95f;
 				}
 			}*/
-
 
 			float plane_size = 100;
 			ddc::EntityPrototype phys_plane_proto( "physics_plane" );
