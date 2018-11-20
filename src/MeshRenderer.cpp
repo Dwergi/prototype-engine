@@ -111,10 +111,11 @@ namespace ddr
 		const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp,
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		Mesh* mesh = nullptr;
-		mesh = Mesh::Get( mesh_cmp.Mesh );
-
-		DD_ASSERT( mesh != nullptr, "Invalid mesh given!" );
+		Mesh* mesh = Mesh::Get( mesh_cmp.Mesh );
+		if( mesh == nullptr )
+		{
+			return;
+		}
 
 		if( mesh->IsDirty() )
 		{

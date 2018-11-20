@@ -555,7 +555,6 @@
     <ClInclude Include="src\MessageType.h">
       <Filter>Messaging</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\EntityPrototype.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -597,6 +596,9 @@
     </ClInclude>
     <ClInclude Include="src\PhysicsBase.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystemRenderer.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\JSON.h">
       <Filter>JSON</Filter>
@@ -1043,7 +1045,6 @@
     <ClCompile Include="src\MeshHandle.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1067,6 +1068,9 @@
     </ClCompile>
     <ClCompile Include="src\TerrainTile.cpp">
       <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystemRenderer.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

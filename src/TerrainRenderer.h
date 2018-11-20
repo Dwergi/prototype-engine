@@ -39,7 +39,7 @@ namespace ddr
 		//
 		// The name to display in the debug view list.
 		//
-		virtual const char* GetDebugTitle() const override { return "Terrain"; }
+		virtual const char* GetDebugTitle() const override { return "Wireframe"; }
 
 	private:
 

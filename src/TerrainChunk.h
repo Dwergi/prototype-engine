@@ -75,6 +75,7 @@ namespace dd
 		static const int VertexCount = MeshVertexCount + FlapVertexCount;
 
 		static uint s_indices[IndexCount];
+		static ConstBuffer<uint> s_indexBuffer;
 
 		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
@@ -95,7 +96,6 @@ namespace dd
 
 		glm::vec3 m_normals[VertexCount];
 		Buffer<glm::vec3> m_normalsBuffer;
-		Buffer<uint> m_indices;
 
 		glm::vec2 m_noiseOffset;
 		

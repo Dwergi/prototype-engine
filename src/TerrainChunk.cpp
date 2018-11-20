@@ -26,6 +26,8 @@
 namespace dd
 {
 	uint TerrainChunk::s_indices[IndexCount];
+	dd::ConstBuffer<uint> TerrainChunk::s_indexBuffer( s_indices, IndexCount );
+
 	ddr::ShaderHandle TerrainChunk::s_shader;
 	ddr::MaterialHandle TerrainChunk::s_material;
 
@@ -35,7 +37,6 @@ namespace dd
 	{
 		m_verticesBuffer.Set( m_vertices, VertexCount );
 		m_normalsBuffer.Set( m_normals, VertexCount );
-		m_indices.Set( s_indices, IndexCount );
 	}
 
 	TerrainChunk::~TerrainChunk()
@@ -407,7 +408,7 @@ namespace dd
 
 		mesh->SetPositions( m_verticesBuffer );
 		mesh->SetNormals( m_normalsBuffer );
-		mesh->SetIndices( m_indices );
+		mesh->SetIndices( s_indexBuffer );
 
 		return mesh;
 	}

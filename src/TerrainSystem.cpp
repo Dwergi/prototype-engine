@@ -282,6 +282,9 @@ namespace dd
 		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
+		ColourComponent* colour_cmp = world.Access<ColourComponent>( entity );
+		colour_cmp->Colour = glm::vec4( 1 );
+
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
 		transform_cmp->Position = glm::vec3( key.X, 0, key.Y );
 		transform_cmp->Update();

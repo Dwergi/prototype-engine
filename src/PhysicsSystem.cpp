@@ -248,8 +248,10 @@ namespace dd
 				a_velocity = (a_initial * (a_mass - b_mass) + (2.0f * b_mass * b_initial)) / (a_mass + b_mass);
 				b_velocity = (b_initial * (b_mass - a_mass) + (2.0f * a_mass * a_initial)) / (a_mass + b_mass);
 
-				a_physics.Momentum = a_velocity * a_mass;
-				b_physics.Momentum = b_velocity * b_mass;
+				float elasticity = a_physics.Elasticity * b_physics.Elasticity;
+
+				a_physics.Momentum = a_velocity * elasticity * a_mass;
+				b_physics.Momentum = b_velocity * elasticity * b_mass;
 
 				// offset positions by remainder of delta
 				float remainder_t = delta_t * (1 - hit_time);
@@ -317,7 +319,7 @@ namespace dd
 				ds_transform.Position = ds_transform.Position + velocity * delta_t;
 				ds_transform.Update();
 			}
-			else if( glm::length2( ds_physics.Momentum ) < 0.05f )
+			else if( glm::length2( velocity ) < 0.05f )
 			{
 				ds_physics.Momentum = glm::vec3( 0 );
 				ds_physics.Resting = true;

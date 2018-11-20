@@ -432,7 +432,7 @@ ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 
 	dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( entity );
 	physics_sphere.Sphere.Radius = 1.0f;
-	physics_sphere.Elasticity = 1.0f;
+	physics_sphere.Elasticity = 0.95f;
 	physics_sphere.Mass = 1.0f;
 
 	return entity;
@@ -519,7 +519,7 @@ int GameMain()
 
 		s_world = new ddc::World( *jobsystem );
 
-		//s_world->RegisterSystem( *terrain_system );
+		s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *particle_system );
 		s_world->RegisterSystem( *hit_testing );
 		s_world->RegisterSystem( *bullet_system );
@@ -569,6 +569,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *physics_system );
 		s_debugUI->RegisterDebugPanel( *s_world );
 		s_debugUI->RegisterDebugPanel( *entity_visualizer );
+		s_debugUI->RegisterDebugPanel( *terrain_renderer );
 
 		s_world->Initialize();
 
@@ -682,14 +683,18 @@ int GameMain()
 		{
 			float sphere_size = 3;
 			
-			dd::Array<glm::vec3, 2> ball_positions;
+			dd::Array<glm::vec3, 4> ball_positions;
 			ball_positions.Add( glm::vec3( 0, 60, -30 ) );
 			ball_positions.Add( glm::vec3( 0, 60, 30 ) );
+			ball_positions.Add( glm::vec3( 30, 60, 0 ) );
+			ball_positions.Add( glm::vec3( -30, 60, 0 ) );
 
-			dd::Array<ddc::Entity, 2> balls;
+			dd::Array<ddc::Entity, 4> balls;
 			balls.Add( CreateBall( ball_positions[0], glm::vec4( 0.2, 0.2, 0.8, 1 ), sphere_size ) );
 			balls.Add( CreateBall( ball_positions[1], glm::vec4( 0.8, 0.2, 0.8, 1 ), sphere_size ) );
-
+			balls.Add( CreateBall( ball_positions[2], glm::vec4( 0.2, 0.8, 0.2, 1 ), sphere_size ) );
+			balls.Add( CreateBall( ball_positions[3], glm::vec4( 0.2, 0.8, 0.8, 1 ), sphere_size ) );
+			
 			/*{
 				float static_sphere_size = 100;
 

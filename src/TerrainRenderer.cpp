@@ -61,32 +61,24 @@ namespace ddr
 
 		m_wireframe->UpdateUniforms( uniforms );
 
-		auto meshes = data.Get<dd::MeshComponent>();
-		auto chunks = data.Get<dd::TerrainChunkComponent>();
-
-		for( size_t i = 0; i < data.Size(); ++i )
+		for( auto chunk : data.Get<dd::TerrainChunkComponent>() )
 		{
-			chunks[i].Chunk->RenderUpdate( data.Uniforms() );
+			chunk.Chunk->RenderUpdate( data.Uniforms() );
 		}
 	}
 
 	void TerrainRenderer::DrawDebugInternal( ddc::World& world )
 	{
-		if( ImGui::TreeNodeEx( "Wireframe", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			ImGui::Checkbox( "Enabled", &m_wireframe->Enabled );
+		ImGui::Checkbox( "Enabled", &m_wireframe->Enabled );
 
-			ImGui::DragFloat( "Width", &m_wireframe->Width, 0.01f, 0.0f, 10.0f );
+		ImGui::DragFloat( "Width", &m_wireframe->Width, 0.01f, 0.0f, 10.0f );
 
-			ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe->Colour ) );
+		ImGui::ColorEdit3( "Colour", glm::value_ptr( m_wireframe->Colour ) );
 
-			ImGui::DragFloat( "Edge Width", &m_wireframe->EdgeWidth, 0.01f, 0.0f, m_wireframe->Width );
+		ImGui::DragFloat( "Edge Width", &m_wireframe->EdgeWidth, 0.01f, 0.0f, m_wireframe->Width );
 
-			ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe->EdgeColour ) );
+		ImGui::ColorEdit3( "Edge Colour", glm::value_ptr( m_wireframe->EdgeColour ) );
 
-			ImGui::DragFloat( "Max Distance", &m_wireframe->MaxDistance, 1.0f, 0.0f, 1000.0f );
-
-			ImGui::TreePop();
-		}
+		ImGui::DragFloat( "Max Distance", &m_wireframe->MaxDistance, 1.0f, 0.0f, 1000.0f );
 	}
 }
