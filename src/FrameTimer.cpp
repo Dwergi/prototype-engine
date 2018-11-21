@@ -34,6 +34,8 @@ namespace dd
 
 	void FrameTimer::Update()
 	{
+		++m_frame;
+
 		m_targetDelta = 1.0f / m_maxFPS;
 
 		m_lastFrameTime = m_currentFrameTime;

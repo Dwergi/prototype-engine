@@ -84,13 +84,7 @@ namespace dd
 	{
 		DestroyChunks( world );
 	}
-
-	void TerrainSystem::SetLODLevels( int lods )
-	{
-		m_lodLevels = lods;
-		m_requiresRegeneration = true;
-	}
-
+	
 	void TerrainSystem::Initialize( ddc::World& world )
 	{
 		TerrainChunk::InitializeShared();
@@ -117,9 +111,8 @@ namespace dd
 
 		DD_TODO( "Introduce Camera Component and use that here." );
 		glm::vec3 pos( 0.0f, 0.0f, 0.0f );
-		float chunk_size = TerrainChunk::Vertices * m_params.VertexDistance;
 
-		glm::ivec2 origin( (int) (pos.x / chunk_size), (int) (pos.z / chunk_size) );
+		glm::ivec2 origin( (int) (pos.x / m_params.ChunkSize), (int) (pos.z / m_params.ChunkSize) );
 		if( m_previousOffset != origin )
 		{
 			GenerateTerrain( world, data, origin );
@@ -170,18 +163,32 @@ namespace dd
 
 	void TerrainSystem::GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset )
 	{
-		const int expected = ChunksPerDimension * ChunksPerDimension + // lod 0
-			(m_lodLevels - 1) * (ChunksPerDimension * ChunksPerDimension - (ChunksPerDimension / 2) * (ChunksPerDimension / 2)); // rest of the LODs
-
 		Vector<TerrainChunkKey> required_chunks;
-		required_chunks.Reserve( expected );
+		required_chunks.Reserve( ChunksPerDimension * ChunksPerDimension );
 
-		// start with a 4x4 grid of the lowest LOD level, 
-		// then at each level generate the centermost 2x2 grid into a 4x4 grid of one LOD level lower
-		for( int lod = 0; lod < m_lodLevels; ++lod )
+		int half_chunks = ChunksPerDimension / 2;
+
+		for( int y = -half_chunks; y < half_chunks; ++y )
+		{
+			for( int x = -half_chunks; x < half_chunks; ++x )
+			{
+				TerrainChunkKey key;
+				key.X = offset.x * m_params.ChunkSize + x * m_params.ChunkSize;
+				key.Y = offset.y * m_params.ChunkSize + y * m_params.ChunkSize;
+				key.LOD = 4;
+
+				required_chunks.Add( key );
+			}
+		}
+
+		DD_ASSERT( required_chunks.Size() == ChunksPerDimension * ChunksPerDimension );
+
+		/*// start with a 4x4 grid of the lowest LOD level, 
+		// then at each level generate the center-most 2x2 grid into a 4x4 grid of one LOD level lower
+		for( int lod = 0; lod < TerrainChunk::MaxLODs; ++lod )
 		{
 			GenerateLODLevel( lod, required_chunks, offset );
-		}
+		}*/
 
 		UpdateTerrainChunks( world, data, required_chunks );
 	}
@@ -232,14 +239,9 @@ namespace dd
 		}
 	}
 
-	void TerrainSystem::GenerateLODLevel( int lod, Vector<TerrainChunkKey>& toGenerate, const glm::ivec2 offset )
+	void TerrainSystem::GenerateLODLevel( int lod, Vector<TerrainChunkKey>& to_generate, const glm::ivec2 offset )
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
-
-		glm::ivec2 lod_offset( offset.x >> lod, offset.y >> lod );
-
-		const float vertex_distance = m_params.VertexDistance * (1 << lod);
-		const float chunk_size = TerrainChunk::Vertices * vertex_distance;
 
 		const int halfChunks = ChunksPerDimension / 2;
 		const int quarterChunks = halfChunks / 2;
@@ -259,11 +261,11 @@ namespace dd
 				}
 
 				TerrainChunkKey key;
-				key.X = lod_offset.x * chunk_size + x * chunk_size;
-				key.Y = lod_offset.y * chunk_size + y * chunk_size;
+				key.X = offset.x * m_params.ChunkSize + x * m_params.ChunkSize;
+				key.Y = offset.y * m_params.ChunkSize + y * m_params.ChunkSize;
 				key.LOD = lod;
 
-				toGenerate.Add( key );
+				to_generate.Add( key );
 
 				++generated;
 			}
@@ -293,7 +295,7 @@ namespace dd
 		TerrainChunk* chunk = new TerrainChunk( m_params, key );
 		chunk_cmp->Chunk = chunk;
 
-		chunk->Generate();
+		chunk->Generate(); 
 		chunk->Update( m_jobsystem );
 
 		return entity;
@@ -320,11 +322,6 @@ namespace dd
 
 			chunk.Chunk->WriteHeightImage( chunk_file.c_str() );
 
-			String64 chunk_normal_file;
-			snprintf( chunk_file.data(), 64, "terrain_%d_n.tga", chunk_index );
-
-			chunk.Chunk->WriteNormalImage( chunk_normal_file.c_str() );
-
 			++chunk_index;
 		} );
 	}
@@ -340,12 +337,7 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Parameters", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			if( ImGui::DragInt( "LODs", &m_lodLevels, 1, 1, 10 ) )
-			{
-				SetLODLevels( m_lodLevels );
-			}
-
-			if( ImGui::DragFloat( "Vertex Distance", &m_params.VertexDistance, 0.05f, 0.01f, 2.0f ) )
+			if( ImGui::DragFloat( "Chunk Size", &m_params.ChunkSize, 0.05f, 0.01f, 2.0f ) )
 			{
 				m_requiresRegeneration = true;
 			}

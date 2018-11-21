@@ -124,11 +124,17 @@ namespace ddr
 		{
 			return it->second;
 		}
+
+		if( !dd::File::Exists( path.c_str() ) )
+		{
+			return nullptr;
+		}
 		
 		Shader* shader = new Shader( path, type );
 		if( shader->m_id == OpenGL::InvalidID || 
 			!shader->Reload() )
 		{
+			DD_ASSERT( false, "Failed to load shader from '%s'!", path.c_str() );
 			delete shader;
 			return nullptr;
 		}

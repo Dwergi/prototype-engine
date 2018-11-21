@@ -25,8 +25,8 @@
 
 namespace dd
 {
-	uint TerrainChunk::s_indices[IndexCount];
-	dd::ConstBuffer<uint> TerrainChunk::s_indexBuffer( s_indices, IndexCount );
+	std::vector<uint> TerrainChunk::s_indices[ MaxLODs ];
+	ConstBuffer<uint> TerrainChunk::s_indexBuffers[ MaxLODs ];
 
 	ddr::ShaderHandle TerrainChunk::s_shader;
 	ddr::MaterialHandle TerrainChunk::s_material;
@@ -35,8 +35,7 @@ namespace dd
 		m_terrainParams( params ),
 		m_key( key )
 	{
-		m_verticesBuffer.Set( m_vertices, VertexCount );
-		m_normalsBuffer.Set( m_normals, VertexCount );
+		m_verticesBuffer.Set( m_vertices, TotalVertexCount );
 	}
 
 	TerrainChunk::~TerrainChunk()
@@ -44,120 +43,117 @@ namespace dd
 		ddr::Mesh::Destroy( m_mesh );
 
 		m_verticesBuffer.Release();
-		m_normalsBuffer.Release();
 	}
 
 	void TerrainChunk::InitializeShared()
 	{
-		uint index = 0;
-		const int actual_vertices = Vertices + 1;
-
-		for( uint z = 0; z < Vertices; ++z )
+		for( uint lod = 0; lod < MaxLODs; ++lod )
 		{
-			for( uint x = 0; x < actual_vertices; ++x )
+			const uint stride = 1 << lod;
+			const uint lod_vertices = MaxVertices / stride;
+			const uint row_width = MaxVertices + 1;
+			const uint mesh_index_count = lod_vertices * lod_vertices * 6;
+			const uint flap_index_count = lod_vertices * 6 * 4;
+
+			DD_ASSERT( stride <= MaxVertices );
+
+			std::vector<uint>& indices = s_indices[ lod ];
+			indices.reserve( mesh_index_count + flap_index_count );
+
+			for( uint z = 0; z < MaxVertices; z += stride )
 			{
-				const uint current = z * actual_vertices + x;
-				const uint next_row = (z + 1) * actual_vertices + x;
-
-				DD_ASSERT( next_row < actual_vertices * actual_vertices );
-
-				if( x != 0 )
+				for( uint x = 0; x < MaxVertices + 1; x += stride )
 				{
-					s_indices[index] = current;
-					s_indices[index + 1] = next_row - 1;
-					s_indices[index + 2] = next_row;
+					const uint current = z * row_width + x;
+					const uint next_row = (z + stride) * row_width + x;
 
-					index += 3;
-				}
+					DD_ASSERT( next_row < row_width * row_width );
 
-				if( x != Vertices )
-				{
-					s_indices[index] = current;
-					s_indices[index + 1] = next_row;
-					s_indices[index + 2] = current + 1;
+					if( x != 0 )
+					{
+						indices.push_back( current );
+						indices.push_back( next_row - stride );
+						indices.push_back( next_row );
+					}
 
-					index += 3;
+					if( x != MaxVertices )
+					{
+						indices.push_back( current );
+						indices.push_back( next_row );
+						indices.push_back( current + stride );
+					}
 				}
 			}
+
+			DD_ASSERT( indices.size() == mesh_index_count );
+
+			int flap_vertex_start = MeshVertexCount;
+
+			// (top, x = varying, z = 0)
+			for( uint x = 0; x < MaxVertices; x += stride )
+			{
+				indices.push_back( x );
+				indices.push_back( flap_vertex_start + x + stride );
+				indices.push_back( flap_vertex_start + x );
+
+				indices.push_back( x );
+				indices.push_back( x + stride );
+				indices.push_back( flap_vertex_start + x + stride );
+			}
+
+			flap_vertex_start += row_width;
+
+			// (right, x = chunk size, z = varying)
+			for( uint z = 0; z < MaxVertices; z += stride )
+			{
+				indices.push_back( (z + stride) * row_width + MaxVertices );
+				indices.push_back( flap_vertex_start + z + stride );
+				indices.push_back( flap_vertex_start + z );
+
+				indices.push_back( flap_vertex_start + z );
+				indices.push_back( z * row_width + MaxVertices );
+				indices.push_back( (z + stride) * row_width + MaxVertices );
+			}
+
+			flap_vertex_start += row_width;
+
+			// (bottom, x = varying, z = chunk size)
+			for( uint x = 0; x < MaxVertices; x += stride )
+			{
+				const uint last_row = MeshVertexCount - row_width;
+
+				indices.push_back( last_row + x + stride );
+				indices.push_back( flap_vertex_start + x );
+				indices.push_back( flap_vertex_start + x + stride );
+
+				indices.push_back( last_row + x );
+				indices.push_back( flap_vertex_start + x );
+				indices.push_back( last_row + x + stride );
+			}
+
+			flap_vertex_start += row_width;
+
+			// (left, x = 0, z = varying)
+			for( uint z = 0; z < MaxVertices; z += stride )
+			{
+				indices.push_back( (z + stride) * row_width );
+				indices.push_back( flap_vertex_start + z );
+				indices.push_back( flap_vertex_start + z + stride );
+
+				indices.push_back( z * row_width );
+				indices.push_back( flap_vertex_start + z );
+				indices.push_back( (z + stride) * row_width );
+			}
+
+			DD_ASSERT( indices.size() == mesh_index_count + flap_index_count );
+
+			for( uint i : indices )
+			{
+				DD_ASSERT( i < TotalVertexCount );
+			}
+
+			s_indexBuffers[ lod ].Set( indices.data(), (int) indices.size() );
 		}
-
-		DD_ASSERT( index == MeshIndexCount );
-
-		int flap_vertex_start = MeshVertexCount;
-
-		// (top, x = varying, z = 0)
-		for( uint x = 0; x < Vertices; ++x )
-		{
-			s_indices[index + 0] = x;
-			s_indices[index + 1] = flap_vertex_start + x + 1;
-			s_indices[index + 2] = flap_vertex_start + x;
-
-			index += 3;
-
-			s_indices[index + 0] = x;
-			s_indices[index + 1] = x + 1;
-			s_indices[index + 2] = flap_vertex_start + x + 1;
-
-			index += 3;
-		}
-
-		flap_vertex_start += actual_vertices;
-
-		// 4th (right, x = chunk size, z = varying)
-		for( uint z = 0; z < Vertices; ++z )
-		{
-			s_indices[ index + 0 ] = (z + 2) * actual_vertices - 1;
-			s_indices[ index + 1 ] = flap_vertex_start + z + 1;
-			s_indices[ index + 2 ] = flap_vertex_start + z;
-
-			index += 3;
-
-			s_indices[ index + 0 ] = flap_vertex_start + z;
-			s_indices[ index + 1 ] = (z + 1) * actual_vertices - 1;
-			s_indices[ index + 2 ] = (z + 2) * actual_vertices - 1;
-
-			index += 3;
-		}
-		
-		flap_vertex_start += actual_vertices;
-
-		// (bottom, x = varying, z = chunk size)
-		for( uint x = 0; x < Vertices; ++x )
-		{
-			const uint last_row = MeshVertexCount - actual_vertices;
-
-			s_indices[index + 0] = last_row + x + 1;
-			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = flap_vertex_start + x + 1;
-
-			index += 3;
-
-			s_indices[index + 0] = last_row + x;
-			s_indices[index + 1] = flap_vertex_start + x;
-			s_indices[index + 2] = last_row + x + 1;
-
-			index += 3;
-		}
-
-		flap_vertex_start += actual_vertices;
-
-		// (left, x = 0, z = varying)
-		for( uint z = 0; z < Vertices; ++z )
-		{
-			s_indices[index + 0] = (z + 1) * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + z;
-			s_indices[index + 2] = flap_vertex_start + z + 1;
-
-			index += 3;
-
-			s_indices[index + 0] = z * actual_vertices;
-			s_indices[index + 1] = flap_vertex_start + z;
-			s_indices[index + 2] = (z + 1) * actual_vertices;
-
-			index += 3;
-		}
-
-		DD_ASSERT( index == IndexCount );
 	}
 
 	void TerrainChunk::CreateRenderResources()
@@ -173,42 +169,42 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainChunk_Generate );
 
-		const float actual_distance = m_terrainParams.VertexDistance * (1 << m_key.LOD);
-		const int actual_vertices = Vertices + 1;
-		for( int z = 0; z < actual_vertices; ++z )
+		const int row_width = MaxVertices + 1;
+		const float vertex_distance = m_terrainParams.ChunkSize / MaxVertices;
+
+		for( int z = 0; z < row_width; ++z )
 		{
-			for( int x = 0; x < actual_vertices; ++x )
+			for( int x = 0; x < row_width; ++x )
 			{
-				const int current = z * actual_vertices + x;
+				const int current = z * row_width + x;
 
 				// height is y
-				m_vertices[ current ] = glm::vec3( x * actual_distance, 0, z * actual_distance );
+				m_vertices[ current ] = glm::vec3( x * vertex_distance, 0, z * vertex_distance );
 			}
 		}
 
-		const float chunk_size = Vertices * actual_distance;
 		int flap_vertex_start = MeshVertexCount;
-		for( int x = 0; x < actual_vertices; ++x )
+		for( int x = 0; x < row_width; ++x )
 		{
-			m_vertices[flap_vertex_start + x] = glm::vec3( x * actual_distance, 0, 0 );
+			m_vertices[flap_vertex_start + x] = glm::vec3( x * vertex_distance, 0, 0 );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int x = 0; x < actual_vertices; ++x )
+		flap_vertex_start += row_width;
+		for( int z = 0; z < row_width; ++z )
 		{
-			m_vertices[flap_vertex_start + x] = glm::vec3( chunk_size, 0, x * actual_distance );
+			m_vertices[flap_vertex_start + z] = glm::vec3( m_terrainParams.ChunkSize, 0, z * vertex_distance );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int x = 0; x < actual_vertices; ++x )
+		flap_vertex_start += row_width;
+		for( int x = 0; x < row_width; ++x )
 		{
-			m_vertices[flap_vertex_start + x] = glm::vec3( x * actual_distance, 0, chunk_size );
+			m_vertices[flap_vertex_start + x] = glm::vec3( x * vertex_distance, 0, m_terrainParams.ChunkSize );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int x = 0; x < actual_vertices; ++x )
+		flap_vertex_start += row_width;
+		for( int z = 0; z < row_width; ++z )
 		{
-			m_vertices[flap_vertex_start + x] = glm::vec3( 0, 0, x * actual_distance );
+			m_vertices[flap_vertex_start + z] = glm::vec3( 0, 0, z * vertex_distance );
 		}
 
 		m_dataDirty = true;
@@ -251,7 +247,7 @@ namespace dd
 			{
 				mesh = CreateMesh( m_key );
 			}
-			
+
 			mesh->SetBoundBox( m_bounds );
 			mesh->SetDirty();
 
@@ -264,7 +260,7 @@ namespace dd
 		m_destroy = true;
 	}
 
-	float TerrainChunk::GetHeight( float x, float y )
+	float TerrainChunk::GetNoise( float x, float y )
 	{
 		float height = 0;
 		float wavelength = m_terrainParams.Wavelength;
@@ -289,27 +285,39 @@ namespace dd
 
 	void TerrainChunk::UpdateVertices( glm::vec2 origin )
 	{
+		if( m_key.LOD >= m_minLod )
+		{
+			return;
+		}
+
+		DD_ASSERT( m_key.LOD < MaxLODs );
+
 		glm::vec2 chunk_pos = origin + glm::vec2( m_key.X, m_key.Y );
-		const int actual_vertices = Vertices + 1;
-		const float actual_distance = m_terrainParams.VertexDistance * (1 << m_key.LOD);
+
+		const uint stride = 1 << m_key.LOD;
+		DD_ASSERT( stride < MaxVertices );
+
+		const int row_width = MaxVertices + 1;
+		const float vertex_distance = m_terrainParams.ChunkSize / MaxVertices;
 
 		float max_height = std::numeric_limits<float>::min();
 		float min_height = std::numeric_limits<float>::max();
 
-		for( int z = 0; z < actual_vertices; ++z )
+		for( int z = 0; z < row_width; z += stride )
 		{
-			for( int x = 0; x < actual_vertices; ++x )
+			for( int x = 0; x < row_width; x += stride )
 			{
-				const float x_coord = chunk_pos.x + x * actual_distance;
-				const float z_coord = chunk_pos.y + z * actual_distance;
+				const float x_coord = chunk_pos.x + x * vertex_distance;
+				const float z_coord = chunk_pos.y + z * vertex_distance;
 
-				const int current = z * actual_vertices + x;
-
-				float height = GetHeight( x_coord, z_coord );
+				float height = GetNoise( x_coord, z_coord );
 
 				// height is y
 				float normalized_height = (1 + height) / 2;
 				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
+
+				const int current = z * row_width + x;
+				DD_ASSERT( current < MeshVertexCount );
 
 				m_vertices[current].y = normalized_height * m_terrainParams.HeightRange;
 
@@ -321,72 +329,38 @@ namespace dd
 		m_position = glm::vec3( chunk_pos.x, 0, chunk_pos.y );
 
 		m_bounds.Min = glm::vec3( 0, min_height, 0 );
-		m_bounds.Max = glm::vec3( Vertices * actual_distance, max_height, Vertices * actual_distance );
+		m_bounds.Max = glm::vec3( m_terrainParams.ChunkSize, max_height, m_terrainParams.ChunkSize );
 
-		for( int i = 0; i < FlapVertexCount; ++i )
-		{
-			m_vertices[MeshVertexCount + i].y = 0.0f;
-		}
+		m_minLod = m_key.LOD;
 
 		int flap_vertex_start = MeshVertexCount;
-		for( int i = 0; i < actual_vertices; ++i )
+		for( int i = 0; i < row_width; i += stride )
 		{
 			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == 0.0f );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int i = 0; i < actual_vertices; ++i )
+		flap_vertex_start += row_width;
+		for( int i = 0; i < row_width; i += stride )
 		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == Vertices * actual_distance );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == m_terrainParams.ChunkSize );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int i = 0; i < actual_vertices; ++i )
+		flap_vertex_start += row_width;
+		for( int i = 0; i < row_width; i += stride )
 		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == Vertices * actual_distance );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == m_terrainParams.ChunkSize );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
 		}
 
-		flap_vertex_start += actual_vertices;
-		for( int i = 0; i < actual_vertices; ++i )
+		flap_vertex_start += row_width;
+		for( int i = 0; i < row_width; i += stride )
 		{
 			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == 0.0f );
+			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
 		}
 	}
-
-	void TerrainChunk::UpdateNormals()
-	{
-		DD_PROFILE_SCOPED( TerrainChunk_InitializeNormals );
-
-		for( int i = 0; i < MeshIndexCount; i += 3 )
-		{
-			uint indexA = s_indices[i];
-			uint indexB = s_indices[i + 1];
-			uint indexC = s_indices[i + 2];
-
-			glm::vec3 a = m_vertices[indexA];
-			glm::vec3 b = m_vertices[indexB];
-			glm::vec3 c = m_vertices[indexC];
-
-			glm::vec3 normal = glm::normalize( glm::cross( b - a, c - a ) );
-			if( normal.y < 0 )
-			{
-				normal = glm::normalize( glm::cross( c - a, b - a ) );
-
-				// should always be pointing at least a little bit up
-				DD_ASSERT( normal.y >= 0 );
-			}
-
-			m_normals[indexA] = normal;
-			m_normals[indexB] = normal;
-			m_normals[indexC] = normal;
-		}
-
-		for( int i = 0; i < FlapVertexCount; ++i )
-		{
-			m_normals[MeshVertexCount + i] = glm::vec3( 0, 1, 0 );
-		}
-	}
-
 
 	void TerrainChunk::SetNoiseOffset( glm::vec2 noise_offset )
 	{
@@ -405,53 +379,30 @@ namespace dd
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_mesh );
 		mesh->SetMaterial( s_material );
-
 		mesh->SetPositions( m_verticesBuffer );
-		mesh->SetNormals( m_normalsBuffer );
-		mesh->SetIndices( s_indexBuffer );
+		mesh->SetIndices( s_indexBuffers[ key.LOD ] );
 
 		return mesh;
 	}
 
 	void TerrainChunk::WriteHeightImage( const char* filename ) const
 	{
-		const int actualVertices = Vertices + 1;
-		byte pixels[actualVertices * actualVertices];
+		const int actual_vertices = MaxVertices + 1;
+		byte pixels[actual_vertices * actual_vertices];
 
-		for( int y = 0; y < actualVertices; ++y )
+		for( int y = 0; y < actual_vertices; ++y )
 		{
-			for( int x = 0; x < actualVertices; ++x )
+			for( int x = 0; x < actual_vertices; ++x )
 			{
-				pixels[y * actualVertices + x] = (byte) ((m_vertices[y * actualVertices + x].y / m_terrainParams.HeightRange) * 255);
+				pixels[y * actual_vertices + x] = (byte) ((m_vertices[y * actual_vertices + x].y / m_terrainParams.HeightRange) * 255);
 			}
 		}
 
-		stbi_write_tga( filename, actualVertices, actualVertices, 1, pixels );
+		stbi_write_tga( filename, actual_vertices, actual_vertices, 1, pixels );
 	}
 
 	static byte NormalToColour( float f )
 	{
 		return (byte) (((f + 1.0f) / 2.0f) * 255.f);
-	}
-
-	void TerrainChunk::WriteNormalImage( const char* filename ) const
-	{
-		const int actualVertices = Vertices + 1;
-		byte pixels[actualVertices * actualVertices * 3];
-
-		for( int y = 0; y < actualVertices; ++y )
-		{
-			for( int x = 0; x < actualVertices; ++x )
-			{
-				int index = y * actualVertices + x;
-
-				glm::vec3 normal = m_normals[index];
-				pixels[3 * index] = NormalToColour( normal.x );
-				pixels[3 * index + 1] = NormalToColour( normal.y );
-				pixels[3 * index + 2] = NormalToColour( normal.z );
-			}
-		}
-
-		stbi_write_tga( filename, actualVertices, actualVertices, 3, pixels );
 	}
 }

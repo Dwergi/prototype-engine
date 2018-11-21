@@ -384,8 +384,8 @@ namespace dd
 		right.SplitAxis = split_axis;
 		right.Parent = parent_index;
 
-		DD_ASSERT( left.Region.Volume() > 0 );
-		DD_ASSERT( right.Region.Volume() > 0 );
+		/*DD_ASSERT( left.Region.Volume() > 0 );
+		DD_ASSERT( right.Region.Volume() > 0 );*/
 
 		parent_bucket.Left = left_index;
 		parent_bucket.Right = right_index;

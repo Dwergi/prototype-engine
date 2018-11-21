@@ -36,27 +36,12 @@ namespace dd
 	public:
 
 		//
-		// The default number of LODs to use.
-		//
-		static const int DefaultLODLevels = 6;
-
-		//
 		// The number of chunks we have per dimension (X/Y).
 		//
-		static const int ChunksPerDimension = 4;
+		static const int ChunksPerDimension = 32;
 
 		TerrainSystem( JobSystem& jobSystem );
 		~TerrainSystem();
-
-		//
-		// Set the number of LOD levels to use.
-		//
-		void SetLODLevels( int lodLevels );
-
-		//
-		// Get the number of LOD levels in use.
-		//
-		int GetLODLevels() const { return m_lodLevels; }
 
 		//
 		// Get the terrain parameters.
@@ -93,7 +78,6 @@ namespace dd
 		bool m_draw { true };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
-		int m_lodLevels { DefaultLODLevels };
 
 		glm::ivec2 m_previousOffset;
 

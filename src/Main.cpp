@@ -70,7 +70,6 @@
 #include "TerrainChunkComponent.h"
 #include "TerrainRenderer.h"
 #include "TerrainSystem.h"
-#include "TerrainTile.h"
 #include "Texture.h"
 #include "Timer.h"
 #include "TransformComponent.h"
@@ -453,11 +452,6 @@ int GameMain()
 	s_mainThread = std::this_thread::get_id();
 
 	{
-		{
-			dd::TerrainTile* tile = new dd::TerrainTile();
-			tile->Initialize();
-		}
-
 		s_window = new Window( glm::ivec2( 1920, 1080 ), "DD" );
 
 		GLFWInputSource* input_source = new GLFWInputSource( *s_window );

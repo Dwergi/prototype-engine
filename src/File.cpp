@@ -15,15 +15,21 @@ namespace dd
 
 	void File::SetDataRoot( std::string root )
 	{
-		std::filesystem::path path( root );
-
-		if( !std::filesystem::is_directory( path ) || !std::filesystem::exists( path ) )
+		if( !std::filesystem::is_directory( root ) || !std::filesystem::exists( root ) )
 		{
-			DD_ASSERT( false, "Invalid data root given!" );
-			return; // don't set an invalid data root
+			DD_ASSERT( false, "Invalid data root given: %s!", root.c_str() );
+			return;
 		}
 
-		s_dataRoot = path.string();
+		s_dataRoot = root;
+	}
+
+	bool File::Exists( std::string file_path )
+	{
+		std::filesystem::path path( s_dataRoot );
+		path.append( file_path );
+
+		return !std::filesystem::is_directory( path ) && std::filesystem::exists( path );
 	}
 
 	File::File( std::string path )
@@ -59,7 +65,7 @@ namespace dd
 			return false;
 		}
 
-		dst.reserve( Size() );
+		dst.resize( Size() );
 		stream.read( dst.data(), dst.capacity() );
 
 		return true;

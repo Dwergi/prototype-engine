@@ -21,9 +21,9 @@ namespace dd
 		static const int Octaves = 6;
 
 		//
-		// Distance between vertices on the chunk.
+		// Size of a chunk in metres in one dimension.
 		//
-		float VertexDistance { 1.0f };
+		float ChunkSize { 32.0f };
 
 		//
 		// The maximum height range of vertices. Heights will vary between 0 and this.

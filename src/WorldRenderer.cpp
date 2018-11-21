@@ -137,7 +137,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn )
+	void WorldRenderer::CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn ) const
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for( const ddc::DataRequest* req : renderer.GetRequirements() )

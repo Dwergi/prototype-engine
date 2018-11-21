@@ -30,9 +30,14 @@ namespace dd
 	public:
 
 		//
+		// Maximum number of LODs.
+		//
+		static const int MaxLODs = 6;
+
+		//
 		// The number of vertices per dimension of the chunk.
 		//
-		static const int Vertices = 16;
+		static const int MaxVertices = 1 << MaxLODs;
 
 		//
 		// Initialize resources that are shared between all chunks.
@@ -56,7 +61,6 @@ namespace dd
 		void Destroy();
 
 		void WriteHeightImage( const char* filename ) const;
-		void WriteNormalImage( const char* filename ) const;
 
 		const TerrainChunkKey& GetKey() const { return m_key; }
 		AABB GetBounds() const { return m_bounds; }
@@ -66,16 +70,12 @@ namespace dd
 
 	private:
 
-		static const int MeshIndexCount = Vertices * Vertices * 6;
-		static const int FlapIndexCount = Vertices * 6 * 4;
-		static const int IndexCount = MeshIndexCount + FlapIndexCount;
+		static const int MeshVertexCount = (MaxVertices + 1) * (MaxVertices + 1);
+		static const int FlapVertexCount = (MaxVertices + 1) * 4;
+		static const int TotalVertexCount = MeshVertexCount + FlapVertexCount;
 
-		static const int MeshVertexCount = (Vertices + 1) * (Vertices + 1);
-		static const int FlapVertexCount = (Vertices + 1) * 4;
-		static const int VertexCount = MeshVertexCount + FlapVertexCount;
-
-		static uint s_indices[IndexCount];
-		static ConstBuffer<uint> s_indexBuffer;
+		static std::vector<uint> s_indices[MaxLODs];
+		static ConstBuffer<uint> s_indexBuffers[MaxLODs];
 
 		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
@@ -91,18 +91,16 @@ namespace dd
 		glm::vec3 m_position;
 		AABB m_bounds;
 
-		glm::vec3 m_vertices[VertexCount];
+		glm::vec3 m_vertices[ TotalVertexCount ];
 		Buffer<glm::vec3> m_verticesBuffer;
 
-		glm::vec3 m_normals[VertexCount];
-		Buffer<glm::vec3> m_normalsBuffer;
-
 		glm::vec2 m_noiseOffset;
+
+		int m_minLod { MaxLODs }; // the best quality LOD that's already been generated
 		
-		float GetHeight( float x, float y );
+		float GetNoise( float x, float y );
 
 		void UpdateVertices( glm::vec2 chunkPos );
-		void UpdateNormals();
 
 		ddr::Mesh* CreateMesh( const TerrainChunkKey& key );
 	};

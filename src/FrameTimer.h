@@ -60,6 +60,7 @@ namespace dd
 		uint m_maxFPS { 0 };
 		bool m_drawCompact { true };
 		bool m_paused { false };
+		uint m_frame { 0 };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE];

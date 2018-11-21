@@ -24,6 +24,8 @@ namespace dd
 
 		size_t Size() const { return std::filesystem::file_size( m_path ); }
 
+		static bool Exists( std::string file_path );
+
 		static void SetDataRoot( std::string root );
 		static std::string GetDataRoot() { return s_dataRoot.string(); }
 

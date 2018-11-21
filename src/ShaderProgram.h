@@ -117,5 +117,7 @@ namespace ddr
 
 		ShaderLocation GetAttribute( const char* name ) const;
 		ShaderLocation GetUniform( const char* name ) const;
+
+		void AssertBeforeUse( const char* name ) const;
 	};
 } 

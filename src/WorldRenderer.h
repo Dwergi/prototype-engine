@@ -97,7 +97,7 @@ namespace ddr
 		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		void CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn );
+		void CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn ) const;
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};
