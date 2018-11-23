@@ -1,32 +1,13 @@
 #pragma once
 
-#include "FunctionView.h"
-
 namespace dd
 {
-	class FSM
+	
+	struct FSMPrototype
 	{
-	public:
-
-		FSM();
-		~FSM();
-
-		void Initialize( int initial_state );
-
-		void AddState( int id );
-		void AddTransition( int from, int to );
-
-		bool TransitionTo( int id );
-
-		void SetOnEnter( int id, FunctionView<void()> on_enter );
-		void SetOnExit( int id, FunctionView<void()> on_exit );
-
-	private:
-
-		class State
+		struct State
 		{
-		public:
-
+			State( int id );
 			State( const State& other );
 			~State();
 
@@ -36,18 +17,46 @@ namespace dd
 			void Exit() const;
 
 		private:
-
-			friend class FSM;
+			friend struct FSMPrototype;
 
 			int m_id { -1 };
-			FunctionView<void()> m_onEnter;
-			FunctionView<void()> m_onExit;
-
-			State( int id );
+			std::function<void()> m_onEnter;
+			std::function<void()> m_onExit;
 		};
 
-		FSM::State* m_current { nullptr };
-		std::unordered_map<int, FSM::State> m_states;
-		Vector<std::pair<int, int>> m_transitions;
+		void AddTransition( int from, int to );
+		bool HasTransition( int from, int to ) const;
+
+		void SetInitialState( int id );
+		int GetInitialState() const { return m_initial; }
+	
+		void AddState( int id );
+
+		State* AccessState( int id );
+		const State* GetState( int id ) const;
+
+		void SetOnEnter( int id, std::function<void()> on_enter );
+		void SetOnExit( int id, std::function<void()> on_exit );
+
+	private:
+
+		int m_initial { 0 };
+
+		std::vector<State> m_states;
+		std::vector<std::pair<int, int>> m_transitions;
+	};
+
+	struct FSM
+	{
+		FSM( const FSMPrototype& prototype );
+		FSM( const FSM& other );
+		~FSM();
+	
+		bool TransitionTo( int id );
+		bool operator==( int id ) const;
+
+	private:
+		const FSMPrototype& m_prototype;
+		int m_current { -1 };
 	};
 }

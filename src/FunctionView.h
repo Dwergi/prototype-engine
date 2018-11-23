@@ -34,7 +34,7 @@ namespace dd
 	{
 	private:
 		void* m_ptr { nullptr };
-		TReturn( *m_erasedFn )(void*, TArgs...);
+		TReturn( *m_erasedFn )(void*, TArgs...) { nullptr };
 
 	public:
 		template <typename T, typename = std::enable_if_t<

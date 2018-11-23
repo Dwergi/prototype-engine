@@ -8,15 +8,12 @@
 
 #include "FrameBuffer.h"
 #include "IDebugPanel.h"
+#include "Mesh.h"
 #include "System.h"
-#include "MeshHandle.h"
 #include "Texture.h"
 
 namespace dd
 {
-	struct MeshComponent;
-	struct MousePicking;
-	struct TransformComponent;
 	class Window;
 }
 
@@ -24,7 +21,6 @@ namespace ddr
 {
 	struct ICamera;
 	class Renderer;
-	struct Frustum;
 	struct RenderData;
 	struct UniformStorage;
 
@@ -77,7 +73,7 @@ namespace ddr
 
 		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
 
-		bool m_debugDrawStandard { true };
+		bool m_debugDrawNormals { false };
 		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_reloadShaders { false };

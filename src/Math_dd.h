@@ -64,3 +64,17 @@ namespace ddm
 
 	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 );
 }
+
+namespace std
+{
+	template <>
+	struct hash<glm::vec2>
+	{
+		size_t operator()( const glm::vec2& v ) const
+		{
+			size_t h = (*reinterpret_cast<const size_t*>(&v.x)) << 32;
+			h = h | (*reinterpret_cast<const size_t*>(&v.y));
+			return h;
+		}
+	};
+}

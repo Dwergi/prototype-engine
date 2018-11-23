@@ -7,20 +7,18 @@
 #pragma once
 
 #include "OpenGL.h"
-#include "ShaderHandle.h"
+#include "ShaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
 
 namespace ddr
 {
 	struct ICamera;
-	class Texture;
+	struct Texture;
 	struct UniformStorage;
 
-	class FrameBuffer
+	struct FrameBuffer
 	{
-	public:
-
 		FrameBuffer();
 		FrameBuffer( const FrameBuffer& other );
 		~FrameBuffer();

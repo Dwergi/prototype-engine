@@ -30,7 +30,6 @@
 #include "FrameBuffer.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
-#include "FSM.h"
 #include "GLFWInputSource.h"
 #include "HitTestSystem.h"
 #include "IDebugPanel.h"
@@ -102,7 +101,6 @@ ddc::World* s_world = nullptr;
 AngelScriptEngine* s_scriptEngine = nullptr;
 FrameTimer* s_frameTimer = nullptr;
 ShipSystem* s_shipSystem = nullptr;
-FSM* s_fsm = nullptr;
 InputBindings* input_bindings = nullptr;
 DebugConsole* s_debugConsole = nullptr;
 
@@ -304,6 +302,22 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	shaky_cam.Update( delta_t );
 }
 
+void CreateSingletons()
+{
+	ddr::MeshManager::RegisterSingleton( new ddr::MeshManager() );
+	ddr::MaterialManager::RegisterSingleton( new ddr::MaterialManager() );
+	ddr::ShaderManager::RegisterSingleton( new ddr::ShaderManager() );
+	ddc::EntityPrototypeManager::RegisterSingleton( new ddc::EntityPrototypeManager() );
+}
+
+void UpdateSingletons()
+{
+	ddr::MeshManager::Instance()->Update();
+	ddr::MaterialManager::Instance()->Update();
+	ddr::ShaderManager::Instance()->Update();
+	ddc::EntityPrototypeManager::Instance()->Update();
+}
+
 ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::vec4 colour, glm::vec3 pos, glm::quat rot, glm::vec3 scale )
 {
 	ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, dd::ColourComponent>();
@@ -321,103 +335,80 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 	colour_cmp->Colour = colour;
 
 	dd::BoundBoxComponent* bounds_cmp = world.Access<dd::BoundBoxComponent>( entity );
-	bounds_cmp->BoundBox = ddr::Mesh::Get( mesh_h )->GetBoundBox();
+	bounds_cmp->BoundBox = ddr::MeshManager::Instance()->Get( mesh_h )->GetBoundBox();
 
 	world.AddTag( entity, ddc::Tag::Visible );
 
 	return entity;
 }
 
+void CreateMeshShader()
+{
+	ddr::ShaderHandle shader_h = ddr::ShaderManager::Instance()->Load( "mesh" );
+	ddr::ShaderProgram* shader = shader_h.Access();
+	DD_ASSERT( shader != nullptr );
+
+	ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+	ddr::Material* material = material_h.Access();
+	DD_ASSERT( material != nullptr );
+
+	material->SetShader( shader_h );
+}
+
 void CreateUnitCube()
 {
-	ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
+	ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
 	if( !unitCube.IsValid() )
 	{
-		unitCube = ddr::Mesh::Create( "cube" );
+		unitCube = ddr::MeshManager::Instance()->Create( "cube" );
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( unitCube );
+		ddr::Mesh* mesh = unitCube.Access();
 		DD_ASSERT( mesh != nullptr );
 
-		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
-		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
-		DD_ASSERT( shader != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
-		ddr::Material* material = ddr::Material::Get( material_h );
-		DD_ASSERT( material != nullptr );
-
-		material->SetShader( shader_h );
+		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
 		mesh->SetMaterial( material_h );
 
-		shader->Use( true );
-
 		dd::MakeUnitCube( *mesh );
-
-		shader->Use( false );
 	}
 }
 
 void CreateUnitSphere()
 {
-	ddr::MeshHandle unitSphere = ddr::Mesh::Find( "sphere" );
+	ddr::MeshHandle unitSphere = ddr::MeshManager::Instance()->Find( "sphere" );
 	if( !unitSphere.IsValid() )
 	{
-		unitSphere = ddr::Mesh::Create( "sphere" );
+		unitSphere = ddr::MeshManager::Instance()->Create( "sphere" );
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( unitSphere );
+		ddr::Mesh* mesh = unitSphere.Access();
 		DD_ASSERT( mesh != nullptr );
 
-		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
-		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
-		DD_ASSERT( shader != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
-		ddr::Material* material = ddr::Material::Get( material_h );
-		DD_ASSERT( material != nullptr );
-
-		material->SetShader( shader_h );
+		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
 		mesh->SetMaterial( material_h );
 
-		shader->Use( true );
-
 		dd::MakeIcosphere( *mesh, 2 );
-
-		shader->Use( false );
 	}
 }
 
 void CreateQuad()
 {
-	ddr::MeshHandle quad = ddr::Mesh::Find( "quad" );
+	ddr::MeshHandle quad = ddr::MeshManager::Instance()->Find( "quad" );
 	if( !quad.IsValid() )
 	{
-		quad = ddr::Mesh::Create( "quad" );
+		quad = ddr::MeshManager::Instance()->Create( "quad" );
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( quad );
+		ddr::Mesh* mesh = quad.Access();
 		DD_ASSERT( mesh != nullptr );
 
-		ddr::ShaderHandle shader_h = ddr::ShaderProgram::Load( "mesh" );
-		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( shader_h );
-		DD_ASSERT( shader != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::Material::Create( "mesh" );
-		ddr::Material* material = ddr::Material::Get( material_h );
-		DD_ASSERT( material != nullptr );
-
-		material->SetShader( shader_h );
+		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Find( "mesh" );
 		mesh->SetMaterial( material_h );
 
-		shader->Use( true );
-
 		dd::MakeQuad( *mesh );
-
-		shader->Use( false );
 	}
 }
 
 ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
 {
-	ddr::MeshHandle mesh_h = ddr::Mesh::Find( "sphere" );
+	ddr::MeshHandle mesh_h = ddr::MeshManager::Instance()->Find( "sphere" );
 
 	ddc::Entity entity = CreateMeshEntity( *s_world, mesh_h, colour,
 		translation,
@@ -482,18 +473,12 @@ int GameMain()
 		//trench_system.CreateRenderResources();
 
 		s_fpsCamera = new FPSCamera( *s_window );
-		s_fpsCamera->SetPosition( glm::vec3( 0, 20, 0 ) );
-		s_fpsCamera->SetRotation( 0, 0 );
-
 		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *input_bindings );
 		
 		s_freeCamera = new FreeCameraController( *s_fpsCamera );
 		s_freeCamera->BindActions( *input_bindings );
 
 		HitTestSystem* hit_testing = new HitTestSystem();
-
-		MousePicking* mouse_picking = new MousePicking( *s_window, *input_source, *hit_testing );
-		mouse_picking->BindActions( *input_bindings );
 
 		PhysicsSystem* physics_system = new PhysicsSystem();
 		
@@ -523,8 +508,10 @@ int GameMain()
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
-		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *mouse_picking, *jobsystem );
+		MousePicking* mouse_picking = new MousePicking( *s_window, *input_source, *hit_testing );
+		mouse_picking->BindActions( *input_bindings );
 
+		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer( *jobsystem );
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
 
 		ddr::BoundsRenderer* bounds_renderer = new ddr::BoundsRenderer();
@@ -567,6 +554,8 @@ int GameMain()
 
 		s_world->Initialize();
 
+		CreateSingletons();
+		CreateMeshShader();
 		CreateUnitCube();
 		CreateUnitSphere();
 		CreateQuad();
@@ -584,8 +573,7 @@ int GameMain()
 			light->Intensity = 0.7;
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
-			glm::vec3 direction( 0.5, 0.4, -0.3 );
-			transform->Position = direction;
+			transform->Rotation = glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 1, 0 ) );
 			transform->Update();
 		}
 
@@ -668,7 +656,7 @@ int GameMain()
 
 		// bounds
 		{
-			//ddr::MeshHandle unitCube = ddr::Mesh::Find( "cube" );
+			//ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
 
 			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 1, 1, 1 ), glm::translate( glm::vec3( 10, 60, 10 ) ) );
 		}
@@ -696,7 +684,7 @@ int GameMain()
 					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, 0 ) ) *
 						glm::scale( glm::vec3( static_sphere_size ) );
 
-					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::MeshManager::Instance()->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
@@ -708,7 +696,7 @@ int GameMain()
 					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, -static_sphere_size * 1.3f ) ) *
 						glm::scale( glm::vec3( static_sphere_size ) );
 
-					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::MeshManager::Instance()->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
@@ -720,7 +708,7 @@ int GameMain()
 					glm::mat4 transform = glm::translate( glm::vec3( 0, static_sphere_size * -0.7f, static_sphere_size * 1.3f ) ) *
 						glm::scale( glm::vec3( static_sphere_size ) );
 
-					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::Mesh::Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
+					ddc::Entity sphere = CreateMeshEntity( *s_world, ddr::MeshManager::Instance()->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), transform );
 					s_world->AddTag( sphere, ddc::Tag::Static );
 
 					dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
@@ -730,21 +718,22 @@ int GameMain()
 			}*/
 
 			float plane_size = 100;
-			ddc::EntityPrototype phys_plane_proto( "physics_plane" );
+			auto proto_h = ddc::EntityPrototypeManager::Instance()->Create( "physics_plane" );
+			ddc::EntityPrototype* phys_plane_proto = proto_h.Access();
 
 			{
-				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::Mesh::Find( "quad" ), glm::vec4( 0.2, 0.8, 0.2, 1 ), glm::vec3( 0 ), glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ), glm::vec3( plane_size ) );
+				ddc::Entity plane = CreateMeshEntity( *s_world, ddr::MeshManager::Instance()->Find( "quad" ), glm::vec4( 0.2, 0.8, 0.2, 1 ), glm::vec3( 0 ), glm::angleAxis( glm::radians( 45.0f ), glm::vec3( 1, 0, 0 ) ), glm::vec3( plane_size ) );
 				s_world->AddTag( plane, ddc::Tag::Static );
 
 				dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
 				physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
 				physics_plane.Elasticity = 0.95f;
 
-				phys_plane_proto.CreateFromEntity( plane, *s_world );
+				phys_plane_proto->PopulateFromEntity( plane, *s_world );
 			}
 
 			{
-				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				ddc::Entity plane = phys_plane_proto->Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.8, 0.2, 0.2, 1 );
 
@@ -754,7 +743,7 @@ int GameMain()
 			}
 
 			{
-				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				ddc::Entity plane = phys_plane_proto->Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.8, 0.8, 0.2, 1 );
 
@@ -766,7 +755,7 @@ int GameMain()
 			}
 
 			{
-				ddc::Entity plane = phys_plane_proto.Instantiate( *s_world );
+				ddc::Entity plane = phys_plane_proto->Instantiate( *s_world );
 				dd::ColourComponent* clr = s_world->Access<dd::ColourComponent>( plane );
 				clr->Colour = glm::vec4( 0.2, 0.2, 0.8, 1 );
 
@@ -812,6 +801,8 @@ int GameMain()
 
 			s_input->Update( app_delta_t );
 			s_debugUI->StartFrame( s_frameTimer->AppDelta() );
+
+			UpdateSingletons();
 
 			s_world->Update( game_delta_t );
 

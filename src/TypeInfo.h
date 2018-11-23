@@ -169,6 +169,7 @@ namespace dd
 		static bool sm_defaultsRegistered;
 		static std::unordered_map<String64, TypeInfo*>* sm_typeMap;
 		static std::vector<std::function<void()>>* sm_registrations;
+		static std::vector<TypeInfo*>* sm_components;
 
 		static AngelScriptEngine* sm_scriptEngine;
 

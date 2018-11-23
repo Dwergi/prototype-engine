@@ -9,7 +9,7 @@
 namespace ddr
 {
 	struct ShaderProgram;
-	class Texture;
+	struct Texture;
 
 	enum class UniformType
 	{

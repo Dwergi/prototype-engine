@@ -25,14 +25,16 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
+#include "fmt/format.h"
+
 namespace dd
 {
-	static glm::vec4 GetMeshColour( const TerrainChunkKey& key )
+	static glm::vec4 GetMeshColour( glm::vec2 pos, int lod )
 	{
 		glm::vec4 colour( 0, 0, 0, 1 );
 
-		int element = key.LOD % 3;
-		int intensity = key.LOD / 3 + 1;
+		int element = lod % 3;
+		int intensity = lod / 3 + 1;
 
 		int xElement = 0;
 		int yElement = 0;
@@ -54,8 +56,8 @@ namespace dd
 			break;
 		}
 
-		colour[xElement] = std::abs( std::fmod( key.X, 255.f ) ) / 255.f;
-		colour[yElement] = std::abs( std::fmod( key.Y, 255.f ) ) / 255.f;
+		colour[xElement] = std::abs( std::fmod( pos.x, 255.f ) ) / 255.f;
+		colour[yElement] = std::abs( std::fmod( pos.y, 255.f ) ) / 255.f;
 		colour[element] = 1.0f / intensity;
 
 		return colour;
@@ -67,7 +69,6 @@ namespace dd
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
 		RequireWrite<TerrainChunkComponent>();
-		RequireWrite<MeshComponent>();
 		RequireWrite<BoundBoxComponent>();
 		RequireWrite<TransformComponent>();
 		RequireWrite<ColourComponent>();
@@ -112,18 +113,14 @@ namespace dd
 		DD_TODO( "Introduce Camera Component and use that here." );
 		glm::vec3 pos( 0.0f, 0.0f, 0.0f );
 
-		glm::ivec2 origin( (int) (pos.x / m_params.ChunkSize), (int) (pos.z / m_params.ChunkSize) );
-		if( m_previousOffset != origin )
-		{
-			GenerateTerrain( world, data, origin );
+		GenerateChunks( world, data, pos.xz );
 
-			m_previousOffset = origin;
-		}
+		DD_TODO( "Hmm, this means that the first generated chunks won't be updated/rendered the first frame." );
 
+		auto entities = data.Entities();
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto transforms = data.Write<TransformComponent>();
 		auto bounds = data.Write<BoundBoxComponent>();
-		auto meshes = data.Write<MeshComponent>();
 		auto colours = data.Write<ColourComponent>();
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -137,34 +134,71 @@ namespace dd
 				world.RemoveTag( data.Entities()[i], ddc::Tag::Visible );
 			}
 
-			UpdateChunk( chunks[ i ], meshes[ i ], bounds[ i ], transforms[ i ], colours[ i ] );
+			UpdateChunk( world, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], pos.xz );
 		}
 	}
 
-	void TerrainSystem::UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, 
-		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp, ColourComponent& colour_cmp )
+	int TerrainSystem::CalculateLOD( glm::vec2 chunk_pos, glm::vec2 camera_pos ) const
+	{
+		float distance = glm::distance( chunk_pos, camera_pos );
+
+		for( int i = 0; i < TerrainParameters::LODs; ++i )
+		{
+			float f = m_params.LODSwitchDistances[ i ];
+			if( distance < f )
+			{
+				return i;
+			}
+		}
+
+		return TerrainParameters::LODs - 1;
+	}
+
+	void TerrainSystem::UpdateChunk( ddc::World& world, ddc::Entity e, TerrainChunkComponent& chunk_cmp, 
+		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp, ColourComponent& colour_cmp, glm::vec2 camera_pos )
 	{
 		if( m_params.UseDebugColours )
 		{
-			colour_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetKey() );
+			colour_cmp.Colour = GetMeshColour( chunk_cmp.Chunk->GetPosition(), chunk_cmp.Chunk->GetLOD() );
 		}
 		else
 		{
 			colour_cmp.Colour = glm::vec4( 1, 1, 1, 1 );
 		}
 
-		chunk_cmp.Chunk->Update( m_jobsystem );
-		mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 		bounds_cmp.BoundBox = chunk_cmp.Chunk->GetBounds();
 
-		transform_cmp.Position = chunk_cmp.Chunk->GetPosition();
+		glm::vec2 pos = chunk_cmp.Chunk->GetPosition();
+
+		chunk_cmp.Chunk->SwitchLOD( CalculateLOD( pos, camera_pos ) );
+		chunk_cmp.Chunk->Update();
+
+		transform_cmp.Position = glm::vec3( pos.x, 0, pos.y );
 		transform_cmp.Update();
+
+		if( chunk_cmp.Chunk->GetMesh().IsValid() )
+		{
+			if( !world.Has<MeshComponent>( e ) )
+			{
+				MeshComponent& mesh_cmp = world.Add<MeshComponent>( e );
+				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
+			}
+		}
 	}
 
-	void TerrainSystem::GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset )
+	void TerrainSystem::GenerateChunks( ddc::World& world, const ddc::DataBuffer& data, glm::vec2 camera_pos )
 	{
-		Vector<TerrainChunkKey> required_chunks;
-		required_chunks.Reserve( ChunksPerDimension * ChunksPerDimension );
+		auto chunks = data.Write<TerrainChunkComponent>();
+		auto entities = data.Entities();
+
+		std::vector<glm::vec2> required_chunks;
+		required_chunks.reserve( ChunksPerDimension * ChunksPerDimension );
+
+		glm::vec2 offset( (int) (camera_pos.x / m_params.ChunkSize), (int) (camera_pos.y / m_params.ChunkSize) );
+		if( m_previousOffset == offset )
+			return;
+
+		m_previousOffset = offset;
 
 		int half_chunks = ChunksPerDimension / 2;
 
@@ -172,131 +206,77 @@ namespace dd
 		{
 			for( int x = -half_chunks; x < half_chunks; ++x )
 			{
-				TerrainChunkKey key;
-				key.X = offset.x * m_params.ChunkSize + x * m_params.ChunkSize;
-				key.Y = offset.y * m_params.ChunkSize + y * m_params.ChunkSize;
-				key.LOD = 4;
+				glm::vec2 pos;
+				pos.x = offset.x * m_params.ChunkSize + x * m_params.ChunkSize;
+				pos.y = offset.y * m_params.ChunkSize + y * m_params.ChunkSize;
 
-				required_chunks.Add( key );
+				required_chunks.push_back( pos );
 			}
 		}
 
-		DD_ASSERT( required_chunks.Size() == ChunksPerDimension * ChunksPerDimension );
+		DD_ASSERT( required_chunks.size() == ChunksPerDimension * ChunksPerDimension );
 
-		/*// start with a 4x4 grid of the lowest LOD level, 
-		// then at each level generate the center-most 2x2 grid into a 4x4 grid of one LOD level lower
-		for( int lod = 0; lod < TerrainChunk::MaxLODs; ++lod )
-		{
-			GenerateLODLevel( lod, required_chunks, offset );
-		}*/
-
-		UpdateTerrainChunks( world, data, required_chunks );
-	}
-
-	void TerrainSystem::UpdateTerrainChunks( ddc::World& world, const ddc::DataBuffer& data, const Vector<TerrainChunkKey>& required_chunks )
-	{
-		auto meshes = data.Write<MeshComponent>();
-		auto chunks = data.Write<TerrainChunkComponent>();
-
-		auto entities = data.Entities();
-
-		m_existing.clear();
+		std::unordered_map<glm::vec2, ddc::Entity> existing;
+		existing.reserve( entities.size() );
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
 			world.RemoveTag( entities[ i ], ddc::Tag::Visible );
 
-			m_existing.insert( std::make_pair( chunks[ i ].Chunk->GetKey(), entities[ i ] ) );
+			existing.insert( std::make_pair( chunks[ i ].Chunk->GetPosition(), entities[ i ] ) );
 		}
 
-		Vector<TerrainChunkKey> missing_chunks;
-		missing_chunks.Reserve( required_chunks.Size() );
+		std::vector<glm::vec2> missing_chunks;
+		missing_chunks.reserve( required_chunks.size() );
 
-		m_active.Clear();
+		std::vector<ddc::Entity> active;
+		active.reserve( required_chunks.size() );
 
-		for( const TerrainChunkKey& required : required_chunks )
+		for( glm::vec2 required : required_chunks )
 		{
-			auto it = m_existing.find( required );
-			if( it != m_existing.end() )
+			auto it = existing.find( required );
+			if( it != existing.end() )
 			{
-				m_active.Add( it->second );
+				active.push_back( it->second );
 			}
 			else
 			{
-				missing_chunks.Add( required );
+				missing_chunks.push_back( required );
 			}
 		}
-		
-		for( ddc::Entity entity : m_active )
+
+		for( ddc::Entity entity : active )
 		{
 			world.AddTag( entity, ddc::Tag::Visible );
 		}
 
-		for( const TerrainChunkKey& key : missing_chunks )
+		for( glm::vec2 pos : missing_chunks )
 		{
-			ddc::Entity created = CreateChunk( world, key );
-			m_existing.insert( std::make_pair( key, created ) );
+			int lod = CalculateLOD( pos, camera_pos );
+			ddc::Entity created = CreateChunk( world, pos, lod );
+			existing.insert( std::make_pair( pos, created ) );
 		}
 	}
 
-	void TerrainSystem::GenerateLODLevel( int lod, Vector<TerrainChunkKey>& to_generate, const glm::ivec2 offset )
-	{
-		DD_PROFILE_SCOPED( TerrainSystem_GenerateLODLevel );
-
-		const int halfChunks = ChunksPerDimension / 2;
-		const int quarterChunks = halfChunks / 2;
-
-		int generated = 0;
-
-		for( int y = -halfChunks; y < halfChunks; ++y )
-		{
-			for( int x = -halfChunks; x < halfChunks; ++x )
-			{
-				// don't generate chunks for the middle-most grid unless we're at LOD 0
-				if( lod != 0 &&
-					(x >= -quarterChunks && x < quarterChunks) &&
-					(y >= -quarterChunks && y < quarterChunks) )
-				{
-					continue;
-				}
-
-				TerrainChunkKey key;
-				key.X = offset.x * m_params.ChunkSize + x * m_params.ChunkSize;
-				key.Y = offset.y * m_params.ChunkSize + y * m_params.ChunkSize;
-				key.LOD = lod;
-
-				to_generate.Add( key );
-
-				++generated;
-			}
-		}
-
-		const int expected = lod == 0 ? ChunksPerDimension * ChunksPerDimension : // lod 0
-			(ChunksPerDimension * ChunksPerDimension - halfChunks * halfChunks); // rest of the LODs
-
-		DD_ASSERT( expected == generated, "Wrong amount of chunks have been generated!\nExpected: %d\tActual: %d", expected, generated );
-	}
-
-	ddc::Entity TerrainSystem::CreateChunk( ddc::World& world, const TerrainChunkKey& key )
+	ddc::Entity TerrainSystem::CreateChunk( ddc::World& world, glm::vec2 pos, int lod )
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		ddc::Entity& entity = world.CreateEntity<TransformComponent, MeshComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
+		ddc::Entity& entity = world.CreateEntity<TransformComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		ColourComponent* colour_cmp = world.Access<ColourComponent>( entity );
 		colour_cmp->Colour = glm::vec4( 1 );
 
 		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
-		transform_cmp->Position = glm::vec3( key.X, 0, key.Y );
+		transform_cmp->Position = glm::vec3( pos.x, 0, pos.y );
 		transform_cmp->Update();
 
 		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
-		TerrainChunk* chunk = new TerrainChunk( m_params, key );
+		TerrainChunk* chunk = new TerrainChunk( m_jobsystem, m_params, pos );
+		chunk->SwitchLOD( lod );
 		chunk_cmp->Chunk = chunk;
-
-		chunk->Generate(); 
-		chunk->Update( m_jobsystem );
+		chunk->Update();
 
 		return entity;
 	}
@@ -330,8 +310,7 @@ namespace dd
 	{
 		ImGui::Checkbox( "Draw", &m_draw );
 
-		ImGui::Value( "Chunks", (int) m_existing.size() );
-		ImGui::Value( "Active", m_active.Size() );
+		ImGui::Value( "Active", m_activeCount );
 
 		ImGui::Checkbox( "Debug Colours", &m_params.UseDebugColours );
 
@@ -362,15 +341,18 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Height Colours", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
+			float previous = 0;
+
 			for( int i = 0; i < m_params.HeightLevelCount; ++i )
 			{
-				char name[ 64 ];
-				snprintf( name, 64, "Height %d", i );
+				std::string str = fmt::format( "Height {}", i );
 
-				if( ImGui::TreeNodeEx( name, ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
+				if( ImGui::TreeNodeEx( str.c_str(), ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen ) )
 				{
 					ImGui::ColorEdit3( "Colour", glm::value_ptr( m_params.HeightColours[i] ) );
-					ImGui::DragFloat( "Cutoff", &m_params.HeightCutoffs[ i ], 0.01f, 0.0f, 1.0f );
+					ImGui::DragFloat( "Cutoff", &m_params.HeightCutoffs[ i ], 0.01f, previous, 1.0f );
+
+					previous = m_params.HeightCutoffs[ i ];
 
 					ImGui::TreePop();
 				}
@@ -382,13 +364,31 @@ namespace dd
 		{
 			for( int i = 0; i < m_params.Octaves; ++i )
 			{
-				char name[64];
-				snprintf( name, 64, "Amplitude %d", i );
+				std::string str = fmt::format( "Amplitude {}", i );
 
-				if( ImGui::DragFloat( name, &m_params.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
+				if( ImGui::DragFloat( str.c_str(), &m_params.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
 				{
 					m_requiresRegeneration = true;
 				}
+			}
+
+			ImGui::TreePop();
+		}
+
+		if( ImGui::TreeNodeEx( "LODs", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			float previous = 0;
+
+			for( int i = 0; i < m_params.LODs; ++i )
+			{
+				std::string str = fmt::format( "LOD {}", i );
+
+				if( ImGui::DragFloat( str.c_str(), &m_params.LODSwitchDistances[ i ], 1.0f, previous, 4096.0f ) )
+				{
+					m_requiresRegeneration = true;
+				}
+
+				previous = m_params.LODSwitchDistances[ i ];
 			}
 
 			ImGui::TreePop();

@@ -7,37 +7,27 @@
 #pragma once
 
 #include "AABB.h"
-#include "MaterialHandle.h"
-#include "MeshHandle.h"
-#include "ShaderHandle.h"
-#include "TerrainChunkKey.h"
+#include "FSM.h"
+#include "JobSystem.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "ShaderProgram.h"
+#include "TerrainParameters.h"
 
 namespace ddr
 {
 	struct ICamera;
-	struct ShaderProgram;
 	struct UniformStorage;
 }
 
 namespace dd
 {
-	struct JobSystem;
-
-	struct TerrainParameters;
-
-	class TerrainChunk
+	struct TerrainChunk
 	{
-	public:
-
-		//
-		// Maximum number of LODs.
-		//
-		static const int MaxLODs = 6;
-
 		//
 		// The number of vertices per dimension of the chunk.
 		//
-		static const int MaxVertices = 1 << MaxLODs;
+		static const int MaxVertices = 1 << TerrainParameters::LODs;
 
 		//
 		// Initialize resources that are shared between all chunks.
@@ -49,22 +39,20 @@ namespace dd
 		//
 		static void CreateRenderResources();
 
-		TerrainChunk( const TerrainParameters& params, const TerrainChunkKey& key );
+		TerrainChunk( JobSystem& jobsystem, const TerrainParameters& params, glm::vec2 position );
 		~TerrainChunk();
 		
-		void Generate();
+		void SwitchLOD( int lod );
 		void SetNoiseOffset( glm::vec2 origin );
 
-		void Update( JobSystem& job_system );
-		void RenderUpdate( ddr::UniformStorage& uniforms );
-
-		void Destroy();
+		void Update();
+		void RenderUpdate();
 
 		void WriteHeightImage( const char* filename ) const;
 
-		const TerrainChunkKey& GetKey() const { return m_key; }
 		AABB GetBounds() const { return m_bounds; }
-		glm::vec3 GetPosition() const { return m_position; }
+		glm::vec2 GetPosition() const { return m_position; }
+		int GetLOD() const { return m_lod; }
 		
 		ddr::MeshHandle GetMesh() const { return m_mesh; }
 
@@ -74,34 +62,49 @@ namespace dd
 		static const int FlapVertexCount = (MaxVertices + 1) * 4;
 		static const int TotalVertexCount = MeshVertexCount + FlapVertexCount;
 
-		static std::vector<uint> s_indices[MaxLODs];
-		static ConstBuffer<uint> s_indexBuffers[MaxLODs];
+		static std::vector<uint> s_indices[ TerrainParameters::LODs ];
+		static ConstBuffer<uint> s_indexBuffers[ TerrainParameters::LODs ];
 
 		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
 
 		const TerrainParameters& m_terrainParams;
-		TerrainChunkKey m_key;
-		
-		bool m_destroy { false };
-		bool m_renderDirty { false };
-		bool m_dataDirty { false };
+
+		enum ChunkStates
+		{
+			INITIALIZE_PENDING,
+			INITIALIZE_DONE,
+			UPDATE_PENDING,
+			UPDATE_DONE,
+			RENDER_UPDATE_PENDING,
+			RENDER_UPDATE_DONE,
+			READY
+		};
+
+		static dd::FSMPrototype s_fsmPrototype;
+		dd::FSM m_state;
+
+		dd::JobSystem& m_jobsystem;
 		ddr::MeshHandle m_mesh;
 
-		glm::vec3 m_position;
+		glm::vec2 m_position;
 		AABB m_bounds;
 
-		glm::vec3 m_vertices[ TotalVertexCount ];
-		Buffer<glm::vec3> m_verticesBuffer;
+		std::vector<glm::vec3> m_vertices;
+		ConstBuffer<glm::vec3> m_verticesBuffer;
 
 		glm::vec2 m_noiseOffset;
 
-		int m_minLod { MaxLODs }; // the best quality LOD that's already been generated
+		int m_lod;
+		int m_minLod { TerrainParameters::LODs }; // the best quality LOD that's already been generated
+
+		bool m_dirty { false };
 		
 		float GetNoise( float x, float y );
 
-		void UpdateVertices( glm::vec2 chunkPos );
+		void UpdateVertices();
+		void Initialize();
 
-		ddr::Mesh* CreateMesh( const TerrainChunkKey& key );
+		void CreateMesh( glm::vec2 pos );
 	};
 }

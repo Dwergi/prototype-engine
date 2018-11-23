@@ -29,6 +29,7 @@ namespace ddc
 	};
 
 	typedef std::bitset<MAX_TAGS> TagBits;
+	typedef std::bitset<MAX_COMPONENTS> ComponentBits;
 
 	struct System;
 	struct SystemNode;
@@ -64,7 +65,7 @@ namespace ddc
 
 		// 
 		// Destroy an entity.
-		// This entity may still participate in the current frame's updates, but will be destroy in the next Update().
+		// This entity may still participate in the current frame's updates, but will be destroyed in the next Update().
 		//
 		void DestroyEntity( Entity entity );
 
@@ -234,11 +235,22 @@ namespace ddc
 		struct EntityEntry
 		{
 			Entity Entity;
-			std::bitset<MAX_COMPONENTS> Ownership;
+
+			union
+			{
+				struct
+				{
+					byte Alive : 1;
+					byte Create : 1;
+					byte Destroy : 1;
+				};
+
+				uint Flags { 0 };
+			};
+
+			ComponentBits Ownership;
 			TagBits Tags;
 		};
-
-		uint m_count { 0 };
 
 		dd::MessageQueue m_messages;
 		dd::JobSystem& m_jobsystem;
@@ -278,15 +290,14 @@ namespace ddc
 	void World::ForAllWith( std::function<void( Entity, T& )> fn ) const
 	{
 		const dd::TypeInfo* type = DD_TYPE( T );
-		std::bitset<MAX_COMPONENTS> mask;
+		ComponentBits mask;
 		mask.set( type->ComponentID(), true );
 
-		for( uint i = 0; i < m_count; ++i )
+		for( const EntityEntry& entry : m_entities )
 		{
-			const EntityEntry& entry = m_entities[ i ];
 			if( IsAlive( entry.Entity ) )
 			{
-				std::bitset<MAX_COMPONENTS> entity_mask = mask;
+				ComponentBits entity_mask = mask;
 				entity_mask &= entry.Ownership;
 
 				if( entity_mask.any() )

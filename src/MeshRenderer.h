@@ -8,7 +8,7 @@
 
 #include "Entity.h"
 #include "IDebugPanel.h"
-#include "MeshHandle.h"
+#include "Mesh.h"
 #include "Renderer.h"
 
 namespace dd
@@ -17,7 +17,6 @@ namespace dd
 	struct ColourComponent;
 	struct JobSystem;
 	struct MeshComponent; 
-	struct MousePicking;
 	struct TransformComponent;
 }
 
@@ -26,8 +25,7 @@ namespace ddr
 	class MeshRenderer : public dd::IDebugPanel, public ddr::Renderer
 	{
 	public:
-
-		MeshRenderer( const dd::MousePicking& mouse_picking, dd::JobSystem& job_system );
+		MeshRenderer( dd::JobSystem& job_system );
 
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void Render( const ddr::RenderData& render_data ) override;
@@ -46,7 +44,6 @@ namespace ddr
 
 		MeshHandle m_cube;
 		
-		const dd::MousePicking& m_mousePicking;
 		dd::JobSystem& m_jobsystem;
 
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,

@@ -7,8 +7,8 @@
 #pragma once
 
 #include "AABB.h"
-#include "MaterialHandle.h"
-#include "MeshHandle.h"
+#include "HandleManager.h"
+#include "Material.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -24,36 +24,14 @@ namespace dd
 namespace ddr
 {
 	struct ICamera;
-	struct MeshHandle;
 	struct ShaderProgram;
 	struct UniformStorage;
 
 	//
 	// A mesh asset.
 	//
-	struct Mesh
+	struct Mesh : dd::HandleTarget
 	{
-		//
-		// Create (or retrieve) a handle to a mesh with the given name.
-		//
-		static MeshHandle Create( const char* name );
-
-		//
-		// Find a handle to a mesh with the given name.
-		//
-		static MeshHandle Find( const char* name );
-
-		//
-		// Get the mesh instance associated with the given handle.
-		// Returns null if the handle does not reference a mesh that still exists.
-		//
-		static Mesh* Get( MeshHandle handle );
-
-		//
-		// Destroy the mesh associated with the given handle. 
-		//
-		static void Destroy( MeshHandle handle );
-
 		//
 		// Render this mesh in the given camera viewport.
 		//
@@ -133,16 +111,12 @@ namespace ddr
 		//
 		void UpdateBuffers( dd::JobSystem& jobsystem );
 
-		//
-		// Get the name of this mesh.
-		//
-		const dd::String& GetName() const { return m_name; }
-
 		bool IsDirty() const { return m_dirty; }
 		void SetDirty() { m_dirty = true; }
 
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
 
+		Mesh();
 		~Mesh();
 
 		Mesh& operator=( const Mesh& ) = delete;
@@ -151,8 +125,6 @@ namespace ddr
 		Mesh( Mesh&& ) = delete;
 
 	private:
-
-		static std::vector<Mesh*> m_instances;
 
 		bool m_dirty { false };
 		
@@ -166,15 +138,15 @@ namespace ddr
 		
 		VAO m_vao;
 
-		dd::String128 m_name;
 		dd::AABB m_bounds;
 
 		dd::BVHTree* m_bvh { nullptr };
-
-		Mesh( const char* name );
 
 		void BindToShader( ShaderProgram& shader );
 
 		void RebuildBVH();
 	};
+
+	using MeshHandle = dd::Handle<ddr::Mesh>;
+	using MeshManager = dd::HandleManager<Mesh>;
 }

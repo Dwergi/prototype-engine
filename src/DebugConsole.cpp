@@ -225,7 +225,7 @@ namespace dd
 
 		// Insert into history. First find match and delete it so it can be pushed to the back. This isn't trying to be smart or optimal.
 		m_historyPos = -1;
-		for( size_t i = m_history.size() - 1; i >= 0; --i )
+		for( int i = (int) m_history.size() - 1; i >= 0; --i )
 		{
 			if( EqualsCaseless( m_history[i], command_line ) )
 			{

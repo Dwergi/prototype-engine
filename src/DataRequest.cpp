@@ -8,14 +8,14 @@ namespace ddc
 		m_usage( usage ),
 		m_cardinality( cardinality )
 	{
-		DD_ASSERT( component != nullptr );
-
 		if( name != nullptr )
 		{
 			m_name = name;
 		}
 
 		m_buffer = new byte[ component->Size() * MAX_ENTITIES ];
+
+		DD_ASSERT( m_component != nullptr );
 	}
 
 	DataRequest::DataRequest( const DataRequest& other )
@@ -25,5 +25,7 @@ namespace ddc
 		m_buffer = other.m_buffer;
 		m_cardinality = other.m_cardinality;
 		m_name = other.m_name;
+
+		DD_ASSERT( m_component != nullptr );
 	}
 }

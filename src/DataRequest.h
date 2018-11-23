@@ -39,7 +39,7 @@ namespace ddc
 		DataCardinality Cardinality() const { return m_cardinality; }
 		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
 		DataUsage Usage() const { return m_usage; }
-		const dd::TypeInfo& Component() const { return *m_component; }
+		const dd::TypeInfo& Component() const { DD_ASSERT( m_component != nullptr ); return *m_component; }
 
 	protected:
 		DataRequest( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name );

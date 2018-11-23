@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "MeshHandle.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
+#include "Mesh.h"
 #include "System.h"
 
 namespace dd

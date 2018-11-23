@@ -47,10 +47,10 @@ namespace ddr
 
 	void RayRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderProgram::Load( "line" );
-		DD_ASSERT( m_shader.Valid() );
+		m_shader = ShaderManager::Instance()->Load( "line" );
+		DD_ASSERT( m_shader.IsValid() );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		ShaderProgram* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );
@@ -73,7 +73,7 @@ namespace ddr
 
 	void RayRenderer::Render( const ddr::RenderData& data )
 	{
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		ShaderProgram* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 		
 		shader->Use( true );

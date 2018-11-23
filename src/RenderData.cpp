@@ -13,7 +13,7 @@
 
 namespace ddr
 {
-	RenderData::RenderData( ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+	RenderData::RenderData( const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
 		const std::vector<ddc::Entity>& entities, const dd::IArray<const ddc::DataRequest*>& requests  ) :
 		m_camera( camera ),
 		m_uniforms( uniforms ),
@@ -29,7 +29,5 @@ namespace ddr
 			ddc::ComponentBuffer buffer( world, entities, *req );
 			m_buffers.push_back( buffer );
 		}
-
-		DD_ASSERT( m_buffers.size() > 0, "No requirements registered." );
 	}
 }

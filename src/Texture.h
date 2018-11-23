@@ -10,10 +10,8 @@
 
 namespace ddr
 {
-	class Texture
+	struct Texture
 	{
-	public:
-
 		Texture();
 		~Texture();
 

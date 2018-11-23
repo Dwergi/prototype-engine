@@ -65,6 +65,7 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 	{
 		// directional lights
 		attenuation = 1.0; 
+		lightDir = -light.Direction;
 	}
 	else if( light.Type == 1 )
 	{
@@ -101,7 +102,6 @@ vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 f
 	return finalColour;
 }
 
-
 void main()
 {
 	vec3 xTangent = dFdx( Fragment.Position );
@@ -117,20 +117,22 @@ void main()
 	vec3 toView = View[ 3 ].xyz - Fragment.Position;
 	float viewDistance = length( toView );
 
-	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
-	fogAmount = fogAmount * fogAmount;
-
-	if( fogAmount >= 1 )
+	if( Fog.Enabled )
 	{
-		Colour = vec4( Fog.Colour, 1 );
-		return;
+		float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
+		fogAmount = fogAmount * fogAmount;
+
+		if( fogAmount >= 1 )
+		{
+			Colour = vec4( Fog.Colour, 1 );
+			return;
+		}
 	}
 
 	vec4 finalColour = vec4( 0 );
-	
 	vec3 fragmentColour = Fragment.Colour.rgb;
 
-	vec3 viewDir = normalize( toView );
+	vec3 viewDir = toView / viewDistance;
 	for( int i = 0; i < LightCount; ++i )
 	{
 		finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, fragmentNormal, Fragment.Position, viewDir );
@@ -142,6 +144,9 @@ void main()
 
 	if( Fog.Enabled )
 	{
+		float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
+		fogAmount = fogAmount * fogAmount;
+
 		finalColour = mix( finalColour, vec4( Fog.Colour, 1 ), fogAmount );
 	}
 

@@ -85,7 +85,7 @@ namespace ddr
 	void WorldRenderer::DrawDebugInternal( ddc::World& world )
 	{
 		ImGui::Checkbox( "Draw Depth", &m_debugDrawDepth );
-		ImGui::Checkbox( "Draw Standard", &m_debugDrawStandard );
+		ImGui::Checkbox( "Draw Normals", &m_debugDrawNormals );
 
 		if( ImGui::TreeNodeEx( "Fog", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
@@ -104,7 +104,7 @@ namespace ddr
 
 	void WorldRenderer::SetRenderState()
 	{
-		if( m_debugDrawStandard )
+		if( !m_debugDrawDepth )
 		{
 			// depth test
 			glEnable( GL_DEPTH_TEST );
@@ -167,6 +167,11 @@ namespace ddr
 
 	void WorldRenderer::Render( ddc::World& world, const ddr::ICamera& camera )
 	{
+		for( ddr::Renderer* r : m_renderers )
+		{
+			r->RenderUpdate( world );
+		}
+
 		ddr::Renderer* debug_render = nullptr;
 
 		BeginRender( world, camera );
@@ -210,7 +215,7 @@ namespace ddr
 
 		if( m_reloadShaders )
 		{
-			ShaderProgram::ReloadAll();
+			ShaderManager::Instance()->ReloadAll();
 			m_reloadShaders = false;
 		}
 
@@ -235,7 +240,7 @@ namespace ddr
 
 		m_uniforms->Set( "View", camera.GetViewMatrix() );
 		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
-		m_uniforms->Set( "DrawStandard", m_debugDrawStandard );
+		m_uniforms->Set( "DrawNormals", m_debugDrawNormals );
 	}
 
 	void WorldRenderer::EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera )

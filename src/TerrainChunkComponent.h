@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include "TerrainChunkKey.h"
-
 namespace dd
 {
-	class TerrainChunk;
+	struct TerrainChunk;
 
 	struct TerrainChunkComponent
 	{

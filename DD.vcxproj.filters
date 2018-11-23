@@ -330,9 +330,6 @@
     <ClInclude Include="src\File.h">
       <Filter>File</Filter>
     </ClInclude>
-    <ClInclude Include="src\GenericHandle.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
     <ClInclude Include="src\TrenchSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
@@ -378,9 +375,6 @@
     <ClInclude Include="src\TerrainChunkComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\ShaderHandle.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\OpenGL.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -408,12 +402,6 @@
     <ClInclude Include="src\BVHTree.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MaterialHandle.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MeshHandle.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\Material.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -436,9 +424,6 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\TerrainChunk.h">
-      <Filter>Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainChunkKey.h">
       <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\Entity.h">
@@ -603,8 +588,8 @@
     <ClInclude Include="src\JSON.h">
       <Filter>JSON</Filter>
     </ClInclude>
-    <ClInclude Include="src\TerrainTile.h">
-      <Filter>Terrain</Filter>
+    <ClInclude Include="src\HandleManager.h">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -918,9 +903,6 @@
     <ClCompile Include="src\TerrainChunk.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\TerrainChunkKey.cpp">
-      <Filter>Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="src\World.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1042,9 +1024,6 @@
     <ClCompile Include="src\TerrainRenderer.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshHandle.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntityPrototype.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1065,9 +1044,6 @@
     </ClCompile>
     <ClCompile Include="src\JSON.cpp">
       <Filter>JSON</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainTile.cpp">
-      <Filter>Terrain</Filter>
     </ClCompile>
     <ClCompile Include="src\ParticleSystemRenderer.cpp">
       <Filter>Rendering</Filter>

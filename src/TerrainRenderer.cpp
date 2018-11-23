@@ -42,9 +42,6 @@ namespace ddr
 		Renderer( "Terrain" ),
 		m_params( params )
 	{
-		Require<dd::MeshComponent>();
-		Require<dd::TerrainChunkComponent>();
-
 		m_wireframe = new Wireframe();
 	}
 
@@ -53,18 +50,18 @@ namespace ddr
 		dd::TerrainChunk::CreateRenderResources();
 	}
 
+	void TerrainRenderer::RenderUpdate( ddc::World& world )
+	{
+		world.ForAllWith<dd::TerrainChunkComponent>( []( ddc::Entity, dd::TerrainChunkComponent& chunk )
+		{
+			chunk.Chunk->RenderUpdate();
+		} );
+	}
+
 	void TerrainRenderer::Render( const ddr::RenderData& data )
 	{
-		ddr::UniformStorage& uniforms = data.Uniforms();
-
-		m_params.UpdateUniforms( uniforms );
-
-		m_wireframe->UpdateUniforms( uniforms );
-
-		for( auto chunk : data.Get<dd::TerrainChunkComponent>() )
-		{
-			chunk.Chunk->RenderUpdate( data.Uniforms() );
-		}
+		m_params.UpdateUniforms( data.Uniforms() );
+		m_wireframe->UpdateUniforms( data.Uniforms() );
 	}
 
 	void TerrainRenderer::DrawDebugInternal( ddc::World& world )

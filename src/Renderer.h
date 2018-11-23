@@ -18,6 +18,7 @@ namespace ddr
 		Renderer( const char* renderer ) : m_name( renderer ) {}
 
 		virtual void RenderInit( ddc::World& world ) {}
+		virtual void RenderUpdate( ddc::World& world ) {}
 		virtual void Render( const RenderData& render_data ) {}
 		virtual void RenderShutdown() {}
 

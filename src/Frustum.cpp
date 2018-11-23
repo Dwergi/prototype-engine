@@ -132,8 +132,8 @@ namespace ddr
 
 	void Frustum::CreateRenderData()
 	{
-		m_shader = ShaderProgram::Load( "mesh" );
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		m_shader = ShaderManager::Instance()->Load( "mesh" );
+		ShaderProgram* shader = m_shader.Access();
 		shader->Use( true );
 
 		m_vao.Create();
@@ -173,9 +173,8 @@ namespace ddr
 
 		UniformStorage& uniforms = data.Uniforms();
 
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
-
-		shader->Use( true );
+		ShaderProgram* shader = m_shader.Access();
+		ScopedShaderUse usage = shader->UseScoped();
 
 		uniforms.Set( "Model", m_transform );
 
@@ -194,8 +193,6 @@ namespace ddr
 		glDisable( GL_BLEND );
 
 		m_vboIndex.Unbind();
-
-		shader->Use( false );
 
 		m_vao.Unbind();
 	}

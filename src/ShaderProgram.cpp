@@ -11,132 +11,29 @@
 #include "ICamera.h"
 #include "OpenGL.h"
 #include "Shader.h"
-#include "ShaderHandle.h"
 #include "Texture.h"
 #include "VAO.h"
 #include "VBO.h"
 
+DD_HANDLE_MANAGER( ddr::ShaderProgram );
+
 namespace ddr
 {
-	std::unordered_map<uint64, ShaderProgram*> ShaderProgram::s_instances;
-
-	ShaderHandle ShaderProgram::Load( const char* name )
+	ScopedShaderUse::ScopedShaderUse( ShaderProgram& shader ) :
+		m_shader( &shader )
 	{
-		ShaderHandle shader_h = ShaderProgram::Find( name );
-		if( !shader_h.Valid() )
-		{
-			const dd::String16 folder( "shaders\\" );
-
-			dd::Vector<Shader*> shaders;
-			shaders.Reserve( 3 );
-
-			{
-				dd::String32 vertexPath( folder );
-				vertexPath += name;
-				vertexPath += ".vertex";
-
-				Shader* vertex = Shader::Create( vertexPath, Shader::Type::Vertex );
-				DD_ASSERT( vertex != nullptr );
-				shaders.Add( vertex );
-			}
-
-			{
-				dd::String32 geometryPath( folder );
-				geometryPath += name;
-				geometryPath += ".geometry";
-
-				Shader* geom = Shader::Create( geometryPath, Shader::Type::Geometry );
-				if( geom != nullptr )
-				{
-					shaders.Add( geom );
-				}
-			}
-
-			{
-				dd::String32 pixelPath( folder );
-				pixelPath += name;
-				pixelPath += ".pixel";
-
-				Shader* pixel = Shader::Create( pixelPath, Shader::Type::Pixel );
-				DD_ASSERT( pixel != nullptr );
-				shaders.Add( pixel );
-			}
-
-			shader_h = ShaderProgram::Create( name, shaders );
-		}
-
-		return shader_h;
+		m_shader->Use( true );
 	}
 
-	ShaderHandle ShaderProgram::Create( const char* name, const dd::Vector<Shader*>& shaders )
+	ScopedShaderUse::~ScopedShaderUse()
 	{
-		DD_ASSERT( strlen( name ) > 0 );
-
-		DD_PROFILE_SCOPED( ShaderProgram_Create );
-
-		ShaderHandle handle = Find( name );
-		if( !handle.Valid() )
+		if( m_shader != nullptr )
 		{
-			uint64 hash = dd::HashString( name, strlen( name ) );
-
-			ShaderProgram* program = CreateInstance( name, shaders );
-			if( program->IsValid() )
-			{
-				s_instances.insert( std::make_pair( hash, program ) );
-			}
-			else
-			{
-				delete program;
-
-				DD_ASSERT_ERROR( false, "ShaderProgram::CreateInstance returned an invalid program!" );
-			}
-
-			handle.m_hash = hash;
-		}
-
-		return handle;
-	}
-
-	ShaderHandle ShaderProgram::Find( const char* name )
-	{
-		DD_ASSERT( strlen( name ) > 0 );
-
-		uint64 hash = dd::HashString( name, strlen( name ) );
-
-		ShaderHandle handle;
-
-		auto it = s_instances.find( hash );
-		if( it != s_instances.end() )
-		{
-			handle.m_hash = hash;
-		}
-		
-		return handle;	
-	}
-
-	ShaderProgram* ShaderProgram::Get( ShaderHandle handle )
-	{
-		auto it = s_instances.find( handle.m_hash );
-		if( it == s_instances.end() )
-		{
-			return nullptr;
-		}
-
-		return it->second;
-	}
-
-	void ShaderProgram::Destroy( ShaderHandle handle )
-	{
-		auto it = s_instances.find( handle.m_hash );
-		if( it != s_instances.end() )
-		{
-			delete it->second;
-			s_instances.erase( it );
+			m_shader->Use( false );
 		}
 	}
 
-	ShaderProgram::ShaderProgram( const char* name ) : 
-		m_name( name )
+	ShaderProgram::ShaderProgram()
 	{
 		m_id = glCreateProgram();
 		CheckOGLError();
@@ -158,44 +55,34 @@ namespace ddr
 		}
 	}
 
-	ShaderProgram* ShaderProgram::CreateInstance( const char* name, const dd::Vector<Shader*>& shaders )
+	void ShaderProgram::SetShaders( const dd::Vector<Shader*>& shaders )
 	{
-		ShaderProgram* program = new ShaderProgram( name );
-		program->m_valid = true;
+		m_valid = true;
 
 		if( shaders.Size() == 0 )
 		{
-			DD_ASSERT_ERROR( shaders.Size() > 0, "ShaderProgram '%s': Failed to provide any shaders!", name );
+			DD_ASSERT_ERROR( shaders.Size() > 0, "ShaderProgram '%s': Failed to provide any shaders!", m_name.c_str() );
 
-			program->m_valid = false;
+			m_valid = false;
 		}
 
 		for( const Shader* shader : shaders )
 		{
-			DD_ASSERT_ERROR( shader != nullptr, "ShaderProgram '%s': Invalid shader given to program!", name );
+			DD_ASSERT_ERROR( shader != nullptr, "ShaderProgram '%s': Invalid shader given to program!", m_name.c_str() );
 
-			glAttachShader( program->m_id, shader->m_id );
+			glAttachShader( m_id, shader->m_id );
 			CheckOGLError();
 		}
 
-		dd::String256 msg = program->Link();
+		dd::String256 msg = Link();
 		if( !msg.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", name, msg.c_str() );
+			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.c_str(), msg.c_str() );
 
-			program->m_valid = false;
+			m_valid = false;
 		}
 
-		program->m_shaders = shaders;
-		return program;
-	}
-
-	void ShaderProgram::ReloadAll()
-	{
-		for( auto it : s_instances )
-		{
-			it.second->Reload();
-		}
+		m_shaders = shaders;
 	}
 
 	dd::String256 ShaderProgram::Link()
@@ -279,6 +166,11 @@ namespace ddr
 
 		glUseProgram( m_inUse ? m_id : 0 );
 		CheckOGLError();
+	}
+
+	ScopedShaderUse ShaderProgram::UseScoped()
+	{
+		return ScopedShaderUse( *this );
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const
@@ -507,4 +399,65 @@ namespace ddr
 		DD_ASSERT( IsValid(), "ShaderProgram '%s': Program is invalid!", m_name.c_str() );
 		DD_ASSERT( strlen( name ) > 0, "ShaderProgram '%s': Empty uniform name given!", m_name.c_str() );
 	}
+
+	ShaderHandle ShaderManager::Load( const char* name )
+	{
+		ShaderHandle shader_h = base::Find( name );
+		if( !shader_h.IsValid() )
+		{
+			const dd::String16 folder( "shaders\\" );
+
+			dd::Vector<Shader*> shaders;
+			shaders.Reserve( 3 );
+
+			{
+				dd::String32 vertexPath( folder );
+				vertexPath += name;
+				vertexPath += ".vertex";
+
+				Shader* vertex = Shader::Create( vertexPath, Shader::Type::Vertex );
+				DD_ASSERT( vertex != nullptr );
+				shaders.Add( vertex );
+			}
+
+			{
+				dd::String32 geometryPath( folder );
+				geometryPath += name;
+				geometryPath += ".geometry";
+
+				Shader* geom = Shader::Create( geometryPath, Shader::Type::Geometry );
+				if( geom != nullptr )
+				{
+					shaders.Add( geom );
+				}
+			}
+
+			{
+				dd::String32 pixelPath( folder );
+				pixelPath += name;
+				pixelPath += ".pixel";
+
+				Shader* pixel = Shader::Create( pixelPath, Shader::Type::Pixel );
+				DD_ASSERT( pixel != nullptr );
+				shaders.Add( pixel );
+			}
+
+			shader_h = base::Create( name );
+
+			ShaderProgram* program = shader_h.Access();
+			program->SetShaders( shaders );
+		}
+
+		return shader_h;
+	}
+
+	void ShaderManager::ReloadAll()
+	{
+		for( size_t i = 0; i < base::Count(); ++i )
+		{
+			ShaderProgram* program = base::AccessAt( i );
+			program->Reload();
+		}
+	}
+
 }

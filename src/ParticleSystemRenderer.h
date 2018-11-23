@@ -8,7 +8,6 @@
 
 #include "ParticleSystemComponent.h"
 #include "Renderer.h"
-#include "ShaderHandle.h"
 #include "VAO.h"
 #include "VBO.h"
 

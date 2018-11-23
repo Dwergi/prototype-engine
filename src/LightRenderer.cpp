@@ -61,10 +61,15 @@ namespace ddr
 
 	void LightRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderProgram::Load( "mesh" );
-		DD_ASSERT( m_shader.Valid() );
+		m_shader = ShaderManager::Instance()->Load( "mesh" );
+		DD_ASSERT( m_shader.IsValid() );
 
-		m_mesh = Mesh::Find( "sphere" );
+		m_mesh = MeshManager::Instance()->Find( "sphere" );
+	}
+
+	void LightRenderer::RenderUpdate( ddc::World& world )
+	{
+		UpdateDebugPointLights( world );
 	}
 
 	void LightRenderer::Render( const RenderData& data )
@@ -84,8 +89,6 @@ namespace ddr
 		uniforms.Set( "LightCount", (int) light_count );
 
 		m_debugLights.clear();
-
-		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
 
 		for( size_t i = 0; i < light_count; ++i )
 		{
@@ -108,8 +111,6 @@ namespace ddr
 			uniforms.Set( GetArrayUniformName( "Lights", i, "CosInnerAngle" ).c_str(), glm::cos( light.InnerAngle ) );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "CosOuterAngle" ).c_str(), glm::cos( light.OuterAngle ) );
 		}
-
-		UpdateDebugPointLights( data.World() );
 	}
 
 	void LightRenderer::DrawDebugInternal( ddc::World& world )
@@ -146,17 +147,20 @@ namespace ddr
 
 				ImGui::DragFloat( "Intensity", &light->Intensity, 0.01, 0, 100 );
 				ImGui::DragFloat( "Attenuation", &light->Attenuation, 0.001, 0.001, 1 );
+				ImGui::DragFloat( "Ambient", &light->Ambient, 0.001, 0, 1 );
+				ImGui::DragFloat( "Specular", &light->Specular, 0.001, 0, 1 );
 
-				const char* positionLabel = light->LightType == dd::LightType::Directional ? "Direction" : "Position";
-				ImGui::DragFloat3( positionLabel, glm::value_ptr( transform->Position ) );
-
-				ImGui::SliderFloat( "Ambient", &light->Ambient, 0, 1 );
-				ImGui::SliderFloat( "Specular", &light->Specular, 0, 1 );
-
-				glm::vec3 light_direction = glm::rotate( transform->Rotation, glm::vec4( 0, 0, 1, 1 ) ).xyz;
-				if( ImGui::DragFloat3( "Direction", glm::value_ptr( light_direction ), 0.0025, -1, 1 ) )
+				if( light->LightType == dd::LightType::Directional )
 				{
-					transform->Rotation = glm::rotation( glm::vec3( 0, 0, 1 ), glm::normalize( light_direction ) );
+					glm::vec3 light_direction = glm::rotate( transform->Rotation, glm::vec4( 0, 0, 1, 1 ) ).xyz;
+					if( ImGui::DragFloat3( "Direction", glm::value_ptr( light_direction ), 0.0025, -1, 1 ) )
+					{
+						transform->Rotation = glm::rotation( glm::vec3( 0, 0, 1 ), glm::normalize( light_direction ) );
+					}
+				}
+				else
+				{
+					ImGui::DragFloat3( "Position", glm::value_ptr( transform->Position ), 0.1 );
 				}
 
 				float outer_angle = glm::degrees( light->OuterAngle );

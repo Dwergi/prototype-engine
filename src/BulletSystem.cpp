@@ -81,7 +81,7 @@ namespace dd
 
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
-		mesh->Mesh = ddr::Mesh::Find( "sphere" );
+		mesh->Mesh = ddr::MeshManager::Instance()->Find( "sphere" );
 
 		dd::ColourComponent* colour;
 		world.Access( entity, colour );
@@ -93,7 +93,7 @@ namespace dd
 
 		dd::BoundBoxComponent* bbox;
 		world.Access( entity, bbox );
-		bbox->BoundBox = ddr::Mesh::Get( mesh->Mesh )->GetBoundBox();
+		bbox->BoundBox = mesh->Mesh.Get()->GetBoundBox();
 
 		dd::LightComponent* light;
 		world.Access( entity, light );

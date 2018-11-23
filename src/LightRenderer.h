@@ -7,9 +7,9 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "MeshHandle.h"
+#include "Mesh.h"
 #include "Renderer.h"
-#include "ShaderHandle.h"
+#include "ShaderProgram.h"
 
 namespace ddr
 {
@@ -18,6 +18,7 @@ namespace ddr
 		LightRenderer();
 
 		virtual void RenderInit( ddc::World& world ) override;
+		virtual void RenderUpdate( ddc::World& world ) override;
 		virtual void Render( const RenderData& render_data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Lights"; }
@@ -25,7 +26,6 @@ namespace ddr
 	private:
 
 		MeshHandle m_mesh;
-
 		ShaderHandle m_shader;
 
 		bool m_createLight { false };

@@ -49,12 +49,12 @@ namespace ddr
 	{
 		dd::Vector<Shader*> shaders;
 
-		if( !s_shaderParticle.Valid() )
+		if( !s_shaderParticle.IsValid() )
 		{
-			s_shaderParticle = ShaderProgram::Load( "particle" );
+			s_shaderParticle = ShaderManager::Instance()->Load( "particle" );
 		}
 
-		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
+		ShaderProgram* shader = s_shaderParticle.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );
@@ -104,7 +104,7 @@ namespace ddr
 
 	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
 	{
-		ShaderProgram* shader = ShaderProgram::Get( s_shaderParticle );
+		ShaderProgram* shader = s_shaderParticle.Access();
 		shader->Use( true );
 
 		ddr::UniformStorage& uniforms = data.Uniforms();

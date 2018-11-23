@@ -34,6 +34,11 @@ namespace ddr
 		//
 		// Update terrain chunks on the render thread.
 		//
+		virtual void RenderUpdate( ddc::World& world ) override;
+
+		//
+		// Commit uniforms to the renderer.
+		//
 		virtual void Render( const ddr::RenderData& data ) override;
 
 		//

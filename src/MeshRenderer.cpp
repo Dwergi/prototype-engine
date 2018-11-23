@@ -12,10 +12,8 @@
 #include "Frustum.h"
 #include "ICamera.h"
 #include "Material.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "MeshUtils.h"
-#include "MousePicking.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -24,9 +22,8 @@
 
 namespace ddr
 {
-	MeshRenderer::MeshRenderer( const dd::MousePicking& mouse_picking, dd::JobSystem& jobsystem ) :
+	MeshRenderer::MeshRenderer( dd::JobSystem& jobsystem ) :
 		ddr::Renderer( "Meshes" ),
-		m_mousePicking( mouse_picking ),
 		m_jobsystem( jobsystem )
 	{
 		RequireTag( ddc::Tag::Visible );
@@ -38,18 +35,17 @@ namespace ddr
 
 	void MeshRenderer::RenderInit( ddc::World& world )
 	{
-		m_cube = Mesh::Find( "cube" );
+		m_cube = MeshManager::Instance()->Find( "cube" );
 		if( !m_cube.IsValid() )
 		{
-			m_cube = Mesh::Create( "cube" );
+			m_cube = MeshManager::Instance()->Create( "cube" );
+			Mesh* mesh = m_cube.Access();
 
-			Mesh* mesh = Mesh::Get( m_cube );
+			ShaderHandle shader_h = ShaderManager::Instance()->Load( "mesh" );
+			ShaderProgram* shader = shader_h.Access();
 
-			ShaderHandle shader_h = ShaderProgram::Load( "mesh" );
-			ShaderProgram* shader = ShaderProgram::Get( shader_h );
-
-			MaterialHandle material_h = Material::Create( "mesh" );
-			Material* material = Material::Get( material_h );
+			MaterialHandle material_h = MaterialManager::Instance()->Create( "mesh" );
+			Material* material = material_h.Access();
 			material->SetShader( shader_h );
 
 			mesh->SetMaterial( material_h );
@@ -111,7 +107,7 @@ namespace ddr
 		const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp,
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		Mesh* mesh = Mesh::Get( mesh_cmp.Mesh );
+		Mesh* mesh = mesh_cmp.Mesh.Access();
 		if( mesh == nullptr )
 		{
 			return;
@@ -152,13 +148,13 @@ namespace ddr
 			debugMultiplier.x = 1.5f;
 		}
 
-		Material* material = Material::Get( mesh->GetMaterial() );
+		const Material* material = mesh->GetMaterial().Get();
 		DD_ASSERT( material != nullptr );
 
-		ShaderProgram* shader = ShaderProgram::Get( material->GetShader() );
+		ShaderProgram* shader = ShaderManager::Instance()->Access( material->GetShader() );
 		DD_ASSERT( shader != nullptr );
 
-		shader->Use( true );
+		ScopedShaderUse usage = shader->UseScoped();
 
 		material->UpdateUniforms( uniforms );
 
@@ -168,8 +164,6 @@ namespace ddr
 		uniforms.Bind( *shader );
 
 		mesh->Render( uniforms, *shader, transform_cmp.Transform() );
-
-		shader->Use( false );
 	}
 
 	void MeshRenderer::DrawDebugInternal( ddc::World& world )

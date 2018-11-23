@@ -8,7 +8,7 @@
 
 #include "IDebugPanel.h"
 #include "Renderer.h"
-#include "ShaderHandle.h"
+#include "ShaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
 

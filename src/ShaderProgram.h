@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ShaderHandle.h"
+#include "HandleManager.h"
 #include "OpenGL.h"
 
 #include <unordered_map>
@@ -14,49 +14,28 @@
 namespace ddr
 {
 	struct Shader;
-	class Texture;
+	struct Texture;
 	struct UniformStorage;
+	struct ShaderProgram;
+	struct ShaderManager;
 
-	struct ShaderProgram
+	struct ScopedShaderUse
 	{
-	public:
+		ScopedShaderUse( ShaderProgram& shader );
+		ScopedShaderUse( ScopedShaderUse&& other ) : m_shader( other.m_shader ) { other.m_shader = nullptr; }
+		~ScopedShaderUse();
 
-		// 
-		// Load a shader of the given name, assuming that it uses standard extensions. 
-		// For anything more advanced, use Create.
-		//
-		static ShaderHandle Load( const char* name );
+	private:
+		ShaderProgram* m_shader { nullptr };
+	};
 
-		//
-		// Create a shader with the given name and shaders.
-		//
-		static ShaderHandle Create( const char* name, const dd::Vector<Shader*>& shaders );
-
-		//
-		// Find a shader with the given name. 
-		// Returns an invalid handle if none exists.
-		//
-		static ShaderHandle Find( const char* name );
-
-		//
-		// Destroy the given shader entirely.
-		//
-		static void Destroy( ShaderHandle handle );
-
-		//
-		// Reload all shaders.
-		//
-		static void ReloadAll();
-
-		//
-		// Get the shader program associated with the given handle.
-		// Returns null if none exists or the handle is invalid.
-		//
-		static ShaderProgram* Get( ShaderHandle handle );
-
+	struct ShaderProgram : dd::HandleTarget
+	{
 		const dd::String& Name() const { return m_name; }
 
 		bool Reload();
+
+		ScopedShaderUse UseScoped();
 
 		void Use( bool use );
 		bool InUse() const;
@@ -88,36 +67,52 @@ namespace ddr
 		bool EnableAttribute( const char* name );
 		bool DisableAttribute( const char* name );
 
+		ShaderProgram();
 		~ShaderProgram();
 
 		ShaderProgram( const ShaderProgram& other ) = delete;
 		ShaderProgram( ShaderProgram&& other ) = delete;
 		ShaderProgram& operator=( const ShaderProgram& other ) = delete;
 		ShaderProgram& operator=( ShaderProgram&& other ) = delete;
-
+		
 	private:
 
-		friend struct ddr::ShaderHandle;
 		friend struct ddr::UniformStorage;
+		friend struct ShaderManager;
 
-		static std::unordered_map<uint64, ShaderProgram*> s_instances;
-
-		static ShaderProgram* CreateInstance( const char* name, const dd::Vector<Shader*>& shaders );
-
-		dd::String64 m_name;
 		bool m_valid { false };
 		bool m_inUse { false };
 		uint m_id { OpenGL::InvalidID };
 
 		dd::Vector<Shader*> m_shaders;
 
-		explicit ddr::ShaderProgram( const char* name );
-
+		void SetShaders( const dd::Vector<Shader*>& shaders );
 		dd::String256 Link();
 
 		ShaderLocation GetAttribute( const char* name ) const;
 		ShaderLocation GetUniform( const char* name ) const;
 
 		void AssertBeforeUse( const char* name ) const;
+	};
+
+	using ShaderHandle = dd::Handle<ShaderProgram>;
+
+	struct ShaderManager : dd::HandleManager<ShaderProgram>
+	{
+		// 
+		// Load a shader of the given name, assuming that it uses standard extensions. 
+		// For anything more advanced, use Create.
+		//
+		ShaderHandle Load( const char* name );
+
+		//
+		// Reload all shaders.
+		//
+		void ReloadAll();
+
+		static ShaderManager* Instance() { return static_cast<ShaderManager*>( s_singleton ); }
+
+	private:
+		using base = HandleManager<ShaderProgram>;
 	};
 } 

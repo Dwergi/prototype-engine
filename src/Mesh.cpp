@@ -11,72 +11,17 @@
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "Material.h"
-#include "MeshHandle.h"
 #include "OpenGL.h"
 #include "ShaderProgram.h"
 #include "Triangulator.h"
 #include "Uniforms.h"
 #include "WorldRenderer.h"
 
+DD_HANDLE_MANAGER( ddr::Mesh );
+
 namespace ddr
 {
-	std::vector<Mesh*> Mesh::m_instances;
-
-	Mesh* Mesh::Get( MeshHandle handle )
-	{
-		if( handle.m_id < m_instances.size() )
-		{
-			return m_instances[handle.m_id];
-		}
-
-		return nullptr;
-	}
-
-	MeshHandle Mesh::Create( const char* name )
-	{
-		MeshHandle mesh_h = Find( name );
-		if( !mesh_h.IsValid() )
-		{
-			mesh_h.m_id = m_instances.size();
-
-			m_instances.push_back( new Mesh( name ) );
-		}
-
-		return mesh_h;
-	}
-
-	MeshHandle Mesh::Find( const char* name )
-	{
-		DD_ASSERT( name != nullptr );
-		DD_ASSERT( strlen( name ) > 0 );
-
-		MeshHandle mesh_h;
-
-		for( size_t i = 0; i < m_instances.size(); ++i )
-		{
-			if( m_instances[i] != nullptr && 
-				m_instances[i]->m_name == name )
-			{
-				mesh_h.m_id = i;
-				break;
-			}
-		}
-
-		return mesh_h;
-	}
-
-	void Mesh::Destroy( MeshHandle mesh_h )
-	{
-		Mesh* mesh = Get( mesh_h );
-		if( mesh != nullptr )
-		{
-			delete m_instances[ mesh_h.m_id ];
-			m_instances[mesh_h.m_id] = nullptr;
-		}
-	}
-
-	Mesh::Mesh( const char* name ) :
-		m_name( name )
+	Mesh::Mesh()
 	{
 		DD_PROFILE_SCOPED( Mesh_Create );
 

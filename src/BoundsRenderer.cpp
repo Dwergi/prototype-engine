@@ -84,10 +84,10 @@ namespace ddr
 	
 	void BoundsRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderProgram::Load( "line" );
-		DD_ASSERT( m_shader.Valid() );
+		m_shader = ShaderManager::Instance()->Load( "line" );
+		DD_ASSERT( m_shader.IsValid() );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		ShaderProgram* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );
@@ -147,7 +147,7 @@ namespace ddr
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_shader );
+		ShaderProgram* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );

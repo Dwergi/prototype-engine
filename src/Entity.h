@@ -8,31 +8,13 @@
 
 namespace ddc
 {
-	static const int MAX_ENTITIES = 1024;
+	static const int MAX_ENTITIES = 32 * 1024;
 	static const int MAX_COMPONENTS = 255;
 	static const int MAX_TAGS = 32;
 
 	struct Entity
 	{
 		friend struct World;
-
-		Entity() :
-			Handle( ~0 ),
-			Flags( 0 )
-		{
-		}
-
-		Entity( const Entity& other )
-		{
-			Handle = other.Handle;
-			Flags = other.Flags;
-		}
-
-		void operator=( const Entity& other )
-		{
-			Handle = other.Handle;
-			Flags = other.Flags;
-		}
 
 		bool operator==( Entity other ) const { return Handle == other.Handle; }
 
@@ -46,19 +28,7 @@ namespace ddc
 				uint Version : 10;
 			};
 
-			uint Handle { 0 };
-		};
-
-		union
-		{
-			struct
-			{
-				byte Alive : 1;
-				byte Create : 1;
-				byte Destroy : 1;
-			};
-
-			uint Flags { 0 };
+			uint Handle { ~0u };
 		};
 	};
 }

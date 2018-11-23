@@ -66,19 +66,20 @@ namespace ddc
 
 		for( EntityEntry& entry : m_entities )
 		{
-			if( entry.Entity.Destroy )
+			if( entry.Destroy )
 			{
-				entry.Entity.Alive = false;
-				entry.Entity.Destroy = false;
-				entry.Entity.Create = false;
+				entry.Alive = false;
+				entry.Destroy = false;
+				entry.Create = false;
 
 				entry.Ownership.reset();
 				entry.Tags.reset();
 			}
 
-			if( entry.Entity.Create )
+			if( entry.Create )
 			{
-				entry.Entity.Alive = true;
+				entry.Create = false;
+				entry.Alive = true;
 			}
 		}
 
@@ -111,22 +112,21 @@ namespace ddc
 	{
 		if( m_free.empty() )
 		{
-			m_free.push_back( m_count );
+			m_free.push_back( (uint) m_entities.size() );
 
 			EntityEntry new_entry;
-			new_entry.Entity.ID = m_count;
+			new_entry.Entity.ID = m_entities.size();
 			new_entry.Entity.Version = -1;
 
 			m_entities.push_back( new_entry );
-
-			++m_count;
 		}
 
-		int idx = dd::pop_front( m_free );
+		uint idx = dd::pop_front( m_free );
+		DD_ASSERT( idx < MAX_ENTITIES );
 
 		EntityEntry& entry = m_entities[ idx ];
 		entry.Entity.Version++;
-		entry.Entity.Create = true;
+		entry.Create = true;
 		return entry.Entity;
 	}
 
@@ -135,7 +135,7 @@ namespace ddc
 		DD_ASSERT( IsAlive( entity ) );
 
 		m_free.push_back( entity.ID );
-		m_entities[ entity.ID ].Entity.Destroy = true;
+		m_entities[ entity.ID ].Destroy = true;
 	}
 
 	Entity World::GetEntity( uint id ) const
@@ -155,7 +155,7 @@ namespace ddc
 		const EntityEntry& entry = m_entities[ entity.ID ];
 
 		return entry.Entity.Version == entity.Version &&
-			(entry.Entity.Alive || entry.Entity.Create);
+			(entry.Alive || entry.Create);
 	}
 
 	bool World::HasComponent( Entity entity, dd::ComponentID id ) const
@@ -236,25 +236,23 @@ namespace ddc
 
 	void World::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const
 	{
-		std::bitset<MAX_COMPONENTS> required;
+		ComponentBits required;
 		for( dd::ComponentID type : components )
 		{
 			required.set( type, true );
 		}
 
-		for( uint i = 0; i < m_count; ++i )
+		for( const EntityEntry& entry : m_entities )
 		{
-			const EntityEntry& entry = m_entities[ i ];
-
 			if( IsAlive( entry.Entity ) )
 			{
 				TagBits entity_tags = tags & entry.Tags;
-				std::bitset<MAX_COMPONENTS> entity_components = required & m_entities[i].Ownership;
+				ComponentBits entity_components = required & entry.Ownership;
 
 				if( entity_components.count() == required.count() && 
 					entity_tags.count() == tags.count() )
 				{
-					outEntities.push_back( m_entities[i].Entity );
+					outEntities.push_back( entry.Entity );
 				}
 			}
 		}
@@ -300,6 +298,8 @@ namespace ddc
 
 	void World::UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t )
 	{
+		DD_ASSERT( system != nullptr );
+
 		WaitForAllFutures( dependencies );
 
 		ddc::UpdateData update( *this, delta_t );
@@ -375,9 +375,12 @@ namespace ddc
 		{
 			DD_ASSERT( s.m_system != nullptr );
 
-			s.m_update = m_jobsystem.Schedule( [this, &s, delta_t]()
+			System* system = s.m_system;
+			auto futures = GetFutures( s, m_orderedSystems );
+
+			s.m_update = m_jobsystem.Schedule( [this, system, futures, delta_t]()
 			{
-				UpdateSystem( s.m_system, GetFutures( s, m_orderedSystems ), delta_t );
+				UpdateSystem( system, futures, delta_t );
 			} ).share();
 		}
 	}

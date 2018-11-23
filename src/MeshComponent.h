@@ -7,7 +7,7 @@
 #pragma once
 
 #include "AABB.h"
-#include "MeshHandle.h"
+#include "Mesh.h"
 
 namespace dd
 {
@@ -20,8 +20,6 @@ namespace dd
 		DD_CLASS( dd::MeshComponent )
 		{
 			DD_COMPONENT();
-
-			DD_MEMBER( dd::MeshComponent, Mesh );
 		}
 	};
 }

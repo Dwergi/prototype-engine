@@ -7,6 +7,8 @@
 #include "PCH.h"
 #include "EntityPrototype.h"
 
+DD_HANDLE_MANAGER( ddc::EntityPrototype );
+
 namespace ddc
 {
 	ComponentPrototype::ComponentPrototype( const void* data, dd::ComponentID id )
@@ -48,13 +50,7 @@ namespace ddc
 		memcpy( cmp, Data, Size );
 	}
 
-	EntityPrototype::EntityPrototype( std::string name ) :
-		Name( name )
-	{
-		
-	}
-
-	void EntityPrototype::CreateFromEntity( ddc::Entity entity, const ddc::World& world )
+	void EntityPrototype::PopulateFromEntity( ddc::Entity entity, const ddc::World& world )
 	{
 		DD_ASSERT( Components.empty(), "Already initialized EntityPrototype!" );
 

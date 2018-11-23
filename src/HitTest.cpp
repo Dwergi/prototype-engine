@@ -34,7 +34,7 @@ namespace ddm
 			return false;
 		}
 
-		ddr::Mesh* mesh = ddr::Mesh::Get( mesh_cmp.Mesh );
+		const ddr::Mesh* mesh = mesh_cmp.Mesh.Get();
 		if( mesh == nullptr )
 		{
 			return false;

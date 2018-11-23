@@ -8,13 +8,8 @@
 
 namespace dd
 {
-	class PlayerComponent
+	struct PlayerComponent
 	{
-	public:
-
-		PlayerComponent() {}
-		virtual ~PlayerComponent() {}
-
 		DD_CLASS( dd::PlayerComponent )
 		{
 			DD_COMPONENT();

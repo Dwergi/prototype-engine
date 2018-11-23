@@ -113,20 +113,20 @@ namespace dd
 
 	void TrenchSystem::CreateRenderResources()
 	{
-		m_shader = ddr::ShaderProgram::Load( "terrain" );
-		ddr::ShaderProgram* shader = ddr::ShaderProgram::Get( m_shader );
+		m_shader = ddr::ShaderManager::Instance()->Load( "terrain" );
+		ddr::ShaderProgram* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
-		ddr::MaterialHandle material_h = ddr::Material::Create( "trench_chunk" );
-		ddr::Material* material = ddr::Material::Get( material_h );
+		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "trench_chunk" );
+		ddr::Material* material = material_h.Access();
 		DD_ASSERT( material != nullptr );
 
 		material->SetShader( m_shader );
 
 		shader->Use( true );
 
-		m_chunkMesh = ddr::Mesh::Create( "trench_chunk" );
-		ddr::Mesh* mesh = ddr::Mesh::Get( m_chunkMesh );
+		m_chunkMesh = ddr::MeshManager::Instance()->Create( "trench_chunk" );
+		ddr::Mesh* mesh = m_chunkMesh.Access();
 		DD_ASSERT( mesh != nullptr );
 
 		mesh->SetMaterial( material_h );

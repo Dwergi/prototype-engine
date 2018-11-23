@@ -76,6 +76,18 @@ namespace dd
 			1.0f
 		};
 
+		static const int LODs = 6;
+
+		float LODSwitchDistances[ LODs ] =
+		{
+			64.0f,
+			128.0f,
+			256.0f,
+			512.0f,
+			1024.0f,
+			2048.0f
+		};
+
 		//
 		// Should the terrain chunks be visualized by their ID?
 		//

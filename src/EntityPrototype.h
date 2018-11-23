@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "HandleManager.h"
 #include "World.h"
 
 namespace ddc
@@ -30,19 +31,16 @@ namespace ddc
 		void Initialize( const void* data, const dd::TypeInfo* typeInfo );
 	};
 
-	struct EntityPrototype
+	struct EntityPrototype : dd::HandleTarget
 	{
-		EntityPrototype( std::string name );
-
 		template <typename TComponent>
 		void AddComponent( const TComponent& cmp );
 
 		void AddTag( ddc::Tag tag );
 
-		void CreateFromEntity( ddc::Entity entity, const ddc::World& world );
+		void PopulateFromEntity( ddc::Entity entity, const ddc::World& world );
 		ddc::Entity Instantiate( ddc::World& world );
 
-		std::string Name;
 		TagBits Tags;
 		std::vector<ComponentPrototype> Components;
 	};
@@ -61,4 +59,6 @@ namespace ddc
 	{
 		Components.emplace_back( cmp );
 	}
+
+	using EntityPrototypeManager = dd::HandleManager<EntityPrototype>;
 }

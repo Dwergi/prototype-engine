@@ -111,7 +111,7 @@ namespace dd
 		TransformComponent* transform_cmp = world.GetWritable<TransformComponent>( entity );
 		transform_cmp->Local = transform;
 
-		ddr::ShaderHandle shader = ddr::ShaderProgram::Load( "mesh" );
+		ddr::ShaderHandle shader = ddr::ShaderManager::Instance()->Load( "mesh" );
 		/ *shader.Get()->Use( true );
 		shader.Get()->BindAttributeFloat( "Position", 3, 6, 0, false );
 		shader.Get()->BindAttributeFloat( "Normal", 3, 6, 3, false );
@@ -122,10 +122,10 @@ namespace dd
 		bounds.Expand( glm::vec3( 0.5f, 0, -1.0 ) );
 		bounds.Expand( glm::vec3( -0.5f, 0, -1.0 ) );
 
-		m_shipMesh = ddr::Mesh::Create( "ship" );
+		m_shipMesh = ddr::MeshManager::Instance()->Create( "ship" );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_shipMesh );
-		mesh->SetMaterial( ddr::Material::Create( "mesh" ) );
+		mesh->SetMaterial( ddr::MaterialManager::Instance()->Create( "mesh" ) );
 		dd::MakeUnitCube( *mesh );
 		
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
@@ -211,7 +211,7 @@ namespace dd
 
 	void ShipSystem::Shutdown( ddc::World& world )
 	{
-		ddr::Mesh::Destroy( m_shipMesh );
+		ddr::MeshManager::Instance()->Destroy( m_shipMesh );
 	}
 
 	void ShipSystem::DrawDebugInternal( ddc::World& world )

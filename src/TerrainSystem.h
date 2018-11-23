@@ -8,7 +8,6 @@
 
 #include "IDebugPanel.h"
 #include "System.h"
-#include "TerrainChunkKey.h"
 #include "TerrainParameters.h"
 
 #include <unordered_map>
@@ -25,7 +24,7 @@ namespace dd
 	struct BoundBoxComponent;
 	struct ColourComponent;
 	struct MeshComponent;
-	class TerrainChunk;
+	struct TerrainChunk;
 	struct TerrainChunkComponent;
 	struct TransformComponent;
 	struct TerrainChunkKey;
@@ -79,26 +78,24 @@ namespace dd
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 
-		glm::ivec2 m_previousOffset;
+		glm::vec2 m_previousOffset;
 
 		JobSystem& m_jobsystem;
 
 		TerrainParameters m_params;
 
-		std::unordered_map<TerrainChunkKey, ddc::Entity> m_existing;
-		Vector<ddc::Entity> m_active;
+		int m_activeCount { 0 };
 
 		virtual void DrawDebugInternal( ddc::World& world ) override;
 
-		void GenerateTerrain( ddc::World& world, const ddc::DataBuffer& data, const glm::ivec2 offset );
-		void GenerateLODLevel( int lodLevel, Vector<TerrainChunkKey>& toGenerate, glm::ivec2 offset );
+		ddc::Entity CreateChunk( ddc::World& world, glm::vec2 pos, int lod );
 
-		ddc::Entity CreateChunk( ddc::World& world, const TerrainChunkKey& key );
-
-		void UpdateChunk( TerrainChunkComponent& chunk_cmp, MeshComponent& mesh_cmp, BoundBoxComponent& bounds_cmp, 
-			TransformComponent& transform_cmp, ColourComponent& colour_cmp );
-		void UpdateTerrainChunks( ddc::World& world, const ddc::DataBuffer& data, const Vector<TerrainChunkKey>& required );
+		void UpdateChunk( ddc::World& world, ddc::Entity e, TerrainChunkComponent& chunk_cmp, BoundBoxComponent& bounds_cmp, 
+			TransformComponent& transform_cmp, ColourComponent& colour_cmp, glm::vec2 camera_pos );
+		void GenerateChunks( ddc::World& world, const ddc::DataBuffer& data, glm::vec2 camera_pos );
 
 		void DestroyChunks( ddc::World& world );
+
+		int CalculateLOD( glm::vec2 chunk_pos, glm::vec2 camera_pos ) const;
 	};
 }

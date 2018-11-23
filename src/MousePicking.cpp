@@ -103,7 +103,7 @@ namespace dd
 
 	void MousePicking::RenderInit( ddc::World& world )
 	{
-		m_shader = ddr::ShaderProgram::Load( "picking" );
+		m_shader = ddr::ShaderManager::Instance()->Load( "picking" );
 
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
@@ -129,33 +129,15 @@ namespace dd
 		m_framebuffer.RenderInit();
 	}
 
-	void MousePicking::Render( const ddr::RenderData& data )
+	void MousePicking::RenderUpdate( ddc::World& world )
 	{
-		if( !m_enabled )
-			return;
-
-		m_position = m_input.GetMousePosition().Absolute;
-
-		// do hit
-		ddc::Entity hit;
-		if( m_rayTest )
-		{
-			hit = HitTestRay( data );
-		}
-		else
-		{
-			hit = HitTestRender( data );
-		}
-
-		ddc::World& world = data.World();
-
 		// set focused
 		if( m_focused.IsValid() )
 		{
 			world.RemoveTag( m_focused, ddc::Tag::Focused );
 		}
 
-		m_focused = hit;
+		m_focused = m_hitEntity;
 
 		if( m_focused.IsValid() )
 		{
@@ -170,7 +152,7 @@ namespace dd
 				world.RemoveTag( m_selected, ddc::Tag::Selected );
 			}
 
-			m_selected = hit;
+			m_selected = m_hitEntity;
 			
 			if( m_selected.IsValid() )
 			{
@@ -178,7 +160,34 @@ namespace dd
 			}
 		}
 
+		if( m_visualizeRay )
+		{
+			world.AddTag( m_previousRay, ddc::Tag::Visible );
+		}
+		else
+		{
+			world.RemoveTag( m_previousRay, ddc::Tag::Visible );
+		}
+
 		m_select = false;
+	}
+
+	void MousePicking::Render( const ddr::RenderData& render_data )
+	{
+		if( !m_enabled )
+			return;
+
+		m_position = m_input.GetMousePosition().Absolute;
+
+		// do hit
+		if( m_rayTest )
+		{
+			m_hitEntity = HitTestRay( render_data );
+		}
+		else
+		{
+			m_hitEntity = HitTestRender( render_data );
+		}
 	}
 
 	ddc::Entity MousePicking::HitTestRender( const ddr::RenderData& data )
@@ -201,7 +210,7 @@ namespace dd
 
 		m_framebuffer.Clear();
 
-		ddr::ShaderProgram& shader = *ddr::ShaderProgram::Get( m_shader );
+		ddr::ShaderProgram& shader = *m_shader.Access();
 		shader.Use( true );
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
@@ -213,7 +222,7 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			ddr::Mesh* mesh = ddr::Mesh::Get( meshes[i].Mesh );
+			ddr::Mesh* mesh = meshes[i].Mesh.Access();
 			if( mesh == nullptr )
 				continue;
 
@@ -238,16 +247,7 @@ namespace dd
 
 	ddc::Entity MousePicking::HitTestRay( const ddr::RenderData& data )
 	{
-		ddc::World& world = data.World();
-
-		if( m_visualizeRay )
-		{
-			world.AddTag( m_previousRay, ddc::Tag::Visible );
-		}
-		else
-		{
-			world.RemoveTag( m_previousRay, ddc::Tag::Visible );
-		}
+		const ddc::World& world = data.World();
 
 		if( m_pendingHit.Valid )
 		{
@@ -289,7 +289,7 @@ namespace dd
 			const dd::MeshComponent* mesh_cmp = meshes.Get( i );
 			if( mesh_cmp != nullptr )
 			{
-				ddr::Mesh* mesh = ddr::Mesh::Get( meshes[ i ].Mesh );
+				const ddr::Mesh* mesh = meshes[ i ].Mesh.Get();
 				if( mesh == nullptr )
 					continue;
 
@@ -399,9 +399,7 @@ namespace dd
 				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_focused );
 				if( mesh_cmp != nullptr )
 				{
-					ddr::MeshHandle mesh_h = mesh_cmp->Mesh;
-
-					const String& name = ddr::Mesh::Get( mesh_h )->GetName();
+					const String& name = mesh_cmp->Mesh.Get()->Name();
 					ImGui::Text( "Mesh: %s", name.c_str() );
 				}
 				else
@@ -428,9 +426,7 @@ namespace dd
 				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_selected );
 				if( mesh_cmp != nullptr )
 				{
-					ddr::MeshHandle mesh_h = mesh_cmp->Mesh;
-
-					const String& name = ddr::Mesh::Get( mesh_h )->GetName();
+					const String& name = mesh_cmp->Mesh.Get()->Name();
 					ImGui::Text( "Mesh: %s", name.c_str() );
 				}
 				else

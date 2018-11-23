@@ -101,11 +101,11 @@ namespace ddr
 
 	void FrameBuffer::RenderInit()
 	{
-		if( !m_blitShader.Valid() )
+		if( !m_blitShader.IsValid() )
 		{
-			m_blitShader = ShaderProgram::Load( "blit" );
-			ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
+			m_blitShader = ShaderManager::Instance()->Load( "blit" );
 
+			ShaderProgram* shader = m_blitShader.Access();
 			shader->Use( true );
 
 			m_vaoFullscreen.Create();
@@ -131,7 +131,7 @@ namespace ddr
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texDepth != nullptr );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
+		ShaderProgram* shader = m_blitShader.Access();
 		shader->Use( true );
 
 		m_vaoFullscreen.Bind();
@@ -163,8 +163,7 @@ namespace ddr
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texColour != nullptr );
 
-		ShaderProgram* shader = ShaderProgram::Get( m_blitShader );
-
+		ShaderProgram* shader = m_blitShader.Access();
 		shader->Use( true );
 
 		m_vaoFullscreen.Bind();

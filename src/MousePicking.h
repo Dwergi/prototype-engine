@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "System.h"
 #include "Ray.h"
-#include "ShaderHandle.h"
+#include "ShaderProgram.h"
 #include "Texture.h"
 
 struct GLFWwindow;
@@ -22,8 +22,6 @@ struct GLFWwindow;
 namespace ddr
 {
 	struct ICamera;
-	struct Mesh;
-	struct ShaderProgram;
 }
 
 namespace dd
@@ -56,7 +54,8 @@ namespace dd
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
 		virtual void RenderInit( ddc::World& world ) override;
-		virtual void Render( const ddr::RenderData& data ) override;
+		virtual void RenderUpdate( ddc::World& world ) override;
+		virtual void Render( const ddr::RenderData& render_data ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
 		virtual void RenderDebug( const ddr::RenderData& data ) override;
@@ -89,6 +88,8 @@ namespace dd
 
 		bool m_visualizeRay { false };
 		ddc::Entity m_previousRay;
+
+		ddc::Entity m_hitEntity;
 
 		dd::HitResult m_hitResult;
 		dd::HitHandle m_pendingHit;

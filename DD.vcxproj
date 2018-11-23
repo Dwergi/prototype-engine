@@ -347,6 +347,7 @@
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
+    <ClInclude Include="src\HandleManager.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\JSON.h" />
@@ -398,16 +399,13 @@
     <ClInclude Include="src\FunctionSignature.h" />
     <ClInclude Include="src\GLError.h" />
     <ClInclude Include="src\Globals.h" />
-    <ClInclude Include="src\GenericHandle.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\ICamera.h" />
     <ClInclude Include="src\IDebugPanel.h" />
     <ClInclude Include="src\LightComponent.h" />
     <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\MaterialHandle.h" />
     <ClInclude Include="src\Math_dd.h" />
-    <ClInclude Include="src\MeshHandle.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\ParticleSystem.h" />
@@ -437,7 +435,6 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\TerrainRenderer.h" />
-    <ClInclude Include="src\TerrainTile.h" />
     <ClInclude Include="src\Triangulator.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
@@ -446,7 +443,6 @@
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptSystem.h" />
     <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\ShaderHandle.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
@@ -462,7 +458,6 @@
     <ClInclude Include="src\SystemsSorting.h" />
     <ClInclude Include="src\TerrainChunk.h" />
     <ClInclude Include="src\TerrainChunkComponent.h" />
-    <ClInclude Include="src\TerrainChunkKey.h" />
     <ClInclude Include="src\TerrainParameters.h" />
     <ClInclude Include="src\TerrainSystem.h" />
     <ClInclude Include="src\Tests.h">
@@ -585,7 +580,6 @@
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\JSON.cpp" />
-    <ClCompile Include="src\MeshHandle.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
@@ -644,7 +638,6 @@
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />
-    <ClCompile Include="src\TerrainTile.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -676,7 +669,6 @@
     <ClCompile Include="src\SystemsSorting.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
     <ClCompile Include="src\TerrainChunkComponent.cpp" />
-    <ClCompile Include="src\TerrainChunkKey.cpp" />
     <ClCompile Include="src\TerrainSystem.cpp" />
     <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

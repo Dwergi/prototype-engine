@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "MeshHandle.h"
-#include "ShaderHandle.h"
+#include "Mesh.h"
+#include "ShaderProgram.h"
 #include "System.h"
 #include "TransformComponent.h"
 #include "TrenchComponent.h"
@@ -19,8 +19,6 @@ namespace ddr
 
 namespace dd
 {
-	struct Mesh;
-
 	class TrenchSystem : public ddc::System
 	{
 	public: 

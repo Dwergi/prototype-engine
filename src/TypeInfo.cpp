@@ -14,6 +14,7 @@ namespace dd
 {
 	std::unordered_map<String64, TypeInfo*>* TypeInfo::sm_typeMap = nullptr;
 	std::vector<std::function<void()>>* TypeInfo::sm_registrations = nullptr;
+	std::vector<TypeInfo*>* TypeInfo::sm_components = nullptr;
 	bool TypeInfo::sm_defaultsRegistered = false;
 
 	uint8 TypeInfo::sm_maxComponentID = 0;
@@ -63,6 +64,11 @@ namespace dd
 		if( sm_registrations == nullptr )
 		{
 			sm_registrations = new std::vector<std::function<void()>>();
+		}
+
+		if( sm_components == nullptr )
+		{
+			sm_components = new std::vector<TypeInfo*>();
 		}
 	}
 
@@ -133,26 +139,14 @@ namespace dd
 	void TypeInfo::RegisterComponent()
 	{
 		m_componentID = sm_maxComponentID;
+		sm_components->push_back( this );
 
 		++sm_maxComponentID;
 	}
 
 	const TypeInfo* TypeInfo::GetComponent( dd::ComponentID id )
 	{
-		DD_TODO( "Maybe worth caching component types separately?" );
-
-		const TypeInfo* current = TypeInfo::Head();
-		while( current != nullptr )
-		{
-			if( current->ComponentID() == id )
-			{
-				return current;
-			}
-
-			current = current->Next();
-		}
-
-		return nullptr;
+		return sm_components->at( id );
 	}
 
 	String128 TypeInfo::FullTypeName() const
