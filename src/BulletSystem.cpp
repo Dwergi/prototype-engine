@@ -11,21 +11,22 @@
 #include "BoundSphereComponent.h"
 #include "BulletComponent.h"
 #include "ColourComponent.h"
+#include "FPSCameraComponent.h"
 #include "HitTest.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "InputBindings.h"
+#include "LightComponent.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "MessageQueue.h"
-#include "LightComponent.h"
+#include "PlayerComponent.h"
 #include "TransformComponent.h"
 
 namespace dd
 {
-	BulletSystem::BulletSystem( ddr::ICamera& camera, IAsyncHitTest& hit_test ) :
+	BulletSystem::BulletSystem( IAsyncHitTest& hit_test ) :
 		ddc::System( "Bullets" ),
-		m_camera( camera ),
 		m_hitTest( hit_test )
 	{
 		m_speed = 50;
@@ -42,6 +43,9 @@ namespace dd
 		OptionalRead<dd::BoundBoxComponent>( "dynamic_meshes" );
 		OptionalRead<dd::BoundSphereComponent>( "dynamic_meshes" );
 		RequireTag( ddc::Tag::Dynamic, "dynamic_meshes" );
+
+		RequireRead<dd::PlayerComponent>( "player" );
+		RequireRead<dd::FPSCameraComponent>( "player" );
 	}
 
 	void BulletSystem::HandleInput( InputAction action, InputType type )
@@ -63,7 +67,7 @@ namespace dd
 
 	}
 	
-	void BulletSystem::FireBullet( ddc::World& world )
+	void BulletSystem::FireBullet( ddc::World& world, const ddr::ICamera& camera )
 	{
 		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
@@ -72,12 +76,12 @@ namespace dd
 		world.Access( entity, transform );
 
 		transform->Scale = glm::vec3( m_scale );
-		transform->Position = m_camera.GetPosition();
+		transform->Position = camera.GetPosition();
 		transform->Update();
 
 		dd::BulletComponent* bullet;
 		world.Access( entity, bullet );
-		bullet->Velocity = m_camera.GetDirection() * m_speed;
+		bullet->Velocity = camera.GetDirection() * m_speed;
 
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
@@ -165,7 +169,10 @@ namespace dd
 
 		if( m_fireBullet )
 		{
-			FireBullet( world );
+			auto player = update.Data( "player" );
+			auto cameras = player.Read<dd::FPSCameraComponent>();
+
+			FireBullet( world, cameras[0] );
 		}
 
 		const ddc::DataBuffer& dynamic_meshes = update.Data( "dynamic_meshes" );

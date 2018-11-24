@@ -19,13 +19,13 @@ DD_HANDLE_MANAGER( ddr::ShaderProgram );
 
 namespace ddr
 {
-	ScopedShaderUse::ScopedShaderUse( ShaderProgram& shader ) :
+	ScopedShader::ScopedShader( ShaderProgram& shader ) :
 		m_shader( &shader )
 	{
 		m_shader->Use( true );
 	}
 
-	ScopedShaderUse::~ScopedShaderUse()
+	ScopedShader::~ScopedShader()
 	{
 		if( m_shader != nullptr )
 		{
@@ -168,9 +168,9 @@ namespace ddr
 		CheckOGLError();
 	}
 
-	ScopedShaderUse ShaderProgram::UseScoped()
+	ScopedShader ShaderProgram::UseScoped()
 	{
-		return ScopedShaderUse( *this );
+		return ScopedShader( *this );
 	}
 
 	ShaderLocation ShaderProgram::GetAttribute( const char* name ) const

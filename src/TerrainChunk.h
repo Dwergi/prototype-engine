@@ -14,6 +14,8 @@
 #include "ShaderProgram.h"
 #include "TerrainParameters.h"
 
+#include <atomic>
+
 namespace ddr
 {
 	struct ICamera;
@@ -82,6 +84,8 @@ namespace dd
 		};
 
 		static dd::FSMPrototype s_fsmPrototype;
+
+		std::atomic<bool> m_updating { false };
 		dd::FSM m_state;
 
 		dd::JobSystem& m_jobsystem;
@@ -93,7 +97,8 @@ namespace dd
 		std::vector<glm::vec3> m_vertices;
 		ConstBuffer<glm::vec3> m_verticesBuffer;
 
-		glm::vec2 m_noiseOffset;
+		glm::vec2 m_previousOffset;
+		glm::vec2 m_offset;
 
 		int m_lod;
 		int m_minLod { TerrainParameters::LODs }; // the best quality LOD that's already been generated

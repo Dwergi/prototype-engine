@@ -369,9 +369,6 @@
     <ClInclude Include="src\ICamera.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\FPSCamera.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\TerrainChunkComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -590,6 +587,12 @@
     </ClInclude>
     <ClInclude Include="src\HandleManager.h">
       <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderState.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FPSCameraComponent.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -846,9 +849,6 @@
     <ClCompile Include="src\ShakyCamera.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\FPSCamera.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\TerrainChunkComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -1046,6 +1046,12 @@
       <Filter>JSON</Filter>
     </ClCompile>
     <ClCompile Include="src\ParticleSystemRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderState.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FPSCameraComponent.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

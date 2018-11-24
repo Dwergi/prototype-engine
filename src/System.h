@@ -25,7 +25,7 @@ namespace ddc
 		const char* GetName() const { return m_name.c_str(); }
 
 		virtual void Initialize( World& world ) {}
-		virtual void Update( const UpdateData& data ) = 0;
+		virtual void Update( const UpdateData& update_data ) = 0;
 		virtual void Shutdown( World& world ) {}
 
 		int MaxPartitions() const { return m_partitions; }

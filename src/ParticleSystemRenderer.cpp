@@ -43,6 +43,10 @@ namespace ddr
 	{
 		Require<dd::ParticleSystemComponent>();
 		RequireTag( ddc::Tag::Visible );
+
+		m_renderState.BackfaceCulling = false;
+		m_renderState.Blending = true;
+		m_renderState.Depth = true;
 	}
 
 	void ParticleSystemRenderer::RenderInit( ddc::World& world )
@@ -57,7 +61,7 @@ namespace ddr
 		ShaderProgram* shader = s_shaderParticle.Access();
 		DD_ASSERT( shader != nullptr );
 
-		shader->Use( true );
+		ScopedShader scoped_state = shader->UseScoped();
 
 		s_vaoParticle.Create();
 		s_vaoParticle.Bind();
@@ -98,25 +102,19 @@ namespace ddr
 		m_vboColours.Unbind();
 
 		s_vaoParticle.Unbind();
-
-		shader->Use( false );
 	}
 
 	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
 	{
 		ShaderProgram* shader = s_shaderParticle.Access();
-		shader->Use( true );
+		ScopedShader scoped_shader = shader->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
 		const ddc::World& world = data.World();
 
 		uniforms.Bind( *shader );
-		uniforms.Set( "View", camera.GetViewMatrix() );
-		uniforms.Set( "Projection", camera.GetProjectionMatrix() );
-
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
 		s_vaoParticle.Bind();
 
@@ -172,9 +170,5 @@ namespace ddr
 		}
 
 		s_vaoParticle.Unbind();
-
-		glDisable( GL_BLEND );
-
-		shader->Use( false );
 	}
 }

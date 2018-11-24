@@ -14,6 +14,7 @@
 #include "MeshComponent.h"
 #include "Mesh.h"
 #include "OpenGL.h"
+#include "PlayerComponent.h"
 #include "Random.h"
 #include "RenderData.h"
 #include "TerrainChunk.h"
@@ -73,6 +74,9 @@ namespace dd
 		RequireWrite<TransformComponent>();
 		RequireWrite<ColourComponent>();
 
+		RequireRead<TransformComponent>( "player" );
+		RequireRead<PlayerComponent>( "player" );
+
 		SetPartitions( 1 );
 	}
 
@@ -91,10 +95,9 @@ namespace dd
 		TerrainChunk::InitializeShared();
 	}
 
-	void TerrainSystem::Update( const ddc::UpdateData& update )
+	void TerrainSystem::Update( const ddc::UpdateData& update_data )
 	{
-		ddc::World& world = update.World();
-		const ddc::DataBuffer& data = update.Data();
+		ddc::World& world = update_data.World();
 
 		if( m_requiresRegeneration )
 		{
@@ -110,31 +113,37 @@ namespace dd
 			m_saveChunkImages = false;
 		}
 
-		DD_TODO( "Introduce Camera Component and use that here." );
-		glm::vec3 pos( 0.0f, 0.0f, 0.0f );
+		const ddc::DataBuffer& chunks_data = update_data.Data();
 
-		GenerateChunks( world, data, pos.xz );
+		const ddc::DataBuffer& player = update_data.Data( "player" );
+		auto player_transforms = player.Read<TransformComponent>();
+		
+		DD_ASSERT( player_transforms.Size() > 0 );
+
+		glm::vec2 player_offset = player_transforms[0].Position.xz;
+
+		GenerateChunks( world, chunks_data, player_offset );
 
 		DD_TODO( "Hmm, this means that the first generated chunks won't be updated/rendered the first frame." );
 
-		auto entities = data.Entities();
-		auto chunks = data.Write<TerrainChunkComponent>();
-		auto transforms = data.Write<TransformComponent>();
-		auto bounds = data.Write<BoundBoxComponent>();
-		auto colours = data.Write<ColourComponent>();
+		auto entities = chunks_data.Entities();
+		auto chunks = chunks_data.Write<TerrainChunkComponent>();
+		auto transforms = chunks_data.Write<TransformComponent>();
+		auto bounds = chunks_data.Write<BoundBoxComponent>();
+		auto colours = chunks_data.Write<ColourComponent>();
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
 			if( m_draw )
 			{
-				world.AddTag( data.Entities()[i], ddc::Tag::Visible );
+				world.AddTag( entities[i], ddc::Tag::Visible );
 			}
 			else 
 			{
-				world.RemoveTag( data.Entities()[i], ddc::Tag::Visible );
+				world.RemoveTag( entities[i], ddc::Tag::Visible );
 			}
 
-			UpdateChunk( world, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], pos.xz );
+			UpdateChunk( world, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
 		}
 	}
 
@@ -219,7 +228,7 @@ namespace dd
 		std::unordered_map<glm::vec2, ddc::Entity> existing;
 		existing.reserve( entities.size() );
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
 			world.RemoveTag( entities[ i ], ddc::Tag::Visible );
 
@@ -297,10 +306,9 @@ namespace dd
 
 		world.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
 		{
-			String64 chunk_file;
-			snprintf( chunk_file.data(), 64, "terrain_%d.tga", chunk_index );
+			std::string file = fmt::format( "terrain_{}.tga", chunk_index );
 
-			chunk.Chunk->WriteHeightImage( chunk_file.c_str() );
+			chunk.Chunk->WriteHeightImage( file.c_str() );
 
 			++chunk_index;
 		} );
@@ -311,6 +319,8 @@ namespace dd
 		ImGui::Checkbox( "Draw", &m_draw );
 
 		ImGui::Value( "Active", m_activeCount );
+
+		ImGui::Value( "Offset", m_previousOffset );
 
 		ImGui::Checkbox( "Debug Colours", &m_params.UseDebugColours );
 

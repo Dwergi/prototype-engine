@@ -9,6 +9,7 @@
 #include "FrameBuffer.h"
 #include "IDebugPanel.h"
 #include "Mesh.h"
+#include "RenderState.h"
 #include "System.h"
 #include "Texture.h"
 
@@ -62,6 +63,9 @@ namespace ddr
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;
 		Texture m_depthTexture;
+
+		RenderState m_defaultState;
+		RenderState m_depthState;
 		
 		ddc::Entity m_xAxis;
 		ddc::Entity m_yAxis;

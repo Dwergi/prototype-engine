@@ -174,7 +174,7 @@ namespace ddr
 		UniformStorage& uniforms = data.Uniforms();
 
 		ShaderProgram* shader = m_shader.Access();
-		ScopedShaderUse usage = shader->UseScoped();
+		ScopedShader usage = shader->UseScoped();
 
 		uniforms.Set( "Model", m_transform );
 

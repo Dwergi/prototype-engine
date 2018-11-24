@@ -9,7 +9,7 @@
 #include "PCH.h"
 #include "ShipSystem.h"
 
-#include "FPSCamera.h"
+#include "FPSCameraComponent.h"
 #include "InputBindings.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -205,7 +205,7 @@ namespace dd
 		transform.Update();
 
 		// move camera after the ship
-		m_nextCameraPos = m_camera.GetPosition() + delta_v + other_modifiers;
+		//m_nextCameraPos = m_camera.GetPosition() + delta_v + other_modifiers;
 		//m_camera.SetDirection( m_camera.GetPosition() - transform.GetWorldPosition() );
 	}
 

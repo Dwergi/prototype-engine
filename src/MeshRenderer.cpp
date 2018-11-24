@@ -154,7 +154,7 @@ namespace ddr
 		ShaderProgram* shader = ShaderManager::Instance()->Access( material->GetShader() );
 		DD_ASSERT( shader != nullptr );
 
-		ScopedShaderUse usage = shader->UseScoped();
+		ScopedShader usage = shader->UseScoped();
 
 		material->UpdateUniforms( uniforms );
 

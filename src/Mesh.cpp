@@ -141,12 +141,15 @@ namespace ddr
 			m_vboVertexColour.Unbind();
 		}
 
-		if( m_bvh != nullptr )
+		if( !m_rebuilding.exchange( true ) )
 		{
-			delete m_bvh;
-		}
+			if( m_bvh != nullptr )
+			{
+				delete m_bvh;
+			}
 
-		jobsystem.Schedule( [this]() { RebuildBVH(); } );
+			jobsystem.Schedule( [this]() { RebuildBVH(); } );
+		}
 
 		m_dirty = false;
 	}
@@ -217,7 +220,7 @@ namespace ddr
 
 	void Mesh::RebuildBVH()
 	{
-		DD_ASSERT( m_bvh == nullptr );
+		DD_ASSERT( m_rebuilding );
 
 		m_bvh = new dd::BVHTree();
 		m_bvh->StartBatch();
@@ -239,5 +242,7 @@ namespace ddr
 		}
 
 		m_bvh->EndBatch();
+
+		m_rebuilding = false;
 	}
 }

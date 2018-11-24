@@ -1,10 +1,8 @@
 #include "PCH.h"
 #include "ShakyCamera.h"
 
-#include "FPSCamera.h"
+#include "FPSCameraComponent.h"
 #include "InputBindings.h"
-
-
 
 #include "glm/gtc/noise.hpp"
 
@@ -16,7 +14,7 @@ namespace dd
 	float ShakyCamera::MaximumRoll = 5.0f;
 	float ShakyCamera::SpeedMultiplier = 25.0f;
 	
-	ShakyCamera::ShakyCamera( const FPSCamera& camera, InputBindings& bindings ) : 
+	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, InputBindings& bindings ) :
 		m_sourceCamera( camera )
 	{
 		bindings.RegisterHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]( InputAction action, InputType type ) 
@@ -141,12 +139,8 @@ namespace dd
 
 	glm::mat4 ShakyCamera::GetViewMatrix() const
 	{
-		glm::vec4 up( 0, 1, 0, 0 );
-		glm::mat4 rotation = glm::rotate( m_roll, glm::vec3( 0, 0, 1 ) );
-		up = up * rotation;
+		glm::vec4 up = glm::rotate( m_roll, glm::vec3( 0, 0, 1 ) ) * glm::vec4( 0, 1, 0, 0 );
 
-		glm::vec3 position = m_sourceCamera.GetPosition();
-
-		return glm::lookAt( position, position + m_direction, up.xyz() );
+		return glm::lookAt( m_sourceCamera.GetPosition(), m_sourceCamera.GetPosition() + m_sourceCamera.GetDirection(), up.xyz() );
 	}
 }

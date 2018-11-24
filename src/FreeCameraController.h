@@ -8,24 +8,23 @@
 
 #include "IDebugPanel.h"
 #include "IInputSource.h"
+#include "System.h"
 
 namespace dd
 {
-	class FPSCamera;
+	struct FPSCameraComponent;
 	struct InputBindings;
 
-	class FreeCameraController : public IDebugPanel
+	struct FreeCameraController : IDebugPanel, ddc::System
 	{
-	public:
-
-		FreeCameraController( FPSCamera& camera );
+		FreeCameraController();
 		FreeCameraController( FreeCameraController&& other );
 		~FreeCameraController();
 		
 		FreeCameraController( const FreeCameraController& ) = delete;
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
-		void Update( float dt );
+		virtual void Update( const ddc::UpdateData& data ) override;
 
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
@@ -43,8 +42,9 @@ namespace dd
 	
 	private:
 
-		FPSCamera& m_camera;
+		std::vector<FPSCameraComponent*> m_cameras;
 		glm::vec2 m_mouseDelta;
+		glm::vec2 m_scrollDelta;
 
 		bool m_enabled { true };
 		bool m_invert { false };

@@ -36,6 +36,8 @@ namespace dd
 		int GetWidth() const { return m_size.x; }
 		int GetHeight() const { return m_size.y; }
 
+		float GetAspectRatio() const { return float( m_size.x ) / float( m_size.y ); }
+
 		GLFWwindow* GetInternalWindow() const { return m_glfwWindow; }	
 
 	private:

@@ -132,12 +132,11 @@ namespace ddr
 		DD_ASSERT( m_texDepth != nullptr );
 
 		ShaderProgram* shader = m_blitShader.Access();
-		shader->Use( true );
+		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vaoFullscreen.Bind();
 		m_texDepth->Bind( 0 );
 
-		glDisable( GL_DEPTH_TEST );
 		CheckOGLError();
 
 		uniforms.Set( "Texture", *m_texDepth );
@@ -149,12 +148,9 @@ namespace ddr
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
 
-		glEnable( GL_DEPTH_TEST );
-
 		m_texDepth->Unbind();
 		m_vaoFullscreen.Unbind();
 
-		shader->Use( false );
 		CheckOGLError();
 	}
 
@@ -164,13 +160,11 @@ namespace ddr
 		DD_ASSERT( m_texColour != nullptr );
 
 		ShaderProgram* shader = m_blitShader.Access();
-		shader->Use( true );
+		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vaoFullscreen.Bind();
 		
 		m_texColour->Bind( 0 );
-
-		glDisable( GL_DEPTH_TEST );
 		
 		uniforms.Set( "Texture", *m_texColour );
 		uniforms.Set( "DrawDepth", false );
@@ -180,13 +174,9 @@ namespace ddr
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
 
-		glEnable( GL_DEPTH_TEST );
-
 		m_texColour->Unbind();
 
 		m_vaoFullscreen.Unbind();
-
-		shader->Use( false );
 	}
 
 	void FrameBuffer::Blit()

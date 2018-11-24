@@ -57,6 +57,11 @@ namespace ddm
 		yaw = atan2( dir.x, dir.z );
 	}
 
+	glm::quat QuatFromPitchYaw( float pitch, float yaw )
+	{
+		return glm::angleAxis( pitch, glm::vec3( 1, 0, 0 ) ) * glm::angleAxis( yaw, glm::vec3( 0, 1, 0 ) );
+	}
+
 	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 )
 	{
 		glm::vec3 a = p1 - p0;

@@ -26,7 +26,7 @@ namespace dd
 
 	struct BulletSystem : ddc::System, IDebugPanel
 	{
-		BulletSystem( ddr::ICamera& camera, IAsyncHitTest& hit_test );
+		BulletSystem( IAsyncHitTest& hit_test );
 
 		void BindActions( InputBindings& bindings );
 
@@ -46,11 +46,10 @@ namespace dd
 		float m_intensity { 0 };
 		float m_attenuation { 0 };
 
-		ddr::ICamera& m_camera;
 		IAsyncHitTest& m_hitTest;
 
 		void HandleInput( InputAction action, InputType type );
-		void FireBullet( ddc::World& world );
+		void FireBullet( ddc::World& world, const ddr::ICamera& camera );
 		void KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet );
 		bool HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos );
 

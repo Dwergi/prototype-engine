@@ -256,9 +256,9 @@ namespace dd
 
 	void TerrainChunk::SetNoiseOffset( glm::vec2 noise_offset )
 	{
-		if( m_noiseOffset != noise_offset )
+		if( m_offset != noise_offset )
 		{
-			m_noiseOffset = noise_offset;
+			m_offset = noise_offset;
 
 			m_dirty = true;
 		}
@@ -292,7 +292,10 @@ namespace dd
 
 		if( m_state == UPDATE_PENDING )
 		{
-			m_jobsystem.Schedule( [this]() { UpdateVertices(); } );
+			if( !m_updating.exchange( true ) )
+			{
+				m_jobsystem.Schedule( [this]() { UpdateVertices(); } );
+			}
 		}
 
 		if( m_state == UPDATE_DONE )
@@ -312,6 +315,7 @@ namespace dd
 			else
 			{
 				ddr::Mesh* mesh = m_mesh.Access();
+				mesh->SetIndices( s_indexBuffers[m_lod] );
 				mesh->SetDirty();
 			}
 
@@ -344,7 +348,18 @@ namespace dd
 
 	void TerrainChunk::UpdateVertices()
 	{
+		DD_ASSERT( m_updating );
 		DD_ASSERT( m_state == UPDATE_PENDING );
+
+		if( m_minLod <= m_lod && m_offset == m_previousOffset )
+		{
+			m_state.TransitionTo( UPDATE_DONE );
+			m_updating = false;
+			return;
+		}
+
+		m_minLod = m_lod;
+		m_previousOffset = m_offset;
 
 		const uint stride = 1 << m_lod;
 		DD_ASSERT( stride < MaxVertices );
@@ -359,8 +374,8 @@ namespace dd
 		{
 			for( int x = 0; x < row_width; x += stride )
 			{
-				const float x_coord = m_position.x + m_noiseOffset.x + x * vertex_distance;
-				const float z_coord = m_position.y + m_noiseOffset.y + z * vertex_distance;
+				const float x_coord = m_position.x + m_offset.x + x * vertex_distance;
+				const float z_coord = m_position.y + m_offset.y + z * vertex_distance;
 
 				float height = GetNoise( x_coord, z_coord );
 
@@ -380,8 +395,6 @@ namespace dd
 
 		m_bounds.Min = glm::vec3( 0, min_height, 0 );
 		m_bounds.Max = glm::vec3( m_terrainParams.ChunkSize, max_height, m_terrainParams.ChunkSize );
-
-		m_minLod = m_lod;
 
 		int flap_vertex_start = MeshVertexCount;
 		for( int i = 0; i < row_width; i += stride )
@@ -414,13 +427,14 @@ namespace dd
 		DD_ASSERT( flap_vertex_start + row_width <= TotalVertexCount );
 
 		m_state.TransitionTo( UPDATE_DONE );
+		m_updating = false;
 	}
 
 	void TerrainChunk::CreateMesh( glm::vec2 pos )
 	{
 		DD_PROFILE_SCOPED( TerrainChunk_CreateMesh );
 
-		std::string name = fmt::format( "{0:.2f}x{1:.2f}", pos.x, pos.y );
+		std::string name = fmt::format( "terrain_{0:.2f}x{1:.2f}", pos.x, pos.y );
 
 		m_mesh = ddr::MeshManager::Instance()->Create( name.c_str() );
 

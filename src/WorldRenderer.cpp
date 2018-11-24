@@ -16,8 +16,8 @@
 #include "MeshComponent.h"
 #include "MousePicking.h"
 #include "LightComponent.h"
-#include "ParticleSystem.h"
 #include "OpenGL.h"
+#include "ParticleSystem.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "TransformComponent.h"
@@ -48,6 +48,14 @@ namespace ddr
 		m_window( window )
 	{
 		m_uniforms = new ddr::UniformStorage();
+
+		m_defaultState.Blending = false;
+		m_defaultState.BackfaceCulling = true;
+		m_defaultState.Depth = true;
+
+		m_depthState.Blending = true;
+		m_depthState.BackfaceCulling = false;
+		m_depthState.Depth = false;
 	}
 
 	WorldRenderer::~WorldRenderer()
@@ -99,32 +107,6 @@ namespace ddr
 		if( ImGui::Button( "Reload Shaders" ) )
 		{
 			m_reloadShaders = true;
-		}
-	}
-
-	void WorldRenderer::SetRenderState()
-	{
-		if( !m_debugDrawDepth )
-		{
-			// depth test
-			glEnable( GL_DEPTH_TEST );
-			glDepthFunc( GL_GREATER );
-			glClipControl( GL_LOWER_LEFT, GL_ZERO_TO_ONE );
-
-			// backface culling
-			glEnable( GL_CULL_FACE );
-			glFrontFace( GL_CCW );
-			glCullFace( GL_BACK );
-
-			// blending
-			glDisable( GL_BLEND );
-		}
-		else
-		{
-			glDisable( GL_CULL_FACE );
-			glDisable( GL_DEPTH_TEST );
-			glEnable( GL_BLEND );
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
 	}
 
@@ -234,10 +216,18 @@ namespace ddr
 		m_framebuffer.BindDraw();
 		m_framebuffer.Clear();
 
-		SetRenderState();
+		if( m_debugDrawDepth )
+		{
+			m_depthState.Use( true );
+		}
+		else
+		{
+			m_defaultState.Use( true );
+		}
 
 		s_fog.UpdateUniforms( *m_uniforms );
 
+		m_uniforms->Set( "ViewPosition", camera.GetPosition() );
 		m_uniforms->Set( "View", camera.GetViewMatrix() );
 		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
 		m_uniforms->Set( "DrawNormals", m_debugDrawNormals );
@@ -255,10 +245,12 @@ namespace ddr
 		if( m_debugDrawDepth )
 		{
 			m_framebuffer.RenderDepth( uniforms, camera );
+			m_depthState.Use( false );
 		}
 		else
 		{
 			m_framebuffer.Blit();
+			m_defaultState.Use( false );
 		}
 
 		m_framebuffer.UnbindRead();

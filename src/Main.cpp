@@ -26,7 +26,7 @@
 #include "EntityPrototype.h"
 #include "EntityVisualizer.h"
 #include "File.h"
-#include "FPSCamera.h"
+#include "FPSCameraComponent.h"
 #include "FrameBuffer.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
@@ -54,6 +54,7 @@
 #include "PhysicsPlaneComponent.h"
 #include "PhysicsSphereComponent.h"
 #include "PhysicsSystem.h"
+#include "PlayerComponent.h"
 #include "Random.h"
 #include "RayComponent.h"
 #include "RayRenderer.h"
@@ -95,7 +96,7 @@ DebugUI* s_debugUI = nullptr;
 Window* s_window = nullptr;
 InputSystem* s_input = nullptr;
 ShakyCamera* s_shakyCamera = nullptr;
-FPSCamera* s_fpsCamera = nullptr;
+dd::FPSCameraComponent* s_fpsCamera = nullptr;
 FreeCameraController* s_freeCamera = nullptr;
 ddc::World* s_world = nullptr;
 AngelScriptEngine* s_scriptEngine = nullptr;
@@ -296,7 +297,6 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 	{
 		free_cam.UpdateMouse( input.Source().GetMousePosition() );
 		free_cam.UpdateScroll( input.Source().GetScrollPosition() );
-		free_cam.Update( delta_t );
 	}
 
 	shaky_cam.Update( delta_t );
@@ -472,13 +472,11 @@ int GameMain()
 		//TrenchSystem trench_system( *s_shakyCam  );
 		//trench_system.CreateRenderResources();
 
-		s_fpsCamera = new FPSCamera( *s_window );
-		s_shakyCamera = new ShakyCamera( *s_fpsCamera, *input_bindings );
-		
-		s_freeCamera = new FreeCameraController( *s_fpsCamera );
+		s_freeCamera = new FreeCameraController();
 		s_freeCamera->BindActions( *input_bindings );
 
 		HitTestSystem* hit_testing = new HitTestSystem();
+		hit_testing->DependsOn( *s_freeCamera );
 
 		PhysicsSystem* physics_system = new PhysicsSystem();
 		
@@ -489,7 +487,8 @@ int GameMain()
 
 		TerrainSystem* terrain_system = new TerrainSystem( *jobsystem );
 
-		BulletSystem* bullet_system = new BulletSystem( *s_fpsCamera, *hit_testing );
+		BulletSystem* bullet_system = new BulletSystem( *hit_testing );
+		bullet_system->DependsOn( *s_freeCamera );
 		bullet_system->DependsOn( *hit_testing );
 		bullet_system->BindActions( *input_bindings );
 
@@ -498,6 +497,7 @@ int GameMain()
 
 		s_world = new ddc::World( *jobsystem );
 
+		s_world->RegisterSystem( *s_freeCamera );
 		s_world->RegisterSystem( *terrain_system );
 		s_world->RegisterSystem( *particle_system );
 		s_world->RegisterSystem( *hit_testing );
@@ -539,7 +539,6 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *s_renderer );
 		s_debugUI->RegisterDebugPanel( *s_freeCamera );
 		s_debugUI->RegisterDebugPanel( *mouse_picking );
-		s_debugUI->RegisterDebugPanel( *s_shakyCamera );
 		s_debugUI->RegisterDebugPanel( *particle_system );
 		s_debugUI->RegisterDebugPanel( *terrain_system );
 		s_debugUI->RegisterDebugPanel( *mesh_renderer );
@@ -561,6 +560,22 @@ int GameMain()
 		CreateQuad();
 
 		s_renderer->InitializeRenderers( *s_world );
+
+		// player
+		{
+			ddc::Entity entity = s_world->CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
+
+			s_fpsCamera = s_world->Access<dd::FPSCameraComponent>( entity );
+			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+			s_fpsCamera->SetVerticalFOV( glm::radians( 45.0f ) );
+
+			DD_TODO( "Shaky camera should be a component/system pair." );
+			s_shakyCamera = new ShakyCamera( *s_fpsCamera, *input_bindings );
+			s_debugUI->RegisterDebugPanel( *s_shakyCamera );
+
+			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
+
+		}
 
 		// dir light
 		{

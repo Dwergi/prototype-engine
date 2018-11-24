@@ -8,6 +8,7 @@
 
 #include "ParticleSystemComponent.h"
 #include "Renderer.h"
+#include "RenderState.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -24,6 +25,9 @@ namespace ddr
 		virtual void Render( const ddr::RenderData& data );
 
 	private:
+		
+		RenderState m_renderState;
+
 		glm::vec3 m_positions[dd::MAX_PARTICLES];
 		VBO m_vboPosition;
 

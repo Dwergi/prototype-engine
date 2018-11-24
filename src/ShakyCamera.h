@@ -7,13 +7,11 @@
 
 namespace dd
 {
-	class FPSCamera;
+	struct FPSCameraComponent;
 	struct InputBindings;
 
-	class ShakyCamera : public IDebugPanel, public ddr::ICamera
+	struct ShakyCamera : IDebugPanel, ddr::ICamera
 	{
-	public:
-
 		//
 		// The rate at which trauma decays over time, in units per second.
 		//
@@ -42,7 +40,7 @@ namespace dd
 		//
 		// Constructor.
 		//
-		ShakyCamera( const FPSCamera& camera, InputBindings& bindings );
+		ShakyCamera( const FPSCameraComponent& camera, InputBindings& bindings );
 
 		//
 		// Destructor.
@@ -95,7 +93,7 @@ namespace dd
 
 	private:
 
-		const FPSCamera& m_sourceCamera;
+		const FPSCameraComponent& m_sourceCamera;
 
 		float Seed { 0 };
 		float m_trauma { 0 };

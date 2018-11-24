@@ -59,8 +59,9 @@ namespace ddm
 	glm::mat4 TransformFromRay( const dd::Ray& ray );
 
 	glm::vec3 DirectionFromPitchYaw( float pitch, float yaw );
-
 	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
+
+	glm::quat QuatFromPitchYaw( float pitch, float yaw );
 
 	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 );
 }

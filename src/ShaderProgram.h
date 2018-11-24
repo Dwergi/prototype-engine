@@ -19,11 +19,11 @@ namespace ddr
 	struct ShaderProgram;
 	struct ShaderManager;
 
-	struct ScopedShaderUse
+	struct ScopedShader
 	{
-		ScopedShaderUse( ShaderProgram& shader );
-		ScopedShaderUse( ScopedShaderUse&& other ) : m_shader( other.m_shader ) { other.m_shader = nullptr; }
-		~ScopedShaderUse();
+		ScopedShader( ShaderProgram& shader );
+		ScopedShader( ScopedShader&& other ) : m_shader( other.m_shader ) { other.m_shader = nullptr; }
+		~ScopedShader();
 
 	private:
 		ShaderProgram* m_shader { nullptr };
@@ -35,7 +35,7 @@ namespace ddr
 
 		bool Reload();
 
-		ScopedShaderUse UseScoped();
+		ScopedShader UseScoped();
 
 		void Use( bool use );
 		bool InUse() const;

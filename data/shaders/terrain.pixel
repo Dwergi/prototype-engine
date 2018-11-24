@@ -10,8 +10,6 @@ in struct FragmentData
 	vec3 Barycentric;
 } Fragment;
 
-uniform mat4 View;
-
 uniform struct MaterialData
 {
 	float Shininess;
@@ -71,6 +69,8 @@ uniform struct FogParameters
 }
 Fog;
 
+uniform vec3 ViewPosition;
+uniform mat4 View;
 uniform bool DrawNormals;
 
 //
@@ -201,7 +201,7 @@ void main()
 		return;
 	}
 
-	vec3 toView = View[ 3 ].xyz - Fragment.Position;
+	vec3 toView = ViewPosition - Fragment.Position;
 	float viewDistance = length( toView );
 
 	if( Fog.Enabled )

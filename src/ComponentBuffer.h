@@ -37,7 +37,9 @@ namespace ddc
 	template <typename TComponent>
 	struct ReadView
 	{
-		ReadView( const ComponentBuffer& buffer ) : m_buffer( buffer )
+		ReadView( const ComponentBuffer& buffer ) :
+			m_buffer( buffer ),
+			m_data( reinterpret_cast<const TComponent*>(m_buffer.Data()) )
 		{
 			DD_ASSERT( m_buffer.Usage() == DataUsage::Read );
 		}
@@ -77,17 +79,20 @@ namespace ddc
 	private:
 
 		const ComponentBuffer& m_buffer;
+		const TComponent* const m_data;
 
 		const TComponent* At( size_t i ) const
 		{
-			return reinterpret_cast<const TComponent*>(m_buffer.Data()) + i;
+			return m_data + i;
 		}
 	};
 
 	template <typename TComponent>
 	struct WriteView
 	{
-		WriteView( const ComponentBuffer& buffer ) : m_buffer( buffer )
+		WriteView( const ComponentBuffer& buffer ) : 
+			m_buffer( buffer ),
+			m_data( reinterpret_cast<TComponent*>(m_buffer.Data()) )
 		{
 			DD_ASSERT( m_buffer.Usage() == DataUsage::Write );
 		}
@@ -127,10 +132,11 @@ namespace ddc
 	private:
 
 		const ComponentBuffer& m_buffer;
+		TComponent* const m_data;
 
 		TComponent* At( size_t i ) const
 		{
-			return reinterpret_cast<TComponent*>(m_buffer.Data()) + i;
+			return m_data + i;
 		}
 	};
 }

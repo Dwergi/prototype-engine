@@ -12,6 +12,7 @@
 #include "VAO.h"
 #include "VBO.h"
 
+#include <atomic>
 #include <memory>
 #include <unordered_map>
 
@@ -140,6 +141,7 @@ namespace ddr
 
 		dd::AABB m_bounds;
 
+		std::atomic<bool> m_rebuilding { false };
 		dd::BVHTree* m_bvh { nullptr };
 
 		void BindToShader( ShaderProgram& shader );

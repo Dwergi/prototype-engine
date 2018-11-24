@@ -7,6 +7,7 @@
 #pragma once
 
 #include "OpenGL.h"
+#include "RenderState.h"
 #include "ShaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
