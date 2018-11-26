@@ -53,8 +53,10 @@ namespace ddm
 
 	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw )
 	{
-		pitch = asin( dir.y );
-		yaw = atan2( dir.x, dir.z );
+		glm::vec3 d = glm::normalize( dir );
+
+		pitch = asin( d.y );
+		yaw = atan2( d.x, d.z );
 	}
 
 	glm::quat QuatFromPitchYaw( float pitch, float yaw )

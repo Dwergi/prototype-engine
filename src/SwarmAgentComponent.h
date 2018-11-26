@@ -15,14 +15,12 @@ namespace dd
 	public:
 
 		glm::vec3 Velocity;
-		OctreeEntry OctreeHandle;
 
 		DD_CLASS( dd::SwarmAgentComponent )
 		{
 			DD_COMPONENT();
 
 			DD_MEMBER( dd::SwarmAgentComponent, Velocity );
-			DD_MEMBER( dd::SwarmAgentComponent, OctreeHandle );
 		}
 	};
 }

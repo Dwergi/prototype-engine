@@ -6,25 +6,30 @@
 
 #pragma once
 
+#include "BVHTree.h"
+#include "IDebugPanel.h"
 #include "SwarmAgentComponent.h"
-#include "DoubleBuffer.h"
 #include "System.h"
-#include "AABBOctree.h"
 
 namespace dd
 {
-	class SwarmSystem : public ddc::System
+	struct SwarmSystem : ddc::System, dd::IDebugPanel
 	{
-	public:
 		SwarmSystem();
 		virtual ~SwarmSystem();
 
+		virtual void Initialize( ddc::World& world ) override;
+
 		virtual void Update( const ddc::UpdateData& data ) override;
 
-		DD_BASIC_TYPE( SwarmSystem )
+		virtual const char* GetDebugTitle() const override { return "Swarm"; }
+
+		DD_BASIC_TYPE( SwarmSystem );
 
 	private:
 
-		DoubleBuffer<AABBOctree> m_agentsTree;
+		BVHTree m_agentsBVH;
+
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }

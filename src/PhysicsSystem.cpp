@@ -210,7 +210,7 @@ namespace dd
 		a_expanded.Radius += glm::length( a_displacement );
 
 		s_hits.clear();
-		bvh.WithinBounds( a_expanded, s_hits );
+		bvh.WithinBoundSphere( a_expanded, s_hits );
 
 		for( size_t b_index : s_hits )
 		{

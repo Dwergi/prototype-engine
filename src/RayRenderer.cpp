@@ -100,7 +100,7 @@ namespace ddr
 
 			shader->SetUniform( "Colour", clr );
 
-			float scale = ray.Length > 0 ? ray.Length : 100;
+			float scale = ray.Ray.HasLength() ? ray.Ray.Length : 100;
 			glm::mat4 model = ddm::TransformFromRay( ray.Ray ) * glm::scale( glm::vec3( scale ) );
 
 			shader->SetUniform( "ModelViewProjection", view_projection * model );

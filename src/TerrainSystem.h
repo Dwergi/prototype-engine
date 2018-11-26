@@ -74,7 +74,7 @@ namespace dd
 
 	private:
 		
-		bool m_draw { true };
+		bool m_draw { false };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 

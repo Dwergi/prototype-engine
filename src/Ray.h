@@ -27,20 +27,17 @@ namespace dd
 		glm::vec3 Direction() const { return m_direction; }
 
 		//
-		// The length of the ray.
-		//
-		float Length() const { return m_length; }
-
-		//
 		// Does this ray have a length set?
 		//
-		bool HasLength() const { return m_length != FLT_MAX; }
+		bool HasLength() const { return Length != FLT_MAX; }
 
 		//
 		// The component-wise inverse of the direction. 
 		// Note: Not actually normalized, nor necessarily valid floats - ie. may contain INFs or NaNs.
 		//
 		glm::vec3 InverseDir() const { return m_invDir; }
+
+		float Length;
 
 		DD_CLASS( dd::Ray )
 		{
@@ -53,7 +50,6 @@ namespace dd
 
 		glm::vec3 m_origin;
 		glm::vec3 m_direction;
-		float m_length;
 
 		glm::vec3 m_invDir;
 

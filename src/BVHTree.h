@@ -29,11 +29,13 @@ namespace dd
 		size_t Add( const AABB& bounds );
 		void Remove( size_t handle );
 
+		void Clear();
+
 		BVHIntersection IntersectsRay( const Ray& ray ) const;
 		BVHIntersection IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const;
 
-		bool WithinBounds( const AABB& bounds, std::vector<size_t>& outHits ) const;
-		bool WithinBounds( const Sphere& sphere, std::vector<size_t>& outHits ) const;
+		bool WithinBoundBox( const AABB& bounds, std::vector<size_t>& outHits ) const;
+		bool WithinBoundSphere( const Sphere& sphere, std::vector<size_t>& outHits ) const;
 
 		AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
 		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }

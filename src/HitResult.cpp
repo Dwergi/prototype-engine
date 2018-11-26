@@ -38,7 +38,7 @@ namespace dd
 
 	void HitResult::RegisterHit( float distance, glm::vec3 normal, ddc::Entity entity )
 	{
-		if( distance < m_ray.Length() && distance < m_distance )
+		if( distance < m_ray.Length && distance < m_distance )
 		{
 			m_distance = distance;
 			m_normal = normal;

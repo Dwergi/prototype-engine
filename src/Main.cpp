@@ -467,7 +467,7 @@ int GameMain()
 
 		s_debugUI = new DebugUI( *s_window, *input_source );
 
-		//SwarmSystem swarm_system;
+		SwarmSystem* swarm_system = new SwarmSystem();
 
 		//TrenchSystem trench_system( *s_shakyCam  );
 		//trench_system.CreateRenderResources();
@@ -503,6 +503,7 @@ int GameMain()
 		s_world->RegisterSystem( *hit_testing );
 		s_world->RegisterSystem( *bullet_system );
 		s_world->RegisterSystem( *physics_system );
+		s_world->RegisterSystem( *swarm_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 
@@ -550,14 +551,15 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *s_world );
 		s_debugUI->RegisterDebugPanel( *entity_visualizer );
 		s_debugUI->RegisterDebugPanel( *terrain_renderer );
-
-		s_world->Initialize();
+		s_debugUI->RegisterDebugPanel( *swarm_system );
 
 		CreateSingletons();
 		CreateMeshShader();
 		CreateUnitCube();
 		CreateUnitSphere();
 		CreateQuad();
+
+		s_world->Initialize();
 
 		s_renderer->InitializeRenderers( *s_world );
 
@@ -613,7 +615,7 @@ int GameMain()
 		}
 		
 		// particle system
-		{
+		/*{
 			ddc::Entity entity = s_world->CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
 			s_world->AddTag( entity, ddc::Tag::Visible );
 			s_world->AddTag( entity, ddc::Tag::Dynamic );
@@ -628,7 +630,7 @@ int GameMain()
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
 			particle->Lifetime = 1000;
-		}
+		}*/
 
 		// axes
 		{
@@ -637,8 +639,7 @@ int GameMain()
 				s_world->AddTag( x_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* x_ray = s_world->Access<dd::RayComponent>( x_entity );
-				x_ray->Ray = dd::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ) );
-				x_ray->Length = 100;
+				x_ray->Ray = dd::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ), 100 );
 
 				dd::ColourComponent* x_colour = s_world->Access<dd::ColourComponent>( x_entity );
 				x_colour->Colour = glm::vec4( 1, 0, 0, 1 );
@@ -649,8 +650,7 @@ int GameMain()
 				s_world->AddTag( y_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* y_ray = s_world->Access<dd::RayComponent>( y_entity );
-				y_ray->Ray = dd::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ) );
-				y_ray->Length = 100;
+				y_ray->Ray = dd::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ), 100 );
 
 				dd::ColourComponent* y_colour = s_world->Access<dd::ColourComponent>( y_entity );
 				y_colour->Colour = glm::vec4( 0, 1, 0, 1 );
@@ -661,8 +661,7 @@ int GameMain()
 				s_world->AddTag( z_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* z_ray = s_world->Access<dd::RayComponent>( z_entity );
-				z_ray->Ray = dd::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ) );
-				z_ray->Length = 100;
+				z_ray->Ray = dd::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ), 100 );
 
 				dd::ColourComponent* z_colour = s_world->Access<dd::ColourComponent>( z_entity );
 				z_colour->Colour = glm::vec4( 0, 0, 1, 1 );
@@ -678,7 +677,7 @@ int GameMain()
 
 		// physics
 		{
-			float sphere_size = 3;
+			/*float sphere_size = 3;
 			
 			dd::Array<glm::vec3, 4> ball_positions;
 			ball_positions.Add( glm::vec3( 0, 60, -30 ) );
@@ -690,7 +689,7 @@ int GameMain()
 			balls.Add( CreateBall( ball_positions[0], glm::vec4( 0.2, 0.2, 0.8, 1 ), sphere_size ) );
 			balls.Add( CreateBall( ball_positions[1], glm::vec4( 0.8, 0.2, 0.8, 1 ), sphere_size ) );
 			balls.Add( CreateBall( ball_positions[2], glm::vec4( 0.2, 0.8, 0.2, 1 ), sphere_size ) );
-			balls.Add( CreateBall( ball_positions[3], glm::vec4( 0.2, 0.8, 0.8, 1 ), sphere_size ) );
+			balls.Add( CreateBall( ball_positions[3], glm::vec4( 0.2, 0.8, 0.8, 1 ), sphere_size ) ); */
 			
 			/*{
 				float static_sphere_size = 100;
@@ -732,7 +731,7 @@ int GameMain()
 				}
 			}*/
 
-			float plane_size = 100;
+			/*float plane_size = 100;
 			auto proto_h = ddc::EntityPrototypeManager::Instance()->Create( "physics_plane" );
 			ddc::EntityPrototype* phys_plane_proto = proto_h.Access();
 
@@ -797,7 +796,7 @@ int GameMain()
 						sphere->Resting = false;
 					}
 				}
-			} );
+			} );*/
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console

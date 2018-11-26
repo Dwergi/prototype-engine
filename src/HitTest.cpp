@@ -55,13 +55,13 @@ namespace ddm
 
 		glm::vec3 position, normal;
 		if( !bound_sphere.IntersectsRay( ray, position, normal ) || 
-			glm::distance2( ray.Origin(), position ) > (ray.Length() * ray.Length()) )
+			glm::distance2( ray.Origin(), position ) > (ray.Length * ray.Length) )
 		{
 			return false;
 		}
 
 		float distance;
-		if( !bound_box.IntersectsRay( ray, distance ) || distance > ray.Length() )
+		if( !bound_box.IntersectsRay( ray, distance ) || distance > ray.Length )
 		{
 			return false;
 		}
@@ -99,7 +99,7 @@ namespace ddm
 			return FLT_MAX;
 		} );
 
-		if( intersection.IsValid() && intersection.Distance < ray.Length() )
+		if( intersection.IsValid() && intersection.Distance < ray.Length )
 		{
 			out_distance = intersection.Distance;
 			return true;

@@ -200,5 +200,5 @@ TEST_CASE( "[BVHTree] Within Bounds" )
 	dd::AABB test( glm::vec3( -10 ), glm::vec3( 10 ) );
 	std::vector<size_t> hits;
 
-	REQUIRE( tree.WithinBounds( test, hits ) );
+	REQUIRE( tree.WithinBoundBox( test, hits ) );
 }

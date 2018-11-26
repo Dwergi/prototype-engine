@@ -25,6 +25,8 @@ namespace dd
 
 	size_t BVHTree::Add( const AABB& bounds )
 	{
+		DD_ASSERT( m_entries.size() < 32 * 1024, "Oversized BVH!" );
+
 		if( m_freeEntries.empty() )
 		{
 			m_freeEntries.push_back( (int) m_entries.size() );
@@ -142,6 +144,31 @@ namespace dd
 		std::sort( m_freeEntries.begin(), m_freeEntries.end() );
 	}
 
+	void BVHTree::Clear()
+	{
+		m_buckets[0] = BVHBucket();
+
+		m_freeBuckets.clear();
+
+		for( size_t b = 1; b < m_buckets.size(); ++b )
+		{
+			m_buckets[b] = BVHBucket();
+
+			m_freeBuckets.push_back( b );
+		}
+
+		m_freeEntries.clear();
+
+		for( size_t e = 0; e < m_entries.size(); ++e )
+		{
+			m_entries[e] = BVHEntry();
+			
+			m_freeEntries.push_back( e );
+		}
+
+		m_rebuildCount = 0;
+	}
+
 	BVHIntersection BVHTree::IntersectsRay( const Ray& ray ) const
 	{
 		dd::Array<size_t, 64> stack;
@@ -162,7 +189,7 @@ namespace dd
 			float bucket_distance;
 			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
 				bucket_distance < nearest.Distance &&
-				bucket_distance < ray.Length() )
+				bucket_distance < ray.Length )
 			{
 				if( bucket.IsLeaf() )
 				{
@@ -211,7 +238,7 @@ namespace dd
 			float bucket_distance;
 			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
 				bucket_distance < nearest.Distance && 
-				bucket_distance < ray.Length() )
+				bucket_distance < ray.Length )
 			{
 				if( bucket.IsLeaf() )
 				{
@@ -243,7 +270,7 @@ namespace dd
 		return nearest;
 	}
 
-	bool BVHTree::WithinBounds( const AABB& bounds, std::vector<size_t>& out_hits ) const
+	bool BVHTree::WithinBoundBox( const AABB& bounds, std::vector<size_t>& out_hits ) const
 	{
 		int buckets_tested = 0;
 
@@ -264,7 +291,7 @@ namespace dd
 				{
 					for( size_t e : bucket.Entries )
 					{
-						if( m_entries[ e ].Bounds.Intersects( bounds ) )
+						if( m_entries[e].Bounds.Intersects( bounds ) )
 						{
 							out_hits.push_back( e );
 							hit = true;
@@ -279,12 +306,12 @@ namespace dd
 			}
 		}
 
-		//DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC( "[BVHTree] WithinBoundBox - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return hit;
 	}
 
-	bool BVHTree::WithinBounds( const Sphere& sphere, std::vector<size_t>& out_hits ) const
+	bool BVHTree::WithinBoundSphere( const Sphere& sphere, std::vector<size_t>& out_hits ) const
 	{
 		int buckets_tested = 0;
 
@@ -319,7 +346,7 @@ namespace dd
 			}
 		}
 
-		//DD_DIAGNOSTIC( "[BVHTree] WithinBounds - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC( "[BVHTree] WithinBoundSphere - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return hit;
 	}
@@ -454,6 +481,8 @@ namespace dd
 
 	void BVHTree::RebuildTree()
 	{
+		m_buckets.reserve( m_entries.size() * 2 );
+
 		m_buckets[ 0 ] = BVHBucket();
 		BVHBucket& root = m_buckets[ 0 ];
 

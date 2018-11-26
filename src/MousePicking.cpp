@@ -322,7 +322,7 @@ namespace dd
 		{
 			dd::RayComponent* ray = world.Access<dd::RayComponent>( m_previousRay );
 			ray->Ray = screen_ray;
-			ray->Length = m_depth;
+			ray->Ray.Length = m_depth;
 		}
 
 		return entity;
