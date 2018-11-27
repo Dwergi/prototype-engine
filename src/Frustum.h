@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Plane.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -20,7 +20,7 @@ namespace ddr
 {
 	struct ICamera;
 	struct RenderData;
-	struct ShaderProgram;
+	struct Shader;
 	struct UniformStorage;
 
 	struct alignas(16) Frustum

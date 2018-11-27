@@ -20,8 +20,8 @@
 #include "ParticleSystemComponent.h"
 #include "RayComponent.h"
 #include "RenderData.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "UpdateData.h"
@@ -210,7 +210,7 @@ namespace dd
 
 		m_framebuffer.Clear();
 
-		ddr::ShaderProgram& shader = *m_shader.Access();
+		ddr::Shader& shader = *m_shader.Access();
 		shader.Use( true );
 
 		ddr::UniformStorage& uniforms = data.Uniforms();

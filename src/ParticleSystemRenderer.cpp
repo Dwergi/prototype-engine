@@ -10,8 +10,8 @@
 #include "ICamera.h"
 #include "OpenGL.h"
 #include "RenderData.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "Uniforms.h"
 
 namespace ddr
@@ -51,14 +51,14 @@ namespace ddr
 
 	void ParticleSystemRenderer::RenderInit( ddc::World& world )
 	{
-		dd::Vector<Shader*> shaders;
+		dd::Vector<ShaderPart*> shaders;
 
 		if( !s_shaderParticle.IsValid() )
 		{
 			s_shaderParticle = ShaderManager::Instance()->Load( "particle" );
 		}
 
-		ShaderProgram* shader = s_shaderParticle.Access();
+		Shader* shader = s_shaderParticle.Access();
 		DD_ASSERT( shader != nullptr );
 
 		ScopedShader scoped_state = shader->UseScoped();
@@ -106,7 +106,7 @@ namespace ddr
 
 	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
 	{
-		ShaderProgram* shader = s_shaderParticle.Access();
+		Shader* shader = s_shaderParticle.Access();
 		ScopedShader scoped_shader = shader->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();

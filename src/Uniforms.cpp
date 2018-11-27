@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "Uniforms.h"
 
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "Texture.h"
 
 namespace ddr
@@ -155,7 +155,7 @@ namespace ddr
 		}
 	}
 
-	void UniformStorage::Bind( ShaderProgram& shader )
+	void UniformStorage::Bind( Shader& shader )
 	{
 		for( int i = 0; i < m_count; ++i )
 		{

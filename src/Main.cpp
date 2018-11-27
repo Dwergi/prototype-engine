@@ -345,7 +345,7 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 void CreateMeshShader()
 {
 	ddr::ShaderHandle shader_h = ddr::ShaderManager::Instance()->Load( "mesh" );
-	ddr::ShaderProgram* shader = shader_h.Access();
+	ddr::Shader* shader = shader_h.Access();
 	DD_ASSERT( shader != nullptr );
 
 	ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );

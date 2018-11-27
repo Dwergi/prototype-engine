@@ -14,7 +14,7 @@
 
 namespace ddr
 {
-	struct ShaderProgram;
+	struct Shader;
 }
 
 namespace dd

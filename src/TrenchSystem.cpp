@@ -13,8 +13,8 @@
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "World.h"
 
 namespace dd
@@ -114,7 +114,7 @@ namespace dd
 	void TrenchSystem::CreateRenderResources()
 	{
 		m_shader = ddr::ShaderManager::Instance()->Load( "terrain" );
-		ddr::ShaderProgram* shader = m_shader.Access();
+		ddr::Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "trench_chunk" );

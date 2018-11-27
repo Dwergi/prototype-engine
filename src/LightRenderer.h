@@ -9,7 +9,7 @@
 #include "IDebugPanel.h"
 #include "Mesh.h"
 #include "Renderer.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 
 namespace ddr
 {

@@ -12,7 +12,7 @@
 #include "JobSystem.h"
 #include "Material.h"
 #include "OpenGL.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "Triangulator.h"
 #include "Uniforms.h"
 #include "WorldRenderer.h"
@@ -154,7 +154,7 @@ namespace ddr
 		m_dirty = false;
 	}
 
-	void Mesh::BindToShader( ShaderProgram& shader )
+	void Mesh::BindToShader( Shader& shader )
 	{
 		if( m_vboPosition.IsValid() )
 		{
@@ -185,7 +185,7 @@ namespace ddr
 		}
 	}
 
-	void Mesh::Render( UniformStorage& uniforms, ShaderProgram& shader, const glm::mat4& transform )
+	void Mesh::Render( UniformStorage& uniforms, Shader& shader, const glm::mat4& transform )
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 

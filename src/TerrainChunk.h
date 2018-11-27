@@ -11,7 +11,7 @@
 #include "JobSystem.h"
 #include "Material.h"
 #include "Mesh.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "TerrainParameters.h"
 
 #include <atomic>

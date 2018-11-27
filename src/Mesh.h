@@ -25,7 +25,7 @@ namespace dd
 namespace ddr
 {
 	struct ICamera;
-	struct ShaderProgram;
+	struct Shader;
 	struct UniformStorage;
 
 	//
@@ -36,7 +36,7 @@ namespace ddr
 		//
 		// Render this mesh in the given camera viewport.
 		//
-		void Render( UniformStorage& uniforms, ShaderProgram& shader, const glm::mat4& transform );
+		void Render( UniformStorage& uniforms, Shader& shader, const glm::mat4& transform );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
@@ -144,7 +144,7 @@ namespace ddr
 		std::atomic<bool> m_rebuilding { false };
 		dd::BVHTree* m_bvh { nullptr };
 
-		void BindToShader( ShaderProgram& shader );
+		void BindToShader( Shader& shader );
 
 		void RebuildBVH();
 	};

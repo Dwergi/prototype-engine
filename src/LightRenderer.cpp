@@ -11,7 +11,7 @@
 #include "MeshUtils.h"
 #include "LightComponent.h"
 #include "Mesh.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "OpenGL.h"

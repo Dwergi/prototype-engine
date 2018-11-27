@@ -15,8 +15,8 @@
 #include "MeshComponent.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 
@@ -42,7 +42,7 @@ namespace ddr
 			Mesh* mesh = m_cube.Access();
 
 			ShaderHandle shader_h = ShaderManager::Instance()->Load( "mesh" );
-			ShaderProgram* shader = shader_h.Access();
+			Shader* shader = shader_h.Access();
 
 			MaterialHandle material_h = MaterialManager::Instance()->Create( "mesh" );
 			Material* material = material_h.Access();
@@ -151,7 +151,7 @@ namespace ddr
 		const Material* material = mesh->GetMaterial().Get();
 		DD_ASSERT( material != nullptr );
 
-		ShaderProgram* shader = ShaderManager::Instance()->Access( material->GetShader() );
+		Shader* shader = ShaderManager::Instance()->Access( material->GetShader() );
 		DD_ASSERT( shader != nullptr );
 
 		ScopedShader usage = shader->UseScoped();

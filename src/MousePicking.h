@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "System.h"
 #include "Ray.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "Texture.h"
 
 struct GLFWwindow;

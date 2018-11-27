@@ -1,145 +1,457 @@
 //
-// Shader.cpp - Wrapper around an OpenGL shader.
+// ShaderProgram.cpp - Wrapper around OpenGL shader program.
 // Copyright (C) Sebastian Nordgren 
-// April 13th 2016
+// February 16th 2016
 //
 
 #include "PCH.h"
 #include "Shader.h"
 
-#include "File.h"
+#include "GLError.h"
+#include "ICamera.h"
 #include "OpenGL.h"
+#include "ShaderPart.h"
+#include "Texture.h"
+#include "VAO.h"
+#include "VBO.h"
+
+DD_HANDLE_MANAGER( ddr::Shader );
 
 namespace ddr
 {
-	std::unordered_map<dd::String128, Shader*> Shader::sm_shaderCache;
-
-	GLenum GetOpenGLShaderType( Shader::Type type )
+	ScopedShader::ScopedShader( Shader& shader ) :
+		m_shader( &shader )
 	{
-		switch( type )
-		{
-		case Shader::Type::Vertex:
-			return GL_VERTEX_SHADER;
-
-		case Shader::Type::Pixel:
-			return GL_FRAGMENT_SHADER;
-
-		case Shader::Type::Geometry:
-			return GL_GEOMETRY_SHADER;
-		}
-
-		return GL_INVALID_INDEX;
+		m_shader->Use( true );
 	}
 
-	Shader::Shader( const dd::String& path, Type type ) :
-		m_path( path ),
-		m_type( type )
+	ScopedShader::~ScopedShader()
 	{
-		m_id = glCreateShader( GetOpenGLShaderType( type ) );
+		if( m_shader != nullptr )
+		{
+			m_shader->Use( false );
+		}
+	}
 
-		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
+	Shader::Shader()
+	{
+		m_id = glCreateProgram();
+		CheckOGLError();
+
+		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "glCreateProgram failed!" );
 	}
 
 	Shader::~Shader()
 	{
+		for( const ShaderPart* shader : m_shaders )
+		{
+			glDetachShader( m_id, shader->m_id );
+		}
+
 		if( m_id != OpenGL::InvalidID )
 		{
-			glDeleteShader( m_id );
+			glDeleteProgram( m_id );
+			m_id = OpenGL::InvalidID;
 		}
 	}
 
-	bool Shader::Reload()
+	void Shader::SetShaders( const dd::Vector<ShaderPart*>& shaders )
 	{
-		dd::String256 oldSource = m_source;
+		m_valid = true;
 
-		dd::String256 source;
-		if( !LoadFile( m_path, source ) )
+		if( shaders.Size() == 0 )
 		{
-			return false;
+			DD_ASSERT_ERROR( shaders.Size() > 0, "ShaderProgram '%s': Failed to provide any shaders!", m_name.c_str() );
+
+			m_valid = false;
 		}
 
-		dd::String256 message = Compile( source );
-		if( !message.IsEmpty() )
+		for( const ShaderPart* shader : shaders )
 		{
-			DD_ASSERT_ERROR( false, "'%s': Compiling failed, message:\n %s", m_path.c_str(), message.c_str() );
+			DD_ASSERT_ERROR( shader != nullptr, "ShaderProgram '%s': Invalid shader given to program!", m_name.c_str() );
 
-			m_source = oldSource;
-			Compile( m_source );
-
-			return false;
+			glAttachShader( m_id, shader->m_id );
+			CheckOGLError();
 		}
 
-		m_source = source;
-		return true;
+		dd::String256 msg = Link();
+		if( !msg.IsEmpty() )
+		{
+			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.c_str(), msg.c_str() );
+
+			m_valid = false;
+		}
+
+		m_shaders = shaders;
 	}
 
-	dd::String256 Shader::Compile( const dd::String& source )
+	dd::String256 Shader::Link()
 	{
-		DD_PROFILE_SCOPED( Shader_Compile );
+		DD_PROFILE_SCOPED( ShaderProgram_Link );
+
+		glLinkProgram( m_id );
 
 		dd::String256 msg;
 
-		const char* src = source.c_str();
-		glShaderSource( m_id, 1, (const GLchar**) &src, NULL );
-
-		glCompileShader( m_id );
-
 		GLint status;
-		glGetShaderiv( m_id, GL_COMPILE_STATUS, &status );
+		glGetProgramiv( m_id, GL_LINK_STATUS, &status );
+		CheckOGLError();
 
 		if( status == GL_FALSE )
 		{
+			msg = "\nProgram linking failure: \n";
+
 			GLint infoLogLength;
-			glGetShaderiv( m_id, GL_INFO_LOG_LENGTH, &infoLogLength );
+			glGetProgramiv( m_id, GL_INFO_LOG_LENGTH, &infoLogLength );
+			CheckOGLError();
 
 			char* strInfoLog = new char[infoLogLength + 1];
-			glGetShaderInfoLog( m_id, infoLogLength, NULL, strInfoLog );
+			glGetProgramInfoLog( m_id, infoLogLength, NULL, strInfoLog );
+			CheckOGLError();
+
+			strInfoLog[ infoLogLength ] = '\0';
 
 			msg += strInfoLog;
 			delete[] strInfoLog;
+
+			m_valid = false;
 		}
 
 		return msg;
 	}
 
-	bool Shader::LoadFile( const dd::String& path, dd::String& outSource )
+	bool Shader::Reload()
 	{
-		dd::File file( path.c_str() );
-		std::string read;
-		if( !file.Read( read ) )
+		for( ShaderPart* shader : m_shaders )
 		{
+			if( !shader->Reload() )
+			{
+				break;
+			}
+		}
+
+		dd::String256 msg = Link();
+		if( !msg.IsEmpty() )
+		{
+			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.c_str(), msg.c_str() );
 			return false;
 		}
 
-		outSource += read;
 		return true;
 	}
 
-	Shader* Shader::Create( const dd::String& path, Shader::Type type )
+	bool Shader::InUse() const
 	{
-		DD_PROFILE_SCOPED( Shader_Create );
-
-		auto it = sm_shaderCache.find( path );
-		if( it != sm_shaderCache.end() )
-		{
-			return it->second;
-		}
-
-		if( !dd::File::Exists( path.c_str() ) )
-		{
-			return nullptr;
-		}
-		
-		Shader* shader = new Shader( path, type );
-		if( shader->m_id == OpenGL::InvalidID || 
-			!shader->Reload() )
-		{
-			DD_ASSERT( false, "Failed to load shader from '%s'!", path.c_str() );
-			delete shader;
-			return nullptr;
-		}
-
-		sm_shaderCache.insert( std::make_pair( dd::String128( path ), shader ) );
-		return shader;
+		return m_inUse;
 	}
+
+	void Shader::Use( bool use )
+	{
+		DD_ASSERT( use != m_inUse, "ShaderProgram '%s': Trying to use shader that is already in use!", m_name.c_str() );
+
+		int current;
+		glGetIntegerv( GL_CURRENT_PROGRAM, &current );
+		CheckOGLError();
+
+		if( use )
+		{
+			DD_ASSERT( current == 0, "ShaderProgram '%s': Shader not deactivated before trying to activate another shader!", m_name.c_str() );
+		}
+		else
+		{
+			DD_ASSERT( current == m_id, "ShaderProgram '%s': Trying to deactivate a different shader than currently bound!", m_name.c_str() );
+		}
+
+		m_inUse = use;
+
+		glUseProgram( m_inUse ? m_id : 0 );
+		CheckOGLError();
+	}
+
+	ScopedShader Shader::UseScoped()
+	{
+		return ScopedShader( *this );
+	}
+
+	ShaderLocation Shader::GetAttribute( const char* name ) const
+	{
+		AssertBeforeUse( name );
+
+		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name );
+		CheckOGLError();
+
+		return attrib;
+	}
+
+	bool Shader::EnableAttribute( const char* name )
+	{
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glEnableVertexAttribArray( loc );
+			CheckOGLError();
+
+			return true;
+		}
+
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		return false;
+	}
+
+	bool Shader::DisableAttribute( const char* name )
+	{
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glDisableVertexAttribArray( loc );
+			CheckOGLError();
+
+			return true;
+		}
+
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		return false;
+	}
+
+	bool Shader::BindPositions()
+	{
+		return BindAttributeVec3( "Position", false );
+	}
+
+	bool Shader::BindNormals()
+	{
+		return BindAttributeVec3( "Normal", true );
+	}
+
+	bool Shader::BindUVs()
+	{
+		return BindAttributeVec2( "UV", false );
+	}
+
+	bool Shader::BindVertexColours()
+	{
+		return BindAttributeVec4( "VertexColour", false );
+	}
+
+	bool Shader::BindAttributeVec2( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 2, normalized );
+	}
+
+	bool Shader::BindAttributeVec3( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 3, normalized );
+	}
+
+	bool Shader::BindAttributeVec4( const char* name, bool normalized )
+	{
+		return BindAttributeFloat( name, 4, normalized );
+	}
+
+	bool Shader::BindAttributeFloat( const char* name, uint components, bool normalized )
+	{
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
+		GLint currentVBO = VBO::GetCurrentVBO( GL_ARRAY_BUFFER );
+		DD_ASSERT( currentVBO != OpenGL::InvalidID, "No VBO is bound!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, 0, nullptr );
+			CheckOGLError();
+
+			glEnableVertexAttribArray( loc );
+			CheckOGLError();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool Shader::SetAttributeInstanced( const char* name )
+	{
+		GLint currentVAO = VAO::GetCurrentVAO();
+		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+
+		ShaderLocation loc = GetAttribute( name );
+		if( loc != InvalidLocation )
+		{
+			glVertexAttribDivisor( loc, 1 );
+			CheckOGLError();
+
+			return true;
+		}
+
+		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		return false;
+	}
+
+	ShaderLocation Shader::GetUniform( const char* name ) const
+	{
+		AssertBeforeUse( name );
+
+		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name );
+		return uniform;
+	}
+
+	void Shader::SetUniform( const char* name, float f )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform1f( uniform, f );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, int i )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform1i( uniform, i );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, bool b )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform1i( uniform, b );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const glm::vec2& vec )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform2fv( uniform, 1, glm::value_ptr( vec ) );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const glm::vec3& vec )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform3fv( uniform, 1, glm::value_ptr( vec ) );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const glm::vec4& vec )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform4fv( uniform, 1, glm::value_ptr( vec ) );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const glm::mat3& mat )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniformMatrix3fv( uniform, 1, false, glm::value_ptr( mat ) );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const glm::mat4& mat )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniformMatrix4fv( uniform, 1, false, glm::value_ptr( mat ) );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::SetUniform( const char* name, const Texture& texture )
+	{
+		ShaderLocation uniform = GetUniform( name );
+		if( uniform != InvalidLocation )
+		{
+			glUniform1i( uniform, texture.GetTextureUnit() );
+			CheckOGLError();
+		}
+	}
+
+	void Shader::AssertBeforeUse( const char* name ) const
+	{
+		DD_ASSERT( InUse(), "ShaderProgram '%s': Need to use shader before trying to access it!", m_name.c_str() );
+		DD_ASSERT( IsValid(), "ShaderProgram '%s': Program is invalid!", m_name.c_str() );
+		DD_ASSERT( strlen( name ) > 0, "ShaderProgram '%s': Empty uniform name given!", m_name.c_str() );
+	}
+
+	ShaderHandle ShaderManager::Load( const char* name )
+	{
+		ShaderHandle shader_h = base::Find( name );
+		if( !shader_h.IsValid() )
+		{
+			const std::string folder( "shaders\\" );
+
+			dd::Vector<ShaderPart*> shaders;
+			shaders.Reserve( 3 );
+
+			{
+				std::string vertex_path = folder + name + ".vertex";
+
+				ShaderPart* vertex = ShaderPart::Create( vertex_path, ShaderPart::Type::Vertex );
+				DD_ASSERT( vertex != nullptr );
+				shaders.Add( vertex );
+			}
+
+			{
+				std::string geometry_path = folder + name + ".geometry";
+
+				ShaderPart* geom = ShaderPart::Create( geometry_path, ShaderPart::Type::Geometry );
+				if( geom != nullptr )
+				{
+					shaders.Add( geom );
+				}
+			}
+
+			{
+				std::string pixel_path = folder + name + ".pixel";
+
+				ShaderPart* pixel = ShaderPart::Create( pixel_path, ShaderPart::Type::Pixel );
+				DD_ASSERT( pixel != nullptr );
+				shaders.Add( pixel );
+			}
+
+			shader_h = base::Create( name );
+
+			Shader* program = shader_h.Access();
+			program->SetShaders( shaders );
+		}
+
+		return shader_h;
+	}
+
+	void ShaderManager::ReloadAll()
+	{
+		for( size_t i = 0; i < base::Count(); ++i )
+		{
+			Shader* program = base::AccessAt( i );
+			program->Reload();
+		}
+	}
+
 }

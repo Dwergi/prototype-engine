@@ -10,8 +10,8 @@
 #include "GLError.h"
 #include "ICamera.h"
 #include "OpenGL.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "Texture.h"
 #include "Uniforms.h"
 #include "Window.h"
@@ -105,7 +105,7 @@ namespace ddr
 		{
 			m_blitShader = ShaderManager::Instance()->Load( "blit" );
 
-			ShaderProgram* shader = m_blitShader.Access();
+			Shader* shader = m_blitShader.Access();
 			shader->Use( true );
 
 			m_vaoFullscreen.Create();
@@ -131,7 +131,7 @@ namespace ddr
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texDepth != nullptr );
 
-		ShaderProgram* shader = m_blitShader.Access();
+		Shader* shader = m_blitShader.Access();
 		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vaoFullscreen.Bind();
@@ -159,7 +159,7 @@ namespace ddr
 		DD_ASSERT( IsValid() );
 		DD_ASSERT( m_texColour != nullptr );
 
-		ShaderProgram* shader = m_blitShader.Access();
+		Shader* shader = m_blitShader.Access();
 		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vaoFullscreen.Bind();

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "HandleManager.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 
 #include <mutex>
 #include <unordered_map>

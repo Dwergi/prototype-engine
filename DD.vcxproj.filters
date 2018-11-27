@@ -288,12 +288,6 @@
     <ClInclude Include="src\Mesh.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShaderProgram.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -594,6 +588,12 @@
     <ClInclude Include="src\FPSCameraComponent.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderPart.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -760,12 +760,6 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShaderProgram.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\MeshComponent.cpp">
@@ -1052,6 +1046,12 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\FPSCameraComponent.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderPart.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

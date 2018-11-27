@@ -65,8 +65,13 @@ namespace dd
 			return false;
 		}
 
-		dst.resize( Size() );
-		stream.read( dst.data(), dst.capacity() );
+		size_t file_size = Size();
+
+		dst.resize( file_size );
+		stream.read( dst.data(), file_size );
+
+		size_t i = dst.find( '\0' );
+		dst.resize( i );
 
 		return true;
 	}

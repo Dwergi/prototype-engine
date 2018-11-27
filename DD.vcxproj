@@ -443,8 +443,8 @@
     <ClInclude Include="src\AngelScriptEngine.h" />
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptSystem.h" />
+    <ClInclude Include="src\ShaderPart.h" />
     <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
     <ClInclude Include="src\ShipComponent.h" />
@@ -662,8 +662,8 @@
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />
+    <ClCompile Include="src\ShaderPart.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />

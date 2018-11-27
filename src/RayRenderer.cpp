@@ -9,7 +9,7 @@
 
 #include "ColourComponent.h"
 #include "RayComponent.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 
 namespace ddr
 {
@@ -50,7 +50,7 @@ namespace ddr
 		m_shader = ShaderManager::Instance()->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );
@@ -73,7 +73,7 @@ namespace ddr
 
 	void RayRenderer::Render( const ddr::RenderData& data )
 	{
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 		
 		shader->Use( true );

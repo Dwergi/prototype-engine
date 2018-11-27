@@ -1,6 +1,9 @@
 #version 330 core
 #extension GL_OES_standard_derivatives : enable
 
+#include "lights.glsl"
+#include "wireframe.glsl"
+
 out vec4 Colour;
 
 in struct FragmentData
@@ -9,45 +12,6 @@ in struct FragmentData
 	vec4 Colour;
 	vec3 Barycentric;
 } Fragment;
-
-uniform struct MaterialData
-{
-	float Shininess;
-	float Specular;
-	float Diffuse;
-	float Ambient;
-}
-Material;
-
-uniform struct WireframeData
-{
-	bool Enabled;
-	vec3 Colour;
-	float Width;
-	vec3 EdgeColour;
-	float EdgeWidth;
-	float MaxDistance;
-}
-Wireframe;
-
-#define MAX_LIGHTS 10
-
-uniform struct LightData 
-{
-	int Type; // 0 = directional, 1 = point, 2 = spot
-	vec4 Position;
-	vec3 Direction;
-	vec3 Colour;
-	float CosInnerAngle;
-	float CosOuterAngle;
-	float Intensity;
-	float AmbientStrength;
-	float SpecularStrength;
-	float Attenuation;
-} 
-Lights[ MAX_LIGHTS ];
-
-uniform int LightCount;
 
 #define MAX_HEIGHTS 10
 
@@ -97,96 +61,6 @@ vec3 GetTerrainHeightColour( float heightPercent )
 
 	float t = (heightPercent - TerrainHeightLevels[previous].Cutoff) / (TerrainHeightLevels[current].Cutoff - TerrainHeightLevels[previous].Cutoff);
 	return mix( TerrainHeightLevels[previous].Colour, TerrainHeightLevels[current].Colour, t );
-}
-
-//
-// Apply a single light to the pixel. 
-// Deals with both directional and point lights.
-//
-vec3 ApplyLight( LightData light, MaterialData material, vec3 fragColour, vec3 fragNormal, vec3 fragPosition, vec3 viewDir )
-{
-	vec3 lightColour = light.Colour * light.Intensity;
-	vec3 ambientColour = light.AmbientStrength * material.Ambient * lightColour;
-	vec3 lightDir;
-
-	float attenuation = 1.0;
-
-	if( light.Type == 0 )
-	{
-		// directional lights
-		attenuation = 1.0; 
-		lightDir = -light.Direction;
-	}
-	else if( light.Type == 1 )
-	{
-		// point lights
-		vec3 fragmentToLight = light.Position.xyz - fragPosition;
-		float distance = length( fragmentToLight );
-		lightDir = fragmentToLight / distance;
-		attenuation = 1.0 / (1.0 + light.Attenuation * distance * distance);
-	}
-	else if( light.Type == 2 )
-	{
-		// spot lights
-		vec3 fragmentToLight = light.Position.xyz - fragPosition;
-		float distance = length( fragmentToLight );
-		lightDir = fragmentToLight / distance;
-
-		float theta = dot( lightDir, -light.Direction );
-		float epsilon = light.CosInnerAngle - light.CosOuterAngle;
-		float intensity = clamp( (theta - light.CosOuterAngle) / epsilon, 0.0, 1.0 );
-		
-		attenuation = 1.0 / (1.0 + light.Attenuation * distance * distance);
-		attenuation *= intensity;
-	}
-
-	if( attenuation < 0.0001 )
-		return vec3( 0 );
-
-	float diffAmount = max( dot( fragNormal, lightDir ), 0.0 );
-	vec3 diffuseColour = diffAmount * material.Diffuse * lightColour;
-
-	vec3 reflectDir = reflect( -lightDir, fragNormal );
-	float specularAmount = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.Shininess );
-	vec3 specularColour = light.SpecularStrength * material.Specular * specularAmount * lightColour;
-
-	vec3 linearColour = attenuation * (specularColour + diffuseColour) + ambientColour;
-	vec3 finalColour = linearColour * fragColour;
-	return finalColour;
-}
-//
-// Calculate the colour of a pixel in wireframe mode by finding the minimum distance to an edge,
-// and adding an edge of a different colour.
-//
-vec4 CalculateWireframe( vec3 barycentric, vec3 wireColour, float wireWidth, vec3 edgeColour, float edgeWidth, float viewDistance, float maxDistance )
-{
-	vec4 colour = vec4( 0.0 );
-
-	if( viewDistance > maxDistance )
-		return colour;
-
-	wireWidth = mix( wireWidth, 0.0, viewDistance / maxDistance );
-	edgeWidth = mix( edgeWidth, 0.0, viewDistance / maxDistance );
-
-	vec3 d = fwidth( barycentric );
-	vec3 tdist = smoothstep( vec3( 0.0 ), d * wireWidth, barycentric );
-	float t = min( min( tdist.x, tdist.y ), tdist.z );
-
-	float edge_ratio = edgeWidth / wireWidth;
-
-	if( edge_ratio > 0 )
-	{
-		float edge_t = clamp( (t - (1.0 - edge_ratio)) / edge_ratio, 0.0, 1.0 );
-		colour = mix( vec4( edgeColour, 1 ), vec4( 0.0 ), edge_t );
-	}
-
-	if( edge_ratio < 1 )
-	{
-		float wire_t = clamp( t / (1.0 - edge_ratio), 0.0, 1.0 );
-		colour = mix( vec4( wireColour, 1 ), colour, wire_t );
-	}
-
-	return colour;
 }
 
 void main()

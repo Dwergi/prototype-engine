@@ -13,8 +13,8 @@
 #include "InputBindings.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "TransformComponent.h"
 
 namespace ddr
@@ -87,7 +87,7 @@ namespace ddr
 		m_shader = ShaderManager::Instance()->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );
@@ -147,7 +147,7 @@ namespace ddr
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		shader->Use( true );

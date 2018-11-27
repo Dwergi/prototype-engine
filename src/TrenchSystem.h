@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Mesh.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "System.h"
 #include "TransformComponent.h"
 #include "TrenchComponent.h"

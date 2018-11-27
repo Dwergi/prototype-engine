@@ -11,7 +11,7 @@
 #include "ICamera.h"
 #include "OpenGL.h"
 #include "RenderData.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "Uniforms.h"
 #include "VAO.h"
 
@@ -133,7 +133,7 @@ namespace ddr
 	void Frustum::CreateRenderData()
 	{
 		m_shader = ShaderManager::Instance()->Load( "mesh" );
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		shader->Use( true );
 
 		m_vao.Create();
@@ -173,7 +173,7 @@ namespace ddr
 
 		UniformStorage& uniforms = data.Uniforms();
 
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		ScopedShader usage = shader->UseScoped();
 
 		uniforms.Set( "Model", m_transform );

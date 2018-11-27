@@ -13,8 +13,8 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "OpenGL.h"
+#include "ShaderPart.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
 #include "TerrainParameters.h"
 #include "Uniforms.h"
 
