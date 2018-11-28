@@ -12,6 +12,7 @@
 #include "OpenGL.h"
 #include "RenderData.h"
 #include "Shader.h"
+#include "Sphere.h"
 #include "Uniforms.h"
 #include "VAO.h"
 
@@ -100,6 +101,26 @@ namespace ddr
 		{
 			m_transform = camera_transform;
 		}
+	}
+
+	bool Frustum::Intersects( const dd::Sphere& bounds ) const
+	{
+		for( const dd::Plane& plane : m_planes )
+		{
+			float distance = plane.DistanceTo( bounds.Centre );
+
+			if( distance < -bounds.Radius )
+			{
+				return false;
+			}
+
+			if( abs( distance ) < bounds.Radius )
+			{
+				return true;
+			}
+		}
+
+		return true;
 	}
 
 	bool Frustum::Intersects( const dd::AABB& bounds ) const

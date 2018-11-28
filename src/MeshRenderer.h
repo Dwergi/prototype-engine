@@ -10,10 +10,12 @@
 #include "IDebugPanel.h"
 #include "Mesh.h"
 #include "Renderer.h"
+#include "RenderState.h"
 
 namespace dd
 {
 	struct BoundBoxComponent;
+	struct BoundSphereComponent;
 	struct ColourComponent;
 	struct JobSystem;
 	struct MeshComponent; 
@@ -37,17 +39,16 @@ namespace ddr
 		
 		bool m_frustumCull { true };
 		bool m_debugHighlightFrustumMeshes { false };
-
-		bool m_depthTest { true };
-		bool m_backfaceCulling { true };
 		bool m_drawNormals { false };
+
+		RenderState m_state;
 
 		MeshHandle m_cube;
 		
 		dd::JobSystem& m_jobsystem;
 
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
-			const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp, 
+			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
 
 		virtual void DrawDebugInternal( ddc::World& world ) override;

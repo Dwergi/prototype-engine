@@ -55,6 +55,10 @@ namespace ddr
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
 		RequireTag( ddc::Tag::Visible );
+
+		m_renderState.BackfaceCulling = true;
+		m_renderState.Blending = true;
+		m_renderState.Depth = true;
 	}
 
 	BoundsRenderer::~BoundsRenderer()
@@ -90,7 +94,7 @@ namespace ddr
 		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
-		shader->Use( true );
+		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vao.Create();
 		m_vao.Bind();
@@ -104,8 +108,6 @@ namespace ddr
 		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
 
 		m_vao.Unbind();
-
-		shader->Use( false );
 
 		m_updateBuffers = true;
 	}
@@ -144,13 +146,12 @@ namespace ddr
 			UpdateBuffers();
 		}
 
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
 		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
-		shader->Use( true );
+		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vao.Bind();
 
@@ -209,10 +210,6 @@ namespace ddr
 		m_vboPosition.Unbind();
 
 		m_vao.Unbind();
-
-		shader->Use( false );
-
-		glDisable( GL_BLEND );
 	}
 
 	void BoundsRenderer::DrawDebugInternal( ddc::World& world )

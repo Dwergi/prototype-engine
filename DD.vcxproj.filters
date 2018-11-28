@@ -594,6 +594,18 @@
     <ClInclude Include="src\Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\TreeSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TreeComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LinesComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LinesRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1047,6 +1059,18 @@
     </ClCompile>
     <ClCompile Include="src\FPSCameraComponent.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinesComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinesRenderer.cpp">
+      <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderPart.cpp">
       <Filter>Rendering</Filter>

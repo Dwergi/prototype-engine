@@ -20,7 +20,7 @@
 
 namespace dd
 {
-	static int AgentCount = 100;
+	static int AgentCount = 0;
 
 	// what radius the swarm searches for others in
 	static float SearchRadius = 50.0f; 

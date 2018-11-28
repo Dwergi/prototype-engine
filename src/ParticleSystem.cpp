@@ -175,16 +175,16 @@ namespace dd
 			if( !particle.Alive() )
 			{
 				particle.Position = transform.Position;
-
-				glm::vec3 velocity = glm::mix( system.MinVelocity, system.MaxVelocity, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) );
+				
+				glm::vec3 velocity = GetRandomVector3( system.RNG, system.MinVelocity, system.MaxVelocity );
 				particle.Velocity = velocity * transform.Rotation;
 
 				DD_ASSERT( !ddm::IsNaN( particle.Velocity ) );
 
-				particle.Size = glm::mix( system.MinSize, system.MaxSize, glm::vec2( system.RNG.Next(), system.RNG.Next() ) );
+				particle.Size = GetRandomVector2( system.RNG, system.MinSize, system.MaxSize );
 				particle.Lifetime = glm::mix( system.MinLifetime, system.MaxLifetime, system.RNG.Next() );
 				particle.Age = 0;
-				particle.Colour = glm::vec4( glm::mix( system.MinColour, system.MaxColour, glm::vec3( system.RNG.Next(), system.RNG.Next(), system.RNG.Next() ) ), 1 );
+				particle.Colour = glm::vec4( GetRandomVector3( system.RNG, system.MinColour, system.MaxColour ), 1 );
 
 				++system.LiveCount;
 				++emitted;

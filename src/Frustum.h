@@ -14,6 +14,7 @@
 namespace dd
 {
 	struct AABB;
+	struct Sphere;
 }
 
 namespace ddr 
@@ -33,7 +34,12 @@ namespace ddr
 		void CreateRenderData();
 
 		//
-		// Check if the frustum intersects with the given bounds.
+		// Check if the frustum intersects with the given sphere.
+		//
+		bool Intersects( const dd::Sphere& bounds ) const;
+
+		//
+		// Check if the frustum intersects with the given bound box.
 		//
 		bool Intersects( const dd::AABB& bounds ) const;
 

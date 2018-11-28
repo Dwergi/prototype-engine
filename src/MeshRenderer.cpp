@@ -8,6 +8,8 @@
 #include "MeshRenderer.h"
 
 #include "BoundBoxComponent.h"
+#include "BoundSphereComponent.h"
+#include "BoundsHelpers.h"
 #include "ColourComponent.h"
 #include "Frustum.h"
 #include "ICamera.h"
@@ -28,9 +30,14 @@ namespace ddr
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
-		Require<dd::BoundBoxComponent>();
 		Require<dd::TransformComponent>();
-		Require<dd::ColourComponent>();
+		Optional<dd::ColourComponent>();
+		Optional<dd::BoundBoxComponent>();
+		Optional<dd::BoundSphereComponent>();
+
+		m_state.BackfaceCulling = true;
+		m_state.Blending = false;
+		m_state.Depth = true;
 	}
 
 	void MeshRenderer::RenderInit( ddc::World& world )
@@ -62,36 +69,15 @@ namespace ddr
 	{
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
-
-		if( m_depthTest )
-		{
-			// depth test
-			glEnable( GL_DEPTH_TEST );
-			glDepthFunc( GL_GREATER );
-			glClipControl( GL_LOWER_LEFT, GL_ZERO_TO_ONE );
-		}
-		else
-		{
-			glDisable( GL_DEPTH_TEST );
-		}
-
-		// backface culling
-		if( m_backfaceCulling )
-		{
-			glEnable( GL_CULL_FACE );
-			glFrontFace( GL_CCW );
-			glCullFace( GL_BACK );
-		}
-		else
-		{
-			glDisable( GL_CULL_FACE );
-		}
+		
+		auto state = m_state.UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		uniforms.Set( "DrawNormals", m_drawNormals );
 
 		auto meshes = data.Get<dd::MeshComponent>();
-		auto bounds = data.Get<dd::BoundBoxComponent>();
+		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
+		auto bound_spheres = data.Get<dd::BoundSphereComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
 		auto colours = data.Get<dd::ColourComponent>();
 
@@ -99,12 +85,13 @@ namespace ddr
 		
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bounds[i], colours[i], data.World(), data.Camera(), uniforms );
+			RenderMesh( entities[i], meshes[i], transforms[i], bound_boxes.Get( i ), bound_spheres.Get( i ), 
+				colours.Get( i ), data.World(), data.Camera(), uniforms );
 		}
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp, 
-		const dd::BoundBoxComponent& bounds_cmp, const dd::ColourComponent& colour_cmp,
+		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp,
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
 		Mesh* mesh = mesh_cmp.Mesh.Access();
@@ -120,11 +107,20 @@ namespace ddr
 
 		++m_meshCount;
 
-		dd::AABB world_bounds = bounds_cmp.BoundBox.GetTransformed( transform_cmp.Transform() );
-		DD_ASSERT( world_bounds.IsValid() );
+		dd::AABB aabb;
+		dd::Sphere sphere;
+		dd::GetBoundBoxAndSphere( bbox_cmp, bsphere_cmp, aabb, sphere );
 		
+		dd::AABB world_aabb = aabb.GetTransformed( transform_cmp.Transform() );
+		DD_ASSERT( world_aabb.IsValid() );
+
+		dd::Sphere world_sphere = sphere.GetTransformed( transform_cmp.Transform() );
+		DD_ASSERT( world_sphere.IsValid() );
+
 		// check if it intersects with the frustum
-		if( m_frustumCull && !camera.GetFrustum().Intersects( world_bounds ) )
+		if( m_frustumCull && 
+			!camera.GetFrustum().Intersects( world_sphere ) &&
+			!camera.GetFrustum().Intersects( world_aabb ) )
 		{
 			return;
 		}
@@ -151,15 +147,19 @@ namespace ddr
 		const Material* material = mesh->GetMaterial().Get();
 		DD_ASSERT( material != nullptr );
 
-		Shader* shader = ShaderManager::Instance()->Access( material->GetShader() );
-		DD_ASSERT( shader != nullptr );
-
+		Shader* shader = material->GetShader().Access();
 		ScopedShader usage = shader->UseScoped();
 
 		material->UpdateUniforms( uniforms );
 
-		glm::vec4 colour = colour_cmp.Colour * debugMultiplier;
-		uniforms.Set( "ObjectColour", colour );
+		glm::vec4 colour( 1 );
+		
+		if( colour_cmp != nullptr )
+		{
+			colour = colour_cmp->Colour;
+		}
+
+		uniforms.Set( "ObjectColour", colour * debugMultiplier );
 
 		uniforms.Bind( *shader );
 
@@ -174,8 +174,17 @@ namespace ddr
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
 
-		ImGui::Checkbox( "Backface Culling", &m_backfaceCulling );
-		ImGui::Checkbox( "Depth Test", &m_depthTest );
+		bool culling = m_state.BackfaceCulling;
+		if( ImGui::Checkbox( "Backface Culling", &culling ) )
+		{
+			m_state.BackfaceCulling = culling;
+		}
+
+		bool depth = m_state.Depth;
+		if( ImGui::Checkbox( "Depth Test", &depth ) )
+		{
+			m_state.Depth = depth;
+		}
 
 		ImGui::Checkbox( "Draw Normals", &m_drawNormals );
 	}

@@ -8,7 +8,6 @@
 
 #include "AABB.h"
 
-
 namespace dd
 {
 	struct BoundBoxComponent

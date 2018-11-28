@@ -10,14 +10,13 @@
 
 namespace dd
 {
-	class Random64
+	constexpr uint DEFAULT_SEED_32 = ~0;
+	constexpr uint DEFAULT_SEED_64 = ~0;
+
+	struct Random64
 	{
-	public:
-
-		static const uint64 DEFAULT_SEED = -1;
-
-		Random64( uint64 seed = DEFAULT_SEED );
-		Random64( uint64 min, uint64 max, uint64 seed = DEFAULT_SEED );
+		Random64( uint64 seed = DEFAULT_SEED_64 );
+		Random64( uint64 min, uint64 max, uint64 seed = DEFAULT_SEED_64 );
 
 		uint64 Next();
 
@@ -35,78 +34,100 @@ namespace dd
 		uint64 m_max;
 	};
 
-	class Random32
+	template <typename T>
+	struct Random32Base
 	{
-	public:
+		Random32Base( uint seed = DEFAULT_SEED_32 );
+		Random32Base( T min, T max, uint seed = DEFAULT_SEED_32 );
 
-		static const uint DEFAULT_SEED = ~0;
+		virtual T Next() = 0;
 
-		Random32( uint seed = DEFAULT_SEED );
-		Random32( uint min, uint max, uint seed = DEFAULT_SEED );
+		T Min() const { return m_min; }
+		void SetMin( T min ) { m_min = min; }
 
-		uint Next();
+		T Max() const { return m_max; }
+		void SetMax( T max ) { m_max = max; }
 
-		uint Max() const { return m_max; }
-		void SetMax( uint max ) { m_max = max; }
-
-		uint Min() const { return m_min; }
-		void SetMin( uint min ) { m_min = min; }
-
-	private:
-
+	protected:
 		pcg32_fast m_rng;
 
-		uint m_min;
-		uint m_max;
+		T m_min;
+		T m_max;
 	};
 
-	class RandomInt
+	struct Random32 : Random32Base<uint>
 	{
-	public:
+		Random32( uint seed = DEFAULT_SEED_32 );
+		Random32( uint min, uint max, uint seed = DEFAULT_SEED_32 );
 
-		static const int DEFAULT_SEED = -1;
+		virtual uint Next() override;
+	};
 
-		RandomInt( int seed = DEFAULT_SEED );
-		RandomInt( int min, int max, int seed = DEFAULT_SEED );
+	struct RandomInt : Random32Base<int>
+	{
+		RandomInt( uint seed = DEFAULT_SEED_32 );
+		RandomInt( int min, int max, uint seed = DEFAULT_SEED_32 );
 
-		int Next();
+		virtual int Next() override;
+	};
 
-		int Max() const { return m_max; }
-		void SetMax( int max ) { m_max = max; }
+	struct RandomFloat : Random32Base<float>
+	{
+		RandomFloat( uint seed = DEFAULT_SEED_32 );
+		RandomFloat( float min, float max, uint seed = DEFAULT_SEED_32 );
 
-		int Min() const { return m_min; }
-		void SetMin( int min ) { m_min = min; }
+		virtual float Next() override;
+	};
+
+	struct RandomVector3
+	{
+		RandomVector3( uint seed = DEFAULT_SEED_32 );
+		RandomVector3( glm::vec3 min, glm::vec3 max, uint seed = DEFAULT_SEED_32 );
+
+		glm::vec3 Next();
+
+		glm::vec3 Min() const;
+		void SetMin( glm::vec3 min );
+
+		glm::vec3 Max() const;
+		void SetMax( glm::vec3 max );
 
 	private:
-
-		pcg32_fast m_rng;
-
-		int m_min;
-		int m_max;
+		RandomFloat m_rngX;
+		RandomFloat m_rngY;
+		RandomFloat m_rngZ;
 	};
 
-	class RandomFloat
+	glm::vec2 GetRandomVector2( dd::RandomFloat& rng, glm::vec2 min, glm::vec2 max );
+	glm::vec3 GetRandomVector3( dd::RandomFloat& rng, glm::vec3 min, glm::vec3 max );
+
+	// 
+	// INLINE IMPLEMENTATION
+	//
+
+	template <typename T>
+	Random32Base<T>::Random32Base( uint seed ) :
+		m_rng( seed ),
+		m_min( std::numeric_limits<T>::min() ),
+		m_max( std::numeric_limits<T>::max() )
 	{
-	public:
+		if( seed == DEFAULT_SEED_32 )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
 
-		static const uint DEFAULT_SEED = -1;
+	template <typename T>
+	Random32Base<T>::Random32Base( T min, T max, uint seed ) :
+		m_rng( seed ),
+		m_min( min ),
+		m_max( max )
+	{
+		DD_ASSERT( m_min < m_max );
 
-		RandomFloat( uint seed = DEFAULT_SEED );
-		RandomFloat( float min, float max, uint seed = DEFAULT_SEED );
-
-		float Next();
-
-		float Max() const { return m_max; }
-		void SetMax( float max ) { m_max = max; }
-
-		float Min() const { return m_min; }
-		void SetMin( float min ) { m_min = min; }
-
-	private:
-
-		pcg32_fast m_rng;
-
-		float m_min;
-		float m_max;
-	};
+		if( seed == DEFAULT_SEED_32 )
+		{
+			m_rng.seed( pcg_extras::seed_seq_from<std::random_device>() );
+		}
+	}
 }

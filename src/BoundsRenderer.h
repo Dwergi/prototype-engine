@@ -8,6 +8,7 @@
 
 #include "IDebugPanel.h"
 #include "Renderer.h"
+#include "RenderState.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
@@ -47,6 +48,7 @@ namespace ddr
 		VBO m_vboPosition;
 		VBO m_vboIndex;
 
+		RenderState m_renderState;
 		ShaderHandle m_shader;
 
 		virtual const char* GetDebugTitle() const override { return "Bounds"; }

@@ -351,6 +351,8 @@
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\JSON.h" />
+    <ClInclude Include="src\LinesComponent.h" />
+    <ClInclude Include="src\LinesRenderer.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
@@ -436,6 +438,8 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\TerrainRenderer.h" />
+    <ClInclude Include="src\TreeComponent.h" />
+    <ClInclude Include="src\TreeSystem.h" />
     <ClInclude Include="src\Triangulator.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
@@ -581,6 +585,8 @@
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\JSON.cpp" />
+    <ClCompile Include="src\LinesComponent.cpp" />
+    <ClCompile Include="src\LinesRenderer.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
@@ -658,6 +664,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\TreeComponent.cpp" />
+    <ClCompile Include="src\TreeSystem.cpp" />
     <ClCompile Include="src\Triangulator.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />

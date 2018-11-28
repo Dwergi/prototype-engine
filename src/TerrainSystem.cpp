@@ -134,7 +134,7 @@ namespace dd
 
 		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
-			if( m_draw )
+			if( m_enabled )
 			{
 				world.AddTag( entities[i], ddc::Tag::Visible );
 			}
@@ -316,7 +316,7 @@ namespace dd
 
 	void TerrainSystem::DrawDebugInternal( ddc::World& world )
 	{
-		ImGui::Checkbox( "Draw", &m_draw );
+		ImGui::Checkbox( "Enabled", &m_enabled );
 
 		ImGui::Value( "Active", m_activeCount );
 
