@@ -3,18 +3,20 @@
 
 #include "AABB.h"
 #include "BoundBoxComponent.h"
-#include "Sphere.h"
 #include "BoundSphereComponent.h"
+#include "Sphere.h"
+#include "TransformComponent.h"
 
 namespace dd
 {
-	bool GetWorldBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const glm::mat4& transform,
-		dd::AABB& aabb, dd::Sphere& sphere )
+	bool GetWorldBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, 
+		const dd::TransformComponent& transform, dd::AABB& aabb, dd::Sphere& sphere )
 	{
 		if( GetBoundBoxAndSphere( bound_box, bound_sphere, aabb, sphere ) )
 		{
-			aabb = aabb.GetTransformed( transform );
-			sphere = sphere.GetTransformed( transform );
+			glm::mat4 m = transform.Transform();
+			aabb = aabb.GetTransformed( m );
+			sphere = sphere.GetTransformed( m );
 			return true;
 		}
 

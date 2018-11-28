@@ -277,9 +277,9 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			dd::AABB box;
+			dd::AABB aabb;
 			dd::Sphere sphere;
-			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ].Transform(), box, sphere ) )
+			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ], aabb, sphere ) )
 			{
 				continue;
 			}
@@ -294,12 +294,12 @@ namespace dd
 					continue;
 
 				glm::vec3 normal;
-				ddm::HitTestMesh( screen_ray, transforms[ i ].Transform(), sphere, box, *mesh, distance, normal );
+				ddm::HitTestMesh( screen_ray, transforms[ i ].Transform(), sphere, aabb, *mesh, distance, normal );
 			}
 			else
 			{
 				float bbox_dist = FLT_MAX;
-				box.IntersectsRay( screen_ray, bbox_dist );
+				aabb.IntersectsRay( screen_ray, bbox_dist );
 				
 				float bsphere_dist = FLT_MAX;
 				glm::vec3 bsphere_pos, bsphere_normal;

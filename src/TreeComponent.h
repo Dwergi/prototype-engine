@@ -13,11 +13,15 @@ namespace dd
 {
 	struct TreeParticle
 	{
-		float Lifetime;
-		float BranchChance;
+		float Lifetime { 0 };
+		float BranchChance { 0 };
+		float BranchAccumulator { 0 };
 
-		glm::vec3 Velocity;
-		glm::vec3 Position;
+		glm::vec3 Velocity { 0 };
+		glm::vec3 Position { 0 };
+
+		glm::vec3 PreviousLine { 0 };
+		float LineAccumulator { 0 };
 	};
 
 	struct TreeComponent

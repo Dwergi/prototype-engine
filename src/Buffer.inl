@@ -39,6 +39,14 @@ ConstBuffer<T>::ConstBuffer( const T* ptr, size_t count ) :
 }
 
 template <typename T>
+ConstBuffer<T>::ConstBuffer( const std::vector<T>& vec ) : 
+	IBuffer( sizeof( T ) )
+{
+	m_ptr = vec.data();
+	m_count = (int) vec.size();
+}
+
+template <typename T>
 ConstBuffer<T>::ConstBuffer( const ConstBuffer<T>& other ) :
 	IBuffer( sizeof( T ) )
 {

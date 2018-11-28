@@ -8,7 +8,7 @@
 
 #include "Renderer.h"
 #include "RenderState.h"
-#include "ShaderProgram.h"
+#include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
 

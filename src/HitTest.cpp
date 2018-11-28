@@ -29,7 +29,7 @@ namespace ddm
 	{
 		dd::AABB aabb;
 		dd::Sphere sphere;
-		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform(), aabb, sphere ) )
+		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp, aabb, sphere ) )
 		{
 			return false;
 		}

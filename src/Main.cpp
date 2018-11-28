@@ -39,6 +39,7 @@
 #include "JobSystem.h"
 #include "LightComponent.h"
 #include "LightRenderer.h"
+#include "LinesRenderer.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -636,6 +637,8 @@ int GameMain()
 
 		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 
+		ddr::LinesRenderer* lines_renderer = new ddr::LinesRenderer();
+
 		ddr::TerrainRenderer* terrain_renderer = new ddr::TerrainRenderer( terrain_system->GetTerrainParameters() );
 
 		s_renderer->Register( *mouse_picking );
@@ -645,6 +648,7 @@ int GameMain()
 		s_renderer->Register( *mesh_renderer );
 		s_renderer->Register( *bounds_renderer );
 		s_renderer->Register( *ray_renderer );
+		s_renderer->Register( *lines_renderer );
 
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );

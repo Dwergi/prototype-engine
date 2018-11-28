@@ -10,6 +10,9 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
+#include "ColourComponent.h"
+#include "Frustum.h"
+#include "ICamera.h"
 #include "LinesComponent.h"
 #include "TransformComponent.h"
 
@@ -21,6 +24,7 @@ namespace ddr
 		Require<dd::LinesComponent>();
 		Require<dd::TransformComponent>();
 
+		Optional<dd::ColourComponent>();
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
 
@@ -34,7 +38,7 @@ namespace ddr
 		m_shader = ShaderManager::Instance()->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
-		ShaderProgram* shader = m_shader.Access();
+		Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
 		ScopedShader scoped_shader = shader->UseScoped();
@@ -56,13 +60,51 @@ namespace ddr
 		auto transforms = render_data.Get<dd::TransformComponent>();
 		auto bound_boxes = render_data.Get<dd::BoundBoxComponent>();
 		auto bound_spheres = render_data.Get<dd::BoundSphereComponent>();
+		auto colours = render_data.Get<dd::ColourComponent>();
+
+		const ddr::ICamera& camera = render_data.Camera();
+
+		Shader* shader = m_shader.Access();
+		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedRenderState scoped_state = m_renderState.UseScoped();
+
+		glm::mat4 view_projection = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 
 		for( size_t i = 0; i < render_data.Size(); ++i )
 		{
-			dd::AABB aabb;
+			/*dd::AABB aabb;
 			dd::Sphere sphere;
-			dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i].Transform(), aabb, sphere );
+			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i], aabb, sphere ) )
+			{
+				continue;
+			}
 
+			if( !camera.GetFrustum().Intersects( sphere ) && !camera.GetFrustum().Intersects( aabb ) )
+			{
+				continue;
+			}*/
+			
+			glm::vec4 colour( 1 );
+			const dd::ColourComponent* colour_cmp = colours.Get( i );
+			if( colour_cmp != nullptr )
+			{
+				colour = colour_cmp->Colour;
+			}
+
+			shader->SetUniform( "Colour", colour );
+			shader->SetUniform( "ModelViewProjection", view_projection * transforms[i].Transform() );
+
+			m_vao.Bind();
+
+			m_vboPosition.Bind();
+			m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( lines[i].Points ) );
+			m_vboPosition.CommitData();
+
+			glDrawArrays( GL_LINES, 0, m_vboPosition.GetDataSize() );
+
+			m_vboPosition.Unbind();
+
+			m_vao.Unbind();
 		}
 	}
 }

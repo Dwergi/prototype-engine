@@ -74,7 +74,7 @@ namespace dd
 
 	private:
 		
-		bool m_enabled { true };
+		bool m_enabled { false };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 

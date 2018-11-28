@@ -45,10 +45,13 @@ namespace dd
 		explicit ConstBuffer( const T( arr )[Size] ) : IBuffer( sizeof( T ) )
 		{
 			m_ptr = arr;
-			m_size = (int) Size 
+			m_size = (int) Size
 		}
 
+		explicit ConstBuffer( const std::vector<T>& vec );
+
 		explicit ConstBuffer( const IBuffer& buffer );
+
 		ConstBuffer( const ConstBuffer<T>& other );
 		ConstBuffer( ConstBuffer<T>&& other );
 		virtual ~ConstBuffer();

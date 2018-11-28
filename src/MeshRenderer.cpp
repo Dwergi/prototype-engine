@@ -109,7 +109,10 @@ namespace ddr
 
 		dd::AABB world_aabb;
 		dd::Sphere world_sphere;
-		dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform(), world_aabb, world_sphere );
+		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp, world_aabb, world_sphere ) )
+		{
+			return;
+		}
 
 		// check if it intersects with the frustum
 		if( m_frustumCull && 
