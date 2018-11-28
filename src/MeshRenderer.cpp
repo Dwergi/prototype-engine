@@ -107,15 +107,9 @@ namespace ddr
 
 		++m_meshCount;
 
-		dd::AABB aabb;
-		dd::Sphere sphere;
-		dd::GetBoundBoxAndSphere( bbox_cmp, bsphere_cmp, aabb, sphere );
-		
-		dd::AABB world_aabb = aabb.GetTransformed( transform_cmp.Transform() );
-		DD_ASSERT( world_aabb.IsValid() );
-
-		dd::Sphere world_sphere = sphere.GetTransformed( transform_cmp.Transform() );
-		DD_ASSERT( world_sphere.IsValid() );
+		dd::AABB world_aabb;
+		dd::Sphere world_sphere;
+		dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp.Transform(), world_aabb, world_sphere );
 
 		// check if it intersects with the frustum
 		if( m_frustumCull && 

@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Shader.h"
+#include "RenderState.h"
+#include "ShaderProgram.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -22,7 +23,10 @@ namespace ddr
 
 	private:
 
+		RenderState m_renderState;
+		ShaderHandle m_shader;
+
 		VAO m_vao;
-		VBO m_vboPositions;
+		VBO m_vboPosition;
 	};
 }
