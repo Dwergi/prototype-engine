@@ -113,8 +113,8 @@ namespace ddr
 
 		++m_meshCount;
 
-		dd::AABB world_aabb;
-		dd::Sphere world_sphere;
+		ddm::AABB world_aabb;
+		ddm::Sphere world_sphere;
 		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp, world_aabb, world_sphere ) )
 		{
 			return;

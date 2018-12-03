@@ -12,7 +12,7 @@ namespace dd
 {
 	struct BoundBoxComponent
 	{
-		AABB BoundBox;
+		ddm::AABB BoundBox;
 
 		DD_CLASS( dd::BoundBoxComponent )
 		{

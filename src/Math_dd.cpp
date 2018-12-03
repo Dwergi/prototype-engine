@@ -39,7 +39,7 @@ namespace ddm
 			glm::vec4( origin, 1 ) );
 	}
 
-	glm::mat4 TransformFromRay( const dd::Ray& ray )
+	glm::mat4 TransformFromRay( const ddm::Ray& ray )
 	{
 		return TransformFromOriginDir( ray.Origin(), ray.Direction() );
 	}

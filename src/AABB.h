@@ -6,17 +6,18 @@
 
 #pragma once
 
-namespace dd
+namespace ddm
 {
-	struct Sphere;
+	struct Plane;
 	struct Ray;
+	struct Sphere;
 
 	struct AABB
 	{
 		AABB();
 		AABB( glm::vec3 min, glm::vec3 max );
 		AABB( const AABB& other );
-		explicit AABB( const dd::Sphere& sphere );
+		explicit AABB( const Sphere& sphere );
 
 		void Clear();
 
@@ -39,7 +40,8 @@ namespace dd
 		bool Contains( const AABB& other ) const;
 
 		bool Intersects( const Sphere& sphere ) const;
-		bool Intersects( const AABB& bb ) const;
+		bool Intersects( const AABB& other ) const;
+		bool Intersects( const Plane& plane ) const;
 		bool IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const;
 		bool IntersectsRay( const Ray& ray ) const;
 		bool IntersectsRay( const Ray& ray, float& distance ) const;
@@ -57,10 +59,10 @@ namespace dd
 		glm::vec3 Min;
 		glm::vec3 Max;
 
-		DD_CLASS( dd::AABB )
+		DD_CLASS( AABB )
 		{
-			DD_MEMBER( dd::AABB, Min );
-			DD_MEMBER( dd::AABB, Max );
+			DD_MEMBER( AABB, Min );
+			DD_MEMBER( AABB, Max );
 		}
 	};
 }

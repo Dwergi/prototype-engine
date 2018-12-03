@@ -23,12 +23,12 @@
 
 namespace ddm
 {
-	bool HitTestMesh( const dd::Ray& ray, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+	bool HitTestMesh( const ddm::Ray& ray, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 		const dd::BoundSphereComponent* bsphere_cmp, const dd::BoundBoxComponent* bbox_cmp,
 		float& out_distance, glm::vec3& out_normal )
 	{
-		dd::AABB aabb;
-		dd::Sphere sphere;
+		ddm::AABB aabb;
+		ddm::Sphere sphere;
 		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp, aabb, sphere ) )
 		{
 			return false;
@@ -43,8 +43,8 @@ namespace ddm
 		return ddm::HitTestMesh( ray, transform_cmp.Transform(), sphere, aabb, *mesh, out_distance, out_normal );
 	}
 
-	bool HitTestMesh( const dd::Ray& ray, const glm::mat4& transform, 
-		const dd::Sphere& bound_sphere, const dd::AABB& bound_box, 
+	bool HitTestMesh( const ddm::Ray& ray, const glm::mat4& transform, 
+		const ddm::Sphere& bound_sphere, const ddm::AABB& bound_box, 
 		const ddr::Mesh& mesh, float& out_distance, glm::vec3& out_normal )
 	{
 		const dd::ConstBuffer<glm::vec3>& positions = mesh.GetPositions();
@@ -83,7 +83,7 @@ namespace ddm
 		DD_ASSERT( triangulator.Size() > 0 );
 
 		dd::BVHIntersection intersection = 
-			bvh->IntersectsRayFn( dd::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( size_t i )
+			bvh->IntersectsRayFn( ddm::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( size_t i )
 		{
 			dd::ConstTriangle tri = triangulator[i];
 

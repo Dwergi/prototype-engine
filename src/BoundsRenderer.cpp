@@ -183,8 +183,8 @@ namespace ddr
 				shader->SetUniform( "Colour", glm::vec4( 1, 1, 1, 0.5 ) );
 			}
 
-			dd::AABB bound_box;
-			dd::Sphere bound_sphere;
+			ddm::AABB bound_box;
+			ddm::Sphere bound_sphere;
 			if( !GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i], bound_box, bound_sphere ) )
 			{
 				continue;

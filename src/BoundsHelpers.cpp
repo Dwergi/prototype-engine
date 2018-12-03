@@ -1,3 +1,9 @@
+//
+// BoundsHelpers.cpp
+// Copyright (C) Sebastian Nordgren 
+// December 12th 2018
+//
+
 #include "PCH.h"
 #include "BoundsHelpers.h"
 
@@ -10,7 +16,7 @@
 namespace dd
 {
 	bool GetWorldBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, 
-		const dd::TransformComponent& transform, dd::AABB& aabb, dd::Sphere& sphere )
+		const dd::TransformComponent& transform, ddm::AABB& aabb, ddm::Sphere& sphere )
 	{
 		if( GetBoundBoxAndSphere( bound_box, bound_sphere, aabb, sphere ) )
 		{
@@ -24,10 +30,10 @@ namespace dd
 	}
 
 	bool GetBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere,
-		dd::AABB& aabb, dd::Sphere& sphere )
+		ddm::AABB& aabb, ddm::Sphere& sphere )
 	{
-		aabb = dd::AABB();
-		sphere = dd::Sphere();
+		aabb = ddm::AABB();
+		sphere = ddm::Sphere();
 
 		if( bound_box != nullptr )
 		{
@@ -49,11 +55,11 @@ namespace dd
 		}
 		else if( aabb.IsValid() && !sphere.IsValid() )
 		{
-			sphere = dd::Sphere( aabb );
+			sphere = ddm::Sphere( aabb );
 		}
 		else if( !aabb.IsValid() && sphere.IsValid() )
 		{
-			aabb = dd::AABB( sphere );
+			aabb = ddm::AABB( sphere );
 		}
 
 		return true;

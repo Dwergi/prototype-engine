@@ -13,7 +13,7 @@ namespace dd
 {
 	struct PhysicsSphereComponent : PhysicsBase
 	{
-		Sphere Sphere;
+		ddm::Sphere Sphere;
 
 		DD_CLASS( dd::PhysicsSphereComponent )
 		{

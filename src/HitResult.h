@@ -35,7 +35,7 @@ namespace dd
 	struct HitResult
 	{
 		HitResult();
-		HitResult( dd::Ray ray );
+		HitResult( ddm::Ray ray );
 		HitResult( const HitResult& other );
 
 		void operator=( const HitResult& other );
@@ -50,7 +50,7 @@ namespace dd
 			return m_normal;
 		}
 
-		dd::Ray Ray() const { return m_ray; }
+		ddm::Ray Ray() const { return m_ray; }
 		float Distance() const { return m_distance; }
 		ddc::Entity Entity() const { return m_entity; }
 
@@ -59,7 +59,7 @@ namespace dd
 	private:
 
 		float m_distance { FLT_MAX };
-		dd::Ray m_ray;
+		ddm::Ray m_ray;
 		glm::vec3 m_normal;
 		ddc::Entity m_entity;
 	};

@@ -39,7 +39,7 @@ namespace dd
 
 	}
 
-	HitHandle HitTestSystem::ScheduleHitTest( const Ray& ray )
+	HitHandle HitTestSystem::ScheduleHitTest( const ddm::Ray& ray )
 	{
 		uint index = ~0u;
 		if( !m_free.empty() )
@@ -154,7 +154,7 @@ namespace dd
 		{
 			glm::vec3 origin( rng_flt.Next() * 100, rng_flt.Next() * 100, rng_flt.Next() * 100 );
 			glm::vec3 dir( rng_flt.Next(), rng_flt.Next(), rng_flt.Next() );
-			dd::Ray ray( origin, dir, rng_flt.Next() * 1000 );
+			ddm::Ray ray( origin, dir, rng_flt.Next() * 1000 );
 
 			HitHandle handle = async_hit_test->ScheduleHitTest( ray );
 

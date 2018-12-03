@@ -442,6 +442,8 @@
     <ClInclude Include="src\TreeComponent.h" />
     <ClInclude Include="src\TreeSystem.h" />
     <ClInclude Include="src\Triangulator.h" />
+    <ClInclude Include="src\WaterComponent.h" />
+    <ClInclude Include="src\WaterSystem.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
@@ -669,6 +671,8 @@
     <ClCompile Include="src\TreeComponent.cpp" />
     <ClCompile Include="src\TreeSystem.cpp" />
     <ClCompile Include="src\Triangulator.cpp" />
+    <ClCompile Include="src\WaterComponent.cpp" />
+    <ClCompile Include="src\WaterSystem.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptSystem.cpp" />

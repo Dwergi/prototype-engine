@@ -9,6 +9,6 @@ TEST_CASE( "[HitTestSystem] Execute Hit" )
 {
 	dd::HitTestSystem* system = new dd::HitTestSystem();
 
-	dd::Ray ray;
+	ddm::Ray ray;
 	system->ScheduleHitTest( ray, 10 );
 }

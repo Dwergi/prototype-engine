@@ -4,7 +4,6 @@
 // December 3rd 2018
 //
 
-
 #include "PCH.h"
 #include "Noise.h"
 

@@ -41,12 +41,12 @@ namespace ddr
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
-		const dd::AABB& GetBoundBox() const { return m_bounds; }
+		const ddm::AABB& GetBoundBox() const { return m_bounds; }
 
 		//
 		// Set the bounds of this mesh.
 		//
-		void SetBoundBox( const dd::AABB& bounds ) { m_bounds = bounds; }
+		void SetBoundBox( const ddm::AABB& bounds ) { m_bounds = bounds; }
 
 		//
 		// Set the positions that the mesh will use.
@@ -149,7 +149,7 @@ namespace ddr
 		
 		VAO m_vao;
 
-		dd::AABB m_bounds;
+		ddm::AABB m_bounds;
 
 		std::atomic<bool> m_rebuilding { false };
 		dd::BVHTree* m_bvh { nullptr };

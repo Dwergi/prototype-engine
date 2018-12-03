@@ -251,7 +251,7 @@ namespace ddr
 		{
 			dd::ConstTriangle tri = triangulator[ i ];
 
-			dd::AABB bounds;
+			ddm::AABB bounds;
 			bounds.Expand( tri.p0 );
 			bounds.Expand( tri.p1 );
 			bounds.Expand( tri.p2 );

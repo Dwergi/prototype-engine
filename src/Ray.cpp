@@ -7,16 +7,16 @@
 #include "PCH.h"
 #include "Ray.h"
 
-DD_TYPE_CPP( dd::Ray );
+DD_TYPE_CPP( ddm::Ray );
 
-namespace dd
+namespace ddm
 {
 	Ray::Ray()
 	{
 		SetDirection( glm::vec3( 0, 0, 1 ) );
 	}
 	
-	Ray::Ray( const Ray& other ) :
+	Ray::Ray( const ddm::Ray& other ) :
 		m_origin( other.m_origin ),
 		m_direction( other.m_direction ),
 		m_invDir( other.m_invDir ),
@@ -31,7 +31,7 @@ namespace dd
 		SetDirection( direction );
 	}
 
-	void Ray::operator=( const Ray& other )
+	void Ray::operator=( const ddm::Ray& other )
 	{
 		m_origin = other.m_origin;
 		m_direction = other.m_direction;

@@ -135,7 +135,7 @@ namespace dd
 
 		shader->Use( false );
 
-		AABB bounds;
+		ddm::AABB bounds;
 		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
 		bounds.Expand( glm::vec3( 0.5, 1, 1 ) );
 		mesh->SetBoundBox( bounds );

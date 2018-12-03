@@ -7,9 +7,9 @@
 #include "PCH.h"
 #include "Plane.h"
 
-DD_TYPE_CPP( dd::Plane );
+DD_TYPE_CPP( ddm::Plane );
 
-namespace dd
+namespace ddm
 {
 	Plane::Plane( const glm::vec4& params )
 		: Plane( params.x, params.y, params.z, params.w )

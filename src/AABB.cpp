@@ -10,9 +10,9 @@
 #include "Sphere.h"
 #include "Ray.h"
 
-DD_TYPE_CPP( dd::AABB );
+DD_TYPE_CPP( ddm::AABB );
 
-namespace dd
+namespace ddm
 {
 	AABB::AABB()
 		: Min( FLT_MAX, FLT_MAX, FLT_MAX ),
@@ -34,7 +34,7 @@ namespace dd
 		DD_ASSERT( IsValid() );
 	}
 
-	AABB::AABB( const dd::Sphere& sphere )
+	AABB::AABB( const Sphere& sphere )
 	{
 		Min = sphere.Centre - glm::vec3( sphere.Radius );
 		Max = sphere.Centre + glm::vec3( sphere.Radius );
@@ -116,6 +116,12 @@ namespace dd
 	{
 		return glm::all( glm::lessThanEqual( Min, other.Max ) ) && 
 			glm::all( glm::greaterThanEqual( Max, other.Min ) );
+	}
+
+	bool AABB::Intersects( const Plane& plane ) const
+	{
+		DD_TODO( "AABB/Plane Intersection" );
+		return false;
 	}
 
 	bool AABB::IntersectsRay( const glm::vec3& start, const glm::vec3& dir, float& distance ) const

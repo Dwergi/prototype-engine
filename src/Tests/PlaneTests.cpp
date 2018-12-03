@@ -9,7 +9,7 @@
 
 #include "Plane.h"
 
-using dd::Plane;
+using ddm::Plane;
 
 TEST_CASE( "[Plane]" )
 {

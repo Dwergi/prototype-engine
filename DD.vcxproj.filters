@@ -609,6 +609,12 @@
     <ClInclude Include="src\Noise.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\WaterSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WaterComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1083,6 +1089,12 @@
     </ClCompile>
     <ClCompile Include="src\Noise.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaterSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaterComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

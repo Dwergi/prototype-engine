@@ -24,12 +24,15 @@ namespace ddr
 	struct ICamera;
 }
 
+namespace ddm
+{
+	struct AABB;
+}
+
 namespace dd
 {
 	struct IAsyncHitTest;
 	struct HitState;
-
-	struct AABB;
 	struct IInputSource;
 	struct InputBindings;
 	struct MeshComponent;
@@ -100,7 +103,7 @@ namespace dd
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 
-		Ray GetScreenRay( const ddr::ICamera& camera, float length ) const;
+		ddm::Ray GetScreenRay( const ddr::ICamera& camera, float length ) const;
 
 		void HandleInput( InputAction action, InputType type );
 

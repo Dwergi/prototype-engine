@@ -142,7 +142,7 @@ namespace dd
 		auto mesh_bspheres = meshes.Read<dd::BoundSphereComponent>();
 
 		glm::vec3 initial_pos = bullet_transform.Position;
-		dd::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * delta_t ) );
+		ddm::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * delta_t ) );
 
 		for( size_t i = 0; i < meshes.Size(); ++i )
 		{
@@ -217,7 +217,7 @@ namespace dd
 
 			if( !bullet.PendingHit.Valid )
 			{
-				dd::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * bullet.Lifetime ) );
+				ddm::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * bullet.Lifetime ) );
 				bullet.PendingHit = m_hitTest.ScheduleHitTest( ray );
 			}
 			else

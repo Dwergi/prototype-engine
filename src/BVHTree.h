@@ -26,19 +26,19 @@ namespace dd
 		BVHTree();
 		~BVHTree();
 
-		size_t Add( const AABB& bounds );
+		size_t Add( const ddm::AABB& bounds );
 		void Remove( size_t handle );
 
 		void Clear();
 
-		BVHIntersection IntersectsRay( const Ray& ray ) const;
-		BVHIntersection IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const;
+		BVHIntersection IntersectsRay( const ddm::Ray& ray ) const;
+		BVHIntersection IntersectsRayFn( const ddm::Ray& ray, const HitTestFn& fn ) const;
 
-		bool WithinBoundBox( const AABB& bounds, std::vector<size_t>& outHits ) const;
-		bool WithinBoundSphere( const Sphere& sphere, std::vector<size_t>& outHits ) const;
+		bool WithinBoundBox( const ddm::AABB& bounds, std::vector<size_t>& outHits ) const;
+		bool WithinBoundSphere( const ddm::Sphere& sphere, std::vector<size_t>& outHits ) const;
 
-		AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
-		AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
+		ddm::AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
+		ddm::AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
 
 		size_t GetEntryCount() const { return m_entries.size() - m_freeEntries.size(); }
 		size_t GetBucketCount() const { return m_buckets.size() - m_freeBuckets.size(); }
@@ -74,7 +74,7 @@ namespace dd
 
 		struct BVHEntry
 		{
-			AABB Bounds;
+			ddm::AABB Bounds;
 		};
 
 		enum class Axis
@@ -87,10 +87,10 @@ namespace dd
 		struct BVHBucket
 		{
 			// The region to use for comparisons.
-			AABB Region;
+			ddm::AABB Region;
 
 			// The actual bounds of the entries in the region.
-			AABB Bounds;
+			ddm::AABB Bounds;
 
 			size_t Parent { INVALID };
 			size_t Left { INVALID };
@@ -115,7 +115,7 @@ namespace dd
 		void RebuildTree();
 		void SplitBucket( size_t parent_index );
 		void InsertEntry( size_t entry_index );
-		AABB CalculateBucketBounds( const BVHBucket& bucket ) const;
+		ddm::AABB CalculateBucketBounds( const BVHBucket& bucket ) const;
 		void MergeEmptyBuckets( size_t parent_index );
 
 		bool IsFreeEntry( size_t entry_index ) const;

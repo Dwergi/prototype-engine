@@ -452,7 +452,7 @@ void CreatePhysicsPlaneTestScene()
 		s_world->AddTag( sphere, ddc::Tag::Static );
 
 		dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-		physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
+		physics_sphere.Sphere = ddm::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 		physics_sphere.Elasticity = 0.95f;
 	}
 
@@ -461,7 +461,7 @@ void CreatePhysicsPlaneTestScene()
 		s_world->AddTag( sphere, ddc::Tag::Static );
 
 		dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-		physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
+		physics_sphere.Sphere = ddm::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 		physics_sphere.Elasticity = 0.95f;
 	}
 
@@ -470,7 +470,7 @@ void CreatePhysicsPlaneTestScene()
 		s_world->AddTag( sphere, ddc::Tag::Static );
 
 		dd::PhysicsSphereComponent& physics_sphere = s_world->Add<dd::PhysicsSphereComponent>( sphere );
-		physics_sphere.Sphere = dd::Sphere( glm::vec3( 0, 0, 0 ), 1 );
+		physics_sphere.Sphere = ddm::Sphere( glm::vec3( 0, 0, 0 ), 1 );
 		physics_sphere.Elasticity = 0.95f;
 	}*/
 
@@ -483,7 +483,7 @@ void CreatePhysicsPlaneTestScene()
 		s_world->AddTag( plane, ddc::Tag::Static );
 
 		dd::PhysicsPlaneComponent& physics_plane = s_world->Add<dd::PhysicsPlaneComponent>( plane );
-		physics_plane.Plane = dd::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+		physics_plane.Plane = ddm::Plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
 		physics_plane.Elasticity = 0.95f;
 
 		phys_plane_proto->PopulateFromEntity( plane, *s_world );
@@ -746,7 +746,7 @@ int GameMain()
 			transform->Update();
 
 			dd::BoundBoxComponent* bounds = s_world->Access<dd::BoundBoxComponent>( entity );
-			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
 			dd::ParticleSystemComponent* particle = s_world->Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
@@ -760,7 +760,7 @@ int GameMain()
 				s_world->AddTag( x_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* x_ray = s_world->Access<dd::RayComponent>( x_entity );
-				x_ray->Ray = dd::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ), 100 );
+				x_ray->Ray = ddm::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ), 100 );
 
 				dd::ColourComponent* x_colour = s_world->Access<dd::ColourComponent>( x_entity );
 				x_colour->Colour = glm::vec4( 1, 0, 0, 1 );
@@ -771,7 +771,7 @@ int GameMain()
 				s_world->AddTag( y_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* y_ray = s_world->Access<dd::RayComponent>( y_entity );
-				y_ray->Ray = dd::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ), 100 );
+				y_ray->Ray = ddm::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ), 100 );
 
 				dd::ColourComponent* y_colour = s_world->Access<dd::ColourComponent>( y_entity );
 				y_colour->Colour = glm::vec4( 0, 1, 0, 1 );
@@ -782,7 +782,7 @@ int GameMain()
 				s_world->AddTag( z_entity, ddc::Tag::Visible );
 
 				dd::RayComponent* z_ray = s_world->Access<dd::RayComponent>( z_entity );
-				z_ray->Ray = dd::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ), 100 );
+				z_ray->Ray = ddm::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ), 100 );
 
 				dd::ColourComponent* z_colour = s_world->Access<dd::ColourComponent>( z_entity );
 				z_colour->Colour = glm::vec4( 0, 0, 1, 1 );

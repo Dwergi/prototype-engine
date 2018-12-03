@@ -11,7 +11,7 @@
 #include "VAO.h"
 #include "VBO.h"
 
-namespace dd
+namespace ddm
 {
 	struct AABB;
 	struct Sphere;
@@ -36,12 +36,12 @@ namespace ddr
 		//
 		// Check if the frustum intersects with the given sphere.
 		//
-		bool Intersects( const dd::Sphere& bounds ) const;
+		bool Intersects( const ddm::Sphere& bounds ) const;
 
 		//
 		// Check if the frustum intersects with the given bound box.
 		//
-		bool Intersects( const dd::AABB& bounds ) const;
+		bool Intersects( const ddm::AABB& bounds ) const;
 
 		void Render( const ddr::RenderData& render_data );
 		void Update( const ddr::ICamera& camera );
@@ -55,7 +55,7 @@ namespace ddr
 		dd::Buffer<glm::vec3> m_corners;
 
 		// planes of the frustum in world space
-		dd::Plane m_planes[6];
+		ddm::Plane m_planes[6];
 
 		glm::mat4 m_transform;
 

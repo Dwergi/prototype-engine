@@ -40,16 +40,16 @@ namespace dd
 
 	}
 
-	static void AddSphereToBVH( BVHTree& bvh, const dd::Sphere& sphere, const glm::vec3& velocity, const glm::mat4& transform )
+	static void AddSphereToBVH( BVHTree& bvh, const ddm::Sphere& sphere, const glm::vec3& velocity, const glm::mat4& transform )
 	{
-		dd::Sphere transformed = sphere.GetTransformed( transform );
-		dd::AABB bounds( transformed );
+		ddm::Sphere transformed = sphere.GetTransformed( transform );
+		ddm::AABB bounds( transformed );
 		bounds.Expand( bounds.Min + velocity );
 		bounds.Expand( bounds.Max + velocity );
 		bvh.Add( bounds );
 	}
 
-	static bool IntersectMovingSpherePlane( const dd::Sphere& sphere, const dd::Plane& plane, const glm::vec3& displacement, float& out_time )
+	static bool IntersectMovingSpherePlane( const ddm::Sphere& sphere, const ddm::Plane& plane, const glm::vec3& displacement, float& out_time )
 	{
 		float distance = plane.DistanceTo( sphere.Centre );
 		if( glm::abs( distance ) < sphere.Radius )
@@ -71,7 +71,7 @@ namespace dd
 	}
 
 	// Real-Time Collision Detection, pg. 224
-	static bool IntersectMovingSphereSphere( const dd::Sphere& s0, const dd::Sphere& s1, const glm::vec3& v0, const glm::vec3& v1, float& out_time )
+	static bool IntersectMovingSphereSphere( const ddm::Sphere& s0, const ddm::Sphere& s1, const glm::vec3& v0, const glm::vec3& v1, float& out_time )
 	{
 		glm::vec3 s = s1.Centre - s0.Centre;
 		glm::vec3 v = v1 - v0;
@@ -111,12 +111,12 @@ namespace dd
 		return true;
 	}
 
-	static void ReflectVelocity( dd::PhysicsSphereComponent& physics, dd::TransformComponent& transform, const dd::Sphere& sphere, 
+	static void ReflectVelocity( dd::PhysicsSphereComponent& physics, dd::TransformComponent& transform, const ddm::Sphere& sphere, 
 		const glm::vec3& normal, float delta_t, float hit_time, float elasticity )
 	{
 		glm::vec3 velocity = physics.Momentum / physics.Mass;
 
-		dd::Sphere moving_interp = sphere;
+		ddm::Sphere moving_interp = sphere;
 		moving_interp.Centre += velocity * (delta_t * hit_time);
 
 		float speed = glm::length( velocity );
@@ -133,7 +133,7 @@ namespace dd
 
 	static bool IntersectStaticPlanes( const ddc::DataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
-		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
+		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
 		auto transforms = static_planes.Read<dd::TransformComponent>();
 		auto physics = static_planes.Read<dd::PhysicsPlaneComponent>();
@@ -141,7 +141,7 @@ namespace dd
 		for( size_t p = 0; p < static_planes.Size(); ++p )
 		{
 			const dd::PhysicsPlaneComponent& phys_plane = physics[p];
-			dd::Plane static_plane = phys_plane.Plane.GetTransformed( transforms[p].Transform() );
+			ddm::Plane static_plane = phys_plane.Plane.GetTransformed( transforms[p].Transform() );
 			glm::vec3 velocity = moving_physics.Momentum / moving_physics.Mass;
 
 			float hit_time = 0;
@@ -161,7 +161,7 @@ namespace dd
 
 	static bool IntersectStaticSpheres( const ddc::DataBuffer& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
-		dd::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
+		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
 		auto transforms = static_spheres.Read<dd::TransformComponent>();
 		auto physics = static_spheres.Read<dd::PhysicsSphereComponent>();
@@ -170,7 +170,7 @@ namespace dd
 		{
 			const dd::PhysicsSphereComponent& static_physics = physics[s];
 
-			dd::Sphere static_sphere = static_physics.Sphere.GetTransformed( transforms[s].Transform() );
+			ddm::Sphere static_sphere = static_physics.Sphere.GetTransformed( transforms[s].Transform() );
 
 			glm::vec3 velocity = moving_physics.Momentum / moving_physics.Mass;
 
@@ -201,12 +201,12 @@ namespace dd
 		dd::PhysicsSphereComponent& a_physics = dynamic_sphere_physics[a_index];
 		dd::TransformComponent& a_transform = dynamic_sphere_transforms[a_index];
 
-		dd::Sphere a_sphere = a_physics.Sphere.GetTransformed( a_transform.Transform() );
+		ddm::Sphere a_sphere = a_physics.Sphere.GetTransformed( a_transform.Transform() );
 
 		glm::vec3 a_velocity = a_physics.Momentum / a_physics.Mass;
 		glm::vec3 a_displacement = a_velocity * delta_t;
 
-		dd::Sphere a_expanded = a_sphere;
+		ddm::Sphere a_expanded = a_sphere;
 		a_expanded.Radius += glm::length( a_displacement );
 
 		s_hits.clear();
@@ -220,7 +220,7 @@ namespace dd
 			dd::PhysicsSphereComponent& b_physics = dynamic_sphere_physics[b_index];
 			dd::TransformComponent& b_transform = dynamic_sphere_transforms[b_index];
 
-			dd::Sphere b_sphere = b_physics.Sphere.GetTransformed( b_transform.Transform() );
+			ddm::Sphere b_sphere = b_physics.Sphere.GetTransformed( b_transform.Transform() );
 
 			glm::vec3 b_velocity = b_physics.Momentum / b_physics.Mass;
 			glm::vec3 b_displacement = b_velocity * delta_t;
@@ -231,10 +231,10 @@ namespace dd
 				if( hit_time < 0 || hit_time > 1 )
 					continue;
 
-				dd::Sphere a_interp = a_sphere;
+				ddm::Sphere a_interp = a_sphere;
 				a_interp.Centre += a_displacement * hit_time;
 
-				dd::Sphere b_interp = b_sphere;
+				ddm::Sphere b_interp = b_sphere;
 				b_interp.Centre += b_displacement * hit_time;
 
 				float a_mass = a_physics.Mass;

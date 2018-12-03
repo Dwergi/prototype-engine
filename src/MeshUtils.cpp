@@ -384,7 +384,7 @@ namespace dd
 		dd::ConstBuffer<glm::vec3> normals( norm->data(), norm->size() );
 		mesh.SetNormals( normals );
 
-		dd::AABB bounds( glm::vec3( -1 ), glm::vec3( 1 ) );
+		ddm::AABB bounds( glm::vec3( -1 ), glm::vec3( 1 ) );
 		mesh.SetBoundBox( bounds );
 	}
 
@@ -450,7 +450,7 @@ namespace dd
 		mesh.SetNormals( s_unitCubeNormalsBuffer );
 		mesh.SetUVs( s_unitCubeUVsBuffer );
 
-		dd::AABB bounds;
+		ddm::AABB bounds;
 		bounds.Expand( glm::vec3( 0, 0, 0 ) );
 		bounds.Expand( glm::vec3( 1, 1, 1 ) );
 		mesh.SetBoundBox( bounds );
@@ -483,7 +483,7 @@ namespace dd
 		mesh.SetPositions( s_quadPositionsBuffer );
 		mesh.SetNormals( s_quadNormalsBuffer );
 
-		dd::AABB bounds;
+		ddm::AABB bounds;
 		bounds.Expand( glm::vec3( -1, 0, -1 ) );
 		bounds.Expand( glm::vec3( 1, 0, 1 ) );
 		mesh.SetBoundBox( bounds );

@@ -72,19 +72,20 @@ namespace ddr
 
 		for( size_t i = 0; i < render_data.Size(); ++i )
 		{
-			/*dd::AABB aabb;
-			dd::Sphere sphere;
+			if( lines[i].Points.size() == 0 )
+			{
+				continue;
+			}
+
+			ddm::AABB aabb;
+			ddm::Sphere sphere;
 			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i], aabb, sphere ) )
 			{
 				continue;
 			}
 
-			if( !camera.GetFrustum().Intersects( sphere ) && !camera.GetFrustum().Intersects( aabb ) )
-			{
-				continue;
-			}*/
-
-			if( lines[i].Points.size() == 0 )
+			const ddr::Frustum& frustum = camera.GetFrustum();
+			if( !frustum.Intersects( sphere ) && !frustum.Intersects( aabb ) )
 			{
 				continue;
 			}

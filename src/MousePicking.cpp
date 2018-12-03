@@ -258,7 +258,7 @@ namespace dd
 			}
 		}
 
-		dd::Ray screen_ray = GetScreenRay( data.Camera(), 1000.f );
+		ddm::Ray screen_ray = GetScreenRay( data.Camera(), 1000.f );
 
 		if( !m_pendingHit.Valid )
 		{
@@ -277,8 +277,8 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			dd::AABB aabb;
-			dd::Sphere sphere;
+			ddm::AABB aabb;
+			ddm::Sphere sphere;
 			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[ i ], aabb, sphere ) )
 			{
 				continue;
@@ -450,7 +450,7 @@ namespace dd
 	//
 	// Unproject a point at the mouse coordinates at the near plane and at the far plane to get a world-space ray.
 	//
-	Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, float length ) const
+	ddm::Ray MousePicking::GetScreenRay( const ddr::ICamera& camera, float length ) const
 	{
 		glm::vec4 viewport( 0, 0, m_window.GetWidth(), m_window.GetHeight() );
 
@@ -460,6 +460,6 @@ namespace dd
 		glm::vec3 world_near = glm::unProject( win_near, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 		glm::vec3 world_far = glm::unProject( win_far, camera.GetViewMatrix(), camera.GetProjectionMatrix(), viewport );
 
-		return Ray( world_near, glm::normalize( world_far - world_near ), length );
+		return ddm::Ray( world_near, glm::normalize( world_far - world_near ), length );
 	}
 }

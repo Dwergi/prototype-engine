@@ -1,9 +1,19 @@
+//
+// BoundsHelpers.h
+// Copyright (C) Sebastian Nordgren 
+// December 12th 2018
+//
+
 #pragma once
 
-namespace dd
+namespace ddm
 {
 	struct AABB;
 	struct Sphere;
+}
+
+namespace dd
+{
 	struct BoundBoxComponent;
 	struct BoundSphereComponent;
 	struct TransformComponent;
@@ -14,8 +24,8 @@ namespace dd
 	// Returns true if bounds are valid, false if neither is defined.
 	// 
 	bool GetWorldBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, 
-		const dd::TransformComponent& transform, dd::AABB& aabb, dd::Sphere& sphere );
+		const dd::TransformComponent& transform, ddm::AABB& aabb, ddm::Sphere& sphere );
 
 	bool GetBoundBoxAndSphere( const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere,
-		dd::AABB& aabb, dd::Sphere& sphere );
+		ddm::AABB& aabb, ddm::Sphere& sphere );
 }

@@ -12,7 +12,7 @@ namespace dd
 {
 	struct RayComponent
 	{
-		Ray Ray;
+		ddm::Ray Ray;
 
 		DD_CLASS( dd::RayComponent )
 		{

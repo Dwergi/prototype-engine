@@ -23,7 +23,7 @@ namespace dd
 
 	}
 
-	size_t BVHTree::Add( const AABB& bounds )
+	size_t BVHTree::Add( const ddm::AABB& bounds )
 	{
 		DD_ASSERT( m_entries.size() < 32 * 1024, "Oversized BVH!" );
 
@@ -169,7 +169,7 @@ namespace dd
 		m_rebuildCount = 0;
 	}
 
-	BVHIntersection BVHTree::IntersectsRay( const Ray& ray ) const
+	BVHIntersection BVHTree::IntersectsRay( const ddm::Ray& ray ) const
 	{
 		dd::Array<size_t, 64> stack;
 		stack.Add( 0 );
@@ -218,7 +218,7 @@ namespace dd
 		return nearest;
 	}
 
-	BVHIntersection BVHTree::IntersectsRayFn( const Ray& ray, const HitTestFn& fn ) const
+	BVHIntersection BVHTree::IntersectsRayFn( const ddm::Ray& ray, const HitTestFn& fn ) const
 	{
 		dd::Array<size_t, 64> stack;
 		stack.Add( 0 );
@@ -270,7 +270,7 @@ namespace dd
 		return nearest;
 	}
 
-	bool BVHTree::WithinBoundBox( const AABB& bounds, std::vector<size_t>& out_hits ) const
+	bool BVHTree::WithinBoundBox( const ddm::AABB& bounds, std::vector<size_t>& out_hits ) const
 	{
 		int buckets_tested = 0;
 
@@ -311,7 +311,7 @@ namespace dd
 		return hit;
 	}
 
-	bool BVHTree::WithinBoundSphere( const Sphere& sphere, std::vector<size_t>& out_hits ) const
+	bool BVHTree::WithinBoundSphere( const ddm::Sphere& sphere, std::vector<size_t>& out_hits ) const
 	{
 		int buckets_tested = 0;
 
@@ -533,9 +533,9 @@ namespace dd
 		return std::binary_search( m_freeBuckets.begin(), m_freeBuckets.end(), bucket_index );
 	}
 
-	AABB BVHTree::CalculateBucketBounds( const BVHBucket& bucket ) const
+	ddm::AABB BVHTree::CalculateBucketBounds( const BVHBucket& bucket ) const
 	{
-		AABB bounds;
+		ddm::AABB bounds;
 
 		for( size_t e : bucket.Entries )
 		{

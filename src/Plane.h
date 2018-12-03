@@ -6,12 +6,10 @@
 
 #pragma once
 
-namespace dd
+namespace ddm
 {
-	class Plane
+	struct Plane
 	{
-	public:
-
 		Plane() {}
 		Plane( const glm::vec4& params );
 		Plane( const glm::vec3& point, const glm::vec3& normal );
@@ -27,10 +25,10 @@ namespace dd
 
 		glm::vec4 Parameters;
 
-		DD_CLASS( dd::Plane )
+		DD_CLASS( ddm::Plane )
 		{
 			DD_COMPONENT();
-			DD_MEMBER( dd::Plane, Parameters );
+			DD_MEMBER( ddm::Plane, Parameters );
 		}
 	};
 }

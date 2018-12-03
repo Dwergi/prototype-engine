@@ -52,7 +52,7 @@ namespace dd
 
 		void WriteHeightImage( const char* filename ) const;
 
-		AABB GetBounds() const { return m_bounds; }
+		ddm::AABB GetBounds() const { return m_bounds; }
 		glm::vec2 GetPosition() const { return m_position; }
 		int GetLOD() const { return m_lod; }
 		
@@ -92,7 +92,7 @@ namespace dd
 		ddr::MeshHandle m_mesh;
 
 		glm::vec2 m_position;
-		AABB m_bounds;
+		ddm::AABB m_bounds;
 
 		std::vector<glm::vec3> m_vertices;
 		ConstBuffer<glm::vec3> m_verticesBuffer;

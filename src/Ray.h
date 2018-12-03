@@ -6,15 +6,15 @@
 
 #pragma once
 
-namespace dd
+namespace ddm
 {
 	struct Ray
 	{
 		Ray();
-		Ray( const Ray& other );
+		Ray( const ddm::Ray& other );
 		Ray( const glm::vec3& origin, const glm::vec3& direction, float length = FLT_MAX );
 
-		void operator=( const Ray& other );
+		void operator=( const ddm::Ray& other );
 
 		//
 		// The origin of the ray.
@@ -39,11 +39,11 @@ namespace dd
 
 		float Length;
 
-		DD_CLASS( dd::Ray )
+		DD_CLASS( ddm::Ray )
 		{
-			DD_METHOD( dd::Ray, Origin );
-			DD_METHOD( dd::Ray, Direction );
-			DD_METHOD( dd::Ray, InverseDir );
+			DD_METHOD( ddm::Ray, Origin );
+			DD_METHOD( ddm::Ray, Direction );
+			DD_METHOD( ddm::Ray, InverseDir );
 		}
 
 	private:

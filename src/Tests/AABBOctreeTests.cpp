@@ -23,7 +23,7 @@ TEST_CASE( "[AABBOctree] Add" )
 
 	for( int i = 0; i < 256; ++i )
 	{
-		AABB new_entry;
+		ddm::AABB new_entry;
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
@@ -42,7 +42,7 @@ TEST_CASE( "[AABBOctree] Add" )
 
 	for( int i = 0; i < 128; ++i )
 	{
-		AABB new_entry;
+		ddm::AABB new_entry;
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
@@ -57,13 +57,13 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 {
 	std::swap( octree, AABBOctree() );
 
-	Vector<AABB> bounds;
+	Vector<ddm::AABB> bounds;
 
 	RandomInt rng( -500, 500, 2020202020 );
 
 	for( int i = 0; i < 256; ++i )
 	{
-		AABB new_entry;
+		ddm::AABB new_entry;
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
@@ -73,7 +73,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 	}
 
 	Vector<OctreeEntry> results;
-	Vector<AABB> comparison;
+	Vector<ddm::AABB> comparison;
 
 	for( int i = 0; i < 128; ++i )
 	{
@@ -85,7 +85,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 		octree.GetAllContaining( pt, results );
 
 		// brute force calculate
-		for( const AABB& aabb : bounds )
+		for( const ddm::AABB& aabb : bounds )
 		{
 			if( aabb.Contains( pt ) )
 				comparison.Add( aabb );
@@ -93,7 +93,7 @@ TEST_CASE( "[AABBOctree] GetContaining" )
 
 		for( int i = 0; i < results.Size(); ++i )
 		{
-			const AABB& bb = octree.GetEntry( results[i] );
+			const ddm::AABB& bb = octree.GetEntry( results[i] );
 
 			REQUIRE( bb.Contains( pt ) );
 			REQUIRE( bb == comparison[i] );
@@ -105,13 +105,13 @@ TEST_CASE( "[AABBOctree] GetIntersecting" )
 {
 	std::swap( octree, AABBOctree() );
 
-	Vector<AABB> bounds;
+	Vector<ddm::AABB> bounds;
 
 	RandomInt rng( -500, 500, 2020202020 );
 
 	for( int i = 0; i < 256; ++i )
 	{
-		AABB new_entry;
+		ddm::AABB new_entry;
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
@@ -121,21 +121,21 @@ TEST_CASE( "[AABBOctree] GetIntersecting" )
 	}
 
 	Vector<OctreeEntry> results;
-	Vector<AABB> comparison;
+	Vector<ddm::AABB> comparison;
 
 	for( uint i = 0; i < 128; ++i )
 	{
 		comparison.Clear();
 		results.Clear();
 
-		AABB test;
+		ddm::AABB test;
 		test.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 		test.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
 		octree.GetAllIntersecting( test, results );
 
 		// brute force calculate
-		for( const AABB& aabb : bounds )
+		for( const ddm::AABB& aabb : bounds )
 		{
 			if( aabb.Intersects( test ) )
 				comparison.Add( aabb );
@@ -143,7 +143,7 @@ TEST_CASE( "[AABBOctree] GetIntersecting" )
 
 		for( int i = 0; i < results.Size(); ++i )
 		{
-			const AABB& bb = octree.GetEntry( results[i] );
+			const ddm::AABB& bb = octree.GetEntry( results[i] );
 
 			REQUIRE( bb.Intersects( test ) );
 			REQUIRE( bb == comparison[i] );

@@ -12,7 +12,7 @@ namespace dd
 {
 	struct PhysicsPlaneComponent
 	{
-		Plane Plane;
+		ddm::Plane Plane;
 		float Elasticity { 1.0f };
 
 		DD_CLASS( dd::PhysicsPlaneComponent )

@@ -110,7 +110,7 @@ namespace dd
 			transform->Update();
 
 			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
-			bounds->BoundBox = dd::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
 			dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;

@@ -103,12 +103,11 @@ namespace ddr
 		}
 	}
 
-	bool Frustum::Intersects( const dd::Sphere& bounds ) const
+	bool Frustum::Intersects( const ddm::Sphere& bounds ) const
 	{
-		for( const dd::Plane& plane : m_planes )
+		for( const ddm::Plane& plane : m_planes )
 		{
 			float distance = plane.DistanceTo( bounds.Centre );
-
 			if( distance < -bounds.Radius )
 			{
 				return false;
@@ -123,12 +122,12 @@ namespace ddr
 		return true;
 	}
 
-	bool Frustum::Intersects( const dd::AABB& bounds ) const
+	bool Frustum::Intersects( const ddm::AABB& bounds ) const
 	{
 		glm::vec3 corners[8];
 		bounds.GetCorners( corners );
 
-		for( const dd::Plane& plane : m_planes )
+		for( const ddm::Plane& plane : m_planes )
 		{
 			bool inside = false;
 
@@ -263,12 +262,12 @@ namespace ddr
 		m_corners[FAR_BL] = far_centre - far_up - far_right;
 		m_corners[FAR_BR] = far_centre - far_up + far_right;
 
-		m_planes[Planes::Top]	 = dd::Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
-		m_planes[Planes::Bottom] = dd::Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
-		m_planes[Planes::Left]	 = dd::Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
-		m_planes[Planes::Right]	 = dd::Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
-		m_planes[Planes::Near]	 = dd::Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
-		m_planes[Planes::Far]	 = dd::Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
+		m_planes[Planes::Top]	 = ddm::Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
+		m_planes[Planes::Bottom] = ddm::Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
+		m_planes[Planes::Left]	 = ddm::Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
+		m_planes[Planes::Right]	 = ddm::Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
+		m_planes[Planes::Near]	 = ddm::Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
+		m_planes[Planes::Far]	 = ddm::Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
 
 		m_dirty = true;
 	}

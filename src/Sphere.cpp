@@ -12,9 +12,9 @@
 
 #include <glm/gtx/intersect.hpp>
 
-DD_TYPE_CPP( dd::Sphere );
+DD_TYPE_CPP( ddm::Sphere );
 
-namespace dd
+namespace ddm
 {
 	Sphere::Sphere()
 	{
@@ -33,7 +33,7 @@ namespace dd
 		Radius = radius;
 	}
 
-	Sphere::Sphere( const AABB& aabb )
+	Sphere::Sphere( const ddm::AABB& aabb )
 	{
 		Centre = aabb.Center();
 		Radius = glm::length( aabb.Extents() ) / 2.0f;
@@ -49,20 +49,20 @@ namespace dd
 		return (glm::length( sphere.Centre - Centre ) + sphere.Radius) <= Radius;
 	}
 
-	bool Sphere::Intersects( const AABB& aabb ) const
+	bool Sphere::Intersects( const ddm::AABB& aabb ) const
 	{
 		glm::vec3 closest = glm::clamp( Centre, aabb.Min, aabb.Max );
 
 		return glm::distance2( closest, Centre ) < Radius * Radius;
 	}
 
-	bool Sphere::IntersectsRay( const Ray& ray ) const
+	bool Sphere::IntersectsRay( const ddm::Ray& ray ) const
 	{
 		glm::vec3 pos, normal;
 		return IntersectsRay( ray, pos, normal );
 	}
 
-	bool Sphere::IntersectsRay( const Ray& ray, glm::vec3& out_position, glm::vec3& out_normal ) const
+	bool Sphere::IntersectsRay( const ddm::Ray& ray, glm::vec3& out_position, glm::vec3& out_normal ) const
 	{
 		return glm::intersectRaySphere( ray.Origin(), ray.Direction(), Centre, Radius, out_position, out_normal );
 	}

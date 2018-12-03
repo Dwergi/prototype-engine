@@ -100,7 +100,7 @@ namespace dd
 			mesh->Mesh = ddr::MeshManager::Instance()->Find( "cube" );
 
 			dd::RayComponent* ray = world.Access<dd::RayComponent>( entity );
-			ray->Ray = Ray( glm::vec3( 0 ), glm::vec3( 0, 0, 1 ), 0.5f );
+			ray->Ray = ddm::Ray( glm::vec3( 0 ), glm::vec3( 0, 0, 1 ), 0.5f );
 
 			world.AddTag( entity, ddc::Tag::Visible );
 		}
@@ -130,7 +130,7 @@ namespace dd
 		{
 			const TransformComponent& transform = transforms[i];
 
-			dd::AABB bb;
+			ddm::AABB bb;
 			bb.Expand( transform.Position );
 
 			m_agentsBVH.Add( bb );
@@ -149,7 +149,7 @@ namespace dd
 			SwarmAgentComponent& swarm_agent = swarm_agents[i];
 
 			// find all entries within the search radius
-			AABB bounds;
+			ddm::AABB bounds;
 			bounds.Expand( transform.Position + glm::vec3( SearchRadius ) );
 			bounds.Expand( transform.Position - glm::vec3( SearchRadius ) );
 			
@@ -246,7 +246,7 @@ namespace dd
 			transform.Position = transform.Position + swarm_agent.Velocity * dt;
 			transform.Update();
 
-			rays[i].Ray = Ray( transform.Position, swarm_agent.Velocity, glm::length( swarm_agent.Velocity ) );
+			rays[i].Ray = ddm::Ray( transform.Position, swarm_agent.Velocity, glm::length( swarm_agent.Velocity ) );
 		}
 	}
 

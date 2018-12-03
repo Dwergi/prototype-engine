@@ -15,7 +15,7 @@ namespace dd
 	{
 	}
 
-	HitResult::HitResult( dd::Ray ray ) :
+	HitResult::HitResult( ddm::Ray ray ) :
 		m_ray( ray )
 	{
 	}

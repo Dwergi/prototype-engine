@@ -6,15 +6,12 @@
 
 #pragma once
 
-namespace dd
-{
-	struct Ray;
-}
-
 namespace ddm
 {
 #undef min
 #undef max
+
+	struct Ray;
 
 	template <typename T>
 	T min( T a, T b )
@@ -56,7 +53,7 @@ namespace ddm
 	bool IsInf( glm::vec3 v );
 
 	glm::mat4 TransformFromOriginDir( const glm::vec3& origin, const glm::vec3& direction );
-	glm::mat4 TransformFromRay( const dd::Ray& ray );
+	glm::mat4 TransformFromRay( const ddm::Ray& ray );
 
 	glm::vec3 DirectionFromPitchYaw( float pitch, float yaw );
 	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw );
