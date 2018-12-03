@@ -353,6 +353,7 @@
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
+    <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
@@ -587,6 +588,7 @@
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
+    <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
@@ -943,6 +945,7 @@
     <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseMap.inl" />
     <None Include="src\DoubleBuffer.inl" />
+    <None Include="src\HandleManager.inl" />
     <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
     <None Include="src\AngelScriptEngine.inl" />

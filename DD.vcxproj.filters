@@ -606,6 +606,9 @@
     <ClInclude Include="src\LinesRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Noise.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1078,6 +1081,9 @@
     <ClCompile Include="src\Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="src\Noise.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -1105,6 +1111,9 @@
       <Filter>Script\AngelScript</Filter>
     </None>
     <None Include="src\DoubleBuffer.inl">
+      <Filter>Containers</Filter>
+    </None>
+    <None Include="src\HandleManager.inl">
       <Filter>Containers</Filter>
     </None>
   </ItemGroup>

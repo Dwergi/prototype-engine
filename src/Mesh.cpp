@@ -24,19 +24,11 @@ namespace ddr
 	Mesh::Mesh()
 	{
 		DD_PROFILE_SCOPED( Mesh_Create );
-
-		m_vao.Create();
 	}
 
 	Mesh::~Mesh()
 	{
-		m_vboPosition.Destroy();
-		m_vboIndex.Destroy();
-		m_vboNormal.Destroy();
-		m_vboUV.Destroy();
-		m_vboVertexColour.Destroy();
-
-		m_vao.Destroy();
+		DD_ASSERT_ERROR( !m_vao.IsValid() );
 	}
 
 	void Mesh::SetPositions( const dd::ConstBuffer<glm::vec3>& positions )
@@ -48,7 +40,7 @@ namespace ddr
 
 		m_vboPosition.SetData( positions );
 
-		SetDirty();
+		m_dirty = true;
 	}
 
 	void Mesh::SetNormals( const dd::ConstBuffer<glm::vec3>& normals )
@@ -60,7 +52,7 @@ namespace ddr
 
 		m_vboNormal.SetData( normals );
 
-		SetDirty();
+		m_dirty = true;
 	}
 
 	void Mesh::SetIndices( const dd::ConstBuffer<uint>& indices )
@@ -72,7 +64,7 @@ namespace ddr
 
 		m_vboIndex.SetData( indices );
 
-		SetDirty();
+		m_dirty = true;
 	}
 
 	void Mesh::SetUVs( const dd::ConstBuffer<glm::vec2>& uvs )
@@ -84,7 +76,7 @@ namespace ddr
 
 		m_vboUV.SetData( uvs );
 
-		SetDirty();
+		m_dirty = true;
 	}
 
 	void Mesh::SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours )
@@ -96,7 +88,7 @@ namespace ddr
 
 		m_vboVertexColour.SetData( colours );
 
-		SetDirty();
+		m_dirty = true;
 	}
 
 	void Mesh::SetMaterial( MaterialHandle material )
@@ -104,54 +96,80 @@ namespace ddr
 		m_material = material;
 	}
 
-	void Mesh::UpdateBuffers( dd::JobSystem& jobsystem )
+	void Mesh::Create()
 	{
-		if( m_vboPosition.IsValid() )
+		DD_ASSERT( !m_vao.IsValid() );
+
+		m_vao.Create();
+	}
+
+	void Mesh::Destroy()
+	{
+		m_vboPosition.Destroy();
+		m_vboIndex.Destroy();
+		m_vboNormal.Destroy();
+		m_vboUV.Destroy();
+		m_vboVertexColour.Destroy();
+
+		m_vao.Destroy();
+	}
+
+	void Mesh::Update( dd::JobSystem& jobsystem )
+	{
+		if( !m_vao.IsValid() )
 		{
-			m_vboPosition.Bind();
-			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
+			return;
 		}
 
-		if( m_vboNormal.IsValid() )
+		if( m_dirty )
 		{
-			m_vboNormal.Bind();
-			m_vboNormal.CommitData();
-			m_vboNormal.Unbind();
-		}
-
-		if( m_vboIndex.IsValid() )
-		{
-			m_vboIndex.Bind();
-			m_vboIndex.CommitData();
-			m_vboIndex.Unbind();
-		}
-		
-		if( m_vboUV.IsValid() )
-		{
-			m_vboUV.Bind();
-			m_vboUV.CommitData();
-			m_vboUV.Unbind();
-		}
-		
-		if( m_vboVertexColour.IsValid() )
-		{
-			m_vboVertexColour.Bind();
-			m_vboVertexColour.CommitData();
-			m_vboVertexColour.Unbind();
-		}
-
-		if( !m_rebuilding.exchange( true ) )
-		{
-			if( m_bvh != nullptr )
+			if( m_vboPosition.IsValid() )
 			{
-				delete m_bvh;
+				m_vboPosition.Bind();
+				m_vboPosition.CommitData();
+				m_vboPosition.Unbind();
 			}
 
-			jobsystem.Schedule( [this]() { RebuildBVH(); } );
-		}
+			if( m_vboNormal.IsValid() )
+			{
+				m_vboNormal.Bind();
+				m_vboNormal.CommitData();
+				m_vboNormal.Unbind();
+			}
 
-		m_dirty = false;
+			if( m_vboIndex.IsValid() )
+			{
+				m_vboIndex.Bind();
+				m_vboIndex.CommitData();
+				m_vboIndex.Unbind();
+			}
+
+			if( m_vboUV.IsValid() )
+			{
+				m_vboUV.Bind();
+				m_vboUV.CommitData();
+				m_vboUV.Unbind();
+			}
+
+			if( m_vboVertexColour.IsValid() )
+			{
+				m_vboVertexColour.Bind();
+				m_vboVertexColour.CommitData();
+				m_vboVertexColour.Unbind();
+			}
+
+			if( !m_rebuilding.exchange( true ) )
+			{
+				if( m_bvh != nullptr )
+				{
+					delete m_bvh;
+				}
+
+				jobsystem.Schedule( [this]() { RebuildBVH(); } );
+			}
+
+			m_dirty = false;
+		}
 	}
 
 	void Mesh::BindToShader( Shader& shader )
@@ -244,5 +262,15 @@ namespace ddr
 		m_bvh->EndBatch();
 
 		m_rebuilding = false;
+	}
+
+	void MeshManager::OnCreate( Mesh& mesh ) const
+	{
+		mesh.Create();
+	}
+
+	void MeshManager::OnDestroy( Mesh& mesh ) const
+	{
+		mesh.Destroy();
 	}
 }

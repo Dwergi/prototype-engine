@@ -316,35 +316,14 @@ namespace dd
 			{
 				ddr::Mesh* mesh = m_mesh.Access();
 				mesh->SetIndices( s_indexBuffers[m_lod] );
-				mesh->SetDirty();
+				mesh->SetBoundBox( m_bounds );
 			}
 
 			m_state.TransitionTo( RENDER_UPDATE_DONE );
 		}
 	}
 
-	float TerrainChunk::GetNoise( float x, float y )
-	{
-		float height = 0;
-		float wavelength = m_terrainParams.Wavelength;
-
-		float total_amplitude = 0;
-
-		for( int i = 0; i < m_terrainParams.Octaves; ++i )
-		{
-			float multiplier = 1.f / wavelength;
-			glm::vec3 coord( x * multiplier, y * multiplier, m_terrainParams.Seed );
-
-			float noise = glm::simplex( coord );
-			height += noise * m_terrainParams.Amplitudes[ i ];
-
-			total_amplitude += m_terrainParams.Amplitudes[ i ];
-			wavelength /= 2;
-		}
-
-		float normalized = height / total_amplitude;
-		return normalized;
-	}
+	thread_local std::vector<float> sm_noise;
 
 	void TerrainChunk::UpdateVertices()
 	{
@@ -361,70 +340,34 @@ namespace dd
 		m_minLod = m_lod;
 		m_previousOffset = m_offset;
 
-		const uint stride = 1 << m_lod;
-		DD_ASSERT( stride < MaxVertices );
+		const glm::ivec2 dimensions( MaxVertices + 1 );
 
-		const int row_width = MaxVertices + 1;
-		const float vertex_distance = m_terrainParams.ChunkSize / MaxVertices;
+		const glm::ivec2 stride( 1 << m_lod );
+		DD_ASSERT( stride.x < MaxVertices );
+
+		const glm::vec2 increment( m_terrainParams.ChunkSize / MaxVertices );
+
+		ddm::GenerateNoise( sm_noise, dimensions, stride, m_position + m_offset, increment, m_terrainParams.Noise );
 
 		float max_height = std::numeric_limits<float>::min();
 		float min_height = std::numeric_limits<float>::max();
 
-		for( int z = 0; z < row_width; z += stride )
+		for( int y = 0; y < dimensions.y; y += stride.y )
 		{
-			for( int x = 0; x < row_width; x += stride )
+			for( int x = 0; x < dimensions.x; x += stride.x )
 			{
-				const float x_coord = m_position.x + m_offset.x + x * vertex_distance;
-				const float z_coord = m_position.y + m_offset.y + z * vertex_distance;
-
-				float height = GetNoise( x_coord, z_coord );
-
-				// height is y
-				float normalized_height = (1 + height) / 2;
-				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
-
-				const int current = z * row_width + x;
+				const int current = y * dimensions.y + x;
 				DD_ASSERT( current < MeshVertexCount );
 
-				m_vertices[ current ].y = normalized_height * m_terrainParams.HeightRange;
+				m_vertices[current].y = sm_noise[current] * m_terrainParams.HeightRange;
 
-				max_height = ddm::max( max_height, m_vertices[ current ].y );
-				min_height = ddm::min( min_height, m_vertices[ current ].y );
+				min_height = ddm::min( min_height, m_vertices[current].y );
+				max_height = ddm::max( max_height, m_vertices[current].y );
 			}
 		}
 
 		m_bounds.Min = glm::vec3( 0, min_height, 0 );
 		m_bounds.Max = glm::vec3( m_terrainParams.ChunkSize, max_height, m_terrainParams.ChunkSize );
-
-		int flap_vertex_start = MeshVertexCount;
-		for( int i = 0; i < row_width; i += stride )
-		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == 0.0f );
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
-		}
-
-		flap_vertex_start += row_width;
-		for( int i = 0; i < row_width; i += stride )
-		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == m_terrainParams.ChunkSize );
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
-		}
-
-		flap_vertex_start += row_width;
-		for( int i = 0; i < row_width; i += stride )
-		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].z == m_terrainParams.ChunkSize );
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
-		}
-
-		flap_vertex_start += row_width;
-		for( int i = 0; i < row_width; i += stride )
-		{
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].x == 0.0f );
-			DD_ASSERT( m_vertices[ flap_vertex_start + i ].y == 0.0f );
-		}
-
-		DD_ASSERT( flap_vertex_start + row_width <= TotalVertexCount );
 
 		m_state.TransitionTo( UPDATE_DONE );
 		m_updating = false;
@@ -447,18 +390,30 @@ namespace dd
 
 	void TerrainChunk::WriteHeightImage( const char* filename ) const
 	{
-		const int actual_vertices = MaxVertices + 1;
-		byte pixels[ actual_vertices * actual_vertices ];
+		const int stride = 1 << m_lod;
+		const int terrain_size = MaxVertices + 1;
+		const int image_size = (MaxVertices >> m_lod) + 1;
 
-		for( int y = 0; y < actual_vertices; ++y )
+		byte* pixels = new byte[image_size * image_size];
+
+		const float range = m_bounds.Extents().y;
+		const float min = m_bounds.Min.y;
+		const float max = m_bounds.Max.y;
+
+		for( int y = 0; y < image_size; ++y )
 		{
-			for( int x = 0; x < actual_vertices; ++x )
+			for( int x = 0; x < image_size; ++x )
 			{
-				pixels[ y * actual_vertices + x ] = (byte) ((m_vertices[ y * actual_vertices + x ].y / m_terrainParams.HeightRange) * 255);
+				float value = m_vertices[y * stride * terrain_size + x * stride].y;
+				float greyscale = (value - min) / range;
+
+				pixels[y * image_size + x] = (byte) (greyscale * 255);
 			}
 		}
 
-		stbi_write_tga( filename, actual_vertices, actual_vertices, 1, pixels );
+		stbi_write_tga( filename, image_size, image_size, 1, pixels );
+
+		delete pixels;
 	}
 
 	static byte NormalToColour( float f )

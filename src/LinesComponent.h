@@ -15,8 +15,6 @@ namespace dd
 		DD_CLASS( dd::LinesComponent )
 		{
 			DD_COMPONENT();
-
-			DD_MEMBER( dd::LinesComponent, Points );
 		}
 	};
 }

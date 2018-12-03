@@ -108,13 +108,23 @@ namespace ddr
 		MaterialHandle GetMaterial() const { return m_material; }
 
 		//
+		// Create the mesh. Must be called on the render thread.
+		//
+		void Create();
+
+		//
 		// Send updated mesh data to the GPU from the same place it currently is.
 		//
-		void UpdateBuffers( dd::JobSystem& jobsystem );
+		void Update( dd::JobSystem& jobsystem );
 
-		bool IsDirty() const { return m_dirty; }
-		void SetDirty() { m_dirty = true; }
+		//
+		// Destroy the mesh. Must be called on the render thread.
+		//
+		void Destroy();
 
+		//
+		// Get the BVH of this mesh.
+		//
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
 
 		Mesh();
@@ -150,5 +160,12 @@ namespace ddr
 	};
 
 	using MeshHandle = dd::Handle<ddr::Mesh>;
-	using MeshManager = dd::HandleManager<Mesh>;
+
+	struct MeshManager : dd::HandleManager<ddr::Mesh>
+	{
+	private:
+
+		virtual void OnCreate( Mesh& mesh ) const override;
+		virtual void OnDestroy( Mesh& mesh ) const override;
+	};
 }

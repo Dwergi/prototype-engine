@@ -65,12 +65,23 @@ namespace ddr
 		}
 	}
 
+	void MeshRenderer::RenderUpdate( ddc::World& world )
+	{
+		size_t count = MeshManager::Instance()->Count();
+		
+		for( size_t i = 0; i < count; ++i )
+		{
+			Mesh* mesh = MeshManager::Instance()->AccessAt( i );
+			mesh->Update( m_jobsystem );
+		}
+	}
+
 	void MeshRenderer::Render( const ddr::RenderData& data )
 	{
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 		
-		auto state = m_state.UseScoped();
+		ScopedRenderState state = m_state.UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		uniforms.Set( "DrawNormals", m_drawNormals );
@@ -98,11 +109,6 @@ namespace ddr
 		if( mesh == nullptr )
 		{
 			return;
-		}
-
-		if( mesh->IsDirty() )
-		{
-			mesh->UpdateBuffers( m_jobsystem );
 		}
 
 		++m_meshCount;

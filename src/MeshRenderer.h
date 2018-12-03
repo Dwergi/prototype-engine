@@ -30,6 +30,7 @@ namespace ddr
 		MeshRenderer( dd::JobSystem& job_system );
 
 		virtual void RenderInit( ddc::World& world ) override;
+		virtual void RenderUpdate( ddc::World& world ) override;
 		virtual void Render( const ddr::RenderData& render_data ) override;
 
 	private:

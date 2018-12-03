@@ -30,10 +30,8 @@ namespace dd
 	struct TerrainChunkKey;
 	struct Wireframe;
 
-	class TerrainSystem : public ddc::System, public IDebugPanel
+	struct TerrainSystem : ddc::System, public IDebugPanel
 	{
-	public:
-
 		//
 		// The number of chunks we have per dimension (X/Y).
 		//
@@ -74,7 +72,7 @@ namespace dd
 
 	private:
 		
-		bool m_enabled { false };
+		bool m_enabled { true };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 
@@ -96,6 +94,6 @@ namespace dd
 
 		void DestroyChunks( ddc::World& world );
 
-		int CalculateLOD( glm::vec2 chunk_pos, glm::vec2 camera_pos ) const;
+		int CalculateLOD( glm::vec2 chunk_middle, glm::vec2 camera_pos ) const;
 	};
 }

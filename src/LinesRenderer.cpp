@@ -83,6 +83,11 @@ namespace ddr
 			{
 				continue;
 			}*/
+
+			if( lines[i].Points.size() == 0 )
+			{
+				continue;
+			}
 			
 			glm::vec4 colour( 1 );
 			const dd::ColourComponent* colour_cmp = colours.Get( i );

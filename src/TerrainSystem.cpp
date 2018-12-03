@@ -147,9 +147,9 @@ namespace dd
 		}
 	}
 
-	int TerrainSystem::CalculateLOD( glm::vec2 chunk_pos, glm::vec2 camera_pos ) const
+	int TerrainSystem::CalculateLOD( glm::vec2 chunk_middle, glm::vec2 camera_pos ) const
 	{
-		float distance = glm::distance( chunk_pos, camera_pos );
+		float distance = glm::distance( chunk_middle, camera_pos );
 
 		for( int i = 0; i < TerrainParameters::LODs; ++i )
 		{
@@ -261,7 +261,7 @@ namespace dd
 
 		for( glm::vec2 pos : missing_chunks )
 		{
-			int lod = CalculateLOD( pos, camera_pos );
+			int lod = CalculateLOD( pos + glm::vec2( m_params.ChunkSize / 2 ), camera_pos );
 			ddc::Entity created = CreateChunk( world, pos, lod );
 			existing.insert( std::make_pair( pos, created ) );
 		}
@@ -306,7 +306,8 @@ namespace dd
 
 		world.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
 		{
-			std::string file = fmt::format( "terrain_{}.tga", chunk_index );
+			glm::ivec2 pos = (glm::ivec2) chunk.Chunk->GetPosition();
+			std::string file = fmt::format( "terrain_{}x{}_{}.tga", pos.x, pos.y, chunk.Chunk->GetLOD() );
 
 			chunk.Chunk->WriteHeightImage( file.c_str() );
 
@@ -336,12 +337,12 @@ namespace dd
 				m_requiresRegeneration = true;
 			}
 
-			if( ImGui::DragFloat( "Wavelength", &m_params.Wavelength, 1.0f, 1.0f, 512.0f ) )
+			if( ImGui::DragFloat( "Wavelength", &m_params.Noise.Wavelength, 1.0f, 1.0f, 512.0f ) )
 			{
 				m_requiresRegeneration = true;
 			}
 
-			if( ImGui::DragFloat( "Seed", &m_params.Seed, 0.1f, 0.0f, 512.0f ) )
+			if( ImGui::DragFloat( "Seed", &m_params.Noise.Seed, 0.1f, 0.0f, 512.0f ) )
 			{
 				m_requiresRegeneration = true;
 			}
@@ -372,11 +373,11 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_params.Octaves; ++i )
+			for( int i = 0; i < m_params.Noise.Octaves; ++i )
 			{
 				std::string str = fmt::format( "Amplitude {}", i );
 
-				if( ImGui::DragFloat( str.c_str(), &m_params.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
+				if( ImGui::DragFloat( str.c_str(), &m_params.Noise.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
 				{
 					m_requiresRegeneration = true;
 				}
@@ -408,16 +409,16 @@ namespace dd
 		{
 			RandomFloat rng( 0.0f, 1.0f );
 
-			m_params.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
 			m_params.HeightRange = glm::mix( 0.0f, 200.0f, rng.Next() );
-			m_params.Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
+			m_params.Noise.Wavelength = glm::mix( 1.0f, 512.0f, rng.Next() );
+			m_params.Noise.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
 
 			float max_amplitude = 1.0f;
-			for( int i = 0; i < m_params.Octaves; ++i )
+			for( int i = 0; i < m_params.Noise.Octaves; ++i )
 			{
 				float amplitude = glm::mix( 0.01f, max_amplitude, rng.Next() );
 
-				m_params.Amplitudes[i] = amplitude;
+				m_params.Noise.Amplitudes[i] = amplitude;
 
 				max_amplitude = amplitude;
 			}

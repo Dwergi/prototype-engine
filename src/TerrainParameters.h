@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Noise.h"
+
 namespace ddr
 {
 	struct UniformStorage;
@@ -15,11 +17,8 @@ namespace dd
 {
 	struct TerrainParameters
 	{
-		//
-		// The number of octaves of noise.
-		//
-		static const int Octaves = 6;
-
+		ddm::NoiseParameters Noise;
+		
 		//
 		// Size of a chunk in metres in one dimension.
 		//
@@ -29,23 +28,6 @@ namespace dd
 		// The maximum height range of vertices. Heights will vary between 0 and this.
 		//
 		float HeightRange { 64.0f };
-
-		//
-		// The wavelength of the noise. 
-		// Smaller numbers lead to higher frequency noise and more jagged terrain.
-		// Larger numbers lead to smooth rolling hills.
-		//
-		float Wavelength { 96.0f };
-
-		//
-		// A seed for noise generation to introduce some variation.
-		//
-		float Seed { 1.0f };
-
-		//
-		// The amplitudes of noise to apply at each octave.
-		//
-		float Amplitudes[Octaves] = { 0.5f, 0.25f, 0.125f, 0.0625f, 0.03f, 0.015f };
 
 		//
 		// The number of height levels for colouring.
