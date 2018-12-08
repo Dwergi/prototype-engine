@@ -71,7 +71,10 @@ namespace dd
 		stream.read( dst.data(), file_size );
 
 		size_t i = dst.find( '\0' );
-		dst.resize( i );
+		if( i != std::string::npos )
+		{
+			dst.resize( i );
+		}
 
 		return true;
 	}

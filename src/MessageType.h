@@ -11,7 +11,8 @@ namespace dd
 	enum class MessageType : uint
 	{
 		Unknown = ~0u,
-		EntityDestroyed = 0,
+		Test = 0,
+		EntityDestroyed,
 		EntityCreated,
 		BulletHit
 	};

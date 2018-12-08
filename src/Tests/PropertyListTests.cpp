@@ -10,7 +10,6 @@
 #include "PropertyList.h"
 #include "TransformComponent.h"
 #include "Recorder.h"
-#include "Vector4.h"
 
 #include "TestTypes.h"
 
@@ -33,9 +32,11 @@ void test_int_prop( dd::Property* int_prop )
 	REQUIRE( i == 20 );
 }
 
-TEST_CASE( "[property] Integer properties" )
+DD_TYPE_CPP( Test::SimpleStruct );
+DD_TYPE_CPP( Test::NestedStruct );
+
+TEST_CASE( "[Property] Integer properties" )
 {
-	DD_REGISTER_CLASS( Test::SimpleStruct );
 	Test::SimpleStruct test_struct;
 
 	SECTION( "Simple" )
@@ -52,7 +53,6 @@ TEST_CASE( "[property] Integer properties" )
 
 	SECTION( "Nested Struct ")
 	{
-		DD_REGISTER_CLASS( Test::NestedStruct );
 		Test::NestedStruct nested;
 		dd::PropertyList nested_props( nested );
 

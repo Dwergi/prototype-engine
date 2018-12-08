@@ -4,9 +4,11 @@
 // September 3rd 2015
 //
 
-// A temporary buffer for copying containers around.
+#pragma once
+
 namespace dd
 {
+	// A temporary buffer for copying containers around.
 	const int BUFFER_SIZE = 2 * 1024 * 1024;
 	static __declspec(thread) char s_buffer[BUFFER_SIZE];
 

@@ -4,6 +4,8 @@
 // December 17th 2015
 //
 
+#include "ContainerHelpers.h"
+
 namespace dd
 {
 	template <typename T>
@@ -100,13 +102,13 @@ namespace dd
 		if( m_tail < m_head )
 		{
 			uint front_count = old_size - m_head;
-			CopyRange( old_data + m_head, m_storage.Get(), front_count );
-			CopyRange( old_data, m_storage.Get() + front_count, m_tail );
+			CopyRange( old_data + m_head, m_storage.Access(), front_count );
+			CopyRange( old_data, m_storage.Access() + front_count, m_tail );
 		}
 		else if( m_tail > m_head )
 		{
 			uint count = m_tail - m_head;
-			CopyRange( old_data + m_head, m_storage.Get(), count );
+			CopyRange( old_data + m_head, m_storage.Access(), count );
 		}
 
 		m_head = 0;
@@ -119,6 +121,6 @@ namespace dd
 		DD_ASSERT( size > 0 );
 
 		m_storage.Set( reinterpret_cast<T*>(new char[size * sizeof( T )]), size );
-		memset( m_storage.Get(), 0xABAD1DEA, size * sizeof( T ) );
+		memset( m_storage.Access(), 0xABAD1DEA, size * sizeof( T ) );
 	}
 }

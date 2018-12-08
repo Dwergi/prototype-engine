@@ -52,7 +52,8 @@ struct AngelScriptTest
 	static bool FunctionRetCalled;
 	static bool FunctionArgCalled;
 
-	DD_CLASS( dd::AngelScriptTest )
+	DD_CLASS( AngelScriptTest )
+	{
 	}
 };
 
@@ -85,7 +86,7 @@ TEST_CASE( "[AngelScript] Register Class" )
 
 	dd::AngelScriptEngine engine;
 
-	engine.RegisterType<AngelScriptTest, false>();
+	engine.RegisterType<AngelScriptTest>();
 
 	SECTION( "Members" )
 	{
@@ -121,8 +122,8 @@ TEST_CASE( "[AngelScript] Evaluate String" )
 {
 	dd::AngelScriptEngine engine;
 
-	dd::String256 output;
-	bool success = engine.Evaluate( dd::String256( "int i = 5; bool b = true;" ), output );
+	std::string output;
+	bool success = engine.Evaluate( "int i = 5; bool b = true;", output );
 
 	REQUIRE( success == true );
 }
@@ -134,12 +135,12 @@ TEST_CASE( "[AngelScript] Call Function" )
 
 	DD_REGISTER_POD( glm::vec3 );
 	dd::TypeInfo* vec3Type = dd::TypeInfo::AccessType<glm::vec3>();
-	vec3Type->RegisterScriptType<glm::vec3, true>();
+	vec3Type->RegisterScriptType<glm::vec3>();
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );
 	vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::z>( "z" );
 
-	dd::String256 output;
+	std::string output;
 	bool success = engine.LoadFile( "test", output );
 	REQUIRE( success == true );
 
@@ -156,7 +157,7 @@ TEST_CASE( "[AngelScript] Return Values" )
 {
 	dd::AngelScriptEngine engine;
 
-	dd::String256 output;
+	std::string output;
 	bool success = engine.LoadFile( "test_returns", output );
 	REQUIRE( success == true );
 
@@ -201,7 +202,7 @@ TEST_CASE( "[AngelScript] Args" )
 {
 	dd::AngelScriptEngine engine;
 
-	dd::String256 output;
+	std::string output;
 	bool success = engine.LoadFile( "test_args", output );
 	REQUIRE( success == true );
 
@@ -240,7 +241,7 @@ TEST_CASE( "[AngelScript] Class" )
 {
 	dd::AngelScriptEngine engine;
 
-	dd::String256 output;
+	std::string output;
 	bool success = engine.LoadFile( "test_class", output );
 
 	dd::AngelScriptObject* object = engine.GetScriptObject( "test_class", "TestClass" );
@@ -277,9 +278,9 @@ TEST_CASE( "[AngelScript] Error Callback" )
 	dd::AngelScriptEngine engine;
 	dd::TypeInfo::SetScriptEngine( &engine );
 
-	dd::String256 output;
+	std::string output;
 	bool success = engine.LoadFile( "test_empty", output );
 
 	REQUIRE( success == false );
-	REQUIRE( output.IsEmpty() == false );
+	REQUIRE( output.empty() == false );
 }

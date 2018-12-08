@@ -11,7 +11,9 @@
 
 namespace dd
 {
-	static const int MAX_PARTICLES = 1024;
+	static const int MAX_PARTICLES = 128;
+
+	DD_TODO( "Particles probably don't need to store all of this. Could maybe just parametrize it?" );
 
 	struct Particle
 	{

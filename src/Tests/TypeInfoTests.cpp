@@ -15,24 +15,25 @@ namespace Test
 	{
 		uint DerivedThing;
 
-		DD_CLASS( dd::DerivedStruct )
+		DD_CLASS( Test::DerivedStruct )
 		{
-			DD_PARENT( dd::SimpleStruct );
-			DD_MEMBER( dd::DerivedStruct, DerivedThing );
+			DD_PARENT( Test::SimpleStruct );
+			DD_MEMBER( Test::DerivedStruct, DerivedThing );
 		}
 	};
 }
 
+DD_TYPE_CPP( Test::SimpleStruct );
+DD_TYPE_CPP( Test::DerivedStruct );
+
 TEST_CASE( "[TypeInfo] Find" )
 {
-	DD_REGISTER_CLASS( Test::SimpleStruct );
-
 	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
 
 	using namespace Test;
 
-	const dd::TypeInfo* typeAlias = DD_TYPE( SimpleStruct );
+	const dd::TypeInfo* typeAlias = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( typeAlias != nullptr );
 
 	REQUIRE( type == typeAlias );
@@ -40,8 +41,6 @@ TEST_CASE( "[TypeInfo] Find" )
 
 TEST_CASE( "[TypeInfo] Namespace" )
 {
-	DD_REGISTER_CLASS( Test::SimpleStruct );
-
 	const dd::TypeInfo* type = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( type != nullptr );
 
@@ -50,7 +49,7 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 	using namespace Test;
 
-	const dd::TypeInfo* typeAlias = DD_TYPE( SimpleStruct );
+	const dd::TypeInfo* typeAlias = DD_TYPE( Test::SimpleStruct );
 	REQUIRE( typeAlias != nullptr );
 
 	REQUIRE( typeAlias->Namespace() == "Test" );
@@ -59,9 +58,6 @@ TEST_CASE( "[TypeInfo] Namespace" )
 
 TEST_CASE( "[TypeInfo] Derived" )
 {
-	DD_REGISTER_CLASS( Test::SimpleStruct );
-	DD_REGISTER_CLASS( Test::DerivedStruct );
-
 	const dd::TypeInfo* type = DD_TYPE( Test::DerivedStruct );
 	REQUIRE( type != nullptr );
 

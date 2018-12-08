@@ -20,14 +20,14 @@ namespace Test
 
 		bool operator==( const SimpleStruct& other ) const;
 
-		DD_CLASS( dd::SimpleStruct )
+		DD_CLASS( Test::SimpleStruct )
 		{
-			DD_MEMBER( dd::SimpleStruct, Int );
-			DD_MEMBER( dd::SimpleStruct, Str );
-			DD_MEMBER( dd::SimpleStruct, Flt );
-			DD_MEMBER( dd::SimpleStruct, Vec );
-			DD_METHOD( dd::SimpleStruct, Double );
-			DD_METHOD( dd::SimpleStruct, Multiply );
+			DD_MEMBER( Test::SimpleStruct, Int );
+			DD_MEMBER( Test::SimpleStruct, Str );
+			DD_MEMBER( Test::SimpleStruct, Flt );
+			DD_MEMBER( Test::SimpleStruct, Vec );
+			DD_METHOD( Test::SimpleStruct, Double );
+			DD_METHOD( Test::SimpleStruct, Multiply );
 		}
 	};
 
@@ -36,10 +36,10 @@ namespace Test
 		SimpleStruct Nested;
 		int SecondInt;
 
-		DD_CLASS( dd::NestedStruct )
+		DD_CLASS( Test::NestedStruct )
 		{
-			DD_MEMBER( dd::NestedStruct, Nested );
-			DD_MEMBER( dd::NestedStruct, SecondInt );
+			DD_MEMBER( Test::NestedStruct, Nested );
+			DD_MEMBER( Test::NestedStruct, SecondInt );
 		}
 	};
 }

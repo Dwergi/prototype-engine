@@ -12,39 +12,30 @@
 
 bool called = false;
 
-uint InvalidMessageID = ((uint) -1) - 100;
-uint TestMessageID = ((uint) -1) - 1;
+dd::MessageType InvalidMessageID =  dd::MessageType::Unknown;
+dd::MessageType TestMessageID = dd::MessageType::Test;
 
-struct TestMessage : public dd::Message
+int Received;
+
+void TestFunction( dd::Message msg )
 {
-	uint Payload;
-
-	DD_CLASS( dd::TestMessage )
-		DD_PARENT( dd::dd::Message )
-	}
-};
-
-dd::Message* Received;
-
-void TestFunction( dd::Message* msg )
-{
-	Received = msg;
+	Received = msg.GetPayload<int>();
 }
 
-dd::Message* Received2;
+int Received2;
 
-void TestFunction2( dd::Message* msg )
+void TestFunction2( dd::Message msg )
 {
-	Received2 = msg;
+	Received2 = msg.GetPayload<int>();
 }
 
 TEST_CASE( "[MessageSystem]" )
 {
 	DD_REGISTER_CLASS( dd::Message );
-	DD_REGISTER_CLASS( TestMessage );
 
 	dd::MessageQueue system;
-	Received = nullptr;
+	Received = 0;
+	Received2 = 0;
 
 	SECTION( "Subscribe/Unsubscribe" )
 	{
@@ -66,62 +57,55 @@ TEST_CASE( "[MessageSystem]" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		TestMessage msg;
+		dd::Message msg;
 		msg.Type = TestMessageID;
-		msg.Payload = 50;
+		msg.SetPayload( 50 );
 
-		system.Send( &msg );
-		system.Update( 0 );
+		system.Send( msg );
+		system.Update();
 
-		REQUIRE( Received == &msg );
-
-		TestMessage* received = static_cast<TestMessage*>( Received );
-
-		REQUIRE( received != nullptr );
-		REQUIRE( received->Payload == 50 );
+		REQUIRE( Received == 50 );
 	}
 
 	SECTION( "Send No Receivers" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		TestMessage msg;
+		dd::Message msg;
 		msg.Type = InvalidMessageID;
-		msg.Payload = 50;
+		msg.SetPayload( 50 );
 
-		system.Send( &msg );
-		system.Update( 0 );
+		system.Send( msg );
+		system.Update();
 
-		REQUIRE( Received == nullptr );
+		REQUIRE( Received == 0 );
 	}
 
 	SECTION( "Send Multiple Receivers" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		Received2 = nullptr;
-
 		dd::MessageSubscription sub = system.Subscribe( TestMessageID, TestFunction2 );
 
-		TestMessage msg;
+		dd::Message msg;
 		msg.Type = TestMessageID;
-		msg.Payload = 50;
+		msg.SetPayload( 50 );
 
-		system.Send( &msg );
-		system.Update( 0 );
+		system.Send( msg );
+		system.Update();
 
-		REQUIRE( Received == &msg );
-		REQUIRE( Received2 == &msg );
+		REQUIRE( Received == 50 );
+		REQUIRE( Received2 == 50 );
 
 		system.Unsubscribe( sub );
 
-		Received = nullptr;
-		Received2 = nullptr;
+		Received = 0;
+		Received2 = 0;
 
-		system.Send( &msg );
-		system.Update( 0 );
+		system.Send( msg );
+		system.Update();
 
-		REQUIRE( Received == &msg );
-		REQUIRE( Received2 == nullptr );
+		REQUIRE( Received == 50 );
+		REQUIRE( Received2 == 0 );
 	}
 }

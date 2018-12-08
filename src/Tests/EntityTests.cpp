@@ -39,6 +39,10 @@ struct ThirdComponent
 	}
 };
 
+DD_TYPE_CPP( FirstComponent );
+DD_TYPE_CPP( SecondComponent );
+DD_TYPE_CPP( ThirdComponent );
+
 struct TestSystem : ddc::System
 {
 	TestSystem() :
@@ -50,8 +54,10 @@ struct TestSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		auto read = data.Read<FirstComponent>();
-		auto write = data.Write<SecondComponent>();
+		auto buffer = data.Data();
+
+		auto read = buffer.Read<FirstComponent>();
+		auto write = buffer.Write<SecondComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -74,8 +80,10 @@ struct DependentSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		auto read = data.Read<SecondComponent>();
-		auto write = data.Write<ThirdComponent>();
+		auto buffer = data.Data();
+
+		auto read = buffer.Read<SecondComponent>();
+		auto write = buffer.Write<ThirdComponent>();
 
 		DD_ASSERT( read.Size() == write.Size() );
 
@@ -97,7 +105,9 @@ struct ReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		auto read = data.Read<ThirdComponent>();
+		auto buffer = data.Data();
+
+		auto read = buffer.Read<ThirdComponent>();
 
 		for( size_t i = 0; i < read.Size(); ++i )
 		{
@@ -118,8 +128,10 @@ struct OnlyReaderSystem : ddc::System
 
 	virtual void Update( const ddc::UpdateData& data ) override
 	{
-		auto read1 = data.Read<FirstComponent>();
-		auto read2 = data.Read<SecondComponent>();
+		auto buffer = data.Data();
+
+		auto read1 = buffer.Read<FirstComponent>();
+		auto read2 = buffer.Read<SecondComponent>();
 
 		for( size_t i = 0; i < read1.Size(); ++i )
 		{
@@ -175,13 +187,14 @@ TEST_CASE( "Component" )
 	ddc::World world( jobs );
 	ddc::Entity a = world.CreateEntity();
 
+	const dd::TypeInfo* type = DD_TYPE( FirstComponent );
+	REQUIRE( type->ComponentID() != dd::INVALID_COMPONENT );
+
 	bool found = world.Has<FirstComponent>( a );
 	REQUIRE( found == false );
 
 	FirstComponent& cmp = world.Add<FirstComponent>( a );
 	REQUIRE( cmp.FirstValue == -100 );
-
-	REQUIRE( &cmp.GetType() == &FirstComponent::Type );
 
 	cmp.FirstValue = 5;
 
@@ -233,6 +246,8 @@ TEST_CASE( "Update System" )
 
 TEST_CASE( "Update With Discontinuity" )
 {
+	dd::TypeInfo::RegisterQueuedTypes();
+
 	dd::JobSystem jobs( 0 );
 	ddc::World world( jobs );
 

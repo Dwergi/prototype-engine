@@ -179,7 +179,8 @@ namespace ddc
 		template <typename T>
 		void Remove( Entity entity )
 		{
-			RemoveComponent( entity, T::Type.ID );
+			const dd::TypeInfo* type = DD_TYPE( T );
+			RemoveComponent( entity, type->ComponentID() );
 		}
 
 		//

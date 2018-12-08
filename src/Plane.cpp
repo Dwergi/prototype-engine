@@ -62,4 +62,19 @@ namespace ddm
 		glm::vec3 normal = glm::normalize( glm::vec3( (transform * glm::vec4( Normal(), 0 )).xyz ) );
 		return Plane( origin, normal );
 	}
+
+	bool Plane::IntersectsLine( glm::vec3 a, glm::vec3 b, glm::vec3& hit ) const
+	{
+		glm::vec3 ab = b - a;
+
+		float t = (Parameters.w - glm::dot( Parameters.xyz(), a )) / glm::dot( Parameters.xyz(), ab );
+
+		if( t >= 0 && t <= 1 )
+		{
+			hit = a + t * ab;
+			return true;
+		}
+
+		return false;
+	}
 }

@@ -35,7 +35,10 @@ namespace ddc
 		for( dd::ComponentID i = 0; i < m_components.size(); ++i )
 		{
 			const dd::TypeInfo* type = dd::TypeInfo::GetComponent( i );
+			DD_ASSERT( type != nullptr );
+
 			size_t buffer_size = type->Size() * MAX_ENTITIES;
+			DD_ASSERT( buffer_size < 1024 * 1024 * 1024 );
 
 			m_components[i] = new byte[buffer_size];
 			memset( m_components[i], 0, buffer_size );

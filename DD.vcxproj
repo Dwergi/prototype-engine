@@ -287,7 +287,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;UNICODE;_DEBUG;SFML_STATIC;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
-      <MinimalRebuild>true</MinimalRebuild>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>

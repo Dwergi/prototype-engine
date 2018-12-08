@@ -75,7 +75,7 @@ namespace dd
 	}
 
 	RandomFloat::RandomFloat( uint seed ) : Random32Base<float>( 0, 1, seed ) {}
-	RandomFloat::RandomFloat( float min, float max, uint seed ) : Random32Base<float>( seed ) {}
+	RandomFloat::RandomFloat( float min, float max, uint seed ) : Random32Base<float>( min, max, seed ) {}
 
 	float RandomFloat::Next()
 	{

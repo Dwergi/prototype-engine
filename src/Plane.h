@@ -23,6 +23,8 @@ namespace ddm
 		float DistanceTo( const glm::vec3& point ) const;
 		Plane GetTransformed( const glm::mat4& transform ) const;
 
+		bool IntersectsLine( glm::vec3 a, glm::vec3 b, glm::vec3& hit ) const;
+
 		glm::vec4 Parameters;
 
 		DD_CLASS( ddm::Plane )

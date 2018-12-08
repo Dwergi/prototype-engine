@@ -855,7 +855,8 @@ int TestMain( int argc, char* argv[] )
 {
 	s_scriptEngine = new AngelScriptEngine();
 	dd::TypeInfo::SetScriptEngine( s_scriptEngine );
-	dd::TypeInfo::RegisterDefaultTypes();
+
+	dd::TypeInfo::RegisterQueuedTypes();
 
 	int iError = tests::RunTests( argc, argv );
 

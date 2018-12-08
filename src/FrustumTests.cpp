@@ -8,11 +8,11 @@
 #include "catch2/catch.hpp"
 
 #include "Frustum.h"
-#include "FPSCamera.h"
+#include "FPSCameraComponent.h"
 
 TEST_CASE( "[Frustum]" )
 {
-	dd::FPSCamera cam;
+	dd::FPSCameraComponent cam;
 	cam.SetAspectRatio( 16, 9 );
 	cam.SetDirection( glm::vec3( 0, 0, 1 ) );
 	cam.SetPosition( glm::vec3( 0, 0, 0 ) );
