@@ -10,6 +10,7 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
+#include "MeshComponent.h"
 #include "Plane.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
@@ -19,6 +20,8 @@
 
 namespace dd
 {
+	const float WATER_HEIGHT = 32.0f;
+
 	WaterSystem::WaterSystem() :
 		ddc::System( "Water" )
 	{
@@ -28,10 +31,16 @@ namespace dd
 		OptionalRead<BoundSphereComponent>( "terrain" );
 
 		RequireWrite<WaterComponent>();
+		RequireRead<TransformComponent>();
 	}
 
-	static void CalculateWaterBorders( dd::TerrainChunk& chunk, const ddm::Plane& water_plane )
+	static void CalculateWaterBorders( dd::TerrainChunk& chunk, const ddm::Plane& water_plane, std::vector<glm::vec3>& edges )
 	{
+		if( !chunk.GetMesh().IsValid() )
+		{
+			return;
+		}
+
 		const ddr::Mesh* mesh = chunk.GetMesh().Get();
 
 		dd::ConstTriangulator triangulator( *mesh );
@@ -40,8 +49,27 @@ namespace dd
 		{
 			dd::ConstTriangle tri = triangulator[i];
 
-			glm::vec3 normal = ddm::NormalFromTriangle( tri.p0, tri.p1, tri.p2 );
+			glm::vec3 hit;
+			if( water_plane.IntersectsLine( tri.p0, tri.p1, hit ) )
+			{
+				edges.push_back( hit );
+			}
+
+			if( water_plane.IntersectsLine( tri.p1, tri.p2, hit ) )
+			{
+				edges.push_back( hit );
+			}
+
+			if( water_plane.IntersectsLine( tri.p0, tri.p2, hit ) )
+			{
+				edges.push_back( hit );
+			}
 		}
+	}
+
+	static void CreateWaterMesh( ddc::World& world, glm::vec2 chunk, std::vector<glm::vec3>& edges )
+	{
+		//world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::WaterComponent>();
 	}
 
 	void WaterSystem::Update( const ddc::UpdateData& update_data )
@@ -56,11 +84,15 @@ namespace dd
 		auto water = update_data.Data();
 		auto water_transforms = water.Read<TransformComponent>();
 		auto water_cmps = water.Write<WaterComponent>();
+		
+		const ddm::Plane water_plane( glm::vec3( 0, WATER_HEIGHT, 0 ), glm::vec3( 0, -1, 0 ) );
 
-		const ddm::Plane water_plane( glm::vec3( 0, 0, 0 ), glm::vec3( 0, -1, 0 ) );
+		std::vector<glm::vec3> edges;
 
 		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
+			edges.clear();
+
 			ddm::AABB aabb;
 			ddm::Sphere sphere;
 
@@ -69,12 +101,19 @@ namespace dd
 				continue;
 			}
 
-			if( aabb.Min.y > 0 || aabb.Max.y < 0 )
+			if( aabb.Min.y > WATER_HEIGHT || aabb.Max.y < WATER_HEIGHT )
 			{
 				continue;
 			}
 
-			CalculateWaterBorders( *chunks[i].Chunk, water_plane );
+			ddm::Plane local_plane = water_plane.GetTransformed( transforms[i].Transform() );
+
+			CalculateWaterBorders( *chunks[i].Chunk, local_plane, edges );
+
+			if( !edges.empty() )
+			{
+				CreateWaterMesh( update_data.World(), chunks[i].Chunk->GetPosition(), edges );
+			}
 		}
 	}
 }

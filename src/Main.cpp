@@ -77,6 +77,7 @@
 #include "TreeSystem.h"
 #include "TrenchSystem.h"
 #include "Uniforms.h"
+#include "WaterSystem.h"
 #include "Window.h"
 #include "World.h"
 #include "WorldRenderer.h"
@@ -253,7 +254,8 @@ void CheckAssert()
 
 			s_debugUI->EndFrame();
 			s_window->Swap();
-		} while( s_assert.Open );
+		} 
+		while( s_assert.Open );
 	}
 }
 
@@ -278,6 +280,7 @@ pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char*
 		}
 		else
 		{
+			__debugbreak();
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 		}
 	} while( s_assert.Action == AssertAction::None );
@@ -542,6 +545,42 @@ void CreatePhysicsPlaneTestScene()
 	} );
 }
 
+void CreateAxes()
+{
+	{
+		ddc::Entity x_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
+		s_world->AddTag( x_entity, ddc::Tag::Visible );
+
+		dd::RayComponent* x_ray = s_world->Access<dd::RayComponent>( x_entity );
+		x_ray->Ray = ddm::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ), 100 );
+
+		dd::ColourComponent* x_colour = s_world->Access<dd::ColourComponent>( x_entity );
+		x_colour->Colour = glm::vec4( 1, 0, 0, 1 );
+	}
+
+	{
+		ddc::Entity y_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
+		s_world->AddTag( y_entity, ddc::Tag::Visible );
+
+		dd::RayComponent* y_ray = s_world->Access<dd::RayComponent>( y_entity );
+		y_ray->Ray = ddm::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ), 100 );
+
+		dd::ColourComponent* y_colour = s_world->Access<dd::ColourComponent>( y_entity );
+		y_colour->Colour = glm::vec4( 0, 1, 0, 1 );
+	}
+
+	{
+		ddc::Entity z_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
+		s_world->AddTag( z_entity, ddc::Tag::Visible );
+
+		dd::RayComponent* z_ray = s_world->Access<dd::RayComponent>( z_entity );
+		z_ray->Ray = ddm::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ), 100 );
+
+		dd::ColourComponent* z_colour = s_world->Access<dd::ColourComponent>( z_entity );
+		z_colour->Colour = glm::vec4( 0, 0, 1, 1 );
+	}
+}
+
 int GameMain()
 {
 	DD_PROFILE_INIT();
@@ -611,6 +650,8 @@ int GameMain()
 
 		dd::TreeSystem* tree_system = new dd::TreeSystem();
 
+		dd::WaterSystem* water_system = new dd::WaterSystem();
+
 		s_world = new ddc::World( *jobsystem );
 		
 		s_world->RegisterSystem( *s_freeCamera );
@@ -621,6 +662,7 @@ int GameMain()
 		s_world->RegisterSystem( *physics_system );
 		s_world->RegisterSystem( *swarm_system );
 		s_world->RegisterSystem( *tree_system );
+		s_world->RegisterSystem( *water_system );
 
 		s_renderer = new ddr::WorldRenderer( *s_window );
 
@@ -649,7 +691,7 @@ int GameMain()
 		s_renderer->Register( *bounds_renderer );
 		s_renderer->Register( *ray_renderer );
 		s_renderer->Register( *lines_renderer );
-
+		
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );
 
@@ -754,47 +796,7 @@ int GameMain()
 		}*/
 
 		// axes
-		{
-			{
-				ddc::Entity x_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
-				s_world->AddTag( x_entity, ddc::Tag::Visible );
-
-				dd::RayComponent* x_ray = s_world->Access<dd::RayComponent>( x_entity );
-				x_ray->Ray = ddm::Ray( glm::vec3( -50, 0, 0 ), glm::vec3( 1, 0, 0 ), 100 );
-
-				dd::ColourComponent* x_colour = s_world->Access<dd::ColourComponent>( x_entity );
-				x_colour->Colour = glm::vec4( 1, 0, 0, 1 );
-			}
-
-			{
-				ddc::Entity y_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
-				s_world->AddTag( y_entity, ddc::Tag::Visible );
-
-				dd::RayComponent* y_ray = s_world->Access<dd::RayComponent>( y_entity );
-				y_ray->Ray = ddm::Ray( glm::vec3( 0, -50, 0 ), glm::vec3( 0, 1, 0 ), 100 );
-
-				dd::ColourComponent* y_colour = s_world->Access<dd::ColourComponent>( y_entity );
-				y_colour->Colour = glm::vec4( 0, 1, 0, 1 );
-			}
-
-			{
-				ddc::Entity z_entity = s_world->CreateEntity<dd::RayComponent, dd::ColourComponent>();
-				s_world->AddTag( z_entity, ddc::Tag::Visible );
-
-				dd::RayComponent* z_ray = s_world->Access<dd::RayComponent>( z_entity );
-				z_ray->Ray = ddm::Ray( glm::vec3( 0, 0, -50 ), glm::vec3( 0, 0, 1 ), 100 );
-
-				dd::ColourComponent* z_colour = s_world->Access<dd::ColourComponent>( z_entity );
-				z_colour->Colour = glm::vec4( 0, 0, 1, 1 );
-			}
-		}
-
-		// bounds
-		{
-			//ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
-
-			//CreateMeshEntity( *s_world, unitCube, glm::vec4( 1, 1, 1, 1 ), glm::translate( glm::vec3( 10, 60, 10 ) ) );
-		}
+		CreateAxes();
 
 		// physics
 		//CreatePhysicsPlaneTestScene();

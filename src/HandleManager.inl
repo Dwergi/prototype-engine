@@ -66,6 +66,11 @@ namespace dd
 	template <typename T>
 	bool HandleManager<T>::IsAlive( Handle<T> h ) const
 	{
+		if( !h.IsValid() )
+		{
+			return false;
+		}
+
 		DD_ASSERT( h.ID >= 0 && h.ID < m_entries.size() );
 
 		const HandleEntry& entry = m_entries[h.ID];

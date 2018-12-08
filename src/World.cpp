@@ -12,6 +12,8 @@ namespace ddc
 
 	static void WaitForAllFutures( std::vector<std::shared_future<void>>& futures )
 	{
+		DD_TODO( "Add a way to check for asserts here." );
+
 		size_t ready = 0;
 		while( ready < futures.size() )
 		{

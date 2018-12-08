@@ -6,7 +6,7 @@ namespace dd
 {
 	struct WaterComponent
 	{
-		ddr::MeshHandle Mesh;
+		glm::vec2 TerrainChunkPosition;
 
 		DD_CLASS( dd::WaterComponent )
 		{

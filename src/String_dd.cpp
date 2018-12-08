@@ -90,7 +90,10 @@ namespace dd
 
 	bool String::operator==( const char* other ) const
 	{
-		DD_ASSERT( other != nullptr );
+		if( other == nullptr )
+		{
+			return false;
+		}
 
 		size_t length = strlen( other );
 
