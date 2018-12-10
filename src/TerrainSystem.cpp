@@ -147,8 +147,10 @@ namespace dd
 		}
 	}
 
-	int TerrainSystem::CalculateLOD( glm::vec2 chunk_middle, glm::vec2 camera_pos ) const
+	int TerrainSystem::CalculateLOD( glm::vec2 chunk_pos, glm::vec2 camera_pos ) const
 	{
+		glm::vec2 chunk_middle = chunk_pos + glm::vec2( m_params.ChunkSize / 2 );
+
 		float distance = glm::distance( chunk_middle, camera_pos );
 
 		for( int i = 0; i < TerrainParameters::LODs; ++i )
@@ -261,7 +263,7 @@ namespace dd
 
 		for( glm::vec2 pos : missing_chunks )
 		{
-			int lod = CalculateLOD( pos + glm::vec2( m_params.ChunkSize / 2 ), camera_pos );
+			int lod = CalculateLOD( pos, camera_pos );
 			ddc::Entity created = CreateChunk( world, pos, lod );
 			existing.insert( std::make_pair( pos, created ) );
 		}

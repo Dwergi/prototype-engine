@@ -22,7 +22,7 @@ namespace dd
 		//
 		// Size of a chunk in metres in one dimension.
 		//
-		float ChunkSize { 32.0f };
+		float ChunkSize { 64.0f };
 
 		//
 		// The maximum height range of vertices. Heights will vary between 0 and this.

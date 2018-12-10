@@ -10,6 +10,7 @@
 #include "FrameBuffer.h"
 #include "IAsyncHitTest.h"
 #include "IDebugPanel.h"
+#include "IHandlesInput.h"
 #include "InputAction.h"
 #include "Renderer.h"
 #include "System.h"
@@ -41,7 +42,7 @@ namespace dd
 	struct TransformComponent;
 	class Window;
 	
-	struct MousePicking : public IDebugPanel, public ddr::Renderer
+	struct MousePicking : IDebugPanel, IHandlesInput, ddr::Renderer
 	{
 	public:
 
@@ -52,7 +53,7 @@ namespace dd
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
 
-		void BindActions( InputBindings& bindings );
+		virtual void BindActions( InputBindings& bindings ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		

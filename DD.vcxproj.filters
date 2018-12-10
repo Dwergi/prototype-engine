@@ -100,6 +100,9 @@
     <Filter Include="JSON">
       <UniqueIdentifier>{9e9437c3-6054-4e4e-a162-f654ac86e1fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{e4f926ed-57fd-4048-ae7c-446053c11030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -480,9 +483,6 @@
     <ClInclude Include="src\TerrainSystem.h">
       <Filter>Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshUtils.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\PhysicsSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
@@ -506,9 +506,6 @@
     </ClInclude>
     <ClInclude Include="src\System.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Triangulator.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\ColourComponent.h">
       <Filter>Components</Filter>
@@ -614,6 +611,18 @@
     </ClInclude>
     <ClInclude Include="src\WaterComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IHandlesInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshUtils.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Triangulator.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WaterRenderer.h">
+      <Filter>Renderers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -984,9 +993,6 @@
     <ClCompile Include="src\TerrainParameters.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshUtils.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\MeshUtilsTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -1011,13 +1017,9 @@
     <ClCompile Include="src\System.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\Triangulator.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\ColourComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\GLFWInputSource.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -1095,6 +1097,18 @@
     </ClCompile>
     <ClCompile Include="src\WaterComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputSystem.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshUtils.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Triangulator.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaterRenderer.cpp">
+      <Filter>Renderers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

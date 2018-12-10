@@ -1,0 +1,5 @@
+#version 330 core
+#extension GL_OES_standard_derivatives : enable
+
+#include "lights.glsl"
+#include "wireframe.glsl"

@@ -78,16 +78,13 @@ void main()
 	vec3 toView = ViewPosition - Fragment.Position;
 	float viewDistance = length( toView );
 
-	if( Fog.Enabled )
+	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
+	fogAmount = fogAmount * fogAmount;
+	
+	if( Fog.Enabled && fogAmount >= 1 )
 	{
-		float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
-		fogAmount = fogAmount * fogAmount;
-
-		if( fogAmount >= 1 )
-		{
-			Colour = vec4( Fog.Colour, 1 );
-			return;
-		}
+		Colour = vec4( Fog.Colour, 1 );
+		return;
 	}
 
 	vec4 finalColour = vec4( 0 );
@@ -118,9 +115,6 @@ void main()
 
 	if( Fog.Enabled )
 	{
-		float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
-		fogAmount = fogAmount * fogAmount;
-
 		finalColour = mix( finalColour, vec4( Fog.Colour, 1 ), fogAmount );
 	}
 

@@ -77,6 +77,7 @@
 #include "TreeSystem.h"
 #include "TrenchSystem.h"
 #include "Uniforms.h"
+#include "WaterRenderer.h"
 #include "WaterSystem.h"
 #include "Window.h"
 #include "World.h"
@@ -650,7 +651,7 @@ int GameMain()
 
 		dd::TreeSystem* tree_system = new dd::TreeSystem();
 
-		dd::WaterSystem* water_system = new dd::WaterSystem();
+		dd::WaterSystem* water_system = new dd::WaterSystem( terrain_system->GetTerrainParameters() );
 
 		s_world = new ddc::World( *jobsystem );
 		
@@ -683,6 +684,8 @@ int GameMain()
 
 		ddr::TerrainRenderer* terrain_renderer = new ddr::TerrainRenderer( terrain_system->GetTerrainParameters() );
 
+		ddr::WaterRenderer* water_renderer = new ddr::WaterRenderer();
+
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *light_renderer );
 		s_renderer->Register( *terrain_renderer );
@@ -691,6 +694,7 @@ int GameMain()
 		s_renderer->Register( *bounds_renderer );
 		s_renderer->Register( *ray_renderer );
 		s_renderer->Register( *lines_renderer );
+		s_renderer->Register( *water_renderer );
 		
 		s_frameTimer = new FrameTimer();
 		s_frameTimer->SetMaxFPS( s_maxFPS );
@@ -715,6 +719,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *terrain_renderer );
 		s_debugUI->RegisterDebugPanel( *swarm_system );
 		s_debugUI->RegisterDebugPanel( *tree_system );
+		s_debugUI->RegisterDebugPanel( *water_system );
 
 		CreateSingletons();
 		CreateMeshShader();

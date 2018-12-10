@@ -30,7 +30,7 @@ namespace dd
 	struct TerrainChunkKey;
 	struct Wireframe;
 
-	struct TerrainSystem : ddc::System, public IDebugPanel
+	struct TerrainSystem : ddc::System, IDebugPanel
 	{
 		//
 		// The number of chunks we have per dimension (X/Y).

@@ -347,6 +347,7 @@
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\HandleManager.h" />
+    <ClInclude Include="src\IHandlesInput.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\JSON.h" />
@@ -442,6 +443,7 @@
     <ClInclude Include="src\TreeSystem.h" />
     <ClInclude Include="src\Triangulator.h" />
     <ClInclude Include="src\WaterComponent.h" />
+    <ClInclude Include="src\WaterRenderer.h" />
     <ClInclude Include="src\WaterSystem.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
@@ -671,6 +673,7 @@
     <ClCompile Include="src\TreeSystem.cpp" />
     <ClCompile Include="src\Triangulator.cpp" />
     <ClCompile Include="src\WaterComponent.cpp" />
+    <ClCompile Include="src\WaterRenderer.cpp" />
     <ClCompile Include="src\WaterSystem.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />

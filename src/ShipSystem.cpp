@@ -45,9 +45,8 @@ namespace dd
 		-0.5f,0.0f,-1.0f,	0.0f,-1.0f,0.0f
 	};
 
-	ShipSystem::ShipSystem( FPSCamera& camera ) :
-		ddc::System( "Ship System" ),
-		m_camera( camera )
+	ShipSystem::ShipSystem() :
+		ddc::System( "Ship System" )
 	{
 		m_inputs.Add( InputAction::FORWARD,		false );
 		m_inputs.Add( InputAction::BACKWARD,	false );

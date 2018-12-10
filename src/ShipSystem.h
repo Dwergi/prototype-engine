@@ -7,25 +7,23 @@
 #pragma once
 
 #include "IDebugPanel.h"
+#include "IHandlesInput.h"
 #include "InputAction.h"
 #include "Mesh.h"
 #include "System.h"
 
 namespace dd
 {
-	class FPSCamera;
 	struct InputBindings;
 	class ShipComponent;
 	struct TransformComponent;
 
-	class ShipSystem : public ddc::System, public IDebugPanel
+	struct ShipSystem : ddc::System, IDebugPanel, IHandlesInput
 	{
-	public:
-
-		ShipSystem( FPSCamera& camera );
+		ShipSystem();
 		ShipSystem( const ShipSystem& other ) = delete;
 
-		void BindActions( InputBindings& bindings );
+		virtual void BindActions( InputBindings& bindings ) override;
 
 		virtual void Initialize( ddc::World& world ) override {}
 		virtual void Update( const ddc::UpdateData& data ) override;
@@ -38,7 +36,6 @@ namespace dd
 
 	private:
 
-		FPSCamera& m_camera;
 		glm::vec3 m_nextCameraPos;
 
 		ddc::Entity m_lastShip;

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "IDebugPanel.h"
+#include "IHandlesInput.h"
 #include "IInputSource.h"
 #include "System.h"
 
@@ -15,7 +16,7 @@ namespace dd
 	struct FPSCameraComponent;
 	struct InputBindings;
 
-	struct FreeCameraController : IDebugPanel, ddc::System
+	struct FreeCameraController : IDebugPanel, IHandlesInput, ddc::System
 	{
 		FreeCameraController();
 		FreeCameraController( FreeCameraController&& other );
@@ -25,11 +26,10 @@ namespace dd
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
 		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void BindActions( InputBindings& bindings ) override;
 
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
-		void HandleInput( InputAction action, InputType type );
-		void BindActions( InputBindings& bindings );
 
 		void Enable( bool enabled ) { m_enabled = enabled; }
 		bool IsEnabled() const { return m_enabled; }
@@ -50,5 +50,7 @@ namespace dd
 		bool m_invert { false };
 		
 		DenseMap<InputAction, bool> m_inputs;
+
+		void HandleInput( InputAction action, InputType type );
 	};
 }

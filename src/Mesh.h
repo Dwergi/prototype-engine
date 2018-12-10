@@ -56,7 +56,7 @@ namespace ddr
 		void SetPositions( const dd::ConstBuffer<glm::vec3>& positions );
 
 		//
-		// Get the currently set buffer for positions.
+		// Access the currently set buffer for positions.
 		// Not guaranteed to be valid.
 		//
 		dd::Buffer<glm::vec3> AccessPositions() const { return dd::Buffer<glm::vec3>( m_vboPosition.GetData() ); }
@@ -78,6 +78,12 @@ namespace ddr
 		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
 		//
 		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<uint>( m_vboIndex.GetData() ); }
+
+		//
+		// Access the currently set buffer for indices.
+		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
+		//
+		dd::Buffer<uint> AccessIndices() const { return dd::Buffer<uint>( m_vboIndex.GetData() ); }
 
 		//
 		// Set the normal buffer that the mesh will use.

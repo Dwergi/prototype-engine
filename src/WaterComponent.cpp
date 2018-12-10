@@ -8,3 +8,5 @@
 #include "WaterComponent.h"
 
 DD_TYPE_CPP( dd::WaterComponent );
+
+const int dd::WaterComponent::VertexCount = 32;

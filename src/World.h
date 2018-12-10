@@ -141,16 +141,17 @@ namespace ddc
 		//
 		bool HasComponent( Entity entity, dd::ComponentID id ) const;
 
-		//
-		// Does the given entity have a component of the given type?
-		//
 		template <typename T>
 		bool Has( Entity entity ) const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
-
-			return HasComponent( entity, type->ComponentID() );
+			return HasComponent( entity, DD_TYPE( T )->ComponentID() );
 		}
+
+		//
+		// Does the given entity have a component of the given type?
+		//
+		template <typename... TComponents>
+		bool HasAll( Entity entity ) const;
 
 		//
 		// Add a component to the given entity of the given type ID.
@@ -186,10 +187,10 @@ namespace ddc
 		//
 		// Find all entities with the given type and return them in the given vector.
 		//
-		template <typename T>
+		template <typename... TComponents>
 		void FindAllWith( std::vector<Entity>& outEntities ) const
 		{
-			ForAllWith<T>( [&outEntities]( Entity e, T& ) { outEntities.push_back( e ); } );
+			ForAllWith<TComponents>( [&outEntities]( Entity e, TComponents&... ) { outEntities.push_back( e ); } );
 		}
 
 		//
@@ -201,8 +202,8 @@ namespace ddc
 		//
 		// Find all entities with the given type and return them in the given vector.
 		//
-		template <typename T>
-		void ForAllWith( std::function<void( Entity, T& )> fn ) const;
+		template <typename... TComponents>
+		void ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const;
 
 		//
 		// Does the given entity have the given tag?
@@ -288,11 +289,45 @@ namespace ddc
 	}
 
 	template <typename T>
-	void World::ForAllWith( std::function<void( Entity, T& )> fn ) const
+	void SetBitmask( ComponentBits& mask )
 	{
-		const dd::TypeInfo* type = DD_TYPE( T );
+		mask.set( DD_TYPE( T )->ComponentID(), true );
+	}
+
+	template <typename... TComponents>
+	bool World::HasAll( Entity entity ) const
+	{
 		ComponentBits mask;
-		mask.set( type->ComponentID(), true );
+
+		ExpandType
+		{
+			0, (SetBitmask<TComponents>( mask ), 0)...
+		};
+
+		if( IsAlive( m_entities[entity.ID] ) )
+		{
+			mask &= m_entities[entity.ID].Ownership;
+
+			if( mask.count() == sizeof...(TComponents) )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template <typename... TComponents>
+	void World::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
+	{
+		ComponentBits mask;
+
+		ExpandType
+		{
+			0, (SetBitmask<TComponents>( mask ), 0)...
+		};
+
+		DD_ASSERT( mask.any() );
 
 		for( const EntityEntry& entry : m_entities )
 		{
@@ -301,9 +336,9 @@ namespace ddc
 				ComponentBits entity_mask = mask;
 				entity_mask &= entry.Ownership;
 
-				if( entity_mask.any() )
+				if( entity_mask.count() == sizeof...( TComponents ) )
 				{
-					fn( entry.Entity, *Access<T>( entry.Entity ) );
+					fn( entry.Entity, *Access<TComponents>( entry.Entity )... );
 				}
 			}
 		}

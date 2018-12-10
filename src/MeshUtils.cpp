@@ -13,6 +13,32 @@
 
 namespace dd
 {
+	struct GridKey
+	{
+		uint LOD;
+		uint VertexCount;
+
+		bool operator==( const GridKey& key ) const 
+		{
+			return LOD == key.LOD && VertexCount == key.VertexCount;
+		}
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<dd::GridKey>
+	{
+		size_t operator()( const dd::GridKey& key ) const
+		{
+			return (size_t) (key.VertexCount << 16 | key.LOD);
+		}
+	};
+}
+
+namespace dd
+{
 	static const glm::vec3 s_unitCubePositions[] =
 	{
 		//  X    Y    Z     
@@ -172,7 +198,7 @@ namespace dd
 		glm::vec2( 0.0f, 1.0f ),
 	};
 
-	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, ArrayLength( s_unitCubeUVs ) );
+	static const dd::ConstBuffer<glm::vec2> s_unitCubeUVsBuffer( s_unitCubeUVs, dd::ArrayLength( s_unitCubeUVs ) );
 
 	// reference: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 	// https://github.com/caosdoar/spheres/blob/master/src/spheres.cpp
@@ -223,11 +249,11 @@ namespace dd
 		9, 8, 1
 	};
 
-	static std::vector<std::vector<glm::vec3>> s_positionLODs = { s_basePosition };
-	static std::vector<std::vector<uint>> s_indexLODs = { s_baseIndex };
-	static std::vector<std::vector<glm::vec3>> s_normalLODs;
+	static std::vector<std::vector<glm::vec3>> s_icospherePositionLODs = { s_basePosition };
+	static std::vector<std::vector<uint>> s_icosphereIndexLODs = { s_baseIndex };
+	static std::vector<std::vector<glm::vec3>> s_icosphereNormalLODs;
 
-	void NormalizePositions( std::vector<glm::vec3>& vec )
+	static void NormalizePositionsIcosphere( std::vector<glm::vec3>& vec )
 	{
 		for( glm::vec3& v : vec )
 		{
@@ -235,7 +261,7 @@ namespace dd
 		}
 	}
 	
-	void CalculateNormals( const std::vector<glm::vec3>& positions, const std::vector<uint>& indices, std::vector<glm::vec3>& out_normals )
+	static void CalculateNormals( const std::vector<glm::vec3>& positions, const std::vector<uint>& indices, std::vector<glm::vec3>& out_normals )
 	{
 		DD_ASSERT( out_normals.empty() );
 		out_normals.resize( positions.size() );
@@ -259,7 +285,7 @@ namespace dd
 		}
 	}
 
-	uint64 GetKey( uint a, uint b )
+	static uint64 GetKeyIcosphere( uint a, uint b )
 	{
 		uint64 low = ddm::min( a, b );
 		uint64 high = ddm::max( a, b );
@@ -268,9 +294,9 @@ namespace dd
 		return key;
 	}
 
-	uint GetMidpoint( uint i0, uint i1, std::vector<glm::vec3>& positions, std::unordered_map<uint64, uint>& vert_cache )
+	static uint GetMidpointIcosphere( uint i0, uint i1, std::vector<glm::vec3>& positions, std::unordered_map<uint64, uint>& vert_cache )
 	{
-		uint64 key = GetKey( i0, i1 );
+		uint64 key = GetKeyIcosphere( i0, i1 );
 
 		auto it = vert_cache.find( key );
 		if( it != vert_cache.end() )
@@ -291,7 +317,7 @@ namespace dd
 		return index;
 	}
 
-	void Subdivide( const std::vector<glm::vec3>& src_pos, const std::vector<uint>& src_idx,
+	static void SubdivideIcosphere( const std::vector<glm::vec3>& src_pos, const std::vector<uint>& src_idx,
 		std::vector<glm::vec3>& dst_pos, std::vector<uint>& dst_idx )
 	{
 		DD_ASSERT( dst_pos.size() == 0 );
@@ -314,9 +340,9 @@ namespace dd
 			uint i1 = src_idx[i + 1];
 			uint i2 = src_idx[i + 2];
 
-			uint i0i1 = GetMidpoint( i0, i1, dst_pos, vert_cache );
-			uint i1i2 = GetMidpoint( i1, i2, dst_pos, vert_cache );
-			uint i2i0 = GetMidpoint( i2, i0, dst_pos, vert_cache );
+			uint i0i1 = GetMidpointIcosphere( i0, i1, dst_pos, vert_cache );
+			uint i1i2 = GetMidpointIcosphere( i1, i2, dst_pos, vert_cache );
+			uint i2i0 = GetMidpointIcosphere( i2, i0, dst_pos, vert_cache );
 
 			dst_idx.push_back( i0 ); dst_idx.push_back( i0i1 ); dst_idx.push_back( i2i0 );
 			dst_idx.push_back( i1 ); dst_idx.push_back( i1i2 ); dst_idx.push_back( i0i1 );
@@ -329,17 +355,17 @@ namespace dd
 	{
 		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
 
-		if( s_normalLODs.empty() )
+		if( s_icosphereNormalLODs.empty() )
 		{
-			std::vector<glm::vec3>& normals = s_normalLODs.emplace_back();
+			std::vector<glm::vec3>& normals = s_icosphereNormalLODs.emplace_back();
 			CalculateNormals( s_basePosition, s_baseIndex, normals );
 		}
 
-		if( s_positionLODs.size() > iterations )
+		if( s_icospherePositionLODs.size() > iterations )
 		{
-			out_pos = &s_positionLODs[iterations];
-			out_idx = &s_indexLODs[iterations];
-			out_normals = &s_normalLODs[iterations];
+			out_pos = &s_icospherePositionLODs[iterations];
+			out_idx = &s_icosphereIndexLODs[iterations];
+			out_normals = &s_icosphereNormalLODs[iterations];
 			return;
 		}
 
@@ -347,25 +373,25 @@ namespace dd
 		std::vector<uint> src_idx;
 		std::vector<glm::vec3> src_norm;
 
-		size_t start = s_positionLODs.size() - 1;
+		size_t start = s_icospherePositionLODs.size() - 1;
 		for( size_t i = start; i < iterations; ++i )
 		{
-			src_pos = s_positionLODs.back();
-			src_idx = s_indexLODs.back();
-			src_norm = s_normalLODs.back();
+			src_pos = s_icospherePositionLODs.back();
+			src_idx = s_icosphereIndexLODs.back();
+			src_norm = s_icosphereNormalLODs.back();
 
-			std::vector<glm::vec3>& dst_pos = s_positionLODs.emplace_back();
-			std::vector<uint>& dst_idx = s_indexLODs.emplace_back();
-			std::vector<glm::vec3>& dst_norm = s_normalLODs.emplace_back();
+			std::vector<glm::vec3>& dst_pos = s_icospherePositionLODs.emplace_back();
+			std::vector<uint>& dst_idx = s_icosphereIndexLODs.emplace_back();
+			std::vector<glm::vec3>& dst_norm = s_icosphereNormalLODs.emplace_back();
 
-			Subdivide( src_pos, src_idx, dst_pos, dst_idx );
-			NormalizePositions( dst_pos );
+			SubdivideIcosphere( src_pos, src_idx, dst_pos, dst_idx );
+			NormalizePositionsIcosphere( dst_pos );
 			CalculateNormals( dst_pos, dst_idx, dst_norm );
 		}
 
-		out_pos = &s_positionLODs[iterations];
-		out_idx = &s_indexLODs[iterations];
-		out_normals = &s_normalLODs[iterations];
+		out_pos = &s_icospherePositionLODs[iterations];
+		out_idx = &s_icosphereIndexLODs[iterations];
+		out_normals = &s_icosphereNormalLODs[iterations];
 	}
 
 	void MakeIcosphere( ddr::Mesh& mesh, int iterations )
@@ -487,5 +513,59 @@ namespace dd
 		bounds.Expand( glm::vec3( -1, 0, -1 ) );
 		bounds.Expand( glm::vec3( 1, 0, 1 ) );
 		mesh.SetBoundBox( bounds );
+	}
+
+	static std::unordered_map<GridKey, std::vector<uint>*> s_gridIndices;
+
+	const std::vector<uint>& GetGridIndices( uint vertex_count, uint lod )
+	{
+		GridKey key;
+		key.LOD = lod;
+		key.VertexCount = vertex_count;
+
+		auto it = s_gridIndices.find( key );
+		if( it != s_gridIndices.end() )
+		{
+			return *it->second;
+		}
+
+		const uint stride = 1 << lod;
+		const uint lod_vertices = vertex_count / stride;
+		const uint row_width = vertex_count + 1;
+		const uint index_count = lod_vertices * lod_vertices * 6;
+
+		DD_ASSERT( stride <= vertex_count );
+
+		std::vector<uint>& indices = *new std::vector<uint>();
+		indices.reserve( index_count );
+
+		for( uint z = 0; z < vertex_count; z += stride )
+		{
+			for( uint x = 0; x < vertex_count + 1; x += stride )
+			{
+				const uint current = z * row_width + x;
+				const uint next_row = (z + stride) * row_width + x;
+
+				DD_ASSERT( next_row < row_width * row_width );
+
+				if( x != 0 )
+				{
+					indices.push_back( current );
+					indices.push_back( next_row - stride );
+					indices.push_back( next_row );
+				}
+
+				if( x != vertex_count )
+				{
+					indices.push_back( current );
+					indices.push_back( next_row );
+					indices.push_back( current + stride );
+				}
+			}
+		}
+
+		s_gridIndices.insert( std::make_pair( key, &indices ) );
+
+		return indices;
 	}
 }

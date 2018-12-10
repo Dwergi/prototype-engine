@@ -12,6 +12,7 @@
 #include "JobSystem.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "MeshUtils.h"
 #include "OpenGL.h"
 #include "ShaderPart.h"
 #include "Shader.h"
@@ -26,13 +27,12 @@
 
 namespace dd
 {
-	std::vector<uint> TerrainChunk::s_indices[ TerrainParameters::LODs ];
-	ConstBuffer<uint> TerrainChunk::s_indexBuffers[ TerrainParameters::LODs ];
-
 	ddr::ShaderHandle TerrainChunk::s_shader;
 	ddr::MaterialHandle TerrainChunk::s_material;
 
 	FSMPrototype TerrainChunk::s_fsmPrototype;
+
+	static std::vector<uint> s_indices[TerrainParameters::LODs];
 
 	TerrainChunk::TerrainChunk( JobSystem& jobsystem, const TerrainParameters& params, glm::vec2 position ) :
 		m_jobsystem( jobsystem ),
@@ -41,60 +41,38 @@ namespace dd
 		m_position( position )
 	{
 		m_vertices.resize( TotalVertexCount );
-		m_verticesBuffer.Set( m_vertices.data(), TotalVertexCount );
 	}
 
 	TerrainChunk::~TerrainChunk()
 	{
 		ddr::MeshManager::Instance()->Destroy( m_mesh );
-
-		m_verticesBuffer.ReleaseConst();
 	}
 
 	void TerrainChunk::InitializeShared()
 	{
 		DD_ASSERT( s_indices[ 0 ].empty(), "Multiple calls of InitializeShared!" );
 
-		for( uint lod = 0; lod < TerrainParameters::LODs; ++lod )
+		for( int lod = 0; lod < TerrainParameters::LODs; ++lod )
 		{
 			const uint stride = 1 << lod;
 			const uint lod_vertices = MaxVertices / stride;
 			const uint row_width = MaxVertices + 1;
 			const uint mesh_index_count = lod_vertices * lod_vertices * 6;
-			const uint flap_index_count = lod_vertices * 6 * 4;
 
 			DD_ASSERT( stride <= MaxVertices );
+
+			const uint flap_index_count = lod_vertices * 6 * 4;
 
 			std::vector<uint>& indices = s_indices[ lod ];
 			indices.reserve( mesh_index_count + flap_index_count );
 
-			for( uint z = 0; z < MaxVertices; z += stride )
-			{
-				for( uint x = 0; x < MaxVertices + 1; x += stride )
-				{
-					const uint current = z * row_width + x;
-					const uint next_row = (z + stride) * row_width + x;
-
-					DD_ASSERT( next_row < row_width * row_width );
-
-					if( x != 0 )
-					{
-						indices.push_back( current );
-						indices.push_back( next_row - stride );
-						indices.push_back( next_row );
-					}
-
-					if( x != MaxVertices )
-					{
-						indices.push_back( current );
-						indices.push_back( next_row );
-						indices.push_back( current + stride );
-					}
-				}
-			}
+			// fetch grid indices
+			const std::vector<uint>& grid_indices = GetGridIndices( MaxVertices, lod );
+			indices.insert( indices.end(), grid_indices.begin(), grid_indices.end() );
 
 			DD_ASSERT( indices.size() == mesh_index_count );
-
+			
+			// add flap indices
 			int flap_vertex_start = MeshVertexCount;
 
 			// (top, x = varying, z = 0)
@@ -159,10 +137,9 @@ namespace dd
 			{
 				DD_ASSERT( i < TotalVertexCount );
 			}
-
-			s_indexBuffers[ lod ].Set( indices.data(), (int) indices.size() );
 		}
 
+		// initialize FSM
 		s_fsmPrototype.AddState( INITIALIZE_PENDING );
 		s_fsmPrototype.SetInitialState( INITIALIZE_PENDING );
 
@@ -315,7 +292,7 @@ namespace dd
 			else
 			{
 				ddr::Mesh* mesh = m_mesh.Access();
-				mesh->SetIndices( s_indexBuffers[m_lod] );
+				mesh->SetIndices( dd::ConstBuffer<uint>( s_indices[m_lod] ) );
 				mesh->SetBoundBox( m_bounds );
 			}
 
@@ -377,14 +354,14 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( TerrainChunk_CreateMesh );
 
-		std::string name = fmt::format( "terrain_{0:.2f}x{1:.2f}", pos.x, pos.y );
+		std::string name = fmt::format( "terrain_{}x{}", (int) pos.x, (int) pos.y );
 
 		m_mesh = ddr::MeshManager::Instance()->Create( name.c_str() );
 
 		ddr::Mesh* mesh = m_mesh.Access();
 		mesh->SetMaterial( s_material );
-		mesh->SetPositions( m_verticesBuffer );
-		mesh->SetIndices( s_indexBuffers[ m_lod ] );
+		mesh->SetPositions( dd::ConstBuffer<glm::vec3>( m_vertices ) );
+		mesh->SetIndices( dd::ConstBuffer<uint>( s_indices[ m_lod ] ) );
 		mesh->SetBoundBox( m_bounds );
 	}
 

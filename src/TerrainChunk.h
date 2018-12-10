@@ -64,9 +64,6 @@ namespace dd
 		static const int FlapVertexCount = (MaxVertices + 1) * 4;
 		static const int TotalVertexCount = MeshVertexCount + FlapVertexCount;
 
-		static std::vector<uint> s_indices[ TerrainParameters::LODs ];
-		static ConstBuffer<uint> s_indexBuffers[ TerrainParameters::LODs ];
-
 		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
 
@@ -95,7 +92,6 @@ namespace dd
 		ddm::AABB m_bounds;
 
 		std::vector<glm::vec3> m_vertices;
-		ConstBuffer<glm::vec3> m_verticesBuffer;
 
 		glm::vec2 m_previousOffset;
 		glm::vec2 m_offset;
