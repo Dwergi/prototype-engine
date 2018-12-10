@@ -34,7 +34,6 @@ uniform struct FogParameters
 Fog;
 
 uniform vec3 ViewPosition;
-uniform mat4 View;
 uniform bool DrawNormals;
 
 //
@@ -77,6 +76,7 @@ void main()
 
 	vec3 toView = ViewPosition - Fragment.Position;
 	float viewDistance = length( toView );
+	vec3 viewDir = toView / viewDistance;
 
 	float fogAmount = clamp( viewDistance / Fog.Distance, 0, 1 );
 	fogAmount = fogAmount * fogAmount;
@@ -95,7 +95,6 @@ void main()
 		fragmentColour *= GetTerrainHeightColour( Fragment.Position.y / TerrainMaxHeight );
 	}
 
-	vec3 viewDir = toView / viewDistance;
 	for( int i = 0; i < LightCount; ++i )
 	{
 		finalColour.rgb += ApplyLight( Lights[ i ], Material, fragmentColour, fragmentNormal, Fragment.Position, viewDir );

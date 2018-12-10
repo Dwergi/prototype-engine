@@ -375,7 +375,7 @@ namespace dd
 
 		if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
 		{
-			for( int i = 0; i < m_params.Noise.Octaves; ++i )
+			for( int i = 0; i < m_params.Noise.MaxOctaves; ++i )
 			{
 				std::string str = fmt::format( "Amplitude {}", i );
 
@@ -416,7 +416,7 @@ namespace dd
 			m_params.Noise.Seed = glm::mix( 0.0f, 512.0f, rng.Next() );
 
 			float max_amplitude = 1.0f;
-			for( int i = 0; i < m_params.Noise.Octaves; ++i )
+			for( int i = 0; i < m_params.Noise.MaxOctaves; ++i )
 			{
 				float amplitude = glm::mix( 0.01f, max_amplitude, rng.Next() );
 

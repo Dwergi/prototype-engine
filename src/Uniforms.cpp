@@ -49,6 +49,11 @@ namespace ddr
 		{
 			Create( name, UniformType::Boolean, value );
 		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
+		}
 	}
 
 	void UniformStorage::Set( const char* name, int value )
@@ -61,6 +66,11 @@ namespace ddr
 		else
 		{
 			Create( name, UniformType::Integer, value );
+		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
 		}
 	}
 
@@ -75,6 +85,11 @@ namespace ddr
 		{
 			Create( name, UniformType::Float, value );
 		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
+		}
 	}
 
 	void UniformStorage::Set( const char* name, glm::vec2 value )
@@ -87,6 +102,11 @@ namespace ddr
 		else
 		{
 			Create( name, UniformType::Vector2, value );
+		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
 		}
 	}
 
@@ -101,6 +121,11 @@ namespace ddr
 		{
 			Create( name, UniformType::Vector3, value );
 		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
+		}
 	}
 
 	void UniformStorage::Set( const char* name, glm::vec4 value )
@@ -113,6 +138,11 @@ namespace ddr
 		else
 		{
 			Create( name, UniformType::Vector4, value );
+		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
 		}
 	}
 
@@ -127,6 +157,11 @@ namespace ddr
 		{
 			Create( name, UniformType::Matrix3, value );
 		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
+		}
 	}
 
 	void UniformStorage::Set( const char* name, const glm::mat4& value )
@@ -139,6 +174,11 @@ namespace ddr
 		else
 		{
 			Create( name, UniformType::Matrix4, value );
+		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
 		}
 	}
 
@@ -153,10 +193,18 @@ namespace ddr
 		{
 			Create( name, UniformType::Texture, value.GetTextureUnit() );
 		}
+
+		if( m_shader != nullptr )
+		{
+			m_shader->SetUniform( name, value );
+		}
 	}
 
 	void UniformStorage::Bind( Shader& shader )
 	{
+		DD_ASSERT( m_shader == nullptr, "UniformStorage already bound!" );
+		DD_ASSERT( m_shader->InUse(), "Shader not in use!" );
+
 		for( int i = 0; i < m_count; ++i )
 		{
 			IUniform* uniform = Access( i );
@@ -219,6 +267,15 @@ namespace ddr
 				}
 			}
 		}
+
+		m_shader = &shader;
+	}
+
+	void UniformStorage::Unbind()
+	{
+		DD_ASSERT( m_shader != nullptr, "UniformStorage not bound!" );
+
+		m_shader = nullptr;
 	}
 
 	IUniform* UniformStorage::Find( const char* name )

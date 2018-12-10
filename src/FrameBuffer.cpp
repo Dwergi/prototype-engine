@@ -148,6 +148,8 @@ namespace ddr
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
 
+		uniforms.Unbind();
+
 		m_texDepth->Unbind();
 		m_vaoFullscreen.Unbind();
 
@@ -173,6 +175,8 @@ namespace ddr
 
 		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
 		CheckOGLError();
+
+		uniforms.Unbind();
 
 		m_texColour->Unbind();
 

@@ -11,9 +11,14 @@ namespace ddm
 	struct NoiseParameters
 	{
 		//
-		// The number of octaves of noise.
+		// The maximum number of octaves of noise.
 		//
-		static const int Octaves = 6;
+		static const int MaxOctaves = 10;
+
+		//
+		// The current number of octaves to use.
+		//
+		int Octaves = 6;
 
 		//
 		// The wavelength of the noise. 
@@ -30,7 +35,7 @@ namespace ddm
 		//
 		// The amplitudes of noise to apply at each octave.
 		//
-		float Amplitudes[Octaves] = { 0.5f, 0.25f, 0.125f, 0.0625f, 0.03f, 0.015f };
+		float Amplitudes[MaxOctaves] = { 0.5f, 0.25f, 0.125f, 0.0625f, 0.03f, 0.015f, 0, 0, 0, 0 };
 	};
 
 	void GenerateNoise( std::vector<float>& data, const glm::ivec2 dimensions, const glm::ivec2 stride, 

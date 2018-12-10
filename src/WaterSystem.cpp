@@ -10,7 +10,7 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
-#include "MeshComponent.h"
+#include "ColourComponent.h"
 #include "Plane.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
@@ -22,12 +22,10 @@
 
 namespace dd
 {
-	ddr::ShaderHandle WaterSystem::s_shader;
-	ddr::MaterialHandle WaterSystem::s_material;
-
-	WaterSystem::WaterSystem( const TerrainParameters& params ) :
+	WaterSystem::WaterSystem( const TerrainParameters& params, dd::JobSystem& jobsystem ) :
 		ddc::System( "Water" ),
-		m_terrainParams( params )
+		m_terrainParams( params ),
+		m_jobSystem( jobsystem )
 	{
 		RequireRead<TerrainChunkComponent>( "terrain" );
 		RequireRead<TransformComponent>( "terrain" );
@@ -35,59 +33,14 @@ namespace dd
 		OptionalRead<BoundSphereComponent>( "terrain" );
 
 		RequireWrite<WaterComponent>( "water" );
-		RequireWrite<MeshComponent>( "water" );
 		RequireRead<TransformComponent>( "water" );
-	}
 
-	static void CreateMeshVertices( dd::MeshComponent& water_mesh, dd::TerrainChunk& chunk, const ddm::Plane& water_plane )
-	{
-		if( !chunk.GetMesh().IsValid() )
-		{
-			return;
-		}
-
-		const ddr::Mesh* mesh = chunk.GetMesh().Get();
-
-		const glm::vec3 water_height( water_plane.Parameters.w );
-
-		dd::ConstTriangulator triangulator( *mesh );
-		for( size_t i = 0; i < triangulator.Size(); ++i )
-		{
-			dd::ConstTriangle tri = triangulator[i];
-
-			glm::vec3 points( tri.p0.y, tri.p1.y, tri.p2.y );
-
-			// fully above, don't create triangles
-			if( glm::all( glm::greaterThan( points, water_height ) ) )
-			{
-				continue;
-			}
-			else if( glm::all( glm::lessThan( points, water_height ) ) )
-			{
-				continue;
-			}
-
-			glm::vec3 hit;
-			if( water_plane.IntersectsLine( tri.p0, tri.p1, hit ) )
-			{
-				//edges.push_back( hit );
-			}
-
-			if( water_plane.IntersectsLine( tri.p1, tri.p2, hit ) )
-			{
-				//edges.push_back( hit );
-			}
-
-			if( water_plane.IntersectsLine( tri.p0, tri.p2, hit ) )
-			{
-				//edges.push_back( hit );
-			}
-		}
+		m_noiseParams.Wavelength = 32;
 	}
 
 	ddc::Entity WaterSystem::CreateWaterEntity( ddc::World& world, glm::vec2 chunk_pos ) const
 	{
-		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::WaterComponent, dd::BoundBoxComponent>();
+		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 		world.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
@@ -96,12 +49,13 @@ namespace dd
 
 		dd::WaterComponent* water = world.Access<dd::WaterComponent>( entity );
 		water->TerrainChunkPosition = chunk_pos;
+		water->Mesh = ddr::MeshManager::Instance()->Create( fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y ).c_str() );
 
-		dd::MeshComponent* mesh_cmp = world.Access<dd::MeshComponent>( entity );
-		mesh_cmp->Mesh = ddr::MeshManager::Instance()->Create( fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y ).c_str() );
+		dd::ColourComponent* colour = world.Access<dd::ColourComponent>( entity );
+		colour->Colour = glm::vec4( 0, 0, 1, 0.5 );
 
-		ddr::Mesh* mesh = mesh_cmp->Mesh.Access();
-		mesh->SetMaterial( s_material );
+		ddr::Mesh* mesh = water->Mesh.Access();
+		mesh->UseBVH( false );
 
 		const float vertex_distance = m_terrainParams.ChunkSize / dd::WaterComponent::VertexCount;
 
@@ -143,15 +97,10 @@ namespace dd
 
 	void WaterSystem::Initialize( ddc::World& world )
 	{
-		s_shader = ddr::ShaderManager::Instance()->Load( "mesh" );
-		s_material = ddr::MaterialManager::Instance()->Create( "water" );
-
-		ddr::Material* material = s_material.Access();
-		material->SetShader( s_shader );
 	}
 
 	void WaterSystem::Update( const ddc::UpdateData& update_data )
-	{	
+	{
 		auto terrain = update_data.Data( "terrain" );
 		auto terrain_chunks = terrain.Read<TerrainChunkComponent>();
 		auto terrain_transforms = terrain.Read<TransformComponent>();
@@ -159,8 +108,7 @@ namespace dd
 		auto terrain_bspheres = terrain.Read<BoundSphereComponent>();
 
 		auto water = update_data.Data( "water" );
-		auto water_meshes = water.Write<MeshComponent>();
-
+		
 		ddc::World& world = update_data.World();
 
 		const ddm::Plane water_plane( glm::vec3( 0, m_waterHeight, 0 ), glm::vec3( 0, -1, 0 ) );
@@ -184,18 +132,13 @@ namespace dd
 
 			ddm::Plane local_plane = water_plane.GetTransformed( terrain_transforms[i].Transform() );
 
-			dd::MeshComponent* water_mesh = &water_meshes[i];
-
 			ddc::Entity water_entity = FindWater( terrain_chunk->GetPosition(), water );
 			if( !water_entity.IsValid() )
 			{
 				water_entity = CreateWaterEntity( update_data.World(), terrain_chunk->GetPosition() );
-				water_mesh = world.Access<dd::MeshComponent>( water_entity );
 
 				++m_waterChunks;
 			}
-
-			CreateMeshVertices( *water_mesh, *terrain_chunk, local_plane );
 		}
 	}
 
@@ -203,5 +146,39 @@ namespace dd
 	{
 		ImGui::Value( "Chunks", m_waterChunks );
 		ImGui::DragFloat( "Water Height", &m_waterHeight, 0.1, 0, m_terrainParams.HeightRange, "%.1f" );
+
+		ImGui::DragFloat( "Wave Height", &m_waveHeight, 0.1, 0, 10, "%.1f" );
+		ImGui::DragFloat2( "Lateral Waves", glm::value_ptr( m_waveLateral ), 0.01, 0, 5, "%.2f" );
+
+		if( ImGui::TreeNodeEx( "Noise", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		{
+			if( ImGui::DragFloat( "Wavelength", &m_noiseParams.Wavelength, 1.0f, 1.0f, 512.0f ) )
+			{
+				m_regenerate = true;
+			}
+
+			if( ImGui::DragFloat( "Seed", &m_noiseParams.Seed, 0.1f, 0.0f, 512.0f ) )
+			{
+				m_regenerate = true;
+			}
+
+			if( ImGui::TreeNodeEx( "Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader ) )
+			{
+				for( int i = 0; i < m_noiseParams.MaxOctaves; ++i )
+				{
+					std::string str = fmt::format( "Amplitude {}", i );
+
+					if( ImGui::DragFloat( str.c_str(), &m_noiseParams.Amplitudes[i], 0.001f, 0.0f, 1.0f ) )
+					{
+						m_regenerate = true;
+					}
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::TreePop();
+		}
+
 	}
 }

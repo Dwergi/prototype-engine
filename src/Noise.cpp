@@ -18,7 +18,7 @@ namespace ddm
 
 		float total_amplitude = 0;
 
-		for( int i = 0; i < params.Octaves; ++i )
+		for( int i = 0; i < params.MaxOctaves; ++i )
 		{
 			float multiplier = 1.f / wavelength;
 			glm::vec3 coord( pos.x * multiplier, pos.y * multiplier, params.Seed );

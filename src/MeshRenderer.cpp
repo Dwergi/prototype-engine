@@ -93,7 +93,7 @@ namespace ddr
 		auto colours = data.Get<dd::ColourComponent>();
 
 		auto entities = data.Entities();
-		
+
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
 			RenderMesh( entities[i], meshes[i], transforms[i], bound_boxes.Get( i ), bound_spheres.Get( i ), 
@@ -163,10 +163,13 @@ namespace ddr
 		}
 
 		uniforms.Set( "ObjectColour", colour * debugMultiplier );
+		uniforms.Set( "Model", transform_cmp.Transform() );
 
 		uniforms.Bind( *shader );
 
-		mesh->Render( uniforms, *shader, transform_cmp.Transform() );
+		mesh->Render( *shader );
+
+		uniforms.Unbind();
 	}
 
 	void MeshRenderer::DrawDebugInternal( ddc::World& world )

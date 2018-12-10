@@ -13,6 +13,7 @@
 #include "VBO.h"
 
 #include <atomic>
+#include <bitset>
 #include <memory>
 #include <unordered_map>
 
@@ -28,15 +29,25 @@ namespace ddr
 	struct Shader;
 	struct UniformStorage;
 
+	enum class BufferType
+	{
+		Position,
+		Normal,
+		Index,
+		UV,
+		Colour,
+		Count
+	};
+
 	//
 	// A mesh asset.
 	//
 	struct Mesh : dd::HandleTarget
 	{
 		//
-		// Render this mesh in the given camera viewport.
+		// Render this mesh with the given shader.
 		//
-		void Render( UniformStorage& uniforms, Shader& shader, const glm::mat4& transform );
+		void Render( Shader& shader );
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.
@@ -129,6 +140,16 @@ namespace ddr
 		void Destroy();
 
 		//
+		// Enable/disable the BVH calculation.
+		//
+		void UseBVH( bool enabled ) { m_enableBVH = enabled; }
+
+		//
+		// Set the mesh to be dirty.
+		//
+		void SetDirty( BufferType type ) { m_dirty.set( (size_t) type, true ); }
+
+		//
 		// Get the BVH of this mesh.
 		//
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
@@ -143,7 +164,8 @@ namespace ddr
 
 	private:
 
-		bool m_dirty { false };
+		static const size_t DirtyBitCount = (size_t) BufferType::Count;
+		std::bitset<DirtyBitCount> m_dirty;
 		
 		VBO m_vboPosition;
 		VBO m_vboNormal;
@@ -156,6 +178,8 @@ namespace ddr
 		VAO m_vao;
 
 		ddm::AABB m_bounds;
+
+		bool m_enableBVH { true };
 
 		std::atomic<bool> m_rebuilding { false };
 		dd::BVHTree* m_bvh { nullptr };

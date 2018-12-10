@@ -40,7 +40,7 @@ namespace ddr
 		//
 		// Render all the registered renderers.
 		//
-		void Render( ddc::World& world, const ddr::ICamera& camera );
+		void Render( ddc::World& world, const ddr::ICamera& camera, float delta_t );
 
 		void ShutdownRenderer() {}
 
@@ -77,6 +77,8 @@ namespace ddr
 
 		glm::vec3 m_skyColour { 0.6, 0.7, 0.8 };
 
+		float m_time { 0 };
+
 		bool m_debugDrawNormals { false };
 		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
@@ -88,10 +90,6 @@ namespace ddr
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
-		ddc::Entity CreatePointLight( ddc::World& world );
-		void UpdateDebugPointLights( ddc::World& world );
-
-		void SetRenderState();
 		void RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render );
 
 		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );

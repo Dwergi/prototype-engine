@@ -48,6 +48,8 @@ namespace dd
 
 		RequireTag( ddc::Tag::Visible );
 		RequireTag( ddc::Tag::Dynamic );
+
+		DD_TODO( "MousePicking RenderState" );
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
@@ -211,7 +213,7 @@ namespace dd
 		m_framebuffer.Clear();
 
 		ddr::Shader& shader = *m_shader.Access();
-		shader.Use( true );
+		auto scoped_shader = shader.UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		uniforms.Bind( shader );
@@ -227,8 +229,12 @@ namespace dd
 				continue;
 
 			uniforms.Set( "ID", (int) entities[i].ID );
-			mesh->Render( uniforms, shader, transforms[i].Transform() );
+			uniforms.Set( "Model", transforms[i].Transform() );
+
+			mesh->Render( shader );
 		}
+
+		uniforms.Unbind();
 
 		shader.Use( false );
 

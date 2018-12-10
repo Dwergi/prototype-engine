@@ -8,6 +8,7 @@ namespace dd
 	{
 		static const int VertexCount;
 
+		ddr::MeshHandle Mesh;
 		glm::vec2 TerrainChunkPosition;
 		std::vector<glm::vec3> Vertices;
 		int LOD { 0 };

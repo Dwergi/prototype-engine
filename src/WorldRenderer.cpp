@@ -147,8 +147,10 @@ namespace ddr
 		fn( renderer, data );
 	}
 
-	void WorldRenderer::Render( ddc::World& world, const ddr::ICamera& camera )
+	void WorldRenderer::Render( ddc::World& world, const ddr::ICamera& camera, float delta_t )
 	{
+		m_time += delta_t;
+
 		for( ddr::Renderer* r : m_renderers )
 		{
 			r->RenderUpdate( world );
@@ -231,6 +233,7 @@ namespace ddr
 		m_uniforms->Set( "View", camera.GetViewMatrix() );
 		m_uniforms->Set( "Projection", camera.GetProjectionMatrix() );
 		m_uniforms->Set( "DrawNormals", m_debugDrawNormals );
+		m_uniforms->Set( "Time", m_time );
 	}
 
 	void WorldRenderer::EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera )

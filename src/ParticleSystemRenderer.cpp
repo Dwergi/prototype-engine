@@ -170,5 +170,7 @@ namespace ddr
 		}
 
 		s_vaoParticle.Unbind();
+
+		uniforms.Unbind();
 	}
 }

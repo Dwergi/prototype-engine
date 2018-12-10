@@ -54,6 +54,7 @@ namespace ddr
 		void Set( const char* name, const ddr::Texture& value );
 
 		void Bind( Shader& shader );
+		void Unbind();
 
 		IUniform* Find( const char* name );
 
@@ -63,6 +64,8 @@ namespace ddr
 		static const int UNIFORM_SIZE = sizeof( Uniform<glm::mat4> );
 
 		int m_count { 0 };
+
+		Shader* m_shader { nullptr };
 
 		byte m_uniforms[MAX_UNIFORMS * UNIFORM_SIZE];
 

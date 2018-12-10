@@ -24,10 +24,13 @@ namespace ddr
 				uint Depth : 1;
 				uint Blending : 1;
 				uint BackfaceCulling : 1;
+				uint DepthWrite : 1;
 			};
 
 			uint Flags { 0 };
 		};
+
+		RenderState();
 
 		void Use( bool use );
 
@@ -45,5 +48,6 @@ namespace ddr
 		static void ApplyDepth( const RenderState& state );
 		static void ApplyBackfaceCulling( const RenderState& state );
 		static void ApplyBlending( const RenderState& state );
+		static void ApplyDepthWrite( const RenderState& state );
 	};
 }

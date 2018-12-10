@@ -30,6 +30,14 @@ namespace ddr
 		return ScopedRenderState( *this );
 	}
 
+	RenderState::RenderState()
+	{
+		Depth = true;
+		Blending = false;
+		BackfaceCulling = true;
+		DepthWrite = true;
+	}
+
 	void RenderState::Use( bool use )
 	{
 		if( use )
@@ -82,6 +90,11 @@ namespace ddr
 			{
 				ApplyDepth( state );
 			}
+
+			if( m_current->DepthWrite != state.DepthWrite )
+			{
+				ApplyDepthWrite( state );
+			}
 		}
 
 		m_current = &state;
@@ -121,6 +134,22 @@ namespace ddr
 		{
 			glEnable( GL_BLEND );
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		}
+		else
+		{
+			glDisable( GL_BLEND );
+		}
+	}
+
+	void RenderState::ApplyDepthWrite( const RenderState& state )
+	{
+		if( state.DepthWrite )
+		{
+			glDepthMask( GL_TRUE );
+		}
+		else
+		{
+			glDepthMask( GL_FALSE );
 		}
 	}
 }

@@ -127,7 +127,12 @@ namespace ddc
 		}
 
 		uint idx = dd::pop_front( m_free );
-		DD_ASSERT( idx < MAX_ENTITIES );
+
+		if( idx > MAX_ENTITIES )
+		{
+			DD_ASSERT( false, "Went over the max entity count!" );
+			throw std::exception( "Went over the max entity count!" );
+		}
 
 		EntityEntry& entry = m_entities[ idx ];
 		entry.Entity.Version++;

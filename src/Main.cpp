@@ -651,7 +651,8 @@ int GameMain()
 
 		dd::TreeSystem* tree_system = new dd::TreeSystem();
 
-		dd::WaterSystem* water_system = new dd::WaterSystem( terrain_system->GetTerrainParameters() );
+		dd::WaterSystem* water_system = new dd::WaterSystem( terrain_system->GetTerrainParameters(), *jobsystem );
+		water_system->DependsOn( *terrain_system );
 
 		s_world = new ddc::World( *jobsystem );
 		
@@ -834,7 +835,7 @@ int GameMain()
 			s_debugUI->RenderDebugPanels( *s_world );
 			s_frameTimer->DrawFPSCounter();
 
-			s_renderer->Render( *s_world, *s_shakyCamera );
+			s_renderer->Render( *s_world, *s_shakyCamera, game_delta_t );
 
 			s_debugUI->EndFrame();
 			s_window->Swap();
