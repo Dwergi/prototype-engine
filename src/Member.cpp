@@ -11,6 +11,7 @@ namespace dd
 {
 	Member::Member()
 		: m_typeInfo( nullptr ),
+		m_parent( nullptr ),
 		m_offset( 0 )
 	{
 		

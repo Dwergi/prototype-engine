@@ -80,7 +80,7 @@ namespace ddr
 		Shader* m_shader { nullptr };
 
 		std::unordered_map<std::string, int> m_uniforms;
-		byte m_storage[MAX_UNIFORMS * UNIFORM_SIZE];
+		byte m_storage[MAX_UNIFORMS * UNIFORM_SIZE] { 0 };
 
 		template <typename T>
 		void SetValue( IUniform* uniform, const T& value );

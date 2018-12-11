@@ -81,7 +81,7 @@ namespace dd
 
 		struct Node
 		{
-			NodeHandle m_children;
+			NodeHandle m_children { -1 };
 			Vector<OctreeEntry> m_data;
 
 			Node();

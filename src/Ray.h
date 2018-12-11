@@ -37,7 +37,7 @@ namespace ddm
 		//
 		glm::vec3 InverseDir() const { return m_invDir; }
 
-		float Length;
+		float Length { FLT_MAX };
 
 		DD_CLASS( ddm::Ray )
 		{

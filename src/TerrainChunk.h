@@ -96,7 +96,7 @@ namespace dd
 		glm::vec2 m_previousOffset;
 		glm::vec2 m_offset;
 
-		int m_lod;
+		int m_lod { TerrainParameters::LODs };
 		int m_minLod { TerrainParameters::LODs }; // the best quality LOD that's already been generated
 
 		bool m_dirty { false };

@@ -63,7 +63,7 @@ namespace dd
 		uint m_frame { 0 };
 
 		static const int SLIDING_WINDOW_SIZE = 60;
-		float m_frameTimes[SLIDING_WINDOW_SIZE];
+		float m_frameTimes[SLIDING_WINDOW_SIZE] { 0 };
 		int m_currentSlidingFrame = 0;
 	};
 }

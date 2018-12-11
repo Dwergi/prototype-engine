@@ -23,7 +23,7 @@ namespace dd
 	struct EnumOption
 	{
 		String32 Name;
-		int Value;
+		int Value { 0 };
 	};
 
 	enum class TypeKind
@@ -81,22 +81,22 @@ namespace dd
 		//
 		// Creation and deletion through a TypeInfo object.
 		//
-		void* (*New)();
-		void (*Copy)( void* data, const void* src );
-		void (*Delete)( void* data );
-		void (*NewCopy)( void* *dest, const void* src );
-		void (*PlacementNew)( void* data );
-		void (*PlacementDelete)( void* data );
-		void (*PlacementCopy)( void* data, const void* src );
+		void* (*New)() { nullptr };
+		void (*Copy)( void* data, const void* src ) { nullptr };
+		void (*Delete)( void* data ) { nullptr };
+		void (*NewCopy)( void* *dest, const void* src ) { nullptr };
+		void (*PlacementNew)( void* data ) { nullptr };
+		void (*PlacementDelete)( void* data ) { nullptr };
+		void (*PlacementCopy)( void* data, const void* src ) { nullptr };
 
 		//
 		// Container type accessors.
 		//
 		inline const TypeInfo* ContainedType() const { return m_containedType; }
 
-		void (*InsertElement)(void* container, uint index, void* item);
-		void* (*ElementAt)(void* container, uint index);
-		uint (*ContainerSize)(void* container);
+		void (*InsertElement)( void* container, uint index, void* item ) { nullptr };
+		void* (*ElementAt)( void* container, uint index ) { nullptr };
+		uint (*ContainerSize)( void* container ) { nullptr };
 
 		//
 		// Register a non-POD, non-container type (eg. a class).

@@ -39,7 +39,7 @@ namespace dd
 
 		struct SpawnRequest
 		{
-			ParticleID Particle;
+			ParticleID Particle { 0 };
 			glm::vec3 Position;
 			glm::vec3 Normal;
 		};

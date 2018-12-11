@@ -59,8 +59,8 @@ namespace ddr
 
 	struct MeshEntry
 	{
-		float Distance2;
-		ddr::MeshHandle Mesh;
+		float Distance2 { std::numeric_limits<float>::max() };
+		ddr::Mesh* Mesh { nullptr };
 		glm::mat4 Transform;
 		glm::vec4 Colour;
 	};

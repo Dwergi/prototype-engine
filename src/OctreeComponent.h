@@ -13,7 +13,7 @@ namespace dd
 	class OctreeComponent
 	{
 	public:
-		OctreeEntry Entry;
+		OctreeEntry Entry { -1 };
 
 		OctreeComponent() {}
 
