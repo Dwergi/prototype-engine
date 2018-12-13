@@ -171,7 +171,7 @@ namespace dd
 		s_material = ddr::MaterialManager::Instance()->Create( "terrain" );
 
 		ddr::Material* material = s_material.Access();
-		material->SetShader( s_shader );
+		material->Shader = s_shader;
 	}
 
 	void TerrainChunk::Initialize()

@@ -32,7 +32,7 @@ namespace dd
 		return !std::filesystem::is_directory( path ) && std::filesystem::exists( path );
 	}
 
-	File::File( std::string path )
+	File::File( std::string_view path )
 	{
 		DD_ASSERT( !std::filesystem::is_directory( path ) );
 

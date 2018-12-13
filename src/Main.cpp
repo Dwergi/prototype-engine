@@ -356,7 +356,7 @@ void CreateMeshShader()
 	ddr::Material* material = material_h.Access();
 	DD_ASSERT( material != nullptr );
 
-	material->SetShader( shader_h );
+	material->Shader = shader_h;
 }
 
 void CreateUnitCube()

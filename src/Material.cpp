@@ -25,9 +25,9 @@ namespace ddr
 
 	void Material::UpdateUniforms( UniformStorage& uniforms ) const
 	{
-		uniforms.Set( "Material.Shininess", m_shininess );
-		uniforms.Set( "Material.Specular", m_specular );
-		uniforms.Set( "Material.Diffuse", m_diffuse );
-		uniforms.Set( "Material.Ambient", m_ambient );
+		uniforms.Set( "Material.Shininess", Shininess );
+		uniforms.Set( "Material.Specular", Specular );
+		uniforms.Set( "Material.Diffuse", Diffuse );
+		uniforms.Set( "Material.Ambient", Ambient );
 	}
 }

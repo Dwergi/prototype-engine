@@ -121,7 +121,7 @@ namespace dd
 		ddr::Material* material = material_h.Access();
 		DD_ASSERT( material != nullptr );
 
-		material->SetShader( m_shader );
+		material->Shader = m_shader;
 
 		shader->Use( true );
 

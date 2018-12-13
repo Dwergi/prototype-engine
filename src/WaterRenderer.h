@@ -25,7 +25,6 @@ namespace ddr
 
 	private:
 
-		static ddr::ShaderHandle s_shader;
 		static ddr::MaterialHandle s_material;
 
 		RenderState m_renderState;

@@ -45,9 +45,9 @@ namespace ddr
 	struct Mesh : dd::HandleTarget
 	{
 		//
-		// Render this mesh with the given shader.
+		// Render this mesh, with the current material.
 		//
-		void Render( Shader& shader );
+		void Render();
 
 		//
 		// Retrieve the axis-aligned bounds of this mesh.

@@ -15,6 +15,7 @@
 #include "ICamera.h"
 #include "Material.h"
 #include "MeshComponent.h"
+#include "MeshRenderCommand.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
 #include "ShaderPart.h"
@@ -53,7 +54,7 @@ namespace ddr
 
 			MaterialHandle material_h = MaterialManager::Instance()->Create( "mesh" );
 			Material* material = material_h.Access();
-			material->SetShader( shader_h );
+			material->Shader = shader_h;
 
 			mesh->SetMaterial( material_h );
 
@@ -105,12 +106,6 @@ namespace ddr
 		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp,
 		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
 	{
-		Mesh* mesh = mesh_cmp.Mesh.Access();
-		if( mesh == nullptr )
-		{
-			return;
-		}
-
 		++m_meshCount;
 
 		ddm::AABB world_aabb;
@@ -147,14 +142,6 @@ namespace ddr
 			debugMultiplier.x = 1.5f;
 		}
 
-		const Material* material = mesh->GetMaterial().Get();
-		DD_ASSERT( material != nullptr );
-
-		Shader* shader = material->GetShader().Access();
-		ScopedShader usage = shader->UseScoped();
-
-		material->UpdateUniforms( uniforms );
-
 		glm::vec4 colour( 1 );
 		
 		if( colour_cmp != nullptr )
@@ -164,12 +151,10 @@ namespace ddr
 
 		uniforms.Set( "ObjectColour", colour * debugMultiplier );
 		uniforms.Set( "Model", transform_cmp.Transform() );
-
-		uniforms.Bind( *shader );
-
-		mesh->Render( *shader );
-
-		uniforms.Unbind();
+		
+		MeshRenderCommand cmd;
+		cmd.Mesh = mesh_cmp.Mesh;
+		cmd.Transform = transform_cmp.Transform();
 	}
 
 	void MeshRenderer::DrawDebugInternal( ddc::World& world )

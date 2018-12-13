@@ -12,10 +12,10 @@
 #include "IDebugPanel.h"
 #include "IHandlesInput.h"
 #include "InputAction.h"
+#include "Material.h"
+#include "Ray.h"
 #include "Renderer.h"
 #include "System.h"
-#include "Ray.h"
-#include "Shader.h"
 #include "Texture.h"
 
 struct GLFWwindow;
@@ -81,7 +81,7 @@ namespace dd
 		glm::vec2 m_position;
 		float m_depth { 0.0f };
 
-		ddr::ShaderHandle m_shader;
+		ddr::MaterialHandle m_material;
 		ddr::Texture m_idTexture;
 		ddr::Texture m_depthTexture;
 		

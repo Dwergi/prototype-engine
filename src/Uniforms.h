@@ -13,6 +13,7 @@ namespace ddr
 
 	enum class UniformType
 	{
+		Invalid = 0,
 		Boolean,
 		Integer,
 		Float,
@@ -21,13 +22,25 @@ namespace ddr
 		Vector4,
 		Matrix3,
 		Matrix4,
-		Texture
+		Sampler2
 	};
+
+	UniformType GetUniformTypeFromName( std::string_view type_name );
+
+	template <typename T> UniformType GetUniformType() { return UniformType::Invalid; }
+
+	template <typename T>
+	UniformType GetUniformTypeFor( const T& value )
+	{
+		return GetUniformType<T>();
+	}
+
+	constexpr int MAX_UNIFORM_NAME = 64;
 
 	struct IUniform
 	{
 		UniformType Type;
-		char Name[256];
+		char Name[ MAX_UNIFORM_NAME ];
 	};
 
 	template <typename T>
@@ -42,6 +55,8 @@ namespace ddr
 
 		UniformStorage();
 		~UniformStorage();
+
+		void Create( const char* name, UniformType type );
 
 		void Set( const char* name, bool value );
 		void Set( const char* name, int value );
@@ -70,19 +85,11 @@ namespace ddr
 		byte m_uniforms[MAX_UNIFORMS * UNIFORM_SIZE];
 
 		template <typename T>
-		void Create( const char* name, UniformType type, T value );
+		void SetValue( IUniform* uniform, const T& value );
 
 		template <typename T>
-		void SetValue( IUniform* uniform, UniformType type, T value );
+		void SetHelper( const char* name, const T& value );
 
 		IUniform* Access( int index );
 	};
-
-	template <typename T>
-	void UniformStorage::SetValue( IUniform* uniform, UniformType type, T value )
-	{
-		DD_ASSERT( uniform->Type == type );
-
-		((Uniform<T>*) uniform)->Value = value;
-	}
 }

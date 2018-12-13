@@ -10,13 +10,13 @@
 #include "BoundBoxComponent.h"
 #include "ColourComponent.h"
 #include "MeshComponent.h"
+#include "MeshRenderCommand.h"
 #include "MeshUtils.h"
 #include "TransformComponent.h"
 #include "WaterComponent.h"
 
 namespace ddr
 {
-	ddr::ShaderHandle WaterRenderer::s_shader;
 	ddr::MaterialHandle WaterRenderer::s_material;
 
 	WaterRenderer::WaterRenderer() :
@@ -36,11 +36,10 @@ namespace ddr
 
 	void WaterRenderer::RenderInit( ddc::World& world )
 	{
-		s_shader = ddr::ShaderManager::Instance()->Load( "water" );
 		s_material = ddr::MaterialManager::Instance()->Create( "water" );
 
 		ddr::Material* material = s_material.Access();
-		material->SetShader( s_shader );
+		material->Shader = ddr::ShaderManager::Instance()->Load( "water" );
 	}
 
 	void WaterRenderer::RenderUpdate( ddc::World& world )
@@ -61,7 +60,7 @@ namespace ddr
 	struct MeshEntry
 	{
 		float Distance2;
-		ddr::Mesh* Mesh;
+		ddr::MeshHandle Mesh;
 		glm::mat4 Transform;
 		glm::vec4 Colour;
 	};
@@ -84,13 +83,11 @@ namespace ddr
 			if( !waters[i].Mesh.IsValid() )
 				continue;
 
-			ddr::Mesh* mesh = waters[i].Mesh.Access();
-
 			ddm::AABB transformed = bound_boxes[i].BoundBox.GetTransformed( transforms[i].Transform() );
 
 			glm::vec3 closest = glm::clamp( camera.GetPosition(), transformed.Min, transformed.Max );
 			MeshEntry entry;
-			entry.Mesh = mesh;
+			entry.Mesh = waters[ i ].Mesh;
 			entry.Distance2 = glm::distance2( camera.GetPosition(), closest );
 			entry.Transform = transforms[i].Transform();
 
@@ -103,22 +100,16 @@ namespace ddr
 			return a.Distance2 > b.Distance2;
 		} );
 
-		auto scoped_state = m_renderState.UseScoped();
-
-		Shader* shader = s_shader.Access();
-		auto scoped_shader = shader->UseScoped();
-
-		UniformStorage uniforms = render_data.Uniforms();
-		uniforms.Bind( *shader );
+		UniformStorage& uniforms = render_data.Uniforms();
 
 		for( auto entry : s_meshes )
 		{
-			uniforms.Set( "Model", entry.Transform );
 			uniforms.Set( "ObjectColour", entry.Colour );
+			uniforms.Set( "Model", entry.Transform );
 
-			entry.Mesh->Render( *shader );
+			MeshRenderCommand cmd;
+			cmd.Mesh = entry.Mesh;
+			cmd.Transform = entry.Transform;
 		}
-
-		uniforms.Unbind();
 	}
 }

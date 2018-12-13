@@ -33,6 +33,8 @@ namespace ddr
 
 	void Mesh::SetPositions( const dd::ConstBuffer<glm::vec3>& positions )
 	{
+		DD_ASSERT( m_vao.IsValid() );
+
 		if( !m_vboPosition.IsValid() )
 		{
 			m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -45,6 +47,8 @@ namespace ddr
 
 	void Mesh::SetNormals( const dd::ConstBuffer<glm::vec3>& normals )
 	{
+		DD_ASSERT( m_vao.IsValid() );
+
 		if( !m_vboNormal.IsValid() )
 		{
 			m_vboNormal.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -57,18 +61,28 @@ namespace ddr
 
 	void Mesh::SetIndices( const dd::ConstBuffer<uint>& indices )
 	{
+		DD_ASSERT( m_vao.IsValid() );
+
+		m_vao.Bind();
+
 		if( !m_vboIndex.IsValid() )
 		{
 			m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
+			m_vboIndex.Bind();
 		}
 
 		m_vboIndex.SetData( indices );
 
 		m_dirty.set( (size_t) BufferType::Index, true );
+
+		m_vao.Unbind();
+		m_vboIndex.Unbind();
 	}
 
 	void Mesh::SetUVs( const dd::ConstBuffer<glm::vec2>& uvs )
 	{
+		DD_ASSERT( m_vao.IsValid() );
+
 		if( !m_vboUV.IsValid() )
 		{
 			m_vboUV.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -81,6 +95,8 @@ namespace ddr
 
 	void Mesh::SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours )
 	{
+		DD_ASSERT( m_vao.IsValid() );
+
 		if( !m_vboVertexColour.IsValid() )
 		{
 			m_vboVertexColour.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
@@ -94,6 +110,11 @@ namespace ddr
 	void Mesh::SetMaterial( MaterialHandle material )
 	{
 		m_material = material;
+
+		Shader* shader = material.Get()->Shader.Access();
+		DD_ASSERT( shader != nullptr );
+
+		BindToShader( *shader );
 	}
 
 	void Mesh::Create()
@@ -116,50 +137,41 @@ namespace ddr
 
 	void Mesh::Update( dd::JobSystem& jobsystem )
 	{
-		if( !m_vao.IsValid() )
-		{
-			return;
-		}
+		DD_ASSERT( m_vao.IsValid() );
+
+		m_vao.Bind();
 
 		if( m_dirty.test( (size_t) BufferType::Position ) && 
 			m_vboPosition.IsValid() )
 		{
-			m_vboPosition.Bind();
 			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
 		}
 
 		if( m_dirty.test( (size_t) BufferType::Normal ) && 
 			m_vboNormal.IsValid() )
 		{
-			m_vboNormal.Bind();
 			m_vboNormal.CommitData();
-			m_vboNormal.Unbind();
 		}
 
 		if( m_dirty.test( (size_t) BufferType::Index ) && 
 			m_vboIndex.IsValid() )
 		{
-			m_vboIndex.Bind();
 			m_vboIndex.CommitData();
-			m_vboIndex.Unbind();
 		}
 
 		if( m_dirty.test( (size_t) BufferType::UV ) && 
 			m_vboUV.IsValid() )
 		{
-			m_vboUV.Bind();
 			m_vboUV.CommitData();
-			m_vboUV.Unbind();
 		}
 
 		if( m_dirty.test( (size_t) BufferType::Colour ) && 
 			m_vboVertexColour.IsValid() )
 		{
-			m_vboVertexColour.Bind();
 			m_vboVertexColour.CommitData();
-			m_vboVertexColour.Unbind();
 		}
+
+		m_vao.Unbind();
 
 		if( m_enableBVH && !m_rebuilding.exchange( true ) )
 		{
@@ -176,53 +188,44 @@ namespace ddr
 
 	void Mesh::BindToShader( Shader& shader )
 	{
+		DD_ASSERT( shader.InUse() );
+		DD_ASSERT( m_vao.IsValid() );
+
+		m_vao.Bind();
+
 		if( m_vboPosition.IsValid() )
 		{
-			m_vboPosition.Bind();
 			shader.BindPositions();
-			m_vboPosition.Unbind();
 		}
 
 		if( m_vboNormal.IsValid() )
 		{
-			m_vboNormal.Bind();
 			shader.BindNormals();
-			m_vboNormal.Unbind();
 		}
 
 		if( m_vboUV.IsValid() )
 		{
-			m_vboUV.Bind();
 			shader.BindUVs();
-			m_vboUV.Unbind();
 		}
 
 		if( m_vboVertexColour.IsValid() )
 		{
-			m_vboVertexColour.Bind();
 			shader.BindVertexColours();
-			m_vboVertexColour.Unbind();
 		}
+
+		m_vao.Unbind();
 	}
 
-	void Mesh::Render( Shader& shader )
+	void Mesh::Render()
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
-		DD_ASSERT( shader.InUse() );
-
 		m_vao.Bind();
-
-		BindToShader( shader );
 
 		if( m_vboIndex.IsValid() )
 		{
-			m_vboIndex.Bind();
-
 			glDrawElements( GL_TRIANGLES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0 );
 			CheckOGLError();
-
-			m_vboIndex.Unbind();
 		}
 		else
 		{

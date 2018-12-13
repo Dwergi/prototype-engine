@@ -353,11 +353,13 @@
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
+    <ClInclude Include="src\MeshRenderCommand.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
+    <ClInclude Include="src\RenderCommand.h" />
     <ClInclude Include="src\RenderState.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />

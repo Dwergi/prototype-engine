@@ -12,20 +12,70 @@
 
 namespace ddr
 {
+	UniformType GetUniformTypeFromName( std::string_view type_name )
+	{
+		if( type_name == "float" )
+		{
+			return UniformType::Float;
+		}
+		else if( type_name == "bool" )
+		{
+			return UniformType::Boolean;
+		}
+		else if( type_name == "int" )
+		{
+			return UniformType::Integer;
+		}
+		else if( type_name == "vec2" )
+		{
+			return UniformType::Vector2;
+		}
+		else if( type_name == "vec3" )
+		{
+			return UniformType::Vector3;
+		}
+		else if( type_name == "vec4" )
+		{
+			return UniformType::Vector4;
+		}
+		else if( type_name == "mat3" )
+		{
+			return UniformType::Matrix3;
+		}
+		else if( type_name == "mat4" )
+		{
+			return UniformType::Matrix4;
+		}
+		else if( type_name == "sampler2d" )
+		{
+			return UniformType::Sampler2;
+		}
+
+		return UniformType::Invalid;
+	}
+
+	template <> UniformType GetUniformType<float>() { return UniformType::Float; }
+	template <> UniformType GetUniformType<bool>() { return UniformType::Boolean; }
+	template <> UniformType GetUniformType<int>() { return UniformType::Integer; }
+	template <> UniformType GetUniformType<glm::vec2>() { return UniformType::Vector2; }
+	template <> UniformType GetUniformType<glm::vec3>() { return UniformType::Vector3; }
+	template <> UniformType GetUniformType<glm::vec4>() { return UniformType::Vector4; }
+	template <> UniformType GetUniformType<glm::mat3>() { return UniformType::Matrix3; }
+	template <> UniformType GetUniformType<glm::mat4>() { return UniformType::Matrix4; }
+	template <> UniformType GetUniformType<Texture>() { return UniformType::Sampler2; }
+
 	IUniform* UniformStorage::Access( int index )
 	{
 		return reinterpret_cast<IUniform*>(m_uniforms + index * UNIFORM_SIZE);
 	}
 
-	template <typename T>
-	void UniformStorage::Create( const char* name, UniformType type, T value )
+	void UniformStorage::Create( const char* name, UniformType type )
 	{
-		DD_ASSERT( strlen( name ) < 256 );
+		DD_ASSERT( strlen( name ) < MAX_UNIFORM_NAME );
 
-		Uniform<T>* created = (Uniform<T>*) Access( m_count );
-		strcpy_s( created->Name, 256, name );
+		IUniform* created = Access( m_count );
+		strcpy_s( created->Name, MAX_UNIFORM_NAME, name );
 		created->Type = type;
-		created->Value = value;
 
 		++m_count;
 	}
@@ -38,161 +88,85 @@ namespace ddr
 	{
 	}
 
-	void UniformStorage::Set( const char* name, bool value )
+	template <typename T>
+	void UniformStorage::SetValue( IUniform* uniform, const T& value )
 	{
+		DD_ASSERT( uniform->Type == GetUniformTypeFor( value ) );
+
+		((Uniform<T>*) uniform)->Value = value;
+	}
+
+	template <typename T>
+	void UniformStorage::SetHelper( const char* name, const T& value )
+	{
+		UniformType type = GetUniformType<T>();
+
 		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
+		if( uniform == nullptr )
 		{
-			SetValue( uniform, UniformType::Boolean, value );
+			Create( name, type );
 		}
-		else
-		{
-			Create( name, UniformType::Boolean, value );
-		}
+
+		DD_ASSERT( uniform->Type == type );
+		SetValue( uniform, value );
 
 		if( m_shader != nullptr )
 		{
 			m_shader->SetUniform( name, value );
 		}
+	}
+
+	void UniformStorage::Set( const char* name, bool value )
+	{
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, int value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Integer, value );
-		}
-		else
-		{
-			Create( name, UniformType::Integer, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, float value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Float, value );
-		}
-		else
-		{
-			Create( name, UniformType::Float, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, glm::vec2 value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Vector2, value );
-		}
-		else
-		{
-			Create( name, UniformType::Vector2, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, glm::vec3 value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Vector3, value );
-		}
-		else
-		{
-			Create( name, UniformType::Vector3, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, glm::vec4 value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Vector4, value );
-		}
-		else
-		{
-			Create( name, UniformType::Vector4, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, const glm::mat3& value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Matrix3, value );
-		}
-		else
-		{
-			Create( name, UniformType::Matrix3, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, const glm::mat4& value )
 	{
-		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
-		{
-			SetValue( uniform, UniformType::Matrix4, value );
-		}
-		else
-		{
-			Create( name, UniformType::Matrix4, value );
-		}
-
-		if( m_shader != nullptr )
-		{
-			m_shader->SetUniform( name, value );
-		}
+		SetHelper( name, value );
 	}
 
 	void UniformStorage::Set( const char* name, const ddr::Texture& value )
 	{
 		IUniform* uniform = Find( name );
-		if( uniform != nullptr )
+		if( uniform == nullptr )
 		{
-			SetValue( uniform, UniformType::Texture, value.GetTextureUnit() );
+			IUniform* created = Access( m_count );
+			strcpy_s( created->Name, MAX_UNIFORM_NAME, name );
+			created->Type = UniformType::Sampler2;
 		}
-		else
-		{
-			Create( name, UniformType::Texture, value.GetTextureUnit() );
-		}
+
+		((Uniform<int>*) uniform)->Value = value.GetTextureUnit();
 
 		if( m_shader != nullptr )
 		{
@@ -259,12 +233,15 @@ namespace ddr
 					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
-				case UniformType::Texture:
+				case UniformType::Sampler2:
 				{
 					Uniform<int>* u = (Uniform<int>*) uniform;
 					shader.SetUniform( u->Name, u->Value );
 					break;
 				}
+
+				default:
+					DD_ASSERT( false, "Invalid uniform type!" );
 			}
 		}
 

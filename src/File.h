@@ -12,7 +12,7 @@ namespace dd
 {
 	struct File
 	{
-		File( std::string path );
+		File( std::string_view path );
 
 		std::string Path() const { return m_path.string(); }
 

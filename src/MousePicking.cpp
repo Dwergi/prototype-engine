@@ -16,6 +16,7 @@
 #include "InputBindings.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
+#include "MeshRenderCommand.h"
 #include "OpenGL.h"
 #include "ParticleSystemComponent.h"
 #include "RayComponent.h"
@@ -48,8 +49,6 @@ namespace dd
 
 		RequireTag( ddc::Tag::Visible );
 		RequireTag( ddc::Tag::Dynamic );
-
-		DD_TODO( "MousePicking RenderState" );
 	}
 
 	void MousePicking::BindActions( InputBindings& bindings )
@@ -105,7 +104,9 @@ namespace dd
 
 	void MousePicking::RenderInit( ddc::World& world )
 	{
-		m_shader = ddr::ShaderManager::Instance()->Load( "picking" );
+		ddr::ShaderHandle shader = ddr::ShaderManager::Instance()->Load( "picking" );
+		m_material = ddr::MaterialManager::Instance()->Create( "picking" );
+		m_material.Access()->Shader = shader;
 
 		CreateFrameBuffer( m_window.GetSize() );
 		m_previousSize = m_window.GetSize();
@@ -212,11 +213,7 @@ namespace dd
 
 		m_framebuffer.Clear();
 
-		ddr::Shader& shader = *m_shader.Access();
-		auto scoped_shader = shader.UseScoped();
-
 		ddr::UniformStorage& uniforms = data.Uniforms();
-		uniforms.Bind( shader );
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
@@ -224,19 +221,13 @@ namespace dd
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			ddr::Mesh* mesh = meshes[i].Mesh.Access();
-			if( mesh == nullptr )
-				continue;
-
 			uniforms.Set( "ID", (int) entities[i].ID );
 			uniforms.Set( "Model", transforms[i].Transform() );
 
-			mesh->Render( shader );
+			ddr::MeshRenderCommand cmd;
+			cmd.Mesh = meshes[ i ].Mesh;
+			cmd.Transform = transforms[ i ].Transform();
 		}
-
-		uniforms.Unbind();
-
-		shader.Use( false );
 
 		m_framebuffer.UnbindRead();
 		m_framebuffer.UnbindDraw();

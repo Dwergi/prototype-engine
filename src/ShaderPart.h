@@ -10,6 +10,8 @@
 
 namespace ddr
 {
+	struct UniformStorage;
+
 	struct ShaderPart
 	{
 	public:
@@ -53,6 +55,7 @@ namespace ddr
 
 		static bool LoadFile( const std::string& path, std::string& outSource );
 		static std::string ProcessIncludes( std::string path, std::string source );
+		static void GatherUniforms( const std::string& src, UniformStorage& outUniforms );
 
 		ShaderPart( const std::string& path, Type type );
 
