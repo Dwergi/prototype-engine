@@ -35,12 +35,9 @@ namespace ddr
 		return GetUniformType<T>();
 	}
 
-	constexpr int MAX_UNIFORM_NAME = 64;
-
 	struct IUniform
 	{
 		UniformType Type;
-		char Name[ MAX_UNIFORM_NAME ];
 	};
 
 	template <typename T>
@@ -56,39 +53,40 @@ namespace ddr
 		UniformStorage();
 		~UniformStorage();
 
-		void Create( const char* name, UniformType type );
+		IUniform* Create( std::string name, UniformType type );
 
-		void Set( const char* name, bool value );
-		void Set( const char* name, int value );
-		void Set( const char* name, float value );
-		void Set( const char* name, glm::vec2 value );
-		void Set( const char* name, glm::vec3 value );
-		void Set( const char* name, glm::vec4 value );
-		void Set( const char* name, const glm::mat3& value );
-		void Set( const char* name, const glm::mat4& value );
-		void Set( const char* name, const ddr::Texture& value );
+		void Set( std::string name, bool value );
+		void Set( std::string name, int value );
+		void Set( std::string name, float value );
+		void Set( std::string name, glm::vec2 value );
+		void Set( std::string name, glm::vec3 value );
+		void Set( std::string name, glm::vec4 value );
+		void Set( std::string name, const glm::mat3& value );
+		void Set( std::string name, const glm::mat4& value );
+		void Set( std::string name, const ddr::Texture& value );
 
 		void Bind( Shader& shader );
 		void Unbind();
 
-		IUniform* Find( const char* name );
+		IUniform* Find( std::string name );
+
+		void Clear();
 
 	private:
 
 		static const int MAX_UNIFORMS = 256;
 		static const int UNIFORM_SIZE = sizeof( Uniform<glm::mat4> );
 
-		int m_count { 0 };
-
 		Shader* m_shader { nullptr };
 
-		byte m_uniforms[MAX_UNIFORMS * UNIFORM_SIZE];
+		std::unordered_map<std::string, int> m_uniforms;
+		byte m_storage[MAX_UNIFORMS * UNIFORM_SIZE];
 
 		template <typename T>
 		void SetValue( IUniform* uniform, const T& value );
 
 		template <typename T>
-		void SetHelper( const char* name, const T& value );
+		void SetHelper( std::string name, const T& value );
 
 		IUniform* Access( int index );
 	};

@@ -80,23 +80,37 @@ namespace dd
 		return entity;
 	}
 
-	static ddc::Entity FindWater( glm::vec2 pos, const ddc::DataBuffer& water_entities )
+	void WaterSystem::Initialize( ddc::World& world )
+	{
+	}
+
+	static std::unordered_map<glm::vec2, ddc::Entity> s_waterCache;
+
+	static ddc::Entity FindWater( glm::vec2 pos )
+	{
+		auto it = s_waterCache.find( pos );
+		if( it == s_waterCache.end() )
+		{
+			return ddc::Entity();
+		}
+
+		return it->second;
+	}
+
+	static void PopulateWaterCache( const ddc::DataBuffer& water_entities )
 	{
 		auto water_cmps = water_entities.Write<WaterComponent>();
+		auto entities = water_entities.Entities();
 
 		for( size_t i = 0; i < water_entities.Size(); ++i )
 		{
-			if( water_cmps[i].TerrainChunkPosition == pos )
+			glm::vec2 pos = water_cmps[ i ].TerrainChunkPosition;
+			ddc::Entity entity = FindWater( pos );
+			if( !entity.IsValid() )
 			{
-				return water_entities.Entities()[i];
+				s_waterCache.insert( std::make_pair( pos, entities[ i ] ) );
 			}
 		}
-
-		return ddc::Entity();
-	}
-
-	void WaterSystem::Initialize( ddc::World& world )
-	{
 	}
 
 	void WaterSystem::Update( const ddc::UpdateData& update_data )
@@ -108,7 +122,8 @@ namespace dd
 		auto terrain_bspheres = terrain.Read<BoundSphereComponent>();
 
 		auto water = update_data.Data( "water" );
-		
+		PopulateWaterCache( water );
+
 		ddc::World& world = update_data.World();
 
 		const ddm::Plane water_plane( glm::vec3( 0, m_waterHeight, 0 ), glm::vec3( 0, -1, 0 ) );
@@ -132,7 +147,7 @@ namespace dd
 
 			ddm::Plane local_plane = water_plane.GetTransformed( terrain_transforms[i].Transform() );
 
-			ddc::Entity water_entity = FindWater( terrain_chunk->GetPosition(), water );
+			ddc::Entity water_entity = FindWater( terrain_chunk->GetPosition() );
 			if( !water_entity.IsValid() )
 			{
 				water_entity = CreateWaterEntity( update_data.World(), terrain_chunk->GetPosition() );

@@ -46,7 +46,7 @@ namespace ddr
 		{
 			return UniformType::Matrix4;
 		}
-		else if( type_name == "sampler2d" )
+		else if( type_name == "sampler2D" )
 		{
 			return UniformType::Sampler2;
 		}
@@ -64,28 +64,29 @@ namespace ddr
 	template <> UniformType GetUniformType<glm::mat4>() { return UniformType::Matrix4; }
 	template <> UniformType GetUniformType<Texture>() { return UniformType::Sampler2; }
 
-	IUniform* UniformStorage::Access( int index )
-	{
-		return reinterpret_cast<IUniform*>(m_uniforms + index * UNIFORM_SIZE);
-	}
-
-	void UniformStorage::Create( const char* name, UniformType type )
-	{
-		DD_ASSERT( strlen( name ) < MAX_UNIFORM_NAME );
-
-		IUniform* created = Access( m_count );
-		strcpy_s( created->Name, MAX_UNIFORM_NAME, name );
-		created->Type = type;
-
-		++m_count;
-	}
-
 	UniformStorage::UniformStorage()
 	{
 	}
 
 	UniformStorage::~UniformStorage()
 	{
+	}
+
+	IUniform* UniformStorage::Access( int index )
+	{
+		return reinterpret_cast<IUniform*>(m_storage + index * UNIFORM_SIZE);
+	}
+
+	IUniform* UniformStorage::Create( std::string name, UniformType type )
+	{
+		int index = (int) m_uniforms.size();
+
+		IUniform* created = Access( index );
+		created->Type = type;
+
+		m_uniforms.insert( std::make_pair( name, index ) );
+
+		return created;
 	}
 
 	template <typename T>
@@ -97,14 +98,14 @@ namespace ddr
 	}
 
 	template <typename T>
-	void UniformStorage::SetHelper( const char* name, const T& value )
+	void UniformStorage::SetHelper( std::string name, const T& value )
 	{
 		UniformType type = GetUniformType<T>();
 
 		IUniform* uniform = Find( name );
 		if( uniform == nullptr )
 		{
-			Create( name, type );
+			uniform = Create( name, type );
 		}
 
 		DD_ASSERT( uniform->Type == type );
@@ -116,54 +117,53 @@ namespace ddr
 		}
 	}
 
-	void UniformStorage::Set( const char* name, bool value )
+	void UniformStorage::Set( std::string name, bool value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, int value )
+	void UniformStorage::Set( std::string name, int value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, float value )
+	void UniformStorage::Set( std::string name, float value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, glm::vec2 value )
+	void UniformStorage::Set( std::string name, glm::vec2 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, glm::vec3 value )
+	void UniformStorage::Set( std::string name, glm::vec3 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, glm::vec4 value )
+	void UniformStorage::Set( std::string name, glm::vec4 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, const glm::mat3& value )
+	void UniformStorage::Set( std::string name, const glm::mat3& value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, const glm::mat4& value )
+	void UniformStorage::Set( std::string name, const glm::mat4& value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( const char* name, const ddr::Texture& value )
+	void UniformStorage::Set( std::string name, const ddr::Texture& value )
 	{
 		IUniform* uniform = Find( name );
 		if( uniform == nullptr )
 		{
-			IUniform* created = Access( m_count );
-			strcpy_s( created->Name, MAX_UNIFORM_NAME, name );
-			created->Type = UniformType::Sampler2;
+			Create( name, UniformType::Sampler2 );
+			uniform = Find( name );
 		}
 
 		((Uniform<int>*) uniform)->Value = value.GetTextureUnit();
@@ -179,64 +179,65 @@ namespace ddr
 		DD_ASSERT( m_shader == nullptr, "UniformStorage already bound!" );
 		DD_ASSERT( m_shader->InUse(), "Shader not in use!" );
 
-		for( int i = 0; i < m_count; ++i )
+		for( auto pair : m_uniforms )
 		{
-			IUniform* uniform = Access( i );
+			std::string name = pair.first;
+			IUniform* uniform = Access( pair.second );
 
 			switch( uniform->Type )
 			{
 				case UniformType::Boolean:
 				{
 					Uniform<bool>* u = (Uniform<bool>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Integer:
 				{
 					Uniform<int>* u = (Uniform<int>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Float:
 				{
 					Uniform<float>* u = (Uniform<float>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Vector2:
 				{
 					Uniform<glm::vec2>* u = (Uniform<glm::vec2>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Vector3:
 				{
 					Uniform<glm::vec3>* u = (Uniform<glm::vec3>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Vector4:
 				{
 					Uniform<glm::vec4>* u = (Uniform<glm::vec4>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Matrix3:
 				{
 					Uniform<glm::mat3>* u = (Uniform<glm::mat3>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Matrix4:
 				{
 					Uniform<glm::mat4>* u = (Uniform<glm::mat4>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 				case UniformType::Sampler2:
 				{
 					Uniform<int>* u = (Uniform<int>*) uniform;
-					shader.SetUniform( u->Name, u->Value );
+					shader.SetUniform( name, u->Value );
 					break;
 				}
 
@@ -255,18 +256,19 @@ namespace ddr
 		m_shader = nullptr;
 	}
 
-	IUniform* UniformStorage::Find( const char* name )
+	IUniform* UniformStorage::Find( std::string name )
 	{
-		for( int i = 0; i < m_count; ++i )
+		auto it = m_uniforms.find( name );
+		if( it == m_uniforms.end() )
 		{
-			IUniform* uniform = Access( i );
-
-			if( strcmp( uniform->Name, name ) == 0 )
-			{
-				return uniform;
-			}
+			return nullptr;
 		}
 
-		return nullptr;
+		return Access( it->second );
+	}
+
+	void UniformStorage::Clear()
+	{
+		m_uniforms.clear();
 	}
 }

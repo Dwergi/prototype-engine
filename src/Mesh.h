@@ -29,13 +29,14 @@ namespace ddr
 	struct Shader;
 	struct UniformStorage;
 
-	enum class BufferType
+	enum class MeshPart
 	{
 		Position,
 		Normal,
 		Index,
 		UV,
 		Colour,
+		Material,
 		Count
 	};
 
@@ -147,7 +148,7 @@ namespace ddr
 		//
 		// Set the mesh to be dirty.
 		//
-		void SetDirty( BufferType type ) { m_dirty.set( (size_t) type, true ); }
+		void SetDirty( MeshPart type ) { m_dirty.set( (size_t) type, true ); }
 
 		//
 		// Get the BVH of this mesh.
@@ -164,14 +165,13 @@ namespace ddr
 
 	private:
 
-		static const size_t DirtyBitCount = (size_t) BufferType::Count;
+		static const size_t DirtyBitCount = (size_t) MeshPart::Count;
 		std::bitset<DirtyBitCount> m_dirty;
 		
 		VBO m_vboPosition;
 		VBO m_vboNormal;
 		VBO m_vboIndex;
 		VBO m_vboUV;
-		VBO m_vboVertexColour;
 
 		MaterialHandle m_material;
 		

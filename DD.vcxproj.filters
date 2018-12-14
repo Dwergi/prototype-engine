@@ -627,10 +627,10 @@
     <ClInclude Include="src\WaterRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderCommand.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshRenderCommand.h">
+      <Filter>Rendering\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderCommand.h">
       <Filter>Rendering\Commands</Filter>
     </ClInclude>
   </ItemGroup>

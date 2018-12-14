@@ -396,7 +396,7 @@ namespace dd
 				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_focused );
 				if( mesh_cmp != nullptr )
 				{
-					const String& name = mesh_cmp->Mesh.Get()->Name();
+					const std::string& name = mesh_cmp->Mesh.Get()->Name();
 					ImGui::Text( "Mesh: %s", name.c_str() );
 				}
 				else
@@ -423,7 +423,7 @@ namespace dd
 				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>( m_selected );
 				if( mesh_cmp != nullptr )
 				{
-					const String& name = mesh_cmp->Mesh.Get()->Name();
+					const std::string& name = mesh_cmp->Mesh.Get()->Name();
 					ImGui::Text( "Mesh: %s", name.c_str() );
 				}
 				else

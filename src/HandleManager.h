@@ -17,15 +17,15 @@ namespace dd
 		//
 		// The name of this instance.
 		//
-		const dd::String& Name() const { return m_name; }
+		const std::string& Name() const { return m_name; }
 
 		//
 		// Set the name of this instance.
 		//
-		void SetName( const char* name ) { m_name = name; }
+		void SetName( std::string name ) { m_name = name; }
 
 	protected:
-		dd::String64 m_name;
+		std::string m_name;
 	};
 
 	//
@@ -40,12 +40,12 @@ namespace dd
 		//
 		// Find a handle to a mesh with the given name.
 		//
-		Handle<T> Find( const char* name ) const;
+		Handle<T> Find( std::string name ) const;
 		
 		//
 		// Create (or retrieve) a handle to a mesh with the given name.
 		//
-		Handle<T> Create( const char* name );
+		Handle<T> Create( std::string name );
 
 		//
 		// Destroy the mesh associated with the given handle. 
@@ -114,7 +114,7 @@ namespace dd
 		std::mutex m_mutex;
 		static HandleManager<T>* s_singleton;
 
-		Handle<T> FindInternal( const char* name ) const;
+		Handle<T> FindInternal( std::string name ) const;
 
 		virtual void OnCreate( T& instance ) const {}
 		virtual void OnDestroy( T& instance ) const {}

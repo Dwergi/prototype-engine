@@ -7,10 +7,9 @@
 namespace dd
 {
 	template <typename T>
-	Handle<T> HandleManager<T>::FindInternal( const char* name ) const
+	Handle<T> HandleManager<T>::FindInternal( std::string name ) const
 	{
-		DD_ASSERT( name != nullptr );
-		DD_ASSERT( strlen( name ) > 0 );
+		DD_ASSERT( !name.empty() );
 
 		for( size_t i = 0; i < m_entries.size(); ++i )
 		{
@@ -25,13 +24,13 @@ namespace dd
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::Find( const char* name ) const
+	Handle<T> HandleManager<T>::Find( std::string name ) const
 	{
 		return FindInternal( name );
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::Create( const char* name )
+	Handle<T> HandleManager<T>::Create( std::string name )
 	{
 		std::scoped_lock<std::mutex> lock( m_mutex );
 		Handle<T> h = FindInternal( name );

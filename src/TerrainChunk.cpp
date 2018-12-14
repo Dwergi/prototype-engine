@@ -292,7 +292,7 @@ namespace dd
 			else
 			{
 				ddr::Mesh* mesh = m_mesh.Access();
-				mesh->SetDirty( ddr::BufferType::Position );
+				mesh->SetDirty( ddr::MeshPart::Position );
 				mesh->SetIndices( dd::ConstBuffer<uint>( s_indices[m_lod] ) );
 				mesh->SetBoundBox( m_bounds );
 			}

@@ -9,7 +9,7 @@
 #ifdef _DEBUG
 #define PPK_ASSERT_ENABLED 1
 #else 
-#define PPK_ASSERT_ENABLED 0
+#define PPK_ASSERT_ENABLED 1
 #endif
 
 #include "PP_Assert.h"

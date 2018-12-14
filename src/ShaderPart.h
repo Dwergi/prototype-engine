@@ -7,11 +7,10 @@
 #pragma once
 
 #include "OpenGL.h"
+#include "Uniforms.h"
 
 namespace ddr
 {
-	struct UniformStorage;
-
 	struct ShaderPart
 	{
 	public:
@@ -47,6 +46,8 @@ namespace ddr
 
 		Type m_type;
 		GLuint m_id { OpenGL::InvalidID };
+
+		UniformStorage m_uniforms;
 
 		std::string m_path;
 		std::string m_source;
