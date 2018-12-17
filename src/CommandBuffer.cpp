@@ -7,6 +7,10 @@
 #include "PCH.h"
 #include "CommandBuffer.h"
 
+#include "MeshRenderCommand.h"
+
+#include <algorithm>
+
 namespace ddr
 {
 	void CommandBuffer::Clear()
@@ -24,14 +28,15 @@ namespace ddr
 		} );
 	}
 
-	void CommandBuffer::Process()
+	void CommandBuffer::Dispatch()
 	{
 		for( const RenderCommand* cmd : m_commands )
 		{
 			switch( cmd->Type )
 			{
-			case CommandType.Mesh:
-				static_cast<const MeshRenderCommand*>()->Dispatch();
+			case CommandType::Mesh:
+				static_cast<const MeshRenderCommand*>( cmd )->Dispatch();
+				break;
 			}
 		}
 	}

@@ -33,5 +33,7 @@ namespace ddr
 	{
 		CommandKey Key;
 		CommandType Type;
+
+		RenderCommand( CommandType type );
 	};
 }

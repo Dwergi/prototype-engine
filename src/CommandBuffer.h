@@ -17,6 +17,9 @@ namespace ddr
 		template <typename T>
 		void Allocate( T*& out_ptr );
 
+		void Sort();
+		void Dispatch();
+
 		std::vector<RenderCommand*>::const_iterator begin() const { return m_commands.begin(); }
 		std::vector<RenderCommand*>::const_iterator end() const { return m_commands.end(); }
 

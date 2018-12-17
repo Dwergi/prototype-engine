@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "Mesh.h"
 #include "RenderCommand.h"
 
 namespace ddr
@@ -15,7 +16,7 @@ namespace ddr
 		glm::mat4 Transform;
 		MeshHandle Mesh;
 
-		MeshRenderCommand() : Type( CommandType.Mesh ) {}
+		MeshRenderCommand();
 
 		void Dispatch() const;
 	};

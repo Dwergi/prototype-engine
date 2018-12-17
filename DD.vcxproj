@@ -603,6 +603,7 @@
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
+    <ClCompile Include="src\RenderCommand.cpp" />
     <ClCompile Include="src\RenderState.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />
