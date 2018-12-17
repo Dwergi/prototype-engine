@@ -198,6 +198,9 @@ namespace ddr
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
+		Shader* shader = m_material.Get()->Shader.Access();
+		auto shader_scope = shader->UseScoped();
+
 		m_vao.Bind();
 
 		if( m_vboIndex.IsValid() )

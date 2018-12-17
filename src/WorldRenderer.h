@@ -20,6 +20,7 @@ namespace dd
 
 namespace ddr
 {
+	struct CommandBuffer;
 	struct ICamera;
 	class Renderer;
 	struct RenderData;
@@ -86,6 +87,7 @@ namespace ddr
 		
 		MeshHandle m_cube;
 
+		CommandBuffer* m_commands { nullptr }; 
 		ddr::UniformStorage* m_uniforms { nullptr };
 
 		void CreateFrameBuffer( glm::ivec2 size );

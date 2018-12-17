@@ -8,6 +8,7 @@
 #include "WorldRenderer.h"
 
 #include "AABB.h"
+#include "CommandBuffer.h"
 #include "GLError.h"
 #include "Frustum.h"
 #include "ICamera.h"
@@ -48,6 +49,7 @@ namespace ddr
 		m_window( window )
 	{
 		m_uniforms = new ddr::UniformStorage();
+		m_commands = new ddr::CommandBuffer();
 
 		m_defaultState.Blending = false;
 		m_defaultState.BackfaceCulling = true;
@@ -142,7 +144,7 @@ namespace ddr
 
 		auto entity_span( entities );
 
-		RenderData data( world, camera, *m_uniforms, entity_span, renderer.GetRequirements() );
+		RenderData data( world, camera, *m_uniforms, *m_commands, entity_span, renderer.GetRequirements() );
 
 		fn( renderer, data );
 	}

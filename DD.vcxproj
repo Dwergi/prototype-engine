@@ -344,6 +344,7 @@
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
+    <ClInclude Include="src\CommandBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\HandleManager.h" />
@@ -587,12 +588,14 @@
     <ClCompile Include="src\BoundsHelpers.cpp" />
     <ClCompile Include="src\BulletComponent.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
+    <ClCompile Include="src\CommandBuffer.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
+    <ClCompile Include="src\MeshRenderCommand.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />

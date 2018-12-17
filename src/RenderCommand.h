@@ -11,7 +11,7 @@ namespace ddr
 	enum class CommandType
 	{
 		Invalid,
-		RenderMesh
+		Mesh
 	};
 
 	struct CommandKey
@@ -31,6 +31,7 @@ namespace ddr
 
 	struct RenderCommand
 	{
+		CommandKey Key;
 		CommandType Type;
 	};
 }

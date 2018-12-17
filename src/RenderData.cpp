@@ -13,12 +13,14 @@
 
 namespace ddr
 {
-	RenderData::RenderData( const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+	RenderData::RenderData( const ddc::World& world, const ddr::ICamera& camera, 
+		ddr::UniformStorage& uniforms, ddr::CommandBuffer& commands,
 		const std::vector<ddc::Entity>& entities, const dd::IArray<const ddc::DataRequest*>& requests  ) :
 		m_camera( camera ),
 		m_uniforms( uniforms ),
 		m_entities( entities ),
-		m_world( world )
+		m_world( world ),
+		m_commands( commands )
 	{
 		m_buffers.reserve( requests.Size() );
 

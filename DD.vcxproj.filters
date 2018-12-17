@@ -633,6 +633,9 @@
     <ClInclude Include="src\RenderCommand.h">
       <Filter>Rendering\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="src\CommandBuffer.h">
+      <Filter>Rendering\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1118,6 +1121,12 @@
     </ClCompile>
     <ClCompile Include="src\WaterRenderer.cpp">
       <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandBuffer.cpp">
+      <Filter>Rendering\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshRenderCommand.cpp">
+      <Filter>Rendering\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

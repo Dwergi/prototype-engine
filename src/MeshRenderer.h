@@ -50,7 +50,7 @@ namespace ddr
 
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
-			const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms );
+			const ddr::RenderData& render_data );
 
 		virtual void DrawDebugInternal( ddc::World& world ) override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }

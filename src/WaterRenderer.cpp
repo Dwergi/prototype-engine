@@ -107,9 +107,11 @@ namespace ddr
 			uniforms.Set( "ObjectColour", entry.Colour );
 			uniforms.Set( "Model", entry.Transform );
 
-			MeshRenderCommand cmd;
-			cmd.Mesh = entry.Mesh;
-			cmd.Transform = entry.Transform;
+			MeshRenderCommand* cmd;
+			render_data.Commands().Allocate( cmd );
+
+			cmd->Mesh = entry.Mesh;
+			cmd->Transform = entry.Transform;
 		}
 	}
 }

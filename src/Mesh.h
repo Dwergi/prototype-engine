@@ -104,12 +104,6 @@ namespace ddr
 		void SetNormals( const dd::ConstBuffer<glm::vec3>& normals );
 
 		//
-		// Set the vertex colour buffer that the mesh will use.
-		// The mesh does *NOT* take ownership of this.
-		//
-		void SetVertexColours( const dd::ConstBuffer<glm::vec4>& colours );
-
-		//
 		// Set the UV buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//

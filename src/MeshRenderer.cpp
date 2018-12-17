@@ -97,15 +97,18 @@ namespace ddr
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bound_boxes.Get( i ), bound_spheres.Get( i ), 
-				colours.Get( i ), data.World(), data.Camera(), uniforms );
+			RenderMesh( entities[i], meshes[i], transforms[i], bound_boxes.Get( i ), bound_spheres.Get( i ), colours.Get( i ), data );
 		}
 	}
 
 	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp, 
-		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp,
-		const ddc::World& world, const ddr::ICamera& camera, ddr::UniformStorage& uniforms )
+		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp, 
+		const ddr::RenderData& render_data )
 	{
+		const ddr::ICamera& camera = render_data.Camera();
+		const ddc::World& world = render_data.World();
+		ddr::UniformStorage& uniforms = render_data.Uniforms();
+
 		++m_meshCount;
 
 		ddm::AABB world_aabb;
@@ -152,9 +155,10 @@ namespace ddr
 		uniforms.Set( "ObjectColour", colour * debugMultiplier );
 		uniforms.Set( "Model", transform_cmp.Transform() );
 		
-		MeshRenderCommand cmd;
-		cmd.Mesh = mesh_cmp.Mesh;
-		cmd.Transform = transform_cmp.Transform();
+		MeshRenderCommand* cmd;
+		render_data.Commands().Allocate( cmd );
+		cmd->Mesh = mesh_cmp.Mesh;
+		cmd->Transform = transform_cmp.Transform();
 	}
 
 	void MeshRenderer::DrawDebugInternal( ddc::World& world )
