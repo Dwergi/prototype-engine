@@ -27,6 +27,8 @@ namespace dd
 
 	private:
 
+		static ddr::MaterialHandle s_material;
+
 		dd::JobSystem& m_jobSystem;
 
 		int m_waterChunks { 0 };

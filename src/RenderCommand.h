@@ -8,11 +8,15 @@
 
 namespace ddr
 {
+	uint DistanceToDepth( float distance, bool transparent );
+
 	enum class CommandType
 	{
 		Invalid,
 		Mesh
 	};
+
+	constexpr int DEPTH_BITS = 24;
 
 	struct CommandKey
 	{
@@ -22,7 +26,7 @@ namespace ddr
 			{
 				uint Layer : 2;
 				uint Opaque : 1;
-				uint Depth : 24;
+				uint Depth : DEPTH_BITS;
 				uint Material : 24;
 			};
 			uint64 Key { 0 };

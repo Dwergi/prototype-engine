@@ -22,6 +22,8 @@
 
 namespace dd
 {
+	ddr::MaterialHandle WaterSystem::s_material;
+
 	WaterSystem::WaterSystem( const TerrainParameters& params, dd::JobSystem& jobsystem ) :
 		ddc::System( "Water" ),
 		m_terrainParams( params ),
@@ -49,13 +51,16 @@ namespace dd
 
 		dd::WaterComponent* water = world.Access<dd::WaterComponent>( entity );
 		water->TerrainChunkPosition = chunk_pos;
-		water->Mesh = ddr::MeshManager::Instance()->Create( fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y ).c_str() );
+
+		std::string mesh_name = fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y );
+		water->Mesh = ddr::MeshManager::Instance()->Create( mesh_name.c_str() );
+
+		ddr::Mesh* mesh = water->Mesh.Access();
+		mesh->SetMaterial( s_material );
+		mesh->UseBVH( false );
 
 		dd::ColourComponent* colour = world.Access<dd::ColourComponent>( entity );
 		colour->Colour = glm::vec4( 0, 0, 1, 0.5 );
-
-		ddr::Mesh* mesh = water->Mesh.Access();
-		mesh->UseBVH( false );
 
 		const float vertex_distance = m_terrainParams.ChunkSize / dd::WaterComponent::VertexCount;
 
@@ -78,10 +83,14 @@ namespace dd
 		water->Dirty = true;
 
 		return entity;
-	}
+	}	
 
 	void WaterSystem::Initialize( ddc::World& world )
 	{
+		s_material = ddr::MaterialManager::Instance()->Create( "water" );
+
+		ddr::Material* material = s_material.Access();
+		material->Shader = ddr::ShaderManager::Instance()->Load( "water" );
 	}
 
 	static std::unordered_map<glm::vec2, ddc::Entity> s_waterCache;

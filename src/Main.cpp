@@ -685,7 +685,7 @@ int GameMain()
 
 		ddr::TerrainRenderer* terrain_renderer = new ddr::TerrainRenderer( terrain_system->GetTerrainParameters() );
 
-		ddr::WaterRenderer* water_renderer = new ddr::WaterRenderer();
+		ddr::WaterRenderer* water_renderer = new ddr::WaterRenderer( *jobsystem );
 
 		s_renderer->Register( *mouse_picking );
 		s_renderer->Register( *light_renderer );
@@ -723,6 +723,7 @@ int GameMain()
 		s_debugUI->RegisterDebugPanel( *water_system );
 
 		CreateSingletons();
+
 		CreateMeshShader();
 		CreateUnitCube();
 		CreateUnitSphere();
@@ -824,9 +825,9 @@ int GameMain()
 			s_input->Update( app_delta_t );
 			s_debugUI->StartFrame( s_frameTimer->AppDelta() );
 
-			UpdateSingletons();
-
 			s_world->Update( game_delta_t );
+
+			UpdateSingletons();
 
 			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 

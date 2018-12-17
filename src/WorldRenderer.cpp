@@ -142,9 +142,7 @@ namespace ddr
 			return;
 		}
 
-		auto entity_span( entities );
-
-		RenderData data( world, camera, *m_uniforms, *m_commands, entity_span, renderer.GetRequirements() );
+		RenderData data( world, camera, *m_uniforms, *m_commands, entities, renderer.GetRequirements() );
 
 		fn( renderer, data );
 	}
@@ -191,6 +189,9 @@ namespace ddr
 					[]( Renderer& rend, const RenderData& data ) { rend.Render( data ); } );
 			}
 		}
+
+		m_commands->Sort( camera );
+		m_commands->Dispatch();
 
 		EndRender( *m_uniforms, camera );
 	}

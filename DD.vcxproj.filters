@@ -1131,6 +1131,9 @@
     <ClCompile Include="src\RenderCommand.cpp">
       <Filter>Rendering\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderCommandTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

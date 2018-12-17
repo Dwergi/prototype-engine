@@ -19,12 +19,22 @@ namespace ddr
 		m_commands.clear();
 	}
 
-	void CommandBuffer::Sort()
+	void CommandBuffer::Sort( const ICamera& camera )
 	{
+		for( RenderCommand* cmd : m_commands )
+		{
+			switch( cmd->Type )
+			{
+			case CommandType::Mesh:
+				static_cast<MeshRenderCommand*>(cmd)->InitializeKey( camera );
+				break;
+			}
+		}
+
 		std::sort( m_commands.begin(), m_commands.end(), 
 			[]( const RenderCommand* a, const RenderCommand* b )
 		{
-			return a->Key.Key < b->Key.Key;
+			return a->Key.Key > b->Key.Key;
 		} );
 	}
 

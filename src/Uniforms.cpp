@@ -249,6 +249,84 @@ namespace ddr
 		m_shader = &shader;
 	}
 
+	void UniformStorage::CopyValue( IUniform* dst, const IUniform* src )
+	{
+		DD_ASSERT( dst->Type == src->Type );
+
+		switch( src->Type )
+		{
+		case UniformType::Boolean:
+		{
+			Uniform<bool>* u = (Uniform<bool>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Integer:
+		{
+			Uniform<int>* u = (Uniform<int>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Float:
+		{
+			Uniform<float>* u = (Uniform<float>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Vector2:
+		{
+			Uniform<glm::vec2>* u = (Uniform<glm::vec2>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Vector3:
+		{
+			Uniform<glm::vec3>* u = (Uniform<glm::vec3>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Vector4:
+		{
+			Uniform<glm::vec4>* u = (Uniform<glm::vec4>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Matrix3:
+		{
+			Uniform<glm::mat3>* u = (Uniform<glm::mat3>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Matrix4:
+		{
+			Uniform<glm::mat4>* u = (Uniform<glm::mat4>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		case UniformType::Sampler2:
+		{
+			Uniform<int>* u = (Uniform<int>*) src;
+			SetValue( dst, u->Value );
+			break;
+		}
+		default:
+			DD_ASSERT( false, "Invalid uniform type!" );
+		}
+	}
+
+	void UniformStorage::GetValuesFrom( UniformStorage& other )
+	{
+		for( auto pair : m_uniforms )
+		{
+			IUniform* other_uniform = other.Find( pair.first );
+			if( other_uniform != nullptr )
+			{
+				IUniform* this_uniform = Access( pair.second );
+				CopyValue( this_uniform, other_uniform );
+			}
+		}
+	}
+
 	void UniformStorage::Unbind()
 	{
 		DD_ASSERT( m_shader != nullptr, "UniformStorage not bound!" );
@@ -256,7 +334,7 @@ namespace ddr
 		m_shader = nullptr;
 	}
 
-	IUniform* UniformStorage::Find( std::string name )
+	IUniform* UniformStorage::Find( std::string name ) 
 	{
 		auto it = m_uniforms.find( name );
 		if( it == m_uniforms.end() )

@@ -72,6 +72,12 @@ namespace ddr
 
 		void Clear();
 
+		//
+		// Get values from another uniform storage.
+		// Does not add any additional uniforms.
+		//
+		void GetValuesFrom( UniformStorage& other );
+
 	private:
 
 		static const int MAX_UNIFORMS = 256;
@@ -83,10 +89,12 @@ namespace ddr
 		byte m_storage[MAX_UNIFORMS * UNIFORM_SIZE] { 0 };
 
 		template <typename T>
-		void SetValue( IUniform* uniform, const T& value );
+		static void SetValue( IUniform* uniform, const T& value );
 
 		template <typename T>
 		void SetHelper( std::string name, const T& value );
+
+		static void CopyValue( IUniform* dst, const IUniform* src );
 
 		IUniform* Access( int index );
 	};

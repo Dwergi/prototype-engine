@@ -1,5 +1,3 @@
-#define MAX_LIGHTS 10
-
 uniform struct LightData 
 {
 	int Type; // 0 = directional, 1 = point, 2 = spot
@@ -13,7 +11,7 @@ uniform struct LightData
 	float SpecularStrength;
 	float Attenuation;
 } 
-Lights[ MAX_LIGHTS ];
+Lights[ 10 ];
 
 uniform int LightCount;
 

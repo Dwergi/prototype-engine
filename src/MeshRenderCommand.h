@@ -13,11 +13,13 @@ namespace ddr
 {
 	struct MeshRenderCommand : RenderCommand
 	{
-		glm::mat4 Transform;
 		MeshHandle Mesh;
+		glm::mat4 Transform;
+		glm::vec4 Colour;
 
 		MeshRenderCommand();
 
+		void InitializeKey( const ICamera& camera );
 		void Dispatch() const;
 	};
 }

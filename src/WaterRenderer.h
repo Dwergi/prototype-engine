@@ -13,11 +13,16 @@
 #include "VAO.h"
 #include "VBO.h"
 
+namespace dd
+{
+	struct JobSystem;
+}
+
 namespace ddr
 {
 	struct WaterRenderer : Renderer
 	{
-		WaterRenderer();
+		WaterRenderer( dd::JobSystem& jobsystem );
 
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void RenderUpdate( ddc::World& world ) override;
@@ -25,8 +30,7 @@ namespace ddr
 
 	private:
 
-		static ddr::MaterialHandle s_material;
-
+		dd::JobSystem& m_jobSystem;
 		RenderState m_renderState;
 	};
 }

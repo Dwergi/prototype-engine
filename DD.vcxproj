@@ -604,6 +604,12 @@
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
     <ClCompile Include="src\RenderCommand.cpp" />
+    <ClCompile Include="src\RenderCommandTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\RenderState.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />

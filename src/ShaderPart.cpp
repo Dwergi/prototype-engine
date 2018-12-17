@@ -11,6 +11,10 @@
 #include "OpenGL.h"
 #include "Uniforms.h"
 
+#include "fmt/format.h"
+
+#include <charconv>
+
 namespace ddr
 {
 	std::unordered_map<std::string, ShaderPart*> ShaderPart::sm_shaderCache;
@@ -123,7 +127,10 @@ namespace ddr
 	{
 		size_t block_start = str.find( '{', offset );
 		offset = str.find( '}', block_start );
-		return str.substr( block_start + 1, offset - block_start - 1 );
+		
+		std::string contents = str.substr( block_start + 1, offset - block_start - 1 );
+		++offset;
+		return contents;
 	}
 
 	std::string NextWord( const std::string& str, size_t& offset )
@@ -180,6 +187,65 @@ namespace ddr
 		return final_source;
 	}
 
+	void ParseStruct( const std::string& src, size_t head, UniformStorage& outUniforms )
+	{
+		std::string struct_contents = BlockContents( src, head );
+		
+		std::string struct_name = NextWord( src, head );
+
+		size_t index_start = src.find( '[', head );
+		size_t line_end = src.find( ';', head );
+
+		int array_count = -1;
+
+		if( index_start < line_end )
+		{
+			size_t index_end = index_start + 1;
+			std::string index = NextWord( src, index_end );
+
+			int parsed = -1;
+			std::from_chars( index.c_str(), index.c_str() + index.size(), parsed );
+
+			if( parsed > 0 )
+			{
+				array_count = parsed;
+			}
+		}
+
+		size_t struct_head = 0;
+		struct_head = SkipWhitespace( struct_contents, struct_head );
+		while( struct_head != std::string::npos )
+		{
+			std::string var_type = NextWord( struct_contents, struct_head );
+
+			UniformType type = GetUniformTypeFromName( var_type );
+			DD_ASSERT( type != UniformType::Invalid );
+
+			std::string var_name = NextWord( struct_contents, struct_head );
+
+			if( array_count == -1 )
+			{
+				std::string full_name = var_name;
+				if( !struct_name.empty() )
+				{
+					full_name = struct_name + "." + var_name;
+				}
+
+				outUniforms.Create( full_name.c_str(), type );
+			}
+			else
+			{
+				for( int i = 0; i < array_count; ++i )
+				{
+					std::string full_name = fmt::format( "{0}[{1}].{2}", struct_name, i, var_name );
+					outUniforms.Create( full_name.c_str(), type );
+				}
+			}
+
+			struct_head = NextLine( struct_contents, struct_head );
+		}
+	}
+
 	void ShaderPart::GatherUniforms( const std::string& src, UniformStorage& outUniforms )
 	{
 		const char* const UNIFORM = "uniform ";
@@ -191,43 +257,22 @@ namespace ddr
 			std::string type_name = NextWord( src, head );
 			if( type_name == "struct" )
 			{
-				std::string struct_contents = BlockContents( src, head );
-
-				std::string struct_name = NextWord( src, head );
-
-				size_t index_start = src.find( '[', head );
-				size_t line_end = src.find( ';', head );
-
-				if( index_start < line_end )
-				{
-					size_t index_end = index_start;
-					std::string index = NextWord( src, index_end );
-				}
-
-				size_t struct_head = 0;
-				struct_head = SkipWhitespace( struct_contents, struct_head );
-				while( struct_head != std::string::npos )
-				{
-					std::string struct_var_type = NextWord( struct_contents, struct_head );
-
-					UniformType type = GetUniformTypeFromName( struct_var_type );
-					DD_ASSERT( type != UniformType::Invalid );
-
-					std::string struct_var_name = NextWord( struct_contents, struct_head );
-
-					outUniforms.Create( struct_var_name.c_str(), type );
-
-					struct_head = NextLine( struct_contents, struct_head );
-				}
+				ParseStruct( src, head, outUniforms );
 			}
 			else
 			{
 				UniformType type = GetUniformTypeFromName( type_name );
-				DD_ASSERT( type != UniformType::Invalid );
+				if( type != UniformType::Invalid )
+				{
+					std::string var_name = NextWord( src, head );
 
-				std::string var_name = NextWord( src, head );
-
-				outUniforms.Create( var_name.c_str(), type );
+					outUniforms.Create( var_name.c_str(), type );
+				}
+				else
+				{
+					// uniform block
+					ParseStruct( src, head, outUniforms );
+				}
 			}
 
 			uniform_start = head;

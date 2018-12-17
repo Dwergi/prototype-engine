@@ -9,6 +9,7 @@
 
 #include "BoundBoxComponent.h"
 #include "ColourComponent.h"
+#include "JobSystem.h"
 #include "MeshComponent.h"
 #include "MeshRenderCommand.h"
 #include "MeshUtils.h"
@@ -17,16 +18,16 @@
 
 namespace ddr
 {
-	ddr::MaterialHandle WaterRenderer::s_material;
 
-	WaterRenderer::WaterRenderer() :
-		Renderer( "Lines" )
+	WaterRenderer::WaterRenderer( dd::JobSystem& jobSystem ) :
+		Renderer( "Lines" ),
+		m_jobSystem( jobSystem )
 	{
+		RequireTag( ddc::Tag::Visible );
 		Require<dd::WaterComponent>();
 		Require<dd::TransformComponent>();
 		Require<dd::BoundBoxComponent>();
 		Require<dd::ColourComponent>();
-		RequireTag( ddc::Tag::Visible );
 
 		m_renderState.BackfaceCulling = true;
 		m_renderState.Blending = true;
@@ -36,10 +37,6 @@ namespace ddr
 
 	void WaterRenderer::RenderInit( ddc::World& world )
 	{
-		s_material = ddr::MaterialManager::Instance()->Create( "water" );
-
-		ddr::Material* material = s_material.Access();
-		material->Shader = ddr::ShaderManager::Instance()->Load( "water" );
 	}
 
 	void WaterRenderer::RenderUpdate( ddc::World& world )
@@ -57,16 +54,6 @@ namespace ddr
 		} );
 	}
 
-	struct MeshEntry
-	{
-		float Distance2 { std::numeric_limits<float>::max() };
-		ddr::MeshHandle Mesh;
-		glm::mat4 Transform;
-		glm::vec4 Colour;
-	};
-
-	static std::vector<MeshEntry> s_meshes;
-
 	void WaterRenderer::Render( const RenderData& render_data )
 	{
 		auto waters = render_data.Get<dd::WaterComponent>();
@@ -75,43 +62,26 @@ namespace ddr
 
 		const ICamera& camera = render_data.Camera();
 
-		s_meshes.clear();
-		s_meshes.reserve( render_data.Size() );
+		UniformStorage& uniforms = render_data.Uniforms();
 
 		for( size_t i = 0; i < render_data.Size(); ++i )
 		{
 			if( !waters[i].Mesh.IsValid() )
 				continue;
 
+			ddr::Mesh* mesh = waters[i].Mesh.Access();
+			mesh->Update( m_jobSystem );
+
 			ddm::AABB transformed = bound_boxes[i].BoundBox.GetTransformed( transforms[i].Transform() );
 
 			glm::vec3 closest = glm::clamp( camera.GetPosition(), transformed.Min, transformed.Max );
-			MeshEntry entry;
-			entry.Mesh = waters[ i ].Mesh;
-			entry.Distance2 = glm::distance2( camera.GetPosition(), closest );
-			entry.Transform = transforms[i].Transform();
-
-			s_meshes.push_back( entry );
-		}
-
-		std::sort( s_meshes.begin(), s_meshes.end(), 
-			[]( const auto& a, const auto& b )
-		{
-			return a.Distance2 > b.Distance2;
-		} );
-
-		UniformStorage& uniforms = render_data.Uniforms();
-
-		for( auto entry : s_meshes )
-		{
-			uniforms.Set( "ObjectColour", entry.Colour );
-			uniforms.Set( "Model", entry.Transform );
 
 			MeshRenderCommand* cmd;
 			render_data.Commands().Allocate( cmd );
 
-			cmd->Mesh = entry.Mesh;
-			cmd->Transform = entry.Transform;
+			cmd->Mesh = waters[i].Mesh;
+			cmd->Transform = transforms[i].Transform();
+			cmd->Colour = glm::vec4( 0, 0, 1, 0.5 );
 		}
 	}
 }

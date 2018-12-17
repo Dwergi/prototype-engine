@@ -8,6 +8,7 @@
 
 namespace ddr
 {
+	struct ICamera;
 	struct RenderCommand;
 
 	struct CommandBuffer
@@ -17,7 +18,7 @@ namespace ddr
 		template <typename T>
 		void Allocate( T*& out_ptr );
 
-		void Sort();
+		void Sort( const ICamera& camera );
 		void Dispatch();
 
 		std::vector<RenderCommand*>::const_iterator begin() const { return m_commands.begin(); }
