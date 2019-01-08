@@ -14,8 +14,6 @@
 #include "Shader.h"
 #include "TerrainParameters.h"
 
-#include <atomic>
-
 namespace ddr
 {
 	struct ICamera;

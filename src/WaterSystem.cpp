@@ -91,6 +91,10 @@ namespace dd
 
 		ddr::Material* material = s_material.Access();
 		material->Shader = ddr::ShaderManager::Instance()->Load( "water" );
+		material->State.BackfaceCulling = true;
+		material->State.Blending = true;
+		material->State.Depth = true;
+		material->State.DepthWrite = false;
 	}
 
 	static std::unordered_map<glm::vec2, ddc::Entity> s_waterCache;

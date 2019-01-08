@@ -8,7 +8,6 @@
 
 #include "Entity.h"
 
-#include <bitset>
 
 namespace ddc
 {

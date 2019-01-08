@@ -52,20 +52,46 @@ namespace ddr
 		} );
 	}
 
+	static void SwitchMaterial( MaterialHandle handle, UniformStorage& uniforms )
+	{
+
+	}
+
 	void CommandBuffer::Dispatch( UniformStorage& uniforms )
 	{
+		MaterialHandle current_material;
+
 		for( int i = 0; i < m_offsets.size(); ++i )
 		{
 			RenderCommand* cmd = Access( i );
-			ScopedRenderState render_state = cmd->RenderState.UseScoped();
+
+			if( cmd->Material != current_material )
+			{
+				if( current_material.IsValid() )
+				{
+					Material* old_material = current_material.Access();
+					old_material->Unbind( uniforms );
+				}
+
+				Material* new_material = cmd->Material.Access();
+				new_material->Bind( uniforms );
+
+				current_material = cmd->Material;
+			}
 
 			switch( cmd->Type )
 			{
 			case CommandType::Mesh:
-				DD_TODO( "Add material batching here to avoid rebinding uniforms." );
+				
 				static_cast<MeshRenderCommand*>( cmd )->Dispatch( uniforms );
 				break;
 			}
+		}
+
+		if( current_material.IsValid() )
+		{
+			Material* old_material = current_material.Access();
+			old_material->Unbind( uniforms );
 		}
 	}
 }

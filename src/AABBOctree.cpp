@@ -8,8 +8,6 @@
 #include "PCH.h"
 #include "AABBOctree.h"
 
-#include <algorithm> // sort
-
 namespace dd
 {
 	const int MAX_DEPTH = 5;

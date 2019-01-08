@@ -9,7 +9,6 @@
 
 #include "AABB.h"
 
-#include <algorithm>
 
 namespace dd
 {

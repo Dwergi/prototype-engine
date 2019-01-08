@@ -21,31 +21,22 @@ namespace ddr
 	void MeshRenderCommand::InitializeKey( const ICamera& camera )
 	{
 		const ddr::Mesh* mesh = Mesh.Get();
-		const ddr::Material* material = mesh->GetMaterial().Get();
+		const ddr::Material* material = Material.Get();
 
 		Key.Opaque = material->State.Blending;
 
 		float depth = glm::distance( Transform[3].xyz(), camera.GetPosition() );
 		Key.Depth = ddr::DistanceToDepth( depth, Key.Opaque );
-		Key.Material = mesh->GetMaterial().GetID() & 0x00FFFFFF;
+		Key.Material = Material.GetID() & 0xFF;
 	}
 
 	void MeshRenderCommand::Dispatch( UniformStorage& uniforms ) const
 	{
 		ddr::Mesh* mesh = Mesh.Access();
 
-		const ddr::Material* material = mesh->GetMaterial().Get();
-		material->UpdateUniforms( uniforms );
-
 		uniforms.Set( "Model", Transform );
 		uniforms.Set( "ObjectColour", Colour );
 
-		Shader* shader = material->Shader.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
-		uniforms.Bind( *shader );
-
 		mesh->Render();
-
-		uniforms.Unbind();
 	}
 }

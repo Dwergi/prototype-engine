@@ -9,8 +9,6 @@
 #include "HandleManager.h"
 #include "OpenGL.h"
 
-#include <unordered_map>
-
 namespace ddr
 {
 	struct ShaderPart;

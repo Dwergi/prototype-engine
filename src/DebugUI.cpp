@@ -23,7 +23,6 @@
 #include "GLFWInputSource.h"
 #include "Window.h"
 
-#include <algorithm>
 
 // Data
 static GLFWwindow*  g_Window = NULL;

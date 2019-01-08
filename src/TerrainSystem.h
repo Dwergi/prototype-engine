@@ -10,8 +10,6 @@
 #include "System.h"
 #include "TerrainParameters.h"
 
-#include <unordered_map>
-
 namespace ddr
 {
 	struct Shader;

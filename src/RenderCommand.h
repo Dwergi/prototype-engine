@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "RenderState.h"
+#include "Material.h"
 
 namespace ddr
 {
@@ -19,6 +19,7 @@ namespace ddr
 	};
 
 	constexpr int DEPTH_BITS = 24;
+	constexpr int MATERIAL_BITS = 8;
 
 	struct CommandKey
 	{
@@ -29,7 +30,7 @@ namespace ddr
 				uint Layer : 2;
 				uint Opaque : 1;
 				uint Depth : DEPTH_BITS;
-				uint Material : 24;
+				uint Material : MATERIAL_BITS;
 			};
 			uint64 Key { 0 };
 		};
@@ -39,7 +40,7 @@ namespace ddr
 	{
 		CommandKey Key;
 		CommandType Type;
-		RenderState RenderState;
+		MaterialHandle Material;
 
 		RenderCommand( CommandType type );
 	};

@@ -16,8 +16,6 @@
 #include "Uniforms.h"
 #include "VAO.h"
 
-#include <cmath>
-
 namespace ddr
 {
 	enum Corners

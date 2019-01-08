@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <unordered_map>
-
 namespace dd
 {
 	typedef uint8 ComponentID;

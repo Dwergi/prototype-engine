@@ -16,7 +16,7 @@ namespace ddr
 
 		constexpr uint MASK = 0x00FFFFFF;
 
-		static_assert(INT_BITS + FRACT_BITS == 24);
+		static_assert(INT_BITS + FRACT_BITS == DEPTH_BITS);
 
 		int int_part = glm::clamp( (int) distance, 0, 2 << INT_BITS );
 		float flt_part = distance - (int) distance;

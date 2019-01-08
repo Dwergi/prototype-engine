@@ -1,15 +1,10 @@
 #pragma once
 
-
 #include "Entity.h"
 #include "FunctionView.h"
 #include "IDebugPanel.h"
 #include "MessageQueue.h"
 #include "SystemsSorting.h"
-
-#include <bitset>
-#include <unordered_map>
-#include <future>
 
 namespace dd
 {

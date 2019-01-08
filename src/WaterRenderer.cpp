@@ -28,11 +28,6 @@ namespace ddr
 		Require<dd::TransformComponent>();
 		Require<dd::BoundBoxComponent>();
 		Require<dd::ColourComponent>();
-
-		m_renderState.BackfaceCulling = true;
-		m_renderState.Blending = true;
-		m_renderState.Depth = true;
-		m_renderState.DepthWrite = false;
 	}
 
 	void WaterRenderer::RenderInit( ddc::World& world )
@@ -79,7 +74,7 @@ namespace ddr
 			MeshRenderCommand* cmd;
 			render_data.Commands().Allocate( cmd );
 
-			cmd->RenderState = m_renderState;
+			cmd->Material = mesh->GetMaterial();
 			cmd->Mesh = waters[i].Mesh;
 			cmd->Transform = transforms[i].Transform();
 			cmd->Colour = glm::vec4( 0, 0, 1, 0.5 );

@@ -10,9 +10,6 @@
 #include "RenderState.h"
 #include "Shader.h"
 
-#include <mutex>
-#include <unordered_map>
-
 namespace ddr
 {
 	struct UniformStorage;
@@ -22,7 +19,8 @@ namespace ddr
 		//
 		// Set the current values of the material's properties to the uniform storage.
 		//
-		void UpdateUniforms( UniformStorage& uniforms ) const;
+		void Bind( UniformStorage& uniforms );
+		void Unbind( UniformStorage& uniforms );
 
 		//
 		// Material properties - Phong shading model.
@@ -42,6 +40,9 @@ namespace ddr
 		Material& operator=( Material&& ) = delete;
 		Material( const Material& ) = delete;
 		Material( Material&& ) = delete;
+
+	private:
+		bool m_inUse { false };
 	};
 
 	using MaterialHandle = dd::Handle<ddr::Material>;

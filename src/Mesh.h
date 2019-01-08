@@ -12,11 +12,6 @@
 #include "VAO.h"
 #include "VBO.h"
 
-#include <atomic>
-#include <bitset>
-#include <memory>
-#include <unordered_map>
-
 namespace dd
 {
 	struct BVHTree;

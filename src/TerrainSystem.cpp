@@ -22,8 +22,6 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 
-#include <algorithm>
-
 #include "glm/gtc/type_ptr.hpp"
 
 #include "fmt/format.h"

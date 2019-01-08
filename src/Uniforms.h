@@ -65,6 +65,8 @@ namespace ddr
 		void Set( std::string name, const glm::mat4& value );
 		void Set( std::string name, const ddr::Texture& value );
 
+		bool IsBound() const { return m_shader != nullptr; }
+
 		void Bind( Shader& shader );
 		void Unbind();
 

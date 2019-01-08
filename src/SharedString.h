@@ -7,9 +7,6 @@
 
 #pragma once
 
-#include <memory>
-#include <mutex>
-
 #include "Iteration.h"
 
 namespace dd

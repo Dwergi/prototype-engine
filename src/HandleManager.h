@@ -131,6 +131,9 @@ namespace dd
 		Handle() {}
 		Handle( const Handle<T>& other ) : m_handle( other.m_handle ) {}
 
+		bool operator==( const Handle<T>& other ) const { return m_handle == other.m_handle; }
+		bool operator!=( const Handle<T>& other ) const { return m_handle != other.m_handle; }
+
 		uint GetID() const { return m_handle; }
 		bool IsValid() const { return m_handle != ~0u; }
 

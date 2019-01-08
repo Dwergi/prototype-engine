@@ -10,7 +10,6 @@
 #include "JobSystem.h"
 #include "Material.h"
 #include "Noise.h"
-#include "Shader.h"
 #include "System.h"
 
 namespace dd
@@ -28,6 +27,7 @@ namespace dd
 	private:
 
 		static ddr::MaterialHandle s_material;
+		static ddr::RenderState s_renderState;
 
 		dd::JobSystem& m_jobSystem;
 

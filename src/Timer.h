@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <ctime>
-
 namespace dd
 {
 	class Timer

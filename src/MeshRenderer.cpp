@@ -35,10 +35,6 @@ namespace ddr
 		Optional<dd::ColourComponent>();
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
-
-		m_renderState.BackfaceCulling = true;
-		m_renderState.Blending = false;
-		m_renderState.Depth = true;
 	}
 
 	void MeshRenderer::RenderInit( ddc::World& world )
@@ -55,6 +51,10 @@ namespace ddr
 			MaterialHandle material_h = MaterialManager::Instance()->Create( "mesh" );
 			Material* material = material_h.Access();
 			material->Shader = shader_h;
+
+			material->State.BackfaceCulling = true;
+			material->State.Blending = false;
+			material->State.Depth = true;
 
 			mesh->SetMaterial( material_h );
 
@@ -152,11 +152,13 @@ namespace ddr
 		{
 			colour = colour_cmp->Colour;
 		}
+
+		const Mesh* mesh = mesh_cmp.Mesh.Get();
 		
 		MeshRenderCommand* cmd;
 		render_data.Commands().Allocate( cmd );
 
-		cmd->RenderState = m_renderState;
+		cmd->Material = mesh->GetMaterial();
 		cmd->Mesh = mesh_cmp.Mesh;
 		cmd->Colour = colour * debug_multiplier;
 		cmd->Transform = transform_cmp.Transform();
@@ -170,16 +172,19 @@ namespace ddr
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
 
-		bool culling = m_renderState.BackfaceCulling;
+		MaterialHandle material_h = MaterialManager::Instance()->Find( "mesh" );
+		Material* material = material_h.Access();
+
+		bool culling = material->State.BackfaceCulling;
 		if( ImGui::Checkbox( "Backface Culling", &culling ) )
 		{
-			m_renderState.BackfaceCulling = culling;
+			material->State.BackfaceCulling = culling;
 		}
 
-		bool depth = m_renderState.Depth;
+		bool depth = material->State.Depth;
 		if( ImGui::Checkbox( "Depth Test", &depth ) )
 		{
-			m_renderState.Depth = depth;
+			material->State.Depth = depth;
 		}
 
 		ImGui::Checkbox( "Draw Normals", &m_drawNormals );

@@ -24,7 +24,6 @@ namespace ddr
 		m_state->Use( false );
 	}
 
-
 	ScopedRenderState RenderState::UseScoped()
 	{
 		return ScopedRenderState( *this );

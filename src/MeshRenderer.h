@@ -10,7 +10,6 @@
 #include "IDebugPanel.h"
 #include "Mesh.h"
 #include "Renderer.h"
-#include "RenderState.h"
 
 namespace dd
 {
@@ -41,8 +40,6 @@ namespace ddr
 		bool m_frustumCull { true };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_drawNormals { false };
-
-		RenderState m_renderState;
 
 		MeshHandle m_cube;
 		

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <future>
-
 namespace ddc
 {
 	struct System;
