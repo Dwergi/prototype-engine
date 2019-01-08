@@ -56,6 +56,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include <algorithm>
+#include <functional>
+
 namespace dd
 {
 	const double M_PI = 3.14159265358979323846;

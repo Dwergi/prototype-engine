@@ -152,6 +152,8 @@ namespace ddr
 	{
 		m_time += delta_t;
 
+		m_commands->Clear();
+
 		for( ddr::Renderer* r : m_renderers )
 		{
 			r->RenderUpdate( world );
@@ -192,7 +194,7 @@ namespace ddr
 		}
 
 		m_commands->Sort( camera );
-		m_commands->Dispatch();
+		m_commands->Dispatch( *m_uniforms );
 
 		EndRender( *m_uniforms, camera );
 	}

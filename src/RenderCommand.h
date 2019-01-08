@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "RenderState.h"
+
 namespace ddr
 {
 	uint DistanceToDepth( float distance, bool transparent );
@@ -37,6 +39,7 @@ namespace ddr
 	{
 		CommandKey Key;
 		CommandType Type;
+		RenderState RenderState;
 
 		RenderCommand( CommandType type );
 	};

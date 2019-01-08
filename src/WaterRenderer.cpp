@@ -79,6 +79,7 @@ namespace ddr
 			MeshRenderCommand* cmd;
 			render_data.Commands().Allocate( cmd );
 
+			cmd->RenderState = m_renderState;
 			cmd->Mesh = waters[i].Mesh;
 			cmd->Transform = transforms[i].Transform();
 			cmd->Colour = glm::vec4( 0, 0, 1, 0.5 );

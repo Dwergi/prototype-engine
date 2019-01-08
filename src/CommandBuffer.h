@@ -10,24 +10,29 @@ namespace ddr
 {
 	struct ICamera;
 	struct RenderCommand;
+	struct UniformStorage;
 
 	struct CommandBuffer
 	{
+		CommandBuffer() {}
+		CommandBuffer( const CommandBuffer& other ) = delete;
+
 		void Clear();
 
 		template <typename T>
 		void Allocate( T*& out_ptr );
 
 		void Sort( const ICamera& camera );
-		void Dispatch();
-
-		std::vector<RenderCommand*>::const_iterator begin() const { return m_commands.begin(); }
-		std::vector<RenderCommand*>::const_iterator end() const { return m_commands.end(); }
+		void Dispatch( UniformStorage& uniforms );
 
 	private:
 
+		friend struct Iterator;
+
 		std::vector<byte> m_storage;
-		std::vector<RenderCommand*> m_commands;
+		std::vector<size_t> m_offsets;
+
+		RenderCommand* Access( int index );
 	};
 
 	template <typename T>
@@ -39,6 +44,6 @@ namespace ddr
 		m_storage.resize( offset + sizeof( T ) );
 
 		out_ptr = new (&m_storage[ offset ]) T();
-		m_commands.push_back( out_ptr );
+		m_offsets.push_back( offset );
 	}
 }

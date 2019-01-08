@@ -42,7 +42,7 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_drawNormals { false };
 
-		RenderState m_state;
+		RenderState m_renderState;
 
 		MeshHandle m_cube;
 		

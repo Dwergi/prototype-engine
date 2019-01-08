@@ -9,7 +9,6 @@
 
 #include "IInputSource.h"
 
-#include <functional>
 
 namespace dd
 {

@@ -38,12 +38,11 @@ namespace dd
 		bool operator!=( const Iterator &rhs ) const;
 
 	private:
-		T* m_data;
+		T* m_data { nullptr };
 	};
 
 	template <typename T>
 	Iterator<T>::Iterator()
-		: m_data( NULL )
 	{
 	}
 

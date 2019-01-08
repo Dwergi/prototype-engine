@@ -36,9 +36,9 @@ namespace ddr
 		Optional<dd::BoundBoxComponent>();
 		Optional<dd::BoundSphereComponent>();
 
-		m_state.BackfaceCulling = true;
-		m_state.Blending = false;
-		m_state.Depth = true;
+		m_renderState.BackfaceCulling = true;
+		m_renderState.Blending = false;
+		m_renderState.Depth = true;
 	}
 
 	void MeshRenderer::RenderInit( ddc::World& world )
@@ -82,8 +82,6 @@ namespace ddr
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
 		
-		ScopedRenderState state = m_state.UseScoped();
-
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		uniforms.Set( "DrawNormals", m_drawNormals );
 
@@ -105,6 +103,9 @@ namespace ddr
 		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp, 
 		const ddr::RenderData& render_data )
 	{
+		if( !mesh_cmp.Mesh.IsValid() )
+			return;
+
 		const ddr::ICamera& camera = render_data.Camera();
 		const ddc::World& world = render_data.World();
 		ddr::UniformStorage& uniforms = render_data.Uniforms();
@@ -128,21 +129,21 @@ namespace ddr
 
 		++m_unculledMeshCount;
 
-		glm::vec4 debugMultiplier( 1, 1, 1, 1 );
+		glm::vec4 debug_multiplier( 1, 1, 1, 1 );
 
 		if( world.HasTag( entity, ddc::Tag::Focused ) )
 		{
-			debugMultiplier.z = 1.5f;
+			debug_multiplier.z = 1.5f;
 		}
 
 		if( world.HasTag( entity, ddc::Tag::Selected ) )
 		{
-			debugMultiplier.y = 1.5f;
+			debug_multiplier.y = 1.5f;
 		}
 
 		if( m_debugHighlightFrustumMeshes )
 		{
-			debugMultiplier.x = 1.5f;
+			debug_multiplier.x = 1.5f;
 		}
 
 		glm::vec4 colour( 1 );
@@ -151,13 +152,13 @@ namespace ddr
 		{
 			colour = colour_cmp->Colour;
 		}
-
-		uniforms.Set( "ObjectColour", colour * debugMultiplier );
-		uniforms.Set( "Model", transform_cmp.Transform() );
 		
 		MeshRenderCommand* cmd;
 		render_data.Commands().Allocate( cmd );
+
+		cmd->RenderState = m_renderState;
 		cmd->Mesh = mesh_cmp.Mesh;
+		cmd->Colour = colour * debug_multiplier;
 		cmd->Transform = transform_cmp.Transform();
 	}
 
@@ -169,16 +170,16 @@ namespace ddr
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
 
-		bool culling = m_state.BackfaceCulling;
+		bool culling = m_renderState.BackfaceCulling;
 		if( ImGui::Checkbox( "Backface Culling", &culling ) )
 		{
-			m_state.BackfaceCulling = culling;
+			m_renderState.BackfaceCulling = culling;
 		}
 
-		bool depth = m_state.Depth;
+		bool depth = m_renderState.Depth;
 		if( ImGui::Checkbox( "Depth Test", &depth ) )
 		{
-			m_state.Depth = depth;
+			m_renderState.Depth = depth;
 		}
 
 		ImGui::Checkbox( "Draw Normals", &m_drawNormals );

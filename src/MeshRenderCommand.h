@@ -11,6 +11,8 @@
 
 namespace ddr
 {
+	struct UniformStorage;
+
 	struct MeshRenderCommand : RenderCommand
 	{
 		MeshHandle Mesh;
@@ -20,6 +22,6 @@ namespace ddr
 		MeshRenderCommand();
 
 		void InitializeKey( const ICamera& camera );
-		void Dispatch() const;
+		void Dispatch( UniformStorage& uniforms ) const;
 	};
 }

@@ -28,13 +28,24 @@ namespace ddr
 		float depth = glm::distance( Transform[3].xyz(), camera.GetPosition() );
 		Key.Depth = ddr::DistanceToDepth( depth, Key.Opaque );
 		Key.Material = mesh->GetMaterial().GetID() & 0x00FFFFFF;
-
 	}
 
-	void MeshRenderCommand::Dispatch() const
+	void MeshRenderCommand::Dispatch( UniformStorage& uniforms ) const
 	{
 		ddr::Mesh* mesh = Mesh.Access();
 
+		const ddr::Material* material = mesh->GetMaterial().Get();
+		material->UpdateUniforms( uniforms );
+
+		uniforms.Set( "Model", Transform );
+		uniforms.Set( "ObjectColour", Colour );
+
+		Shader* shader = material->Shader.Access();
+		ScopedShader scoped_shader = shader->UseScoped();
+		uniforms.Bind( *shader );
+
 		mesh->Render();
+
+		uniforms.Unbind();
 	}
 }

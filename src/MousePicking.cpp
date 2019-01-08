@@ -226,8 +226,12 @@ namespace dd
 			uniforms.Set( "ID", (int) entities[i].ID );
 			uniforms.Set( "Model", transforms[i].Transform() );
 
+			if( !meshes[i].Mesh.IsValid() )
+				continue;
+
 			ddr::MeshRenderCommand* cmd;
 			data.Commands().Allocate( cmd );
+
 			cmd->Mesh = meshes[ i ].Mesh;
 			cmd->Transform = transforms[ i ].Transform();
 		}

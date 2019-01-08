@@ -177,7 +177,7 @@ namespace ddr
 	void UniformStorage::Bind( Shader& shader )
 	{
 		DD_ASSERT( m_shader == nullptr, "UniformStorage already bound!" );
-		DD_ASSERT( m_shader->InUse(), "Shader not in use!" );
+		DD_ASSERT( shader.InUse(), "Shader not in use!" );
 
 		for( auto pair : m_uniforms )
 		{
@@ -247,6 +247,13 @@ namespace ddr
 		}
 
 		m_shader = &shader;
+	}
+
+	void UniformStorage::Unbind()
+	{
+		DD_ASSERT( m_shader != nullptr, "UniformStorage not bound!" );
+
+		m_shader = nullptr;
 	}
 
 	void UniformStorage::CopyValue( IUniform* dst, const IUniform* src )
@@ -325,13 +332,6 @@ namespace ddr
 				CopyValue( this_uniform, other_uniform );
 			}
 		}
-	}
-
-	void UniformStorage::Unbind()
-	{
-		DD_ASSERT( m_shader != nullptr, "UniformStorage not bound!" );
-
-		m_shader = nullptr;
 	}
 
 	IUniform* UniformStorage::Find( std::string name ) 

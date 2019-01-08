@@ -9,7 +9,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <future>
-#include <functional>
 #include <stdexcept>
 
 namespace dd

@@ -108,17 +108,15 @@ namespace dd
 
 	static void PopulateWaterCache( const ddc::DataBuffer& water_entities )
 	{
+		s_waterCache.clear();
+
 		auto water_cmps = water_entities.Write<WaterComponent>();
 		auto entities = water_entities.Entities();
 
 		for( size_t i = 0; i < water_entities.Size(); ++i )
 		{
 			glm::vec2 pos = water_cmps[ i ].TerrainChunkPosition;
-			ddc::Entity entity = FindWater( pos );
-			if( !entity.IsValid() )
-			{
-				s_waterCache.insert( std::make_pair( pos, entities[ i ] ) );
-			}
+			s_waterCache.insert( std::make_pair( pos, entities[ i ] ) );
 		}
 	}
 
