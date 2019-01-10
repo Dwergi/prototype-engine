@@ -12,6 +12,8 @@
 #include "GLError.h"
 #include "OpenGL.h"
 
+DD_HANDLE_MANAGER( ddr::Texture );
+
 namespace ddr
 {
 	Texture::Texture()
@@ -24,7 +26,14 @@ namespace ddr
 		Destroy();
 	}
 
-	void Texture::Create( glm::ivec2 size, GLenum format, int mips )
+	void Texture::Initialize( glm::ivec2 size, GLenum format, int mips )
+	{
+		m_format = format;
+		m_size = size;
+		m_mips = mips;
+	}
+
+	void Texture::Create()
 	{
 		glGenTextures( 1, &m_id );
 		CheckOGLError();
@@ -32,11 +41,7 @@ namespace ddr
 		glBindTexture( GL_TEXTURE_2D, m_id );
 		CheckOGLError();
 
-		m_format = format;
-		m_size = size;
-		m_mips = mips;
-
-		glTexStorage2D( GL_TEXTURE_2D, mips, m_format, m_size.x, m_size.y );
+		glTexStorage2D( GL_TEXTURE_2D, m_mips, m_format, m_size.x, m_size.y );
 		CheckOGLError();
 
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -53,7 +58,7 @@ namespace ddr
 	void Texture::SetData( const dd::ConstBuffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
-		DD_ASSERT( data.GetVoid() != nullptr );
+		DD_ASSERT( data.IsValid() );
 
 		int expectedSize = m_size.x * m_size.y * 4 / (1 << mip);
 		DD_ASSERT( data.SizeBytes() == expectedSize );
@@ -66,7 +71,7 @@ namespace ddr
 	void Texture::GetData( dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType )
 	{
 		DD_ASSERT( IsValid() );
-		DD_ASSERT( data.GetVoid() != nullptr );
+		DD_ASSERT( data.IsValid() );
 
 		int expectedSize = m_size.x * m_size.y * 4 / (1 << mip);
 		DD_ASSERT( data.SizeBytes() == expectedSize );
@@ -78,11 +83,11 @@ namespace ddr
 
 	void Texture::Destroy()
 	{
-		if( m_id != OpenGL::InvalidID )
-		{
-			glDeleteTextures( 1, &m_id );
-			CheckOGLError();
-		}
+		if( !m_valid )
+			return;
+
+		glDeleteTextures( 1, &m_id );
+		CheckOGLError();
 
 		m_id = OpenGL::InvalidID;
 		m_valid = false;
@@ -104,5 +109,15 @@ namespace ddr
 		glBindTexture( GL_TEXTURE_2D, 0 );
 
 		m_textureUnit = -1;
+	}
+
+	void TextureManager::OnCreate( Texture& tex ) const
+	{
+		tex.Create();
+	}
+
+	void TextureManager::OnDestroy( Texture& tex ) const
+	{
+		tex.Destroy();
 	}
 }

@@ -62,6 +62,7 @@
 #include "Recorder.h"
 #include "ScopedTimer.h"
 #include "ScriptComponent.h"
+#include "Services.h"
 #include "ShakyCamera.h"
 #include "ShipComponent.h"
 #include "ShipSystem.h"
@@ -96,22 +97,31 @@ using namespace dd;
 extern uint s_maxFPS;
 uint s_maxFPS = 60;
 
-DebugUI* s_debugUI = nullptr;
-Window* s_window = nullptr;
-InputSystem* s_input = nullptr;
-ShakyCamera* s_shakyCamera = nullptr;
-dd::FPSCameraComponent* s_fpsCamera = nullptr;
-FreeCameraController* s_freeCamera = nullptr;
-ddc::World* s_world = nullptr;
-AngelScriptEngine* s_scriptEngine = nullptr;
-FrameTimer* s_frameTimer = nullptr;
-ShipSystem* s_shipSystem = nullptr;
-InputBindings* s_inputBindings = nullptr;
-DebugConsole* s_debugConsole = nullptr;
+SERVICE_CPP( dd::Window );
+SERVICE_CPP( dd::InputSystem );
+SERVICE_CPP( dd::InputBindings );
+SERVICE_CPP( dd::FreeCameraController );
+SERVICE_CPP( ddc::World );
+SERVICE_CPP( dd::AngelScriptEngine );
+SERVICE_CPP( dd::FrameTimer );
+SERVICE_CPP( dd::ShipSystem );
+SERVICE_CPP( dd::DebugConsole );
+SERVICE_CPP( ddr::WorldRenderer );
+SERVICE_CPP( dd::DebugUI );
+SERVICE_CPP( dd::ShakyCamera );
+SERVICE_CPP( dd::FPSCameraComponent );
 
-ddr::WorldRenderer* s_renderer = nullptr;
-
-Assert s_assert;
+dd::Service<dd::Window> s_window;
+dd::Service<dd::InputSystem> s_input;
+dd::Service<dd::InputBindings> s_inputBindings;
+dd::Service<dd::DebugUI> s_debugUI;
+dd::Service<dd::FPSCameraComponent> s_player;
+dd::Service<ddc::World> s_world;
+dd::Service<dd::FreeCameraController> s_freeCamera;
+dd::Service<ddr::WorldRenderer> s_renderer;
+dd::Service<dd::FrameTimer> s_frameTimer;
+dd::Service<dd::ShipSystem> s_shipSystem;
+dd::Service<dd::ShakyCamera> s_shakyCamera;
 
 std::thread::id s_mainThread;
 
@@ -170,34 +180,34 @@ void SetCameraPos( InputAction action, InputType type )
 	if( type != InputType::RELEASED )
 		return;
 
-	s_fpsCamera->SetRotation( 0, 0 );
+	s_player->SetRotation( 0, 0 );
 
 	const glm::vec3 cube_pos( 10.5, 60.5, 10 );
 
 	switch( action )
 	{
 	case InputAction::CAMERA_POS_1:
-		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 0.5 ) );
+		s_player->SetPosition( cube_pos - glm::vec3( 0, 0, 0.5 ) );
 		break;
 
 	case InputAction::CAMERA_POS_2:
-		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 1 ) );
+		s_player->SetPosition( cube_pos - glm::vec3( 0, 0, 1 ) );
 		break;
 
 	case InputAction::CAMERA_POS_3:
-		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 2 ) );
+		s_player->SetPosition( cube_pos - glm::vec3( 0, 0, 2 ) );
 		break;
 
 	case InputAction::CAMERA_POS_4:
-		s_fpsCamera->SetPosition( cube_pos - glm::vec3( 0, 0, 3 ) );
+		s_player->SetPosition( cube_pos - glm::vec3( 0, 0, 3 ) );
 		break;
 
 	case InputAction::DECREASE_DEPTH:
-		s_fpsCamera->SetPosition( s_fpsCamera->GetPosition() + glm::vec3( 0, 0, 1 ) );
+		s_player->SetPosition( s_player->GetPosition() + glm::vec3( 0, 0, 1 ) );
 		break;
 
 	case InputAction::INCREASE_DEPTH:
-		s_fpsCamera->SetPosition( s_fpsCamera->GetPosition() - glm::vec3( 0, 0, 1 ) );
+		s_player->SetPosition( s_player->GetPosition() - glm::vec3( 0, 0, 1 ) );
 		break;
 	}
 }
@@ -215,78 +225,6 @@ void SetTimeScale( InputAction action, InputType type )
 		float time_scale = s_frameTimer->GetTimeScale();
 		s_frameTimer->SetTimeScale( time_scale * 1.1f );
 	}
-}
-
-void CheckAssert()
-{
-	if( s_assert.Open )
-	{
-		static dd::String256 s_message;
-		s_message = s_assert.Info;
-		s_message += s_assert.Message;
-
-		printf( s_message.c_str() );
-		OutputDebugStringA( s_message.c_str() );
-
-		s_input->Source().CaptureMouse( false );
-
-		if( s_debugUI->IsMidWindow() )
-		{
-			ImGui::End();
-		}
-
-		if( s_debugUI->IsMidFrame() )
-		{
-			s_debugUI->EndFrame();
-			s_window->Swap();
-		}
-
-		do
-		{
-			s_frameTimer->Update();
-
-			float delta_t = s_frameTimer->AppDelta();
-
-			s_input->Update( delta_t );
-
-			s_debugUI->StartFrame( delta_t );
-
-			DrawAssertDialog( s_window->GetSize(), s_assert );
-
-			s_debugUI->EndFrame();
-			s_window->Swap();
-		} 
-		while( s_assert.Open );
-	}
-}
-
-pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
-	int level, const char* message )
-{
-	s_assert.Open = true;
-	s_assert.Info = FormatAssert( level, file, line, function, expression );
-	s_assert.Message = String256();
-	s_assert.Action = AssertAction::None;
-	if( message != nullptr )
-	{
-		s_assert.Message += "Message: ";
-		s_assert.Message += message;
-	}
-
-	do
-	{
-		if( std::this_thread::get_id() == s_mainThread )
-		{
-			CheckAssert();
-		}
-		else
-		{
-			__debugbreak();
-			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
-		}
-	} while( s_assert.Action == AssertAction::None );
-
-	return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 }
 
 void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, InputSystem& input, float delta_t )
@@ -308,17 +246,19 @@ void UpdateFreeCam( FreeCameraController& free_cam, ShakyCamera& shaky_cam, Inpu
 
 void CreateSingletons()
 {
-	ddr::MeshManager::RegisterSingleton( new ddr::MeshManager() );
-	ddr::MaterialManager::RegisterSingleton( new ddr::MaterialManager() );
+	ddr::TextureManager::RegisterSingleton( new ddr::TextureManager() );
 	ddr::ShaderManager::RegisterSingleton( new ddr::ShaderManager() );
+	ddr::MaterialManager::RegisterSingleton( new ddr::MaterialManager() );
+	ddr::MeshManager::RegisterSingleton( new ddr::MeshManager() );
 	ddc::EntityPrototypeManager::RegisterSingleton( new ddc::EntityPrototypeManager() );
 }
 
 void UpdateSingletons()
 {
-	ddr::MeshManager::Instance()->Update();
-	ddr::MaterialManager::Instance()->Update();
+	ddr::TextureManager::Instance()->Update();
 	ddr::ShaderManager::Instance()->Update();
+	ddr::MaterialManager::Instance()->Update();
+	ddr::MeshManager::Instance()->Update();
 	ddc::EntityPrototypeManager::Instance()->Update();
 }
 
@@ -344,70 +284,6 @@ ddc::Entity CreateMeshEntity( ddc::World& world, ddr::MeshHandle mesh_h, glm::ve
 	world.AddTag( entity, ddc::Tag::Visible );
 
 	return entity;
-}
-
-void CreateMeshShader()
-{
-	ddr::ShaderHandle shader_h = ddr::ShaderManager::Instance()->Load( "mesh" );
-	ddr::Shader* shader = shader_h.Access();
-	DD_ASSERT( shader != nullptr );
-
-	ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
-	ddr::Material* material = material_h.Access();
-	DD_ASSERT( material != nullptr );
-
-	material->Shader = shader_h;
-}
-
-void CreateUnitCube()
-{
-	ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
-	if( !unitCube.IsValid() )
-	{
-		unitCube = ddr::MeshManager::Instance()->Create( "cube" );
-
-		ddr::Mesh* mesh = unitCube.Access();
-		DD_ASSERT( mesh != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
-		mesh->SetMaterial( material_h );
-
-		dd::MakeUnitCube( *mesh );
-	}
-}
-
-void CreateUnitSphere()
-{
-	ddr::MeshHandle unitSphere = ddr::MeshManager::Instance()->Find( "sphere" );
-	if( !unitSphere.IsValid() )
-	{
-		unitSphere = ddr::MeshManager::Instance()->Create( "sphere" );
-
-		ddr::Mesh* mesh = unitSphere.Access();
-		DD_ASSERT( mesh != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
-		mesh->SetMaterial( material_h );
-
-		dd::MakeIcosphere( *mesh, 2 );
-	}
-}
-
-void CreateQuad()
-{
-	ddr::MeshHandle quad = ddr::MeshManager::Instance()->Find( "quad" );
-	if( !quad.IsValid() )
-	{
-		quad = ddr::MeshManager::Instance()->Create( "quad" );
-
-		ddr::Mesh* mesh = quad.Access();
-		DD_ASSERT( mesh != nullptr );
-
-		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Find( "mesh" );
-		mesh->SetMaterial( material_h );
-
-		dd::MakeQuad( *mesh );
-	}
 }
 
 ddc::Entity CreateBall( glm::vec3 translation, glm::vec4 colour, float size )
@@ -528,7 +404,7 @@ void CreatePhysicsPlaneTestScene()
 	}
 
 	ddc::World* world = s_world;
-	s_inputBindings->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )
+	Service<InputBindings>()->RegisterHandler( InputAction::RESET_PHYSICS, [balls, ball_positions, world]( InputAction action, InputType type )
 	{
 		if( type == InputType::RELEASED )
 		{
@@ -597,12 +473,12 @@ int GameMain()
 	s_mainThread = std::this_thread::get_id();
 
 	{
-		s_window = new Window( glm::ivec2( 1920, 1080 ), "DD" );
+		Services::Register( new Window( glm::ivec2( 1920, 1080 ), "DD" ) );
 
 		GLFWInputSource* input_source = new GLFWInputSource( *s_window );
 		input_source->SetMode( InputMode::GAME );
 
-		s_inputBindings = new InputBindings();
+		Services::Register( new InputBindings() );
 		s_inputBindings->RegisterHandler( InputAction::TOGGLE_FREECAM, &ToggleFreeCam );
 		s_inputBindings->RegisterHandler( InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI );
 		s_inputBindings->RegisterHandler( InputAction::EXIT, &Exit );
@@ -616,17 +492,17 @@ int GameMain()
 		s_inputBindings->RegisterHandler( InputAction::TIME_SCALE_DOWN, &SetTimeScale );
 		s_inputBindings->RegisterHandler( InputAction::TIME_SCALE_UP, &SetTimeScale );
 
-		s_input = new InputSystem( *input_source, *s_inputBindings );
+		Services::Register( new InputSystem( *input_source, *s_inputBindings ) );
 		s_input->BindKeys();
 
-		s_debugUI = new DebugUI( *s_window, *input_source );
+		Services::Register( new DebugUI( *s_window, *input_source ) );
 
 		SwarmSystem* swarm_system = new SwarmSystem();
 
 		//TrenchSystem trench_system( *s_shakyCam  );
 		//trench_system.CreateRenderResources();
 
-		s_freeCamera = new FreeCameraController();
+		Services::Register( new FreeCameraController() );
 		s_freeCamera->BindActions( *s_inputBindings );
 
 		HitTestSystem* hit_testing = new HitTestSystem();
@@ -654,7 +530,7 @@ int GameMain()
 		dd::WaterSystem* water_system = new dd::WaterSystem( terrain_system->GetTerrainParameters(), *jobsystem );
 		water_system->DependsOn( *terrain_system );
 
-		s_world = new ddc::World( *jobsystem );
+		Services::Register( new ddc::World( *jobsystem ) );
 		
 		s_world->RegisterSystem( *s_freeCamera );
 		s_world->RegisterSystem( *terrain_system );
@@ -666,7 +542,7 @@ int GameMain()
 		s_world->RegisterSystem( *tree_system );
 		s_world->RegisterSystem( *water_system );
 
-		s_renderer = new ddr::WorldRenderer( *s_window );
+		Services::Register( new ddr::WorldRenderer( *s_window ) );
 
 		ddr::ParticleSystemRenderer* particle_renderer = new ddr::ParticleSystemRenderer();
 
@@ -697,7 +573,7 @@ int GameMain()
 		s_renderer->Register( *lines_renderer );
 		s_renderer->Register( *water_renderer );
 		
-		s_frameTimer = new FrameTimer();
+		Services::Register( new FrameTimer() );
 		s_frameTimer->SetMaxFPS( s_maxFPS );
 
 		dd::EntityVisualizer* entity_visualizer = new dd::EntityVisualizer();
@@ -724,10 +600,10 @@ int GameMain()
 
 		CreateSingletons();
 
-		CreateMeshShader();
-		CreateUnitCube();
-		CreateUnitSphere();
-		CreateQuad();
+		dd::CreateDefaultMaterial();
+		dd::CreateUnitCube();
+		dd::CreateUnitSphere();
+		dd::CreateQuad();
 
 		s_world->Initialize();
 
@@ -737,13 +613,14 @@ int GameMain()
 		{
 			ddc::Entity entity = s_world->CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
 
-			s_fpsCamera = s_world->Access<dd::FPSCameraComponent>( entity );
-			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
-			s_fpsCamera->SetVerticalFOV( glm::radians( 45.0f ) );
+			Services::Register( s_world->Access<dd::FPSCameraComponent>( entity ) );
+			s_player->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+			s_player->SetVerticalFOV( glm::radians( 45.0f ) );
 
 			DD_TODO( "Shaky camera should be a component/system pair." );
-			s_shakyCamera = new ShakyCamera( *s_fpsCamera, *s_inputBindings );
-			s_debugUI->RegisterDebugPanel( *s_shakyCamera );
+			Services::Register( new ShakyCamera( s_player, s_inputBindings ) );
+
+			s_debugUI->RegisterDebugPanel( Service<ShakyCamera>::Get() );
 
 			dd::TransformComponent* transform = s_world->Access<dd::TransformComponent>( entity );
 
@@ -809,7 +686,7 @@ int GameMain()
 		//CreatePhysicsPlaneTestScene();
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
-		pempek::assert::implementation::setAssertHandler( OnAssert );
+		dd::InitializeAssert( s_mainThread );
 		::ShowWindow( GetConsoleWindow(), SW_HIDE );
 
 		while( !s_window->ShouldClose() )
@@ -829,28 +706,20 @@ int GameMain()
 
 			UpdateSingletons();
 
-			s_fpsCamera->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
+			s_player->SetAspectRatio( s_window->GetWidth(), s_window->GetHeight() );
 
-			UpdateFreeCam( *s_freeCamera, *s_shakyCamera, *s_input, app_delta_t );
+			UpdateFreeCam( s_freeCamera, s_shakyCamera, s_input, app_delta_t );
 
-			s_debugUI->RenderDebugPanels( *s_world );
+			s_debugUI->RenderDebugPanels( s_world );
 			s_frameTimer->DrawFPSCounter();
 
-			s_renderer->Render( *s_world, *s_shakyCamera, game_delta_t );
+			s_renderer->Render( s_world, s_shakyCamera, game_delta_t );
 
 			s_debugUI->EndFrame();
 			s_window->Swap();
 
 			s_frameTimer->DelayFrame();
 		}
-
-		s_renderer->ShutdownRenderer();
-		delete s_renderer;
-
-		s_world->Shutdown();
-
-		s_window->Close();
-		delete s_window;
 	}
 
 	DD_PROFILE_DEINIT();

@@ -8,14 +8,6 @@
 
 namespace dd
 {
-	struct Assert
-	{
-		String256 Info;
-		String256 Message;
-		bool Open { false };
-		AssertAction Action { AssertAction::None };
-	};
-
-	String256 FormatAssert( int level, const char* file, int line, const char* function, const char* expression );
-	void DrawAssertDialog( glm::ivec2 window_size, Assert& assert );
+	void InitializeAssert( std::thread::id main_thread );
+	void CheckAssert();
 }

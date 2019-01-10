@@ -17,6 +17,7 @@ namespace dd
 	std::vector<TypeInfo*>* TypeInfo::sm_components = nullptr;
 	bool TypeInfo::sm_defaultsRegistered = false;
 
+	uint TypeInfo::sm_maxID = 0;
 	uint8 TypeInfo::sm_maxComponentID = 0;
 	AngelScriptEngine* TypeInfo::sm_scriptEngine = nullptr;
 
@@ -80,6 +81,9 @@ namespace dd
 		m_name = typeName;
 		m_namespace = nameSpace;
 		m_size = size;
+
+		m_id = sm_maxID;
+		++sm_maxID;
 	}
 
 	const Member* TypeInfo::GetMember( const char* memberName ) const

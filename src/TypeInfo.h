@@ -14,6 +14,9 @@ namespace dd
 	typedef uint8 ComponentID;
 	static const ComponentID INVALID_COMPONENT = 255;
 
+	typedef uint TypeID;
+	static const TypeID INVALID_TYPE = ~0u;
+
 	struct Method
 	{
 		String32 Name;
@@ -39,7 +42,7 @@ namespace dd
 		TypeInfo();
 		void Init( const char* name, uint size );
 
-		bool operator==( const TypeInfo& other ) const;
+		TypeID ID() const { return m_id; }
 
 		const Vector<Member>& Members() const { return m_members; }
 		const Member* GetMember( const char* memberName ) const;
@@ -144,10 +147,14 @@ namespace dd
 		static const TypeInfo* GetComponent( dd::ComponentID id );
 		static size_t ComponentCount() { return sm_maxComponentID; }
 
+		bool operator==( const TypeInfo& other ) const;
+
 	private:
 
 		String8 m_namespace;
 		String64 m_name;
+
+		dd::TypeID m_id { INVALID_TYPE };
 
 		uint m_size { 0 };
 
@@ -164,6 +171,7 @@ namespace dd
 		Vector<Method> m_methods;
 		Vector<EnumOption> m_enumOptions;
 
+		static uint sm_maxID;
 		static uint8 sm_maxComponentID;
 
 		static bool sm_defaultsRegistered;

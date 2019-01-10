@@ -9,10 +9,8 @@
 namespace dd
 {
 	template <typename T>
-	class Vector
+	struct Vector
 	{
-	public:
-
 		Vector();
 		Vector( T* data, int size, int capacity, bool can_delete );
 		Vector( const Vector& other );
@@ -145,13 +143,8 @@ namespace dd
 	};
 
 	template <typename T, size_t N = 64> 
-	class StackVector : public Vector<T>
+	struct StackVector : Vector<T>
 	{
-	private:
-		byte m_stack[sizeof( T ) * N];
-
-	public:
-
 		StackVector() : Vector<T>( (T*) m_stack, 0, N, false ) {}
 		
 		template <size_t OtherSize>
@@ -161,7 +154,10 @@ namespace dd
 			AddAll( other );
 		}
 
-		bool IsOnStack() const { return Vector<T>::Data() == (T*) m_stack;  }
+		bool IsOnStack() const { return Vector<T>::Data() == (T*) m_stack; }
+
+	private:
+		byte m_stack[ sizeof( T ) * N ];
 	};
 }
 

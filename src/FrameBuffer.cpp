@@ -89,7 +89,7 @@ namespace ddr
 		GLuint status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
 		if( status != GL_FRAMEBUFFER_COMPLETE )
 		{
-			DD_ASSERT( false, "Failed to create framebuffer!" );
+			DD_ASSERT( status != GL_FRAMEBUFFER_COMPLETE, "Failed to create framebuffer!" );
 			return false;
 		}
 

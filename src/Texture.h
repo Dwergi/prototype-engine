@@ -6,16 +6,21 @@
 
 #pragma once
 
+#include "HandleManager.h"
 #include "OpenGL.h"
 
 namespace ddr
 {
-	struct Texture
+	struct Texture : dd::HandleTarget
 	{
+		//
+		// Do not create directly, use TextureManager.
+		//
 		Texture();
 		~Texture();
 
-		void Create( glm::ivec2 size, GLenum format, int mips );
+		void Initialize( glm::ivec2 size, GLenum format, int mips );
+		void Create();
 		void Destroy();
 
 		glm::ivec2 GetSize() const { return m_size; }
@@ -34,6 +39,8 @@ namespace ddr
 
 	private:
 
+		friend struct TextureManager;
+
 		glm::ivec2 m_size;
 
 		bool m_valid { false };
@@ -42,5 +49,15 @@ namespace ddr
 		GLenum m_format { OpenGL::InvalidID };
 
 		int m_textureUnit { -1 };
+	};
+
+	using TextureHandle = dd::Handle<ddr::Texture>;
+
+	struct TextureManager : dd::HandleManager<ddr::Texture>
+	{
+	private:
+
+		virtual void OnCreate( Texture& tex ) const override;
+		virtual void OnDestroy( Texture& tex ) const override;
 	};
 }

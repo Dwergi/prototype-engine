@@ -10,10 +10,8 @@ struct GLFWwindow;
 
 namespace dd
 {
-	class Window
+	struct Window
 	{
-	public:
-
 		Window( glm::ivec2 resolution, const char* title );
 		~Window();
 

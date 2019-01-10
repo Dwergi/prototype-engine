@@ -11,24 +11,14 @@ out struct FragmentData
 } 
 Fragment;
 
-uniform struct WaterBlock
-{
-	float Time;
-	vec2 WaterOffset;
-	vec2 WindVelocity;
-};
+uniform float Time;
+uniform vec2 WaterOffset;
+uniform vec2 WindVelocity;
 
-uniform struct InstanceBlock
-{
-	vec4 ObjectColour;
-	mat4 Model;
-};
-
-uniform struct ViewBlock
-{
-	mat4 View;
-	mat4 Projection;
-};
+uniform vec4 ObjectColour;
+uniform mat4 Model;
+uniform mat4 View;
+uniform mat4 Projection;
 
 const float Period = 5.0;
 const float WaveHeight = 1.0;

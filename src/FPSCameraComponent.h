@@ -13,7 +13,7 @@
 
 namespace dd
 {
-	class Window;
+	struct Window;
 
 	struct FPSCameraComponent : ddr::ICamera
 	{

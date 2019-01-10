@@ -482,6 +482,71 @@ namespace dd
 		mesh.SetBoundBox( bounds );
 	}
 
+
+	void CreateDefaultMaterial()
+	{
+		ddr::ShaderHandle shader_h = ddr::ShaderManager::Instance()->Load( "mesh" );
+		ddr::Shader* shader = shader_h.Access();
+		DD_ASSERT( shader != nullptr );
+
+		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+		ddr::Material* material = material_h.Access();
+		DD_ASSERT( material != nullptr );
+
+		material->Shader = shader_h;
+	}
+
+	void CreateUnitCube()
+	{
+		ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
+		if( !unitCube.IsValid() )
+		{
+			unitCube = ddr::MeshManager::Instance()->Create( "cube" );
+
+			ddr::Mesh* mesh = unitCube.Access();
+			DD_ASSERT( mesh != nullptr );
+
+			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+			mesh->SetMaterial( material_h );
+
+			MakeUnitCube( *mesh );
+		}
+	}
+
+	void CreateUnitSphere()
+	{
+		ddr::MeshHandle unitSphere = ddr::MeshManager::Instance()->Find( "sphere" );
+		if( !unitSphere.IsValid() )
+		{
+			unitSphere = ddr::MeshManager::Instance()->Create( "sphere" );
+
+			ddr::Mesh* mesh = unitSphere.Access();
+			DD_ASSERT( mesh != nullptr );
+
+			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+			mesh->SetMaterial( material_h );
+
+			MakeIcosphere( *mesh, 2 );
+		}
+	}
+
+	void CreateQuad()
+	{
+		ddr::MeshHandle quad = ddr::MeshManager::Instance()->Find( "quad" );
+		if( !quad.IsValid() )
+		{
+			quad = ddr::MeshManager::Instance()->Create( "quad" );
+
+			ddr::Mesh* mesh = quad.Access();
+			DD_ASSERT( mesh != nullptr );
+
+			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Find( "mesh" );
+			mesh->SetMaterial( material_h );
+
+			MakeQuad( *mesh );
+		}
+	}
+
 	static const glm::vec3 s_quadPositions[] = {
 		glm::vec3( -1.0f,	0.0f,	-1.0f ),
 		glm::vec3( -1.0f,	0.0f,	1.0f ),

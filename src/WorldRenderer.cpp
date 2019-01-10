@@ -28,7 +28,6 @@
 
 namespace ddr
 {
-
 	struct Fog
 	{
 		bool Enabled { true };
@@ -83,8 +82,10 @@ namespace ddr
 
 	void WorldRenderer::CreateFrameBuffer( glm::ivec2 size )
 	{
-		m_colourTexture.Create( size, GL_SRGB8_ALPHA8, 1 );
-		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
+		m_colourTexture.Initialize( size, GL_SRGB8_ALPHA8, 1 );
+		m_colourTexture.Create();
+		m_depthTexture.Initialize( size, GL_DEPTH_COMPONENT32F, 1 );
+		m_depthTexture.Create();
 
 		m_framebuffer.SetClearColour( glm::vec4( m_skyColour.xyz, 0.0 ) );
 		m_framebuffer.SetClearDepth( 0.0f );

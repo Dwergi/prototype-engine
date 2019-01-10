@@ -121,10 +121,12 @@ namespace dd
 		int buffer_size = size.x * size.y * 4;
 
 		m_lastIDBuffer.Set( new byte[buffer_size], buffer_size );
-		m_idTexture.Create( size, GL_R32UI, 1 );
+		m_idTexture.Initialize( size, GL_R32UI, 1 );
+		m_idTexture.Create();
 
 		m_lastDepthBuffer.Set( new byte[buffer_size], buffer_size );
-		m_depthTexture.Create( size, GL_DEPTH_COMPONENT32F, 1 );
+		m_depthTexture.Initialize( size, GL_DEPTH_COMPONENT32F, 1 );
+		m_depthTexture.Create();
 
 		m_framebuffer.SetClearDepth( 0.0f );
 		m_framebuffer.SetClearColour( glm::vec4( 1 ) );

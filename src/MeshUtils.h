@@ -14,6 +14,11 @@ namespace ddr
 
 namespace dd
 {
+	void CreateDefaultMaterial();
+	void CreateUnitCube();
+	void CreateUnitSphere();
+	void CreateQuad();
+
 	void MakeQuad( ddr::Mesh& mesh );
 	
 	void MakeUnitCube( ddr::Mesh& mesh );

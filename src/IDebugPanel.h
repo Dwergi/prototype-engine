@@ -17,8 +17,6 @@ namespace dd
 {
 	struct IDebugPanel
 	{
-	public:
-
 		IDebugPanel() :
 			m_debugOpen( false )
 		{

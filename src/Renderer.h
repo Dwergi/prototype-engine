@@ -11,10 +11,8 @@
 
 namespace ddr
 {
-	class Renderer
+	struct Renderer
 	{
-	public:
-
 		Renderer( const char* renderer ) : m_name( renderer ) {}
 
 		virtual void RenderInit( ddc::World& world ) {}

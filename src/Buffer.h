@@ -12,10 +12,8 @@ namespace dd
 	//
 	// IBuffer - Buffer interface.
 	//
-	class IBuffer
+	struct IBuffer
 	{
-	public:
-
 		virtual ~IBuffer();
 
 		virtual const void* GetVoid() const = 0;
@@ -33,10 +31,8 @@ namespace dd
 	// ConstBuffer - const version of buffer.
 	//
 	template <typename T>
-	class ConstBuffer : public IBuffer
+	struct ConstBuffer : IBuffer
 	{
-	public:
-
 		ConstBuffer();
 		ConstBuffer( const T* ptr, int count );
 		ConstBuffer( const T* ptr, size_t count );
@@ -87,10 +83,8 @@ namespace dd
 	// Buffer - non-const version of buffer
 	//
 	template <typename T>
-	class Buffer : public ConstBuffer<T>
+	struct Buffer : ConstBuffer<T>
 	{
-	public:
-
 		Buffer();
 		Buffer( T* ptr, int count );
 		Buffer( T* ptr, size_t count );

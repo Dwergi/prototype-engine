@@ -149,6 +149,9 @@ namespace ddr
 		//
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
 
+		//
+		// Do not create directly, use MeshManager.
+		//
 		Mesh();
 		~Mesh();
 

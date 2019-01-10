@@ -40,12 +40,10 @@ namespace dd
 	struct MousePosition;
 	struct RayComponent;
 	struct TransformComponent;
-	class Window;
+	struct Window;
 	
 	struct MousePicking : IDebugPanel, IHandlesInput, ddr::Renderer
 	{
-	public:
-
 		static const int DownScalingFactor = 2;
 
 		MousePicking( const Window& window, const IInputSource& input, IAsyncHitTest& hit_test );

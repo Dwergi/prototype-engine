@@ -30,7 +30,7 @@ namespace dd
 
 	//
 	// Handle container that cares rather little about the internals of your type, as long as it derives from this.
-	// Stick DD_HANDLE_TARGET( YourType ) into your .cpp as well.
+	// Stick DD_HANDLE_MANAGER( YourType ) into your .cpp as well.
 	//
 	template <typename T>
 	struct HandleManager
@@ -38,30 +38,30 @@ namespace dd
 		static_assert(std::is_base_of<HandleTarget, T>::value);
 
 		//
-		// Find a handle to a mesh with the given name.
+		// Find a handle to an object with the given name.
 		//
 		Handle<T> Find( std::string name ) const;
 		
 		//
-		// Create (or retrieve) a handle to a mesh with the given name.
+		// Create (or retrieve) a handle to an object with the given name.
 		//
 		Handle<T> Create( std::string name );
 
 		//
-		// Destroy the mesh associated with the given handle. 
+		// Destroy the object associated with the given handle. 
 		// Returns true if something was destroyed, false if nothing of the given name was found.
 		//
 		void Destroy( Handle<T> handle );
 		
 		//
-		// Get the mesh instance associated with the given handle.
-		// Returns null if the handle does not reference a mesh that still exists.
+		// Get the object instance associated with the given handle.
+		// Returns null if the handle does not reference an object that still exists.
 		//
 		const T* Get( Handle<T> handle ) const;
 
 		//
-		// Access the mesh instance associated with the given handle.
-		// Returns null if the handle does not reference a mesh that still exists.
+		// Access the object instance associated with the given handle.
+		// Returns null if the handle does not reference an object that still exists.
 		//
 		T* Access( Handle<T> handle ) const;
 

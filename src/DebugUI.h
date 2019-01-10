@@ -18,11 +18,10 @@ namespace dd
 {
 	struct IDebugPanel;
 	struct GLFWInputSource;
-	class Window;
+	struct Window;
 
-	class DebugUI
+	struct DebugUI
 	{
-	public:
 		DebugUI( Window& window, GLFWInputSource& input );
 		~DebugUI();
 

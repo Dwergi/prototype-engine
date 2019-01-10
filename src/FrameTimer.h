@@ -11,10 +11,8 @@
 
 namespace dd
 {
-	class FrameTimer : public IDebugPanel
+	struct FrameTimer : public IDebugPanel
 	{
-	public:
-
 		FrameTimer();
 
 		void Update();
@@ -42,10 +40,6 @@ namespace dd
 
 		void DrawFPSCounter();
 
-	protected:
-
-		virtual void DrawDebugInternal( ddc::World& world ) override;
-
 	private:
 
 		Timer m_timer;
@@ -65,5 +59,7 @@ namespace dd
 		static const int SLIDING_WINDOW_SIZE = 60;
 		float m_frameTimes[SLIDING_WINDOW_SIZE] { 0 };
 		int m_currentSlidingFrame = 0;
+
+		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};
 }

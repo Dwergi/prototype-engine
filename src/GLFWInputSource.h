@@ -14,7 +14,7 @@ struct GLFWwindow;
 
 namespace dd
 {
-	class Window;
+	struct Window;
 
 	struct GLFWInputSource : IInputSource
 	{

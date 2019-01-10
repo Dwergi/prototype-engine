@@ -15,21 +15,19 @@
 
 namespace dd
 {
-	class Window;
+	struct Window;
 }
 
 namespace ddr
 {
 	struct CommandBuffer;
 	struct ICamera;
-	class Renderer;
+	struct Renderer;
 	struct RenderData;
 	struct UniformStorage;
 
-	class WorldRenderer : public dd::IDebugPanel
+	struct WorldRenderer : dd::IDebugPanel
 	{
-	public:
-
 		WorldRenderer( const dd::Window& window );
 		~WorldRenderer();
 
@@ -68,10 +66,6 @@ namespace ddr
 		RenderState m_defaultState;
 		RenderState m_depthState;
 		
-		ddc::Entity m_xAxis;
-		ddc::Entity m_yAxis;
-		ddc::Entity m_zAxis;
-
 		std::vector<ddr::Renderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
