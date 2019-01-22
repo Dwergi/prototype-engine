@@ -97,20 +97,6 @@ using namespace dd;
 extern uint s_maxFPS;
 uint s_maxFPS = 60;
 
-SERVICE_CPP( dd::Window );
-SERVICE_CPP( dd::InputSystem );
-SERVICE_CPP( dd::InputBindings );
-SERVICE_CPP( dd::FreeCameraController );
-SERVICE_CPP( ddc::World );
-SERVICE_CPP( dd::AngelScriptEngine );
-SERVICE_CPP( dd::FrameTimer );
-SERVICE_CPP( dd::ShipSystem );
-SERVICE_CPP( dd::DebugConsole );
-SERVICE_CPP( ddr::WorldRenderer );
-SERVICE_CPP( dd::DebugUI );
-SERVICE_CPP( dd::ShakyCamera );
-SERVICE_CPP( dd::FPSCameraComponent );
-
 dd::Service<dd::Window> s_window;
 dd::Service<dd::InputSystem> s_input;
 dd::Service<dd::InputBindings> s_inputBindings;

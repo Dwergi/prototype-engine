@@ -8,8 +8,6 @@
 
 namespace dd
 {
-#define SERVICE_CPP( TypeName ) TypeName* dd::Service<TypeName>::s_instance = nullptr
-
 	struct Services
 	{
 		template <typename T>
@@ -43,3 +41,5 @@ namespace dd
 		static T* s_instance;
 	};
 }
+
+template <typename T> T* dd::Service<T>::s_instance = nullptr;
