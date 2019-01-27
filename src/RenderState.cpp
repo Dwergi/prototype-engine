@@ -101,6 +101,8 @@ namespace ddr
 
 	void RenderState::ApplyDepth( const RenderState& state )
 	{
+		dd::Profiler::RenderStateChanged();
+
 		if( state.Depth )
 		{
 			glEnable( GL_DEPTH_TEST );
@@ -115,6 +117,8 @@ namespace ddr
 
 	void RenderState::ApplyBackfaceCulling( const RenderState& state )
 	{
+		dd::Profiler::RenderStateChanged();
+
 		if( state.BackfaceCulling )
 		{
 			glEnable( GL_CULL_FACE );
@@ -129,6 +133,8 @@ namespace ddr
 
 	void RenderState::ApplyBlending( const RenderState& state )
 	{
+		dd::Profiler::RenderStateChanged();
+
 		if( state.Blending )
 		{
 			glEnable( GL_BLEND );
@@ -142,6 +148,8 @@ namespace ddr
 
 	void RenderState::ApplyDepthWrite( const RenderState& state )
 	{
+		dd::Profiler::RenderStateChanged();
+
 		if( state.DepthWrite )
 		{
 			glDepthMask( GL_TRUE );

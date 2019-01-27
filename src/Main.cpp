@@ -676,8 +676,12 @@ int GameMain()
 		{
 			DD_PROFILE_SCOPED( Frame );
 
+			dd::Profiler::BeginFrame();
+
 			s_frameTimer->SetMaxFPS( s_maxFPS );
 			s_frameTimer->Update();
+
+			
 
 			float game_delta_t = s_frameTimer->GameDelta();
 			float app_delta_t = s_frameTimer->AppDelta();
@@ -702,6 +706,8 @@ int GameMain()
 			s_window->Swap();
 
 			s_frameTimer->DelayFrame();
+
+			dd::Profiler::EndFrame();
 		}
 	}
 

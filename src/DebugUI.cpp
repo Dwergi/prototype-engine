@@ -479,7 +479,23 @@ namespace dd
 				ImGui::EndMenu();
 			}
 
+			if( ImGui::BeginMenu( "Profiler" ) )
+			{
+				bool draw = dd::Profiler::ShouldDraw();
+				if( ImGui::MenuItem( "Show", nullptr, &draw ) )
+				{
+					dd::Profiler::EnableDraw( draw );
+				}
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMainMenuBar();
+		}
+
+		if( dd::Profiler::ShouldDraw() )
+		{
+			dd::Profiler::Draw();
 		}
 
 		for( IDebugPanel* panel : m_debugPanels )

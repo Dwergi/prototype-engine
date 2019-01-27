@@ -27,6 +27,8 @@ namespace ddr
 	{
 		DD_ASSERT( !m_inUse, "Material already in use when bound!" );
 
+		dd::Profiler::MaterialChanged();
+
 		uniforms.Set( "Material.Shininess", Shininess );
 		uniforms.Set( "Material.Specular", Specular );
 		uniforms.Set( "Material.Diffuse", Diffuse );

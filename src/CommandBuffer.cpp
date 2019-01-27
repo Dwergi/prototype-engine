@@ -52,11 +52,6 @@ namespace ddr
 		} );
 	}
 
-	static void SwitchMaterial( MaterialHandle handle, UniformStorage& uniforms )
-	{
-
-	}
-
 	void CommandBuffer::Dispatch( UniformStorage& uniforms )
 	{
 		MaterialHandle current_material;

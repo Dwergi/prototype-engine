@@ -198,6 +198,8 @@ namespace ddr
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
+		dd::Profiler::MeshRendered();
+
 		m_vao.Bind();
 
 		if( m_vboIndex.IsValid() )

@@ -605,6 +605,7 @@
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
+    <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\RenderCommand.cpp" />
     <ClCompile Include="src\RenderCommandTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

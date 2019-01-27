@@ -7,12 +7,10 @@
 #include "PCH.h"
 #include "FrameTimer.h"
 
-
-
-
 namespace dd
 {
-	FrameTimer::FrameTimer()
+	FrameTimer::FrameTimer() : 
+		m_frameTimes( "Frame Time" )
 	{
 		m_maxFPS = 120;
 		m_targetDelta = 1.0f / m_maxFPS;
@@ -21,12 +19,6 @@ namespace dd
 		m_gameDelta = m_targetDelta;
 		m_appDelta = m_targetDelta;
 		m_deltaWithoutDelay = m_targetDelta;
-
-		// fill history with standard deltas
-		for( int i = 0; i < SLIDING_WINDOW_SIZE; ++i )
-		{
-			m_frameTimes[i] = m_targetDelta * 1000.0f;
-		}
 
 		m_timer.Start();
 	}
@@ -56,22 +48,8 @@ namespace dd
 			m_gameDelta = 0;
 		}
 
-		// update sliding window
-		m_frameTimes[m_currentSlidingFrame] = m_deltaWithoutDelay * 1000.f;
-		++m_currentSlidingFrame;
-
-		if( m_currentSlidingFrame >= SLIDING_WINDOW_SIZE )
-		{
-			m_currentSlidingFrame = 0;
-		}
-
-		float total_time = 0;
-		for( float f : m_frameTimes )
-		{
-			total_time += f;
-		}
-
-		m_slidingDelta = (total_time / SLIDING_WINDOW_SIZE) / 1000.f;
+		m_frameTimes.BeginFrame();
+		m_frameTimes.SetValue( m_deltaWithoutDelay * 1000.f );
 	}
 
 	void FrameTimer::DelayFrame()
@@ -89,6 +67,8 @@ namespace dd
 
 			delta_t = m_timer.Time() - m_lastFrameTime;
 		}
+
+		m_frameTimes.EndFrame();
 	}
 
 	void FrameTimer::DrawDebugInternal( ddc::World& world )
@@ -96,18 +76,11 @@ namespace dd
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
 
 		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
-
-		ImGui::Value( "FPS: ", 1.0f / m_slidingDelta, "%.1f" );
-		ImGui::Text( "Frame Time: %.1fms", m_deltaWithoutDelay * 1000.f );
-		ImGui::Text( "Sliding Time: %.1fms", m_slidingDelta * 1000.0f );
-
 		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
-		
-		if( ImGui::TreeNodeEx( "Frame Times", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			ImGui::PlotLines( "", m_frameTimes, SLIDING_WINDOW_SIZE, 0, nullptr, 0, 50, ImVec2( 200, 50 ) );
-			ImGui::TreePop();
-		}
+
+		ImGui::Value( "FPS: ", 1.0f / m_frameTimes.SlidingAverage(), "%.1f" );
+
+		m_frameTimes.Draw();
 	}
 
 	void FrameTimer::DrawFPSCounter()
@@ -122,7 +95,7 @@ namespace dd
 			ImGui::PushStyleVar( ImGuiStyleVar_ItemInnerSpacing, ImVec2( 0, 0 ) );
 
 			ImGui::Begin( "CompactFPS", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs );
-			ImGui::Text( "%.1f", 1.0f / m_slidingDelta );
+			ImGui::Text( "%.1f", 1.0f / m_frameTimes.SlidingAverage() );
 			ImGui::SameLine();
 			ImGui::End();
 

@@ -30,13 +30,10 @@ namespace dd
 		float GameDelta() const { return m_gameDelta; }
 		float AppDelta() const { return m_appDelta; }
 
-		float SlidingDelta() const { return m_slidingDelta; }
+		float SlidingDelta() const { return m_frameTimes.SlidingAverage(); }
 		float DeltaWithoutDelay() const { return m_deltaWithoutDelay; }
 
-		virtual const char* GetDebugTitle() const override
-		{
-			return "FPS";
-		}
+		virtual const char* GetDebugTitle() const override { return "FPS"; }
 
 		void DrawFPSCounter();
 
@@ -49,16 +46,13 @@ namespace dd
 		float m_gameDelta { 0.0f };
 		float m_appDelta { 0.0f };
 		float m_deltaWithoutDelay { 0.0f };
-		float m_slidingDelta { 0.0f };
 		float m_timeScale { 1.0f };
 		uint m_maxFPS { 0 };
 		bool m_drawCompact { true };
 		bool m_paused { false };
 		uint m_frame { 0 };
 
-		static const int SLIDING_WINDOW_SIZE = 60;
-		float m_frameTimes[SLIDING_WINDOW_SIZE] { 0 };
-		int m_currentSlidingFrame = 0;
+		ProfilerValue m_frameTimes;
 
 		virtual void DrawDebugInternal( ddc::World& world ) override;
 	};

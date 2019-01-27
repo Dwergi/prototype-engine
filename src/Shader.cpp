@@ -149,6 +149,8 @@ namespace ddr
 	{
 		DD_ASSERT( use != m_inUse, "ShaderProgram '%s': Trying to use shader that is already in use!", m_name.c_str() );
 
+		dd::Profiler::ShaderChanged();
+
 		int current;
 		glGetIntegerv( GL_CURRENT_PROGRAM, &current );
 		CheckOGLError();
