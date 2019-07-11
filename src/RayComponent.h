@@ -14,11 +14,10 @@ namespace dd
 	{
 		ddm::Ray Ray;
 
-		DD_CLASS( dd::RayComponent )
-		{
+		DD_BEGIN_CLASS( dd::RayComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::RayComponent, Ray );
-		}
+			DD_MEMBER( Ray );
+		DD_END_CLASS()
 	};
 }

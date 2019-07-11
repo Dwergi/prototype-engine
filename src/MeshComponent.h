@@ -17,9 +17,10 @@ namespace dd
 
 		ddr::MeshHandle Mesh;
 
-		DD_CLASS( dd::MeshComponent )
-		{
+		DD_BEGIN_CLASS( dd::MeshComponent )
 			DD_COMPONENT();
-		}
+
+			DD_MEMBER( Mesh );
+		DD_END_CLASS()
 	};
 }

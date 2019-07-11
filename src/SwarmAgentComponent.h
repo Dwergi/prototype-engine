@@ -16,11 +16,10 @@ namespace dd
 
 		glm::vec3 Velocity;
 
-		DD_CLASS( dd::SwarmAgentComponent )
-		{
+		DD_BEGIN_CLASS( dd::SwarmAgentComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::SwarmAgentComponent, Velocity );
-		}
+			DD_MEMBER( Velocity );
+		DD_END_CLASS()
 	};
 }

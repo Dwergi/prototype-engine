@@ -15,13 +15,22 @@ namespace dd
 
 	void File::SetDataRoot( std::string root )
 	{
-		if( !std::filesystem::is_directory( root ) || !std::filesystem::exists( root ) )
+		std::filesystem::path canonical_path(root);
+		canonical_path = std::filesystem::canonical(canonical_path);
+
+		if (!std::filesystem::is_directory(canonical_path))
 		{
-			DD_ASSERT( false, "Invalid data root given: %s!", root.c_str() );
+			DD_ASSERT(false, "Invalid data root given, not a directory: %s!", root.c_str());
 			return;
 		}
 
-		s_dataRoot = root;
+		if (!std::filesystem::exists(canonical_path))
+		{
+			DD_ASSERT(false, "Invalid data root given, doesn't exist: %s!", root.c_str());
+			return;
+		}
+
+		s_dataRoot = canonical_path;
 	}
 
 	bool File::Exists( std::string file_path )

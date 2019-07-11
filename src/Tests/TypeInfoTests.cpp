@@ -15,11 +15,10 @@ namespace Test
 	{
 		uint DerivedThing;
 
-		DD_CLASS( Test::DerivedStruct )
-		{
+		DD_BEGIN_CLASS( Test::DerivedStruct )
 			DD_PARENT( Test::SimpleStruct );
-			DD_MEMBER( Test::DerivedStruct, DerivedThing );
-		}
+			DD_MEMBER( DerivedThing );
+		DD_END_CLASS()
 	};
 }
 

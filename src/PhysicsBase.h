@@ -17,12 +17,11 @@ namespace dd
 
 		bool Resting { false };
 
-		DD_CLASS( dd::PhysicsBase )
-		{
-			DD_MEMBER( dd::PhysicsBase, Momentum );
-			DD_MEMBER( dd::PhysicsBase, Mass );
-			DD_MEMBER( dd::PhysicsBase, Elasticity );
-			DD_MEMBER( dd::PhysicsBase, Resting );
-		}
+		DD_BEGIN_CLASS( dd::PhysicsBase )
+			DD_MEMBER( Momentum );
+			DD_MEMBER( Mass );
+			DD_MEMBER( Elasticity );
+			DD_MEMBER( Resting );
+		DD_END_CLASS()
 	};
 }

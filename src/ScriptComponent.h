@@ -15,12 +15,11 @@ namespace dd
 		String64 Module;
 		bool Loaded { false };
 
-		DD_CLASS( dd::ScriptComponent )
-		{
+		DD_BEGIN_CLASS( dd::ScriptComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::ScriptComponent, Module );
-			DD_MEMBER( dd::ScriptComponent, Loaded );
-		}
+			DD_MEMBER( Module );
+			DD_MEMBER( Loaded );
+		DD_END_CLASS()
 	};
 }

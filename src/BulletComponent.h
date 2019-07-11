@@ -18,12 +18,11 @@ namespace dd
 		glm::vec3 SurfaceNormal;
 		glm::vec3 Velocity;
 
-		DD_CLASS( dd::BulletHitMessage )
-		{
-			DD_MEMBER( dd::BulletHitMessage, Position );
-			DD_MEMBER( dd::BulletHitMessage, SurfaceNormal );
-			DD_MEMBER( dd::BulletHitMessage, Velocity );
-		}
+		DD_BEGIN_CLASS( dd::BulletHitMessage )
+			DD_MEMBER( Position );
+			DD_MEMBER( SurfaceNormal );
+			DD_MEMBER( Velocity );
+		DD_END_CLASS()
 	};
 
 	struct BulletComponent
@@ -37,15 +36,14 @@ namespace dd
 		
 		HitHandle PendingHit; 
 		
-		DD_CLASS( dd::BulletComponent )
-		{
+		DD_BEGIN_CLASS( dd::BulletComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::BulletComponent, Velocity );
-			DD_MEMBER( dd::BulletComponent, HitPosition );
-			DD_MEMBER( dd::BulletComponent, Age );
-			DD_MEMBER( dd::BulletComponent, Lifetime );
-			DD_MEMBER( dd::BulletComponent, PendingHit );
-		}
+			DD_MEMBER( Velocity );
+			DD_MEMBER( HitPosition );
+			DD_MEMBER( Age );
+			DD_MEMBER( Lifetime );
+			DD_MEMBER( PendingHit );
+		DD_END_CLASS()
 	};
 }

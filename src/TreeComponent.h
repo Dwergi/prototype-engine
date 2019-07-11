@@ -29,9 +29,8 @@ namespace dd
 		dd::RandomFloat RNG;
 		std::vector<TreeParticle> Particles;
 
-		DD_CLASS( dd::TreeComponent )
-		{
+		DD_BEGIN_CLASS( dd::TreeComponent )
 			DD_COMPONENT();
-		}
+		DD_END_CLASS()
 	};
 }

@@ -14,9 +14,8 @@ namespace dd
 	{
 		TerrainChunk* Chunk { nullptr };
 
-		DD_CLASS( dd::TerrainChunkComponent )
-		{
+		DD_BEGIN_CLASS( dd::TerrainChunkComponent )
 			DD_COMPONENT();
-		}
+		DD_END_CLASS()
 	};
 }

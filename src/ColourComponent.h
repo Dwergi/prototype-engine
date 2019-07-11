@@ -12,12 +12,11 @@ namespace dd
 	{
 		glm::vec4 Colour;
 
-		DD_CLASS( dd::ColourComponent )
-		{
+		DD_BEGIN_CLASS( dd::ColourComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::ColourComponent, Colour );
-		}
+			DD_MEMBER( Colour );
+		DD_END_CLASS()
 	};
 
 	DD_SERIALIZABLE( dd::ColourComponent );

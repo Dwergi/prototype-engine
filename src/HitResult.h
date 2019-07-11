@@ -26,10 +26,9 @@ namespace dd
 			uint Handle { 0 };
 		};
 
-		DD_CLASS( dd::HitHandle )
-		{
-			DD_MEMBER( dd::HitHandle, Handle );
-		}
+		DD_BEGIN_CLASS( dd::HitHandle )
+			DD_MEMBER( Handle );
+		DD_END_CLASS()
 	};
 
 	struct HitResult

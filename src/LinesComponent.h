@@ -12,9 +12,10 @@ namespace dd
 	{
 		std::vector<glm::vec3> Points;
 
-		DD_CLASS( dd::LinesComponent )
-		{
+		DD_BEGIN_CLASS( dd::LinesComponent )
 			DD_COMPONENT();
-		}
+
+			DD_MEMBER( Points );
+		DD_END_CLASS()
 	};
 }

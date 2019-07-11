@@ -17,11 +17,10 @@ namespace dd
 
 		OctreeComponent() {}
 
-		DD_CLASS( dd::OctreeComponent )
-		{
+		DD_BEGIN_CLASS( dd::OctreeComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::OctreeComponent, Entry );
-		}
+			DD_MEMBER( Entry );
+		DD_END_CLASS()
 	};
 }

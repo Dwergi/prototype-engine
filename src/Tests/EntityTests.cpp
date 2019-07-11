@@ -13,30 +13,27 @@ struct FirstComponent
 {
 	int FirstValue { -100 };
 
-	DD_CLASS( FirstComponent )
-	{
+	DD_BEGIN_CLASS( FirstComponent )
 		DD_COMPONENT();
-	}
+	DD_END_CLASS()
 };
 
 struct SecondComponent
 {
 	int SecondValue { 0 };
 
-	DD_CLASS( SecondComponent )
-	{
+	DD_BEGIN_CLASS( SecondComponent )
 		DD_COMPONENT();
-	}
+	DD_END_CLASS()
 };
 
 struct ThirdComponent
 {
 	int ThirdValue { 0 };
 	
-	DD_CLASS( ThirdComponent )
-	{
+	DD_BEGIN_CLASS( ThirdComponent )
 		DD_COMPONENT();
-	}
+	DD_END_CLASS()
 };
 
 DD_TYPE_CPP( FirstComponent );

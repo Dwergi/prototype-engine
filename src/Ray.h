@@ -39,12 +39,11 @@ namespace ddm
 
 		float Length { FLT_MAX };
 
-		DD_CLASS( ddm::Ray )
-		{
-			DD_METHOD( ddm::Ray, Origin );
-			DD_METHOD( ddm::Ray, Direction );
-			DD_METHOD( ddm::Ray, InverseDir );
-		}
+		DD_BEGIN_CLASS( ddm::Ray )
+			DD_METHOD( Origin );
+			DD_METHOD( Direction );
+			DD_METHOD( InverseDir );
+		DD_END_CLASS()
 
 	private:
 

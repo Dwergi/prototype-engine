@@ -10,9 +10,8 @@ namespace dd
 {
 	struct PlayerComponent
 	{
-		DD_CLASS( dd::PlayerComponent )
-		{
+		DD_BEGIN_CLASS( dd::PlayerComponent )
 			DD_COMPONENT();
-		}
+		DD_END_CLASS()
 	};
 }

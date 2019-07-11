@@ -14,11 +14,9 @@ namespace dd
 
 		glm::vec3 Direction;
 
-		DD_CLASS( dd::TrenchComponent )
-		{
+		DD_BEGIN_CLASS( dd::TrenchComponent )
 			DD_COMPONENT();
-
-			DD_MEMBER( dd::TrenchComponent, Direction );
-		}
+			DD_MEMBER( Direction );
+		DD_END_CLASS()
 	};
 }

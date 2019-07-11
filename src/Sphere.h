@@ -33,10 +33,9 @@ namespace ddm
 		glm::vec3 Centre;
 		float Radius { 0.0f };
 
-		DD_CLASS( ddm::Sphere )
-		{
-			DD_MEMBER( ddm::Sphere, Centre );
-			DD_MEMBER( ddm::Sphere, Radius );
-		}
+		DD_BEGIN_CLASS( ddm::Sphere )
+			DD_MEMBER( Centre );
+			DD_MEMBER( Radius );
+		DD_END_CLASS()
 	};
 }

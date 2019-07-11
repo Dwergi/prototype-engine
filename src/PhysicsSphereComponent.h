@@ -15,12 +15,11 @@ namespace dd
 	{
 		ddm::Sphere Sphere;
 
-		DD_CLASS( dd::PhysicsSphereComponent )
-		{
+		DD_BEGIN_CLASS( dd::PhysicsSphereComponent )
 			DD_PARENT( dd::PhysicsBase );
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::PhysicsSphereComponent, Sphere );
-		}
+			DD_MEMBER( Sphere );
+		DD_END_CLASS()
 	};
 }

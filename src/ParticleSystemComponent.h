@@ -62,30 +62,29 @@ namespace dd
 
 		Particle Particles[MAX_PARTICLES];
 
-		DD_CLASS( dd::ParticleSystemComponent )
-		{
+		DD_BEGIN_CLASS( dd::ParticleSystemComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::ParticleSystemComponent, Seed );
+			DD_MEMBER( Seed );
 
-			DD_MEMBER( dd::ParticleSystemComponent, MinLifetime );
-			DD_MEMBER( dd::ParticleSystemComponent, MaxLifetime );
+			DD_MEMBER( MinLifetime );
+			DD_MEMBER( MaxLifetime );
 
-			DD_MEMBER( dd::ParticleSystemComponent, Lifetime );
-			DD_MEMBER( dd::ParticleSystemComponent, Age );
+			DD_MEMBER( Lifetime );
+			DD_MEMBER( Age );
 
-			DD_MEMBER( dd::ParticleSystemComponent, MinVelocity );
-			DD_MEMBER( dd::ParticleSystemComponent, MaxVelocity );
+			DD_MEMBER( MinVelocity );
+			DD_MEMBER( MaxVelocity );
 
-			DD_MEMBER( dd::ParticleSystemComponent, MinColour );
-			DD_MEMBER( dd::ParticleSystemComponent, MaxColour );
+			DD_MEMBER( MinColour );
+			DD_MEMBER( MaxColour );
 
-			DD_MEMBER( dd::ParticleSystemComponent, MinSize );
-			DD_MEMBER( dd::ParticleSystemComponent, MaxSize );
+			DD_MEMBER( MinSize );
+			DD_MEMBER( MaxSize );
 
-			DD_MEMBER( dd::ParticleSystemComponent, LiveCount );
+			DD_MEMBER( LiveCount );
 
-			DD_MEMBER( dd::ParticleSystemComponent, EmissionRate );
-		}
+			DD_MEMBER( EmissionRate );
+		DD_END_CLASS()
 	};
 }

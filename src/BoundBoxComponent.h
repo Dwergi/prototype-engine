@@ -14,11 +14,10 @@ namespace dd
 	{
 		ddm::AABB BoundBox;
 
-		DD_CLASS( dd::BoundBoxComponent )
-		{
+		DD_BEGIN_CLASS( dd::BoundBoxComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::BoundBoxComponent, BoundBox );
-		}
+			DD_MEMBER( BoundBox );
+		DD_END_CLASS()
 	};
 }

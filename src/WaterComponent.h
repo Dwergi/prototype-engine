@@ -14,9 +14,8 @@ namespace dd
 		int LOD { 0 };
 		bool Dirty { false };
 
-		DD_CLASS( dd::WaterComponent )
-		{
+		DD_BEGIN_CLASS( dd::WaterComponent )
 			DD_COMPONENT();
-		}
+		DD_END_CLASS()
 	};
 }

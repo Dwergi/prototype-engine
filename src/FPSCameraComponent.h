@@ -49,27 +49,26 @@ namespace dd
 
 		void CopyValuesFrom( const FPSCameraComponent& other );
 		
-		DD_CLASS( dd::FPSCameraComponent )
-		{
+		DD_BEGIN_CLASS( dd::FPSCameraComponent )
 			DD_COMPONENT();
 
-			DD_METHOD( dd::FPSCameraComponent, SetRotation );
-			DD_METHOD( dd::FPSCameraComponent, GetYaw );
-			DD_METHOD( dd::FPSCameraComponent, GetPitch );
-			DD_METHOD( dd::FPSCameraComponent, GetPosition );
-			DD_METHOD( dd::FPSCameraComponent, SetPosition );
-			DD_METHOD( dd::FPSCameraComponent, GetDirection );
-			DD_METHOD( dd::FPSCameraComponent, SetDirection );
-			DD_METHOD( dd::FPSCameraComponent, GetNear );
-			DD_METHOD( dd::FPSCameraComponent, SetNear );
-			DD_METHOD( dd::FPSCameraComponent, GetFar );
-			DD_METHOD( dd::FPSCameraComponent, SetFar );
-			DD_METHOD( dd::FPSCameraComponent, GetAspectRatio );
-			DD_METHOD( dd::FPSCameraComponent, SetAspectRatio );
-			DD_METHOD( dd::FPSCameraComponent, GetProjectionMatrix );
-			DD_METHOD( dd::FPSCameraComponent, GetVerticalFOV );
-			DD_METHOD( dd::FPSCameraComponent, SetVerticalFOV );
-		}
+			DD_METHOD( SetRotation );
+			DD_METHOD( GetYaw );
+			DD_METHOD( GetPitch );
+			DD_METHOD( GetPosition );
+			DD_METHOD( SetPosition );
+			DD_METHOD( GetDirection );
+			DD_METHOD( SetDirection );
+			DD_METHOD( GetNear );
+			DD_METHOD( SetNear );
+			DD_METHOD( GetFar );
+			DD_METHOD( SetFar );
+			DD_METHOD( GetAspectRatio );
+			DD_METHOD( SetAspectRatio );
+			DD_METHOD( GetProjectionMatrix );
+			DD_METHOD( GetVerticalFOV );
+			DD_METHOD( SetVerticalFOV );
+		DD_END_CLASS()
 
 	private:
 

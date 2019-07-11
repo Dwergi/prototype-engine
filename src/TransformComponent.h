@@ -30,14 +30,13 @@ namespace dd
 
 		ALIGNED_ALLOCATORS( 16 );
 
-		DD_CLASS( dd::TransformComponent )
-		{
+		DD_BEGIN_CLASS( dd::TransformComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::TransformComponent, Position );
-			DD_MEMBER( dd::TransformComponent, Rotation );
-			DD_MEMBER( dd::TransformComponent, Scale );
-		}
+			DD_MEMBER( Position );
+			DD_MEMBER( Rotation );
+			DD_MEMBER( Scale );
+		DD_END_CLASS()
 
 	private:
 

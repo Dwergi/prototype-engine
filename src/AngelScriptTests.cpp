@@ -52,9 +52,7 @@ struct AngelScriptTest
 	static bool FunctionRetCalled;
 	static bool FunctionArgCalled;
 
-	DD_CLASS( AngelScriptTest )
-	{
-	}
+	DD_BASIC_TYPE( AngelScriptTest )
 };
 
 bool AngelScriptTest::FunctionCalled = false;

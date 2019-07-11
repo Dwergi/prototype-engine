@@ -14,12 +14,11 @@ namespace dd
 	{
 		ddm::Sphere Sphere;
 
-		DD_CLASS( dd::BoundSphereComponent )
-		{
+		DD_BEGIN_CLASS( dd::BoundSphereComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::BoundSphereComponent, Sphere );
-		}
+			DD_MEMBER( Sphere );
+		DD_END_CLASS()
 	};
 
 	DD_SERIALIZABLE( dd::BoundSphereComponent );

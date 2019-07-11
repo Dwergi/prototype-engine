@@ -30,18 +30,17 @@ namespace dd
 		// The number of seconds to recharge to full boost.
 		float BoostMaximum { 0 };
 
-		DD_CLASS( dd::ShipComponent )
-		{
+		DD_BEGIN_CLASS( dd::ShipComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::ShipComponent, Velocity );
-			DD_MEMBER( dd::ShipComponent, MaximumSpeed );
-			DD_MEMBER( dd::ShipComponent, MinimumSpeed );
-			DD_MEMBER( dd::ShipComponent, Acceleration );
-			DD_MEMBER( dd::ShipComponent, BoostFactor );
-			DD_MEMBER( dd::ShipComponent, BoostRemaining );
-			DD_MEMBER( dd::ShipComponent, BoostRechargeRate );
-			DD_MEMBER( dd::ShipComponent, BoostMaximum );
-		}
+			DD_MEMBER( Velocity );
+			DD_MEMBER( MaximumSpeed );
+			DD_MEMBER( MinimumSpeed );
+			DD_MEMBER( Acceleration );
+			DD_MEMBER( BoostFactor );
+			DD_MEMBER( BoostRemaining );
+			DD_MEMBER( BoostRechargeRate );
+			DD_MEMBER( BoostMaximum );
+		DD_END_CLASS()
 	};
 };

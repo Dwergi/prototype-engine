@@ -15,12 +15,11 @@ namespace dd
 		ddm::Plane Plane;
 		float Elasticity { 1.0f };
 
-		DD_CLASS( dd::PhysicsPlaneComponent )
-		{
+		DD_BEGIN_CLASS( dd::PhysicsPlaneComponent )
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::PhysicsPlaneComponent, Plane );
-			DD_MEMBER( dd::PhysicsPlaneComponent, Elasticity );
-		}
+			DD_MEMBER( Plane );
+			DD_MEMBER( Elasticity );
+		DD_END_CLASS()
 	};
 }

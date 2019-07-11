@@ -29,17 +29,21 @@
 
 #define DD_TYPE_STR( NameString ) dd::TypeInfo::GetType( NameString )
 
-#define DD_CLASS( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo )
+#define DD_BEGIN_CLASS( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) { using TClass = TypeName;
+
+#define DD_END_CLASS() }
 
 #define DD_COMPONENT() typeInfo->RegisterComponent()
+
+#define DD_TAG_COMPONENT( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) { typeInfo->RegisterComponent(); }
 
 #define DD_REGISTER_PARENT( TypeName, ParentType ) dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
 
 #define DD_PARENT( ParentType ) typeInfo->RegisterParentType<ParentType>()
 
-#define DD_MEMBER( TypeName, MemberName ) typeInfo->RegisterMember<TypeName, decltype(MemberName), &TypeName::MemberName>( #MemberName )
+#define DD_MEMBER( MemberName ) typeInfo->RegisterMember<TClass, decltype(MemberName), &TClass::MemberName>( #MemberName )
 
-#define DD_METHOD( TypeName, MethodName ) typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
+#define DD_METHOD( MethodName ) typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
 
 #define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
 

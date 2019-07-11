@@ -59,10 +59,9 @@ namespace ddm
 		glm::vec3 Min;
 		glm::vec3 Max;
 
-		DD_CLASS( AABB )
-		{
-			DD_MEMBER( AABB, Min );
-			DD_MEMBER( AABB, Max );
-		}
+		DD_BEGIN_CLASS( AABB )
+			DD_MEMBER( Min );
+			DD_MEMBER( Max );
+		DD_END_CLASS()
 	};
 }

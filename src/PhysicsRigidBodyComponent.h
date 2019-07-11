@@ -21,15 +21,14 @@ namespace dd
 		// Offset relative to placement point.
 		glm::vec3 CentreOfMass; 
 
-		DD_CLASS( dd::PhysicsRigidBodyComponent )
-		{
+		DD_BEGIN_CLASS( dd::PhysicsRigidBodyComponent )
 			DD_PARENT( dd::PhysicsBase );
 			DD_COMPONENT();
 
-			DD_MEMBER( dd::PhysicsRigidBodyComponent, AngularMomentum );
-			DD_MEMBER( dd::PhysicsRigidBodyComponent, Spin );
-			DD_MEMBER( dd::PhysicsRigidBodyComponent, AngularInertia );
-			DD_MEMBER( dd::PhysicsRigidBodyComponent, CentreOfMass );
-		}
+			DD_MEMBER( AngularMomentum );
+			DD_MEMBER( Spin );
+			DD_MEMBER( AngularInertia );
+			DD_MEMBER( CentreOfMass );
+		DD_END_CLASS()
 	};
 }
