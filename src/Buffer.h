@@ -18,6 +18,7 @@ namespace dd
 
 		virtual const void* GetVoid() const = 0;
 		int SizeBytes() const;
+		int Size() const;
 
 	protected:
 
@@ -64,8 +65,6 @@ namespace dd
 		virtual const void* GetVoid() const override { return m_ptr; }
 
 		const T* ReleaseConst();
-
-		int Size() const;
 
 		void Delete();
 

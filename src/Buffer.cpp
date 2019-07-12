@@ -21,6 +21,11 @@ namespace dd
 		m_elementSize = 0;
 	}
 
+	int IBuffer::Size() const
+	{
+		return m_count;
+	}
+
 	int IBuffer::SizeBytes() const
 	{
 		return m_count * m_elementSize;

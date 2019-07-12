@@ -69,7 +69,7 @@ namespace dd
 
 		DD_BASIC_TYPE( String )
 
-		DEFINE_ITERATORS( char, m_buffer.Get(), m_length )
+		DD_DEFINE_ITERATORS( char, m_buffer.Get(), m_length )
 
 	protected:
 

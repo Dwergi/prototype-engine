@@ -44,7 +44,7 @@ namespace dd
 
 		DD_BASIC_TYPE( SharedString )
 		
-		DEFINE_ITERATORS( const char, *m_ptr, m_length )
+		DD_DEFINE_ITERATORS( const char, *m_ptr, m_length )
 
 	private:
 

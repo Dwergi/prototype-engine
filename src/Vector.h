@@ -117,7 +117,7 @@ namespace dd
 		//
 		// Iteration
 		//
-		DEFINE_ITERATORS( T, m_data, m_size )
+		DD_DEFINE_ITERATORS( T, m_data, m_size )
 
 	private:
 

@@ -12,8 +12,8 @@ namespace dd
 	class IArray
 	{
 	public:
-		uint Capacity() const { return m_capacity; }
-		uint Size() const { return m_size; }
+		int Capacity() const { return m_data.Size(); }
+		int Size() const { return m_size; }
 
 		virtual ~IArray();
 		IArray<T>& operator=( const IArray<T>& other );
@@ -22,7 +22,7 @@ namespace dd
 		void Add( const T& value );
 		void PushAll( const IArray<T>& other );
 
-		void RemoveAt( uint index );
+		void RemoveAt( int index );
 		void Remove( const T& value );
 
 		T Pop();
@@ -36,23 +36,23 @@ namespace dd
 		T& First() const;
 
 		T* Data() { return m_data; }
-		void SetSize( uint size ) { m_size = size; }
+		void SetSize( int size ) { m_size = size; }
 
-		DEFINE_ITERATORS( T, m_data, m_size )
+		T* begin() const { return m_data.begin(); }
+		T* end() const { return m_data.end(); }
 
 	protected:
 
-		uint m_capacity;
-		uint m_size;
-		T* m_data;
+		int m_size;
+		Buffer<T> m_data;
 
-		IArray( T* buffer, uint capacity );
+		IArray( T* buffer, int capacity );
 	};
 
 	//
 	// Array is, as the name implies, a static array that is allocated on the stack. Useful for temporary passing around of values. 
 	//
-	template <typename T, uint MaxCapacity>
+	template <typename T, int MaxCapacity>
 	class Array 
 		: public IArray<T>
 	{
@@ -65,7 +65,7 @@ namespace dd
 
 	private:
 
-		T m_buffer[ MaxCapacity ];
+		T m_inline[ MaxCapacity ];
 	};
 }
 

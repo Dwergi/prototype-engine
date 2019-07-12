@@ -123,12 +123,6 @@ void ConstBuffer<T>::Delete()
 }
 
 template <typename T>
-int ConstBuffer<T>::Size() const
-{
-	return m_count;
-}
-
-template <typename T>
 const T& ConstBuffer<T>::operator[]( size_t index ) const
 {
 	DD_ASSERT( index < m_count );

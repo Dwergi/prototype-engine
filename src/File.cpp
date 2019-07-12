@@ -49,24 +49,38 @@ namespace dd
 		m_path.append( path );
 	}
 
-	bool File::Read( byte* buffer, size_t length ) const
+	size_t File::Read( Buffer<byte>& buffer ) const
 	{
-		if( length < Size() )
+		if(buffer.SizeBytes() < Size())
 		{
-			return false;
+			return 0;
 		}
 
 		std::ifstream stream( m_path );
 		if( stream.bad() )
 		{
-			return false;
+			return 0;
 		}
 
-		stream.read( reinterpret_cast<char*>( buffer ), length );
-		return true;
+		stream.read((char*) buffer.Access(), (size_t) buffer.SizeBytes());
+		return stream.tellg();
 	}
 
-	bool File::Read( std::string& dst ) const
+	Buffer<byte> File::ReadIntoBuffer() const
+	{
+		size_t file_size = Size();
+		Buffer<byte> buffer(new byte[file_size], file_size);
+
+		size_t read = Read(buffer);
+		if (read == 0)
+		{
+			buffer.Delete();
+		}
+		
+		return buffer;
+	}
+
+	size_t File::Read( std::string& dst ) const
 	{
 		std::ifstream stream( m_path );
 		if( stream.bad() )
@@ -85,7 +99,7 @@ namespace dd
 			dst.resize( i );
 		}
 
-		return true;
+		return dst.length();
 	}
 
 	bool File::Write( const std::string& src ) const
@@ -100,7 +114,7 @@ namespace dd
 		return true;
 	}
 
-	bool File::Write( const byte* buffer, size_t length ) const
+	bool File::Write( const IBuffer& buffer ) const
 	{
 		std::ofstream stream( m_path );
 		if( stream.bad() )
@@ -108,7 +122,7 @@ namespace dd
 			return false;
 		}
 
-		stream.write( reinterpret_cast<const char*>( buffer ), length );
+		stream.write(reinterpret_cast<const char*>(buffer.GetVoid()), buffer.SizeBytes());
 		return true;
 	}
 }

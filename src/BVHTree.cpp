@@ -116,8 +116,8 @@ namespace dd
 
 		BVHBucket& bucket = m_buckets[ current_index ];
 
-		uint remove_at = -1;
-		for( uint i = 0; i < bucket.Entries.Size(); ++i )
+		int remove_at = -1;
+		for( int i = 0; i < bucket.Entries.Size(); ++i )
 		{
 			if( bucket.Entries[ i ] == handle )
 			{

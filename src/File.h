@@ -16,11 +16,12 @@ namespace dd
 
 		std::string Path() const { return m_path.string(); }
 
-		bool Read( std::string& dst ) const;
-		bool Read( byte* dst, size_t length ) const;
+		size_t Read(std::string& dst) const;
+		size_t Read(Buffer<byte>& buffer) const;
+		Buffer<byte> ReadIntoBuffer() const;
 
-		bool Write( const std::string& src ) const;
-		bool Write( const byte* src, size_t length ) const;
+		bool Write(const std::string& src) const;
+		bool Write(const IBuffer& buffer) const;
 
 		size_t Size() const { return std::filesystem::file_size( m_path ); }
 

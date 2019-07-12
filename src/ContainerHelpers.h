@@ -13,43 +13,43 @@ namespace dd
 	static __declspec(thread) char s_buffer[BUFFER_SIZE];
 
 	template <typename T>
-	void CopyRange( const T* src, T* dest, uint count )
+	void CopyRange( const T* src, T* dest, int count )
 	{
 		DD_ASSERT( (count * sizeof( T )) <= BUFFER_SIZE );
 
 		T* temp = reinterpret_cast<T*>(s_buffer);
 
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			new (&temp[i]) T( src[i] );
 		}
 
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			new (&dest[i]) T( std::move( temp[i] ) );
 		}
 	}
 
 	template <typename T>
-	void ConstructRange( T* src, uint count )
+	void ConstructRange( T* src, int count )
 	{
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			new (&src[i]) T();
 		}
 	}
 
 	template <typename T>
-	void DestroyRange( T* src, uint count )
+	void DestroyRange( T* src, int count )
 	{
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			src[i].~T();
 		}
 	}
 
 	template <typename T>
-	void MoveRange( const T* src, T* dest, uint count )
+	void MoveRange( const T* src, T* dest, int count )
 	{
 		DD_ASSERT( src != nullptr && dest != nullptr );
 		DD_ASSERT( src != dest );
@@ -58,13 +58,13 @@ namespace dd
 
 		T* temp = reinterpret_cast<T*>(s_buffer);
 
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			new (&temp[i]) T( std::move( src[i] ) );
 			src[i].~T();
 		}
 
-		for( uint i = 0; i < count; ++i )
+		for( int i = 0; i < count; ++i )
 		{
 			new (&dest[i]) T( std::move( temp[i] ) );
 		}

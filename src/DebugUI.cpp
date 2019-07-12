@@ -324,10 +324,10 @@ namespace dd
 		File file = File( "fonts\\Roboto-Medium.ttf" );
 
 		size_t size = file.Size();
-		byte* buffer = new byte[ size ];
-		file.Read( buffer, size );
+		Buffer<byte> buffer(new byte[size], size);
+		size_t read = file.Read( buffer );
 
-		io.Fonts->AddFontFromMemoryTTF( buffer, (int) size, 16.0f );
+		io.Fonts->AddFontFromMemoryTTF( buffer.Access(), (int) read, 16.0f );
 
 		//io.Fonts->AddFontDefault();
 
