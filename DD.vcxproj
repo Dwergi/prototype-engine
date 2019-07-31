@@ -347,6 +347,7 @@
     <ClInclude Include="src\CommandBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
+    <ClInclude Include="src\IGame.h" />
     <ClInclude Include="src\HandleManager.h" />
     <ClInclude Include="src\IHandlesInput.h" />
     <ClInclude Include="src\IInputSource.h" />
@@ -355,6 +356,7 @@
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
     <ClInclude Include="src\MeshRenderCommand.h" />
+    <ClInclude Include="src\NeutrinoGame.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
@@ -444,6 +446,7 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\TerrainRenderer.h" />
+    <ClInclude Include="src\TestEntities.h" />
     <ClInclude Include="src\TreeComponent.h" />
     <ClInclude Include="src\TreeSystem.h" />
     <ClInclude Include="src\Triangulator.h" />
@@ -598,6 +601,7 @@
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
+    <ClCompile Include="src\NeutrinoGame.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
@@ -667,6 +671,7 @@
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />
+    <ClCompile Include="src\TestEntities.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

@@ -16,15 +16,15 @@ namespace dd
 {
 	static void AddValue( const String& name, Variable& var )
 	{
-		if( var.Type() == DD_TYPE( float ) )
+		if( var.Type() == DD_FIND_TYPE( float ) )
 		{
 			ImGui::DragFloat( name.c_str(), &var.GetValue<float>(), 0.001f );
 		}
-		else if( var.Type() == DD_TYPE( int ) )
+		else if( var.Type() == DD_FIND_TYPE( int ) )
 		{
 			ImGui::DragInt( name.c_str(), &var.GetValue<int>() );
 		}
-		else if( var.Type() == DD_TYPE( bool ) )
+		else if( var.Type() == DD_FIND_TYPE( bool ) )
 		{
 			ImGui::Checkbox( name.c_str(), &var.GetValue<bool>() );
 		}

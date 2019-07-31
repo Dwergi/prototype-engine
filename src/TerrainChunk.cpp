@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TerrainParameters.h"
@@ -27,6 +28,11 @@
 
 namespace dd
 {
+	static dd::Service<JobSystem> s_jobsystem;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
+	static dd::Service<ddr::MeshManager> s_meshManager;
+
 	ddr::ShaderHandle TerrainChunk::s_shader;
 	ddr::MaterialHandle TerrainChunk::s_material;
 
@@ -34,8 +40,7 @@ namespace dd
 
 	static std::vector<uint> s_indices[TerrainParameters::LODs];
 
-	TerrainChunk::TerrainChunk( JobSystem& jobsystem, const TerrainParameters& params, glm::vec2 position ) :
-		m_jobsystem( jobsystem ),
+	TerrainChunk::TerrainChunk( const TerrainParameters& params, glm::vec2 position ) :
 		m_terrainParams( params ),
 		m_state( s_fsmPrototype ),
 		m_position( position )
@@ -45,7 +50,7 @@ namespace dd
 
 	TerrainChunk::~TerrainChunk()
 	{
-		ddr::MeshManager::Instance()->Destroy( m_mesh );
+		s_meshManager->Destroy( m_mesh );
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -67,7 +72,7 @@ namespace dd
 			indices.reserve( mesh_index_count + flap_index_count );
 
 			// fetch grid indices
-			const std::vector<uint>& grid_indices = GetGridIndices( MaxVertices, lod );
+			const std::vector<uint>& grid_indices = dd::MeshUtils::GetGridIndices( MaxVertices, lod );
 			indices.insert( indices.end(), grid_indices.begin(), grid_indices.end() );
 
 			DD_ASSERT( indices.size() == mesh_index_count );
@@ -167,8 +172,8 @@ namespace dd
 
 	void TerrainChunk::CreateRenderResources()
 	{
-		s_shader = ddr::ShaderManager::Instance()->Load( "terrain" );
-		s_material = ddr::MaterialManager::Instance()->Create( "terrain" );
+		s_shader = s_shaderManager->Load( "terrain" );
+		s_material = s_materialManager->Create( "terrain" );
 
 		ddr::Material* material = s_material.Access();
 		material->Shader = s_shader;
@@ -245,7 +250,7 @@ namespace dd
 	{
 		if( m_state == INITIALIZE_PENDING )
 		{
-			m_jobsystem.Schedule( [this]() { Initialize(); } );
+			s_jobsystem->Schedule( [this]() { Initialize(); } );
 		}
 
 		if( m_state == INITIALIZE_DONE )
@@ -271,7 +276,7 @@ namespace dd
 		{
 			if( !m_updating.exchange( true ) )
 			{
-				m_jobsystem.Schedule( [this]() { UpdateVertices(); } );
+				s_jobsystem->Schedule( [this]() { UpdateVertices(); } );
 			}
 		}
 
@@ -357,7 +362,7 @@ namespace dd
 
 		std::string name = fmt::format( "terrain_{}x{}", (int) pos.x, (int) pos.y );
 
-		m_mesh = ddr::MeshManager::Instance()->Create( name.c_str() );
+		m_mesh = s_meshManager->Create( name.c_str() );
 
 		ddr::Mesh* mesh = m_mesh.Access();
 		mesh->SetMaterial( s_material );

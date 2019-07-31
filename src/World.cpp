@@ -3,11 +3,14 @@
 
 #include "JobSystem.h"
 #include "UpdateData.h"
+#include "Services.h"
 #include "System.h"
 #include "SystemsSorting.h"
 
 namespace ddc
 {
+	static dd::Service<dd::JobSystem> s_jobsystem;
+
 	DD_STATIC_ASSERT( sizeof( Entity ) <= sizeof( uint ) + sizeof( uint ) );
 
 	static void WaitForAllFutures( std::vector<std::shared_future<void>>& futures )
@@ -29,9 +32,10 @@ namespace ddc
 		}
 	}
 
-	World::World( dd::JobSystem& jobsystem ) :
-		m_jobsystem( jobsystem )
+	World::World()
 	{
+		DD_TODO("Split this up again - World should really be something more like EntitySpace. Systems can be updated elsewhere.")
+
 		m_components.resize( dd::TypeInfo::ComponentCount() );
 
 		for( dd::ComponentID i = 0; i < m_components.size(); ++i )
@@ -388,7 +392,7 @@ namespace ddc
 			System* system = s.m_system;
 			auto futures = GetFutures( s, m_orderedSystems );
 
-			s.m_update = m_jobsystem.Schedule( [this, system, futures, delta_t]()
+			s.m_update = s_jobsystem->Schedule( [this, system, futures, delta_t]()
 			{
 				UpdateSystem( system, futures, delta_t );
 			} ).share();

@@ -22,15 +22,13 @@ namespace ddr
 {
 	struct WaterRenderer : Renderer
 	{
-		WaterRenderer( dd::JobSystem& jobsystem );
+		WaterRenderer();
 
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void RenderUpdate( ddc::World& world ) override;
 		virtual void Render( const RenderData& render_data ) override;
 
 	private:
-
-		dd::JobSystem& m_jobSystem;
 		RenderState m_renderState;
 	};
 }

@@ -92,6 +92,11 @@ namespace dd
 		m_glfwWindow = glfwCreateWindow( mode->width, mode->height, m_title.c_str(), monitor, NULL );
 	}
 
+	void Window::ShowConsole(bool show)
+	{
+		::ShowWindow(GetConsoleWindow(), show ? SW_SHOW : SW_HIDE);
+	}
+
 	bool Window::IsValid() const
 	{
 		return m_glfwWindow != nullptr;

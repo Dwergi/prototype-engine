@@ -7,6 +7,13 @@
 namespace dd
 {
 	template <typename T>
+	HandleManager<T>::HandleManager()
+	{
+		DD_ASSERT(Handle<T>::m_manager == nullptr);
+		Handle<T>::m_manager = this;
+	}
+
+	template <typename T>
 	Handle<T> HandleManager<T>::FindInternal( std::string name ) const
 	{
 		DD_ASSERT( !name.empty() );

@@ -19,7 +19,7 @@
 
 #define DD_REGISTER_CONTAINER( Container, Containing ) dd::TypeInfo::RegisterContainer<dd::RemoveQualifiers<Container<Containing>>::type, Containing>( #Container )
 
-#define DD_TYPE( TypeName ) dd::TypeInfo::GetType<TypeName>()
+#define DD_FIND_TYPE( TypeName ) dd::TypeInfo::GetType<TypeName>()
 
 #define DD_TYPE_OF( Object ) dd::TypeInfo::GetType<dd::RemoveQualifiers<decltype(Object)>::type>()
 
@@ -58,6 +58,8 @@
 #define DD_ENUM( TypeName ) template <> void RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
 
 #define DD_ENUM_OPTION( TypeName, OptionName ) typeInfo->RegisterEnumOption( DD_CONCAT_NAMESPACE( TypeName, OptionName ), #OptionName )
+
+#define DD_POD_CPP( TypeName ) static dd::PODRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 
 #define DD_TYPE_CPP( TypeName ) static dd::ClassRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 

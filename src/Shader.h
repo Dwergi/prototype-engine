@@ -106,8 +106,6 @@ namespace ddr
 		//
 		void ReloadAll();
 
-		static ShaderManager* Instance() { return static_cast<ShaderManager*>( s_singleton ); }
-
 	private:
 		using base = HandleManager<Shader>;
 	};

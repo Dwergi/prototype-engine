@@ -9,7 +9,7 @@
 
 #include "Uniforms.h"
 
-DD_HANDLE_MANAGER( ddr::Material );
+DD_POD_CPP(ddr::MaterialHandle);
 
 namespace ddr
 {

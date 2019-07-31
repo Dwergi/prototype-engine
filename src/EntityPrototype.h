@@ -48,7 +48,7 @@ namespace ddc
 	template <typename TComponent>
 	ComponentPrototype::ComponentPrototype( const TComponent& cmp )
 	{
-		const TypeInfo* typeInfo = DD_TYPE( TComponent );
+		const TypeInfo* typeInfo = DD_FIND_TYPE( TComponent );
 		DD_ASSERT( typeInfo != nullptr && typeInfo->ComponentID() != INVALID_COMPONENT );
 
 		Initialize( &cmp, typeInfo );

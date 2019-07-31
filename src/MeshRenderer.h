@@ -26,7 +26,7 @@ namespace ddr
 	class MeshRenderer : public dd::IDebugPanel, public ddr::Renderer
 	{
 	public:
-		MeshRenderer( dd::JobSystem& job_system );
+		MeshRenderer();
 
 		virtual void RenderInit( ddc::World& world ) override;
 		virtual void RenderUpdate( ddc::World& world ) override;
@@ -43,8 +43,6 @@ namespace ddr
 
 		MeshHandle m_cube;
 		
-		dd::JobSystem& m_jobsystem;
-
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data );

@@ -6,11 +6,6 @@
 #include "MessageQueue.h"
 #include "SystemsSorting.h"
 
-namespace dd
-{
-	struct JobSystem;
-}
-
 namespace ddc
 {
 	enum class Tag : uint
@@ -31,7 +26,7 @@ namespace ddc
 
 	struct World : dd::IDebugPanel
 	{
-		World( dd::JobSystem& jobsystem );
+		World();
 
 		//
 		// Initialize all currently registered systems.
@@ -96,7 +91,7 @@ namespace ddc
 		template <typename T>
 		T* Access( Entity entity ) const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			return reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
 		}
@@ -107,7 +102,7 @@ namespace ddc
 		template <typename T>
 		bool Access( Entity entity, T*& cmp ) const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			cmp = reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
 			return cmp != nullptr;
@@ -124,7 +119,7 @@ namespace ddc
 		template <typename T>
 		const T* Get( Entity entity ) const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			return reinterpret_cast<const T*>(GetComponent( entity, type->ComponentID() ));
 		}
@@ -139,7 +134,7 @@ namespace ddc
 		template <typename T>
 		bool Has( Entity entity ) const
 		{
-			return HasComponent( entity, DD_TYPE( T )->ComponentID() );
+			return HasComponent( entity, DD_FIND_TYPE( T )->ComponentID() );
 		}
 
 		//
@@ -159,7 +154,7 @@ namespace ddc
 		template <typename T>
 		T& Add( Entity entity )
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			return *reinterpret_cast<T*>(AddComponent( entity, type->ComponentID() ));
 		}
@@ -175,7 +170,7 @@ namespace ddc
 		template <typename T>
 		void Remove( Entity entity )
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 			RemoveComponent( entity, type->ComponentID() );
 		}
 
@@ -250,7 +245,6 @@ namespace ddc
 		};
 
 		dd::MessageQueue m_messages;
-		dd::JobSystem& m_jobsystem;
 
 		std::vector<EntityEntry> m_entities;
 		std::vector<uint> m_free;
@@ -286,7 +280,7 @@ namespace ddc
 	template <typename T>
 	void SetBitmask( ComponentBits& mask )
 	{
-		mask.set( DD_TYPE( T )->ComponentID(), true );
+		mask.set( DD_FIND_TYPE( T )->ComponentID(), true );
 	}
 
 	template <typename... TComponents>

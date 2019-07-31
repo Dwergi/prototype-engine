@@ -18,10 +18,10 @@
 
 namespace ddr
 {
+	static dd::Service<dd::JobSystem> s_jobSystem;
 
-	WaterRenderer::WaterRenderer( dd::JobSystem& jobSystem ) :
-		Renderer( "Lines" ),
-		m_jobSystem( jobSystem )
+	WaterRenderer::WaterRenderer() :
+		Renderer( "Lines" )
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::WaterComponent>();
@@ -42,7 +42,7 @@ namespace ddr
 			{
 				ddr::Mesh* mesh = water.Mesh.Access();
 				mesh->SetPositions( dd::ConstBuffer<glm::vec3>( water.Vertices ) );
-				mesh->SetIndices( dd::ConstBuffer<uint>( dd::GetGridIndices( dd::WaterComponent::VertexCount, water.LOD ) ) );
+				mesh->SetIndices( dd::ConstBuffer<uint>( dd::MeshUtils::GetGridIndices( dd::WaterComponent::VertexCount, water.LOD ) ) );
 
 				water.Dirty = false;
 			}
@@ -65,7 +65,7 @@ namespace ddr
 				continue;
 
 			ddr::Mesh* mesh = waters[i].Mesh.Access();
-			mesh->Update( m_jobSystem );
+			mesh->Update( *s_jobSystem );
 
 			ddm::AABB transformed = bound_boxes[i].BoundBox.GetTransformed( transforms[i].Transform() );
 

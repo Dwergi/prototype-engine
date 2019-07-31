@@ -21,6 +21,7 @@
 #include "ParticleSystemComponent.h"
 #include "RayComponent.h"
 #include "RenderData.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TransformComponent.h"
@@ -32,6 +33,9 @@
 #include "HitTest.h"
 
 #include "glm/gtx/rotate_vector.hpp"
+
+static dd::Service<ddr::ShaderManager> s_shaderManager;
+static dd::Service<ddr::MaterialManager> s_materialManager;
 
 namespace dd
 {
@@ -104,8 +108,8 @@ namespace dd
 
 	void MousePicking::RenderInit( ddc::World& world )
 	{
-		ddr::ShaderHandle shader = ddr::ShaderManager::Instance()->Load( "picking" );
-		m_material = ddr::MaterialManager::Instance()->Create( "picking" );
+		ddr::ShaderHandle shader = s_shaderManager->Load( "picking" );
+		m_material = s_materialManager->Create( "picking" );
 		m_material.Access()->Shader = shader;
 
 		CreateFrameBuffer( m_window.GetSize() );

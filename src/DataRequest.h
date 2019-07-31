@@ -56,7 +56,7 @@ namespace ddc
 	struct ReadRequirement : DataRequest
 	{
 		ReadRequirement( const char* name ) :
-			DataRequest( DD_TYPE( TComponent ), DataUsage::Read, DataCardinality::Required, name )
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -65,7 +65,7 @@ namespace ddc
 	struct WriteRequirement : DataRequest
 	{
 		WriteRequirement( const char* name ) :
-			DataRequest( DD_TYPE( TComponent ), DataUsage::Write, DataCardinality::Required, name )
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Required, name )
 		{
 		}
 	};
@@ -74,7 +74,7 @@ namespace ddc
 	struct ReadOptional : DataRequest
 	{
 		ReadOptional( const char* name ) :
-			DataRequest( DD_TYPE( TComponent ), DataUsage::Read, DataCardinality::Optional, name )
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Optional, name )
 		{
 		}
 	};
@@ -83,7 +83,7 @@ namespace ddc
 	struct WriteOptional : DataRequest
 	{
 		WriteOptional( const char* name ) :
-			DataRequest( DD_TYPE( TComponent ), DataUsage::Write, DataCardinality::Optional, name )
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Optional, name )
 		{
 		}
 	};

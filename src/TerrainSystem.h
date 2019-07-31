@@ -18,7 +18,6 @@ namespace ddr
 namespace dd
 {
 	struct ICamera;
-	struct JobSystem;
 	struct BoundBoxComponent;
 	struct ColourComponent;
 	struct MeshComponent;
@@ -35,7 +34,7 @@ namespace dd
 		//
 		static const int ChunksPerDimension = 32;
 
-		TerrainSystem( JobSystem& jobSystem );
+		TerrainSystem();
 		~TerrainSystem();
 
 		//
@@ -75,8 +74,6 @@ namespace dd
 		bool m_saveChunkImages { false };
 
 		glm::vec2 m_previousOffset;
-
-		JobSystem& m_jobsystem;
 
 		TerrainParameters m_params;
 

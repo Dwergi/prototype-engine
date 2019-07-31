@@ -88,8 +88,8 @@ TEST_CASE( "[AngelScript] Register Class" )
 
 	SECTION( "Members" )
 	{
-		engine.RegisterMember<AngelScriptTest, int, &AngelScriptTest::Integer>( "Integer", DD_TYPE( AngelScriptTest ) );
-		engine.RegisterMember<AngelScriptTest, bool, &AngelScriptTest::Boolean>( "Boolean", DD_TYPE( AngelScriptTest ) );
+		engine.RegisterMember<AngelScriptTest, int, &AngelScriptTest::Integer>( "Integer", DD_FIND_TYPE( AngelScriptTest ) );
+		engine.RegisterMember<AngelScriptTest, bool, &AngelScriptTest::Boolean>( "Boolean", DD_FIND_TYPE( AngelScriptTest ) );
 	}
 
 	SECTION( "Methods" )

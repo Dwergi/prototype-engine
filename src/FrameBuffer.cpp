@@ -10,6 +10,7 @@
 #include "GLError.h"
 #include "ICamera.h"
 #include "OpenGL.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -21,6 +22,8 @@ namespace ddr
 	VAO FrameBuffer::m_vaoFullscreen;
 	VBO FrameBuffer::m_vboFullscreen;
 	ShaderHandle FrameBuffer::m_blitShader;
+
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	static const glm::vec3 s_fullScreenQuadVertices[] = {
 		glm::vec3( -1.0f, -1.0f, 0.0f ),
@@ -103,7 +106,7 @@ namespace ddr
 	{
 		if( !m_blitShader.IsValid() )
 		{
-			m_blitShader = ShaderManager::Instance()->Load( "blit" );
+			m_blitShader = s_shaderManager->Load( "blit" );
 
 			Shader* shader = m_blitShader.Access();
 			shader->Use( true );

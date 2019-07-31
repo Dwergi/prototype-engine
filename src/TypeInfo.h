@@ -73,9 +73,6 @@ namespace dd
 		void RegisterParentType();
 
 		template <typename T>
-		void RegisterScriptType();
-
-		template <typename T>
 		void RegisterEnumOption( T value, const char* name );
 		const Vector<EnumOption>& GetEnumOptions() const { return m_enumOptions; }
 
@@ -140,8 +137,6 @@ namespace dd
 		static void RegisterQueuedTypes();
 		static void RegisterDefaultTypes();
 
-		static void SetScriptEngine( AngelScriptEngine* scriptEngine );
-
 		static const TypeInfo* GetComponent( dd::ComponentID id );
 		static size_t ComponentCount() { return sm_maxComponentID; }
 
@@ -155,8 +150,6 @@ namespace dd
 		dd::TypeID m_id { INVALID_TYPE };
 
 		uint m_size { 0 };
-
-		bool m_scriptObject { false };
 		
 		TypeKind m_typeKind;
 		
@@ -176,8 +169,6 @@ namespace dd
 		static std::unordered_map<String64, TypeInfo*>* sm_typeMap;
 		static std::vector<std::function<void()>>* sm_registrations;
 		static std::vector<TypeInfo*>* sm_components;
-
-		static AngelScriptEngine* sm_scriptEngine;
 
 		template <typename T>
 		void RegisterFunctions();
@@ -200,6 +191,15 @@ namespace dd
 			};
 
 			dd::TypeInfo::QueueRegistration( fn );
+		}
+	};
+
+	template <typename T>
+	struct PODRegistration
+	{
+		PODRegistration(const char* typeName)
+		{
+			dd::TypeInfo::RegisterPOD<T>(typeName);
 		}
 	};
 

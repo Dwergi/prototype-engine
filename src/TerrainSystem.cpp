@@ -17,6 +17,7 @@
 #include "PlayerComponent.h"
 #include "Random.h"
 #include "RenderData.h"
+#include "Services.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
 #include "TransformComponent.h"
@@ -28,6 +29,8 @@
 
 namespace dd
 {
+	static Service<JobSystem> s_jobsystem;
+
 	static glm::vec4 GetMeshColour( glm::vec2 pos, int lod )
 	{
 		glm::vec4 colour( 0, 0, 0, 1 );
@@ -62,9 +65,8 @@ namespace dd
 		return colour;
 	}
 
-	TerrainSystem::TerrainSystem( JobSystem& jobSystem ) :
+	TerrainSystem::TerrainSystem() :
 		ddc::System( "Terrain System" ),
-		m_jobsystem( jobSystem ),
 		m_previousOffset( INT_MAX, INT_MAX )
 	{
 		RequireWrite<TerrainChunkComponent>();
@@ -282,7 +284,7 @@ namespace dd
 		transform_cmp->Update();
 
 		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
-		TerrainChunk* chunk = new TerrainChunk( m_jobsystem, m_params, pos );
+		TerrainChunk* chunk = new TerrainChunk( m_params, pos );
 		chunk->SwitchLOD( lod );
 		chunk_cmp->Chunk = chunk;
 		chunk->Update();

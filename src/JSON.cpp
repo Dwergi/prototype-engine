@@ -17,15 +17,15 @@ namespace dd
 {
 	static void WritePOD( nlohmann::json& json, Variable& var )
 	{
-		if( var.Type() == DD_TYPE( float ) )
+		if( var.Type() == DD_FIND_TYPE( float ) )
 		{
 			json = var.GetValue<float>();
 		}
-		else if( var.Type() == DD_TYPE( int ) )
+		else if( var.Type() == DD_FIND_TYPE( int ) )
 		{
 			json = var.GetValue<int>();
 		}
-		else if( var.Type() == DD_TYPE( bool ) )
+		else if( var.Type() == DD_FIND_TYPE( bool ) )
 		{
 			json = var.GetValue<bool>();
 		}
@@ -107,19 +107,19 @@ namespace dd
 
 	static void ReadPOD( const nlohmann::json& json, Variable& var )
 	{
-		if( var.Type() == DD_TYPE( float ) )
+		if( var.Type() == DD_FIND_TYPE( float ) )
 		{
 			DD_ASSERT( json.is_number_float() );
 
 			var.GetValue<float>() = json.get<float>();
 		}
-		else if( var.Type() == DD_TYPE( int ) )
+		else if( var.Type() == DD_FIND_TYPE( int ) )
 		{
 			DD_ASSERT( json.is_number_integer() );
 
 			var.GetValue<int>() = json.get<int>();
 		}
-		else if( var.Type() == DD_TYPE( bool ) )
+		else if( var.Type() == DD_FIND_TYPE( bool ) )
 		{
 			DD_ASSERT( json.is_boolean() );
 

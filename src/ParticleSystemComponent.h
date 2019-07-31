@@ -13,8 +13,6 @@ namespace dd
 {
 	static const int MAX_PARTICLES = 128;
 
-	DD_TODO( "Particles probably don't need to store all of this. Could maybe just parameterize it?" );
-
 	struct Particle
 	{
 		glm::vec4 Colour;

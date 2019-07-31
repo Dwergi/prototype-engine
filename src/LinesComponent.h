@@ -10,12 +10,10 @@ namespace dd
 {
 	struct LinesComponent
 	{
-		std::vector<glm::vec3> Points;
+		dd::Vector<glm::vec3> Points;
 
 		DD_BEGIN_CLASS( dd::LinesComponent )
 			DD_COMPONENT();
-
-			DD_MEMBER( Points );
 		DD_END_CLASS()
 	};
 }

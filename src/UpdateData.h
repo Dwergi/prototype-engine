@@ -27,7 +27,7 @@ namespace ddc
 		template <typename T>
 		ddc::ReadView<T> Read() const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			for( const ComponentBuffer& buffer : m_buffers )
 			{
@@ -43,7 +43,7 @@ namespace ddc
 		template <typename T>
 		ddc::WriteView<T> Write() const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			for( const ComponentBuffer& buffer : m_buffers )
 			{

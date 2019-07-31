@@ -19,7 +19,6 @@ namespace dd
 
 	uint TypeInfo::sm_maxID = 0;
 	uint8 TypeInfo::sm_maxComponentID = 0;
-	AngelScriptEngine* TypeInfo::sm_scriptEngine = nullptr;
 
 	struct DefaultTypeRegistration
 	{
@@ -175,8 +174,6 @@ namespace dd
 		member.m_typeInfo = memberType;
 		member.m_parent = this;
 		member.m_offset = offset;
-
-		DD_TODO( "Script engine should use offset as well, see TypeInfo::RegisterMember." );
 	}
 
 	void TypeInfo::RegisterDefaultTypes()
@@ -255,11 +252,6 @@ namespace dd
 		mat4Type->RegisterMemberInternal( "y", vec4Type, (uintptr_t) vec4Type->Size() );
 		mat4Type->RegisterMemberInternal( "z", vec4Type, (uintptr_t) vec4Type->Size() * 2 );
 		mat4Type->RegisterMemberInternal( "w", vec4Type, (uintptr_t) vec4Type->Size() * 3 );
-	}
-
-	void TypeInfo::SetScriptEngine( AngelScriptEngine* scriptEngine )
-	{
-		sm_scriptEngine = scriptEngine;
 	}
 
 	void TypeInfo::QueueRegistration( std::function<void()> fn )

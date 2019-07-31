@@ -13,12 +13,15 @@
 #include "InputBindings.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TransformComponent.h"
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	static const glm::vec3 s_corners[] =
 	{
 		// bottom
@@ -88,7 +91,7 @@ namespace ddr
 	
 	void BoundsRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderManager::Instance()->Load( "line" );
+		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
 		Shader* shader = m_shader.Access();
@@ -128,7 +131,7 @@ namespace ddr
 		}
 		else if( m_drawMode == DrawMode::Sphere )
 		{
-			dd::MakeIcosphereLines( m_vboPosition, m_vboIndex, m_subdivisions );
+			dd::MeshUtils::MakeIcosphereLines( m_vboPosition, m_vboIndex, m_subdivisions );
 		}
 
 		m_updateBuffers = false;

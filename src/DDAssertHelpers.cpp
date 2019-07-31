@@ -141,8 +141,10 @@ namespace dd
 		return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 	}
 
-	void InitializeAssert( std::thread::id main_thread )
+	void InitializeAssert()
 	{
+		s_mainThread = std::this_thread::get_id();
+
 		pempek::assert::implementation::setAssertHandler( OnAssert );
 	}
 

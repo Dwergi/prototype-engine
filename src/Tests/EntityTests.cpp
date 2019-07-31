@@ -184,7 +184,7 @@ TEST_CASE( "Component" )
 	ddc::World world( jobs );
 	ddc::Entity a = world.CreateEntity();
 
-	const dd::TypeInfo* type = DD_TYPE( FirstComponent );
+	const dd::TypeInfo* type = DD_FIND_TYPE( FirstComponent );
 	REQUIRE( type->ComponentID() != dd::INVALID_COMPONENT );
 
 	bool found = world.Has<FirstComponent>( a );

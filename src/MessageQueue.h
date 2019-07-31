@@ -108,14 +108,14 @@ namespace dd
 	void Message::SetPayload( const T& payload )
 	{
 		static_assert(sizeof( T ) <= PAYLOAD_SIZE);
-		m_payloadType = DD_TYPE( T );
+		m_payloadType = DD_FIND_TYPE( T );
 		memcpy( m_payload, &payload, sizeof( T ) );
 	}
 
 	template <typename T>
 	const T& Message::GetPayload() const
 	{
-		DD_ASSERT( m_payloadType == DD_TYPE( T ) );
+		DD_ASSERT( m_payloadType == DD_FIND_TYPE( T ) );
 
 		return *reinterpret_cast<const T*>(m_payload);
 	}

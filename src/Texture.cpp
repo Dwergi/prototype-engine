@@ -12,13 +12,12 @@
 #include "GLError.h"
 #include "OpenGL.h"
 
-DD_HANDLE_MANAGER( ddr::Texture );
+DD_POD_CPP(ddr::TextureHandle);
 
 namespace ddr
 {
 	Texture::Texture()
 	{
-
 	}
 
 	Texture::~Texture()

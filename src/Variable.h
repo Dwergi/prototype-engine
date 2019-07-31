@@ -65,21 +65,21 @@ namespace dd
 	template <typename T>
 	Variable::Variable( const T& rhs )
 		: m_data( (T*) &rhs ),
-		m_typeInfo( DD_TYPE( T ) )
+		m_typeInfo( DD_FIND_TYPE( T ) )
 	{
 	}
 
 	template <typename T>
 	Variable::Variable( const T* rhs )
 		: m_data( (T*) rhs ),
-		m_typeInfo( DD_TYPE( T* )  )
+		m_typeInfo( DD_FIND_TYPE( T* )  )
 	{
 	}
 
 	template <typename T>
 	Variable::Variable( T* rhs )
 		: m_data( rhs ),
-		m_typeInfo( DD_TYPE( T* )  )
+		m_typeInfo( DD_FIND_TYPE( T* )  )
 	{
 	}
 
@@ -124,7 +124,7 @@ namespace dd
 	T& Variable::GetValue()
 	{
 		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
-		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_TYPE( T ) ) );
+		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_FIND_TYPE( T ) ) );
 
 		return CastHelper<T>::Cast( m_data );
 	}
@@ -132,7 +132,7 @@ namespace dd
 	template <typename T>
 	const T& Variable::GetValue() const
 	{
-		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_TYPE( T ) ) );
+		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_FIND_TYPE( T ) ) );
 
 		return CastHelper<T>::Cast( m_data );
 	}

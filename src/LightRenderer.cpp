@@ -11,6 +11,7 @@
 #include "MeshUtils.h"
 #include "LightComponent.h"
 #include "Mesh.h"
+#include "Services.h"
 #include "Shader.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
@@ -18,6 +19,9 @@
 
 namespace ddr
 {
+	static dd::Service<ddr::MeshManager> s_meshManager;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	LightRenderer::LightRenderer() :
 		ddr::Renderer( "Lights" )
 	{
@@ -61,10 +65,10 @@ namespace ddr
 
 	void LightRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderManager::Instance()->Load( "mesh" );
+		m_shader = s_shaderManager->Load( "mesh" );
 		DD_ASSERT( m_shader.IsValid() );
 
-		m_mesh = MeshManager::Instance()->Find( "sphere" );
+		m_mesh = s_meshManager->Find( "sphere" );
 	}
 
 	void LightRenderer::RenderUpdate( ddc::World& world )

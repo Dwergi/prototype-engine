@@ -14,6 +14,7 @@
 #include "PlayerComponent.h"
 #include "Random.h"
 #include "RayComponent.h"
+#include "Services.h"
 #include "TransformComponent.h"
 
 #include "glm/gtx/vector_angle.hpp"
@@ -56,6 +57,8 @@ namespace dd
 	// how heavily the player-seeking is weighted
 	static float PlayerSearchWeight = 0.3f;
 
+	static dd::Service<ddr::MeshManager> s_meshManager;
+
 	SwarmSystem::SwarmSystem() :
 		ddc::System( "Swarm System" )
 	{
@@ -97,7 +100,7 @@ namespace dd
 			agent->Velocity = transform->Rotation * glm::vec3( 0, 0, 10 * rng.Next() );
 
 			dd::MeshComponent* mesh = world.Access<dd::MeshComponent>( entity );
-			mesh->Mesh = ddr::MeshManager::Instance()->Find( "cube" );
+			mesh->Mesh = s_meshManager->Find( "cube" );
 
 			dd::RayComponent* ray = world.Access<dd::RayComponent>( entity );
 			ray->Ray = ddm::Ray( glm::vec3( 0 ), glm::vec3( 0, 0, 1 ), 0.5f );

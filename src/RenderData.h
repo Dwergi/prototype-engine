@@ -76,7 +76,7 @@ namespace ddr
 		template <typename T>
 		ddc::ReadView<T> Get() const
 		{
-			const dd::TypeInfo* type = DD_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE( T );
 
 			for( const ddc::ComponentBuffer& buffer : m_buffers )
 			{

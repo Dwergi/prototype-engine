@@ -15,7 +15,7 @@
 #include "VAO.h"
 #include "VBO.h"
 
-DD_HANDLE_MANAGER( ddr::Shader );
+DD_POD_CPP(ddr::ShaderHandle);
 
 namespace ddr
 {

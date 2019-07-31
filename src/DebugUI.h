@@ -17,12 +17,12 @@ namespace ddc
 namespace dd
 {
 	struct IDebugPanel;
-	struct GLFWInputSource;
+	struct IInputSource;
 	struct Window;
 
 	struct DebugUI
 	{
-		DebugUI( Window& window, GLFWInputSource& input );
+		DebugUI( Window& window, IInputSource& input );
 		~DebugUI();
 
 		void StartFrame( float delta_t );
@@ -58,7 +58,7 @@ namespace dd
 		bool m_midWindow { false };
 		bool m_midFrame { false };
 		bool m_focused { false };
-		GLFWInputSource* m_input { nullptr };
+		IInputSource* m_input { nullptr };
 		Window* m_window { nullptr };
 	};
 }

@@ -14,7 +14,7 @@ namespace dd
 		T* Factory()
 		{
 			T* ptr = new T();
-			ptr->m_refCount.Init( ptr, DD_TYPE( T ) );
+			ptr->m_refCount.Init( ptr, DD_FIND_TYPE( T ) );
 			return ptr;
 		}
 
@@ -106,7 +106,7 @@ namespace dd
 	template <typename T>
 	void AngelScriptEngine::RegisterObject()
 	{
-		const TypeInfo* typeInfo = DD_TYPE( T );
+		const TypeInfo* typeInfo = DD_FIND_TYPE( T );
 		DD_ASSERT( typeInfo->IsRegistered() );
 
 		String64 objType( ReplacePointer( typeInfo->Name() ) );
@@ -141,7 +141,7 @@ namespace dd
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
 	void AngelScriptEngine::RegisterMember( const char* name, const TypeInfo* classType )
 	{
-		const TypeInfo* propType = DD_TYPE( TProp );
+		const TypeInfo* propType = DD_FIND_TYPE( TProp );
 
 		String128 signature;
 		signature += ReplacePointer( propType->Name() );
@@ -157,7 +157,7 @@ namespace dd
 	template <typename T, T& Variable>
 	void AngelScriptEngine::RegisterGlobalVariable( const char* name )
 	{
-		const TypeInfo* typeInfo = DD_TYPE( T );
+		const TypeInfo* typeInfo = DD_FIND_TYPE( T );
 		DD_ASSERT( typeInfo != nullptr );
 
 		String128 signature;

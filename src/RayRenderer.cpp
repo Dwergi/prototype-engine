@@ -9,10 +9,13 @@
 
 #include "ColourComponent.h"
 #include "RayComponent.h"
+#include "Services.h"
 #include "Shader.h"
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	static const glm::vec3 s_lines[] =
 	{
 		// direction
@@ -47,7 +50,7 @@ namespace ddr
 
 	void RayRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderManager::Instance()->Load( "line" );
+		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
 		Shader* shader = m_shader.Access();

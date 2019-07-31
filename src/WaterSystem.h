@@ -19,7 +19,7 @@ namespace dd
 
 	struct WaterSystem : ddc::System, IDebugPanel
 	{
-		WaterSystem( const TerrainParameters& params, dd::JobSystem& jobsystem );
+		WaterSystem( const TerrainParameters& params );
 
 		virtual void Update( const ddc::UpdateData& update_data ) override;
 		virtual void Initialize( ddc::World& world ) override;
@@ -28,8 +28,6 @@ namespace dd
 
 		static ddr::MaterialHandle s_material;
 		static ddr::RenderState s_renderState;
-
-		dd::JobSystem& m_jobSystem;
 
 		int m_waterChunks { 0 };
 		float m_waveHeight { 2.0f };

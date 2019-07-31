@@ -21,7 +21,10 @@
 #include "MeshComponent.h"
 #include "MessageQueue.h"
 #include "PlayerComponent.h"
+#include "Services.h"
 #include "TransformComponent.h"
+
+static dd::Service<ddr::MeshManager> s_meshManager;
 
 namespace dd
 {
@@ -85,7 +88,9 @@ namespace dd
 
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
-		mesh->Mesh = ddr::MeshManager::Instance()->Find( "sphere" );
+
+		DD_TODO("Would be better to just create a Handle from the name and resolve it later. Could get rid of mesh manager ref.");
+		mesh->Mesh = s_meshManager->Find( "sphere" );
 
 		dd::ColourComponent* colour;
 		world.Access( entity, colour );

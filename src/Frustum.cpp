@@ -11,6 +11,7 @@
 #include "ICamera.h"
 #include "OpenGL.h"
 #include "RenderData.h"
+#include "Services.h"
 #include "Shader.h"
 #include "Sphere.h"
 #include "Uniforms.h"
@@ -18,6 +19,8 @@
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	enum Corners
 	{
 		NEAR_TR = 0,
@@ -150,7 +153,7 @@ namespace ddr
 
 	void Frustum::CreateRenderData()
 	{
-		m_shader = ShaderManager::Instance()->Load( "mesh" );
+		m_shader = s_shaderManager->Load( "mesh" );
 		Shader* shader = m_shader.Access();
 		shader->Use( true );
 

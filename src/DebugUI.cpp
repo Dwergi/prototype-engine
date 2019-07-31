@@ -287,15 +287,17 @@ namespace dd
 		return true;
 	}
 
-	DebugUI::DebugUI( Window& window, GLFWInputSource& input )
+	DebugUI::DebugUI( Window& window, IInputSource& input )
 	{
 		m_input = &input;
 		m_window = &window;
 
-		m_input->AddKeyboardCallback( &DebugUI::KeyCallback );
-		m_input->AddScrollCallback( &DebugUI::ScrollCallback );
-		m_input->AddMouseCallback( &DebugUI::MouseButtonCallback );
-		m_input->AddCharCallback( &DebugUI::CharCallback );
+		GLFWInputSource& glfwInput = (GLFWInputSource&) input;
+
+		glfwInput.AddKeyboardCallback( &DebugUI::KeyCallback );
+		glfwInput.AddScrollCallback( &DebugUI::ScrollCallback );
+		glfwInput.AddMouseCallback( &DebugUI::MouseButtonCallback );
+		glfwInput.AddCharCallback( &DebugUI::CharCallback );
 
 		g_Window = window.GetInternalWindow();
 

@@ -6,24 +6,67 @@
 
 #pragma once
 
+namespace ddc
+{
+	struct World;
+}
+
 namespace dd
 {
 	struct Services
 	{
 		template <typename T>
-		static void Register( T* instance )
+		static T& Register(T* instance)
 		{
-			Service<T>::Register( instance );
+			DD_ASSERT(instance != nullptr);
+			return Register(*instance);
+		}
+
+		template <typename T>
+		static T& Register(T& instance)
+		{
+			static_assert(!std::is_same_v<T, ddc::World>);
+			Service<T>::Register(instance);
+			return instance;
+		}
+
+		template <typename T>
+		static void Unregister()
+		{
+			Service<T>::Unregister();
+		}
+
+		template <typename TInterface, typename TImpl>
+		static TInterface& RegisterInterface(TImpl* instance)
+		{
+			DD_ASSERT(instance != nullptr);
+			return RegisterInterface<TInterface>(*instance);
+		}
+
+		template <typename TInterface, typename TImpl>
+		static TInterface& RegisterInterface(TImpl& instance)
+		{
+			static_assert(!std::is_same_v<TImpl, ddc::World>);
+			static_assert(std::is_base_of_v<TInterface, TImpl>);
+			Service<TInterface>::Register(instance);
+
+			return (TInterface&) instance;
 		}
 	};
 
 	template <typename T>
 	struct Service
 	{
-		static void Register( T* instance ) 
+		static void Register( T& instance ) 
 		{
 			DD_ASSERT( s_instance == nullptr, "Instance already registered!" );
-			s_instance = instance;
+			s_instance = &instance;
+		}
+
+		static void Unregister()
+		{
+			DD_ASSERT(s_instance != nullptr, "Instance not registered!");
+			s_instance = nullptr;
 		}
 
 		static T& Get()

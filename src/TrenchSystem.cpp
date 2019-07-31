@@ -13,12 +13,17 @@
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "World.h"
 
 namespace dd
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
+	static dd::Service<ddr::MeshManager> s_meshManager;
+
 	const float TRENCH_CHUNK_LENGTH = 10.0f;
 
 	static const glm::vec3 s_trenchChunkPositions[] =
@@ -113,11 +118,11 @@ namespace dd
 
 	void TrenchSystem::CreateRenderResources()
 	{
-		m_shader = ddr::ShaderManager::Instance()->Load( "terrain" );
+		m_shader = s_shaderManager->Load( "terrain" );
 		ddr::Shader* shader = m_shader.Access();
 		DD_ASSERT( shader != nullptr );
 
-		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "trench_chunk" );
+		ddr::MaterialHandle material_h = s_materialManager->Create( "trench_chunk" );
 		ddr::Material* material = material_h.Access();
 		DD_ASSERT( material != nullptr );
 
@@ -125,7 +130,7 @@ namespace dd
 
 		shader->Use( true );
 
-		m_chunkMesh = ddr::MeshManager::Instance()->Create( "trench_chunk" );
+		m_chunkMesh = s_meshManager->Create( "trench_chunk" );
 		ddr::Mesh* mesh = m_chunkMesh.Access();
 		DD_ASSERT( mesh != nullptr );
 

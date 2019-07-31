@@ -17,7 +17,7 @@
 #include "Uniforms.h"
 #include "WorldRenderer.h"
 
-DD_HANDLE_MANAGER( ddr::Mesh );
+DD_POD_CPP(ddr::MeshHandle);
 
 namespace ddr
 {

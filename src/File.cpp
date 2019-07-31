@@ -7,11 +7,11 @@
 #include "PCH.h"
 #include "File.h"
 
-#include <fstream>
+#include <cstdio>
 
 namespace dd
 {
-	std::filesystem::path File::s_dataRoot;
+	std::string File::s_dataRoot;
 
 	void File::SetDataRoot( std::string root )
 	{
@@ -30,23 +30,37 @@ namespace dd
 			return;
 		}
 
-		s_dataRoot = canonical_path;
+		s_dataRoot = canonical_path.string();
 	}
 
 	bool File::Exists( std::string file_path )
 	{
 		std::filesystem::path path( s_dataRoot );
-		path.append( file_path );
+		path /= file_path;
 
 		return !std::filesystem::is_directory( path ) && std::filesystem::exists( path );
 	}
 
-	File::File( std::string_view path )
+	File::File( std::string_view relative_file )
 	{
-		DD_ASSERT( !std::filesystem::is_directory( path ) );
+		std::filesystem::path path( s_dataRoot );
+		path /= relative_file;
 
-		m_path = s_dataRoot;
-		m_path.append( path );
+		DD_ASSERT(!std::filesystem::is_directory(path));
+
+		m_path = path.string();
+	}
+
+	FILE* File::Open(const char* mode) const
+	{
+		FILE* file;
+		errno_t err = fopen_s(&file, m_path.c_str(), mode);
+		if (err != 0)
+		{
+			return nullptr;
+		}
+
+		return file;
 	}
 
 	size_t File::Read( Buffer<byte>& buffer ) const
@@ -56,14 +70,15 @@ namespace dd
 			return 0;
 		}
 
-		std::ifstream stream( m_path );
-		if( stream.bad() )
+		FILE* file = Open("rb");
+		if (file == nullptr)
 		{
 			return 0;
 		}
 
-		stream.read((char*) buffer.Access(), (size_t) buffer.SizeBytes());
-		return stream.tellg();
+		size_t read = fread(buffer.Access(), 1, (size_t) buffer.SizeBytes(), file);
+		fclose(file);
+		return read;
 	}
 
 	Buffer<byte> File::ReadIntoBuffer() const
@@ -82,16 +97,14 @@ namespace dd
 
 	size_t File::Read( std::string& dst ) const
 	{
-		std::ifstream stream( m_path );
-		if( stream.bad() )
+		FILE* file = Open("rb");
+		if (file == nullptr)
 		{
-			return false;
+			return 0;
 		}
 
-		size_t file_size = Size();
-
-		dst.resize( file_size );
-		stream.read( dst.data(), file_size );
+		size_t read = fread(dst.data(), 1, dst.size(), file);
+		fclose(file);
 
 		size_t i = dst.find( '\0' );
 		if( i != std::string::npos )
@@ -104,25 +117,29 @@ namespace dd
 
 	bool File::Write( const std::string& src ) const
 	{
-		std::ofstream stream( m_path );
-		if( stream.bad() )
+		FILE* file = Open("wb");
+		if (file == nullptr)
 		{
-			return false;
+			return 0;
 		}
 
-		stream << src;
-		return true;
+		size_t written = fwrite(src.c_str(), 1, src.size(), file);
+		fclose(file);
+
+		return written > 0;
 	}
 
 	bool File::Write( const IBuffer& buffer ) const
 	{
-		std::ofstream stream( m_path );
-		if( stream.bad() )
+		FILE* file = Open("wb");
+		if (file == nullptr)
 		{
-			return false;
+			return 0;
 		}
 
-		stream.write(reinterpret_cast<const char*>(buffer.GetVoid()), buffer.SizeBytes());
-		return true;
+		size_t written = fwrite(buffer.GetVoid(), 1, buffer.SizeBytes(), file);
+		fclose(file);
+
+		return written > 0;
 	}
 }

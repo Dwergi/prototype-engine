@@ -7,7 +7,9 @@
 #include "PCH.h"
 #include "MeshUtils.h"
 
+#include "Material.h"
 #include "Mesh.h"
+#include "Shader.h"
 #include "Triangulator.h"
 #include "VBO.h"
 
@@ -39,6 +41,10 @@ namespace std
 
 namespace dd
 {
+	static dd::Service<ddr::MeshManager> s_meshManager;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
+
 	static const glm::vec3 s_unitCubePositions[] =
 	{
 		//  X    Y    Z     
@@ -351,7 +357,7 @@ namespace dd
 		}
 	}
 
-	void CalculateIcosphere( std::vector<glm::vec3>*& out_pos, std::vector<uint>*& out_idx, std::vector<glm::vec3>*& out_normals, int iterations )
+	static void CalculateIcosphere( std::vector<glm::vec3>*& out_pos, std::vector<uint>*& out_idx, std::vector<glm::vec3>*& out_normals, int iterations )
 	{
 		DD_ASSERT( iterations <= 6, "Too many iterations! Danger, Will Robinson!" );
 
@@ -394,7 +400,7 @@ namespace dd
 		out_normals = &s_icosphereNormalLODs[iterations];
 	}
 
-	void MakeIcosphere( ddr::Mesh& mesh, int iterations )
+	void MeshUtils::MakeIcosphere( ddr::Mesh& mesh, int iterations )
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
@@ -414,7 +420,7 @@ namespace dd
 		mesh.SetBoundBox( bounds );
 	}
 
-	void MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, ddr::VBO& normals, int iterations )
+	void MeshUtils::MakeIcosphere( ddr::VBO& positions, ddr::VBO& indices, ddr::VBO& normals, int iterations )
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
@@ -426,7 +432,7 @@ namespace dd
 		normals.SetData( norm->data(), norm->size() );
 	}
 
-	void GetLineIndicesFromTriangles( const std::vector<uint>& src, std::vector<uint>& dest )
+	void MeshUtils::GetLineIndicesFromTriangles( const std::vector<uint>& src, std::vector<uint>& dest )
 	{
 		DD_ASSERT( dest.empty() );
 
@@ -449,7 +455,7 @@ namespace dd
 		}
 	}
 
-	void MakeIcosphereLines( ddr::VBO& positions, ddr::VBO& indices, int iterations )
+	void MeshUtils::MakeIcosphereLines( ddr::VBO& positions, ddr::VBO& indices, int iterations )
 	{
 		std::vector<glm::vec3>* pos = nullptr;
 		std::vector<uint>* idx = nullptr;
@@ -470,7 +476,7 @@ namespace dd
 		indices.Unbind();
 	}
 
-	void MakeUnitCube( ddr::Mesh& mesh )
+	void MeshUtils::MakeUnitCube( ddr::Mesh& mesh )
 	{
 		mesh.SetPositions( s_unitCubePositionsBuffer );
 		mesh.SetNormals( s_unitCubeNormalsBuffer );
@@ -483,64 +489,64 @@ namespace dd
 	}
 
 
-	void CreateDefaultMaterial()
+	void MeshUtils::CreateDefaultMaterial()
 	{
-		ddr::ShaderHandle shader_h = ddr::ShaderManager::Instance()->Load( "mesh" );
+		ddr::ShaderHandle shader_h = s_shaderManager->Load( "mesh" );
 		ddr::Shader* shader = shader_h.Access();
 		DD_ASSERT( shader != nullptr );
 
-		ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+		ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
 		ddr::Material* material = material_h.Access();
 		DD_ASSERT( material != nullptr );
 
 		material->Shader = shader_h;
 	}
 
-	void CreateUnitCube()
+	void MeshUtils::CreateUnitCube()
 	{
-		ddr::MeshHandle unitCube = ddr::MeshManager::Instance()->Find( "cube" );
+		ddr::MeshHandle unitCube = s_meshManager->Find( "cube" );
 		if( !unitCube.IsValid() )
 		{
-			unitCube = ddr::MeshManager::Instance()->Create( "cube" );
+			unitCube = s_meshManager->Create( "cube" );
 
 			ddr::Mesh* mesh = unitCube.Access();
 			DD_ASSERT( mesh != nullptr );
 
-			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+			ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
 			mesh->SetMaterial( material_h );
 
 			MakeUnitCube( *mesh );
 		}
 	}
 
-	void CreateUnitSphere()
+	void MeshUtils::CreateUnitSphere()
 	{
-		ddr::MeshHandle unitSphere = ddr::MeshManager::Instance()->Find( "sphere" );
+		ddr::MeshHandle unitSphere = s_meshManager->Find( "sphere" );
 		if( !unitSphere.IsValid() )
 		{
-			unitSphere = ddr::MeshManager::Instance()->Create( "sphere" );
+			unitSphere = s_meshManager->Create( "sphere" );
 
 			ddr::Mesh* mesh = unitSphere.Access();
 			DD_ASSERT( mesh != nullptr );
 
-			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Create( "mesh" );
+			ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
 			mesh->SetMaterial( material_h );
 
 			MakeIcosphere( *mesh, 2 );
 		}
 	}
 
-	void CreateQuad()
+	void MeshUtils::CreateQuad()
 	{
-		ddr::MeshHandle quad = ddr::MeshManager::Instance()->Find( "quad" );
+		ddr::MeshHandle quad = s_meshManager->Find( "quad" );
 		if( !quad.IsValid() )
 		{
-			quad = ddr::MeshManager::Instance()->Create( "quad" );
+			quad = s_meshManager->Create( "quad" );
 
 			ddr::Mesh* mesh = quad.Access();
 			DD_ASSERT( mesh != nullptr );
 
-			ddr::MaterialHandle material_h = ddr::MaterialManager::Instance()->Find( "mesh" );
+			ddr::MaterialHandle material_h = s_materialManager->Find( "mesh" );
 			mesh->SetMaterial( material_h );
 
 			MakeQuad( *mesh );
@@ -569,7 +575,7 @@ namespace dd
 
 	static const dd::ConstBuffer<glm::vec3> s_quadNormalsBuffer( s_quadNormals, ArrayLength( s_quadNormals ) );
 
-	void MakeQuad( ddr::Mesh& mesh )
+	void MeshUtils::MakeQuad( ddr::Mesh& mesh )
 	{
 		mesh.SetPositions( s_quadPositionsBuffer );
 		mesh.SetNormals( s_quadNormalsBuffer );
@@ -582,7 +588,7 @@ namespace dd
 
 	static std::unordered_map<GridKey, std::vector<uint>*> s_gridIndices;
 
-	const std::vector<uint>& GetGridIndices( uint vertex_count, uint lod )
+	const std::vector<uint>& MeshUtils::GetGridIndices( uint vertex_count, uint lod )
 	{
 		GridKey key;
 		key.LOD = lod;

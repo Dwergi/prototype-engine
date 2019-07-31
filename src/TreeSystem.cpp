@@ -129,8 +129,8 @@ namespace dd
 			p.LineAccumulator += delta_t;
 			if( p.LineAccumulator > LineInterval )
 			{
-				lines.Points.push_back( p.PreviousLine );
-				lines.Points.push_back( p.Position );
+				lines.Points.Add( p.PreviousLine );
+				lines.Points.Add( p.Position );
 
 				p.PreviousLine = p.Position;
 				p.LineAccumulator = 0;
@@ -157,7 +157,7 @@ namespace dd
 			bound_box.BoundBox.Clear();
 			bound_box.BoundBox.Expand( transform.Position );
 
-			lines.Points.clear();
+			lines.Points.Clear();
 			return;
 		}
 	}

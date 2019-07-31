@@ -7,8 +7,6 @@
 #include "PCH.h"
 #include "EntityPrototype.h"
 
-DD_HANDLE_MANAGER( ddc::EntityPrototype );
-
 namespace ddc
 {
 	ComponentPrototype::ComponentPrototype( const void* data, dd::ComponentID id )

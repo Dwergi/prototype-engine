@@ -19,6 +19,7 @@
 #include "LightComponent.h"
 #include "OpenGL.h"
 #include "ParticleSystem.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TransformComponent.h"
@@ -28,6 +29,8 @@
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	struct Fog
 	{
 		bool Enabled { true };
@@ -205,7 +208,7 @@ namespace ddr
 
 		if( m_reloadShaders )
 		{
-			ShaderManager::Instance()->ReloadAll();
+			s_shaderManager->ReloadAll();
 			m_reloadShaders = false;
 		}
 

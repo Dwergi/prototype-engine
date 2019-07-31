@@ -8,8 +8,6 @@
 
 namespace dd
 {
-#define DD_HANDLE_MANAGER( TypeName ) dd::HandleManager<TypeName>* dd::HandleManager<TypeName>::s_singleton;
-
 	template <typename T> struct Handle;
 
 	struct HandleTarget
@@ -36,6 +34,8 @@ namespace dd
 	struct HandleManager
 	{
 		static_assert(std::is_base_of<HandleTarget, T>::value);
+
+		HandleManager();
 
 		//
 		// Find a handle to an object with the given name.
@@ -85,9 +85,6 @@ namespace dd
 		//
 		virtual void Update();
 
-		static void RegisterSingleton( HandleManager<T>* singleton ) { s_singleton = singleton; }
-		static HandleManager<T>* Instance() { return s_singleton; }
-
 	protected:
 
 		struct HandleEntry
@@ -112,7 +109,6 @@ namespace dd
 		std::vector<size_t> m_free;
 		std::vector<HandleEntry> m_entries;
 		std::mutex m_mutex;
-		static HandleManager<T>* s_singleton;
 
 		Handle<T> FindInternal( std::string name ) const;
 
@@ -137,11 +133,12 @@ namespace dd
 		uint GetID() const { return m_handle; }
 		bool IsValid() const { return m_handle != ~0u; }
 
-		const T* Get() const { return HandleManager<T>::Instance()->Get( *this ); }
-		T* Access() const { return HandleManager<T>::Instance()->Access( *this ); }
+		const T* Get() const { return m_manager->Get( *this ); }
+		T* Access() const { return m_manager->Access( *this ); }
 
 	private:
 		friend struct HandleManager<T>;
+		static const HandleManager<T>* m_manager;
 
 		union
 		{
@@ -155,5 +152,7 @@ namespace dd
 		};
 	};
 }
+
+template <typename T> const dd::HandleManager<T>* dd::Handle<T>::m_manager = nullptr;
 
 #include "HandleManager.inl"

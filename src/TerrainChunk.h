@@ -39,7 +39,7 @@ namespace dd
 		//
 		static void CreateRenderResources();
 
-		TerrainChunk( JobSystem& jobsystem, const TerrainParameters& params, glm::vec2 position );
+		TerrainChunk( const TerrainParameters& params, glm::vec2 position );
 		~TerrainChunk();
 		
 		void SwitchLOD( int lod );
@@ -83,7 +83,6 @@ namespace dd
 		std::atomic<bool> m_updating { false };
 		dd::FSM m_state;
 
-		dd::JobSystem& m_jobsystem;
 		ddr::MeshHandle m_mesh;
 
 		glm::vec2 m_position;

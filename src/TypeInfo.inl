@@ -158,7 +158,7 @@ namespace dd
 	template <typename T>
 	void TypeInfo::RegisterParentType()
 	{
-		const TypeInfo* parent = DD_TYPE( T );
+		const TypeInfo* parent = DD_FIND_TYPE( T );
 		DD_ASSERT( parent->IsRegistered() );
 
 		m_parentType = parent;
@@ -174,12 +174,6 @@ namespace dd
 		Method& m = m_methods.Allocate();
 		m.Name = name;
 		m.Function = dd::BuildFunction<FnType, Fn>( Fn );
-
-		// don't register with script if this isn't a script object
-		if( m_scriptObject && sm_scriptEngine != nullptr )
-		{
-			sm_scriptEngine->RegisterFunction<FnType, Fn>( name );
-		}
 	}
 	
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
@@ -192,11 +186,6 @@ namespace dd
 
 		uintptr_t offset = (uintptr_t) (&(((TClass*) nullptr)->*MemberPtr));
 		RegisterMemberInternal( name, memberType, offset );
-
-		if( m_scriptObject && sm_scriptEngine != nullptr )
-		{
-			sm_scriptEngine->RegisterMember<TClass, TProp, MemberPtr>( name, this );
-		}
 	}
 
 	template <typename T>
@@ -213,18 +202,5 @@ namespace dd
 		EnumOption& option = m_enumOptions.Allocate();
 		option.Value = (int) value;
 		option.Name = name;
-	}
-
-	template <typename T>
-	void TypeInfo::RegisterScriptType()
-	{
-		DD_ASSERT( sm_scriptEngine != nullptr );
-
-		if( sm_scriptEngine != nullptr )
-		{
-			m_scriptObject = true;
-
-			sm_scriptEngine->RegisterType<T>();
-		}
 	}
 }

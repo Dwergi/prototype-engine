@@ -10,12 +10,15 @@
 #include "ICamera.h"
 #include "OpenGL.h"
 #include "RenderData.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "Uniforms.h"
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	static const glm::vec2 s_screenFacingQuadVertices[] = {
 			glm::vec2( -0.5f,	-0.5f ),
 			glm::vec2( 0.5f,	-0.5f ),
@@ -55,7 +58,7 @@ namespace ddr
 
 		if( !s_shaderParticle.IsValid() )
 		{
-			s_shaderParticle = ShaderManager::Instance()->Load( "particle" );
+			s_shaderParticle = s_shaderManager->Load( "particle" );
 		}
 
 		Shader* shader = s_shaderParticle.Access();

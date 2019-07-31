@@ -106,6 +106,9 @@
     <Filter Include="Rendering\Commands">
       <UniqueIdentifier>{ad0517d3-bcdf-4c04-a0a6-73b304d9b410}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{0e52d069-7158-418c-bb41-833200ce8a97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -642,6 +645,15 @@
     <ClInclude Include="src\Services.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\NeutrinoGame.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestEntities.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IGame.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1143,7 +1155,15 @@
     <ClCompile Include="src\Services.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\Profiler.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NeutrinoGame.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestEntities.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

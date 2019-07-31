@@ -18,16 +18,21 @@
 #include "MeshRenderCommand.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
+#include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TransformComponent.h"
 #include "Uniforms.h"
 
+static dd::Service<dd::JobSystem> s_jobsystem;
+static dd::Service<ddr::ShaderManager> s_shaderManager;
+static dd::Service<ddr::MeshManager> s_meshManager;
+static dd::Service<ddr::MaterialManager> s_materialManager;
+
 namespace ddr
 {
-	MeshRenderer::MeshRenderer( dd::JobSystem& jobsystem ) :
-		ddr::Renderer( "Meshes" ),
-		m_jobsystem( jobsystem )
+	MeshRenderer::MeshRenderer() :
+		ddr::Renderer( "Meshes" )
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::MeshComponent>();
@@ -39,16 +44,16 @@ namespace ddr
 
 	void MeshRenderer::RenderInit( ddc::World& world )
 	{
-		m_cube = MeshManager::Instance()->Find( "cube" );
+		m_cube = s_meshManager->Find( "cube" );
 		if( !m_cube.IsValid() )
 		{
-			m_cube = MeshManager::Instance()->Create( "cube" );
+			m_cube = s_meshManager->Create( "cube" );
 			Mesh* mesh = m_cube.Access();
 
-			ShaderHandle shader_h = ShaderManager::Instance()->Load( "mesh" );
+			ShaderHandle shader_h = s_shaderManager->Load( "mesh" );
 			Shader* shader = shader_h.Access();
 
-			MaterialHandle material_h = MaterialManager::Instance()->Create( "mesh" );
+			MaterialHandle material_h = s_materialManager->Create( "mesh" );
 			Material* material = material_h.Access();
 			material->Shader = shader_h;
 
@@ -60,7 +65,7 @@ namespace ddr
 
 			shader->Use( true );
 
-			dd::MakeUnitCube( *mesh );
+			dd::MeshUtils::MakeUnitCube( *mesh );
 
 			shader->Use( false );
 		}
@@ -68,12 +73,12 @@ namespace ddr
 
 	void MeshRenderer::RenderUpdate( ddc::World& world )
 	{
-		size_t count = MeshManager::Instance()->Count();
+		size_t count = s_meshManager->Count();
 		
 		for( size_t i = 0; i < count; ++i )
 		{
-			Mesh* mesh = MeshManager::Instance()->AccessAt( i );
-			mesh->Update( m_jobsystem );
+			Mesh* mesh = s_meshManager->AccessAt( i );
+			mesh->Update( *s_jobsystem );
 		}
 	}
 
@@ -172,7 +177,7 @@ namespace ddr
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
 
-		MaterialHandle material_h = MaterialManager::Instance()->Find( "mesh" );
+		MaterialHandle material_h = s_materialManager->Find( "mesh" );
 		Material* material = material_h.Access();
 
 		bool culling = material->State.BackfaceCulling;

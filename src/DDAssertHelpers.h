@@ -8,6 +8,6 @@
 
 namespace dd
 {
-	void InitializeAssert( std::thread::id main_thread );
+	void InitializeAssert();
 	void CheckAssert();
 }

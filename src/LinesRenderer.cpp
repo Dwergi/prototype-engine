@@ -14,10 +14,13 @@
 #include "Frustum.h"
 #include "ICamera.h"
 #include "LinesComponent.h"
+#include "Services.h"
 #include "TransformComponent.h"
 
 namespace ddr
 {
+	dd::Service<ddr::ShaderManager> s_shaderManager;
+
 	LinesRenderer::LinesRenderer() :
 		Renderer( "Lines" )
 	{
@@ -35,7 +38,7 @@ namespace ddr
 
 	void LinesRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = ShaderManager::Instance()->Load( "line" );
+		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
 
 		Shader* shader = m_shader.Access();
@@ -70,40 +73,40 @@ namespace ddr
 
 		glm::mat4 view_projection = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 
-		for( size_t i = 0; i < render_data.Size(); ++i )
+		for (size_t i = 0; i < render_data.Size(); ++i)
 		{
-			if( lines[i].Points.size() == 0 )
+			if (lines[i].Points.Size() == 0)
 			{
 				continue;
 			}
 
 			ddm::AABB aabb;
 			ddm::Sphere sphere;
-			if( !dd::GetWorldBoundBoxAndSphere( bound_boxes.Get( i ), bound_spheres.Get( i ), transforms[i], aabb, sphere ) )
+			if (!dd::GetWorldBoundBoxAndSphere(bound_boxes.Get(i), bound_spheres.Get(i), transforms[i], aabb, sphere))
 			{
 				continue;
 			}
 
 			const ddr::Frustum& frustum = camera.GetFrustum();
-			if( !frustum.Intersects( sphere ) && !frustum.Intersects( aabb ) )
+			if (!frustum.Intersects(sphere) && !frustum.Intersects(aabb))
 			{
 				continue;
 			}
-			
-			glm::vec4 colour( 1 );
-			const dd::ColourComponent* colour_cmp = colours.Get( i );
-			if( colour_cmp != nullptr )
+
+			glm::vec4 colour(1);
+			const dd::ColourComponent* colour_cmp = colours.Get(i);
+			if (colour_cmp != nullptr)
 			{
 				colour = colour_cmp->Colour;
 			}
 
-			shader->SetUniform( "Colour", colour );
-			shader->SetUniform( "ModelViewProjection", view_projection * transforms[i].Transform() );
+			shader->SetUniform("Colour", colour);
+			shader->SetUniform("ModelViewProjection", view_projection * transforms[i].Transform());
 
 			m_vao.Bind();
 
 			m_vboPosition.Bind();
-			m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( lines[i].Points ) );
+			m_vboPosition.SetData(dd::ConstBuffer<glm::vec3>(lines[i].Points.Data(), lines[i].Points.Size()));
 			m_vboPosition.CommitData();
 
 			glDrawArrays( GL_LINES, 0, m_vboPosition.GetDataSize() );

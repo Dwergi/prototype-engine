@@ -11,6 +11,8 @@ DD_TYPE_CPP( dd::ParticleSystemComponent );
 
 namespace dd
 {
+	DD_TODO("Particles probably don't need to store all of their data. Could maybe just parameterize it?");
+
 	ParticleSystemComponent::ParticleSystemComponent() :
 		MinLifetime( 0.5 ), MaxLifetime( 5.0 ),
 		MinVelocity( -10.0f, -10.0f, -10.0f ), MaxVelocity( 10.0f, 10.0f, 10.0f ),

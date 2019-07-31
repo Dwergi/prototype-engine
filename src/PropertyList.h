@@ -19,7 +19,7 @@ namespace dd
 		explicit PropertyList( T& host )
 			: m_base( &host )
 		{
-			AddMembers( DD_TYPE( T ), &host );
+			AddMembers( DD_FIND_TYPE( T ), &host );
 		}
 
 		PropertyList( const PropertyList& other );

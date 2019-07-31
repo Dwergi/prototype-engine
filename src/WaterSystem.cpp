@@ -12,6 +12,7 @@
 #include "BoundsHelpers.h"
 #include "ColourComponent.h"
 #include "Plane.h"
+#include "Services.h"
 #include "TerrainChunk.h"
 #include "TerrainChunkComponent.h"
 #include "TransformComponent.h"
@@ -22,12 +23,16 @@
 
 namespace dd
 {
+	static dd::Service<dd::JobSystem> s_jobsystem;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
+	static dd::Service<ddr::MeshManager> s_meshManager;
+
 	ddr::MaterialHandle WaterSystem::s_material;
 
-	WaterSystem::WaterSystem( const TerrainParameters& params, dd::JobSystem& jobsystem ) :
+	WaterSystem::WaterSystem( const TerrainParameters& params ) :
 		ddc::System( "Water" ),
-		m_terrainParams( params ),
-		m_jobSystem( jobsystem )
+		m_terrainParams( params )
 	{
 		RequireRead<TerrainChunkComponent>( "terrain" );
 		RequireRead<TransformComponent>( "terrain" );
@@ -53,7 +58,7 @@ namespace dd
 		water->TerrainChunkPosition = chunk_pos;
 
 		std::string mesh_name = fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y );
-		water->Mesh = ddr::MeshManager::Instance()->Create( mesh_name.c_str() );
+		water->Mesh = s_meshManager->Create( mesh_name.c_str() );
 
 		ddr::Mesh* mesh = water->Mesh.Access();
 		mesh->SetMaterial( s_material );
@@ -87,10 +92,11 @@ namespace dd
 
 	void WaterSystem::Initialize( ddc::World& world )
 	{
-		s_material = ddr::MaterialManager::Instance()->Create( "water" );
+		DD_TODO("This should be in renderer, irrelevant to system.");
+		s_material = s_materialManager->Create( "water" );
 
 		ddr::Material* material = s_material.Access();
-		material->Shader = ddr::ShaderManager::Instance()->Load( "water" );
+		material->Shader = s_shaderManager->Load( "water" );
 		material->State.BackfaceCulling = true;
 		material->State.Blending = true;
 		material->State.Depth = true;

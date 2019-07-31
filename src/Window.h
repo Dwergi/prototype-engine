@@ -27,6 +27,7 @@ namespace dd
 		void SetToClose() const;
 
 		void MakeBorderless();
+		void ShowConsole(bool visible);
 
 		void Swap();
 
@@ -42,7 +43,7 @@ namespace dd
 		static Window* m_pInstance;
 
 		GLFWwindow* m_glfwWindow { nullptr };
-		String32  m_title;
+		String32 m_title;
 
 		bool m_focused { false };
 
