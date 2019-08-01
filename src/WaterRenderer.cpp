@@ -19,6 +19,8 @@
 namespace ddr
 {
 	static dd::Service<dd::JobSystem> s_jobSystem;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
 
 	WaterRenderer::WaterRenderer() :
 		Renderer( "Lines" )
@@ -32,6 +34,15 @@ namespace ddr
 
 	void WaterRenderer::RenderInit( ddc::World& world )
 	{
+		DD_TODO("This should be in renderer, irrelevant to system.");
+		ddr::MaterialHandle material_h = s_materialManager->Create("water");
+
+		ddr::Material* material = material_h.Access();
+		material->Shader = s_shaderManager->Load("water");
+		material->State.BackfaceCulling = true;
+		material->State.Blending = true;
+		material->State.Depth = true;
+		material->State.DepthWrite = false;
 	}
 
 	void WaterRenderer::RenderUpdate( ddc::World& world )

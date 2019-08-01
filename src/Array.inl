@@ -102,6 +102,12 @@ namespace dd
 	}
 
 	template <typename T>
+	void IArray<T>::Fill(const T& value)
+	{
+		m_data.Fill(value);
+	}
+
+	template <typename T>
 	void IArray<T>::RemoveAt(int index)
 	{
 		DD_ASSERT(index < m_size);

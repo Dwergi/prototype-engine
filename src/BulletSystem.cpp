@@ -24,8 +24,6 @@
 #include "Services.h"
 #include "TransformComponent.h"
 
-static dd::Service<ddr::MeshManager> s_meshManager;
-
 namespace dd
 {
 	BulletSystem::BulletSystem( IAsyncHitTest& hit_test ) :
@@ -89,8 +87,7 @@ namespace dd
 		dd::MeshComponent* mesh;
 		world.Access( entity, mesh );
 
-		DD_TODO("Would be better to just create a Handle from the name and resolve it later. Could get rid of mesh manager ref.");
-		mesh->Mesh = s_meshManager->Find( "sphere" );
+		mesh->Mesh = ddr::MeshHandle( "sphere" );
 
 		dd::ColourComponent* colour;
 		world.Access( entity, colour );

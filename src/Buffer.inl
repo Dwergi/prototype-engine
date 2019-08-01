@@ -236,9 +236,23 @@ T* Buffer<T>::Release()
 }
 
 template <typename T>
+void Buffer<T>::Fill(const T& value)
+{
+	DD_ASSERT(m_ptr != nullptr);
+
+	T* ptr = Access();
+
+	for (size_t i = 0; i < m_count; ++i)
+	{
+		ptr[i] = value;
+	}
+}
+
+template <typename T>
 T& Buffer<T>::operator[]( size_t index ) const
 {
-	DD_ASSERT( index < m_count );
+	DD_ASSERT(m_ptr != nullptr);
+	DD_ASSERT(index < m_count);
 
 	return Access()[ index ];
 }

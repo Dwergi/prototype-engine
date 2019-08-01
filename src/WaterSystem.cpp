@@ -24,11 +24,7 @@
 namespace dd
 {
 	static dd::Service<dd::JobSystem> s_jobsystem;
-	static dd::Service<ddr::ShaderManager> s_shaderManager;
-	static dd::Service<ddr::MaterialManager> s_materialManager;
 	static dd::Service<ddr::MeshManager> s_meshManager;
-
-	ddr::MaterialHandle WaterSystem::s_material;
 
 	WaterSystem::WaterSystem( const TerrainParameters& params ) :
 		ddc::System( "Water" ),
@@ -61,7 +57,7 @@ namespace dd
 		water->Mesh = s_meshManager->Create( mesh_name.c_str() );
 
 		ddr::Mesh* mesh = water->Mesh.Access();
-		mesh->SetMaterial( s_material );
+		mesh->SetMaterial( ddr::MaterialHandle("water") );
 		mesh->UseBVH( false );
 
 		dd::ColourComponent* colour = world.Access<dd::ColourComponent>( entity );
@@ -92,15 +88,6 @@ namespace dd
 
 	void WaterSystem::Initialize( ddc::World& world )
 	{
-		DD_TODO("This should be in renderer, irrelevant to system.");
-		s_material = s_materialManager->Create( "water" );
-
-		ddr::Material* material = s_material.Access();
-		material->Shader = s_shaderManager->Load( "water" );
-		material->State.BackfaceCulling = true;
-		material->State.Blending = true;
-		material->State.Depth = true;
-		material->State.DepthWrite = false;
 	}
 
 	static std::unordered_map<glm::vec2, ddc::Entity> s_waterCache;

@@ -100,7 +100,7 @@ namespace dd
 			agent->Velocity = transform->Rotation * glm::vec3( 0, 0, 10 * rng.Next() );
 
 			dd::MeshComponent* mesh = world.Access<dd::MeshComponent>( entity );
-			mesh->Mesh = s_meshManager->Find( "cube" );
+			mesh->Mesh = ddr::MeshHandle( "cube" );
 
 			dd::RayComponent* ray = world.Access<dd::RayComponent>( entity );
 			ray->Ray = ddm::Ray( glm::vec3( 0 ), glm::vec3( 0, 0, 1 ), 0.5f );

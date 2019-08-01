@@ -104,6 +104,8 @@ namespace dd
 		void Set( T* ptr, int count );
 		T* Access() const;
 
+		void Fill(const T& value);
+
 		T* Release();
 
 		bool operator==( const Buffer<T>& other ) const;

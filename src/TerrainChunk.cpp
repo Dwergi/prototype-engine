@@ -29,8 +29,6 @@
 namespace dd
 {
 	static dd::Service<JobSystem> s_jobsystem;
-	static dd::Service<ddr::ShaderManager> s_shaderManager;
-	static dd::Service<ddr::MaterialManager> s_materialManager;
 	static dd::Service<ddr::MeshManager> s_meshManager;
 
 	ddr::ShaderHandle TerrainChunk::s_shader;
@@ -50,7 +48,7 @@ namespace dd
 
 	TerrainChunk::~TerrainChunk()
 	{
-		s_meshManager->Destroy( m_mesh );
+		m_mesh.Destroy();
 	}
 
 	void TerrainChunk::InitializeShared()
@@ -170,14 +168,6 @@ namespace dd
 		s_fsmPrototype.AddTransition( READY, UPDATE_PENDING );
 	}
 
-	void TerrainChunk::CreateRenderResources()
-	{
-		s_shader = s_shaderManager->Load( "terrain" );
-		s_material = s_materialManager->Create( "terrain" );
-
-		ddr::Material* material = s_material.Access();
-		material->Shader = s_shader;
-	}
 
 	void TerrainChunk::Initialize()
 	{
@@ -288,6 +278,16 @@ namespace dd
 
 	void TerrainChunk::RenderUpdate()
 	{
+		if (!s_material.IsValid())
+		{
+			s_material = ddr::MaterialHandle("terrain");
+		}
+
+		if (!s_shader.IsValid())
+		{
+			s_shader = ddr::ShaderHandle("terrain");
+		}
+
 		if( m_state == RENDER_UPDATE_PENDING )
 		{
 			if( !m_mesh.IsValid() )

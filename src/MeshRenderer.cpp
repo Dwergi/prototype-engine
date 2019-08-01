@@ -25,9 +25,7 @@
 #include "Uniforms.h"
 
 static dd::Service<dd::JobSystem> s_jobsystem;
-static dd::Service<ddr::ShaderManager> s_shaderManager;
 static dd::Service<ddr::MeshManager> s_meshManager;
-static dd::Service<ddr::MaterialManager> s_materialManager;
 
 namespace ddr
 {
@@ -44,40 +42,19 @@ namespace ddr
 
 	void MeshRenderer::RenderInit( ddc::World& world )
 	{
-		m_cube = s_meshManager->Find( "cube" );
-		if( !m_cube.IsValid() )
-		{
-			m_cube = s_meshManager->Create( "cube" );
-			Mesh* mesh = m_cube.Access();
-
-			ShaderHandle shader_h = s_shaderManager->Load( "mesh" );
-			Shader* shader = shader_h.Access();
-
-			MaterialHandle material_h = s_materialManager->Create( "mesh" );
-			Material* material = material_h.Access();
-			material->Shader = shader_h;
-
-			material->State.BackfaceCulling = true;
-			material->State.Blending = false;
-			material->State.Depth = true;
-
-			mesh->SetMaterial( material_h );
-
-			shader->Use( true );
-
-			dd::MeshUtils::MakeUnitCube( *mesh );
-
-			shader->Use( false );
-		}
+		dd::MeshUtils::CreateDefaultMaterial();
+		dd::MeshUtils::CreateUnitCube();
+		dd::MeshUtils::CreateUnitSphere();
+		dd::MeshUtils::CreateQuad();
 	}
 
 	void MeshRenderer::RenderUpdate( ddc::World& world )
 	{
-		size_t count = s_meshManager->Count();
+		size_t count = s_meshManager->LiveCount();
 		
 		for( size_t i = 0; i < count; ++i )
 		{
-			Mesh* mesh = s_meshManager->AccessAt( i );
+			Mesh* mesh = s_meshManager->AccessNth( i );
 			mesh->Update( *s_jobsystem );
 		}
 	}
@@ -177,7 +154,7 @@ namespace ddr
 		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
 		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
 
-		MaterialHandle material_h = s_materialManager->Find( "mesh" );
+		MaterialHandle material_h( "mesh" );
 		Material* material = material_h.Access();
 
 		bool culling = material->State.BackfaceCulling;

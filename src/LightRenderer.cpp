@@ -19,9 +19,6 @@
 
 namespace ddr
 {
-	static dd::Service<ddr::MeshManager> s_meshManager;
-	static dd::Service<ddr::ShaderManager> s_shaderManager;
-
 	LightRenderer::LightRenderer() :
 		ddr::Renderer( "Lights" )
 	{
@@ -65,10 +62,8 @@ namespace ddr
 
 	void LightRenderer::RenderInit( ddc::World& world )
 	{
-		m_shader = s_shaderManager->Load( "mesh" );
-		DD_ASSERT( m_shader.IsValid() );
-
-		m_mesh = s_meshManager->Find( "sphere" );
+		m_shader = ddr::ShaderHandle( "mesh" );
+		m_mesh = ddr::MeshHandle( "sphere" );
 	}
 
 	void LightRenderer::RenderUpdate( ddc::World& world )

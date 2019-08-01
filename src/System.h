@@ -15,12 +15,12 @@ namespace ddc
 
 	struct System
 	{
-		System( const char* name ) : m_name( name ) {}
+		System(const char* name);
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
-		const dd::IArray<const DataRequest*>& GetRequests() const { return m_requests; }
-		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
+		const dd::Vector<const DataRequest*>& GetRequests() const { return m_requests; }
+		const dd::Vector<const System*>& GetDependencies() const { return m_dependencies; }
 		std::bitset<MAX_TAGS> GetRequiredTags( const char* name = nullptr ) const;
 		const char* GetName() const { return m_name.c_str(); }
 
@@ -77,10 +77,10 @@ namespace ddc
 			std::bitset<MAX_TAGS> Tags;
 		};
 
-		dd::Array<const DataRequest*, MAX_COMPONENTS> m_requests;
-		dd::Array<TagRequest, MAX_COMPONENTS> m_tags;
+		dd::Vector<const DataRequest*> m_requests;
+		dd::Vector<TagRequest> m_tags;
 
-		dd::Array<const System*, 32> m_dependencies;
+		dd::Vector<const System*> m_dependencies;
 		dd::String32 m_name;
 
 		const static int MAX_PARTITIONS = 8;

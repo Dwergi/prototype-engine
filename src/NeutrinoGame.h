@@ -4,7 +4,7 @@
 
 namespace neutrino
 {
-	struct Game : dd::IGame
+	struct NeutrinoGame : dd::IGame
 	{
 		virtual void Initialize(ddc::World& world) override;
 		virtual void Shutdown(ddc::World& world) override;
@@ -12,8 +12,5 @@ namespace neutrino
 		virtual void RenderUpdate(ddc::World& world) override;
 
 		virtual const char* GetTitle() const override { return "Neutrino"; }
-
-	private:
-		bool m_createdEntities = false;
 	};
 }

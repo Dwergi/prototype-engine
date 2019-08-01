@@ -20,7 +20,6 @@
 
 namespace dd
 {
-	static dd::Service<ddr::MeshManager> s_meshManager;
 	static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
 
 	ddc::Entity TestEntities::CreateMeshEntity(ddc::World& world, const ddr::MeshHandle& mesh_h, glm::vec4 colour, glm::vec3 pos, glm::quat rot, glm::vec3 scale)
@@ -40,7 +39,7 @@ namespace dd
 		colour_cmp->Colour = colour;
 
 		dd::BoundBoxComponent* bounds_cmp = world.Access<dd::BoundBoxComponent>(entity);
-		bounds_cmp->BoundBox = s_meshManager->Get(mesh_h)->GetBoundBox();
+		bounds_cmp->BoundBox = mesh_h.Get()->GetBoundBox();
 
 		world.AddTag(entity, ddc::Tag::Visible);
 
@@ -49,7 +48,7 @@ namespace dd
 
 	ddc::Entity TestEntities::CreateBall(ddc::World& world, glm::vec3 translation, glm::vec4 colour, float size)
 	{
-		ddr::MeshHandle mesh_h = s_meshManager->Find("sphere");
+		ddr::MeshHandle mesh_h("sphere");
 
 		ddc::Entity entity = CreateMeshEntity(world, mesh_h, colour,
 			translation,
@@ -87,9 +86,11 @@ namespace dd
 
 		float static_sphere_size = 100;
 
+		ddr::MeshHandle sphere_mesh("sphere");
+
 		/* STATIC SPHERES
 		{
-			ddc::Entity sphere = CreateMeshEntity( world, s_meshManager->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, 0 ), glm::quat(), glm::vec3( static_sphere_size ) );
+			ddc::Entity sphere = CreateMeshEntity( world, sphere_mesh, glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, 0 ), glm::quat(), glm::vec3( static_sphere_size ) );
 			world.AddTag( sphere, ddc::Tag::Static );
 
 			dd::PhysicsSphereComponent& physics_sphere = world.Add<dd::PhysicsSphereComponent>( sphere );
@@ -98,7 +99,7 @@ namespace dd
 		}
 
 		{
-			ddc::Entity sphere = CreateMeshEntity( world, s_meshManager->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, -static_sphere_size * 1.3f ), glm::quat(), glm::vec3( static_sphere_size ) );
+			ddc::Entity sphere = CreateMeshEntity( world, sphere_mesh, glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, -static_sphere_size * 1.3f ), glm::quat(), glm::vec3( static_sphere_size ) );
 			world.AddTag( sphere, ddc::Tag::Static );
 
 			dd::PhysicsSphereComponent& physics_sphere = world.Add<dd::PhysicsSphereComponent>( sphere );
@@ -107,7 +108,7 @@ namespace dd
 		}
 
 		{
-			ddc::Entity sphere = CreateMeshEntity( world, s_meshManager->Find( "sphere" ), glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, static_sphere_size * 1.3f ), glm::quat(), glm::vec3( static_sphere_size ) );
+			ddc::Entity sphere = CreateMeshEntity( world, sphere_mesh, glm::vec4( 0.9, 0.9, 0.9, 1 ), glm::vec3( 0, static_sphere_size * -0.7f, static_sphere_size * 1.3f ), glm::quat(), glm::vec3( static_sphere_size ) );
 			world.AddTag( sphere, ddc::Tag::Static );
 
 			dd::PhysicsSphereComponent& physics_sphere = world.Add<dd::PhysicsSphereComponent>( sphere );
@@ -120,7 +121,7 @@ namespace dd
 		ddc::EntityPrototype* phys_plane_proto = proto_h.Access();
 
 		{
-			ddc::Entity plane = CreateMeshEntity(world, s_meshManager->Find("quad"), glm::vec4(0.2, 0.8, 0.2, 1), glm::vec3(0), glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 0, 0)), glm::vec3(plane_size));
+			ddc::Entity plane = CreateMeshEntity(world, ddr::MeshHandle("quad"), glm::vec4(0.2, 0.8, 0.2, 1), glm::vec3(0), glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 0, 0)), glm::vec3(plane_size));
 			world.AddTag(plane, ddc::Tag::Static);
 
 			dd::PhysicsPlaneComponent& physics_plane = world.Add<dd::PhysicsPlaneComponent>(plane);

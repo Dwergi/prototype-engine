@@ -150,7 +150,7 @@ namespace dd
 		glm::vec3( 1.0f, 0.0f, 0.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, ArrayLength( s_unitCubeNormals ) );
+	static const dd::ConstBuffer<glm::vec3> s_cube_hNormalsBuffer( s_unitCubeNormals, ArrayLength( s_unitCubeNormals ) );
 
 	static const glm::vec2 s_unitCubeUVs[] =
 	{
@@ -479,7 +479,7 @@ namespace dd
 	void MeshUtils::MakeUnitCube( ddr::Mesh& mesh )
 	{
 		mesh.SetPositions( s_unitCubePositionsBuffer );
-		mesh.SetNormals( s_unitCubeNormalsBuffer );
+		mesh.SetNormals( s_cube_hNormalsBuffer );
 		mesh.SetUVs( s_unitCubeUVsBuffer );
 
 		ddm::AABB bounds;
@@ -491,65 +491,87 @@ namespace dd
 
 	void MeshUtils::CreateDefaultMaterial()
 	{
-		ddr::ShaderHandle shader_h = s_shaderManager->Load( "mesh" );
-		ddr::Shader* shader = shader_h.Access();
-		DD_ASSERT( shader != nullptr );
+		ddr::ShaderHandle shader_h = s_shaderManager->Find("mesh");
+		DD_ASSERT(!shader_h.IsValid(), "Mesh material has already been created!");
 
-		ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
-		ddr::Material* material = material_h.Access();
-		DD_ASSERT( material != nullptr );
+		if (!shader_h.IsValid())
+		{
+			shader_h = s_shaderManager->Load("mesh");
+			ddr::Shader* shader = shader_h.Access();
+			DD_ASSERT(shader != nullptr);
 
-		material->Shader = shader_h;
+			ddr::MaterialHandle material_h = s_materialManager->Create("mesh");
+			ddr::Material* material = material_h.Access();
+			DD_ASSERT(material != nullptr);
+
+			material->Shader = shader_h;
+
+			material->State.BackfaceCulling = true;
+			material->State.Blending = false;
+			material->State.Depth = true;
+		}
 	}
 
 	void MeshUtils::CreateUnitCube()
 	{
-		ddr::MeshHandle unitCube = s_meshManager->Find( "cube" );
-		if( !unitCube.IsValid() )
+		ddr::MeshHandle cube_h = s_meshManager->Find( "cube" );
+		DD_ASSERT(!cube_h.IsValid(), "Unit cube has already been created!");
+
+		if( !cube_h.IsValid() )
 		{
-			unitCube = s_meshManager->Create( "cube" );
+			cube_h = s_meshManager->Create( "cube" );
 
-			ddr::Mesh* mesh = unitCube.Access();
-			DD_ASSERT( mesh != nullptr );
+			ddr::Mesh* cube_mesh = cube_h.Access();
+			DD_ASSERT(cube_mesh != nullptr );
 
-			ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
-			mesh->SetMaterial( material_h );
+			ddr::MaterialHandle material_h( "mesh" );
+			DD_ASSERT(material_h.IsValid(), "Mesh material not created!");
 
-			MakeUnitCube( *mesh );
+			cube_mesh->SetMaterial( material_h );
+
+			MakeUnitCube(*cube_mesh);
 		}
 	}
 
 	void MeshUtils::CreateUnitSphere()
 	{
-		ddr::MeshHandle unitSphere = s_meshManager->Find( "sphere" );
-		if( !unitSphere.IsValid() )
+		ddr::MeshHandle sphere_h = s_meshManager->Find( "sphere" );
+		DD_ASSERT(!sphere_h.IsValid(), "Unit sphere has already been created!");
+
+		if( !sphere_h.IsValid() )
 		{
-			unitSphere = s_meshManager->Create( "sphere" );
+			sphere_h = s_meshManager->Create( "sphere" );
 
-			ddr::Mesh* mesh = unitSphere.Access();
-			DD_ASSERT( mesh != nullptr );
+			ddr::Mesh* sphere_mesh = sphere_h.Access();
+			DD_ASSERT(sphere_mesh != nullptr );
 
-			ddr::MaterialHandle material_h = s_materialManager->Create( "mesh" );
-			mesh->SetMaterial( material_h );
+			ddr::MaterialHandle material_h( "mesh" );
+			DD_ASSERT(material_h.IsValid(), "Mesh material not created!");
 
-			MakeIcosphere( *mesh, 2 );
+			sphere_mesh->SetMaterial( material_h );
+
+			MakeIcosphere( *sphere_mesh, 2 );
 		}
 	}
 
 	void MeshUtils::CreateQuad()
 	{
-		ddr::MeshHandle quad = s_meshManager->Find( "quad" );
-		if( !quad.IsValid() )
-		{
-			quad = s_meshManager->Create( "quad" );
+		ddr::MeshHandle quad_h = s_meshManager->Find( "quad" );
+		DD_ASSERT(!quad_h.IsValid(), "Quad has already been created!");
 
-			ddr::Mesh* mesh = quad.Access();
-			DD_ASSERT( mesh != nullptr );
+		if( !quad_h.IsValid() )
+		{
+			quad_h = s_meshManager->Create( "quad" );
+
+			ddr::Mesh* quad_mesh = quad_h.Access();
+			DD_ASSERT(quad_mesh != nullptr );
 
 			ddr::MaterialHandle material_h = s_materialManager->Find( "mesh" );
-			mesh->SetMaterial( material_h );
+			DD_ASSERT(material_h.IsValid(), "Mesh material not created!");
 
-			MakeQuad( *mesh );
+			quad_mesh->SetMaterial( material_h );
+
+			MakeQuad( *quad_mesh);
 		}
 	}
 

@@ -9,6 +9,11 @@
 
 namespace ddc
 {
+	System::System(const char* name) :
+		m_name(name)
+	{
+	}
+
 	bool System::CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const
 	{
 		for( const DataRequest* req : m_requests )

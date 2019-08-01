@@ -15,6 +15,9 @@
 
 namespace ddr
 {
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
+
 	struct Wireframe
 	{
 		bool Enabled { false };
@@ -47,7 +50,10 @@ namespace ddr
 
 	void TerrainRenderer::RenderInit( ddc::World& world )
 	{
-		dd::TerrainChunk::CreateRenderResources();
+		ddr::MaterialHandle material_h = s_materialManager->Create("terrain");
+
+		ddr::Material* material = material_h.Access();
+		material->Shader = s_shaderManager->Load("terrain");
 	}
 
 	void TerrainRenderer::RenderUpdate( ddc::World& world )

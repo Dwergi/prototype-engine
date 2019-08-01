@@ -86,10 +86,15 @@ namespace dd
 	}
 
 	template <typename T>
-	void HandleManager<T>::Destroy( Handle<T> h )
+	bool HandleManager<T>::Destroy( Handle<T> h )
 	{
-		DD_ASSERT( IsAlive( h ) );
+		if (!IsAlive(h))
+		{
+			return false;
+		}
+
 		m_entries[h.ID].Destroy = true;
+		return true;
 	}
 
 	template <typename T>
@@ -108,18 +113,11 @@ namespace dd
 	template <typename T>
 	const T* HandleManager<T>::Get( Handle<T> handle ) const
 	{
-		DD_ASSERT( IsAlive( handle ) );
-
-		if( handle.ID < m_entries.size() )
-		{
-			return m_entries[handle.ID].Instance;
-		}
-
-		return nullptr;
+		return Access(handle);
 	}
 
 	template <typename T>
-	size_t HandleManager<T>::Count() const
+	size_t HandleManager<T>::LiveCount() const
 	{
 		size_t count = 0;
 
@@ -135,7 +133,7 @@ namespace dd
 	}
 
 	template <typename T>
-	T* HandleManager<T>::AccessAt( size_t i ) const
+	T* HandleManager<T>::AccessNth( size_t i ) const
 	{
 		size_t current = 0;
 		for( const HandleEntry& e : m_entries )
@@ -184,5 +182,11 @@ namespace dd
 				entry.Destroy = false;
 			}
 		}
+	}
+
+	template <typename T>
+	Handle<T>::Handle(const char* name)
+	{
+		m_handle = m_manager->Find(name).m_handle;
 	}
 }

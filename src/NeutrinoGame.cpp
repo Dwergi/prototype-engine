@@ -13,7 +13,6 @@
 #include "LightRenderer.h"
 #include "LinesRenderer.h"
 #include "MeshRenderer.h"
-#include "MeshUtils.h"
 #include "MousePicking.h"
 #include "ParticleSystem.h"
 #include "ParticleSystemRenderer.h"
@@ -115,7 +114,87 @@ namespace neutrino
 		}
 	}
 
-	void Game::Initialize(ddc::World& world)
+	static void CreateEntities(ddc::World& world)
+	{
+		// player
+		{
+			ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
+
+			dd::Services::Register(world.Access<dd::FPSCameraComponent>(entity));
+			s_player->SetAspectRatio(s_window->GetWidth(), s_window->GetHeight());
+			s_player->SetVerticalFOV(glm::radians(45.0f));
+
+			DD_TODO("Shaky camera should be a component/system pair.");
+			dd::Services::Register(new dd::ShakyCamera(s_player, s_inputBindings));
+			dd::Services::RegisterInterface<ddr::ICamera>(s_shakyCamera.Get());
+
+			s_debugUI->RegisterDebugPanel(s_shakyCamera);
+
+			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+
+		}
+
+		// dir light
+		{
+			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			world.AddTag(entity, ddc::Tag::Visible);
+
+			dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
+			light->LightType = dd::LightType::Directional;
+			light->Colour = glm::vec3(1, 1, 1);
+			light->Intensity = 0.7;
+
+			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+			transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 1, 0));
+			transform->Update();
+		}
+
+		// point light
+		{
+			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			world.AddTag(entity, ddc::Tag::Visible);
+
+			dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
+			light->LightType = dd::LightType::Point;
+			light->Colour = glm::vec3(1, 1, 1);
+			light->Intensity = 3;
+			light->Ambient = 0.01;
+			light->Attenuation = 0.03;
+			light->InnerAngle = glm::radians(30.f);
+			light->OuterAngle = glm::radians(45.f);
+
+			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+			transform->Position = glm::vec3(0, 30, 0);
+			transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 0, 0));
+			transform->Update();
+		}
+
+		// particle system
+		/*{
+			ddc::Entity entity = world.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
+			world.AddTag( entity, ddc::Tag::Visible );
+			world.AddTag( entity, ddc::Tag::Dynamic );
+
+			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+			transform->Position = glm::vec3( 10, 60, 10 );
+			transform->Update();
+
+			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
+			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+
+			dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
+			particle->Age = 0;
+			particle->Lifetime = 1000;
+		}*/
+
+		// axes
+		dd::TestEntities::CreateAxes(world);
+
+		// physics
+		//dd::TestEntities::CreatePhysicsPlaneTestScene();
+	}
+
+	void NeutrinoGame::Initialize(ddc::World& world)
 	{
 		dd::SwarmSystem& swarm_system = dd::Services::Register(new dd::SwarmSystem());
 
@@ -211,106 +290,21 @@ namespace neutrino
 		s_debugUI->RegisterDebugPanel(tree_system);
 		s_debugUI->RegisterDebugPanel(water_system);
 
-		dd::MeshUtils::CreateDefaultMaterial();
-		dd::MeshUtils::CreateUnitCube();
-		dd::MeshUtils::CreateUnitSphere();
-		dd::MeshUtils::CreateQuad();
+		CreateEntities(world);
 	}
 
-	void Game::Update(ddc::World& world)
+	void NeutrinoGame::Update(ddc::World& world)
 	{
-		if (!m_createdEntities)
-		{
-			m_createdEntities = true;
-
-			// player
-			{
-				ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
-
-				dd::Services::Register(world.Access<dd::FPSCameraComponent>(entity));
-				s_player->SetAspectRatio(s_window->GetWidth(), s_window->GetHeight());
-				s_player->SetVerticalFOV(glm::radians(45.0f));
-
-				DD_TODO("Shaky camera should be a component/system pair.");
-				dd::Services::Register(new dd::ShakyCamera(s_player, s_inputBindings));
-				dd::Services::RegisterInterface<ddr::ICamera>(s_shakyCamera.Get());
-
-				s_debugUI->RegisterDebugPanel(s_shakyCamera);
-
-				dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
-
-			}
-
-			// dir light
-			{
-				ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-				world.AddTag(entity, ddc::Tag::Visible);
-
-				dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
-				light->LightType = dd::LightType::Directional;
-				light->Colour = glm::vec3(1, 1, 1);
-				light->Intensity = 0.7;
-
-				dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
-				transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 1, 0));
-				transform->Update();
-			}
-
-			// point light
-			{
-				ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-				world.AddTag(entity, ddc::Tag::Visible);
-
-				dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
-				light->LightType = dd::LightType::Point;
-				light->Colour = glm::vec3(1, 1, 1);
-				light->Intensity = 3;
-				light->Ambient = 0.01;
-				light->Attenuation = 0.03;
-				light->InnerAngle = glm::radians(30.f);
-				light->OuterAngle = glm::radians(45.f);
-
-				dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
-				transform->Position = glm::vec3(0, 30, 0);
-				transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 0, 0));
-				transform->Update();
-			}
-
-			// particle system
-			/*{
-				ddc::Entity entity = world.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
-				world.AddTag( entity, ddc::Tag::Visible );
-				world.AddTag( entity, ddc::Tag::Dynamic );
-
-				dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
-				transform->Position = glm::vec3( 10, 60, 10 );
-				transform->Update();
-
-				dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
-				bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
-
-				dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
-				particle->Age = 0;
-				particle->Lifetime = 1000;
-			}*/
-
-			// axes
-			dd::TestEntities::CreateAxes(world);
-
-			// physics
-			//dd::TestEntities::CreatePhysicsPlaneTestScene();
-		}
-
 	}
 
-	void Game::RenderUpdate(ddc::World& world)
+	void NeutrinoGame::RenderUpdate(ddc::World& world)
 	{
 		s_player->SetAspectRatio(s_window->GetWidth(), s_window->GetHeight());
 
 		UpdateFreeCam(s_freeCamera, s_shakyCamera, s_input, s_frameTimer->AppDelta());
 	}
 
-	void Game::Shutdown(ddc::World& world)
+	void NeutrinoGame::Shutdown(ddc::World& world)
 	{
 
 	}

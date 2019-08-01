@@ -103,7 +103,9 @@ namespace dd
 			return 0;
 		}
 
-		size_t read = fread(dst.data(), 1, dst.size(), file);
+		dst.resize(Size());
+
+		size_t read = fread(dst.data(), 1, Size(), file);
 		fclose(file);
 
 		size_t i = dst.find( '\0' );

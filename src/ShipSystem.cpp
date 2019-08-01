@@ -23,9 +23,6 @@
 
 namespace dd
 {
-	static dd::Service<ddr::ShaderManager> s_shaderManager;
-	static dd::Service<ddr::MeshManager> s_meshManager;
-
 	static const float s_shipMesh[] = 
 	{
 		// left edge
@@ -128,7 +125,7 @@ namespace dd
 		m_shipMesh = s_meshManager->Create( "ship" );
 
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_shipMesh );
-		mesh->SetMaterial( s_materialManager->Create( "mesh" ) );
+		mesh->SetMaterial(ddr::MaterialHandle( "mesh" ) );
 		dd::MakeUnitCube( *mesh );
 		
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
@@ -214,7 +211,6 @@ namespace dd
 
 	void ShipSystem::Shutdown( ddc::World& world )
 	{
-		s_meshManager->Destroy( m_shipMesh );
 	}
 
 	void ShipSystem::DrawDebugInternal( ddc::World& world )

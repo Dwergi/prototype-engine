@@ -118,7 +118,10 @@ namespace dd
 		const ddc::DataBuffer& player = update_data.Data( "player" );
 		auto player_transforms = player.Read<TransformComponent>();
 		
-		DD_ASSERT( player_transforms.Size() > 0 );
+		if (player_transforms.Size() == 0)
+		{
+			return;
+		}
 
 		glm::vec2 player_offset = player_transforms[0].Position.xz;
 

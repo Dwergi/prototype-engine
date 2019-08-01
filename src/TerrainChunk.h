@@ -34,11 +34,6 @@ namespace dd
 		//
 		static void InitializeShared();
 
-		//
-		// Create render resources for all chunks.
-		//
-		static void CreateRenderResources();
-
 		TerrainChunk( const TerrainParameters& params, glm::vec2 position );
 		~TerrainChunk();
 		

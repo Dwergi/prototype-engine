@@ -45,7 +45,7 @@
 
 // GAME TO USE
 #include "NeutrinoGame.h"
-using TGame = neutrino::Game;
+using TGame = neutrino::NeutrinoGame;
 static dd::Service<dd::IGame> s_game;
 
 static dd::Service<dd::Window> s_window;

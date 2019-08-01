@@ -20,7 +20,7 @@ namespace dd
 		//
 		// Set the name of this instance.
 		//
-		void SetName( std::string name ) { m_name = name; }
+		void SetName(std::string name) { m_name = name; }
 
 	protected:
 		std::string m_name;
@@ -40,45 +40,45 @@ namespace dd
 		//
 		// Find a handle to an object with the given name.
 		//
-		Handle<T> Find( std::string name ) const;
-		
+		Handle<T> Find(std::string name) const;
+
 		//
 		// Create (or retrieve) a handle to an object with the given name.
 		//
-		Handle<T> Create( std::string name );
+		Handle<T> Create(std::string name);
 
 		//
 		// Destroy the object associated with the given handle. 
 		// Returns true if something was destroyed, false if nothing of the given name was found.
 		//
-		void Destroy( Handle<T> handle );
-		
+		bool Destroy(Handle<T> handle);
+
 		//
 		// Get the object instance associated with the given handle.
 		// Returns null if the handle does not reference an object that still exists.
 		//
-		const T* Get( Handle<T> handle ) const;
+		const T* Get(Handle<T> handle) const;
 
 		//
 		// Access the object instance associated with the given handle.
 		// Returns null if the handle does not reference an object that still exists.
 		//
-		T* Access( Handle<T> handle ) const;
+		T* Access(Handle<T> handle) const;
 
 		//
 		// Is the given handle pointing a valid, live object.
 		//
-		bool IsAlive( Handle<T> h ) const;
+		bool IsAlive(Handle<T> h) const;
 
 		//
 		// Get the number of valid handles.
 		//
-		size_t Count() const;
+		size_t LiveCount() const;
 
 		//
 		// Access the handle at index i.
 		//
-		T* AccessAt( size_t i ) const;
+		T* AccessNth(size_t i) const;
 
 		//
 		// Update the handle manager, creating/destroying things that were created last frame.
@@ -110,10 +110,10 @@ namespace dd
 		std::vector<HandleEntry> m_entries;
 		std::mutex m_mutex;
 
-		Handle<T> FindInternal( std::string name ) const;
+		Handle<T> FindInternal(std::string name) const;
 
-		virtual void OnCreate( T& instance ) const {}
-		virtual void OnDestroy( T& instance ) const {}
+		virtual void OnCreate(T& instance) const {}
+		virtual void OnDestroy(T& instance) const {}
 	};
 
 	// 
@@ -125,20 +125,24 @@ namespace dd
 		static_assert(std::is_base_of<HandleTarget, T>::value);
 
 		Handle() {}
-		Handle( const Handle<T>& other ) : m_handle( other.m_handle ) {}
+		Handle(const char* name);
+		Handle(const Handle<T>& other) : m_handle(other.m_handle) {}
 
-		bool operator==( const Handle<T>& other ) const { return m_handle == other.m_handle; }
-		bool operator!=( const Handle<T>& other ) const { return m_handle != other.m_handle; }
+		bool operator==(const Handle<T>& other) const { return m_handle == other.m_handle; }
+		bool operator!=(const Handle<T>& other) const { return m_handle != other.m_handle; }
 
 		uint GetID() const { return m_handle; }
 		bool IsValid() const { return m_handle != ~0u; }
+		bool IsAlive() const { return m_manager->IsAlive(*this); }
 
-		const T* Get() const { return m_manager->Get( *this ); }
-		T* Access() const { return m_manager->Access( *this ); }
+		const T* Get() const { return m_manager->Get(*this); }
+		T* Access() const { return m_manager->Access(*this); }
+
+		void Destroy() const { m_manager->Destroy(*this); }
 
 	private:
 		friend struct HandleManager<T>;
-		static const HandleManager<T>* m_manager;
+		static HandleManager<T>* m_manager;
 
 		union
 		{
@@ -153,6 +157,6 @@ namespace dd
 	};
 }
 
-template <typename T> const dd::HandleManager<T>* dd::Handle<T>::m_manager = nullptr;
+template <typename T> dd::HandleManager<T>* dd::Handle<T>::m_manager = nullptr;
 
 #include "HandleManager.inl"

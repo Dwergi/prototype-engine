@@ -449,9 +449,9 @@ namespace ddr
 
 	void ShaderManager::ReloadAll()
 	{
-		for( size_t i = 0; i < base::Count(); ++i )
+		for( size_t i = 0; i < base::LiveCount(); ++i )
 		{
-			Shader* program = base::AccessAt( i );
+			Shader* program = base::AccessNth( i );
 			program->Reload();
 		}
 	}

@@ -22,6 +22,8 @@ namespace dd
 		void Add( const T& value );
 		void PushAll( const IArray<T>& other );
 
+		void Fill(const T& value);
+
 		void RemoveAt( int index );
 		void Remove( const T& value );
 
@@ -39,7 +41,7 @@ namespace dd
 		void SetSize( int size ) { m_size = size; }
 
 		T* begin() const { return m_data.begin(); }
-		T* end() const { return m_data.end(); }
+		T* end() const { return m_data.begin() + Size(); }
 
 	protected:
 
