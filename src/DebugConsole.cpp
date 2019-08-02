@@ -7,91 +7,13 @@
 #include "PCH.h"
 #include "DebugConsole.h"
 
-#include "AngelScriptEngine.h"
 #include "TransformComponent.h"
 
-#include <fmt/format.h>
-
-// script helpers
-namespace
-{
-	fmt::memory_buffer s_buffer;
-
-	void grabInt( int v )
-	{
-		fmt::format_to( s_buffer, "{}", v );
-	}
-
-	void grabUint( uint v )
-	{
-		fmt::format_to( s_buffer, "{}", v );
-	}
-
-	void grabBool( bool v )
-	{
-		fmt::format_to( s_buffer, "{}", v );
-	}
-
-	void grabFloat( float v )
-	{
-		fmt::format_to( s_buffer, "{}", v );
-	}
-
-	void grabDouble( double v )
-	{
-		fmt::format_to( s_buffer, "{}", v );
-	}
-
-	void grabString( const dd::String& str )
-	{
-		fmt::format_to( s_buffer, "{}", str.c_str() );
-	}
-
-	void grab()
-	{
-		// There is no value
-	}
-}
+#include "fmt/format.h"
 
 namespace dd
 {
-	void RegisterScriptCommands( AngelScriptEngine& scriptEngine, std::vector<std::string>& commands )
-	{
-		asIScriptEngine* engine = scriptEngine.GetInternalEngine();
-
-		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
-		{
-			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
-
-			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
-			if( func->GetName()[0] != '_' )
-				commands.push_back( func->GetName() );
-		}
-
-		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
-		{
-			const char* name;
-			int res = engine->GetGlobalPropertyByIndex( i, &name );
-			if( res >= 0 )
-				commands.push_back( name );
-		}
-	}
-
-	void RegisterConsoleHelpers( AngelScriptEngine& engine )
-	{
-		// Register special function with overloads to catch any type.
-		// This is used by the exec command to output the resulting value from the statement.
-		engine.RegisterFunction<decltype(&grabBool), &grabBool>( "_grab" );
-		engine.RegisterFunction<decltype(&grabInt), &grabInt>( "_grab" );
-		engine.RegisterFunction<decltype(&grabUint), &grabUint>( "_grab" );
-		engine.RegisterFunction<decltype(&grabFloat), &grabFloat>( "_grab" );
-		engine.RegisterFunction<decltype(&grabDouble), &grabDouble>( "_grab" );
-		engine.RegisterFunction<decltype(&grab), &grab>( "_grab" );
-		/*engine.RegisterGlobalFunction( "void _grab(const string &in)", asFUNCTIONPR( grab, (const string&), void ), asCALL_CDECL );*/
-	}
-
-	DebugConsole::DebugConsole( AngelScriptEngine& scriptEngine )
-		: m_scriptEngine( scriptEngine )
+	DebugConsole::DebugConsole()
 	{
 		ClearLog();
 
@@ -103,9 +25,6 @@ namespace dd
 		m_commands.push_back( "Clear" );
 		m_commands.push_back( "Functions" );
 		m_commands.push_back( "Variables" );
-
-		RegisterConsoleHelpers( m_scriptEngine );
-		RegisterScriptCommands( m_scriptEngine, m_commands );
 	}
 
 	DebugConsole::~DebugConsole()
@@ -133,7 +52,7 @@ namespace dd
 	{
 		DD_PROFILE_START( DebugConsole_Draw );
 
-		ImGui::SetWindowSize( ImVec2( 520, 600 ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetWindowSize( ImVec2( 520, 600 ), ImGuiCond_FirstUseEver);
 
 		ImGui::PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 0, 0 ) );
 
@@ -279,17 +198,17 @@ namespace dd
 		std::string errors;
 
 		// pass to AngelScript to evaluate 
-		if( m_scriptEngine.Evaluate( completeString, errors ) )
+		/*if( m_scriptEngine.Evaluate( completeString, errors ) )
 			AddLog( fmt::format( "\t{}\n", errors ) );
 		else
-			AddLog( fmt::format( "\tScript error: {}!", errors.c_str() ) );
+			AddLog( fmt::format( "\tScript error: {}!", errors.c_str() ) );*/
 	}
 
 	void DebugConsole::ListFunctions()
 	{
 		AddLog( "Functions:\n" );
 
-		asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
+		/*asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
 		{
 			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
@@ -297,14 +216,14 @@ namespace dd
 			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
 			if( func->GetName()[0] != '_' )
 				AddLog( fmt::format( "\t- {}\n", func->GetDeclaration() ) );
-		}
+		}*/
 	}
 
 	void DebugConsole::ListVariables()
 	{
 		AddLog( "Variables:\n" );
 
-		asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
+		/*asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
 		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
 		{
 			const char* name;
@@ -327,7 +246,7 @@ namespace dd
 					AddLog( fmt::format( "\t- {} {}\n", type_declaration, name ) );
 				}
 			}
-		}
+		}*/
 	}
 
 	int DebugConsole::TextEditCallback( ImGuiTextEditCallbackData* data )

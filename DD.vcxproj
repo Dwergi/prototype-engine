@@ -130,7 +130,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -139,9 +139,10 @@
       <ConformanceMode>false</ConformanceMode>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32d.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32d.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -156,9 +157,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PreprocessorDefinitions>UNICODE;_DEBUG;SFML_STATIC;</PreprocessorDefinitions>
@@ -171,8 +172,8 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;sfml-system-s64-d.lib;opengl32.lib;glfw64d.lib;user32.lib;gdi32.lib;shell32.lib;ws2_32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -190,7 +191,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PreprocessorDefinitions>_NDEBUG;_RELEASE;UNICODE;SFML_STATIC;</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -199,9 +200,10 @@
       <ConformanceMode>false</ConformanceMode>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>imgui32.lib;angelscript32.lib;sfml-network-s.lib;sfml-audio-s.lib;sfml-system-s.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-network-s.lib;sfml-audio-s.lib;sfml-system-s.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <LinkStatus>false</LinkStatus>
@@ -217,10 +219,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
@@ -234,8 +236,8 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
-      <AdditionalDependencies>imgui64.lib;angelscript64.lib;sfml-network-s64.lib;sfml-audio-s64.lib;sfml-system-s64.lib;opengl32.lib;glfw64.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Release\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-system-s.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <LinkStatus>false</LinkStatus>
@@ -254,8 +256,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;UNICODE;_DEBUG;SFML_STATIC;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -267,7 +269,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>imgui32d.lib;angelscript32d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;glfw32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <ShowProgress>NotSet</ShowProgress>
@@ -286,14 +288,14 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;UNICODE;_DEBUG;SFML_STATIC;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\angelscript\angelscript\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
       <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -303,8 +305,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>imgui64d.lib;angelscript64d.lib;sfml-network-s64-d.lib;sfml-audio-s64-d.lib;sfml-system-s64-d.lib;opengl32.lib;glfw64.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\imgui;$(SolutionDir)lib\angelscript;$(SolutionDir)lib\glfw;$(SolutionDir)lib\sfml</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
     </Link>
@@ -318,9 +320,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h" />
-    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h" />
-    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h" />
     <ClInclude Include="include\fmt\include\fmt\color.h" />
     <ClInclude Include="include\fmt\include\fmt\core.h" />
     <ClInclude Include="include\fmt\include\fmt\format-inl.h" />
@@ -333,14 +332,22 @@
     <ClInclude Include="include\gl3w\include\GL\gl3w.h" />
     <ClInclude Include="include\glm\fwd.hpp" />
     <ClInclude Include="include\glm\glm.hpp" />
+    <ClInclude Include="include\imgui\imconfig.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="include\imgui\imstb_textedit.h" />
+    <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="include\nlohmann\json.hpp" />
     <ClInclude Include="include\pcg\pcg_extras.hpp" />
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
+    <ClInclude Include="include\stb\stb_image.h" />
     <ClInclude Include="include\stb\stb_image_write.h" />
+    <ClInclude Include="include\tinygltf\tinygltf.h" />
     <ClInclude Include="src\AABB.h" />
-    <ClInclude Include="src\ASInternal.h" />
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
@@ -351,7 +358,9 @@
     <ClInclude Include="src\HandleManager.h" />
     <ClInclude Include="src\IHandlesInput.h" />
     <ClInclude Include="src\IInputSource.h" />
+    <ClInclude Include="src\ImGuiBinding.h" />
     <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="src\IWindow.h" />
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
@@ -365,7 +374,10 @@
     <ClInclude Include="src\RenderCommand.h" />
     <ClInclude Include="src\RenderState.h" />
     <ClInclude Include="src\Services.h" />
+    <ClInclude Include="src\SFMLInputSource.h" />
+    <ClInclude Include="src\SFMLWindow.h" />
     <ClInclude Include="src\ShadowMap.h" />
+    <ClInclude Include="src\SoundComponent.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
@@ -423,7 +435,6 @@
     <ClInclude Include="src\ParticleSystemComponent.h" />
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
-    <ClInclude Include="src\GLFWInputSource.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\JobSystem.h" />
     <ClInclude Include="src\InputBindings.h" />
@@ -456,7 +467,6 @@
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
-    <ClInclude Include="src\AngelScriptEngine.h" />
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptSystem.h" />
     <ClInclude Include="src\ShaderPart.h" />
@@ -468,7 +478,6 @@
     <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\Span.h" />
-    <ClInclude Include="src\StringBinding.h" />
     <ClInclude Include="src\String_dd.h" />
     <ClInclude Include="src\SwarmAgentComponent.h" />
     <ClInclude Include="src\SwarmSystem.h" />
@@ -511,34 +520,9 @@
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\VBO.h" />
     <ClInclude Include="src\Vector.h" />
-    <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="include\fmt\src\format.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
@@ -563,6 +547,46 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="include\Remotery\lib\Remotery.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -578,6 +602,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\stb\stb_vorbis.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\AngelScriptTests.cpp">
@@ -596,7 +628,26 @@
     <ClCompile Include="src\CommandBuffer.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
+    <ClCompile Include="src\IInputSource.cpp" />
+    <ClCompile Include="src\ImGuiBinding.cpp" />
+    <ClCompile Include="src\include\stb\stb_image.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\include\tinygltf.cpp\tinygltf.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\IWindow.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
@@ -619,6 +670,8 @@
     </ClCompile>
     <ClCompile Include="src\RenderState.cpp" />
     <ClCompile Include="src\Services.cpp" />
+    <ClCompile Include="src\SFMLInputSource.cpp" />
+    <ClCompile Include="src\SFMLWindow.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
@@ -704,7 +757,6 @@
     <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />
-    <ClCompile Include="src\StringBinding.cpp" />
     <ClCompile Include="src\SystemsSorting.cpp" />
     <ClCompile Include="src\TerrainChunk.cpp" />
     <ClCompile Include="src\TerrainChunkComponent.cpp" />
@@ -793,7 +845,6 @@
     <ClCompile Include="src\FunctionSignature.cpp" />
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\Hash.cpp" />
-    <ClCompile Include="src\GLFWInputSource.cpp" />
     <ClCompile Include="src\JobSystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Member.cpp" />
@@ -832,7 +883,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\ScopedTimer.cpp" />
-    <ClCompile Include="src\AngelScriptEngine.cpp" />
     <ClCompile Include="src\SharedString.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
     <ClCompile Include="src\SwarmAgentComponent.cpp" />
@@ -969,29 +1019,13 @@
     <ClCompile Include="src\TypeInfo.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Variable.cpp" />
-    <ClCompile Include="src\Window.cpp" />
     <None Include="src\DenseMap.inl" />
     <None Include="src\DoubleBuffer.inl" />
     <None Include="src\HandleManager.inl" />
     <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
-    <None Include="src\AngelScriptEngine.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\Vector.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="include\angelscript\angelscript\projects\msvc2015\angelscript.vcxproj">
-      <Project>{39e6af97-6ba3-4a72-8c61-bcebf214ebfd}</Project>
-    </ProjectReference>
-    <ProjectReference Include="include\imgui\imgui.vcxproj">
-      <Project>{60d06b70-22a9-41b4-a681-febed15b77cb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="include\sfml\sfml-audio.vcxproj">
-      <Project>{c2ed5540-0601-382b-92b4-4e4f19f10b7b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="include\sfml\sfml-network.vcxproj">
-      <Project>{7d6e565f-5f2d-32b4-b071-769d6b2fb6b7}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

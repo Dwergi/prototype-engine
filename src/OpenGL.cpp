@@ -1,6 +1,14 @@
 #include "PCH.h"
 #include "OpenGL.h"
 
+namespace OpenGL
+{
+	bool Initialize()
+	{
+		return gl3wInit() == 0;
+	}
+}
+
 namespace ddr
 {
 	dd::String128 GetArrayUniformName( const char* arrayName, size_t index, const char* uniform )

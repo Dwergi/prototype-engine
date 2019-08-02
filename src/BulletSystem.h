@@ -19,14 +19,13 @@ namespace ddr
 namespace dd
 {
 	struct BulletComponent;
-	struct IAsyncHitTest;
 	struct InputBindings;
 	struct HitState;
 	struct TransformComponent;
 
 	struct BulletSystem : ddc::System, IDebugPanel
 	{
-		BulletSystem( IAsyncHitTest& hit_test );
+		BulletSystem();
 
 		void BindActions( InputBindings& bindings );
 
@@ -45,8 +44,6 @@ namespace dd
 		float m_scale { 0 };
 		float m_intensity { 0 };
 		float m_attenuation { 0 };
-
-		IAsyncHitTest& m_hitTest;
 
 		void HandleInput( InputAction action, InputType type );
 		void FireBullet( ddc::World& world, const ddr::ICamera& camera );

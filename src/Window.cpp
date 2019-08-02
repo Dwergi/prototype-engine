@@ -5,7 +5,7 @@
 //
 
 #include "PCH.h"
-#include "Window.h"
+#include "GLFWWindow.h"
 
 #include "GLError.h"
 #include "OpenGL.h"
@@ -14,18 +14,10 @@
 
 namespace dd
 {
-	Window* Window::m_pInstance = nullptr;
-
 	Window::Window( glm::ivec2 resolution, const char* title )
 		: m_title( title ),
 		m_size( resolution )
 	{
-		DD_ASSERT( m_pInstance == nullptr );
-		m_pInstance = this;
-
-		if( !glfwInit() )
-			return;
-
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
 		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );

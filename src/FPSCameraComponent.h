@@ -17,57 +17,57 @@ namespace dd
 
 	struct FPSCameraComponent : ddr::ICamera
 	{
-		void SetRotation( float yaw, float pitch );
+		void SetRotation(float yaw, float pitch);
 
 		virtual float GetYaw() const override { return m_yaw; }
 		virtual float GetPitch() const override { return m_pitch; }
 
 		virtual glm::vec3 GetPosition() const override;
-		void SetPosition( const glm::vec3& pos );
+		void SetPosition(const glm::vec3& pos);
 
 		virtual glm::vec3 GetDirection() const override;
-		void SetDirection( const glm::vec3& dir );
+		void SetDirection(const glm::vec3& dir);
 
 		virtual float GetNear() const override;
-		void SetNear( float dist_near );
+		void SetNear(float dist_near);
 
 		virtual float GetFar() const override;
-		void SetFar( float dist_far );
+		void SetFar(float dist_far);
 
 		virtual float GetAspectRatio() const override;
-		void SetAspectRatio( int w, int h );
+		void SetSize(glm::ivec2 size);
 
 		virtual float GetVerticalFOV() const override;
-		void SetVerticalFOV( float vfov );
+		void SetVerticalFOV(float vfov);
 
 		virtual glm::mat4 GetProjectionMatrix() const override;
 		virtual glm::mat4 GetViewMatrix() const override;
 
 		virtual const ddr::Frustum& GetFrustum() const override { return m_frustum; }
 
-		virtual void Update( float delta_t ) override;
+		virtual void Update(float delta_t) override;
 
-		void CopyValuesFrom( const FPSCameraComponent& other );
-		
-		DD_BEGIN_CLASS( dd::FPSCameraComponent )
+		void CopyValuesFrom(const FPSCameraComponent& other);
+
+		DD_BEGIN_CLASS(dd::FPSCameraComponent)
 			DD_COMPONENT();
 
-			DD_METHOD( SetRotation );
-			DD_METHOD( GetYaw );
-			DD_METHOD( GetPitch );
-			DD_METHOD( GetPosition );
-			DD_METHOD( SetPosition );
-			DD_METHOD( GetDirection );
-			DD_METHOD( SetDirection );
-			DD_METHOD( GetNear );
-			DD_METHOD( SetNear );
-			DD_METHOD( GetFar );
-			DD_METHOD( SetFar );
-			DD_METHOD( GetAspectRatio );
-			DD_METHOD( SetAspectRatio );
-			DD_METHOD( GetProjectionMatrix );
-			DD_METHOD( GetVerticalFOV );
-			DD_METHOD( SetVerticalFOV );
+			DD_METHOD(SetRotation);
+			DD_METHOD(GetYaw);
+			DD_METHOD(GetPitch);
+			DD_METHOD(GetPosition);
+			DD_METHOD(SetPosition);
+			DD_METHOD(GetDirection);
+			DD_METHOD(SetDirection);
+			DD_METHOD(GetNear);
+			DD_METHOD(SetNear);
+			DD_METHOD(GetFar);
+			DD_METHOD(SetFar);
+			DD_METHOD(GetAspectRatio);
+			DD_METHOD(SetSize);
+			DD_METHOD(GetProjectionMatrix);
+			DD_METHOD(GetVerticalFOV);
+			DD_METHOD(SetVerticalFOV);
 		DD_END_CLASS()
 
 	private:

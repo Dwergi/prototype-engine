@@ -8,7 +8,7 @@
 #include "FPSCameraComponent.h"
 
 #include "Math_dd.h"
-#include "Window.h"
+#include "IWindow.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -100,9 +100,9 @@ namespace dd
 		return m_aspectRatio;
 	}
 
-	void FPSCameraComponent::SetAspectRatio( int w, int h )
+	void FPSCameraComponent::SetSize(glm::ivec2 size)
 	{
-		float aspectRatio = float( w ) / float( h );
+		float aspectRatio = (float) size.x / (float) size.y;
 		if( aspectRatio != m_aspectRatio )
 		{
 			m_aspectRatio = aspectRatio;

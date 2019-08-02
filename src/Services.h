@@ -27,6 +27,8 @@ namespace dd
 		{
 			static_assert(!std::is_same_v<T, ddc::World>);
 			Service<T>::Register(instance);
+
+			s_unregisterFuncs.push_back(&Service<T>::Unregister);
 			return instance;
 		}
 
@@ -52,6 +54,20 @@ namespace dd
 
 			return (TInterface&) instance;
 		}
+
+		static void UnregisterAll()
+		{
+			for (void(*unregister_fn)() : s_unregisterFuncs)
+			{
+				unregister_fn();
+			}
+
+			s_unregisterFuncs.clear();
+		}
+
+	private:
+
+		static std::vector<void(*)()> s_unregisterFuncs;
 	};
 
 	template <typename T>
@@ -66,6 +82,7 @@ namespace dd
 		static void Unregister()
 		{
 			DD_ASSERT(s_instance != nullptr, "Instance not registered!");
+			delete s_instance;
 			s_instance = nullptr;
 		}
 

@@ -32,7 +32,7 @@
 #include "Services.h"
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
-#include "Window.h"
+#include "IWindow.h"
 #include "World.h"
 #include "WorldRenderer.h"
 
@@ -45,7 +45,7 @@ namespace neutrino
 	static dd::Service<dd::FPSCameraComponent> s_player;
 	static dd::Service<dd::ShakyCamera> s_shakyCamera;
 	static dd::Service<ddr::WorldRenderer> s_renderer;
-	static dd::Service<dd::Window> s_window;
+	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::IInputSource> s_inputSource;
 	static dd::Service<dd::DebugUI> s_debugUI;
 	static dd::Service<dd::JobSystem> s_jobSystem;
@@ -91,15 +91,15 @@ namespace neutrino
 	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::InputSystem& input, float delta_t)
 	{
 		bool captureMouse = !s_debugUI->Draw();
-		if (captureMouse != input.Source().IsMouseCaptured())
+		if (captureMouse != s_inputSource->IsMouseCaptured())
 		{
-			input.Source().CaptureMouse(captureMouse);
+			s_inputSource->CaptureMouse(captureMouse);
 		}
 
 		if (captureMouse)
 		{
-			free_cam.UpdateMouse(input.Source().GetMousePosition());
-			free_cam.UpdateScroll(input.Source().GetScrollPosition());
+			free_cam.UpdateMouse(s_inputSource->GetMousePosition());
+			free_cam.UpdateScroll(s_inputSource->GetScrollPosition());
 		}
 
 		shaky_cam.Update(delta_t);
@@ -121,7 +121,7 @@ namespace neutrino
 			ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
 
 			dd::Services::Register(world.Access<dd::FPSCameraComponent>(entity));
-			s_player->SetAspectRatio(s_window->GetWidth(), s_window->GetHeight());
+			s_player->SetSize(s_window->GetSize());
 			s_player->SetVerticalFOV(glm::radians(45.0f));
 
 			DD_TODO("Shaky camera should be a component/system pair.");
@@ -204,8 +204,9 @@ namespace neutrino
 		dd::Services::Register(new dd::FreeCameraController());
 		s_freeCamera->BindActions(*s_inputBindings);
 
-		dd::HitTestSystem& hit_testing_system = dd::Services::Register(new dd::HitTestSystem());
-		hit_testing_system.DependsOn(*s_freeCamera);
+		dd::HitTestSystem* hit_testing_system = new dd::HitTestSystem();
+		dd::Services::RegisterInterface<dd::IAsyncHitTest>(hit_testing_system);
+		hit_testing_system->DependsOn(*s_freeCamera);
 
 		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
 
@@ -215,9 +216,9 @@ namespace neutrino
 
 		dd::TerrainSystem& terrain_system = dd::Services::Register(new dd::TerrainSystem());
 
-		dd::BulletSystem& bullet_system = dd::Services::Register(new dd::BulletSystem(hit_testing_system));
+		dd::BulletSystem& bullet_system = dd::Services::Register(new dd::BulletSystem());
 		bullet_system.DependsOn(*s_freeCamera);
-		bullet_system.DependsOn(hit_testing_system);
+		bullet_system.DependsOn(*hit_testing_system);
 		bullet_system.BindActions(*s_inputBindings);
 
 		dd::ParticleSystem& particle_system = dd::Services::Register(new dd::ParticleSystem());
@@ -231,7 +232,7 @@ namespace neutrino
 		world.RegisterSystem(*s_freeCamera);
 		world.RegisterSystem(terrain_system);
 		world.RegisterSystem(particle_system);
-		world.RegisterSystem(hit_testing_system);
+		world.RegisterSystem(*hit_testing_system);
 		world.RegisterSystem(bullet_system);
 		world.RegisterSystem(physics_system);
 		world.RegisterSystem(swarm_system);
@@ -248,7 +249,7 @@ namespace neutrino
 
 		ddr::ParticleSystemRenderer& particle_renderer = dd::Services::Register(new ddr::ParticleSystemRenderer());
 
-		dd::MousePicking& mouse_picking = dd::Services::Register(new dd::MousePicking(*s_window, *s_inputSource, hit_testing_system));
+		dd::MousePicking& mouse_picking = dd::Services::Register(new dd::MousePicking());
 		mouse_picking.BindActions(*s_inputBindings);
 
 		ddr::MeshRenderer& mesh_renderer = dd::Services::Register(new ddr::MeshRenderer());
@@ -282,7 +283,7 @@ namespace neutrino
 		s_debugUI->RegisterDebugPanel(mesh_renderer);
 		s_debugUI->RegisterDebugPanel(bounds_renderer);
 		s_debugUI->RegisterDebugPanel(light_renderer);
-		s_debugUI->RegisterDebugPanel(hit_testing_system);
+		s_debugUI->RegisterDebugPanel(*hit_testing_system);
 		s_debugUI->RegisterDebugPanel(bullet_system);
 		s_debugUI->RegisterDebugPanel(physics_system);
 		s_debugUI->RegisterDebugPanel(terrain_renderer);
@@ -299,7 +300,7 @@ namespace neutrino
 
 	void NeutrinoGame::RenderUpdate(ddc::World& world)
 	{
-		s_player->SetAspectRatio(s_window->GetWidth(), s_window->GetHeight());
+		s_player->SetSize(s_window->GetSize());
 
 		UpdateFreeCam(s_freeCamera, s_shakyCamera, s_input, s_frameTimer->AppDelta());
 	}

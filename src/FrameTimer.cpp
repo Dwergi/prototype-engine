@@ -73,7 +73,7 @@ namespace dd
 
 	void FrameTimer::DrawDebugInternal( ddc::World& world )
 	{
-		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiCond_FirstUseEver );
 
 		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
 		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
@@ -87,8 +87,8 @@ namespace dd
 	{
 		if( m_drawCompact )
 		{
-			ImGui::SetNextWindowPos( ImVec2( 0.0f, 0.0f ), ImGuiSetCond_Always );
-			ImGui::SetNextWindowSize( ImVec2( 45, 20 ), ImGuiSetCond_Always );
+			ImGui::SetNextWindowPos( ImVec2( 0.0f, 0.0f ), ImGuiCond_Always );
+			ImGui::SetNextWindowSize( ImVec2( 45, 20 ), ImGuiCond_Always );
 
 			ImGui::PushStyleColor( ImGuiCol_WindowBg, ImVec4( 0, 0, 0, 0.5 ) );
 			ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );

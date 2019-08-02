@@ -21,7 +21,6 @@
 #include "EntityVisualizer.h"
 #include "File.h"
 #include "FrameTimer.h"
-#include "GLFWInputSource.h"
 #include "IGame.h"
 #include "IInputSource.h"
 #include "InputBindings.h"
@@ -34,12 +33,13 @@
 #include "Texture.h"
 #include "Timer.h"
 #include "Uniforms.h"
-#include "Window.h"
+#include "IWindow.h"
+#include "SFMLInputSource.h"
+#include "SFMLWindow.h"
 #include "World.h"
 #include "WorldRenderer.h"
 
-#include "SFML/Network/UdpSocket.hpp"
-
+#include <filesystem>
 #include <nlohmann/json.hpp>
 //---------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@
 using TGame = neutrino::NeutrinoGame;
 static dd::Service<dd::IGame> s_game;
 
-static dd::Service<dd::Window> s_window;
+static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::InputSystem> s_input;
 static dd::Service<dd::InputBindings> s_inputBindings;
 static dd::Service<dd::IInputSource> s_inputSource;
@@ -62,6 +62,11 @@ static ddc::World* g_world;
 
 std::thread::id g_mainThread;
 
+static void ShowSystemConsole(bool show)
+{
+	::ShowWindow(GetConsoleWindow(), show ? SW_SHOW : SW_HIDE);
+}
+
 static void ToggleConsole(dd::InputAction action, dd::InputType type)
 {
 	if (action == dd::InputAction::TOGGLE_CONSOLE && type == dd::InputType::RELEASED)
@@ -74,13 +79,13 @@ static void ToggleDebugUI(dd::InputAction action, dd::InputType type)
 {
 	if (action == dd::InputAction::TOGGLE_DEBUG_UI && type == dd::InputType::RELEASED)
 	{
-		if (s_input->Source().GetMode() == dd::InputMode::DEBUG)
+		if (s_inputSource->GetMode() == dd::InputMode::DEBUG)
 		{
-			s_input->Source().SetMode(dd::InputMode::GAME);
+			s_inputSource->SetMode(dd::InputMode::GAME);
 		}
 		else
 		{
-			s_input->Source().SetMode(dd::InputMode::DEBUG);
+			s_inputSource->SetMode(dd::InputMode::DEBUG);
 		}
 
 		s_debugUI->EnableDraw(!s_debugUI->Draw());
@@ -156,9 +161,14 @@ static int GameMain()
 	DD_TODO("Should fetch EntitySpaces from game.");
 
 	{
-		dd::Services::Register(new dd::Window(glm::ivec2(1920, 1080), s_game->GetTitle()));
+		dd::IWindow& window = *new dd::SFMLWindow();
+		window.SetTitle(s_game->GetTitle())
+			.SetSize(glm::ivec2(1280, 960))
+			.Initialize();
+		
+		dd::Services::RegisterInterface<dd::IWindow>(window);
 
-		dd::Services::RegisterInterface<dd::IInputSource>(new dd::GLFWInputSource(*s_window));
+		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 		s_inputSource->SetMode(dd::InputMode::GAME);
 
 		dd::Services::Register(new dd::InputBindings());
@@ -168,13 +178,13 @@ static int GameMain()
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_DOWN, &SetTimeScale);
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_UP, &SetTimeScale);
 
-		dd::Services::Register(new dd::InputSystem(*s_inputSource, *s_inputBindings));
+		dd::Services::Register(new dd::InputSystem());
 		s_input->BindKeys();
 
-		dd::Services::Register(new dd::DebugUI(*s_window, *s_inputSource));
+		dd::Services::Register(new dd::DebugUI());
 
 		g_world = new ddc::World();
-		dd::Services::Register(new ddr::WorldRenderer(*s_window));
+		dd::Services::Register(new ddr::WorldRenderer());
 
 		dd::Services::Register(new dd::FrameTimer());
 		s_frameTimer->SetMaxFPS(60);
@@ -196,9 +206,9 @@ static int GameMain()
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		dd::InitializeAssert();
-		s_window->ShowConsole(false);
+		ShowSystemConsole(false);
 
-		while (!s_window->ShouldClose())
+		while (!s_window->IsClosing())
 		{
 			DD_PROFILE_SCOPED(Frame);
 
@@ -231,6 +241,8 @@ static int GameMain()
 		}
 	}
 
+	dd::Services::UnregisterAll();
+
 	DD_PROFILE_DEINIT();
 
 	return 0;
@@ -259,6 +271,8 @@ int TestMain(int argc, char* argv[])
 //
 int main(int argc, char* argv[])
 {
+	std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
+
 	dd::CommandLine cmdLine(argv, argc);
 	if (cmdLine.Exists("noassert"))
 	{

@@ -15,7 +15,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Uniforms.h"
-#include "Window.h"
+#include "IWindow.h"
 
 namespace ddr
 {

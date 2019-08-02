@@ -8,7 +8,7 @@ namespace dd
 {
 	void IDebugPanel::DrawDebugPanel( ddc::World& world )
 	{
-		ImGui::SetNextWindowPos( ImVec2( 30, 30 ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetNextWindowPos( ImVec2( 30, 30 ), ImGuiCond_FirstUseEver );
 
 		if( ImGui::Begin( GetDebugTitle(), &m_debugOpen, ImVec2( 0, 0 ), 0.4f, ImGuiWindowFlags_NoSavedSettings ) )
 		{

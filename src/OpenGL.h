@@ -17,6 +17,8 @@ typedef unsigned int GLenum;
 namespace OpenGL
 {
 	static const GLuint InvalidID = 0;
+
+	static bool Initialize();
 }
 
 namespace ddr

@@ -6,3 +6,5 @@
 
 #include "PCH.h"
 #include "Services.h"
+
+std::vector<void(*)()> dd::Services::s_unregisterFuncs;

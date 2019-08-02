@@ -6,8 +6,8 @@
 
 #pragma once
 
-struct GLFWwindow;
 struct ImDrawData;
+struct ImGuiContext;
 
 namespace ddc
 {
@@ -22,7 +22,7 @@ namespace dd
 
 	struct DebugUI
 	{
-		DebugUI( Window& window, IInputSource& input );
+		DebugUI();
 		~DebugUI();
 
 		void StartFrame( float delta_t );
@@ -40,10 +40,10 @@ namespace dd
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
 		void RenderDebugPanels( ddc::World& world );
 
-		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
+		/*static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
 		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );
 		static void KeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods );
-		static void CharCallback( GLFWwindow* window, unsigned int c );
+		static void CharCallback( GLFWwindow* window, unsigned int c );*/
 
 	private:
 		static void RenderDrawLists( ImDrawData* draw_data );
@@ -58,7 +58,7 @@ namespace dd
 		bool m_midWindow { false };
 		bool m_midFrame { false };
 		bool m_focused { false };
-		IInputSource* m_input { nullptr };
-		Window* m_window { nullptr };
+
+		ImGuiContext* m_imguiContext { nullptr };
 	};
 }

@@ -10,22 +10,21 @@
 
 namespace dd
 {
-	struct IInputSource;
 	struct InputBindings;
+	struct IInputSource;
 
 	struct InputSystem
 	{
-		InputSystem( IInputSource& source, InputBindings& bindings );
+		InputSystem();
 
 		void Update( float delta_t );
 		void BindKeys();
 
-		IInputSource& Source() { return m_source; }
-		InputBindings& Bindings() { return m_bindings; }
+		void SetBindings(const InputBindings& bindings);
+		InputBindings* GetBindings() const { return m_bindings; }
+		IInputSource& GetSource() const;
 
 	private:
-
-		IInputSource& m_source;
-		InputBindings& m_bindings;
+		InputBindings* m_bindings;
 	};
 }

@@ -15,7 +15,7 @@
 
 namespace dd
 {
-	struct Window;
+	struct IWindow;
 }
 
 namespace ddr
@@ -28,7 +28,7 @@ namespace ddr
 
 	struct WorldRenderer : dd::IDebugPanel
 	{
-		WorldRenderer( const dd::Window& window );
+		WorldRenderer();
 		~WorldRenderer();
 
 		//
@@ -56,8 +56,6 @@ namespace ddr
 		virtual void DrawDebugInternal( ddc::World& world ) override;
 
 	private:
-
-		const dd::Window& m_window;
 		
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;

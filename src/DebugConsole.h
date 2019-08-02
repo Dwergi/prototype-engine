@@ -8,7 +8,7 @@
 
 #include "IDebugPanel.h"
 
-struct ImGuiTextEditCallbackData;
+struct ImGuiInputTextCallbackData;
 
 namespace dd
 {
@@ -16,7 +16,7 @@ namespace dd
 	{
 	public:
 
-		DebugConsole( AngelScriptEngine& scriptEngine );
+		DebugConsole();
 		~DebugConsole();
 
 		virtual const char* GetDebugTitle() const override { return "Console"; }
@@ -32,9 +32,8 @@ namespace dd
 		std::vector<std::string> m_history;
 		int					m_historyPos { -1 };   // -1: new line, 0..History.Size-1 browsing history.
 		std::vector<std::string> m_commands;
-		AngelScriptEngine&  m_scriptEngine;
 
-		int TextEditCallback( ImGuiTextEditCallbackData* data );
+		int TextEditCallback(ImGuiInputTextCallbackData* data );
 		void AddLog( std::string msg );
 		void ExecCommand( std::string command_line );
 		void ClearLog();

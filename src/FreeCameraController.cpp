@@ -89,7 +89,7 @@ namespace dd
 
 	void FreeCameraController::DrawDebugInternal( ddc::World& world )
 	{
-		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiCond_FirstUseEver );
 
 		ImGui::Checkbox( "Enabled", &m_enabled );
 

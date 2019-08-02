@@ -24,11 +24,12 @@
 #include "Services.h"
 #include "TransformComponent.h"
 
+static dd::Service<dd::IAsyncHitTest> s_hitTest;
+
 namespace dd
 {
-	BulletSystem::BulletSystem( IAsyncHitTest& hit_test ) :
-		ddc::System( "Bullets" ),
-		m_hitTest( hit_test )
+	BulletSystem::BulletSystem() :
+		ddc::System( "Bullets" )
 	{
 		m_speed = 50;
 		m_colour = glm::vec3( 1, 0, 0 );
@@ -116,7 +117,7 @@ namespace dd
 	{
 		if( bullet.PendingHit.Valid )
 		{
-			m_hitTest.ReleaseResult( bullet.PendingHit );
+			s_hitTest->ReleaseResult( bullet.PendingHit );
 		}
 
 		if( glm::length2( bullet.HitPosition ) > 0 )
@@ -220,12 +221,12 @@ namespace dd
 			if( !bullet.PendingHit.Valid )
 			{
 				ddm::Ray ray( initial_pos, bullet.Velocity, glm::length( bullet.Velocity * bullet.Lifetime ) );
-				bullet.PendingHit = m_hitTest.ScheduleHitTest( ray );
+				bullet.PendingHit = s_hitTest->ScheduleHitTest( ray );
 			}
 			else
 			{
 				HitResult result;
-				if( m_hitTest.FetchResult( bullet.PendingHit, result ) )
+				if( s_hitTest->FetchResult( bullet.PendingHit, result ) )
 				{
 					if( result.Distance() < FLT_MAX )
 					{

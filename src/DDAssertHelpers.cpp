@@ -12,7 +12,7 @@
 #include "IInputSource.h"
 #include "InputSystem.h"
 #include "Services.h"
-#include "Window.h"
+#include "IWindow.h"
 
 #include "imgui/imgui.h"
 
@@ -60,7 +60,7 @@ namespace dd
 
 	void DrawAssertDialog( glm::ivec2 window_size, Assert& assert )
 	{
-		ImGui::SetNextWindowPos( ImVec2( window_size.x / 2.0f - window_size.x / 6.5f, window_size.y / 2.0f - window_size.y / 6.5f ), ImGuiSetCond_FirstUseEver );
+		ImGui::SetNextWindowPos( ImVec2( window_size.x / 2.0f - window_size.x / 6.5f, window_size.y / 2.0f - window_size.y / 6.5f ), ImGuiCond_FirstUseEver);
 
 		if( ImGui::Begin( "Assert", &assert.Open ) )
 		{
@@ -107,10 +107,10 @@ namespace dd
 	}
 
 	static std::thread::id s_mainThread;
-	Service<FrameTimer> s_frameTimer;
-	Service<InputSystem> s_input;
-	Service<DebugUI> s_debugUI;
-	Service<Window> s_window;
+	Service<dd::FrameTimer> s_frameTimer;
+	Service<dd::InputSystem> s_input;
+	Service<dd::DebugUI> s_debugUI;
+	Service<dd::IWindow> s_window;
 
 	static pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
 		int level, const char* message )
@@ -159,7 +159,7 @@ namespace dd
 			printf( s_message.c_str() );
 			OutputDebugStringA( s_message.c_str() );
 
-			s_input->Source().CaptureMouse( false );
+			s_input->GetSource().CaptureMouse( false );
 
 			if( s_debugUI->IsMidWindow() )
 			{

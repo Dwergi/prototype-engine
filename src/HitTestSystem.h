@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	class HitTestSystem : public ddc::System, public IAsyncHitTest, public IDebugPanel
+	struct HitTestSystem : ddc::System, IAsyncHitTest, IDebugPanel
 	{
 	public:
 

@@ -28,9 +28,6 @@
     <Filter Include="Containers">
       <UniqueIdentifier>{82b0b89f-8e41-45a0-824a-405d47c4450e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script">
-      <UniqueIdentifier>{11e0d14b-e6f4-40dd-9b8e-afe2cacc3d00}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DebugUI">
       <UniqueIdentifier>{ddf752d4-dc51-4c2d-ab6c-eb6d44b50336}</UniqueIdentifier>
     </Filter>
@@ -51,12 +48,6 @@
     </Filter>
     <Filter Include="Messaging">
       <UniqueIdentifier>{81c3db90-4cb0-48f4-b975-6bc058b48c4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Script\AngelScript">
-      <UniqueIdentifier>{a9ec13a1-e651-4551-bc2c-adcd707e8c9b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Script\AngelScript\Add-Ons">
-      <UniqueIdentifier>{b184cb4f-9bd7-4dbf-a594-7e9dfda46ced}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
       <UniqueIdentifier>{ded36cdd-4bfa-4719-b778-bbddfc305d7a}</UniqueIdentifier>
@@ -108,6 +99,12 @@
     </Filter>
     <Filter Include="Game">
       <UniqueIdentifier>{0e52d069-7158-418c-bb41-833200ce8a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\tinygltf">
+      <UniqueIdentifier>{904a51d6-0d08-4c61-bddc-9f3cdb0adcdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\imgui">
+      <UniqueIdentifier>{01eba49b-77d5-4950-9264-4f4c07d92ed3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +158,6 @@
     </ClInclude>
     <ClInclude Include="src\Hash.h">
       <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Window.h">
-      <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="src\RemoveQualifiers.h">
       <Filter>Types</Filter>
@@ -273,15 +267,6 @@
     <ClInclude Include="src\MessageQueue.h">
       <Filter>Messaging</Filter>
     </ClInclude>
-    <ClInclude Include="src\AngelScriptEngine.h">
-      <Filter>Script\AngelScript</Filter>
-    </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scriptmath\scriptmath.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scripthelper\scripthelper.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
     <ClInclude Include="src\PlayerComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -314,15 +299,6 @@
     </ClInclude>
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.h">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\StringBinding.h">
-      <Filter>Script\AngelScript</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ASInternal.h">
-      <Filter>Script\AngelScript</Filter>
     </ClInclude>
     <ClInclude Include="src\Memory.h">
       <Filter>Core</Filter>
@@ -519,9 +495,6 @@
     <ClInclude Include="src\InputSystem.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\GLFWInputSource.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="src\IInputSource.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -654,6 +627,48 @@
     <ClInclude Include="src\IGame.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="include\stb\stb_image.h">
+      <Filter>Includes\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tinygltf\tinygltf.h">
+      <Filter>Includes\tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SoundComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imconfig.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_internal.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_rectpack.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_textedit.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_truetype.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_impl_opengl3.h">
+      <Filter>Includes\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImGuiBinding.h">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SFMLInputSource.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SFMLWindow.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -698,9 +713,6 @@
     </ClCompile>
     <ClCompile Include="src\Hash.cpp">
       <Filter>Containers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="src\String_dd.cpp">
       <Filter>Containers</Filter>
@@ -798,15 +810,6 @@
     <ClCompile Include="src\Tests\DoubleBufferTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\AngelScriptEngine.cpp">
-      <Filter>Script\AngelScript</Filter>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scriptmath\scriptmath.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scripthelper\scripthelper.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\TypeInfoTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -845,12 +848,6 @@
     </ClCompile>
     <ClCompile Include="src\AngelScriptTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="include\angelscript\add_on\scriptbuilder\scriptbuilder.cpp">
-      <Filter>Script\AngelScript\Add-Ons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\StringBinding.cpp">
-      <Filter>Script\AngelScript</Filter>
     </ClCompile>
     <ClCompile Include="src\Socket.cpp">
       <Filter>Networking</Filter>
@@ -1050,9 +1047,6 @@
     <ClCompile Include="src\ColourComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\GLFWInputSource.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="src\PCH.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1164,6 +1158,45 @@
     <ClCompile Include="src\TestEntities.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\include\stb\stb_image.cpp">
+      <Filter>Includes\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\include\tinygltf.cpp\tinygltf.cpp">
+      <Filter>Includes\tinygltf</Filter>
+    </ClCompile>
+    <ClCompile Include="include\stb\stb_vorbis.c">
+      <Filter>Includes\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <Filter>Includes\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <Filter>Includes\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>Includes\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+      <Filter>Includes\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Includes\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImGuiBinding.cpp">
+      <Filter>DebugUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IWindow.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SFMLInputSource.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SFMLWindow.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IInputSource.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -1186,9 +1219,6 @@
     </None>
     <None Include="src\RingBuffer.inl">
       <Filter>Containers</Filter>
-    </None>
-    <None Include="src\AngelScriptEngine.inl">
-      <Filter>Script\AngelScript</Filter>
     </None>
     <None Include="src\DoubleBuffer.inl">
       <Filter>Containers</Filter>

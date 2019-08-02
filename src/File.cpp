@@ -76,8 +76,8 @@ namespace dd
 			return 0;
 		}
 
-		size_t read = fread(buffer.Access(), 1, (size_t) buffer.SizeBytes(), file);
-		fclose(file);
+		size_t read = std::fread(buffer.Access(), 1, ( size_t) buffer.SizeBytes(), file);
+		std::fclose(file);
 		return read;
 	}
 
@@ -105,12 +105,13 @@ namespace dd
 
 		dst.resize(Size());
 
-		size_t read = fread(dst.data(), 1, Size(), file);
-		fclose(file);
+		size_t read = std::fread(dst.data(), 1, Size(), file);
+		std::fclose(file);
 
 		size_t i = dst.find( '\0' );
 		if( i != std::string::npos )
 		{
+			DD_ASSERT(false, "Resized");
 			dst.resize( i );
 		}
 
@@ -119,16 +120,8 @@ namespace dd
 
 	bool File::Write( const std::string& src ) const
 	{
-		FILE* file = Open("wb");
-		if (file == nullptr)
-		{
-			return 0;
-		}
-
-		size_t written = fwrite(src.c_str(), 1, src.size(), file);
-		fclose(file);
-
-		return written > 0;
+		dd::ConstBuffer<char> buffer(src.c_str(), src.size());
+		return Write(buffer);
 	}
 
 	bool File::Write( const IBuffer& buffer ) const
@@ -139,8 +132,8 @@ namespace dd
 			return 0;
 		}
 
-		size_t written = fwrite(buffer.GetVoid(), 1, buffer.SizeBytes(), file);
-		fclose(file);
+		size_t written = std::fwrite(buffer.GetVoid(), 1, buffer.SizeBytes(), file);
+		std::fclose(file);
 
 		return written > 0;
 	}

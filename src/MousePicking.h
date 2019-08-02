@@ -46,7 +46,7 @@ namespace dd
 	{
 		static const int DownScalingFactor = 2;
 
-		MousePicking( const Window& window, const IInputSource& input, IAsyncHitTest& hit_test );
+		MousePicking();
 
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
@@ -63,10 +63,6 @@ namespace dd
 		virtual void RenderDebug( const ddr::RenderData& data ) override;
 
 	private:
-
-		const IInputSource& m_input;
-		const Window& m_window;
-		dd::IAsyncHitTest& m_hitTest;
 
 		bool m_select { false };
 		bool m_enabled { false };
