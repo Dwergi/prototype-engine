@@ -20,7 +20,7 @@ namespace ddr
 	struct ScopedShader
 	{
 		ScopedShader( Shader& shader );
-		ScopedShader( ScopedShader&& other ) : m_shader( other.m_shader ) { other.m_shader = nullptr; }
+		ScopedShader( ScopedShader&& other ) noexcept : m_shader( other.m_shader ) { other.m_shader = nullptr; }
 		~ScopedShader();
 
 	private:
@@ -107,6 +107,6 @@ namespace ddr
 		void ReloadAll();
 
 	private:
-		using base = HandleManager<Shader>;
+		using super = HandleManager<Shader>;
 	};
 } 

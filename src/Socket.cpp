@@ -8,8 +8,8 @@
 #include "Socket.h"
 /*
 
-#include "SFML/Network/IpAddress.hpp"
-#include "SFML/Network/UdpSocket.hpp"
+#include <sfml/Network/IpAddress.hpp>
+#include <sfml/Network/UdpSocket.hpp>
 
 namespace dd
 {

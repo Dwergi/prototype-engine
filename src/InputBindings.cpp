@@ -18,31 +18,28 @@ namespace dd
 	{
 	}
 
-	void InputBindings::RegisterHandler( InputAction action, InputBindings::InputHandler handler )
+	void InputBindings::RegisterHandler(InputAction action, InputBindings::InputHandler handler)
 	{
-		Vector<InputHandler>* handlers = m_bindings.Find( action );
+		Vector<InputHandler>* handlers = m_bindings.Find(action);
 
-		if( handlers == nullptr )
+		if (handlers == nullptr)
 		{
-			m_bindings.Add( action, Vector<InputHandler>() );
-			handlers = m_bindings.Find( action );
+			m_bindings.Add(action, Vector<InputHandler>());
+			handlers = m_bindings.Find(action);
 		}
 
-		handlers->Add( handler );
+		handlers->Add(handler);
 	}
 
-	void InputBindings::Dispatch( const IArray<InputEvent>& actions ) const
+	void InputBindings::Dispatch(InputEvent evt) const
 	{
-		for( const InputEvent& evt : actions )
-		{
-			Vector<InputHandler>* handlers = m_bindings.Find( evt.Action );
-			if( handlers == nullptr )
-				continue;
+		Vector<InputHandler>* handlers = m_bindings.Find(evt.Action);
+		if (handlers == nullptr)
+			return;
 
-			for( InputHandler& handler : *handlers )
-			{
-				handler( evt.Action, evt.Type );
-			}
+		for (InputHandler& handler : *handlers)
+		{
+			handler(evt.Action, evt.Type);
 		}
 	}
 }

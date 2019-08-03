@@ -37,8 +37,8 @@ namespace ddr
 		glm::vec2( 1,	1 )
 	};
 
-	static VAO s_vaoParticle;
-	static VBO s_vboParticle;
+	static VBO s_vboQuad;
+	
 	static ShaderHandle s_shaderParticle;
 
 	ParticleSystemRenderer::ParticleSystemRenderer() :
@@ -54,28 +54,27 @@ namespace ddr
 
 	void ParticleSystemRenderer::RenderInit( ddc::World& world )
 	{
-		dd::Vector<ShaderPart*> shaders;
-
-		if( !s_shaderParticle.IsValid() )
-		{
-			s_shaderParticle = s_shaderManager->Load( "particle" );
-		}
+		s_shaderParticle = s_shaderManager->Load( "particle" );
 
 		Shader* shader = s_shaderParticle.Access();
 		DD_ASSERT( shader != nullptr );
 
 		ScopedShader scoped_state = shader->UseScoped();
 
-		s_vaoParticle.Create();
-		s_vaoParticle.Bind();
+		m_vaoParticle.Create();
+		m_vaoParticle.Bind();
 
-		s_vboParticle.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		s_vboParticle.Bind();
-		s_vboParticle.SetData( dd::ConstBuffer<glm::vec2>( s_screenFacingQuadVertices, 6 ) );
-		s_vboParticle.CommitData();
+		s_vboQuad.Bind();
+
+		if (!s_vboQuad.IsValid())
+		{
+			s_vboQuad.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
+			s_vboQuad.CommitData();
+		}
 
 		shader->BindAttributeVec2( "Position", false );
-		s_vboParticle.Unbind();
+		s_vboQuad.Unbind();
 
 		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
 		m_vboPosition.Bind();
@@ -104,7 +103,7 @@ namespace ddr
 		shader->SetAttributeInstanced( "ColourInstanced" );
 		m_vboColours.Unbind();
 
-		s_vaoParticle.Unbind();
+		m_vaoParticle.Unbind();
 	}
 
 	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
@@ -119,7 +118,7 @@ namespace ddr
 		uniforms.Bind( *shader );
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
-		s_vaoParticle.Bind();
+		m_vaoParticle.Bind();
 
 		auto particle_systems = data.Get<dd::ParticleSystemComponent>();
 
@@ -142,7 +141,7 @@ namespace ddr
 				return a.Distance > b.Distance;
 			} );
 
-			int index = 0;
+			int count = 0;
 			for( const dd::Particle& particle : m_tempBuffer )
 			{
 				if( !particle.Alive() )
@@ -150,11 +149,11 @@ namespace ddr
 					break;
 				}
 
-				m_positions[index] = particle.Position;
-				m_colours[index] = particle.Colour;
-				m_sizes[index] = particle.Size;
+				m_positions[count] = particle.Position;
+				m_colours[count] = particle.Colour;
+				m_sizes[count] = particle.Size;
 
-				++index;
+				++count;
 			}
 
 			m_vboPosition.Bind();
@@ -169,10 +168,10 @@ namespace ddr
 			m_vboColours.CommitData();
 			m_vboColours.Unbind();
 
-			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, index );
+			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, count);
 		}
 
-		s_vaoParticle.Unbind();
+		m_vaoParticle.Unbind();
 
 		uniforms.Unbind();
 	}

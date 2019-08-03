@@ -1,11 +1,13 @@
 #include "PCH.h"
 #include "SFMLWindow.h"
 
-#include "sfml/Window.hpp"
+#include <sfml/Window.hpp>
 
 namespace dd
 {
 	using super = IWindow;
+
+	static sf::Cursor* s_cursors[(int) dd::Cursor::COUNT];
 
 	bool SFMLWindow::OnInitialize()
 	{
@@ -21,6 +23,31 @@ namespace dd
 		sf::String sfml_title = title;
 
 		m_sfmlWindow = new sf::Window(video_mode, sfml_title);
+
+		s_cursors[(int) dd::Cursor::Arrow] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::Arrow]->loadFromSystem(sf::Cursor::Arrow);
+
+		s_cursors[(int) dd::Cursor::Text] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::Text]->loadFromSystem(sf::Cursor::Text);
+
+		s_cursors[(int) dd::Cursor::SizeAll] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::SizeAll]->loadFromSystem(sf::Cursor::SizeAll);
+
+		s_cursors[(int) dd::Cursor::SizeNS] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::SizeNS]->loadFromSystem(sf::Cursor::SizeVertical);
+
+		s_cursors[(int) dd::Cursor::SizeEW] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::SizeEW]->loadFromSystem(sf::Cursor::SizeHorizontal);
+
+		s_cursors[(int) dd::Cursor::SizeNESW] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::SizeNESW]->loadFromSystem(sf::Cursor::SizeBottomLeftTopRight);
+
+		s_cursors[(int) dd::Cursor::SizeNWSE] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::SizeNWSE]->loadFromSystem(sf::Cursor::SizeTopLeftBottomRight);
+
+		s_cursors[(int) dd::Cursor::Hand] = new sf::Cursor();
+		s_cursors[(int) dd::Cursor::Hand]->loadFromSystem(sf::Cursor::Hand);
+
 
 		return true;
 	}
@@ -87,5 +114,23 @@ namespace dd
 		}
 
 		return m_sfmlWindow->hasFocus();
+	}
+
+	void SFMLWindow::OnSetMousePosition(glm::ivec2 pos)
+	{
+		sf::Mouse::setPosition(sf::Vector2i(pos.x, pos.y));
+	}
+
+	void SFMLWindow::OnSetCursor(dd::Cursor cursor)
+	{
+		if (cursor == dd::Cursor::Hidden)
+		{
+			m_sfmlWindow->setMouseCursorVisible(false);
+		}
+		else
+		{
+			m_sfmlWindow->setMouseCursorVisible(true);
+			m_sfmlWindow->setMouseCursor(*s_cursors[(int) cursor]);
+		}
 	}
 }

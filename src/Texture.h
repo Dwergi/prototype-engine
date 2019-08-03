@@ -55,7 +55,11 @@ namespace ddr
 
 	struct TextureManager : dd::HandleManager<ddr::Texture>
 	{
+		ddr::TextureHandle Load(std::string texture_name);
+
 	private:
+
+		using super = HandleManager<ddr::Texture>;
 
 		virtual void OnCreate( Texture& tex ) const override;
 		virtual void OnDestroy( Texture& tex ) const override;

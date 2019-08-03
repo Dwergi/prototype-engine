@@ -28,6 +28,8 @@ namespace ddr
 		
 		RenderState m_renderState;
 
+		VAO m_vaoParticle;
+
 		glm::vec3 m_positions[dd::MAX_PARTICLES];
 		VBO m_vboPosition;
 

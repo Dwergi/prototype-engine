@@ -9,9 +9,9 @@
 
 #include "IWindow.h"
 
-#include "sfml/Window.hpp"
+#include <sfml/Window.hpp>
 
-dd::Service<dd::IWindow> s_window;
+static dd::Service<dd::IWindow> s_window;
 
 namespace dd
 {
@@ -22,64 +22,103 @@ namespace dd
 		DD_ASSERT(m_sfmlWindow != nullptr, "Window not initialized!");
 	}
 
-	SFMLInputSource::~SFMLInputSource()
+	static Key GetKeyCode(sf::Keyboard::Key sfml_key)
 	{
+		switch (sfml_key)
+		{
+			case sf::Keyboard::A: return Key::A;
+			case sf::Keyboard::B: return Key::B;
+			case sf::Keyboard::C: return Key::C;
+			case sf::Keyboard::D: return Key::D;
+			case sf::Keyboard::E: return Key::E;
+			case sf::Keyboard::F: return Key::F;
+			case sf::Keyboard::G: return Key::G;
+			case sf::Keyboard::H: return Key::H;
+			case sf::Keyboard::I: return Key::I;
+			case sf::Keyboard::J: return Key::J;
+			case sf::Keyboard::K: return Key::K;
+			case sf::Keyboard::L: return Key::L;
+			case sf::Keyboard::M: return Key::M;
+			case sf::Keyboard::N: return Key::N;
+			case sf::Keyboard::O: return Key::O;
+			case sf::Keyboard::P: return Key::P;
+			case sf::Keyboard::Q: return Key::Q;
+			case sf::Keyboard::R: return Key::R;
+			case sf::Keyboard::S: return Key::S;
+			case sf::Keyboard::T: return Key::T;
+			case sf::Keyboard::U: return Key::U;
+			case sf::Keyboard::V: return Key::V;
+			case sf::Keyboard::W: return Key::W;
+			case sf::Keyboard::X: return Key::X;
+			case sf::Keyboard::Y: return Key::Y;
+			case sf::Keyboard::Z: return Key::Z;
+			case sf::Keyboard::Escape: return Key::ESCAPE;
+			case sf::Keyboard::Enter: return Key::ENTER;
+			case sf::Keyboard::Tab: return Key::TAB;
+			case sf::Keyboard::PageUp: return Key::PAGE_UP;
+			case sf::Keyboard::PageDown: return Key::PAGE_DOWN;
+			case sf::Keyboard::Home: return Key::HOME;
+			case sf::Keyboard::End: return Key::END;
+			case sf::Keyboard::Pause: return Key::PAUSE;
+			case sf::Keyboard::F1: return Key::F1;
+			case sf::Keyboard::F2: return Key::F2;
+			case sf::Keyboard::F3: return Key::F3;
+			case sf::Keyboard::F4: return Key::F4;
+			case sf::Keyboard::F5: return Key::F5;
+			case sf::Keyboard::F6: return Key::F6;
+			case sf::Keyboard::F7: return Key::F7;
+			case sf::Keyboard::F8: return Key::F8;
+			case sf::Keyboard::F9: return Key::F9;
+			case sf::Keyboard::F10: return Key::F10;
+			case sf::Keyboard::LShift: return Key::LSHIFT;
+			case sf::Keyboard::LControl: return Key::LCTRL;
+			case sf::Keyboard::LAlt: return Key::LALT;
+			default: return Key::NONE;
+		}
 	}
 
-	static int GetKeyCode(dd::IInputSource& src, sf::Keyboard::Key key)
+	static uint8 GetModifiers( const sf::Event::KeyEvent& evt )
 	{
-		int key = -1;
-		switch (key_evt.code)
+		uint8 modifiers = 0;
+		if( evt.alt )
 		{
-			case sf::Keyboard::A: key = 'a'; break;
-			case sf::Keyboard::B: key = 'b'; break;
-			case sf::Keyboard::C: key = 'c'; break;
-			case sf::Keyboard::D: key = 'd'; break;
-			case sf::Keyboard::E: key = 'e'; break;
-			case sf::Keyboard::F: key = 'f'; break;
-			case sf::Keyboard::G: key = 'g'; break;
-			case sf::Keyboard::H: key = 'h'; break;
-			case sf::Keyboard::I: key = 'i'; break;
-			case sf::Keyboard::J: key = 'j'; break;
-			case sf::Keyboard::K: key = 'k'; break;
-			case sf::Keyboard::L: key = 'l'; break;
-			case sf::Keyboard::M: key = 'm'; break;
-			case sf::Keyboard::N: key = 'n'; break;
-			case sf::Keyboard::O: key = 'o'; break;
-			case sf::Keyboard::P: key = 'p'; break;
-			case sf::Keyboard::Q: key = 'q'; break;
-			case sf::Keyboard::R: key = 'r'; break;
-			case sf::Keyboard::S: key = 's'; break;
-			case sf::Keyboard::T: key = 't'; break;
-			case sf::Keyboard::U: key = 'u'; break;
-			case sf::Keyboard::V: key = 'v'; break;
-			case sf::Keyboard::W: key = 'w'; break;
-			case sf::Keyboard::X: key = 'x'; break;
-			case sf::Keyboard::Y: key = 'y'; break;
-			case sf::Keyboard::Z: key = 'z'; break;
-			case sf::Keyboard::Escape: key = ( int) Key::ESCAPE; break;
-			case sf::Keyboard::Enter: key = ( int) Key::ENTER; break;
-			case sf::Keyboard::Tab: key = ( int) Key::TAB; break;
-			case sf::Keyboard::PageUp: key = ( int) Key::PAGE_UP; break;
-			case sf::Keyboard::PageDown: key = ( int) Key::PAGE_DOWN; break;
-			case sf::Keyboard::Home: key = ( int) Key::HOME; break;
-			case sf::Keyboard::End: key = ( int) Key::END; break;
-			case sf::Keyboard::Pause: key = ( int) Key::PAUSE; break;
-			case sf::Keyboard::F1: key = ( int) Key::F1; break;
-			case sf::Keyboard::F2: key = ( int) Key::F2; break;
-			case sf::Keyboard::F3: key = ( int) Key::F3; break;
-			case sf::Keyboard::F4: key = ( int) Key::F4; break;
-			case sf::Keyboard::F5: key = ( int) Key::F5; break;
-			case sf::Keyboard::F6: key = ( int) Key::F6; break;
-			case sf::Keyboard::F7: key = ( int) Key::F7; break;
-			case sf::Keyboard::F8: key = ( int) Key::F8; break;
-			case sf::Keyboard::F9: key = ( int) Key::F9; break;
-			case sf::Keyboard::F10: key = ( int) Key::F10; break;
-			case sf::Keyboard::LShift: key = ( int) Key::LSHIFT; break;
-			case sf::Keyboard::LControl: key = ( int) Key::LCTRL; break;
-			case sf::Keyboard::LAlt: key = ( int) Key::LALT; break;
+			modifiers |= Modifiers::ALT;
 		}
 
+		if( evt.control )
+		{
+			modifiers |= Modifiers::CTRL;
+		}
+
+		if( evt.shift )
+		{
+			modifiers |= Modifiers::SHIFT;
+		}
+
+		return modifiers;
+	}
+
+	static Key GetMouseButton(const sf::Event::MouseButtonEvent& evt)
+	{
+		switch (evt.button)
+		{
+		case sf::Mouse::Left:
+			return Key::MOUSE_LEFT;
+
+		case sf::Mouse::Right:
+			return Key::MOUSE_RIGHT;
+
+		case sf::Mouse::Middle:
+			return Key::MOUSE_MIDDLE; 
+
+		case sf::Mouse::XButton1:
+			return Key::MOUSE_4;
+
+		case sf::Mouse::XButton2:
+			return Key::MOUSE_5;
+		}
+
+		return Key::NONE;
 	}
 	
 	void SFMLInputSource::OnUpdateInput()
@@ -90,19 +129,25 @@ namespace dd
 			switch (evt.type)
 			{
 				case sf::Event::KeyPressed:
-					AddKeyEvent(evt.key, InputType::PRESSED);
+				{
+					Key key = GetKeyCode( evt.key.code );
+					int modifiers = GetModifiers( evt.key );
+					OnKey( key, modifiers, InputType::PRESSED );
 					break;
-
+				}
 				case sf::Event::KeyReleased:
-					AddKeyEvent(evt.key, InputType::RELEASED);
+				{
+					Key key = GetKeyCode(evt.key.code);
+					int modifiers = GetModifiers(evt.key);
+					OnKey(key, modifiers, InputType::RELEASED);
 					break;
-
+				}
 				case sf::Event::MouseButtonPressed:
-					AddMouseButtonEvent(evt.mouseButton, InputType::PRESSED);
+					OnKey(GetMouseButton(evt.mouseButton), Modifiers::NONE, InputType::PRESSED);
 					break;
 
 				case sf::Event::MouseButtonReleased:
-					AddMouseButtonEvent(evt.mouseButton, InputType::RELEASED);
+					OnKey(GetMouseButton(evt.mouseButton), Modifiers::NONE, InputType::RELEASED);
 					break;
 
 				case sf::Event::MouseMoved:
@@ -114,14 +159,30 @@ namespace dd
 					break;
 
 				case sf::Event::TextEntered:
-					OnTextEvent(evt.text.unicode);
+					OnText(evt.text.unicode);
 					break;
 			}
 		}
 	}
 
-	void SFMLInputSource::OnCaptureMouse(bool capture)
+	void SFMLInputSource::OnSetMousePosition(glm::vec2 pos)
+	{
+		sf::Window* sfml_window = (sf::Window*) s_window->GetNative(); 
+		sf::Mouse::setPosition(sf::Vector2i((int) pos.x, (int) pos.y), *sfml_window);
+	}
+
+	void SFMLInputSource::OnSetMouseCapture(bool capture)
 	{
 		m_sfmlWindow->setMouseCursorGrabbed(capture);
+	}
+
+	const char* SFMLInputSource::GetClipboardText() const
+	{
+		return sf::Clipboard::getString().toAnsiString().c_str();
+	}
+
+	void SFMLInputSource::SetClipboardText(const char* text)
+	{
+		sf::Clipboard::setString(text);
 	}
 }

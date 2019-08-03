@@ -2,10 +2,26 @@
 
 namespace dd
 {
+	enum class Cursor : int8
+	{
+		Hidden = -1,
+		Arrow = 0,
+		Text,
+		SizeAll,
+		SizeNS,
+		SizeEW,
+		SizeNESW,
+		SizeNWSE,
+		Hand,
+		COUNT
+	};
+
 	struct IWindow
 	{
 		bool Initialize();
 		void Shutdown();
+
+		IWindow& Swap();
 
 		bool IsClosing() const { return m_closing; }
 		IWindow& SetToClose();
@@ -13,7 +29,9 @@ namespace dd
 		bool IsFocused() const { return m_focused; }
 
 		IWindow& SetBorderless(bool borderless);
-		IWindow& Swap();
+
+		dd::Cursor GetCursor() const;
+		IWindow& SetCursor(dd::Cursor cursor);
 
 		IWindow& SetSize(glm::ivec2 size);
 		glm::ivec2 GetSize() const { return m_size; }
@@ -32,12 +50,15 @@ namespace dd
 		virtual void OnSetSize(glm::ivec2 size) = 0;
 		virtual void OnSetTitle(std::string title) = 0;
 		virtual void OnSetBorderless(bool borderless) = 0;
+		virtual void OnSetMousePosition(glm::ivec2 pos) = 0;
 		virtual void OnSwap() = 0;
 		virtual bool OnGetFocused() = 0;
+		virtual void OnSetCursor(Cursor cursor) = 0;
 
-		glm::ivec2 m_size;
+		glm::ivec2 m_size { 0, 0 };
 		std::string m_title;
 		bool m_focused { false };
 		bool m_closing { false };
+		dd::Cursor m_cursor { Cursor::Hidden };
 	};
 }

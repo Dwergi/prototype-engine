@@ -24,6 +24,7 @@ namespace dd
 		OnSetBorderless(borderless);
 		return *this;
 	}
+
 	IWindow& IWindow::Swap()
 	{
 		OnSwap();
@@ -42,6 +43,18 @@ namespace dd
 	{
 		m_title = title;
 		OnSetTitle(title);
+		return *this;
+	}
+
+	dd::Cursor IWindow::GetCursor() const
+	{
+		return m_cursor;
+	}
+
+	IWindow& IWindow::SetCursor(dd::Cursor cursor)
+	{
+		m_cursor = cursor;
+		OnSetCursor(cursor);
 		return *this;
 	}
 }

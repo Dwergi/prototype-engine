@@ -90,16 +90,10 @@ namespace neutrino
 
 	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::InputSystem& input, float delta_t)
 	{
-		bool captureMouse = !s_debugUI->Draw();
-		if (captureMouse != s_inputSource->IsMouseCaptured())
-		{
-			s_inputSource->CaptureMouse(captureMouse);
-		}
-
-		if (captureMouse)
+		if (s_freeCamera->IsEnabled() && s_input->GetMode() == dd::InputMode::GAME)
 		{
 			free_cam.UpdateMouse(s_inputSource->GetMousePosition());
-			free_cam.UpdateScroll(s_inputSource->GetScrollPosition());
+			free_cam.UpdateScroll(s_inputSource->GetMouseScroll());
 		}
 
 		shaky_cam.Update(delta_t);

@@ -185,7 +185,7 @@ namespace dd
 		{
 			// hard case - collision, so linearly search for the next free slot
 			Entry* current = &entry + 1;
-			Entry* last = &m_data[m_data.Size() - 1];
+			Entry* last = &m_data[(size_t) m_data.Size() - 1];
 
 			while( current <= last )
 			{
@@ -327,7 +327,7 @@ namespace dd
 		{
 			// find a new slot by linearly searching for the next free one
 			Entry* current = &entry + 1;
-			Entry* last = &m_data[m_data.Size() - 1];
+			Entry* last = &m_data[(size_t) m_data.Size() - 1];
 
 			while( current <= last )
 			{

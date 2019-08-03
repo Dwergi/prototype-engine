@@ -106,6 +106,9 @@
     <Filter Include="Includes\imgui">
       <UniqueIdentifier>{01eba49b-77d5-4950-9264-4f4c07d92ed3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{5729b7d4-6f1b-40aa-ac36-3b353e12b793}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -279,9 +282,6 @@
     <ClInclude Include="src\InputBindings.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -330,9 +330,6 @@
     <ClInclude Include="src\FrameTimer.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math_dd.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\ScriptComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -352,9 +349,6 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\OpenGL.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\FrameBuffer.h">
@@ -377,9 +371,6 @@
     </ClInclude>
     <ClInclude Include="src\BVHTree.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Material.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\Uniforms.h">
       <Filter>Rendering</Filter>
@@ -549,9 +540,6 @@
     <ClInclude Include="src\PhysicsBase.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleSystemRenderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\JSON.h">
       <Filter>JSON</Filter>
     </ClInclude>
@@ -565,9 +553,6 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\ShaderPart.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\TreeSystem.h">
@@ -668,6 +653,51 @@
     </ClInclude>
     <ClInclude Include="src\SFMLWindow.h">
       <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlaneComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlaneRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math_dd.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystemRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OrthoCamera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputMode.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteAnimationComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LuxportGame.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -822,9 +852,6 @@
     <ClCompile Include="src\FreeCameraController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\MeshComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -906,9 +933,6 @@
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\OpenGL.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -929,9 +953,6 @@
     </ClCompile>
     <ClCompile Include="src\Tests\BVHTreeTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Material.cpp">
-      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\Uniforms.cpp">
       <Filter>Rendering</Filter>
@@ -1086,9 +1107,6 @@
     <ClCompile Include="src\JSON.cpp">
       <Filter>JSON</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystemRenderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderState.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1108,9 +1126,6 @@
       <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderPart.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\Noise.cpp">
@@ -1158,12 +1173,6 @@
     <ClCompile Include="src\TestEntities.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\include\stb\stb_image.cpp">
-      <Filter>Includes\stb</Filter>
-    </ClCompile>
-    <ClCompile Include="src\include\tinygltf.cpp\tinygltf.cpp">
-      <Filter>Includes\tinygltf</Filter>
-    </ClCompile>
     <ClCompile Include="include\stb\stb_vorbis.c">
       <Filter>Includes\stb</Filter>
     </ClCompile>
@@ -1196,6 +1205,52 @@
     </ClCompile>
     <ClCompile Include="src\IInputSource.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlaneComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlaneRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="include\tinygltf\tinygltf.cpp">
+      <Filter>Includes\tinygltf</Filter>
+    </ClCompile>
+    <ClCompile Include="include\stb\stb_image.cpp">
+      <Filter>Includes\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleSystemRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OrthoCamera.cpp" />
+    <ClCompile Include="src\InputMode.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sprite.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteAnimationComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LuxportGame.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

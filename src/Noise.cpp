@@ -11,6 +11,8 @@
 
 namespace ddm
 {
+#pragma optimize("",off)
+
 	float GetNoise( glm::vec2 pos, const NoiseParameters& params )
 	{
 		float height = 0;
@@ -52,7 +54,7 @@ namespace ddm
 
 				// height is y
 				float normalized_height = (1 + height) / 2;
-				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1 );
+				DD_ASSERT( normalized_height >= 0 && normalized_height <= 1, "Normalized heightis out of range 0-1: %f.", normalized_height );
 
 				const int current = y * dimensions.y + x;
 				DD_ASSERT( current < data.size() );

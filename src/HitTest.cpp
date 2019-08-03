@@ -87,13 +87,14 @@ namespace ddm
 		{
 			dd::ConstTriangle tri = triangulator[i];
 
-			glm::vec3 bary;
-			if( glm::intersectRayTriangle( origin, dir, tri.p0, tri.p1, tri.p2, bary ) )
+			float distance = 0;
+			glm::vec2 bary;
+			if( glm::intersectRayTriangle( origin, dir, tri.p0, tri.p1, tri.p2, bary, distance ) )
 			{
 				glm::vec3 normal = (transform * glm::vec4( ddm::NormalFromTriangle( tri.p0, tri.p1, tri.p2 ), 0 )).xyz;
 				out_normal = glm::normalize( normal );
 
-				return bary.z;
+				return distance;
 			}
 
 			return FLT_MAX;

@@ -60,5 +60,7 @@ namespace ddc
 		Components.emplace_back( cmp );
 	}
 
+	using EntityPrototypeHandle = dd::Handle<EntityPrototype>;
+
 	using EntityPrototypeManager = dd::HandleManager<EntityPrototype>;
 }

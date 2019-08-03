@@ -17,7 +17,6 @@ namespace ddr
 
 namespace dd
 {
-	struct ICamera;
 	struct BoundBoxComponent;
 	struct ColourComponent;
 	struct MeshComponent;
@@ -73,7 +72,7 @@ namespace dd
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
 
-		glm::vec2 m_previousOffset;
+		glm::vec2 m_previousOffset { 0, 0 };
 
 		TerrainParameters m_params;
 

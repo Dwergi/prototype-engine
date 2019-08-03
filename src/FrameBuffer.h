@@ -66,10 +66,10 @@ namespace ddr
 		bool m_valid { false };
 		GLuint m_fbo { OpenGL::InvalidID };
 
-		glm::vec4 m_clearColour;
+		glm::vec4 m_clearColour { 0, 0, 0, 0 };
 		float m_clearDepth { 0.0f };
 
-		glm::ivec2 m_previousSize;
+		glm::ivec2 m_previousSize { 0, 0 };
 		GLint m_previousDraw { -1 };
 		GLint m_previousRead { -1 };
 

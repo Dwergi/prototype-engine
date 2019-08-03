@@ -1,3 +1,9 @@
+//
+// IGame.h - Interface for games.
+// Copyright (C) Sebastian Nordgren 
+// August 2nd 2019
+//
+
 #pragma once
 
 #include "World.h"

@@ -34,21 +34,21 @@ namespace dd
 		//
 		static void InitializeShared();
 
-		TerrainChunk( const TerrainParameters& params, glm::vec2 position );
+		TerrainChunk(const TerrainParameters& params, glm::vec2 position);
 		~TerrainChunk();
-		
-		void SwitchLOD( int lod );
-		void SetNoiseOffset( glm::vec2 origin );
+
+		void SwitchLOD(int lod);
+		void SetNoiseOffset(glm::vec2 origin);
 
 		void Update();
 		void RenderUpdate();
 
-		void WriteHeightImage( const char* filename ) const;
+		void WriteHeightImage(const char* filename) const;
 
 		ddm::AABB GetBounds() const { return m_bounds; }
 		glm::vec2 GetPosition() const { return m_position; }
 		int GetLOD() const { return m_lod; }
-		
+
 		ddr::MeshHandle GetMesh() const { return m_mesh; }
 
 	private:
@@ -80,13 +80,13 @@ namespace dd
 
 		ddr::MeshHandle m_mesh;
 
-		glm::vec2 m_position;
+		glm::vec2 m_position { 0, 0 };
 		ddm::AABB m_bounds;
 
 		std::vector<glm::vec3> m_vertices;
 
-		glm::vec2 m_previousOffset;
-		glm::vec2 m_offset;
+		glm::vec2 m_previousOffset { 0, 0 };
+		glm::vec2 m_offset { 0, 0 };
 
 		int m_lod { TerrainParameters::LODs };
 		int m_minLod { TerrainParameters::LODs }; // the best quality LOD that's already been generated

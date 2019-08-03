@@ -28,36 +28,25 @@ namespace dd
 		void StartFrame( float delta_t );
 		void EndFrame();
 
-		bool Draw() const { return m_draw; }
-		void EnableDraw( bool enable ) { m_draw = enable; }
+		bool ShouldDraw() const { return m_draw; }
+		DebugUI& SetDraw(bool draw) { m_draw = draw; return *this; }
+
+		DebugUI& SetMouseHandling(bool handle);
+		bool IsMouseHandled() const;
 
 		bool IsMidFrame() const { return m_midFrame; }
 		bool IsMidWindow() const { return m_midWindow; }
 
-		void SetFocused( bool focused );
-		void SetMousePosition( glm::vec2 pos );
-
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
 		void RenderDebugPanels( ddc::World& world );
 
-		/*static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
-		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );
-		static void KeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods );
-		static void CharCallback( GLFWwindow* window, unsigned int c );*/
-
 	private:
-		static void RenderDrawLists( ImDrawData* draw_data );
-
-		bool CreateDeviceObjects();
-		void CreateFontsTexture();
-		void UpdateDisplaySize();
-
 		std::vector<IDebugPanel*> m_debugPanels;
 
+		bool m_captureMouse { false };
 		bool m_draw { false };
 		bool m_midWindow { false };
 		bool m_midFrame { false };
-		bool m_focused { false };
 
 		ImGuiContext* m_imguiContext { nullptr };
 	};

@@ -20,7 +20,7 @@ namespace dd
 		~InputBindings();
 
 		void RegisterHandler( InputAction action, InputHandler handler );
-		void Dispatch( const IArray<InputEvent>& actions ) const;
+		void Dispatch( InputEvent evt ) const;
 
 	private:
 		

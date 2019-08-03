@@ -11,7 +11,7 @@
 #include <windows.h>
 #endif
 
-#define GLM_SWIZZLE 1
+#define GLM_FORCE_SWIZZLE 1
 
 #pragma warning( disable : 4723 )
 

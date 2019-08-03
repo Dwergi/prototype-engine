@@ -12,7 +12,6 @@
 
 namespace dd
 {
-	struct ICamera;
 	struct InputBindings;
 	struct ParticleSystemComponent;
 	struct TransformComponent;

@@ -14,7 +14,7 @@ namespace dd
 	{
 		ddm::Plane Plane;
 
-		DD_CLASS( dd::PlaneComponent )
+		DD_BEGIN_CLASS( dd::PlaneComponent )
 			DD_COMPONENT();
 
 			DD_MEMBER( Plane );

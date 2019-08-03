@@ -43,8 +43,8 @@ namespace dd
 	private:
 
 		std::vector<FPSCameraComponent*> m_cameras;
-		glm::vec2 m_mouseDelta;
-		glm::vec2 m_scrollDelta;
+		glm::vec2 m_mouseDelta { 0, 0 };
+		glm::vec2 m_scrollDelta { 0, 0 };
 
 		bool m_enabled { true };
 		bool m_invert { false };

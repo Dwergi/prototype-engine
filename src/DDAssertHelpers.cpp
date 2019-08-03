@@ -28,47 +28,47 @@ namespace dd
 
 	static Assert s_assert;
 
-	String256 FormatAssert( int level, const char* file, int line, const char* function, const char* expression )
+	String256 FormatAssert(int level, const char* file, int line, const char* function, const char* expression)
 	{
 		String256 out;
-		switch( level )
+		switch (level)
 		{
-		case (int) AssertLevel::Debug:
+		case ( int) AssertLevel::Debug:
 			out += "DEBUG";
 			break;
 
-		case (int) AssertLevel::Warning:
+		case ( int) AssertLevel::Warning:
 			out += "WARNING";
 			break;
 
-		case (int) AssertLevel::Error:
+		case ( int) AssertLevel::Error:
 			out += "ERROR";
 			break;
 
-		case (int) AssertLevel::Fatal:
+		case ( int) AssertLevel::Fatal:
 			out += "FATAL";
 			break;
 		}
 
-		char buffer[ 1024 ];
-		snprintf( buffer, 1024, ": \"%s\" in %s() (%s:%d)", expression, function, file, line );
+		char buffer[1024];
+		snprintf(buffer, 1024, ": \"%s\" in %s() (%s:%d)", expression, function, file, line);
 
 		out += buffer;
 
 		return out;
 	}
 
-	void DrawAssertDialog( glm::ivec2 window_size, Assert& assert )
+	void DrawAssertDialog(glm::ivec2 window_size, Assert& assert)
 	{
-		ImGui::SetNextWindowPos( ImVec2( window_size.x / 2.0f - window_size.x / 6.5f, window_size.y / 2.0f - window_size.y / 6.5f ), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(window_size.x / 2.0f - window_size.x / 6.5f, window_size.y / 2.0f - window_size.y / 6.5f), ImGuiCond_FirstUseEver);
 
-		if( ImGui::Begin( "Assert", &assert.Open ) )
+		if (ImGui::Begin("Assert", &assert.Open))
 		{
-			ImGui::Text( assert.Info.c_str() );
-			ImGui::Text( assert.Message.c_str() );
+			ImGui::Text(assert.Info.c_str());
+			ImGui::Text(assert.Message.c_str());
 			ImGui::Spacing();
 
-			if( ImGui::Button( "Break" ) )
+			if (ImGui::Button("Break"))
 			{
 				assert.Action = AssertAction::Break;
 				assert.Open = false;
@@ -76,7 +76,7 @@ namespace dd
 
 			ImGui::SameLine();
 
-			if( ImGui::Button( "Ignore" ) )
+			if (ImGui::Button("Ignore"))
 			{
 				assert.Action = AssertAction::Ignore;
 				assert.Open = false;
@@ -84,7 +84,7 @@ namespace dd
 
 			ImGui::SameLine();
 
-			if( ImGui::Button( "Ignore This" ) )
+			if (ImGui::Button("Ignore This"))
 			{
 				assert.Action = AssertAction::IgnoreLine;
 				assert.Open = false;
@@ -92,7 +92,7 @@ namespace dd
 
 			ImGui::SameLine();
 
-			if( ImGui::Button( "Abort" ) )
+			if (ImGui::Button("Abort"))
 			{
 				assert.Action = AssertAction::Abort;
 				assert.Open = false;
@@ -112,14 +112,14 @@ namespace dd
 	Service<dd::DebugUI> s_debugUI;
 	Service<dd::IWindow> s_window;
 
-	static pempek::assert::implementation::AssertAction::AssertAction OnAssert( const char* file, int line, const char* function, const char* expression,
-		int level, const char* message )
+	static pempek::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
+		int level, const char* message)
 	{
 		s_assert.Open = true;
-		s_assert.Info = FormatAssert( level, file, line, function, expression );
+		s_assert.Info = FormatAssert(level, file, line, function, expression);
 		s_assert.Message = String256();
 		s_assert.Action = AssertAction::None;
-		if( message != nullptr )
+		if (message != nullptr)
 		{
 			s_assert.Message += "Message: ";
 			s_assert.Message += message;
@@ -127,16 +127,16 @@ namespace dd
 
 		do
 		{
-			if( std::this_thread::get_id() == s_mainThread )
+			if (std::this_thread::get_id() == s_mainThread)
 			{
 				CheckAssert();
 			}
 			else
 			{
 				__debugbreak();
-				std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
-		} while( s_assert.Action == AssertAction::None );
+		} while (s_assert.Action == AssertAction::None);
 
 		return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 	}
@@ -145,28 +145,28 @@ namespace dd
 	{
 		s_mainThread = std::this_thread::get_id();
 
-		pempek::assert::implementation::setAssertHandler( OnAssert );
+		pempek::assert::implementation::setAssertHandler(OnAssert);
 	}
 
 	void CheckAssert()
 	{
-		if( s_assert.Open )
+		if (s_assert.Open)
 		{
 			static dd::String256 s_message;
 			s_message = s_assert.Info;
 			s_message += s_assert.Message;
 
-			printf( s_message.c_str() );
-			OutputDebugStringA( s_message.c_str() );
+			printf(s_message.c_str());
+			OutputDebugStringA(s_message.c_str());
 
-			s_input->GetSource().CaptureMouse( false );
+			s_input->GetSource().SetMouseCapture(false);
 
-			if( s_debugUI->IsMidWindow() )
+			if (s_debugUI->IsMidWindow())
 			{
 				ImGui::End();
 			}
 
-			if( s_debugUI->IsMidFrame() )
+			if (s_debugUI->IsMidFrame())
 			{
 				s_debugUI->EndFrame();
 				s_window->Swap();
@@ -178,16 +178,15 @@ namespace dd
 
 				float delta_t = s_frameTimer->AppDelta();
 
-				s_input->Update( delta_t );
+				s_input->Update(delta_t);
 
-				s_debugUI->StartFrame( delta_t );
+				s_debugUI->StartFrame(delta_t);
 
-				DrawAssertDialog( s_window->GetSize(), s_assert );
+				DrawAssertDialog(s_window->GetSize(), s_assert);
 
 				s_debugUI->EndFrame();
 				s_window->Swap();
-			}
-			while( s_assert.Open );
+			} while (s_assert.Open);
 		}
 	}
 }

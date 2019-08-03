@@ -15,10 +15,10 @@ namespace dd
 
 	struct Particle
 	{
-		glm::vec4 Colour;
-		glm::vec3 Velocity;
-		glm::vec3 Position;
-		glm::vec2 Size;
+		glm::vec4 Colour { 0, 0, 0, 0 };
+		glm::vec3 Velocity { 0, 0, 0 };
+		glm::vec3 Position { 0, 0, 0 };
+		glm::vec2 Size { 0, 0 };
 		float Age { 0 };
 		float Lifetime { 0 };
 		float Distance { -1 };

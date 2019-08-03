@@ -14,6 +14,9 @@
 #include "Shader.h"
 #include "TransformComponent.h"
 
+dd::Service<ddr::ShaderManager> s_shaderManager;
+dd::Service<ddr::MaterialManager> s_materialManager;
+
 namespace ddr
 {
 	static const glm::vec3 s_lines[] =
@@ -66,7 +69,7 @@ namespace ddr
 
 	void PlaneRenderer::RenderInit( ddc::World& world )
 	{
-		m_lineShader = ShaderManager::Instance()->Load( "line" );
+		m_lineShader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_lineShader.IsValid() );
 
 		Shader* line_shader = m_lineShader.Access();
@@ -89,12 +92,12 @@ namespace ddr
 
 		line_shader->Use( false );
 
-		ShaderHandle mesh_shader = ShaderManager::Instance()->Load( "mesh" );
+		ShaderHandle mesh_shader = s_shaderManager->Load( "mesh" );
 		DD_ASSERT( mesh_shader.IsValid() );
 
-		m_mesh = MeshManager::Instance()->Find( "quad" );
+		m_mesh = ddr::MeshHandle( "quad" );
 
-		m_meshMaterial = MaterialManager::Instance()->Create( "plane" );
+		m_meshMaterial = s_materialManager->Create( "plane" );
 
 		Material* material = m_meshMaterial.Access();
 		material->Shader = mesh_shader;
@@ -145,7 +148,7 @@ namespace ddr
 
 			line_shader->SetUniform( "Colour", colour );
 
-			glm::mat4 plane_transform( ddm::AlignToDir( glm::vec3( 0, 0, 1 ), plane.Plane.Normal() ) );
+			glm::mat4 plane_transform = ddm::TransformFromOriginDir( glm::vec3( 0, 0, 1 ), plane.Plane.Normal() );
 			plane_transform[3] = glm::vec4( plane.Plane.Origin(), 1 );
 
 			glm::mat4 model = transform * plane_transform * glm::scale( glm::vec3( m_scale ) );

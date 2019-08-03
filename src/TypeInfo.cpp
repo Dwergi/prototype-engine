@@ -225,6 +225,10 @@ namespace dd
 		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::x>( "x" );
 		vec2Type->RegisterMember<glm::vec2, float, &glm::vec2::y>( "y" );
 
+		TypeInfo* ivec2Type = DD_REGISTER_CLASS(glm::ivec2);
+		ivec2Type->RegisterMember<glm::ivec2, int, &glm::ivec2::x>("x");
+		ivec2Type->RegisterMember<glm::ivec2, int, &glm::ivec2::y>("y");
+
 		TypeInfo* vec3Type = DD_REGISTER_CLASS( glm::vec3 );
 		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::x>( "x" );
 		vec3Type->RegisterMember<glm::vec3, float, &glm::vec3::y>( "y" );

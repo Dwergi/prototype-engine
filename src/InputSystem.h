@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "InputMode.h"
 #include "System.h"
 
 namespace dd
@@ -17,14 +18,22 @@ namespace dd
 	{
 		InputSystem();
 
-		void Update( float delta_t );
-		void BindKeys();
+		void Initialize();
 
-		void SetBindings(const InputBindings& bindings);
-		InputBindings* GetBindings() const { return m_bindings; }
+		void Update( float delta_t );
+
+		void SetBindings(const InputBindings& bindings) { m_bindings = &bindings; }
+		const InputBindings* GetBindings() const { return m_bindings; }
 		IInputSource& GetSource() const;
 
+		void SetMode(uint8 id);
+		uint8 GetMode() { return m_currentMode; }
+
 	private:
-		InputBindings* m_bindings;
+		const InputBindings* m_bindings { nullptr };
+		uint8 m_currentMode { InputMode::NONE };
+		uint8 m_nextMode { InputMode::NONE };
+
+		void BindKeys();
 	};
 }

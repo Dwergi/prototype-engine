@@ -36,6 +36,7 @@
 #include "IWindow.h"
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
+#include "Sprite.h"
 #include "World.h"
 #include "WorldRenderer.h"
 
@@ -44,8 +45,8 @@
 //---------------------------------------------------------------------------
 
 // GAME TO USE
-#include "NeutrinoGame.h"
-using TGame = neutrino::NeutrinoGame;
+#include "LuxportGame.h"
+using TGame = lux::LuxportGame;
 static dd::Service<dd::IGame> s_game;
 
 static dd::Service<dd::IWindow> s_window;
@@ -71,7 +72,7 @@ static void ToggleConsole(dd::InputAction action, dd::InputType type)
 {
 	if (action == dd::InputAction::TOGGLE_CONSOLE && type == dd::InputType::RELEASED)
 	{
-		s_debugUI->EnableDraw(true);
+		s_debugUI->SetDraw(true);
 	}
 }
 
@@ -79,16 +80,7 @@ static void ToggleDebugUI(dd::InputAction action, dd::InputType type)
 {
 	if (action == dd::InputAction::TOGGLE_DEBUG_UI && type == dd::InputType::RELEASED)
 	{
-		if (s_inputSource->GetMode() == dd::InputMode::DEBUG)
-		{
-			s_inputSource->SetMode(dd::InputMode::GAME);
-		}
-		else
-		{
-			s_inputSource->SetMode(dd::InputMode::DEBUG);
-		}
-
-		s_debugUI->EnableDraw(!s_debugUI->Draw());
+		s_input->SetMode(s_input->GetMode() == dd::InputMode::GAME ? dd::InputMode::DEBUG : dd::InputMode::GAME);
 	}
 }
 
@@ -128,6 +120,7 @@ static dd::Service<ddr::ShaderManager> s_shaderManager;
 static dd::Service<ddr::MaterialManager> s_materialManager;
 static dd::Service<ddr::MeshManager> s_meshManager;
 static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
+static dd::Service<ddr::SpriteManager> s_spriteManager;
 
 static void CreateAssetManagers()
 {
@@ -136,6 +129,7 @@ static void CreateAssetManagers()
 	dd::Services::Register(new ddr::MaterialManager());
 	dd::Services::Register(new ddr::MeshManager());
 	dd::Services::Register(new ddc::EntityPrototypeManager());
+	dd::Services::Register(new ddr::SpriteManager());
 }
 
 static void UpdateAssetManagers()
@@ -145,6 +139,7 @@ static void UpdateAssetManagers()
 	s_materialManager->Update();
 	s_meshManager->Update();
 	s_entityProtoManager->Update();
+	s_spriteManager->Update();
 }
 
 static int GameMain()
@@ -163,13 +158,14 @@ static int GameMain()
 	{
 		dd::IWindow& window = *new dd::SFMLWindow();
 		window.SetTitle(s_game->GetTitle())
-			.SetSize(glm::ivec2(1280, 960))
+			.SetSize(glm::ivec2(1024, 768))
 			.Initialize();
+
+		OpenGL::Initialize();
 		
 		dd::Services::RegisterInterface<dd::IWindow>(window);
 
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
-		s_inputSource->SetMode(dd::InputMode::GAME);
 
 		dd::Services::Register(new dd::InputBindings());
 		s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
@@ -179,7 +175,9 @@ static int GameMain()
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_UP, &SetTimeScale);
 
 		dd::Services::Register(new dd::InputSystem());
-		s_input->BindKeys();
+		s_input->SetBindings(*s_inputBindings);
+		s_input->Initialize();
+		s_input->SetMode(dd::InputMode::GAME);
 
 		dd::Services::Register(new dd::DebugUI());
 

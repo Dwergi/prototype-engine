@@ -404,7 +404,7 @@ namespace ddr
 
 	ShaderHandle ShaderManager::Load( std::string name )
 	{
-		ShaderHandle shader_h = base::Find( name );
+		ShaderHandle shader_h = super::Find( name );
 		if( !shader_h.IsValid() )
 		{
 			const std::string folder( "shaders\\" );
@@ -413,7 +413,7 @@ namespace ddr
 			shaders.Reserve( 3 );
 
 			{
-				std::string vertex_path = folder + name + ".vertex";
+				std::string vertex_path = folder + name + ".vert";
 
 				ShaderPart* vertex = ShaderPart::Create( vertex_path, ShaderPart::Type::Vertex );
 				DD_ASSERT( vertex != nullptr );
@@ -421,7 +421,7 @@ namespace ddr
 			}
 
 			{
-				std::string geometry_path = folder + name + ".geometry";
+				std::string geometry_path = folder + name + ".geom";
 
 				ShaderPart* geom = ShaderPart::Create( geometry_path, ShaderPart::Type::Geometry );
 				if( geom != nullptr )
@@ -431,14 +431,14 @@ namespace ddr
 			}
 
 			{
-				std::string pixel_path = folder + name + ".pixel";
+				std::string pixel_path = folder + name + ".frag";
 
 				ShaderPart* pixel = ShaderPart::Create( pixel_path, ShaderPart::Type::Pixel );
 				DD_ASSERT( pixel != nullptr );
 				shaders.Add( pixel );
 			}
 
-			shader_h = base::Create( name );
+			shader_h = super::Create( name );
 
 			Shader* program = shader_h.Access();
 			program->SetShaders( shaders );
@@ -449,9 +449,9 @@ namespace ddr
 
 	void ShaderManager::ReloadAll()
 	{
-		for( size_t i = 0; i < base::LiveCount(); ++i )
+		for( size_t i = 0; i < super::LiveCount(); ++i )
 		{
-			Shader* program = base::AccessNth( i );
+			Shader* program = super::AccessNth( i );
 			program->Reload();
 		}
 	}

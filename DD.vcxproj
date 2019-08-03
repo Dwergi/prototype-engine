@@ -172,8 +172,8 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;ws2_32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -237,7 +237,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Release\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-network-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-system-s.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-network-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-graphics-s.lib;sfml-system-s.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <LinkStatus>false</LinkStatus>
@@ -305,8 +305,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
     </Link>
@@ -359,18 +359,23 @@
     <ClInclude Include="src\IHandlesInput.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\ImGuiBinding.h" />
+    <ClInclude Include="src\InputMode.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\IWindow.h" />
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
+    <ClInclude Include="src\LuxportGame.h" />
     <ClInclude Include="src\MeshRenderCommand.h" />
     <ClInclude Include="src\NeutrinoGame.h" />
     <ClInclude Include="src\Noise.h" />
+    <ClInclude Include="src\OrthoCamera.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
+    <ClInclude Include="src\PlaneComponent.h" />
+    <ClInclude Include="src\PlaneRenderer.h" />
     <ClInclude Include="src\RenderCommand.h" />
     <ClInclude Include="src\RenderState.h" />
     <ClInclude Include="src\Services.h" />
@@ -405,6 +410,10 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RayComponent.h" />
     <ClInclude Include="src\RayRenderer.h" />
+    <ClInclude Include="src\Sprite.h" />
+    <ClInclude Include="src\SpriteAnimationComponent.h" />
+    <ClInclude Include="src\SpriteComponent.h" />
+    <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\System.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
@@ -595,6 +604,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="include\stb\stb_image.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -607,6 +621,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\tinygltf\tinygltf.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -630,36 +649,25 @@
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
     <ClCompile Include="src\ImGuiBinding.cpp" />
-    <ClCompile Include="src\include\stb\stb_image.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="src\include\tinygltf.cpp\tinygltf.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="src\InputMode.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\IWindow.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
+    <ClCompile Include="src\LuxportGame.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
     <ClCompile Include="src\NeutrinoGame.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
+    <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
     <ClCompile Include="src\PhysicsSphereComponent.cpp" />
+    <ClCompile Include="src\PlaneComponent.cpp" />
+    <ClCompile Include="src\PlaneRenderer.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\RenderCommand.cpp" />
     <ClCompile Include="src\RenderCommandTests.cpp">
@@ -721,6 +729,10 @@
     <ClCompile Include="src\RayComponent.cpp" />
     <ClCompile Include="src\RayRenderer.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
+    <ClCompile Include="src\Sprite.cpp" />
+    <ClCompile Include="src\SpriteAnimationComponent.cpp" />
+    <ClCompile Include="src\SpriteComponent.cpp" />
+    <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />

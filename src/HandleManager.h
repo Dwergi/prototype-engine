@@ -128,9 +128,6 @@ namespace dd
 		Handle(const char* name);
 		Handle(const Handle<T>& other) : m_handle(other.m_handle) {}
 
-		bool operator==(const Handle<T>& other) const { return m_handle == other.m_handle; }
-		bool operator!=(const Handle<T>& other) const { return m_handle != other.m_handle; }
-
 		uint GetID() const { return m_handle; }
 		bool IsValid() const { return m_handle != ~0u; }
 		bool IsAlive() const { return m_manager->IsAlive(*this); }
@@ -139,6 +136,12 @@ namespace dd
 		T* Access() const { return m_manager->Access(*this); }
 
 		void Destroy() const { m_manager->Destroy(*this); }
+
+		// comparisons
+		bool operator==(const Handle<T>& other) const { return m_handle == other.m_handle; }
+		bool operator!=(const Handle<T>& other) const { return m_handle != other.m_handle; }
+		bool operator<(const Handle<T>& other) const { return m_handle < other.m_handle; }
+		bool operator>(const Handle<T>& other) const { return m_handle > other.m_handle; }
 
 	private:
 		friend struct HandleManager<T>;

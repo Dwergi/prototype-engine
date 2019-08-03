@@ -18,7 +18,7 @@ namespace OpenGL
 {
 	static const GLuint InvalidID = 0;
 
-	static bool Initialize();
+	bool Initialize();
 }
 
 namespace ddr
