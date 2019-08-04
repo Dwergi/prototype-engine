@@ -38,6 +38,12 @@ namespace ddm
 	}
 
 	template <typename T>
+	T clamp(T value, T min, T max)
+	{ 
+		return (value < min ? min : (value > max ? max : value));
+	}
+
+	template <typename T>
 	T wrap( T value, T min, T max )
 	{
 		value = min + std::fmod( value - min, max - min );

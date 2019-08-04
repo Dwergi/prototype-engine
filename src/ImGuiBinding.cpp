@@ -9,6 +9,7 @@
 
 namespace dd
 {
+#pragma optimize("",off)
 	static dd::Service<IWindow> s_window;
 	static dd::Service<IInputSource> s_inputSource;
 
@@ -16,6 +17,8 @@ namespace dd
 
 	static double g_Time = 0.0;
 	static dd::Cursor g_MouseCursors[ImGuiMouseCursor_COUNT] = { dd::Cursor::Hidden };
+
+	static int g_click[5];
 
 	static const char* GetClipboardText()
 	{
@@ -110,6 +113,15 @@ namespace dd
 			return;
 		}
 
+		for (int i = 0; i < 5; ++i)
+		{
+			if (g_click[i] >= 2)
+			{
+				io.MouseDown[i] = false;
+			}
+			g_click[i] = 0;
+		}
+
 		// Update buttons
 		dd::Array<InputEvent, 64> events;
 		s_inputSource->GetEvents(events);
@@ -121,10 +133,32 @@ namespace dd
 				continue;
 			}
 
+			int index = (int) evt.Key - (int) Key::MOUSE_LEFT;
+			
 			if (evt.Type == InputType::PRESSED)
 			{
-				int index = (int) evt.Key - (int) Key::MOUSE_LEFT;
 				io.MouseDown[index] = true;
+
+				++g_click[index];
+			}
+
+			if (evt.Type == InputType::RELEASED)
+			{
+				io.MouseDown[index] = false;
+
+				if (g_click[index] > 0)
+				{
+					++g_click[index];
+				}
+			}
+		}
+
+		// handle clicks as MouseDown
+		for (int i = 0; i < 5; ++i)
+		{
+			if (g_click[i] >= 2)
+			{
+				io.MouseDown[i] = true;
 			}
 		}
 
@@ -262,13 +296,13 @@ namespace dd
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
+		UpdateWindowSize();
+
 		double current_time = g_Time + delta_t;
-		io.DeltaTime = g_Time > 0.0 ? (float) (current_time - g_Time) : (float) (1.0f / 60.0f);
+		io.DeltaTime = g_Time > 0.0 ? ( float) (current_time - g_Time) : ( float) (1.0f / 60.0f);
 		g_Time = current_time;
 
 		ImGui_ImplOpenGL3_NewFrame();
-
-		UpdateWindowSize();
 
 		UpdateMouse();
 		UpdateMouseCursor();

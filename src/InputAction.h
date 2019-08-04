@@ -40,7 +40,11 @@ namespace dd
 		RESET_PHYSICS,
 		PAUSE,
 		TIME_SCALE_DOWN,
-		TIME_SCALE_UP
+		TIME_SCALE_UP,
+		PREVIOUS_MAP,
+		NEXT_MAP,
+		RETURN_TELEPORTER,
+		RESET
 	};
 
 	enum class InputType : unsigned int

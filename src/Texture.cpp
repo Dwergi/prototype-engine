@@ -30,30 +30,34 @@ namespace ddr
 		Destroy();
 	}
 
-	void Texture::Initialize(glm::ivec2 size, GLenum format, int mips)
+	void Texture::Initialize(glm::ivec2 size, GLenum internalFormat, int mips)
 	{
-		m_format = format;
+		m_internalFormat = internalFormat;
 		m_size = size;
 		m_mips = mips;
 	}
 
 	void Texture::Create()
 	{
+		if (m_valid)
+		{
+			// already explicitly created
+			return;
+		}
+
 		glGenTextures(1, &m_id);
 		CheckOGLError();
 
 		glBindTexture(GL_TEXTURE_2D, m_id);
 		CheckOGLError();
 
-		glTexStorage2D(GL_TEXTURE_2D, m_mips, m_format, m_size.x, m_size.y);
+		glTexStorage2D(GL_TEXTURE_2D, m_mips, m_internalFormat, m_size.x, m_size.y);
 		CheckOGLError();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		CheckOGLError();
-
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		CheckOGLError();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -71,8 +75,16 @@ namespace ddr
 		DD_ASSERT(data.SizeBytes() == expectedSize);
 		DD_ASSERT(mip >= 0);
 
+		glBindTexture(GL_TEXTURE_2D, m_id);
+		CheckOGLError();
+
 		glTextureSubImage2D(m_id, mip, 0, 0, m_size.x, m_size.y, dataFormat, dataType, data.GetVoid());
 		CheckOGLError();
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+		CheckOGLError();
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void Texture::GetData(dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType)
@@ -100,20 +112,20 @@ namespace ddr
 		m_valid = false;
 	}
 
-	void Texture::Bind(int index)
+	void Texture::Bind(int textureUnit)
 	{
 		DD_ASSERT(IsValid());
-		DD_ASSERT(index >= 0);
+		DD_ASSERT(textureUnit >= 0);
 
-		glBindTextureUnit(index, m_id);
+		m_textureUnit = textureUnit;
+
+		glBindTextureUnit(m_textureUnit, m_id);
 		CheckOGLError();
-
-		m_textureUnit = index;
 	}
 
 	void Texture::Unbind()
 	{
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTextureUnit(m_textureUnit, 0);
 
 		m_textureUnit = -1;
 	}

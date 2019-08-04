@@ -28,7 +28,6 @@ namespace dd
 
 	//
 	// Handle container that cares rather little about the internals of your type, as long as it derives from this.
-	// Stick DD_HANDLE_MANAGER( YourType ) into your .cpp as well.
 	//
 	template <typename T>
 	struct HandleManager

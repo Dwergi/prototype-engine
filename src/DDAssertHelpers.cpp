@@ -186,7 +186,8 @@ namespace dd
 
 				s_debugUI->EndFrame();
 				s_window->Swap();
-			} while (s_assert.Open);
+			}
+			while (s_assert.Open);
 		}
 	}
 }

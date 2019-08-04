@@ -104,6 +104,7 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>Luxport</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -113,6 +114,7 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <TargetName>Luxport</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -172,8 +174,8 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib;freetype.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\extlibs\libs-msvc\x64;$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -236,8 +238,8 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Release\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-network-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-graphics-s.lib;sfml-system-s.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\extlibs\libs-msvc\x64;$(SolutionDir)include\sfml\out\build\x64-Release\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-network-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-graphics-s.lib;sfml-system-s.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib;freetype.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
       <LinkStatus>false</LinkStatus>
@@ -283,7 +285,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -306,7 +308,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\extlibs\libs-msvc\x64;$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
     </Link>
@@ -350,6 +352,7 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
+    <ClInclude Include="src\Box2DPhysicsComponent.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
@@ -363,14 +366,18 @@
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\IWindow.h" />
     <ClInclude Include="src\JSON.h" />
+    <ClInclude Include="src\Light2DComponent.h" />
+    <ClInclude Include="src\Light2DRenderer.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
     <ClInclude Include="src\LuxportGame.h" />
+    <ClInclude Include="src\LuxportMap.h" />
     <ClInclude Include="src\MeshRenderCommand.h" />
     <ClInclude Include="src\NeutrinoGame.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\OrthoCamera.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
+    <ClInclude Include="src\Physics2DSystem.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
@@ -410,10 +417,15 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RayComponent.h" />
     <ClInclude Include="src\RayRenderer.h" />
+    <ClInclude Include="src\Circle2DPhysicsComponent.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SpriteAnimationComponent.h" />
+    <ClInclude Include="src\SpriteAnimationSystem.h" />
     <ClInclude Include="src\SpriteComponent.h" />
     <ClInclude Include="src\SpriteRenderer.h" />
+    <ClInclude Include="src\SpriteSheet.h" />
+    <ClInclude Include="src\SpriteTileComponent.h" />
+    <ClInclude Include="src\SpriteTileSystem.h" />
     <ClInclude Include="src\System.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
@@ -653,15 +665,18 @@
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\IWindow.cpp" />
     <ClCompile Include="src\JSON.cpp" />
+    <ClCompile Include="src\Light2DRenderer.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
     <ClCompile Include="src\LuxportGame.cpp" />
+    <ClCompile Include="src\LuxportMap.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
     <ClCompile Include="src\NeutrinoGame.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
+    <ClCompile Include="src\Physics2DSystem.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
@@ -731,8 +746,12 @@
     <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteAnimationComponent.cpp" />
+    <ClCompile Include="src\SpriteAnimationSystem.cpp" />
     <ClCompile Include="src\SpriteComponent.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
+    <ClCompile Include="src\SpriteSheet.cpp" />
+    <ClCompile Include="src\SpriteTileComponent.cpp" />
+    <ClCompile Include="src\SpriteTileSystem.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />

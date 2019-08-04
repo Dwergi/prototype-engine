@@ -161,14 +161,21 @@ namespace dd
 				case sf::Event::TextEntered:
 					OnText(evt.text.unicode);
 					break;
+
+				case sf::Event::Closed:
+					s_window->SetToClose();
+					break;
+
+				case sf::Event::Resized:
+					s_window->SetSize(glm::ivec2(evt.size.width, evt.size.height));
+					break;
 			}
 		}
 	}
 
 	void SFMLInputSource::OnSetMousePosition(glm::vec2 pos)
 	{
-		sf::Window* sfml_window = (sf::Window*) s_window->GetNative(); 
-		sf::Mouse::setPosition(sf::Vector2i((int) pos.x, (int) pos.y), *sfml_window);
+		sf::Mouse::setPosition(sf::Vector2i((int) pos.x, (int) pos.y), *m_sfmlWindow);
 	}
 
 	void SFMLInputSource::OnSetMouseCapture(bool capture)

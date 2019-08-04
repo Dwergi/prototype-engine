@@ -109,6 +109,12 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{5729b7d4-6f1b-40aa-ac36-3b353e12b793}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Lux">
+      <UniqueIdentifier>{a6c54984-6d7a-4674-b2f4-9cef58b6aecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Neutrino">
+      <UniqueIdentifier>{f1d03ad5-bd78-497a-8b18-658df003f9e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -603,9 +609,6 @@
     <ClInclude Include="src\Services.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\NeutrinoGame.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\TestEntities.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -696,8 +699,37 @@
     <ClInclude Include="src\SpriteAnimationComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\SpriteTileComponent.h" />
+    <ClInclude Include="src\SpriteTileSystem.h" />
+    <ClInclude Include="src\Box2DPhysicsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Circle2DPhysicsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics2DSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteSheet.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light2DComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light2DRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
     <ClInclude Include="src\LuxportGame.h">
-      <Filter>Game</Filter>
+      <Filter>Game\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LuxportMap.h">
+      <Filter>Game\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NeutrinoGame.h">
+      <Filter>Game\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteAnimationSystem.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1167,9 +1199,6 @@
     <ClCompile Include="src\Profiler.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="src\NeutrinoGame.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\TestEntities.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1249,8 +1278,28 @@
     <ClCompile Include="src\SpriteAnimationComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="src\SpriteTileComponent.cpp" />
+    <ClCompile Include="src\SpriteTileSystem.cpp" />
+    <ClCompile Include="src\Physics2DSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteSheet.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Light2DRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
     <ClCompile Include="src\LuxportGame.cpp">
-      <Filter>Game</Filter>
+      <Filter>Game\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LuxportMap.cpp">
+      <Filter>Game\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NeutrinoGame.cpp">
+      <Filter>Game\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteAnimationSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

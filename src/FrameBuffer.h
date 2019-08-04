@@ -57,6 +57,7 @@ namespace ddr
 		void RenderDepth( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
 		void Blit();
+		void BlitTexture(ddr::UniformStorage& uniforms, ddr::Texture* texture);
 
 		void SetClearColour( glm::vec4 colour ) { m_clearColour = colour; }
 		void SetClearDepth( float depth ) { m_clearDepth = depth; }

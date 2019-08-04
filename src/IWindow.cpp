@@ -13,6 +13,11 @@ namespace dd
 		OnShutdown();
 	}
 
+	void IWindow::Update(float delta_t)
+	{
+		OnUpdate(delta_t);
+	}
+
 	IWindow& IWindow::SetToClose()
 	{
 		m_closing = true;

@@ -73,8 +73,9 @@ namespace ddc
 	{
 		DD_ASSERT( m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!" );
 
-		for( EntityEntry& entry : m_entities )
+		for( int id = 0; id < m_entities.size(); ++id )
 		{
+			EntityEntry& entry = m_entities[id];
 			if( entry.Destroy )
 			{
 				entry.Alive = false;
@@ -83,6 +84,8 @@ namespace ddc
 
 				entry.Ownership.reset();
 				entry.Tags.reset();
+
+				m_free.push_back(id);
 			}
 
 			if( entry.Create )
@@ -146,9 +149,8 @@ namespace ddc
 
 	void World::DestroyEntity( Entity entity )
 	{
-		DD_ASSERT( IsAlive( entity ) );
+		DD_ASSERT( IsAlive( entity ), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version );
 
-		m_free.push_back( entity.ID );
 		m_entities[ entity.ID ].Destroy = true;
 	}
 

@@ -41,6 +41,7 @@ namespace dd
 				char message[256];
 				snprintf( message, 256, "GL_%s - %s:%d\n", error, file, line );
 
+				__debugbreak();
 				DD_ASSERT( false, message );
 			}
 

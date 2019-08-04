@@ -23,9 +23,9 @@ void main()
 {
 	vec2 vertexPosition = PositionInstanced + Position * SizeInstanced;
 
-	gl_Position = Projection * View * vec4( vec3(vertexPosition, 0), 1 );
+	gl_Position = Projection * vec4( vec3(vertexPosition, 0), 1 );
 
 	Vertex.UV = UV * UVScaleInstanced + UVOffsetInstanced;
 	Vertex.Colour = ColourInstanced;
-	Vertex.Position = gl_Position.xy;
+	Vertex.Position = vertexPosition.xy;
 };

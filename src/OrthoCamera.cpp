@@ -13,8 +13,21 @@ namespace ddr
 {
 	glm::mat4 OrthoCamera::GetProjectionMatrix() const
 	{
-		glm::ivec2 size = s_window->GetSize();
-		return glm::ortho<float>(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y / 2.0f);
+		glm::ivec2 window_size = s_window->GetSize();
+		
+		float left = 0;
+		float right = (float) window_size.x;
+		float top = 0;
+		float bottom = (float) window_size.y;
+
+		glm::mat4 ortho(1);
+		ortho[0][0] = 2.f / (right - left);
+		ortho[1][1] = 2.f / (top - bottom);
+		ortho[2][2] = -1.f;
+		ortho[3][0] = -(right + left) / (right - left);
+		ortho[3][1] = -(top + bottom) / (top - bottom);
+
+		return ortho;
 	}
 
 	glm::mat4 OrthoCamera::GetViewMatrix() const

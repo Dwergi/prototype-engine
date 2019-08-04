@@ -37,6 +37,7 @@
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
 #include "Sprite.h"
+#include "SpriteSheet.h"
 #include "World.h"
 #include "WorldRenderer.h"
 
@@ -121,15 +122,19 @@ static dd::Service<ddr::MaterialManager> s_materialManager;
 static dd::Service<ddr::MeshManager> s_meshManager;
 static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
 static dd::Service<ddr::SpriteManager> s_spriteManager;
+static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 
 static void CreateAssetManagers()
 {
+	DD_TODO("Assets probably shouldn't live in main...");
+
 	dd::Services::Register(new ddr::TextureManager());
 	dd::Services::Register(new ddr::ShaderManager());
 	dd::Services::Register(new ddr::MaterialManager());
 	dd::Services::Register(new ddr::MeshManager());
 	dd::Services::Register(new ddc::EntityPrototypeManager());
 	dd::Services::Register(new ddr::SpriteManager());
+	dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
 }
 
 static void UpdateAssetManagers()
@@ -140,6 +145,7 @@ static void UpdateAssetManagers()
 	s_meshManager->Update();
 	s_entityProtoManager->Update();
 	s_spriteManager->Update();
+	s_spriteSheetManager->Update();
 }
 
 static int GameMain()
@@ -168,7 +174,7 @@ static int GameMain()
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 
 		dd::Services::Register(new dd::InputBindings());
-		s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
+		//s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
 		s_inputBindings->RegisterHandler(dd::InputAction::EXIT, &Exit);
 		s_inputBindings->RegisterHandler(dd::InputAction::PAUSE, &PauseGame);
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_DOWN, &SetTimeScale);
@@ -214,6 +220,7 @@ static int GameMain()
 
 			s_frameTimer->Update();
 
+			s_window->Update(s_frameTimer->AppDelta());
 			s_input->Update(s_frameTimer->AppDelta());
 			s_debugUI->StartFrame(s_frameTimer->AppDelta());
 

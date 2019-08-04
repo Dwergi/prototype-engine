@@ -33,7 +33,7 @@ namespace ddr
 
 		bool IsValid() const { return m_valid; }
 		GLuint ID() const { return m_id; }
-		GLenum Format() const { return m_format; }
+		GLenum InternalFormat() const { return m_internalFormat; }
 
 		int GetTextureUnit() const { return m_textureUnit; }
 
@@ -46,7 +46,7 @@ namespace ddr
 		bool m_valid { false };
 		int m_mips { 0 };
 		GLuint m_id { OpenGL::InvalidID };
-		GLenum m_format { OpenGL::InvalidID };
+		GLenum m_internalFormat { OpenGL::InvalidID };
 
 		int m_textureUnit { -1 };
 	};

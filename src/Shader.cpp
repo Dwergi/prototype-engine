@@ -199,7 +199,7 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
 		return false;
 	}
 
@@ -217,7 +217,7 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
 		return false;
 	}
 
@@ -293,7 +293,7 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
 		return false;
 	}
 

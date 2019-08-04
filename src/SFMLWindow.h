@@ -14,6 +14,7 @@ namespace dd
 	private:
 		virtual bool OnInitialize() override;
 		virtual void OnShutdown() override;
+		virtual void OnUpdate(float delta_t) override {}
 		virtual void OnSetSize(glm::ivec2 size) override;
 		virtual void OnSetTitle(std::string title) override;
 		virtual void OnSetBorderless(bool borderless) override;
@@ -25,6 +26,6 @@ namespace dd
 		virtual void* GetNative() const override { return m_sfmlWindow; }
 
 		sf::Window* m_sfmlWindow { nullptr };
-
+		bool m_resizing { true };
 	};
 }

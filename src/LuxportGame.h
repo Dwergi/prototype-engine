@@ -11,6 +11,6 @@ namespace lux
 		virtual void Update(ddc::World& world) override;
 		virtual void RenderUpdate(ddc::World& world) override;
 
-		virtual const char* GetTitle() const { return "Lux"; }
+		virtual const char* GetTitle() const { return "Luxport"; }
 	};
 }

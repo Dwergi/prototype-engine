@@ -161,27 +161,32 @@ namespace ddr
 
 	void FrameBuffer::Render( ddr::UniformStorage& uniforms )
 	{
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( m_texColour != nullptr );
+		BlitTexture(uniforms, m_texColour);
+	}
+
+	void FrameBuffer::BlitTexture(ddr::UniformStorage& uniforms, ddr::Texture* texture)
+	{
+		DD_ASSERT(IsValid());
+		DD_ASSERT(m_texColour != nullptr);
 
 		Shader* shader = m_blitShader.Access();
 		ScopedShader scoped_shader = shader->UseScoped();
 
 		m_vaoFullscreen.Bind();
-		
-		m_texColour->Bind( 0 );
-		
-		uniforms.Set( "Texture", *m_texColour );
-		uniforms.Set( "DrawDepth", false );
 
-		uniforms.Bind( *shader );
+		texture->Bind(0);
 
-		glDrawArrays( GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size() );
+		uniforms.Set("Texture", *texture);
+		uniforms.Set("DrawDepth", false);
+
+		uniforms.Bind(*shader);
+
+		glDrawArrays(GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size());
 		CheckOGLError();
 
 		uniforms.Unbind();
 
-		m_texColour->Unbind();
+		texture->Unbind();
 
 		m_vaoFullscreen.Unbind();
 	}

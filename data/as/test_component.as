@@ -1,4 +1,0 @@
-void Update( float dt )
-{
-	
-}

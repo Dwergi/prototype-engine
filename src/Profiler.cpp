@@ -11,13 +11,15 @@
 
 namespace dd
 {
-	ProfilerValue::ProfilerValue( const char* name ) :
+	ProfilerValue::ProfilerValue( const char* name, float initial ) :
 		m_name( name )
 	{
 		for( float& f : m_values )
 		{
-			f = 0;
+			f = initial;
 		}
+
+		m_sliding = initial;
 	}
 
 	void ProfilerValue::Increment()

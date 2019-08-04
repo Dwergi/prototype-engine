@@ -17,7 +17,9 @@ namespace dd
 		m_currentEvents = m_pendingEvents;
 		m_pendingEvents.Clear();
 
-		if (m_mouseCaptured)
+		dd::InputMode* mode = dd::InputMode::Access(m_mode);
+
+		if (mode->ShouldCentreMouse())
 		{
 			glm::ivec2 window_size = s_window->GetSize();
 			glm::vec2 window_center(window_size.x / 2, window_size.y / 2);
@@ -31,6 +33,7 @@ namespace dd
 		{
 			m_pendingMousePosition.Delta = m_pendingMousePosition.Absolute - m_currentMousePosition.Absolute;
 		}
+
 		m_currentMousePosition = m_pendingMousePosition;
 
 		m_pendingScrollPosition.Delta = m_pendingScrollPosition.Absolute - m_currentScrollPosition.Absolute;
@@ -67,8 +70,10 @@ namespace dd
 			return;
 		}
 
+		dd::InputMode* mode = dd::InputMode::Access(m_mode);
+
 		InputActionBinding binding;
-		if (FindBinding(key, m_mode, modifiers, binding))
+		if (FindKeyBinding(key, modifiers, mode, binding))
 		{
 			InputEvent evt;
 			evt.Key = key;
@@ -89,14 +94,14 @@ namespace dd
 	{
 		m_pendingScrollPosition.Absolute = absolute;
 	}
-
-	bool IInputSource::FindBinding(Key key, uint8 modes, uint8 modifiers, InputActionBinding& binding) const
+	
+	bool IInputSource::FindKeyBinding(Key key, uint8 modifiers, const InputMode* mode, InputActionBinding& out_binding) const
 	{
-		for (InputActionBinding& b : m_bindings)
+		for (const InputActionBinding& b : m_bindings)
 		{
-			if (b.Key == key && (b.Modes & modes) != 0)
+			if (b.Key == key && b.Modifiers == modifiers && (mode == nullptr || (b.Modes & mode->ID()) != 0))
 			{
-				binding = b;
+				out_binding = b;
 				return true;
 			}
 		}
@@ -104,20 +109,35 @@ namespace dd
 		return false;
 	}
 
-	bool IInputSource::IsBound(Key key, uint8 modes, uint8 modifiers) const
+	bool IInputSource::IsBound(Key key, uint8 modifiers, const InputMode* mode) const
 	{
 		InputActionBinding binding;
-		return FindBinding(key, modes, modifiers, binding);
+		return FindKeyBinding(key, modifiers, mode, binding);
 	}
 
-	void IInputSource::BindKey(InputAction action, Key key, uint8 modes, uint8 modifiers)
+	void IInputSource::BindKeyInMode(const dd::InputMode& mode, InputAction action, Key key, uint8 modifiers)
 	{
-		DD_ASSERT(!IsBound(key, modes, modifiers));
+		DD_ASSERT(!IsBound(key, modifiers, &mode));
 
-		InputActionBinding& binding = m_bindings.Allocate();
+		InputActionBinding binding;
 		binding.Key = key;
 		binding.Action = action;
-		binding.Modes = modes;
+		binding.Modes |= mode.ID();
 		binding.Modifiers = modifiers;
+		m_bindings.push_back(binding);
+	}
+
+	void IInputSource::BindKey(InputAction action, Key key, uint8 modifiers)
+	{
+		DD_ASSERT(!IsBound(key, modifiers, nullptr));
+
+		DD_TODO("This should also take the action type and resolve in the binding.");
+
+		InputActionBinding binding;
+		binding.Key = key;
+		binding.Action = action;
+		binding.Modes = dd::InputMode::ALL;
+		binding.Modifiers = modifiers;
+		m_bindings.push_back(binding);
 	}
 }

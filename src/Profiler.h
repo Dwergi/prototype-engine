@@ -59,7 +59,7 @@ namespace dd
 	{
 		static const int VALUE_COUNT = 100;
 
-		ProfilerValue( const char* name );
+		ProfilerValue( const char* name, float initial = 0 );
 
 		void Increment();
 		void SetValue( float value );
@@ -76,6 +76,6 @@ namespace dd
 		std::string m_name;
 		int m_index { 0 };
 		float m_sliding { 0 };
-		float m_values[VALUE_COUNT];
+		float m_values[VALUE_COUNT] = { 0 };
 	};
 }

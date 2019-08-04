@@ -21,6 +21,8 @@ namespace dd
 		bool Initialize();
 		void Shutdown();
 
+		void Update(float delta_t);
+
 		IWindow& Swap();
 
 		bool IsClosing() const { return m_closing; }
@@ -45,6 +47,7 @@ namespace dd
 
 	private:
 		virtual bool OnInitialize() = 0;
+		virtual void OnUpdate(float delta_t) = 0;
 		virtual void OnShutdown() = 0;
 
 		virtual void OnSetSize(glm::ivec2 size) = 0;

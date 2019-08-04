@@ -38,7 +38,7 @@ namespace dd
 		ImGuiBinding::Initialize();
 
 		dd::InputMode::Access(dd::InputMode::DEBUG)
-			.OnEnter(&OnEnterDebugMode)
+			->OnEnter(&OnEnterDebugMode)
 			.OnExit(&OnExitDebugMode);
 	}
 
@@ -107,7 +107,11 @@ namespace dd
 			{
 				for (IDebugPanel* debug_view : m_debugPanels)
 				{
-					debug_view->AddToMenu();
+					bool is_open = debug_view->IsDebugPanelOpen();
+					if (ImGui::MenuItem(debug_view->GetDebugTitle()))
+					{
+						debug_view->SetDebugPanelOpen(!is_open);
+					}
 				}
 
 				ImGui::EndMenu();

@@ -70,8 +70,17 @@ namespace dd
 			return;
 		}
 
+		if (m_resizing)
+		{
+			return;
+		}
+
+		m_resizing = true;
+
 		sf::Vector2u sfml_size(size.x, size.y);
 		m_sfmlWindow->setSize(sfml_size);
+
+		m_resizing = false;
 	}
 
 	void SFMLWindow::OnSetTitle(std::string title)

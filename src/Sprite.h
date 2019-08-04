@@ -34,8 +34,6 @@ namespace ddr
 
 	struct SpriteManager : dd::HandleManager<Sprite>
 	{
-		std::vector<SpriteHandle> LoadSpriteSheet(std::string base_name, ddr::TextureHandle sheet, glm::ivec2 size);
-		
 	private:
 		using super = dd::HandleManager<Sprite>;
 	};

@@ -137,10 +137,14 @@ namespace dd
 
 		void GetEvents(IArray<InputEvent>& out) const { out = m_currentEvents; }
 
-		void BindKey(InputAction action, Key key, uint8 modes = InputMode::ALL, uint8 modifiers = 0);
+		void BindKey(InputAction action, Key key, uint8 modifiers = 0);
+		void BindKeyInMode(const InputMode& mode, InputAction action, Key key, uint8 modifiers = 0);
 
 		virtual const char* GetClipboardText() const = 0;
 		virtual void SetClipboardText(const char* text) = 0;
+
+		// don't call this directly, should be in InputSystem
+		void SetMode(int16 mode) { m_mode = mode; }
 
 	protected:
 		
@@ -163,13 +167,13 @@ namespace dd
 		MousePosition m_pendingScrollPosition;
 		MousePosition m_currentScrollPosition;
 
-		uint8 m_mode { InputMode::NONE };
+		int16 m_mode { InputMode::NONE };
 
-		Vector<InputActionBinding> m_bindings;
+		std::vector<InputActionBinding> m_bindings;
 		bool m_mouseCaptured { false };
 
-		bool IsBound(Key key, uint8 modes, uint8 modifiers) const;
-		bool FindBinding(Key key, uint8 modes, uint8 modifiers, InputActionBinding& binding) const;
+		bool IsBound(Key key, uint8 modifiers, const InputMode* mode) const;
+		bool FindKeyBinding(Key key, uint8 modifiers, const InputMode* mode, InputActionBinding& binding) const;
 
 		// implement these
 		virtual void OnUpdateInput() = 0;

@@ -20,26 +20,16 @@ namespace ddr
 {
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
-	static const glm::vec2 s_screenFacingQuadVertices[] = {
-			glm::vec2(-0.5f,	-0.5f),
-			glm::vec2(0.5f,	-0.5f),
-			glm::vec2(-0.5f,	0.5f),
-			glm::vec2(-0.5f,	0.5f),
-			glm::vec2(0.5f,	-0.5f),
-			glm::vec2(0.5f,	0.5f)
+	static const glm::vec2 s_quad[] = {
+			glm::vec2(0,	0),
+			glm::vec2(1,	0),
+			glm::vec2(0,	1),
+			glm::vec2(0,	1),
+			glm::vec2(1,	0),
+			glm::vec2(1,	1)
 	};
 
-	static const glm::vec2 s_screenFacingQuadUVs[] = {
-		glm::vec2(0,	0),
-		glm::vec2(1,	0),
-		glm::vec2(0,	1),
-		glm::vec2(0,	1),
-		glm::vec2(1,	0),
-		glm::vec2(1,	1)
-	};
-
-	static VBO s_vboQuadPositions;
-	static VBO s_vboQuadUVs;
+	static VBO s_vboQuad;
 
 	static ShaderHandle s_shader;
 
@@ -66,51 +56,57 @@ namespace ddr
 		m_vao.Create();
 		m_vao.Bind();
 
-		s_vboQuadPositions.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		s_vboQuadPositions.Bind();
-		s_vboQuadPositions.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
-		s_vboQuadPositions.CommitData();
+		s_vboQuad.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+		{
+			s_vboQuad.Bind();
+			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_quad, 6));
+			s_vboQuad.CommitData();
 
-		shader->BindAttributeVec2("Position", false);
-		s_vboQuadPositions.Unbind();
+			shader->BindAttributeVec2("Position", false);
+			shader->BindAttributeVec2("UV", false);
+			s_vboQuad.Unbind();
+		}
 
-		s_vboQuadUVs.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		s_vboQuadUVs.Bind();
-		s_vboQuadUVs.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadUVs, 6));
-		s_vboQuadUVs.CommitData();
-
-		shader->BindAttributeVec2("UV", false);
-		s_vboQuadUVs.Unbind();
 
 		m_vboPositions.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboPositions.Bind();
-		shader->BindAttributeVec2("PositionInstanced", false);
-		shader->SetAttributeInstanced("PositionInstanced");
-		m_vboPositions.Unbind();
+		{
+			m_vboPositions.Bind();
+			shader->BindAttributeVec2("PositionInstanced", false);
+			shader->SetAttributeInstanced("PositionInstanced");
+			m_vboPositions.Unbind();
+		}
 
 		m_vboSizes.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboSizes.Bind();
-		shader->BindAttributeVec2("SizeInstanced", false);
-		shader->SetAttributeInstanced("SizeInstanced");
-		m_vboSizes.Unbind();
+		{
+			m_vboSizes.Bind();
+			shader->BindAttributeVec2("SizeInstanced", false);
+			shader->SetAttributeInstanced("SizeInstanced");
+			m_vboSizes.Unbind();
+		}
 
 		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboColours.Bind();
-		shader->BindAttributeVec4("ColourInstanced", false);
-		shader->SetAttributeInstanced("ColourInstanced");
-		m_vboColours.Unbind();
+		{
+			m_vboColours.Bind();
+			shader->BindAttributeVec4("ColourInstanced", false);
+			shader->SetAttributeInstanced("ColourInstanced");
+			m_vboColours.Unbind();
+		}
 
 		m_vboUVOffsets.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboUVOffsets.Bind();
-		shader->BindAttributeVec2("UVOffsetInstanced", false);
-		shader->SetAttributeInstanced("UVOffsetInstanced");
-		m_vboUVOffsets.Unbind();
+		{
+			m_vboUVOffsets.Bind();
+			shader->BindAttributeVec2("UVOffsetInstanced", false);
+			shader->SetAttributeInstanced("UVOffsetInstanced");
+			m_vboUVOffsets.Unbind();
+		}
 
 		m_vboUVScales.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboUVScales.Bind();
-		shader->BindAttributeVec2("UVScaleInstanced", false);
-		shader->SetAttributeInstanced("UVScaleInstanced");
-		m_vboUVScales.Unbind();
+		{
+			m_vboUVScales.Bind();
+			shader->BindAttributeVec2("UVScaleInstanced", false);
+			shader->SetAttributeInstanced("UVScaleInstanced");
+			m_vboUVScales.Unbind();
+		}
 
 		m_vao.Unbind();
 	}
@@ -209,6 +205,7 @@ namespace ddr
 		const ddc::World& world = data.World();
 
 		uniforms.Bind(*shader);
+
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
 		m_vao.Bind();
@@ -249,7 +246,7 @@ namespace ddr
 		// sort by z index
 		std::sort(m_temp.begin(), m_temp.end(), [](const auto& a, const auto& b)
 		{
-			return a.ZIndex > b.ZIndex;
+			return a.ZIndex < b.ZIndex;
 		});
 
 		SpriteIterator layer_start = m_temp.begin();
@@ -262,7 +259,6 @@ namespace ddr
 				return a.ZIndex == layer_z_index;
 			});
 
-			// sort by textures
 			DrawLayer(layer_start, layer_end, uniforms);
 
 			layer_start = layer_end;

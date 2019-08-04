@@ -26,13 +26,13 @@ namespace dd
 		const InputBindings* GetBindings() const { return m_bindings; }
 		IInputSource& GetSource() const;
 
-		void SetMode(uint8 id);
-		uint8 GetMode() { return m_currentMode; }
+		void SetMode(int16 id);
+		int16 GetMode() { return m_currentMode; }
 
 	private:
 		const InputBindings* m_bindings { nullptr };
-		uint8 m_currentMode { InputMode::NONE };
-		uint8 m_nextMode { InputMode::NONE };
+		int16 m_currentMode { InputMode::NONE };
+		int16 m_nextMode { InputMode::NONE };
 
 		void BindKeys();
 	};

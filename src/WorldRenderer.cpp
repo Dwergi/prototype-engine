@@ -30,6 +30,7 @@
 namespace ddr
 {
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 
 	struct Fog
@@ -91,7 +92,8 @@ namespace ddr
 		m_depthTexture.Initialize(size, GL_DEPTH_COMPONENT32F, 1);
 		m_depthTexture.Create();
 
-		m_framebuffer.SetClearColour(glm::vec4(m_skyColour.xyz, 0.0));
+		glm::vec4 clear_colour = glm::vec4(m_skyColour.xyz, 0.0);
+		m_framebuffer.SetClearColour(glm::vec4(0));
 		m_framebuffer.SetClearDepth(0.0f);
 		m_framebuffer.Create(m_colourTexture, &m_depthTexture);
 		m_framebuffer.RenderInit();
@@ -263,6 +265,7 @@ namespace ddr
 		else
 		{
 			m_framebuffer.Blit();
+
 			m_defaultState.Use(false);
 		}
 

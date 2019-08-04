@@ -17,9 +17,4 @@ namespace dd
 
 		ImGui::End();
 	}
-
-	void IDebugPanel::AddToMenu()
-	{
-		ImGui::MenuItem( GetDebugTitle(), nullptr, &m_debugOpen );
-	}
 }

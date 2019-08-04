@@ -10,10 +10,10 @@
 namespace dd
 {
 	FrameTimer::FrameTimer() : 
-		m_frameTimes( "Frame Time" )
+		m_maxFPS(120),
+		m_targetDelta(1.0f / m_maxFPS),
+		m_frameTimes( "Frame Time", m_targetDelta)
 	{
-		m_maxFPS = 120;
-		m_targetDelta = 1.0f / m_maxFPS;
 		m_lastFrameTime = 0.0f;
 		m_currentFrameTime = -m_targetDelta;
 		m_gameDelta = m_targetDelta;
@@ -30,7 +30,7 @@ namespace dd
 		m_targetDelta = 1.0f / m_maxFPS;
 
 		m_lastFrameTime = m_currentFrameTime;
-		m_currentFrameTime = m_timer.Time();
+		m_currentFrameTime = (float) m_timer.Time();
 		
 		m_appDelta = m_currentFrameTime - m_lastFrameTime;
 
@@ -56,16 +56,17 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( FrameTimer_DelayFrame );
 
-		float now = m_timer.Time();
+		float now = (float) m_timer.Time();
 		float delta_t = (now - m_lastFrameTime);
 
 		m_deltaWithoutDelay = delta_t;
 
 		while( delta_t < m_targetDelta )
 		{
-			std::this_thread::sleep_for( std::chrono::milliseconds( (int) delta_t * 1000 ) );
+			float remainder_t = m_targetDelta - delta_t;
+			std::this_thread::sleep_for( std::chrono::milliseconds( (int) remainder_t * 1000 ) );
 
-			delta_t = m_timer.Time() - m_lastFrameTime;
+			delta_t = (float) m_timer.Time() - m_lastFrameTime;
 		}
 
 		m_frameTimes.EndFrame();
@@ -78,7 +79,7 @@ namespace dd
 		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
 		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
 
-		ImGui::Value( "FPS: ", 1.0f / m_frameTimes.SlidingAverage(), "%.1f" );
+		ImGui::Value( "FPS: ", 1000.f / m_frameTimes.SlidingAverage(), "%.1f" );
 
 		m_frameTimes.Draw();
 	}
@@ -95,7 +96,7 @@ namespace dd
 			ImGui::PushStyleVar( ImGuiStyleVar_ItemInnerSpacing, ImVec2( 0, 0 ) );
 
 			ImGui::Begin( "CompactFPS", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs );
-			ImGui::Text( "%.1f", 1.0f / m_frameTimes.SlidingAverage() );
+			ImGui::Text( "%.1f", 1000.f / m_frameTimes.SlidingAverage() );
 			ImGui::SameLine();
 			ImGui::End();
 

@@ -40,6 +40,7 @@ namespace dd
 	private:
 
 		Timer m_timer;
+		uint m_maxFPS { 0 };
 		float m_targetDelta { 0.0f };
 		float m_lastFrameTime { 0.0f };
 		float m_currentFrameTime { 0.0f };
@@ -47,7 +48,6 @@ namespace dd
 		float m_appDelta { 0.0f };
 		float m_deltaWithoutDelay { 0.0f };
 		float m_timeScale { 1.0f };
-		uint m_maxFPS { 0 };
 		bool m_drawCompact { true };
 		bool m_paused { false };
 		uint m_frame { 0 };

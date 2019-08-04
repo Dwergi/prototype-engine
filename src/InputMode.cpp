@@ -16,8 +16,8 @@
 
 namespace dd
 {
-	InputMode InputMode::s_modes[8];
-	uint8 InputMode::s_used = 0;
+	InputMode InputMode::s_modes[MAX_MODES];
+	int16 InputMode::s_used = 0;
 
 	InputMode& InputMode::InputMode::Create(std::string name)
 	{
@@ -50,20 +50,31 @@ namespace dd
 		return nullptr;
 	}
 
-	InputMode& InputMode::Access(uint8 id)
+	InputMode* InputMode::Access(int16 id)
 	{
-		DD_ASSERT(id > 0 && id < (1 << MAX_MODES));
-		uint8 index = 0;
+		if (id == 0 || id >= (1 << MAX_MODES))
+		{
+			return nullptr;
+		}
+
+		int16 index = 0;
 		while (id > 1)
 		{
 			id = id >> 1;
 			++index;
 		}
 
-		DD_ASSERT(index >= 0 && id < MAX_MODES);
+		if (index > MAX_MODES)
+		{
+			return nullptr;
+		}
 
-		DD_ASSERT(s_modes[index].m_index != -1);
-		return s_modes[index];
+		if (s_modes[index].m_index == -1)
+		{
+			return nullptr;
+		}
+
+		return &s_modes[index];
 	}
 
 	void InputMode::ModeExited()
