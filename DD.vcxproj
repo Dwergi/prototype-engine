@@ -355,6 +355,8 @@
     <ClInclude Include="src\Box2DPhysicsComponent.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\UpdateDataBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
