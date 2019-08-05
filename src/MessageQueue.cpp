@@ -10,7 +10,7 @@
 
 #include <thread>
 
-namespace dd
+namespace ddc
 {
 	Message::Message()
 	{
@@ -45,17 +45,17 @@ namespace dd
 		new_token.Handler = m_nextHandlerID++;
 		new_token.Type = type;
 
-		auto it = m_subscribers.find(message.Type);
+		auto it = m_subscribers.find(type);
 		if (it == m_subscribers.end())
 		{
 			m_subscribers.insert(std::make_pair(type, std::vector<MessageHandlerID>()));
 			it = m_subscribers.find(type);
 		}
 
-		std::vector<MessageHandlerID>& subs = it.second;
+		std::vector<MessageHandlerID>& subs = it->second;
 
 		subs.push_back(new_token.Handler);
-		m_handlers.push_back(new_token.Handler, handler);
+		m_handlers.insert(std::make_pair(new_token.Handler, handler));
 
 		return new_token;
 	}
@@ -64,19 +64,19 @@ namespace dd
 	{
 		std::lock_guard lock(m_mutex);
 
-		m_handlers.Remove(token.Handler);
+		m_handlers.erase(token.Handler);
 
-		auto it = m_subscribers.find(message.Type);
+		auto it = m_subscribers.find(token.Type);
 		if (it == m_subscribers.end())
 			return;
 
-		std::vector<MessageHandlerID>& subs = it.second;
+		std::vector<MessageHandlerID>& subs = it->second;
 
-		for (int i = 0; i < subs->Size(); ++i)
+		for (int i = 0; i < subs.size(); ++i)
 		{
-			if ((*subs)[i] == token.Handler)
+			if (subs[i] == token.Handler)
 			{
-				subs->Remove(i);
+				subs.erase(subs.begin() + i);
 				break;
 			}
 		}
@@ -95,13 +95,13 @@ namespace dd
 		if (it == m_subscribers.end())
 			return;
 
-		std::vector<MessageHandlerID>& subs = it.second;
-		for (MessageHandlerID handler : subs)
+		const std::vector<MessageHandlerID>& subs = it->second;
+		for (MessageHandlerID handler_id : subs)
 		{
-			std::function<void(Message)>* fn = m_handlers.Find(handler);
-			if (fn != nullptr)
+			auto it = m_handlers.find(handler_id);
+			if (it != m_handlers.end())
 			{
-				(*fn)(message);
+				(it->second)(message);
 			}
 		}
 	}
@@ -119,21 +119,20 @@ namespace dd
 			Dispatch(message);
 		}
 
-		m_pendingMessages.Write().Clear();
+		m_pendingMessages.Write().clear();
 	}
 
 	int MessageQueue::GetSubscriberCount(MessageType type) const
 	{
-		Vector<MessageHandlerID>* subs = m_subscribers.Find(type);
-
-		if (subs == nullptr)
+		auto it = m_subscribers.find(type);
+		if (it == m_subscribers.end())
 			return 0;
 
-		return subs->Size();
+		return (int) it->second.size();
 	}
 
 	int MessageQueue::GetPendingMessageCount() const
 	{
-		return m_pendingMessages.Write().Size();
+		return (int) m_pendingMessages.Write().size();
 	}
 }

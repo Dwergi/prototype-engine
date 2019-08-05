@@ -32,4 +32,6 @@ namespace ddm
 	bool HitTestMesh( const ddm::Ray& ray, const glm::mat4& mesh_transform,
 		const ddm::Sphere& bound_sphere, const ddm::AABB& bound_box,
 		const ddr::Mesh& mesh, float& out_distance, glm::vec3& out_normal );
+
+	bool BoxBoxIntersect(glm::vec2 a_min, glm::vec2 a_max, glm::vec2 b_min, glm::vec2 b_max);
 }

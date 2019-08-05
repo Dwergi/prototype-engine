@@ -1,8 +1,8 @@
 #pragma once
 
-namespace dd
+namespace d2d
 {
-	struct Circle2DPhysicsComponent
+	struct CirclePhysicsComponent
 	{
 		float Radius { 0.5f };
 		float Elasticity { 1 };
@@ -16,7 +16,7 @@ namespace dd
 		}
 		bool IsResting() const { return RestingFrames >= 10; }
 
-		DD_BEGIN_CLASS(dd::Circle2DPhysicsComponent)
+		DD_BEGIN_CLASS(d2d::CirclePhysicsComponent)
 			DD_COMPONENT();
 			DD_MEMBER(Radius); 
 			DD_MEMBER(Elasticity);

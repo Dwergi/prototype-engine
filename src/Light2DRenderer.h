@@ -3,11 +3,11 @@
 #include "Renderer.h"
 #include "Shader.h"
 
-namespace lux
+namespace d2d
 {
-	struct Light2DRenderer : ddr::Renderer
+	struct LightRenderer : ddr::Renderer
 	{
-		Light2DRenderer();
+		LightRenderer();
 
 		virtual void Render(const ddr::RenderData& render_data) override;
 		virtual void RenderInit(ddc::EntitySpace& entities) override;

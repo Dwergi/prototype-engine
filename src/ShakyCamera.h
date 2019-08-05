@@ -3,12 +3,11 @@
 #include "Frustum.h"
 #include "ICamera.h"
 #include "IDebugPanel.h"
-#include "InputAction.h"
 
 namespace dd
 {
 	struct FPSCameraComponent;
-	struct InputKeyBindings;
+	struct Input;
 
 	struct ShakyCamera : IDebugPanel, ddr::ICamera
 	{
@@ -40,7 +39,7 @@ namespace dd
 		//
 		// Constructor.
 		//
-		ShakyCamera( const FPSCameraComponent& camera, InputKeyBindings& bindings );
+		ShakyCamera( const FPSCameraComponent& camera, Input& input );
 
 		//
 		// Destructor.

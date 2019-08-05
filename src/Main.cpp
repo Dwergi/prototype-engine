@@ -36,8 +36,7 @@
 #include "IWindow.h"
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
-#include "Sprite.h"
-#include "SpriteSheet.h"
+#include "SystemManager.h"
 #include "WorldRenderer.h"
 
 #include <filesystem>
@@ -60,7 +59,7 @@ static dd::Service<dd::JobSystem> s_jobSystem;
 static dd::Service<ddr::ICamera> s_camera;
 static dd::Service<ddc::SystemManager> s_systemManager;
 
-static ddc::EntitySpace* g_entitySpace;
+static ddc::EntitySpace* g_tempSpace;
 
 std::thread::id g_mainThread;
 
@@ -69,51 +68,36 @@ static void ShowSystemConsole(bool show)
 	::ShowWindow(GetConsoleWindow(), show ? SW_SHOW : SW_HIDE);
 }
 
-static void ToggleConsole(dd::InputAction action, dd::InputType type)
+static void ToggleConsole()
 {
-	if (action == dd::InputAction::TOGGLE_CONSOLE && type == dd::InputType::Release)
-	{
-		s_debugUI->SetDraw(true);
-	}
+	s_debugUI->SetDraw(true);
 }
 
-static void ToggleDebugUI(dd::InputAction action, dd::InputType type)
+static void ToggleDebugUI()
 {
-	if (action == dd::InputAction::TOGGLE_DEBUG_UI && type == dd::InputType::Release)
-	{
-		s_input->SetMode(s_input->GetMode() == dd::InputMode::GAME ? dd::InputMode::DEBUG : dd::InputMode::GAME);
-	}
+	s_input->SetCurrentMode(s_input->GetCurrentMode() == "game" ? "debug" : "game");
 }
 
-static void PauseGame(dd::InputAction action, dd::InputType type)
+static void PauseGame()
 {
-	if (action == dd::InputAction::PAUSE && type == dd::InputType::Release)
-	{
-		s_frameTimer->SetPaused(!s_frameTimer->IsPaused());
-	}
+	s_frameTimer->SetPaused(!s_frameTimer->IsPaused());
 }
 
-static void Exit(dd::InputAction action, dd::InputType type)
+static void Exit()
 {
-	if (action == dd::InputAction::EXIT && type == dd::InputType::Release)
-	{
-		s_window->SetToClose();
-	}
+	s_window->SetToClose();
 }
 
-static void SetTimeScale(dd::InputAction action, dd::InputType type)
+static void DecreaseTimeScale()
 {
-	if (action == dd::InputAction::TIME_SCALE_DOWN && type == dd::InputType::Release)
-	{
-		float time_scale = s_frameTimer->GetTimeScale();
-		s_frameTimer->SetTimeScale(time_scale * 0.9f);
-	}
+	float time_scale = s_frameTimer->GetTimeScale();
+	s_frameTimer->SetTimeScale(time_scale * 0.9f);
+}
 
-	if (action == dd::InputAction::TIME_SCALE_UP && type == dd::InputType::Release)
-	{
-		float time_scale = s_frameTimer->GetTimeScale();
-		s_frameTimer->SetTimeScale(time_scale * 1.1f);
-	}
+static void IncreaseTimeScale()
+{
+	float time_scale = s_frameTimer->GetTimeScale();
+	s_frameTimer->SetTimeScale(time_scale * 1.1f);
 }
 
 static dd::Service<ddr::TextureManager> s_textureManager;
@@ -121,8 +105,6 @@ static dd::Service<ddr::ShaderManager> s_shaderManager;
 static dd::Service<ddr::MaterialManager> s_materialManager;
 static dd::Service<ddr::MeshManager> s_meshManager;
 static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
-static dd::Service<ddr::SpriteManager> s_spriteManager;
-static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 
 static void CreateAssetManagers()
 {
@@ -133,8 +115,6 @@ static void CreateAssetManagers()
 	dd::Services::Register(new ddr::MaterialManager());
 	dd::Services::Register(new ddr::MeshManager());
 	dd::Services::Register(new ddc::EntityPrototypeManager());
-	dd::Services::Register(new ddr::SpriteManager());
-	dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
 }
 
 static void UpdateAssetManagers()
@@ -144,8 +124,6 @@ static void UpdateAssetManagers()
 	s_materialManager->Update();
 	s_meshManager->Update();
 	s_entityProtoManager->Update();
-	s_spriteManager->Update();
-	s_spriteSheetManager->Update();
 }
 
 static int GameMain()
@@ -174,23 +152,24 @@ static int GameMain()
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 
 		dd::Services::Register(new dd::InputKeyBindings());
-		//s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
-		s_inputBindings->RegisterHandler(dd::InputAction::EXIT, &Exit);
-		s_inputBindings->RegisterHandler(dd::InputAction::PAUSE, &PauseGame);
-		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_DOWN, &SetTimeScale);
-		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_UP, &SetTimeScale);
 
 		dd::Services::Register(new dd::Input());
-		s_input->SetBindings(*s_inputBindings);
+		s_input->SetKeyBindings(*s_inputBindings);
 		s_input->Initialize();
-		s_input->SetMode(dd::InputMode::GAME);
+		s_input->SetCurrentMode("game");
+
+		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
+		s_input->AddHandler(dd::InputAction::EXIT, &Exit);
+		s_input->AddHandler(dd::InputAction::PAUSE, &PauseGame);
+		s_input->AddHandler(dd::InputAction::TIME_SCALE_DOWN, &DecreaseTimeScale);
+		s_input->AddHandler(dd::InputAction::TIME_SCALE_UP, &IncreaseTimeScale);
 
 		dd::Services::Register(new dd::DebugUI());
 
-		dd::Services::Register(new dd::SystemManager());
+		dd::Services::Register(new ddc::SystemManager());
 
 		DD_TODO("IGame should provide EntitySpace, update all");
-		g_entitySpace = new ddc::EntitySpace();
+		g_tempSpace = new ddc::EntitySpace("default");
 
 		dd::Services::Register(new ddr::WorldRenderer());
 
@@ -198,19 +177,20 @@ static int GameMain()
 		s_frameTimer->SetMaxFPS(60);
 
 		dd::EntityVisualizer& entity_visualizer = dd::Services::Register(new dd::EntityVisualizer());
-		entity_visualizer.BindActions(*s_inputBindings);
 
 		s_debugUI->RegisterDebugPanel(*s_frameTimer);
 		s_debugUI->RegisterDebugPanel(*s_renderer);
-		s_debugUI->RegisterDebugPanel(*g_entitySpace);
+		s_debugUI->RegisterDebugPanel(*s_systemManager);
 		s_debugUI->RegisterDebugPanel(entity_visualizer);
 
 		CreateAssetManagers();
 
-		s_game->Initialize(*g_entitySpace);
+		{
+			dd::GameUpdateData initial_update(*g_tempSpace, *s_input, 0);
+			s_game->Initialize(initial_update);
+		}
 
-		g_entitySpace->Initialize();
-		s_renderer->InitializeRenderers(*g_entitySpace);
+		s_renderer->InitializeRenderers(*g_tempSpace);
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		dd::InitializeAssert();
@@ -228,18 +208,22 @@ static int GameMain()
 			s_input->Update(s_frameTimer->AppDelta());
 			s_debugUI->StartFrame(s_frameTimer->AppDelta());
 
-			g_entitySpace->Update(s_frameTimer->GameDelta());
-
 			UpdateAssetManagers();
 
-			s_game->Update(*g_entitySpace);
+			{
+				DD_TODO("Add a loop over all available entity spaces.");
+				g_tempSpace->Update(s_frameTimer->GameDelta());
 
-			s_debugUI->RenderDebugPanels(*g_entitySpace);
+				dd::GameUpdateData update_data(*g_tempSpace, *s_input, s_frameTimer->GameDelta());
+				s_game->Update(update_data);
+
+				s_game->RenderUpdate(update_data);
+
+				s_renderer->Render(*g_tempSpace, s_camera, s_frameTimer->GameDelta());
+			}
+
 			s_frameTimer->DrawFPSCounter();
-
-			s_game->RenderUpdate(*g_entitySpace);
-
-			s_renderer->Render(*g_entitySpace, s_camera, s_frameTimer->GameDelta());
+			s_debugUI->RenderDebugPanels(*g_tempSpace);
 
 			s_debugUI->EndFrame();
 			s_window->Swap();

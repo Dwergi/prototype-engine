@@ -10,7 +10,7 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
-#include "InputKeyBindings.h"
+#include "Input.h"
 #include "MeshUtils.h"
 #include "OpenGL.h"
 #include "Services.h"
@@ -21,6 +21,7 @@
 namespace ddr
 {
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<dd::Input> s_input;
 
 	static const glm::vec3 s_corners[] =
 	{
@@ -69,26 +70,22 @@ namespace ddr
 
 	}
 
-	void BoundsRenderer::BindKeys(dd::InputKeyBindings& bindings)
+	void BoundsRenderer::RenderInit(ddc::EntitySpace& entities)
 	{
 		auto handler = [this]()
 		{
-			int mode = ( int) m_drawMode;
+			int mode = (int) m_drawMode;
 			++mode;
 
 			if (mode > 2)
 				mode = 0;
 
-			m_drawMode = ( DrawMode) mode;
+			m_drawMode = (DrawMode) mode;
 			m_updateBuffers = true;
 		};
 
-		DD_TODO("Fix key handler bindings");
-		//bindings.RegisterHandler( dd::InputAction::TOGGLE_BOUNDS, handler );
-	}
+		s_input->AddHandler(dd::InputAction::TOGGLE_BOUNDS, handler);
 
-	void BoundsRenderer::RenderInit(ddc::EntitySpace& entities)
-	{
 		m_shader = s_shaderManager->Load("line");
 		DD_ASSERT(m_shader.IsValid());
 

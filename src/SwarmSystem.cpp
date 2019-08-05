@@ -115,12 +115,12 @@ namespace dd
 		const float max_turn = TurnSpeed * dt;
 		const float max_accel = AccelerationRate * dt;
 
-		const ddc::DataBuffer& data = update.Data();
+		auto data = update.Data();
 		auto transforms = data.Write<TransformComponent>();
 		auto swarm_agents = data.Write<SwarmAgentComponent>();
 		auto rays = data.Write<RayComponent>();
 
-		const ddc::DataBuffer& player_data = update.Data( "player" );
+		auto player_data = update.Data( "player" );
 		auto player_transforms = player_data.Read<TransformComponent>();
 
 		glm::vec3 player_pos = player_transforms[0].Position;

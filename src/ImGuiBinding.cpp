@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "ImGuiBinding.h"
 
+#include "Input.h"
 #include "IInputSource.h"
 #include "IWindow.h"
 
@@ -9,9 +10,9 @@
 
 namespace dd
 {
-#pragma optimize("",off)
 	static dd::Service<IWindow> s_window;
 	static dd::Service<IInputSource> s_inputSource;
+	static dd::Service<Input> s_input;
 
 	static bool s_handleMouse = false;
 
@@ -299,8 +300,8 @@ namespace dd
 
 		UpdateKeyboard();
 
-		s_inputSource->EnableKeyboard(!io.WantCaptureKeyboard);
-		s_inputSource->EnableKeyboard(!io.WantCaptureMouse);
+		s_input->EnableKeyboard(!io.WantCaptureKeyboard);
+		s_input->EnableKeyboard(!io.WantCaptureMouse);
 
 		ImGui::NewFrame();
 	}

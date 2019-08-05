@@ -29,29 +29,35 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::Initialize()
+	void SystemManager::Initialize(EntitySpace& space)
 	{
 		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
 
 		for (System* system : m_systems)
 		{
-			system->Initialize(*this);
+			if (system->IsEnabledForSpace(space))
+			{
+				system->Initialize(space);
+			}
 		}
 
 		ddc::OrderSystemsByDependencies(dd::Span<System*>(m_systems), m_orderedSystems);
 	}
 
-	void SystemManager::Shutdown()
+	void SystemManager::Shutdown(EntitySpace& space)
 	{
 		for (System* system : m_systems)
 		{
-			system->Shutdown(*this);
+			if (system->IsEnabledForSpace(space))
+			{
+				system->Shutdown(space);
+			}
 		}
 	}
 
-	void SystemManager::Update(float delta_t)
+	void SystemManager::Update(EntitySpace& space, float delta_t)
 	{
-		UpdateSystemsWithTreeScheduling(delta_t);
+		UpdateSystemsWithTreeScheduling(space, delta_t);
 
 		std::vector<std::shared_future<void>> updates;
 		updates.reserve(m_orderedSystems.size());
@@ -69,18 +75,18 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::RegisterSystem(System& system)
+	void SystemManager::Register(System& system)
 	{
 		m_systems.push_back(&system);
 	}
 
-	void SystemManager::UpdateSystem(System* system, std::vector<std::shared_future<void>> dependencies, float delta_t)
+	void SystemManager::UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t)
 	{
 		DD_ASSERT(system != nullptr);
 
 		WaitForAllFutures(dependencies);
 
-		ddc::UpdateData update(*this, delta_t);
+		ddc::UpdateData update(space, delta_t);
 
 		// get names
 		dd::Array<dd::String16, 8> names;
@@ -124,7 +130,7 @@ namespace ddc
 
 			// find entities with requirements
 			std::vector<Entity> entities;
-			FindAllWith(required, tags, entities);
+			space.FindAllWith(required, tags, entities);
 
 			update.AddData(entities, requests, name.c_str());
 		}
@@ -147,7 +153,7 @@ namespace ddc
 		return futures;
 	}
 
-	void SystemManager::UpdateSystemsWithTreeScheduling(float delta_t)
+	void SystemManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
 	{
 		for (SystemNode& s : m_orderedSystems)
 		{
@@ -156,9 +162,9 @@ namespace ddc
 			System* system = s.m_system;
 			auto futures = GetFutures(s, m_orderedSystems);
 
-			s.m_update = s_jobsystem->Schedule([this, system, futures, delta_t]()
+			s.m_update = s_jobsystem->Schedule([this, &space, system, futures, delta_t]()
 				{
-					UpdateSystem(system, futures, delta_t);
+					UpdateSystem(space, system, futures, delta_t);
 				}).share();
 		}
 	}

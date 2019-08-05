@@ -11,6 +11,9 @@ namespace dd
 		Flags(const Flags<T>& other) { m_flags = other.m_flags; }
 		Flags(T flag); // intentionally implicit
 
+		void Clear();
+		void Fill();
+
 		void Set(T flag);
 		void SetAll(Flags<T> flags);
 
@@ -30,15 +33,15 @@ namespace dd
 	template <typename T>
 	Flags<T>::Flags(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
-		m_flags = (TStorage) flag;
+		DD_ASSERT((T) flag % 2 == 0);
+		m_flags = (T) flag;
 	}
 
 	template <typename T>
 	bool Flags<T>::Has(T flag) const
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
-		return (m_flags & (TStorage) flag) != 0;
+		DD_ASSERT((T) flag % 2 == 0);
+		return (m_flags & (T) flag) != 0;
 	}
 
 	template <typename T>
@@ -56,26 +59,38 @@ namespace dd
 	template <typename T>
 	void Flags<T>::Set(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
-		m_flags |= (TStorage) flag;
+		DD_ASSERT((T) flag % 2 == 0);
+		m_flags |= (T) flag;
 	}
 
 	template <typename T>
 	void Flags<T>::SetAll(Flags<T> flags)
 	{
-		m_flags |= (TStorage) flags.m_flags;
+		m_flags |= (T) flags.m_flags;
 	}
 
 	template <typename T>
 	void Flags<T>::Unset(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
-		m_flags &= ~(TStorage) flag;
+		DD_ASSERT((T) flag % 2 == 0);
+		m_flags &= ~(T) flag;
 	}
 
 	template <typename T>
 	void Flags<T>::UnsetAll(Flags<T> flags)
 	{
-		m_flags &= ~(TStorage) flags.m_flags;
+		m_flags &= ~(T) flags.m_flags;
+	}
+
+	template <typename T>
+	void Flags<T>::Clear()
+	{
+		m_flags = 0;
+	}
+
+	template <typename T>
+	void Flags<T>::Fill()
+	{
+		m_flags = (T) ~0;
 	}
 }

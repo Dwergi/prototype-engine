@@ -9,7 +9,8 @@ namespace dd
 	{
 		None,
 		Press,
-		Release
+		Release,
+		Hold
 	};
 
 	struct MousePosition

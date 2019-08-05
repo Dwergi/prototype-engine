@@ -11,16 +11,15 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData(ddc::EntitySpace& entities, dd::Input& input, float delta_t) :
-		m_world(entities),
-		m_input(input),
+	UpdateData::UpdateData(ddc::EntitySpace& space, float delta_t) :
+		m_entitySpace(space),
 		m_delta(delta_t)
 	{
 	}
 
 	void UpdateData::AddData(const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name)
 	{
-		UpdateDataBuffer buffer(m_world, entities, requests, name);
+		UpdateDataBuffer buffer(m_entitySpace, entities, requests, name);
 		m_dataBuffers.push_back(buffer);
 	}
 
@@ -58,7 +57,7 @@ namespace ddc
 
 				for (Entity entity : data_buffer.Entities())
 				{
-					void* dest = m_world.AccessComponent(entity, buffer.Component().ComponentID());
+					void* dest = m_entitySpace.AccessComponent(entity, buffer.Component().ComponentID());
 					if (dest != nullptr)
 					{
 						memcpy(dest, src, cmp_size);

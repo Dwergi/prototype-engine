@@ -38,12 +38,17 @@ namespace dd
 			.ShowCursor(true);
 
 		DD_ASSERT(debug_mode.ID() == (1 << 1));
+	}
 
-		BindKeys();
+	void Input::Shutdown()
+	{
+
 	}
 
 	void Input::Update(float delta_t)
 	{
+		DD_ASSERT(m_bindings != nullptr, "Key bindings still null in Input::Update!");
+
 		// switch mode
 		UpdateMode();
 		
@@ -61,19 +66,20 @@ namespace dd
 		{
 			bool bound = false;
 			InputAction action;
-			if (evt.IsMouse() && m_mouseEnabled)
+			if ((evt.IsMouse() && m_mouseEnabled) || 
+				(evt.IsKeyboard() && m_keyboardEnabled))
 			{
-				bound = FindKeyBinding(evt, action);
-			}
-
-			if (evt.IsKeyboard() && m_keyboardEnabled)
-			{
-				bound = FindKeyBinding(evt, action);
+				bound = m_bindings->FindBinding(m_currentMode->ID(), evt, action);
 			}
 
 			if (bound)
 			{
-				DispatchAction(action);
+				DispatchAction(action, evt.Type);
+				
+				if (UpdateHeldState(action, evt))
+				{
+					DispatchAction(action, InputType::Hold);
+				}
 			}
 
 			m_actions.push_back(action);
@@ -96,39 +102,31 @@ namespace dd
 		return it != m_actions.end();
 	}
 
-	void Input::BindKeys()
+	bool Input::IsHeld(dd::InputAction action) const
 	{
-		DD_TODO("Fix key binding!");
-		//s_source->BindKey(InputAction::TOGGLE_DEBUG_UI, Key::ESCAPE);
-		//s_source->BindKey(InputAction::TOGGLE_FREECAM, Key::F1);
-		//s_source->BindKey(InputAction::TOGGLE_BOUNDS, Key::F2);
-		//s_source->BindKey(InputAction::FORWARD, Key::W);
-		//s_source->BindKey(InputAction::BACKWARD,Key::S);
-		//s_source->BindKey(InputAction::LEFT,Key::A);
-		//s_source->BindKey(InputAction::RIGHT,Key::D);
-		//s_source->BindKey(InputAction::UP,Key::SPACE);
-		//s_source->BindKey(InputAction::ADD_MINOR_TRAUMA,Key::R);
-		//s_source->BindKey(InputAction::ADD_MAJOR_TRAUMA,Key::T);
-		//s_source->BindKey(InputAction::DOWN, Key::LCTRL);
-		//s_source->BindKey(InputAction::BOOST, Key::LSHIFT);
-		//s_source->BindKey(InputAction::CAMERA_POS_1,Key::KEY_1);
-		//s_source->BindKey(InputAction::CAMERA_POS_2,Key::KEY_2);
-		//s_source->BindKey(InputAction::CAMERA_POS_3,Key::KEY_3);
-		//s_source->BindKey(InputAction::CAMERA_POS_4,Key::KEY_4);
-		//s_source->BindKey(InputAction::DECREASE_DEPTH, Key::HOME);
-		//s_source->BindKey(InputAction::INCREASE_DEPTH, Key::END);
-		//s_source->BindKey(InputAction::PAUSE, Key::PAUSE);
-		//s_source->BindKey(InputAction::TIME_SCALE_DOWN, Key::PAGE_DOWN);
-		//s_source->BindKey(InputAction::TIME_SCALE_UP, Key::PAGE_UP);
+		auto it = m_held.find(action);
+		if (it == m_held.end())
+		{
+			return false;
+		}
+		
+		return it->second;
+	}
 
-		//s_source->BindKeyInMode(*debug, InputAction::TOGGLE_ENTITY_DATA, Key::E);
-		//s_source->BindKeyInMode(*game, InputAction::RESET_PHYSICS, Key::P);
-		//s_source->BindKeyInMode(*debug, InputAction::TOGGLE_PICKING, Key::F3);
-		//s_source->BindKeyInMode(*debug, InputAction::SELECT_MESH, Key::MOUSE_LEFT);
-		//s_source->BindKeyInMode(*game, InputAction::SHOOT, Key::MOUSE_LEFT);
-		//s_source->BindKey(InputAction::EXIT, Key::ESCAPE);
+	bool Input::UpdateHeldState(InputAction action, const InputEvent& evt)
+	{
+		if (evt.Type == InputType::Press)
+		{
+			m_held[action] = true;
+			return true;
+		}
+		else if (evt.Type == InputType::Release)
+		{
+			m_held[action] = false;
+			return false;
+		}
 
-		//s_source->BindKey( InputAction::TOGGLE_CONSOLE, Key::F2, InputMode::DEBUG );
+		return false;
 	}
 
 	void Input::SetCurrentMode(std::string mode_name)
@@ -139,21 +137,21 @@ namespace dd
 		m_nextMode = mode->ID();
 	}
 
-	bool Input::FindKeyBinding(const InputEvent& evt, InputAction& out_action) const
+	void Input::AddHandler(InputAction action, InputHandler handler)
 	{
-		if (m_bindings == nullptr)
-		{
-			return false;
-		}
-		return m_bindings->FindBinding(m_currentMode->ID(), evt, out_action);
+		AddHandler(action, InputType::Release, handler);
 	}
 
-	void Input::RegisterActionHandler(InputAction action, InputHandler handler)
+	void Input::AddHandler(InputAction action, InputType type, InputHandler handler)
 	{
-		auto it = m_handlers.find(action);
+		DD_TODO("Probably need a remove handler?");
+
+		ActionKey key { action, type };
+
+		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
 		{
-			auto result = m_handlers.insert(std::make_pair(action, std::vector<dd::InputHandler>()));
+			auto result = m_handlers.insert(std::make_pair(key, std::vector<dd::InputHandler>()));
 			it = result.first;
 		}
 
@@ -161,9 +159,22 @@ namespace dd
 		handlers.push_back(handler);
 	}
 
-	void Input::DispatchAction(InputAction action) const
+	void Input::AddHeldHandler(InputAction action)
 	{
-		auto it = m_handlers.find(action);
+		ActionKey key { action, InputType::Hold };
+
+		auto it = m_handlers.find(key);
+		if (it == m_handlers.end())
+		{
+			m_handlers.insert(std::make_pair(key, std::vector<dd::InputHandler>()));
+		}
+	}
+
+	void Input::DispatchAction(InputAction action, InputType type) const
+	{
+		ActionKey key { action, type };
+
+		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
 		{
 			return;

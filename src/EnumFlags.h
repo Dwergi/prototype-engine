@@ -14,6 +14,9 @@ namespace dd
 		EnumFlags(const EnumFlags<T>& other) { m_flags = other.m_flags; }
 		EnumFlags(T flag); // intentionally implicit
 
+		void Clear();
+		void Fill();
+
 		void Set(T flag);
 		void SetAll(EnumFlags<T> flags);
 
@@ -76,5 +79,17 @@ namespace dd
 	void EnumFlags<T>::UnsetAll(EnumFlags<T> flags)
 	{
 		m_flags &= ~(TStorage) flags.m_flags;
+	}
+
+	template <typename T>
+	void EnumFlags<T>::Clear()
+	{
+		m_flags = (TStorage) 0;
+	}
+
+	template <typename T>
+	void EnumFlags<T>::Fill()
+	{
+		m_flags = (TStorage) ~0;
 	}
 }

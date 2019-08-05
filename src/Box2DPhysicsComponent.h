@@ -1,8 +1,8 @@
 #pragma once
 
-namespace dd
+namespace d2d
 {
-	struct Box2DPhysicsComponent
+	struct BoxPhysicsComponent
 	{
 		// Hit box dimensions relative to the size of the sprite, [0-1].
 		glm::vec2 HitBoxMin { 0, 0 };
@@ -22,7 +22,7 @@ namespace dd
 			return RestingFrames >= 10;
 		}
 
-		DD_BEGIN_CLASS(dd::Box2DPhysicsComponent)
+		DD_BEGIN_CLASS(d2d::BoxPhysicsComponent)
 			DD_COMPONENT();
 
 			DD_MEMBER(HitBoxMin);

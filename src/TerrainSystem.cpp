@@ -85,37 +85,37 @@ namespace dd
 		
 	}
 
-	void TerrainSystem::Shutdown( ddc::EntitySpace& entities )
+	void TerrainSystem::Shutdown(ddc::EntitySpace& space)
 	{
-		DestroyChunks( entities );
+		DestroyChunks(space);
 	}
 	
-	void TerrainSystem::Initialize( ddc::EntitySpace& entities )
+	void TerrainSystem::Initialize(ddc::EntitySpace& space)
 	{
 		TerrainChunk::InitializeShared();
 	}
 
 	void TerrainSystem::Update( const ddc::UpdateData& update_data )
 	{
-		ddc::EntitySpace& entities = update_data.EntitySpace();
+		ddc::EntitySpace& space = update_data.EntitySpace();
 
 		if( m_requiresRegeneration )
 		{
-			DestroyChunks( entities );
+			DestroyChunks(space);
 
 			m_requiresRegeneration = false;
 		}
 
 		if( m_saveChunkImages )
 		{
-			SaveChunkImages( entities );
+			SaveChunkImages(space);
 
 			m_saveChunkImages = false;
 		}
 
-		const ddc::DataBuffer& chunks_data = update_data.Data();
+		auto chunks_data = update_data.Data();
 
-		const ddc::DataBuffer& player = update_data.Data( "player" );
+		auto player = update_data.Data( "player" );
 		auto player_transforms = player.Read<TransformComponent>();
 		
 		if (player_transforms.Size() == 0)
@@ -125,7 +125,7 @@ namespace dd
 
 		glm::vec2 player_offset = player_transforms[0].Position.xz;
 
-		GenerateChunks( entities, chunks_data, player_offset );
+		GenerateChunks(space, chunks_data, player_offset );
 
 		DD_TODO( "Hmm, this means that the first generated chunks won't be updated/rendered the first frame." );
 
@@ -139,14 +139,14 @@ namespace dd
 		{
 			if( m_enabled )
 			{
-				entities.AddTag( entities[i], ddc::Tag::Visible );
+				entities[i].AddTag( ddc::Tag::Visible );
 			}
 			else 
 			{
-				entities.RemoveTag( entities[i], ddc::Tag::Visible );
+				entities[i].RemoveTag( ddc::Tag::Visible );
 			}
 
-			UpdateChunk( entities, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
+			UpdateChunk(space, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
 		}
 	}
 
@@ -200,7 +200,7 @@ namespace dd
 		}
 	}
 
-	void TerrainSystem::GenerateChunks( ddc::EntitySpace& entities, const ddc::DataBuffer& data, glm::vec2 camera_pos )
+	void TerrainSystem::GenerateChunks( ddc::EntitySpace& space, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos )
 	{
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto entities = data.Entities();
@@ -235,7 +235,7 @@ namespace dd
 
 		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
-			entities.RemoveTag( entities[ i ], ddc::Tag::Visible );
+			entities[i].RemoveTag( ddc::Tag::Visible );
 
 			existing.insert( std::make_pair( chunks[ i ].Chunk->GetPosition(), entities[ i ] ) );
 		}
@@ -261,13 +261,13 @@ namespace dd
 
 		for( ddc::Entity entity : active )
 		{
-			entities.AddTag( entity, ddc::Tag::Visible );
+			entity.AddTag( ddc::Tag::Visible );
 		}
 
 		for( glm::vec2 pos : missing_chunks )
 		{
 			int lod = CalculateLOD( pos, camera_pos );
-			ddc::Entity created = CreateChunk( entities, pos, lod );
+			ddc::Entity created = CreateChunk( space, pos, lod );
 			existing.insert( std::make_pair( pos, created ) );
 		}
 	}
@@ -295,13 +295,13 @@ namespace dd
 		return entity;
 	}
 
-	void TerrainSystem::DestroyChunks( ddc::EntitySpace& entities )
+	void TerrainSystem::DestroyChunks( ddc::EntitySpace& space )
 	{
-		entities.ForAllWith<TerrainChunkComponent>( [&entities]( ddc::Entity entity, TerrainChunkComponent& chunk )
+		space.ForAllWith<TerrainChunkComponent>( [&space]( ddc::Entity entity, TerrainChunkComponent& chunk )
 		{
 			delete chunk.Chunk;
 			chunk.Chunk = nullptr;
-			entities.DestroyEntity( entity );
+			space.DestroyEntity( entity );
 		} );
 	}
 

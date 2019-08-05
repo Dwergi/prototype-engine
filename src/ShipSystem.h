@@ -21,8 +21,6 @@ namespace dd
 		ShipSystem();
 		ShipSystem( const ShipSystem& other ) = delete;
 
-		virtual void BindActions( InputKeyBindings& bindings ) override;
-
 		virtual void Initialize( ddc::EntitySpace& entities ) override {}
 		virtual void Update( const ddc::UpdateData& data ) override;
 		virtual void Shutdown( ddc::EntitySpace& entities ) override;
@@ -39,10 +37,8 @@ namespace dd
 		ddc::Entity m_lastShip;
 		ddr::MeshHandle m_shipMesh;
 
-		DenseMap<InputAction, bool> m_inputs;
 		bool m_enabled { false };
 	
-		void HandleInput( InputAction action, InputType type );
 		void UpdateShip( TransformComponent& transform, ShipComponent& ship, float delta_t );
 
 		void CreateShip( ddc::EntitySpace& entities );

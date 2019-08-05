@@ -164,21 +164,18 @@ namespace dd
 			transform_cmp->Update();
 		}
 
-		dd::Service<dd::InputKeyBindings>()->RegisterHandler(dd::InputAction::RESET_PHYSICS, 
-			[balls, ball_positions, &entities](dd::InputAction action, dd::InputType type)
+		dd::Service<dd::Input>()->AddHandler(dd::InputAction::RESET_PHYSICS, 
+			[balls, ball_positions, &entities]()
 			{
-				if (type == dd::InputType::Release)
+				for (size_t i = 0; i < balls.Size(); ++i)
 				{
-					for (size_t i = 0; i < balls.Size(); ++i)
-					{
-						dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(balls[i]);
-						transform->Position = ball_positions[i];
-						transform->Update();
+					dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(balls[i]);
+					transform->Position = ball_positions[i];
+					transform->Update();
 
-						dd::PhysicsSphereComponent* sphere = entities.Access<dd::PhysicsSphereComponent>(balls[i]);
-						sphere->Momentum = glm::vec3(0, 0, 0);
-						sphere->Resting = false;
-					}
+					dd::PhysicsSphereComponent* sphere = entities.Access<dd::PhysicsSphereComponent>(balls[i]);
+					sphere->Momentum = glm::vec3(0, 0, 0);
+					sphere->Resting = false;
 				}
 			});
 	}

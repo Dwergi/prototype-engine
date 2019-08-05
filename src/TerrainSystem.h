@@ -84,7 +84,7 @@ namespace dd
 
 		void UpdateChunk( ddc::EntitySpace& entities, ddc::Entity e, TerrainChunkComponent& chunk_cmp, BoundBoxComponent& bounds_cmp, 
 			TransformComponent& transform_cmp, ColourComponent& colour_cmp, glm::vec2 camera_pos );
-		void GenerateChunks( ddc::EntitySpace& entities, const ddc::DataBuffer& data, glm::vec2 camera_pos );
+		void GenerateChunks( ddc::EntitySpace& entities, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos );
 
 		void DestroyChunks( ddc::EntitySpace& entities );
 

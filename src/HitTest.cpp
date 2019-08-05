@@ -108,4 +108,9 @@ namespace ddm
 
 		return false;
 	}
+
+	bool BoxBoxIntersect(glm::vec2 a_min, glm::vec2 a_max, glm::vec2 b_min, glm::vec2 b_max)
+	{
+		return glm::all(glm::lessThanEqual(a_min, b_max)) && glm::all(glm::greaterThanEqual(a_max, b_min));
+	}
 }

@@ -749,6 +749,9 @@
     <ClInclude Include="src\Entity.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tweakable.h">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">

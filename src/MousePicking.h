@@ -49,8 +49,6 @@ namespace dd
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
 
-		virtual void BindActions( InputKeyBindings& bindings ) override;
-
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
 		virtual void RenderInit( ddc::EntitySpace& entities ) override;
@@ -62,7 +60,6 @@ namespace dd
 
 	private:
 
-		bool m_select { false };
 		bool m_enabled { false };
 		bool m_renderDebug { false };
 		bool m_rayTest { true };
@@ -98,9 +95,7 @@ namespace dd
 
 		ddm::Ray GetScreenRay( const ddr::ICamera& camera, float length ) const;
 
-		void HandleInput( InputAction action, InputType type );
-
 		ddc::Entity HitTestRender( const ddr::RenderData& data );
-		ddc::Entity HitTestRay( const ddr::RenderData& data );
+		ddc::Entity HitTestRay( const ddr::RenderData& data, bool select);
 	};
 }

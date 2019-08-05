@@ -11,7 +11,7 @@
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
 #include "ICamera.h"
-#include "IInputSource.h"
+#include "Input.h"
 #include "InputKeyBindings.h"
 #include "IWindow.h"
 #include "MeshComponent.h"
@@ -37,7 +37,7 @@ static dd::Service<ddr::ShaderManager> s_shaderManager;
 static dd::Service<ddr::MaterialManager> s_materialManager;
 
 static dd::Service<dd::IWindow> s_window;
-static dd::Service<dd::IInputSource> s_input;
+static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IAsyncHitTest> s_hitTest;
 
 namespace dd
@@ -53,31 +53,6 @@ namespace dd
 
 		RequireTag(ddc::Tag::Visible);
 		RequireTag(ddc::Tag::Dynamic);
-	}
-
-	void MousePicking::BindActions(InputKeyBindings& bindings)
-	{
-		auto handler = [this](InputAction action, InputType type)
-		{
-			HandleInput(action, type);
-		};
-
-		bindings.RegisterHandler(InputAction::SELECT_MESH, handler);
-		bindings.RegisterHandler(InputAction::TOGGLE_PICKING, handler);
-	}
-
-	void MousePicking::HandleInput(InputAction action, InputType type)
-	{
-		if (action == InputAction::SELECT_MESH && type == InputType::Release)
-		{
-			m_select = true;
-		}
-
-		if (action == InputAction::TOGGLE_PICKING && type == InputType::Release)
-		{
-			m_enabled = !m_enabled;
-			IDebugPanel::SetDebugPanelOpen(true);
-		}
 	}
 
 	static int GetPixelIndex(glm::vec2 mouse_pos)
@@ -162,7 +137,7 @@ namespace dd
 		}
 
 		// select
-		if (m_select)
+		if (s_input->GotInput(dd::InputAction::SELECT_MESH))
 		{
 			if (m_selected.IsValid())
 			{
@@ -177,6 +152,12 @@ namespace dd
 			}
 		}
 
+		if (s_input->GotInput(dd::InputAction::TOGGLE_PICKING))
+		{
+			m_enabled = !m_enabled;
+			IDebugPanel::SetDebugPanelOpen(true);
+		}
+
 		if (m_visualizeRay)
 		{
 			entities.AddTag(m_previousRay, ddc::Tag::Visible);
@@ -185,8 +166,6 @@ namespace dd
 		{
 			entities.RemoveTag(m_previousRay, ddc::Tag::Visible);
 		}
-
-		m_select = false;
 	}
 
 	void MousePicking::Render(const ddr::RenderData& render_data)
@@ -199,7 +178,8 @@ namespace dd
 		// do hit
 		if (m_rayTest)
 		{
-			m_hitEntity = HitTestRay(render_data);
+			bool select = s_input->GotInput(dd::InputAction::SELECT_MESH);
+			m_hitEntity = HitTestRay(render_data, select);
 		}
 		else
 		{
@@ -261,9 +241,9 @@ namespace dd
 		return entity;
 	}
 
-	ddc::Entity MousePicking::HitTestRay(const ddr::RenderData& data)
+	ddc::Entity MousePicking::HitTestRay(const ddr::RenderData& data, bool select)
 	{
-		const ddc::EntitySpace& entities = data.EntitySpace();
+		const ddc::EntitySpace& space = data.EntitySpace();
 
 		if (m_pendingHit.Valid)
 		{
@@ -334,9 +314,9 @@ namespace dd
 			}
 		}
 
-		if (m_select)
+		if (select)
 		{
-			dd::RayComponent* ray = entities.Access<dd::RayComponent>(m_previousRay);
+			dd::RayComponent* ray = m_previousRay.Access<dd::RayComponent>();
 			ray->Ray = screen_ray;
 			ray->Ray.Length = m_depth;
 		}
@@ -353,7 +333,7 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::DrawDebugInternal(ddc::EntitySpace& entities)
+	void MousePicking::DrawDebugInternal(ddc::EntitySpace& space)
 	{
 		ImGui::SetWindowPos(ImVec2(2.0f, ImGui::GetIO().DisplaySize.y - 100), ImGuiCond_FirstUseEver);
 
@@ -400,7 +380,7 @@ namespace dd
 		{
 			ImGui::Checkbox("Visualize Ray", &m_visualizeRay);
 
-			const dd::RayComponent* ray_cmp = entities.Get<dd::RayComponent>(m_previousRay);
+			const dd::RayComponent* ray_cmp = m_previousRay.Get<dd::RayComponent>();
 
 			ImGui::Value("Ray Origin", ray_cmp->Ray.Origin());
 			ImGui::Value("Ray Dir", ray_cmp->Ray.Direction());
@@ -412,7 +392,7 @@ namespace dd
 		{
 			if (m_focused.IsValid())
 			{
-				const dd::MeshComponent* mesh_cmp = entities.Get<MeshComponent>(m_focused);
+				const dd::MeshComponent* mesh_cmp = m_focused.Get<MeshComponent>();
 				if (mesh_cmp != nullptr)
 				{
 					const std::string& name = mesh_cmp->Mesh.Get()->Name();
@@ -423,7 +403,7 @@ namespace dd
 					ImGui::TextUnformatted("Mesh: <none>");
 				}
 
-				glm::vec3 mesh_pos = entities.Get<TransformComponent>(m_focused)->Position;
+				glm::vec3 mesh_pos = m_focused.Get<TransformComponent>()->Position;
 				ImGui::Value("Position", mesh_pos, "%.2f");
 			}
 			else
@@ -439,7 +419,7 @@ namespace dd
 		{
 			if (m_selected.IsValid())
 			{
-				const dd::MeshComponent* mesh_cmp = entities.Get<MeshComponent>(m_selected);
+				const dd::MeshComponent* mesh_cmp = m_selected.Get<MeshComponent>();
 				if (mesh_cmp != nullptr)
 				{
 					const std::string& name = mesh_cmp->Mesh.Get()->Name();
@@ -450,7 +430,7 @@ namespace dd
 					ImGui::TextUnformatted("Mesh: <none>");
 				}
 
-				glm::vec3 mesh_pos = entities.Get<TransformComponent>(m_selected)->Position;
+				glm::vec3 mesh_pos = m_selected.Get<TransformComponent>()->Position;
 				ImGui::Value("Position", mesh_pos, "%.2f");
 			}
 			else

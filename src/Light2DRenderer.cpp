@@ -11,11 +11,11 @@
 
 DD_TYPE_CPP(lux::Light2DComponent);
 
-namespace lux
+namespace d2d
 {
 	static dd::Timer s_timer;
 
-	Light2DRenderer::Light2DRenderer() :
+	LightRenderer::LightRenderer() :
 		Renderer("2D Lights")
 	{
 		RequireTag(ddc::Tag::Visible);
@@ -24,12 +24,12 @@ namespace lux
 		s_timer.Start();
 	}
 
-	void Light2DRenderer::RenderInit(ddc::EntitySpace& entities)
+	void LightRenderer::RenderInit(ddc::EntitySpace& entities)
 	{
 		m_shader = ddr::ShaderHandle("sprite");
 	}
 
-	void Light2DRenderer::Render(const ddr::RenderData& render_data)
+	void LightRenderer::Render(const ddr::RenderData& render_data)
 	{
 		auto lights = render_data.Get<lux::Light2DComponent>(); 
 		auto sprites = render_data.Get<dd::SpriteComponent>();

@@ -6,7 +6,7 @@
 #include "SpriteTileComponent.h" 
 #include "IWindow.h"
 
-namespace lux
+namespace d2d
 {
 	static dd::Service<dd::IWindow> s_window;
 
@@ -17,7 +17,7 @@ namespace lux
 		m_tileSize = tile_size;
 
 		RequireTag(ddc::Tag::Visible);
-		RequireRead<lux::SpriteTileComponent>();
+		RequireRead<d2d::SpriteTileComponent>();
 		RequireWrite<dd::SpriteComponent>();
 	}
 
@@ -69,7 +69,7 @@ namespace lux
 
 		for (int i = 0; i < update_data.Data().Size(); ++i)
 		{
-			const lux::SpriteTileComponent& sprite_tile_cmp = sprite_tiles[i];
+			const d2d::SpriteTileComponent& sprite_tile_cmp = sprite_tiles[i];
 			dd::SpriteComponent& sprite_cmp = sprites[i];
 
 			glm::vec2 sprite_pos_px = CoordToPixels(sprite_tile_cmp.Coordinate);

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "Array.h"
 #include "DoubleBuffer.h"
 #include "InputAction.h"
 #include "InputEvent.h"
@@ -28,7 +27,7 @@ namespace dd
 		IInputSource& SetCaptureMouse(bool capture);
 		bool IsMouseCaptured() const { return m_mouseCaptured; }
 
-		IInputSource& SetCentreMouse(bool centre) { m_mouseRecenter = true; }
+		IInputSource& SetCentreMouse(bool centre) { m_mouseRecenter = true; return *this; }
 
 		void GetEvents(IArray<InputEvent>& out) const { out = m_events.Read(); }
 

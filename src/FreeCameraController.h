@@ -24,8 +24,8 @@ namespace dd
 		FreeCameraController( const FreeCameraController& ) = delete;
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
+		virtual void Initialize(ddc::EntitySpace& space) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void BindActions( InputKeyBindings& bindings ) override;
 
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
@@ -47,9 +47,5 @@ namespace dd
 
 		bool m_enabled { true };
 		bool m_invert { false };
-		
-		DenseMap<InputAction, bool> m_inputs;
-
-		void HandleInput( InputAction action, InputType type );
 	};
 }

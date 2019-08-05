@@ -25,8 +25,6 @@ namespace ddr
 		BoundsRenderer();
 		~BoundsRenderer();
 
-		void BindKeys( dd::InputKeyBindings& bindings );
-
 		virtual void RenderInit( ddc::EntitySpace& entities ) override;
 		virtual void Render( const ddr::RenderData& data ) override;
 		virtual bool UsesAlpha() const { return true; }

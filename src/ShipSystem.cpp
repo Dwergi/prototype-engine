@@ -10,7 +10,7 @@
 #include "ShipSystem.h"
 
 #include "FPSCameraComponent.h"
-#include "InputKeyBindings.h"
+#include "Input.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -22,7 +22,7 @@
 
 namespace dd
 {
-	static const float s_shipMesh[] = 
+	static const float s_shipMesh[] =
 	{
 		// left edge
 		0.0f,0.0f,1.0f,		-1.0f,0.0f,0.0f,
@@ -45,63 +45,29 @@ namespace dd
 		-0.5f,0.0f,-1.0f,	0.0f,-1.0f,0.0f
 	};
 
+	static dd::Service<dd::Input> s_input;
+
 	ShipSystem::ShipSystem() :
-		ddc::System( "Ship System" )
+		ddc::System("Ship System")
 	{
-		m_inputs.Add( InputAction::FORWARD,		false );
-		m_inputs.Add( InputAction::BACKWARD,	false );
-		m_inputs.Add( InputAction::LEFT,		false );
-		m_inputs.Add( InputAction::RIGHT,		false );
-		m_inputs.Add( InputAction::UP,			false );
-		m_inputs.Add( InputAction::DOWN,		false );
-		m_inputs.Add( InputAction::BOOST,		false );
 	}
 
-	void ShipSystem::BindActions( InputKeyBindings& bindings )
+	void ShipSystem::Update(const ddc::UpdateData& data)
 	{
-		auto handle_input = [this]( InputAction action, InputType type )
-		{
-			HandleInput( action, type );
-		};
-
-		bindings.RegisterHandler( InputAction::FORWARD,		handle_input );
-		bindings.RegisterHandler( InputAction::BACKWARD,	handle_input );
-		bindings.RegisterHandler( InputAction::LEFT,		handle_input );
-		bindings.RegisterHandler( InputAction::RIGHT,		handle_input );
-		bindings.RegisterHandler( InputAction::UP,			handle_input );
-		bindings.RegisterHandler( InputAction::DOWN,		handle_input );
-		bindings.RegisterHandler( InputAction::BOOST,		handle_input );
-	}
-	
-	void ShipSystem::Update( const ddc::UpdateData& data )
-	{
-		if( !m_enabled )
+		if (!m_enabled)
 			return;
 
-		DD_TODO( "Uncomment" );
+		DD_TODO("Uncomment");
 
-	/*	entities.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
-		{
-			UpdateShip( entity, transform, ship, dt );
-		} );*/
+		/*	entities.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
+			{
+				UpdateShip( entity, transform, ship, dt );
+			} );*/
 	}
 
-	void ShipSystem::HandleInput( InputAction action, InputType type )
+	void ShipSystem::CreateShip(ddc::EntitySpace& entities)
 	{
-		bool* state = m_inputs.Find( action );
-		if( state == nullptr )
-			return;
-
-		if( type == InputType::Press )
-			*state = true;
-
-		if( type == InputType::Release )
-			*state = false;
-	}
-
-	void ShipSystem::CreateShip( ddc::EntitySpace& entities )
-	{
-		DD_TODO( "Uncomment" );
+		DD_TODO("Uncomment");
 		/*
 		EntityHandle entity = entities.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
 
@@ -126,7 +92,7 @@ namespace dd
 		ddr::Mesh* mesh = ddr::Mesh::Get( m_shipMesh );
 		mesh->SetMaterial(ddr::MaterialHandle( "mesh" ) );
 		dd::MakeUnitCube( *mesh );
-		
+
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
 		mesh_h.Get()->SetBoundBox( bounds );* /
 
@@ -148,53 +114,53 @@ namespace dd
 		m_lastShip = entity;*/
 	}
 
-	void ShipSystem::UpdateShip( TransformComponent& transform, ShipComponent& ship, float delta_t )
+	void ShipSystem::UpdateShip(TransformComponent& transform, ShipComponent& ship, float delta_t)
 	{
 		glm::vec3 current_velocity = ship.Velocity;
-		float current_speed = glm::length( current_velocity );
+		float current_speed = glm::length(current_velocity);
 		glm::vec3 current_position = transform.Position;
 		bool boosting = false;
 
-		glm::vec3 other_modifiers = glm::vec3( 0, 0, 0 );
+		glm::vec3 other_modifiers = glm::vec3(0, 0, 0);
 
-		glm::vec3 up = glm::vec3( 0, 1, 0 );
-		glm::vec3 right = glm::normalize( glm::cross( current_velocity, up ) );
+		glm::vec3 up = glm::vec3(0, 1, 0);
+		glm::vec3 right = glm::normalize(glm::cross(current_velocity, up));
 
-		if( m_inputs[InputAction::FORWARD] )
+		if (s_input->IsHeld(InputAction::FORWARD))
 			current_velocity *= 1.0f + (ship.Acceleration * delta_t);
 
-		if( m_inputs[InputAction::BACKWARD] )
+		if (s_input->IsHeld(InputAction::BACKWARD))
 			current_velocity *= 1.0f - (ship.Acceleration * delta_t);
 
-		if( m_inputs[InputAction::UP] )
+		if (s_input->IsHeld(InputAction::UP))
 			other_modifiers += up * current_speed * delta_t;
 
-		if( m_inputs[InputAction::DOWN] )
+		if (s_input->IsHeld(InputAction::DOWN))
 			other_modifiers -= up * current_speed * delta_t;
 
-		if( m_inputs[InputAction::RIGHT] )
+		if (s_input->IsHeld(InputAction::RIGHT))
 			other_modifiers += right * current_speed * delta_t;
 
-		if( m_inputs[InputAction::LEFT] )
+		if (s_input->IsHeld(InputAction::LEFT))
 			other_modifiers -= right * current_speed * delta_t;
 
-		if( m_inputs[InputAction::BOOST] && ship.BoostRemaining > 0 )
+		if (s_input->IsHeld(InputAction::BOOST) && ship.BoostRemaining > 0)
 		{
-			float boost_amount = ddm::min( ship.BoostRemaining, delta_t );
+			float boost_amount = ddm::min(ship.BoostRemaining, delta_t);
 			current_velocity *= 1.0f + (ship.Acceleration * ship.BoostFactor * boost_amount);
 			ship.BoostRemaining -= boost_amount;
 			boosting = true;
 		}
 		else
 		{
-			ship.BoostRemaining = ddm::min( ship.BoostRemaining + (1.0f / ship.BoostRechargeRate) * delta_t, ship.BoostMaximum );
+			ship.BoostRemaining = ddm::min(ship.BoostRemaining + (1.0f / ship.BoostRechargeRate) * delta_t, ship.BoostMaximum);
 		}
 
-		float speed = glm::length( current_velocity );
+		float speed = glm::length(current_velocity);
 		float max_speed = boosting ? ship.MaximumSpeed * ship.BoostFactor : ship.MaximumSpeed;
 
-		float clamped_speed = glm::clamp( speed, ship.MinimumSpeed, max_speed );
-		current_velocity = glm::normalize( current_velocity ) * clamped_speed;
+		float clamped_speed = glm::clamp(speed, ship.MinimumSpeed, max_speed);
+		current_velocity = glm::normalize(current_velocity) * clamped_speed;
 
 		glm::vec3 delta_v = current_velocity * delta_t;
 
@@ -208,15 +174,15 @@ namespace dd
 		//m_camera.SetDirection( m_camera.GetPosition() - transform.GetWorldPosition() );
 	}
 
-	void ShipSystem::Shutdown( ddc::EntitySpace& entities )
+	void ShipSystem::Shutdown(ddc::EntitySpace& entities)
 	{
 	}
 
-	void ShipSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void ShipSystem::DrawDebugInternal(ddc::EntitySpace& entities)
 	{
-		if( m_lastShip.IsValid() )
+		if (m_lastShip.IsValid())
 		{
-			DD_TODO( "Uncomment" );
+			DD_TODO("Uncomment");
 			/*ImGui::Checkbox( "Enabled", &m_enabled );
 
 			TransformComponent* transform = m_lastShip.Get<TransformComponent>().Write();

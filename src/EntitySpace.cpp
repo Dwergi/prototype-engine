@@ -240,4 +240,29 @@ namespace ddc
 
 		return m_entities[ e.ID ].Tags;
 	}
+
+	bool Entity::IsValid() const
+	{
+		return m_space != nullptr && Handle != ~0;
+	}
+
+	bool Entity::IsAlive() const
+	{
+		return m_space != nullptr && m_space->IsAlive(*this);
+	}
+
+	void Entity::AddTag(ddc::Tag tag) const
+	{
+		m_space->AddTag(*this, tag);
+	}
+
+	void Entity::RemoveTag(ddc::Tag tag) const
+	{
+		m_space->RemoveTag(*this, tag);
+	}
+
+	bool Entity::HasTag(ddc::Tag tag) const
+	{
+		return m_space->HasTag(*this, tag);
+	}
 }

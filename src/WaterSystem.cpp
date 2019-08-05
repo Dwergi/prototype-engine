@@ -103,7 +103,7 @@ namespace dd
 		return it->second;
 	}
 
-	static void PopulateWaterCache( const ddc::DataBuffer& water_entities )
+	static void PopulateWaterCache( const ddc::UpdateDataBuffer& water_entities )
 	{
 		s_waterCache.clear();
 

@@ -25,7 +25,8 @@ namespace ddc
 		// Allow the system to be updated for the given space. May be called multiple times. 
 		// If never called, then system will allow all spaces.
 		//
-		System& EnableForSpace(EntitySpace& space);
+		void EnableForSpace(const EntitySpace& space);
+		bool IsEnabledForSpace(const EntitySpace& space) const;
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 

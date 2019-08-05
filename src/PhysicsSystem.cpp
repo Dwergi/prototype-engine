@@ -131,7 +131,7 @@ namespace dd
 		transform.Update();
 	}
 
-	static bool IntersectStaticPlanes( const ddc::DataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
+	static bool IntersectStaticPlanes( const ddc::UpdateDataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
 		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
@@ -159,7 +159,7 @@ namespace dd
 		return false;
 	}
 
-	static bool IntersectStaticSpheres( const ddc::DataBuffer& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
+	static bool IntersectStaticSpheres( const ddc::UpdateDataBuffer& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
 		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
@@ -275,9 +275,9 @@ namespace dd
 
 		float delta_t = update.Delta();
 		
-		const ddc::DataBuffer& static_planes = update.Data( "static_planes" );
-		const ddc::DataBuffer& static_spheres = update.Data( "static_spheres" );
-		const ddc::DataBuffer& dynamic_spheres = update.Data( "dynamic_spheres" );
+		auto static_planes = update.Data( "static_planes" );
+		auto static_spheres = update.Data( "static_spheres" );
+		auto dynamic_spheres = update.Data( "dynamic_spheres" );
 
 		auto dynamic_sphere_transforms = dynamic_spheres.Write<dd::TransformComponent>();
 		auto dynamic_sphere_physics = dynamic_spheres.Write<dd::PhysicsSphereComponent>();

@@ -66,14 +66,14 @@ namespace lux
 
 	static ddc::Entity CreateSpriteEntity(ddc::EntitySpace& entities, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
 	{
-		ddc::Entity new_entity = entities.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent>();
+		ddc::Entity new_entity = entities.CreateEntity<dd::SpriteComponent, d2d::SpriteTileComponent>();
 		entities.AddTag(new_entity, ddc::Tag::Visible);
 
 		dd::SpriteComponent* sprite_cmp = entities.Access<dd::SpriteComponent>(new_entity);
 		sprite_cmp->Sprite = sprite_h;
 		sprite_cmp->ZIndex = z_index;
 
-		lux::SpriteTileComponent* sprite_tile_cmp = entities.Access<lux::SpriteTileComponent>(new_entity);
+		d2d::SpriteTileComponent* sprite_tile_cmp = entities.Access<d2d::SpriteTileComponent>(new_entity);
 		sprite_tile_cmp->Coordinate = coord;
 
 		return new_entity;
@@ -87,7 +87,7 @@ namespace lux
 		{
 			if (SpecialTiles::IsOneOf(tile_index, SpecialTiles::Solids))
 			{
-				entities.Add<dd::Box2DPhysicsComponent>(entity);
+				entities.Add<d2d::BoxPhysicsComponent>(entity);
 				entities.AddTag(entity, ddc::Tag::Static);
 			}
 		}

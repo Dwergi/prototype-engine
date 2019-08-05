@@ -15,7 +15,7 @@
 #include "HitTest.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
-#include "InputKeyBindings.h"
+#include "Input.h"
 #include "LightComponent.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -26,6 +26,7 @@
 
 static dd::Service<dd::IAsyncHitTest> s_hitTest;
 static dd::Service<ddc::MessageQueue> s_messageQueue;
+static dd::Service<dd::Input> s_input;
 
 namespace dd
 {
@@ -156,7 +157,7 @@ namespace dd
 	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
 		ddc::EntitySpace& entities = update.EntitySpace();
-		const std::vector<dd::InputAction>& actions = update.InputActions();
+		const std::vector<dd::InputAction>& actions = s_input->GetInputs();
 
 		if(std::find(actions.begin(), actions.end(), InputAction::SHOOT) != actions.end())
 		{

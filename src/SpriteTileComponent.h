@@ -1,6 +1,6 @@
 #pragma once
 
-namespace lux
+namespace d2d
 {
 	struct SpriteTileComponent
 	{
@@ -10,7 +10,7 @@ namespace lux
 		// scale of the tile, so eg. (2,2) occupies 4 tiles
 		glm::vec2 Scale { 1, 1 };
 
-		DD_BEGIN_CLASS(lux::SpriteTileComponent)
+		DD_BEGIN_CLASS(d2d::SpriteTileComponent)
 			DD_COMPONENT();
 
 			DD_MEMBER(Coordinate); 

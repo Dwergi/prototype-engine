@@ -1,21 +1,24 @@
 #pragma once
 
+#include "IDebugPanel.h"
+#include "SystemsSorting.h"
+
 namespace ddc
 {
 	struct System;
 	struct SystemNode;
 
-	struct SystemManager
+	struct SystemManager : dd::IDebugPanel
 	{
 		//
 		// Initialize all currently registered systems.
 		//
-		void Initialize();
+		void Initialize(EntitySpace& space);
 
 		//
 		// Shut down all currently registered systems.
 		//
-		void Shutdown();
+		void Shutdown(EntitySpace& space);
 
 		// 
 		// Register a system to be updated every frame.
@@ -23,9 +26,9 @@ namespace ddc
 		void Register(System& system);
 
 		//
-		// Update all registered systems with the given delta.
+		// Update all registered systems that are enabled for the given space with the given delta.
 		//
-		void Update(float delta_t);
+		void Update(EntitySpace& space, float delta_t);
 
 	private:
 
@@ -34,7 +37,12 @@ namespace ddc
 
 		bool m_drawSystemsGraph { false };
 
-		void UpdateSystem(System* system, std::vector<std::shared_future<void>> dependencies, float delta_t);
-		void UpdateSystemsWithTreeScheduling(float delta_t);
+		void UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t);
+		void UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t);
+
+		void DrawDebugInternal(ddc::EntitySpace& entities);
+
+		// Inherited via IDebugPanel
+		virtual const char* GetDebugTitle() const override { return "Systems"; }
 	};
 }

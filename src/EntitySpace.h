@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "MessageQueue.h"
 
 namespace ddc
 {
@@ -53,6 +54,12 @@ namespace ddc
 		// Access a component from the given entity by type ID.
 		//
 		void* AccessComponent( Entity entity, dd::ComponentID id ) const;
+
+		//
+		// Access the message queue of this entity space.
+		// 
+		ddc::MessageQueue& Messages() { return m_messages; }
+		const ddc::MessageQueue& Messages() const { return m_messages; }
 
 		//
 		// Access a component from the given entity.
@@ -223,7 +230,7 @@ namespace ddc
 
 		std::string m_name;
 
-		//virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		ddc::MessageQueue m_messages;
 	};
 
 	using ExpandType = int[];
@@ -296,17 +303,7 @@ namespace ddc
 			}
 		}
 	}
-
-	bool Entity::IsValid() const
-	{
-		return m_space != nullptr && Handle != ~0;
-	}
-
-	bool Entity::IsAlive() const
-	{
-		return m_space != nullptr && m_space->IsAlive(*this);
-	}
-
+	
 	template <typename TComponent>
 	TComponent* Entity::Access() const
 	{
@@ -335,20 +332,5 @@ namespace ddc
 	void Entity::Remove() const
 	{
 		m_space->Remove<TComponent>(*this);
-	}
-
-	void Entity::AddTag(ddc::Tag tag) const
-	{
-		m_space->AddTag(*this, tag);
-	}
-
-	void Entity::RemoveTag(ddc::Tag tag) const
-	{
-		m_space->RemoveTag(*this, tag);
-	}
-
-	bool Entity::HasTag(ddc::Tag tag) const
-	{
-		return m_space->HasTag(*this, tag);
 	}
 }

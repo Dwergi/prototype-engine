@@ -7,6 +7,7 @@
 #pragma once
 
 #include "IDebugPanel.h"
+#include "MessageQueue.h"
 #include "System.h"
 
 namespace dd
@@ -15,7 +16,7 @@ namespace dd
 	struct ParticleSystemComponent;
 	struct TransformComponent;
 
-	struct ParticleSystem : ddc::System, dd::IDebugPanel, dd::IHandlesInput
+	struct ParticleSystem : ddc::System, dd::IDebugPanel
 	{
 		ParticleSystem();
 		~ParticleSystem();
@@ -23,8 +24,6 @@ namespace dd
 		virtual void Initialize( ddc::EntitySpace& ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 		virtual void Shutdown( ddc::EntitySpace& ) override {}
-
-		void BindActions( dd::InputKeyBindings& input_bindings );
 
 		ParticleSystem( const ParticleSystem& ) = delete;
 		ParticleSystem( ParticleSystem&& ) = delete;

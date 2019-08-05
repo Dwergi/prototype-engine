@@ -14,6 +14,16 @@ namespace ddc
 	{
 	}
 
+	void System::EnableForSpace(const ddc::EntitySpace& space)
+	{
+	}
+
+	bool System::IsEnabledForSpace(const ddc::EntitySpace& space) const
+	{
+		DD_TODO("Think about this space enabling thing...");
+		return true;
+	}
+
 	bool System::CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const
 	{
 		for( const DataRequest* req : m_requests )

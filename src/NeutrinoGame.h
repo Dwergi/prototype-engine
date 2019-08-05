@@ -6,11 +6,13 @@ namespace neutrino
 {
 	struct NeutrinoGame : dd::IGame
 	{
-		virtual void Initialize(ddc::EntitySpace& entities) override;
-		virtual void Shutdown(ddc::EntitySpace& entities) override;
-		virtual void Update(ddc::EntitySpace& entities) override;
-		virtual void RenderUpdate(ddc::EntitySpace& entities) override;
+		virtual void Initialize(const dd::GameUpdateData& update_data) override;
+		virtual void Shutdown(const dd::GameUpdateData& update_data) override;
+		virtual void Update(const dd::GameUpdateData& update_data) override;
+		virtual void RenderUpdate(const dd::GameUpdateData& update_data) override;
 
 		virtual const char* GetTitle() const override { return "Neutrino"; }
+
+		virtual const std::vector<ddc::EntitySpace*>& GetEntitySpaces() const;
 	};
 }

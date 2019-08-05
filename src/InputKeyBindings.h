@@ -18,15 +18,19 @@ namespace dd
 
 		bool FindBinding(InputModeID mode, const InputEvent& evt, InputAction& out_action) const;
 
-		void BindKey(std::string mode_name, const InputEvent& evt, InputAction action);
-		void BindKey(InputModeFlags modes, const InputEvent& evt, InputAction action);
+		void BindKey(Key key, InputAction action);
+		void BindKey(Key key, InputAction action, std::string mode_name);
+		void BindKey(Key key, InputAction action, InputModeFlags modes);
+		void BindKey(Key key, ModifierFlags modifiers, InputAction action, std::string mode_name);
+		void BindKey(Key key, ModifierFlags modifiers, InputAction action, InputModeFlags modes);
 
 	private:
 
 		struct KeyBinding
 		{
 			dd::InputModeFlags Modes;
-			dd::InputEvent Event;
+			dd::Key Key;
+			dd::ModifierFlags Modifiers;
 			dd::InputAction Action;
 		};
 		

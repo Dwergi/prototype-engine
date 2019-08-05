@@ -2,7 +2,7 @@
 
 #include "System.h"
 
-namespace lux
+namespace d2d
 {
 	struct SpriteTileSystem : ddc::System
 	{

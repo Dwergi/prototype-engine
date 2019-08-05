@@ -6,12 +6,11 @@
 #include "SpriteTileComponent.h"
 #include "SpriteTileSystem.h"
 
-DD_TYPE_CPP(dd::Box2DPhysicsComponent);
-DD_TYPE_CPP(dd::Circle2DPhysicsComponent);
+DD_TYPE_CPP(d2d::BoxPhysicsComponent);
+DD_TYPE_CPP(d2d::CirclePhysicsComponent);
 
-dd::Service<lux::SpriteTileSystem> s_spriteTileSystem;
+dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
 
-#pragma optimize("",off)
 namespace dd
 {
 	Physics2DSystem::Physics2DSystem() :
@@ -19,18 +18,18 @@ namespace dd
 	{
 		RequireTag(ddc::Tag::Visible, "circles");
 		RequireTag(ddc::Tag::Dynamic, "circles");
-		RequireWrite<dd::Circle2DPhysicsComponent>("circles");
-		RequireWrite<lux::SpriteTileComponent>("circles");
+		RequireWrite<d2d::CirclePhysicsComponent>("circles");
+		RequireWrite<d2d::SpriteTileComponent>("circles");
 
 		RequireTag(ddc::Tag::Visible, "dynamic_boxes");
 		RequireTag(ddc::Tag::Dynamic, "dynamic_boxes");
-		RequireWrite<dd::Box2DPhysicsComponent>("dynamic_boxes");
-		RequireWrite<lux::SpriteTileComponent>("dynamic_boxes");
+		RequireWrite<d2d::BoxPhysicsComponent>("dynamic_boxes");
+		RequireWrite<d2d::SpriteTileComponent>("dynamic_boxes");
 
 		RequireTag(ddc::Tag::Visible, "static_boxes");
 		RequireTag(ddc::Tag::Static, "static_boxes");
-		RequireRead<dd::Box2DPhysicsComponent>("static_boxes");
-		RequireRead<lux::SpriteTileComponent>("static_boxes");
+		RequireRead<d2d::BoxPhysicsComponent>("static_boxes");
+		RequireRead<d2d::SpriteTileComponent>("static_boxes");
 	}
 
 	static glm::vec2 NearestPointBox(glm::vec2 pt, glm::vec2 box_min, glm::vec2 box_max)
@@ -64,12 +63,12 @@ namespace dd
 	void Physics2DSystem::Update(const ddc::UpdateData& update_data)
 	{
 		auto static_boxes = update_data.Data("static_boxes");
-		auto static_box_physics = static_boxes.Read<dd::Box2DPhysicsComponent>();
-		auto static_box_tiles = static_boxes.Read<lux::SpriteTileComponent>();
+		auto static_box_physics = static_boxes.Read<d2d::BoxPhysicsComponent>();
+		auto static_box_tiles = static_boxes.Read<d2d::SpriteTileComponent>();
 
 		auto circles = update_data.Data("circles");
-		auto circle_physics = circles.Write<dd::Circle2DPhysicsComponent>();
-		auto circle_tiles = circles.Write<lux::SpriteTileComponent>();
+		auto circle_physics = circles.Write<d2d::CirclePhysicsComponent>();
+		auto circle_tiles = circles.Write<d2d::SpriteTileComponent>();
 
 		float delta_t = update_data.Delta();
 
@@ -154,14 +153,14 @@ namespace dd
 
 		// TODO: BROKEN
 		auto dynamic_boxes = update_data.Data("dynamic_boxes");
-		auto dynamic_box_physics = dynamic_boxes.Write<dd::Box2DPhysicsComponent>();
-		auto dynamic_box_tiles = dynamic_boxes.Write<lux::SpriteTileComponent>();
+		auto dynamic_box_physics = dynamic_boxes.Write<d2d::BoxPhysicsComponent>();
+		auto dynamic_box_tiles = dynamic_boxes.Write<d2d::SpriteTileComponent>();
 
 		// dynamic boxes
 		for (int db = 0; db < dynamic_boxes.Size(); ++db)
 		{
-			dd::Box2DPhysicsComponent& db_physics = dynamic_box_physics[db];
-			lux::SpriteTileComponent& db_tile = dynamic_box_tiles[db];
+			d2d::BoxPhysicsComponent& db_physics = dynamic_box_physics[db];
+			d2d::SpriteTileComponent& db_tile = dynamic_box_tiles[db];
 
 			glm::vec2 tile_pos = db_tile.Coordinate;
 

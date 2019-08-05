@@ -9,6 +9,7 @@
 #include "FreeCameraController.h"
 #include "HitTestSystem.h"
 #include "Input.h"
+#include "InputKeyBindings.h"
 #include "LightComponent.h"
 #include "LightRenderer.h"
 #include "LinesRenderer.h"
@@ -21,6 +22,7 @@
 #include "RayRenderer.h"
 #include "ShakyCamera.h"
 #include "ShipSystem.h"
+#include "SystemManager.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "TerrainRenderer.h"
@@ -51,38 +53,45 @@ namespace neutrino
 	static dd::Service<dd::FrameTimer> s_frameTimer;
 	static dd::Service<ddc::SystemManager> s_systemManager;
 
-	static void SetCameraPos(dd::InputAction action, dd::InputType type)
+	enum class CameraPos
 	{
-		if (type != dd::InputType::Release)
-			return;
+		One,
+		Two,
+		Three,
+		Four,
+		IncreaseDepth,
+		DecreaseDepth
+	};
 
+	static void SetCameraPos(CameraPos pos)
+	{
 		s_player->SetRotation(0, 0);
 
 		const glm::vec3 cube_pos(10.5, 60.5, 10);
 
-		switch (action)
+		switch (pos)
 		{
-			case dd::InputAction::CAMERA_POS_1:
+		case CameraPos::One:
 				s_player->SetPosition(cube_pos - glm::vec3(0, 0, 0.5));
 				break;
 
-			case dd::InputAction::CAMERA_POS_2:
+			case CameraPos::Two:
 				s_player->SetPosition(cube_pos - glm::vec3(0, 0, 1));
 				break;
 
-			case dd::InputAction::CAMERA_POS_3:
+			case CameraPos::Three:
 				s_player->SetPosition(cube_pos - glm::vec3(0, 0, 2));
 				break;
 
-			case dd::InputAction::CAMERA_POS_4:
+			case CameraPos::Four:
 				s_player->SetPosition(cube_pos - glm::vec3(0, 0, 3));
 				break;
 
-			case dd::InputAction::DECREASE_DEPTH:
+			case CameraPos::IncreaseDepth:
 				s_player->SetPosition(s_player->GetPosition() + glm::vec3(0, 0, 1));
 				break;
 
-			case dd::InputAction::INCREASE_DEPTH:
+			case CameraPos::DecreaseDepth:
 				s_player->SetPosition(s_player->GetPosition() - glm::vec3(0, 0, 1));
 				break;
 		}
@@ -90,7 +99,8 @@ namespace neutrino
 
 	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::Input& input, float delta_t)
 	{
-		if (s_freeCamera->IsEnabled() && s_input->GetMode() == dd::InputMode::GAME)
+		DD_TODO("This shouldn't really be doing a string comparison...");
+		if (s_freeCamera->IsEnabled() && s_input->GetCurrentMode() == "game")
 		{
 			free_cam.UpdateMouse(s_inputSource->GetMousePosition());
 			free_cam.UpdateScroll(s_inputSource->GetMouseScroll());
@@ -99,13 +109,10 @@ namespace neutrino
 		shaky_cam.Update(delta_t);
 	}
 
-	static void ToggleFreeCam(dd::InputAction action, dd::InputType type)
+	static void ToggleFreeCam()
 	{
-		if (action == dd::InputAction::TOGGLE_FREECAM && type == dd::InputType::Release)
-		{
-			s_freeCamera->Enable(!s_freeCamera->IsEnabled());
-			//s_shipSystem->Enable(!s_shipSystem->IsEnabled());
-		}
+		s_freeCamera->Enable(!s_freeCamera->IsEnabled());
+		//s_shipSystem->Enable(!s_shipSystem->IsEnabled());
 	}
 
 	static void CreateEntities(ddc::EntitySpace& entities)
@@ -119,7 +126,7 @@ namespace neutrino
 			s_player->SetVerticalFOV(glm::radians(45.0f));
 
 			DD_TODO("Shaky camera should be a component/system pair.");
-			dd::Services::Register(new dd::ShakyCamera(s_player, s_inputBindings));
+			dd::Services::Register(new dd::ShakyCamera(s_player, s_input));
 			dd::Services::RegisterInterface<ddr::ICamera>(s_shakyCamera.Get());
 
 			s_debugUI->RegisterDebugPanel(s_shakyCamera);
@@ -188,7 +195,7 @@ namespace neutrino
 		//dd::TestEntities::CreatePhysicsPlaneTestScene();
 	}
 
-	void NeutrinoGame::Initialize(ddc::EntitySpace& entities)
+	void NeutrinoGame::Initialize(const dd::GameUpdateData& update_data)
 	{
 		dd::SwarmSystem& swarm_system = dd::Services::Register(new dd::SwarmSystem());
 
@@ -196,7 +203,6 @@ namespace neutrino
 		//trench_system.CreateRenderResources();
 
 		dd::Services::Register(new dd::FreeCameraController());
-		s_freeCamera->BindActions(*s_inputBindings);
 
 		dd::HitTestSystem* hit_testing_system = new dd::HitTestSystem();
 		dd::Services::RegisterInterface<dd::IAsyncHitTest>(hit_testing_system);
@@ -213,10 +219,8 @@ namespace neutrino
 		dd::BulletSystem& bullet_system = dd::Services::Register(new dd::BulletSystem());
 		bullet_system.DependsOn(*s_freeCamera);
 		bullet_system.DependsOn(*hit_testing_system);
-		bullet_system.BindActions(*s_inputBindings);
 
 		dd::ParticleSystem& particle_system = dd::Services::Register(new dd::ParticleSystem());
-		particle_system.BindActions(*s_inputBindings);
 
 		dd::TreeSystem& tree_system = dd::Services::Register(new dd::TreeSystem());
 
@@ -233,25 +237,54 @@ namespace neutrino
 		s_systemManager->Register(tree_system);
 		s_systemManager->Register(water_system);
 
-		DD_TODO("Fix input bindings");
-		/*s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
-		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_1, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_2, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_3, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_4, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::INCREASE_DEPTH, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::DECREASE_DEPTH, &SetCameraPos);*/
+		dd::InputModeFlags all_modes;
+		all_modes.Fill();
+
+		s_inputBindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		s_inputBindings->BindKey(dd::Key::F1, dd::InputAction::TOGGLE_FREECAM);
+		s_inputBindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_BOUNDS);
+		s_inputBindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
+		s_inputBindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
+		s_inputBindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
+		s_inputBindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
+		s_inputBindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
+		s_inputBindings->BindKey(dd::Key::R, dd::InputAction::ADD_MINOR_TRAUMA);
+		s_inputBindings->BindKey(dd::Key::T, dd::InputAction::ADD_MAJOR_TRAUMA);
+		s_inputBindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
+		s_inputBindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
+		s_inputBindings->BindKey(dd::Key::KEY_1, dd::InputAction::CAMERA_POS_1);
+		s_inputBindings->BindKey(dd::Key::KEY_2, dd::InputAction::CAMERA_POS_2);
+		s_inputBindings->BindKey(dd::Key::KEY_3, dd::InputAction::CAMERA_POS_3);
+		s_inputBindings->BindKey(dd::Key::KEY_4, dd::InputAction::CAMERA_POS_4);
+		s_inputBindings->BindKey(dd::Key::HOME, dd::InputAction::DECREASE_DEPTH);
+		s_inputBindings->BindKey(dd::Key::END, dd::InputAction::INCREASE_DEPTH);
+		s_inputBindings->BindKey(dd::Key::PAUSE, dd::InputAction::PAUSE);
+		s_inputBindings->BindKey(dd::Key::PAGE_DOWN, dd::InputAction::TIME_SCALE_DOWN);
+		s_inputBindings->BindKey(dd::Key::PAGE_UP, dd::InputAction::TIME_SCALE_UP);
+		s_inputBindings->BindKey(dd::Key::E, dd::InputAction::TOGGLE_ENTITY_DATA, "debug");
+		s_inputBindings->BindKey(dd::Key::F3, dd::InputAction::TOGGLE_PICKING, "debug");
+		s_inputBindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SELECT_MESH, "debug");
+		s_inputBindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		s_inputBindings->BindKey(dd::Key::P, dd::InputAction::RESET_PHYSICS, "game");
+		s_inputBindings->BindKey(dd::Key::ESCAPE, dd::InputAction::EXIT);
+		s_inputBindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_CONSOLE, "debug");
+
+		s_input->AddHandler(dd::InputAction::TOGGLE_FREECAM, dd::InputType::Release, &ToggleFreeCam);
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_1, dd::InputType::Release, []() { SetCameraPos(CameraPos::One); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_2, dd::InputType::Release, []() { SetCameraPos(CameraPos::Two); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_3, dd::InputType::Release, []() { SetCameraPos(CameraPos::Three); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_4, dd::InputType::Release, []() { SetCameraPos(CameraPos::Four); });
+		s_input->AddHandler(dd::InputAction::INCREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::IncreaseDepth); });
+		s_input->AddHandler(dd::InputAction::DECREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::DecreaseDepth); });
 
 		ddr::ParticleSystemRenderer& particle_renderer = dd::Services::Register(new ddr::ParticleSystemRenderer());
 
 		dd::MousePicking& mouse_picking = dd::Services::Register(new dd::MousePicking());
-		mouse_picking.BindActions(*s_inputBindings);
 
 		ddr::MeshRenderer& mesh_renderer = dd::Services::Register(new ddr::MeshRenderer());
 		ddr::LightRenderer& light_renderer = dd::Services::Register(new ddr::LightRenderer());
 
 		ddr::BoundsRenderer& bounds_renderer = dd::Services::Register(new ddr::BoundsRenderer());
-		bounds_renderer.BindKeys(*s_inputBindings);
 
 		ddr::RayRenderer& ray_renderer = dd::Services::Register(new ddr::RayRenderer());
 
@@ -286,22 +319,29 @@ namespace neutrino
 		s_debugUI->RegisterDebugPanel(tree_system);
 		s_debugUI->RegisterDebugPanel(water_system);
 
-		CreateEntities(entities);
+		CreateEntities(update_data.EntitySpace());
 	}
 
-	void NeutrinoGame::Update(ddc::EntitySpace& entities)
+	void NeutrinoGame::Update(const dd::GameUpdateData& update_data)
 	{
 	}
 
-	void NeutrinoGame::RenderUpdate(ddc::EntitySpace& entities)
+	void NeutrinoGame::RenderUpdate(const dd::GameUpdateData& update_data)
 	{
 		s_player->SetSize(s_window->GetSize());
 
 		UpdateFreeCam(s_freeCamera, s_shakyCamera, s_input, s_frameTimer->AppDelta());
 	}
 
-	void NeutrinoGame::Shutdown(ddc::EntitySpace& entities)
+	void NeutrinoGame::Shutdown(const dd::GameUpdateData& entities)
 	{
 
+	}
+
+	std::vector<ddc::EntitySpace*> s_spaces;
+
+	const std::vector<ddc::EntitySpace*>& NeutrinoGame::GetEntitySpaces() const
+	{
+		return s_spaces;
 	}
 }

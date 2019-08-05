@@ -2,7 +2,7 @@
 #include "ShakyCamera.h"
 
 #include "FPSCameraComponent.h"
-#include "InputKeyBindings.h"
+#include "Input.h"
 
 #include "glm/gtc/noise.hpp"
 
@@ -14,15 +14,15 @@ namespace dd
 	float ShakyCamera::MaximumRoll = 5.0f;
 	float ShakyCamera::SpeedMultiplier = 25.0f;
 	
-	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, InputKeyBindings& bindings ) :
+	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, Input& input ) :
 		m_sourceCamera( camera )
 	{
-		bindings.RegisterHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]() 
+		input.AddHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]()
 		{ 
 			AddTrauma(0.25f); 
 		} );
 
-		bindings.RegisterHandler( dd::InputAction::ADD_MAJOR_TRAUMA, [this]()
+		input.AddHandler( dd::InputAction::ADD_MAJOR_TRAUMA, [this]()
 		{
 			AddTrauma(1);
 		} );

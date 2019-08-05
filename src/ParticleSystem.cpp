@@ -11,7 +11,7 @@
 #include "BulletComponent.h"
 #include "ParticleSystemComponent.h"
 #include "DataRequest.h"
-#include "InputKeyBindings.h"
+#include "Input.h"
 #include "ParticleSystemComponent.h"
 #include "TransformComponent.h"
 #include "UpdateData.h"
@@ -23,6 +23,9 @@
 namespace dd
 {
 	static const glm::vec3 s_gravity( 0, -9.81, 0 );
+
+	// TODO: There's a bit too many of these spraffed around now.
+	static dd::Service<dd::Input> s_input;
 
 	ParticleSystem::ParticleSystem() :
 		ddc::System( "Particles" )
@@ -38,22 +41,12 @@ namespace dd
 
 	void ParticleSystem::Initialize( ddc::EntitySpace& entities )
 	{
-		entities.Messages().Subscribe( dd::MessageType::BulletHit, [this]( Message msg ) { OnBulletHitMessage( msg ); } );
+		entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
+
+		s_input->AddHandler(dd::InputAction::START_PARTICLE, [this](){ m_startEmitting = true; });
 	}
 	
-	void ParticleSystem::BindActions( dd::InputKeyBindings& bindings )
-	{
-		DD_TODO("Fix key bindings!");
-		/*bindings.RegisterHandler( dd::InputAction::START_PARTICLE, [this]( dd::InputAction action, dd::InputType type )
-		{
-			if( type == dd::InputType::Release )
-			{
-				m_startEmitting = true;
-			}
-		} );*/
-	}
-
-	void ParticleSystem::OnBulletHitMessage( dd::Message msg )
+	void ParticleSystem::OnBulletHitMessage( ddc::Message msg )
 	{
 		dd::BulletHitMessage payload = msg.GetPayload<dd::BulletHitMessage>();
 		SpawnRequest req;
@@ -65,7 +58,7 @@ namespace dd
 	
 	void ParticleSystem::Update( const ddc::UpdateData& update )
 	{
-		const ddc::DataBuffer& data = update.Data();
+		auto data = update.Data();
 		ddc::EntitySpace& entities = update.EntitySpace();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();

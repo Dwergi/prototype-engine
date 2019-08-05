@@ -127,7 +127,8 @@ namespace dd
 
 	EntityVisualizer::EntityVisualizer()
 	{
-		s_input->RegisterActionHandler(InputAction::TOGGLE_ENTITY_DATA, [this]()
+		s_input->AddHandler(InputAction::TOGGLE_ENTITY_DATA, InputType::Release, 
+			[this]()
 			{
 				SetDebugPanelOpen(!IsDebugPanelOpen());
 			});
