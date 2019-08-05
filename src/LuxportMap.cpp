@@ -8,7 +8,6 @@
 #include "SpriteSheet.h"
 #include "SpriteComponent.h" 
 #include "SpriteTileComponent.h"
-#include "World.h"
 
 #include <fmt/format.h>
 
@@ -65,22 +64,22 @@ namespace lux
 
 	static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 
-	static ddc::Entity CreateSpriteEntity(ddc::World& world, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
+	static ddc::Entity CreateSpriteEntity(ddc::EntitySpace& entities, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
 	{
-		ddc::Entity new_entity = world.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent>();
-		world.AddTag(new_entity, ddc::Tag::Visible);
+		ddc::Entity new_entity = entities.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent>();
+		entities.AddTag(new_entity, ddc::Tag::Visible);
 
-		dd::SpriteComponent* sprite_cmp = world.Access<dd::SpriteComponent>(new_entity);
+		dd::SpriteComponent* sprite_cmp = entities.Access<dd::SpriteComponent>(new_entity);
 		sprite_cmp->Sprite = sprite_h;
 		sprite_cmp->ZIndex = z_index;
 
-		lux::SpriteTileComponent* sprite_tile_cmp = world.Access<lux::SpriteTileComponent>(new_entity);
+		lux::SpriteTileComponent* sprite_tile_cmp = entities.Access<lux::SpriteTileComponent>(new_entity);
 		sprite_tile_cmp->Coordinate = coord;
 
 		return new_entity;
 	}
 
-	void LuxportMap::HandleSpecialTiles(ddc::World& world, ddc::Entity entity, std::string tileset, int tile_index)
+	void LuxportMap::HandleSpecialTiles(ddc::EntitySpace& entities, ddc::Entity entity, std::string tileset, int tile_index)
 	{
 		const bool solid_tileset = tileset == SpecialTiles::SolidTileSet;
 
@@ -88,8 +87,8 @@ namespace lux
 		{
 			if (SpecialTiles::IsOneOf(tile_index, SpecialTiles::Solids))
 			{
-				world.Add<dd::Box2DPhysicsComponent>(entity);
-				world.AddTag(entity, ddc::Tag::Static);
+				entities.Add<dd::Box2DPhysicsComponent>(entity);
+				entities.AddTag(entity, ddc::Tag::Static);
 			}
 		}
 
@@ -103,20 +102,20 @@ namespace lux
 
 			if (tile_index == SpecialTiles::End)
 			{
-				lux::Light2DComponent& light = world.Add<lux::Light2DComponent>(entity);
+				lux::Light2DComponent& light = entities.Add<lux::Light2DComponent>(entity);
 				light.Type = lux::LightType::Exit;
 				m_end = entity;
 			}
 
 			if (SpecialTiles::IsOneOf(tile_index, SpecialTiles::RedLights))
 			{
-				lux::Light2DComponent& light = world.Add<lux::Light2DComponent>(entity);
+				lux::Light2DComponent& light = entities.Add<lux::Light2DComponent>(entity);
 				light.Type = lux::LightType::Red;
 			}
 
 			if (SpecialTiles::IsOneOf(tile_index, SpecialTiles::YellowLights))
 			{
-				lux::Light2DComponent& light = world.Add<lux::Light2DComponent>(entity);
+				lux::Light2DComponent& light = entities.Add<lux::Light2DComponent>(entity);
 				light.Type = lux::LightType::Yellow;
 			}
 		}
@@ -128,7 +127,7 @@ namespace lux
 		m_folder = fmt::format("map{}\\", index);
 	}
 
-	void LuxportMap::LoadLayer(ddc::World& world, int layer)
+	void LuxportMap::LoadLayer(ddc::EntitySpace& entities, int layer)
 	{
 		std::string filename = fmt::format("{}layer_{}.csv", m_folder, layer);
 		if (!dd::File::Exists(filename))
@@ -167,9 +166,9 @@ namespace lux
 				if (!number.empty())
 				{
 					int tile_index = atoi(number.c_str());
-					ddc::Entity created = CreateSpriteEntity(world, spritesheet->Get(tile_index), coord, layer);
+					ddc::Entity created = CreateSpriteEntity(entities, spritesheet->Get(tile_index), coord, layer);
 
-					HandleSpecialTiles(world, created, tileset_name, tile_index);
+					HandleSpecialTiles(entities, created, tileset_name, tile_index);
 
 					m_entities.push_back(created);
 					number.clear();
@@ -189,25 +188,25 @@ namespace lux
 		}
 	}
 
-	void LuxportMap::Load(ddc::World& world)
+	void LuxportMap::Load(ddc::EntitySpace& entities)
 	{
 		const int MAX_LAYERS = 5;
 
 		for (int i = 0; i < MAX_LAYERS; ++i)
 		{
-			LoadLayer(world, i);
+			LoadLayer(entities, i);
 		}
 
 		DD_ASSERT(m_start.IsValid());
 		DD_ASSERT(m_end.IsValid());
 	}
 
-	void LuxportMap::Unload(ddc::World& world)
+	void LuxportMap::Unload(ddc::EntitySpace& entities)
 	{
 		for (ddc::Entity e : m_entities)
 		{
-			world.RemoveTag(e, ddc::Tag::Visible);
-			world.DestroyEntity(e);
+			entities.RemoveTag(e, ddc::Tag::Visible);
+			entities.DestroyEntity(e);
 		}
 		m_entities.clear();
 	}

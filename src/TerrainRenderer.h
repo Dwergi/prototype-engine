@@ -15,7 +15,7 @@ namespace dd
 
 namespace ddc
 {
-	struct World;
+	struct EntitySpace;
 }
 
 namespace ddr
@@ -29,12 +29,12 @@ namespace ddr
 		//
 		// Initialize render resources for the terrain system.
 		//
-		virtual void RenderInit( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
 
 		//
 		// Update terrain chunks on the render thread.
 		//
-		virtual void RenderUpdate( ddc::World& world ) override;
+		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
 
 		//
 		// Commit uniforms to the renderer.
@@ -51,6 +51,6 @@ namespace ddr
 		const dd::TerrainParameters& m_params;
 		Wireframe* m_wireframe { nullptr };
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

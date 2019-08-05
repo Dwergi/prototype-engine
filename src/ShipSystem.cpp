@@ -10,7 +10,7 @@
 #include "ShipSystem.h"
 
 #include "FPSCameraComponent.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -19,7 +19,6 @@
 #include "Shader.h"
 #include "ShipComponent.h"
 #include "TransformComponent.h"
-#include "World.h"
 
 namespace dd
 {
@@ -58,7 +57,7 @@ namespace dd
 		m_inputs.Add( InputAction::BOOST,		false );
 	}
 
-	void ShipSystem::BindActions( InputBindings& bindings )
+	void ShipSystem::BindActions( InputKeyBindings& bindings )
 	{
 		auto handle_input = [this]( InputAction action, InputType type )
 		{
@@ -81,7 +80,7 @@ namespace dd
 
 		DD_TODO( "Uncomment" );
 
-	/*	world.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
+	/*	entities.ForAllWithReadable<TransformComponent, ShipComponent>( [this, dt]( auto entity, auto transform, auto ship )
 		{
 			UpdateShip( entity, transform, ship, dt );
 		} );*/
@@ -93,22 +92,22 @@ namespace dd
 		if( state == nullptr )
 			return;
 
-		if( type == InputType::PRESSED )
+		if( type == InputType::Press )
 			*state = true;
 
-		if( type == InputType::RELEASED )
+		if( type == InputType::Release )
 			*state = false;
 	}
 
-	void ShipSystem::CreateShip( ddc::World& world )
+	void ShipSystem::CreateShip( ddc::EntitySpace& entities )
 	{
 		DD_TODO( "Uncomment" );
 		/*
-		EntityHandle entity = world.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
+		EntityHandle entity = entities.CreateEntity<TransformComponent, MeshComponent, ShipComponent>();
 
 		glm::mat4 transform = glm::translate( glm::vec3( 0, 2.5, 10 ) );
 
-		TransformComponent* transform_cmp = world.GetWritable<TransformComponent>( entity );
+		TransformComponent* transform_cmp = entities.GetWritable<TransformComponent>( entity );
 		transform_cmp->Local = transform;
 
 		ddr::ShaderHandle shader = ddr::s_shaderManager->Load( "mesh" );
@@ -131,12 +130,12 @@ namespace dd
 		/ *mesh_h.Get()->SetData( s_shipMesh, sizeof( s_shipMesh ), 6 );
 		mesh_h.Get()->SetBoundBox( bounds );* /
 
-		MeshComponent* mesh_cmp = world.GetWritable<MeshComponent>( entity );
+		MeshComponent* mesh_cmp = entities.GetWritable<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_shipMesh;
 		mesh_cmp->Colour = glm::vec4( 1, 0, 0, 1 );
 		mesh_cmp->Hidden = false;
 
-		ShipComponent* ship_cmp = world.GetWritable<ShipComponent>( entity );
+		ShipComponent* ship_cmp = entities.GetWritable<ShipComponent>( entity );
 		ship_cmp->Acceleration = 5.0f;
 		ship_cmp->Velocity = glm::vec3( 0, 0, 1 );
 		ship_cmp->BoostFactor = 2.0f;
@@ -209,11 +208,11 @@ namespace dd
 		//m_camera.SetDirection( m_camera.GetPosition() - transform.GetWorldPosition() );
 	}
 
-	void ShipSystem::Shutdown( ddc::World& world )
+	void ShipSystem::Shutdown( ddc::EntitySpace& entities )
 	{
 	}
 
-	void ShipSystem::DrawDebugInternal( ddc::World& world )
+	void ShipSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		if( m_lastShip.IsValid() )
 		{

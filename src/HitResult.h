@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "Entity.h"
 #include "Ray.h"
 
 namespace dd

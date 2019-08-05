@@ -22,7 +22,7 @@ namespace ddr
 
 		SpriteRenderer();
 
-		virtual void RenderInit(ddc::World& world) override;
+		virtual void RenderInit(ddc::EntitySpace& entities) override;
 		virtual bool UsesAlpha() const override { return true; }
 		virtual void Render(const ddr::RenderData& data);
 

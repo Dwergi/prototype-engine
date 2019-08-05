@@ -41,16 +41,16 @@ namespace dd
 		m_noiseParams.Wavelength = 32;
 	}
 
-	ddc::Entity WaterSystem::CreateWaterEntity( ddc::World& world, glm::vec2 chunk_pos ) const
+	ddc::Entity WaterSystem::CreateWaterEntity( ddc::EntitySpace& entities, glm::vec2 chunk_pos ) const
 	{
-		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
-		world.AddTag( entity, ddc::Tag::Visible );
+		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
+		entities.AddTag( entity, ddc::Tag::Visible );
 
-		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+		dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 		transform->Position = glm::vec3( chunk_pos.x, m_waterHeight, chunk_pos.y );
 		transform->Update();
 
-		dd::WaterComponent* water = world.Access<dd::WaterComponent>( entity );
+		dd::WaterComponent* water = entities.Access<dd::WaterComponent>( entity );
 		water->TerrainChunkPosition = chunk_pos;
 
 		std::string mesh_name = fmt::format( "water_{}x{}", chunk_pos.x, chunk_pos.y );
@@ -60,12 +60,12 @@ namespace dd
 		mesh->SetMaterial( ddr::MaterialHandle("water") );
 		mesh->UseBVH( false );
 
-		dd::ColourComponent* colour = world.Access<dd::ColourComponent>( entity );
+		dd::ColourComponent* colour = entities.Access<dd::ColourComponent>( entity );
 		colour->Colour = glm::vec4( 0, 0, 1, 0.5 );
 
 		const float vertex_distance = m_terrainParams.ChunkSize / dd::WaterComponent::VertexCount;
 
-		dd::BoundBoxComponent* bound_box = world.Access<dd::BoundBoxComponent>( entity );
+		dd::BoundBoxComponent* bound_box = entities.Access<dd::BoundBoxComponent>( entity );
 		bound_box->BoundBox.Min = glm::vec3( 0 );
 		bound_box->BoundBox.Max = glm::vec3( vertex_distance * dd::WaterComponent::VertexCount, 0, vertex_distance * dd::WaterComponent::VertexCount );
 
@@ -86,7 +86,7 @@ namespace dd
 		return entity;
 	}	
 
-	void WaterSystem::Initialize( ddc::World& world )
+	void WaterSystem::Initialize( ddc::EntitySpace& entities )
 	{
 	}
 
@@ -128,7 +128,7 @@ namespace dd
 		auto water = update_data.Data( "water" );
 		PopulateWaterCache( water );
 
-		ddc::World& world = update_data.World();
+		ddc::EntitySpace& entities = update_data.EntitySpace();
 
 		const ddm::Plane water_plane( glm::vec3( 0, m_waterHeight, 0 ), glm::vec3( 0, -1, 0 ) );
 
@@ -154,14 +154,14 @@ namespace dd
 			ddc::Entity water_entity = FindWater( terrain_chunk->GetPosition() );
 			if( !water_entity.IsValid() )
 			{
-				water_entity = CreateWaterEntity( update_data.World(), terrain_chunk->GetPosition() );
+				water_entity = CreateWaterEntity( update_data.EntitySpace(), terrain_chunk->GetPosition() );
 
 				++m_waterChunks;
 			}
 		}
 	}
 
-	void WaterSystem::DrawDebugInternal( ddc::World& world )
+	void WaterSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::Value( "Chunks", m_waterChunks );
 		ImGui::DragFloat( "Water Height", &m_waterHeight, 0.1, 0, m_terrainParams.HeightRange, "%.1f" );

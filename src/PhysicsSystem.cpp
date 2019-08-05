@@ -35,7 +35,7 @@ namespace dd
 		RequireTag( ddc::Tag::Static, "static_planes" );
 	}
 
-	void PhysicsSystem::Initialize( ddc::World& world )
+	void PhysicsSystem::Initialize( ddc::EntitySpace& entities )
 	{
 
 	}
@@ -327,7 +327,7 @@ namespace dd
 		}
 	}
 
-	void PhysicsSystem::DrawDebugInternal( ddc::World& world )
+	void PhysicsSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::DragFloat3( "Gravity", glm::value_ptr( m_gravity ) );
 	}

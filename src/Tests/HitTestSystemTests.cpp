@@ -3,7 +3,6 @@
 
 #include "HitTestSystem.h"
 #include "JobSystem.h"
-#include "World.h"
 
 TEST_CASE( "[HitTestSystem] Execute Hit" )
 {

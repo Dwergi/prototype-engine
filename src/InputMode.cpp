@@ -1,34 +1,33 @@
 //
-// InputMode.cpp
+// InputModeConfig.cpp
 // Copyright (C) Sebastian Nordgren 
 // August 3rd 2019
 //
 
 #include "PCH.h"
-#include "InputSystem.h"
+#include "Input.h"
 
 #include "DebugUI.h"
-#include "IInputSource.h"
-#include "InputBindings.h"
 #include "IWindow.h"
 
 #include <imgui/imgui.h>
 
 namespace dd
 {
-	InputMode InputMode::s_modes[MAX_MODES];
-	int16 InputMode::s_used = 0;
+	InputModeConfig InputModeConfig::s_modes[MAX_MODES];
+	uint8 InputModeConfig::s_used = 0;
 
-	InputMode& InputMode::InputMode::Create(std::string name)
+	InputModeConfig& InputModeConfig::InputModeConfig::Create(std::string name)
 	{
-		for (int i = 0; i < s_used; ++i)
+		InputModeConfig* existing = Find(name);
+		if (existing != nullptr)
 		{
-			DD_ASSERT(name != s_modes[s_used].m_name, "Duplicate name given for input mode: %s", name.c_str());
+			return *existing;
 		}
 
-		DD_ASSERT(s_used < InputMode::MAX_MODES);
+		DD_ASSERT(s_used < InputModeConfig::MAX_MODES);
 
-		InputMode& new_mode = s_modes[s_used];
+		InputModeConfig& new_mode = s_modes[s_used];
 		new_mode.m_index = s_used;
 		new_mode.m_name = name;
 
@@ -37,7 +36,7 @@ namespace dd
 		return new_mode;
 	}
 
-	InputMode* InputMode::Find(std::string name)
+	InputModeConfig* InputModeConfig::Find(std::string name)
 	{
 		for (int i = 0; i < s_used; ++i)
 		{
@@ -50,26 +49,18 @@ namespace dd
 		return nullptr;
 	}
 
-	InputMode* InputMode::Access(int16 id)
+	InputModeConfig* InputModeConfig::Access(InputModeID id)
 	{
-		if (id == 0 || id >= (1 << MAX_MODES))
-		{
-			return nullptr;
-		}
+		DD_ASSERT(id % 2 == 0);
 
-		int16 index = 0;
+		uint8 index = 0;
 		while (id > 1)
 		{
 			id = id >> 1;
 			++index;
 		}
 
-		if (index > MAX_MODES)
-		{
-			return nullptr;
-		}
-
-		if (s_modes[index].m_index == -1)
+		if (index > MAX_MODES || s_modes[index].m_index == -1)
 		{
 			return nullptr;
 		}
@@ -77,7 +68,7 @@ namespace dd
 		return &s_modes[index];
 	}
 
-	void InputMode::ModeExited()
+	void InputModeConfig::ModeExited()
 	{
 		if (m_onExit != nullptr)
 		{
@@ -85,7 +76,7 @@ namespace dd
 		}
 	}
 
-	void InputMode::ModeEntered()
+	void InputModeConfig::ModeEntered()
 	{
 		if (m_onEnter != nullptr)
 		{

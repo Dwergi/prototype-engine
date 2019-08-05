@@ -67,7 +67,7 @@ namespace ddr
 
 	}
 
-	void PlaneRenderer::RenderInit( ddc::World& world )
+	void PlaneRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		m_lineShader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_lineShader.IsValid() );

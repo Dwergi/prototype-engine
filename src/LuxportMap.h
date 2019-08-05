@@ -1,20 +1,13 @@
 #pragma once
 
-#include "Entity.h"
-
-namespace ddc
-{
-	struct World;
-}
-
 namespace lux
 {
 	struct LuxportMap
 	{
 		LuxportMap(int index);
 
-		void Load(ddc::World& world);
-		void Unload(ddc::World& world);
+		void Load(ddc::EntitySpace& entities);
+		void Unload(ddc::EntitySpace& entities);
 
 		int GetIndex() const { return m_index; }
 
@@ -29,7 +22,7 @@ namespace lux
 		ddc::Entity m_start;
 		ddc::Entity m_end;
 
-		void LoadLayer(ddc::World& world, int layer);
-		void HandleSpecialTiles(ddc::World& world, ddc::Entity entity, std::string tileset, int tile_index);
+		void LoadLayer(ddc::EntitySpace& entities, int layer);
+		void HandleSpecialTiles(ddc::EntitySpace& entities, ddc::Entity entity, std::string tileset, int tile_index);
 	};
 }

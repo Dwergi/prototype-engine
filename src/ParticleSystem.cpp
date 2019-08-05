@@ -11,7 +11,7 @@
 #include "BulletComponent.h"
 #include "ParticleSystemComponent.h"
 #include "DataRequest.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 #include "ParticleSystemComponent.h"
 #include "TransformComponent.h"
 #include "UpdateData.h"
@@ -36,20 +36,21 @@ namespace dd
 
 	}
 
-	void ParticleSystem::Initialize( ddc::World& world )
+	void ParticleSystem::Initialize( ddc::EntitySpace& entities )
 	{
-		world.Messages().Subscribe( dd::MessageType::BulletHit, [this]( Message msg ) { OnBulletHitMessage( msg ); } );
+		entities.Messages().Subscribe( dd::MessageType::BulletHit, [this]( Message msg ) { OnBulletHitMessage( msg ); } );
 	}
 	
-	void ParticleSystem::BindActions( dd::InputBindings& bindings )
+	void ParticleSystem::BindActions( dd::InputKeyBindings& bindings )
 	{
-		bindings.RegisterHandler( dd::InputAction::START_PARTICLE, [this]( dd::InputAction action, dd::InputType type )
+		DD_TODO("Fix key bindings!");
+		/*bindings.RegisterHandler( dd::InputAction::START_PARTICLE, [this]( dd::InputAction action, dd::InputType type )
 		{
-			if( type == dd::InputType::RELEASED )
+			if( type == dd::InputType::Release )
 			{
 				m_startEmitting = true;
 			}
-		} );
+		} );*/
 	}
 
 	void ParticleSystem::OnBulletHitMessage( dd::Message msg )
@@ -65,7 +66,7 @@ namespace dd
 	void ParticleSystem::Update( const ddc::UpdateData& update )
 	{
 		const ddc::DataBuffer& data = update.Data();
-		ddc::World& world = update.World();
+		ddc::EntitySpace& entities = update.EntitySpace();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();
@@ -101,18 +102,18 @@ namespace dd
 
 		for( const SpawnRequest& req : m_pendingSpawns )
 		{
-			ddc::Entity entity = world.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
-			world.AddTag( entity, ddc::Tag::Visible );
+			ddc::Entity entity = entities.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
+			entities.AddTag( entity, ddc::Tag::Visible );
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 			transform->Rotation = glm::rotation( req.Normal, glm::vec3( 0, 0, 1 ) );
 			transform->Position = req.Position;
 			transform->Update();
 
-			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
+			dd::BoundBoxComponent* bounds = entities.Access<dd::BoundBoxComponent>( entity );
 			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
-			dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
+			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
 			particle->MinLifetime = 0.1;
 			particle->MaxLifetime = 0.2;
@@ -192,7 +193,7 @@ namespace dd
 		}
 	}
 
-	void ParticleSystem::DrawDebugInternal( ddc::World& world )
+	void ParticleSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES );
 

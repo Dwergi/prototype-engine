@@ -2,7 +2,7 @@
 #include "ShakyCamera.h"
 
 #include "FPSCameraComponent.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 
 #include "glm/gtc/noise.hpp"
 
@@ -14,36 +14,23 @@ namespace dd
 	float ShakyCamera::MaximumRoll = 5.0f;
 	float ShakyCamera::SpeedMultiplier = 25.0f;
 	
-	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, InputBindings& bindings ) :
+	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, InputKeyBindings& bindings ) :
 		m_sourceCamera( camera )
 	{
-		bindings.RegisterHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]( InputAction action, InputType type ) 
+		bindings.RegisterHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]() 
 		{ 
-			AddTraumaHandler( action, type ); 
+			AddTrauma(0.25f); 
 		} );
 
-		bindings.RegisterHandler( dd::InputAction::ADD_MAJOR_TRAUMA, [this]( InputAction action, InputType type )
+		bindings.RegisterHandler( dd::InputAction::ADD_MAJOR_TRAUMA, [this]()
 		{
-			AddTraumaHandler( action, type );
+			AddTrauma(1);
 		} );
 	}
 
 	ShakyCamera::~ShakyCamera()
 	{
 
-	}
-	
-	void ShakyCamera::AddTraumaHandler( InputAction action, InputType type )
-	{
-		if( action == InputAction::ADD_MINOR_TRAUMA && type == InputType::RELEASED )
-		{
-			AddTrauma( 0.25f );
-		}
-
-		if( action == InputAction::ADD_MAJOR_TRAUMA && type == InputType::RELEASED )
-		{
-			AddTrauma( 1.0f );
-		}
 	}
 
 	void ShakyCamera::Update( float delta_t )
@@ -87,7 +74,7 @@ namespace dd
 		m_trauma = glm::clamp( m_trauma, 0.0f, 1.0f );
 	}
 
-	void ShakyCamera::DrawDebugInternal( ddc::World& world )
+	void ShakyCamera::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::ProgressBar( m_trauma );
 		ImGui::DragFloat( "Decay Rate", &ShakyCamera::TraumaDecayRate, 0.01f, 0.0f, 1.0f );

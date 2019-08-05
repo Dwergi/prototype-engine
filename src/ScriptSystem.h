@@ -21,9 +21,9 @@ namespace dd
 		ScriptSystem( AngelScriptEngine& script_engine );
 		~ScriptSystem();
 
-		virtual void Initialize( ddc::World& ) {}
+		virtual void Initialize( ddc::EntitySpace& ) {}
 		virtual void Update( const ddc::UpdateData& data, float dt );
-		virtual void Shutdown( ddc::World& ) {}
+		virtual void Shutdown( ddc::EntitySpace& ) {}
 
 	private:
 		AngelScriptEngine& m_scriptEngine;

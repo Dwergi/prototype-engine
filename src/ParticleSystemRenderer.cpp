@@ -52,7 +52,7 @@ namespace ddr
 		m_renderState.Depth = true;
 	}
 
-	void ParticleSystemRenderer::RenderInit( ddc::World& world )
+	void ParticleSystemRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		s_shaderParticle = s_shaderManager->Load( "particle" );
 
@@ -113,7 +113,7 @@ namespace ddr
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
-		const ddc::World& world = data.World();
+		const ddc::EntitySpace& entities = data.EntitySpace();
 
 		uniforms.Bind( *shader );
 		ScopedRenderState scoped_state = m_renderState.UseScoped();

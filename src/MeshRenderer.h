@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "Entity.h"
 #include "IDebugPanel.h"
 #include "Mesh.h"
 #include "Renderer.h"
@@ -28,8 +27,8 @@ namespace ddr
 	public:
 		MeshRenderer();
 
-		virtual void RenderInit( ddc::World& world ) override;
-		virtual void RenderUpdate( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
+		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
 		virtual void Render( const ddr::RenderData& render_data ) override;
 
 	private:
@@ -47,7 +46,7 @@ namespace ddr
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data );
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }
 	};
 }

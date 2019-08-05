@@ -27,17 +27,17 @@ namespace ddr
 		RequireTag( ddc::Tag::Visible );
 	}
 
-	ddc::Entity CreatePointLight( ddc::World& world )
+	ddc::Entity CreatePointLight( ddc::EntitySpace& entities )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::LightComponent>();
-		world.AddTag( entity, ddc::Tag::Visible );
+		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::LightComponent>();
+		entities.AddTag( entity, ddc::Tag::Visible );
 
-		dd::LightComponent* light = world.Access<dd::LightComponent>( entity );
+		dd::LightComponent* light = entities.Access<dd::LightComponent>( entity );
 		light->Ambient = 0.01f;
 		light->Colour = glm::vec3( 1, 1, 1 );
 		light->LightType = dd::LightType::Point;
 
-		dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+		dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 		transform->Position = glm::vec3( 0, 20, 0 );
 		transform->Scale = glm::vec3( 0.4 );
 		transform->Update();
@@ -45,30 +45,30 @@ namespace ddr
 		return entity;
 	}
 
-	void LightRenderer::UpdateDebugPointLights( ddc::World& world )
+	void LightRenderer::UpdateDebugPointLights( ddc::EntitySpace& entities )
 	{
 		if( m_createLight )
 		{
-			CreatePointLight( world );
+			CreatePointLight( entities );
 			m_createLight = false;
 		}
 
 		if( m_deleteLight.IsValid() )
 		{
-			world.DestroyEntity( m_deleteLight );
+			entities.DestroyEntity( m_deleteLight );
 			m_deleteLight = ddc::Entity();
 		}
 	}
 
-	void LightRenderer::RenderInit( ddc::World& world )
+	void LightRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		m_shader = ddr::ShaderHandle( "mesh" );
 		m_mesh = ddr::MeshHandle( "sphere" );
 	}
 
-	void LightRenderer::RenderUpdate( ddc::World& world )
+	void LightRenderer::RenderUpdate( ddc::EntitySpace& entities )
 	{
-		UpdateDebugPointLights( world );
+		UpdateDebugPointLights( entities );
 	}
 
 	void LightRenderer::Render( const RenderData& data )
@@ -112,15 +112,15 @@ namespace ddr
 		}
 	}
 
-	void LightRenderer::DrawDebugInternal( ddc::World& world )
+	void LightRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 400 ), ImGuiCond_FirstUseEver );
 
 		for( size_t i = 0; i < m_debugLights.size(); ++i )
 		{
 			ddc::Entity entity = m_debugLights[i];
-			dd::LightComponent* light = world.Access<dd::LightComponent>( entity );
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+			dd::LightComponent* light = entities.Access<dd::LightComponent>( entity );
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 
 			if( light == nullptr )
 				continue;

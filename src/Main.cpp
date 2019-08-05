@@ -23,8 +23,8 @@
 #include "FrameTimer.h"
 #include "IGame.h"
 #include "IInputSource.h"
-#include "InputBindings.h"
-#include "InputSystem.h"
+#include "InputKeyBindings.h"
+#include "Input.h"
 #include "JobSystem.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -38,7 +38,6 @@
 #include "SFMLWindow.h"
 #include "Sprite.h"
 #include "SpriteSheet.h"
-#include "World.h"
 #include "WorldRenderer.h"
 
 #include <filesystem>
@@ -51,16 +50,17 @@ using TGame = lux::LuxportGame;
 static dd::Service<dd::IGame> s_game;
 
 static dd::Service<dd::IWindow> s_window;
-static dd::Service<dd::InputSystem> s_input;
-static dd::Service<dd::InputBindings> s_inputBindings;
+static dd::Service<dd::Input> s_input;
+static dd::Service<dd::InputKeyBindings> s_inputBindings;
 static dd::Service<dd::IInputSource> s_inputSource;
 static dd::Service<dd::DebugUI> s_debugUI;
 static dd::Service<ddr::WorldRenderer> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
 static dd::Service<ddr::ICamera> s_camera;
+static dd::Service<ddc::SystemManager> s_systemManager;
 
-static ddc::World* g_world;
+static ddc::EntitySpace* g_entitySpace;
 
 std::thread::id g_mainThread;
 
@@ -71,7 +71,7 @@ static void ShowSystemConsole(bool show)
 
 static void ToggleConsole(dd::InputAction action, dd::InputType type)
 {
-	if (action == dd::InputAction::TOGGLE_CONSOLE && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::TOGGLE_CONSOLE && type == dd::InputType::Release)
 	{
 		s_debugUI->SetDraw(true);
 	}
@@ -79,7 +79,7 @@ static void ToggleConsole(dd::InputAction action, dd::InputType type)
 
 static void ToggleDebugUI(dd::InputAction action, dd::InputType type)
 {
-	if (action == dd::InputAction::TOGGLE_DEBUG_UI && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::TOGGLE_DEBUG_UI && type == dd::InputType::Release)
 	{
 		s_input->SetMode(s_input->GetMode() == dd::InputMode::GAME ? dd::InputMode::DEBUG : dd::InputMode::GAME);
 	}
@@ -87,7 +87,7 @@ static void ToggleDebugUI(dd::InputAction action, dd::InputType type)
 
 static void PauseGame(dd::InputAction action, dd::InputType type)
 {
-	if (action == dd::InputAction::PAUSE && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::PAUSE && type == dd::InputType::Release)
 	{
 		s_frameTimer->SetPaused(!s_frameTimer->IsPaused());
 	}
@@ -95,7 +95,7 @@ static void PauseGame(dd::InputAction action, dd::InputType type)
 
 static void Exit(dd::InputAction action, dd::InputType type)
 {
-	if (action == dd::InputAction::EXIT && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::EXIT && type == dd::InputType::Release)
 	{
 		s_window->SetToClose();
 	}
@@ -103,13 +103,13 @@ static void Exit(dd::InputAction action, dd::InputType type)
 
 static void SetTimeScale(dd::InputAction action, dd::InputType type)
 {
-	if (action == dd::InputAction::TIME_SCALE_DOWN && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::TIME_SCALE_DOWN && type == dd::InputType::Release)
 	{
 		float time_scale = s_frameTimer->GetTimeScale();
 		s_frameTimer->SetTimeScale(time_scale * 0.9f);
 	}
 
-	if (action == dd::InputAction::TIME_SCALE_UP && type == dd::InputType::RELEASED)
+	if (action == dd::InputAction::TIME_SCALE_UP && type == dd::InputType::Release)
 	{
 		float time_scale = s_frameTimer->GetTimeScale();
 		s_frameTimer->SetTimeScale(time_scale * 1.1f);
@@ -173,21 +173,25 @@ static int GameMain()
 
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 
-		dd::Services::Register(new dd::InputBindings());
+		dd::Services::Register(new dd::InputKeyBindings());
 		//s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
 		s_inputBindings->RegisterHandler(dd::InputAction::EXIT, &Exit);
 		s_inputBindings->RegisterHandler(dd::InputAction::PAUSE, &PauseGame);
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_DOWN, &SetTimeScale);
 		s_inputBindings->RegisterHandler(dd::InputAction::TIME_SCALE_UP, &SetTimeScale);
 
-		dd::Services::Register(new dd::InputSystem());
+		dd::Services::Register(new dd::Input());
 		s_input->SetBindings(*s_inputBindings);
 		s_input->Initialize();
 		s_input->SetMode(dd::InputMode::GAME);
 
 		dd::Services::Register(new dd::DebugUI());
 
-		g_world = new ddc::World();
+		dd::Services::Register(new dd::SystemManager());
+
+		DD_TODO("IGame should provide EntitySpace, update all");
+		g_entitySpace = new ddc::EntitySpace();
+
 		dd::Services::Register(new ddr::WorldRenderer());
 
 		dd::Services::Register(new dd::FrameTimer());
@@ -198,15 +202,15 @@ static int GameMain()
 
 		s_debugUI->RegisterDebugPanel(*s_frameTimer);
 		s_debugUI->RegisterDebugPanel(*s_renderer);
-		s_debugUI->RegisterDebugPanel(*g_world);
+		s_debugUI->RegisterDebugPanel(*g_entitySpace);
 		s_debugUI->RegisterDebugPanel(entity_visualizer);
 
 		CreateAssetManagers();
 
-		s_game->Initialize(*g_world);
+		s_game->Initialize(*g_entitySpace);
 
-		g_world->Initialize();
-		s_renderer->InitializeRenderers(*g_world);
+		g_entitySpace->Initialize();
+		s_renderer->InitializeRenderers(*g_entitySpace);
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		dd::InitializeAssert();
@@ -224,18 +228,18 @@ static int GameMain()
 			s_input->Update(s_frameTimer->AppDelta());
 			s_debugUI->StartFrame(s_frameTimer->AppDelta());
 
-			g_world->Update(s_frameTimer->GameDelta());
+			g_entitySpace->Update(s_frameTimer->GameDelta());
 
 			UpdateAssetManagers();
 
-			s_game->Update(*g_world);
+			s_game->Update(*g_entitySpace);
 
-			s_debugUI->RenderDebugPanels(*g_world);
+			s_debugUI->RenderDebugPanels(*g_entitySpace);
 			s_frameTimer->DrawFPSCounter();
 
-			s_game->RenderUpdate(*g_world);
+			s_game->RenderUpdate(*g_entitySpace);
 
-			s_renderer->Render(*g_world, s_camera, s_frameTimer->GameDelta());
+			s_renderer->Render(*g_entitySpace, s_camera, s_frameTimer->GameDelta());
 
 			s_debugUI->EndFrame();
 			s_window->Swap();

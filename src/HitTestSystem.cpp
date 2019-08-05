@@ -15,7 +15,6 @@
 #include "MeshComponent.h"
 #include "Random.h"
 #include "TransformComponent.h"
-#include "World.h"
 
 namespace dd
 {
@@ -34,7 +33,7 @@ namespace dd
 		RequireTag( ddc::Tag::Static );
 	}
 
-	void HitTestSystem::Initialize( ddc::World& world )
+	void HitTestSystem::Initialize( ddc::EntitySpace& entities )
 	{
 
 	}
@@ -101,7 +100,7 @@ namespace dd
 
 	void HitTestSystem::Update( const ddc::UpdateData& update )
 	{
-		const ddc::DataBuffer& data = update.Data();
+		auto data = update.Data();
 
 		auto transforms = data.Read<dd::TransformComponent>();
 		auto bound_boxes = data.Read<dd::BoundBoxComponent>();
@@ -162,7 +161,7 @@ namespace dd
 		}
 	}
 
-	void HitTestSystem::DrawDebugInternal( ddc::World& world )
+	void HitTestSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SliderInt( "Hit Tests", &m_hitTests, 0, MAX_HITS / 2 );
 

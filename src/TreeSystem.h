@@ -15,13 +15,13 @@ namespace dd
 	{
 		TreeSystem();
 
-		virtual void Initialize( ddc::World& world );
+		virtual void Initialize( ddc::EntitySpace& entities );
 		virtual void Update( const ddc::UpdateData& update_data );
 
 		virtual const char* GetDebugTitle() const override { return "Trees"; }
 
 	private:
 
-		virtual void DrawDebugInternal( ddc::World& world );
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities );
 	};
 }

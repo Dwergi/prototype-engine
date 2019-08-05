@@ -7,27 +7,25 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "IHandlesInput.h"
 #include "InputAction.h"
 #include "Mesh.h"
 #include "System.h"
 
 namespace dd
 {
-	struct InputBindings;
 	class ShipComponent;
 	struct TransformComponent;
 
-	struct ShipSystem : ddc::System, IDebugPanel, IHandlesInput
+	struct ShipSystem : ddc::System, IDebugPanel
 	{
 		ShipSystem();
 		ShipSystem( const ShipSystem& other ) = delete;
 
-		virtual void BindActions( InputBindings& bindings ) override;
+		virtual void BindActions( InputKeyBindings& bindings ) override;
 
-		virtual void Initialize( ddc::World& world ) override {}
+		virtual void Initialize( ddc::EntitySpace& entities ) override {}
 		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void Shutdown( ddc::World& world ) override;
+		virtual void Shutdown( ddc::EntitySpace& entities ) override;
 
 		void Enable( bool enabled ) { m_enabled = enabled; }
 		bool IsEnabled() const { return m_enabled; }
@@ -47,8 +45,8 @@ namespace dd
 		void HandleInput( InputAction action, InputType type );
 		void UpdateShip( TransformComponent& transform, ShipComponent& ship, float delta_t );
 
-		void CreateShip( ddc::World& world );
+		void CreateShip( ddc::EntitySpace& entities );
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

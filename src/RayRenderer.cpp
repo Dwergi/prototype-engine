@@ -48,7 +48,7 @@ namespace ddr
 
 	}
 
-	void RayRenderer::RenderInit( ddc::World& world )
+	void RayRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );

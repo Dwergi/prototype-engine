@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include "Entity.h"
-
-
 namespace ddc
 {
 	enum class DataUsage

@@ -285,9 +285,6 @@
     <ClInclude Include="src\FreeCameraController.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\InputBindings.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -399,12 +396,6 @@
     <ClInclude Include="src\TerrainChunk.h">
       <Filter>Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\ComponentBuffer.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -488,9 +479,6 @@
     </ClInclude>
     <ClInclude Include="src\ColourComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\InputSystem.h">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="src\IInputSource.h">
       <Filter>Input</Filter>
@@ -581,9 +569,6 @@
     </ClInclude>
     <ClInclude Include="src\WaterComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IHandlesInput.h">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshUtils.h">
       <Filter>Mesh</Filter>
@@ -730,6 +715,33 @@
     </ClInclude>
     <ClInclude Include="src\SpriteAnimationSystem.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EnumFlags.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputKeys.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputEvent.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputKeyBindings.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntitySpace.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemManager.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flags.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UpdateDataBuffer.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -878,9 +890,6 @@
     <ClCompile Include="src\tests\FunctionTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputBindings.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="src\FreeCameraController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -1006,9 +1015,6 @@
     </ClCompile>
     <ClCompile Include="src\TerrainChunk.cpp">
       <Filter>Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World.cpp">
-      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\ComponentBuffer.cpp">
       <Filter>Entities</Filter>
@@ -1169,9 +1175,6 @@
     <ClCompile Include="src\WaterComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputSystem.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="src\MeshUtils.cpp">
       <Filter>Mesh</Filter>
     </ClCompile>
@@ -1300,6 +1303,24 @@
     </ClCompile>
     <ClCompile Include="src\SpriteAnimationSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputKeyBindings.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntitySpace.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemManager.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UpdateDataBuffer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputEvent.cpp">
+      <Filter>Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

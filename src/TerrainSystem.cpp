@@ -85,30 +85,30 @@ namespace dd
 		
 	}
 
-	void TerrainSystem::Shutdown( ddc::World& world )
+	void TerrainSystem::Shutdown( ddc::EntitySpace& entities )
 	{
-		DestroyChunks( world );
+		DestroyChunks( entities );
 	}
 	
-	void TerrainSystem::Initialize( ddc::World& world )
+	void TerrainSystem::Initialize( ddc::EntitySpace& entities )
 	{
 		TerrainChunk::InitializeShared();
 	}
 
 	void TerrainSystem::Update( const ddc::UpdateData& update_data )
 	{
-		ddc::World& world = update_data.World();
+		ddc::EntitySpace& entities = update_data.EntitySpace();
 
 		if( m_requiresRegeneration )
 		{
-			DestroyChunks( world );
+			DestroyChunks( entities );
 
 			m_requiresRegeneration = false;
 		}
 
 		if( m_saveChunkImages )
 		{
-			SaveChunkImages( world );
+			SaveChunkImages( entities );
 
 			m_saveChunkImages = false;
 		}
@@ -125,7 +125,7 @@ namespace dd
 
 		glm::vec2 player_offset = player_transforms[0].Position.xz;
 
-		GenerateChunks( world, chunks_data, player_offset );
+		GenerateChunks( entities, chunks_data, player_offset );
 
 		DD_TODO( "Hmm, this means that the first generated chunks won't be updated/rendered the first frame." );
 
@@ -139,14 +139,14 @@ namespace dd
 		{
 			if( m_enabled )
 			{
-				world.AddTag( entities[i], ddc::Tag::Visible );
+				entities.AddTag( entities[i], ddc::Tag::Visible );
 			}
 			else 
 			{
-				world.RemoveTag( entities[i], ddc::Tag::Visible );
+				entities.RemoveTag( entities[i], ddc::Tag::Visible );
 			}
 
-			UpdateChunk( world, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
+			UpdateChunk( entities, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
 		}
 	}
 
@@ -168,7 +168,7 @@ namespace dd
 		return TerrainParameters::LODs - 1;
 	}
 
-	void TerrainSystem::UpdateChunk( ddc::World& world, ddc::Entity e, TerrainChunkComponent& chunk_cmp, 
+	void TerrainSystem::UpdateChunk( ddc::EntitySpace& entities, ddc::Entity e, TerrainChunkComponent& chunk_cmp, 
 		BoundBoxComponent& bounds_cmp, TransformComponent& transform_cmp, ColourComponent& colour_cmp, glm::vec2 camera_pos )
 	{
 		if( m_params.UseDebugColours )
@@ -192,15 +192,15 @@ namespace dd
 
 		if( chunk_cmp.Chunk->GetMesh().IsValid() )
 		{
-			if( !world.Has<MeshComponent>( e ) )
+			if( !entities.Has<MeshComponent>( e ) )
 			{
-				MeshComponent& mesh_cmp = world.Add<MeshComponent>( e );
+				MeshComponent& mesh_cmp = entities.Add<MeshComponent>( e );
 				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 			}
 		}
 	}
 
-	void TerrainSystem::GenerateChunks( ddc::World& world, const ddc::DataBuffer& data, glm::vec2 camera_pos )
+	void TerrainSystem::GenerateChunks( ddc::EntitySpace& entities, const ddc::DataBuffer& data, glm::vec2 camera_pos )
 	{
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto entities = data.Entities();
@@ -235,7 +235,7 @@ namespace dd
 
 		for( size_t i = 0; i < chunks.Size(); ++i )
 		{
-			world.RemoveTag( entities[ i ], ddc::Tag::Visible );
+			entities.RemoveTag( entities[ i ], ddc::Tag::Visible );
 
 			existing.insert( std::make_pair( chunks[ i ].Chunk->GetPosition(), entities[ i ] ) );
 		}
@@ -261,32 +261,32 @@ namespace dd
 
 		for( ddc::Entity entity : active )
 		{
-			world.AddTag( entity, ddc::Tag::Visible );
+			entities.AddTag( entity, ddc::Tag::Visible );
 		}
 
 		for( glm::vec2 pos : missing_chunks )
 		{
 			int lod = CalculateLOD( pos, camera_pos );
-			ddc::Entity created = CreateChunk( world, pos, lod );
+			ddc::Entity created = CreateChunk( entities, pos, lod );
 			existing.insert( std::make_pair( pos, created ) );
 		}
 	}
 
-	ddc::Entity TerrainSystem::CreateChunk( ddc::World& world, glm::vec2 pos, int lod )
+	ddc::Entity TerrainSystem::CreateChunk( ddc::EntitySpace& entities, glm::vec2 pos, int lod )
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
-		ddc::Entity& entity = world.CreateEntity<TransformComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
-		world.AddTag( entity, ddc::Tag::Visible );
+		ddc::Entity& entity = entities.CreateEntity<TransformComponent, TerrainChunkComponent, BoundBoxComponent, ColourComponent>();
+		entities.AddTag( entity, ddc::Tag::Visible );
 
-		ColourComponent* colour_cmp = world.Access<ColourComponent>( entity );
+		ColourComponent* colour_cmp = entities.Access<ColourComponent>( entity );
 		colour_cmp->Colour = glm::vec4( 1 );
 
-		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
+		TransformComponent* transform_cmp = entities.Access<TransformComponent>( entity );
 		transform_cmp->Position = glm::vec3( pos.x, 0, pos.y );
 		transform_cmp->Update();
 
-		TerrainChunkComponent* chunk_cmp = world.Access<TerrainChunkComponent>( entity );
+		TerrainChunkComponent* chunk_cmp = entities.Access<TerrainChunkComponent>( entity );
 		TerrainChunk* chunk = new TerrainChunk( m_params, pos );
 		chunk->SwitchLOD( lod );
 		chunk_cmp->Chunk = chunk;
@@ -295,21 +295,21 @@ namespace dd
 		return entity;
 	}
 
-	void TerrainSystem::DestroyChunks( ddc::World& world )
+	void TerrainSystem::DestroyChunks( ddc::EntitySpace& entities )
 	{
-		world.ForAllWith<TerrainChunkComponent>( [&world]( ddc::Entity entity, TerrainChunkComponent& chunk )
+		entities.ForAllWith<TerrainChunkComponent>( [&entities]( ddc::Entity entity, TerrainChunkComponent& chunk )
 		{
 			delete chunk.Chunk;
 			chunk.Chunk = nullptr;
-			world.DestroyEntity( entity );
+			entities.DestroyEntity( entity );
 		} );
 	}
 
-	void TerrainSystem::SaveChunkImages( const ddc::World& world ) const
+	void TerrainSystem::SaveChunkImages( const ddc::EntitySpace& entities ) const
 	{
 		int chunk_index = 0;
 
-		world.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
+		entities.ForAllWith<TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, TerrainChunkComponent& chunk )
 		{
 			glm::ivec2 pos = (glm::ivec2) chunk.Chunk->GetPosition();
 			std::string file = fmt::format( "terrain_{}x{}_{}.tga", pos.x, pos.y, chunk.Chunk->GetLOD() );
@@ -320,7 +320,7 @@ namespace dd
 		} );
 	}
 
-	void TerrainSystem::DrawDebugInternal( ddc::World& world )
+	void TerrainSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::Checkbox( "Enabled", &m_enabled );
 

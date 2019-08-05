@@ -8,7 +8,7 @@
 namespace dd
 {
 	struct FPSCameraComponent;
-	struct InputBindings;
+	struct InputKeyBindings;
 
 	struct ShakyCamera : IDebugPanel, ddr::ICamera
 	{
@@ -40,7 +40,7 @@ namespace dd
 		//
 		// Constructor.
 		//
-		ShakyCamera( const FPSCameraComponent& camera, InputBindings& bindings );
+		ShakyCamera( const FPSCameraComponent& camera, InputKeyBindings& bindings );
 
 		//
 		// Destructor.
@@ -89,7 +89,7 @@ namespace dd
 
 	protected:
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 
 	private:
 
@@ -105,7 +105,5 @@ namespace dd
 		float m_roll { 0 };
 
 		ddr::Frustum m_frustum;
-
-		void AddTraumaHandler( InputAction action, InputType type );
 	};
 }

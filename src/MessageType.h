@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace dd
+namespace ddc
 {
 	enum class MessageType : uint
 	{

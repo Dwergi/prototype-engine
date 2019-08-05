@@ -13,7 +13,7 @@ namespace dd
 	struct IAsyncHitTest
 	{
 		// 
-		// Start a hit test against the world with the given ray.
+		// Start a hit test against the entities with the given ray.
 		// Length is the maximum length that will be considered.
 		// Fetch the current state using FetchResult().
 		//

@@ -25,7 +25,6 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "IWindow.h"
-#include "World.h"
 
 namespace ddr
 {
@@ -69,14 +68,14 @@ namespace ddr
 		delete m_commands;
 	}
 
-	void WorldRenderer::InitializeRenderers(ddc::World& world)
+	void WorldRenderer::InitializeRenderers(ddc::EntitySpace& entities)
 	{
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
 
 		for (ddr::Renderer* current : m_renderers)
 		{
-			current->RenderInit(world);
+			current->RenderInit(entities);
 		}
 	}
 
@@ -99,7 +98,7 @@ namespace ddr
 		m_framebuffer.RenderInit();
 	}
 
-	void WorldRenderer::DrawDebugInternal(ddc::World& world)
+	void WorldRenderer::DrawDebugInternal(ddc::EntitySpace& entities)
 	{
 		ImGui::Checkbox("Draw Depth", &m_debugDrawDepth);
 		ImGui::Checkbox("Draw Normals", &m_debugDrawNormals);
@@ -128,7 +127,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void WorldRenderer::CallRenderer(ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn) const
+	void WorldRenderer::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn) const
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -142,19 +141,19 @@ namespace ddr
 		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();
 
 		std::vector<ddc::Entity> entities;
-		world.FindAllWith(required, tags, entities);
+		entities.FindAllWith(required, tags, entities);
 
 		if (entities.size() == 0)
 		{
 			return;
 		}
 
-		RenderData data(world, camera, *m_uniforms, *m_commands, entities, renderer.GetRequirements());
+		RenderData data(entities, camera, *m_uniforms, *m_commands, entities, renderer.GetRequirements());
 
 		fn(renderer, data);
 	}
 
-	void WorldRenderer::Render(ddc::World& world, const ddr::ICamera& camera, float delta_t)
+	void WorldRenderer::Render(ddc::EntitySpace& entities, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
@@ -162,18 +161,18 @@ namespace ddr
 
 		for (ddr::Renderer* r : m_renderers)
 		{
-			r->RenderUpdate(world);
+			r->RenderUpdate(entities);
 		}
 
 		ddr::Renderer* debug_render = nullptr;
 
-		BeginRender(world, camera);
+		BeginRender(entities, camera);
 
 		for (ddr::Renderer* r : m_renderers)
 		{
 			if (!r->UsesAlpha())
 			{
-				CallRenderer(*r, world, camera,
+				CallRenderer(*r, entities, camera,
 					[](Renderer& rend, const RenderData& data) { rend.Render(data); });
 			}
 
@@ -186,7 +185,7 @@ namespace ddr
 
 		if (debug_render != nullptr)
 		{
-			CallRenderer(*debug_render, world, camera,
+			CallRenderer(*debug_render, entities, camera,
 				[](Renderer& rend, const RenderData& data) { rend.RenderDebug(data); });
 		}
 
@@ -194,7 +193,7 @@ namespace ddr
 		{
 			if (r->UsesAlpha())
 			{
-				CallRenderer(*r, world, camera,
+				CallRenderer(*r, entities, camera,
 					[](Renderer& rend, const RenderData& data) { rend.Render(data); });
 			}
 		}
@@ -205,7 +204,7 @@ namespace ddr
 		EndRender(*m_uniforms, camera);
 	}
 
-	void WorldRenderer::BeginRender(const ddc::World& world, const ddr::ICamera& camera)
+	void WorldRenderer::BeginRender(const ddc::EntitySpace& entities, const ddr::ICamera& camera)
 	{
 		if (m_reloadShaders)
 		{

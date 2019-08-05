@@ -63,6 +63,8 @@
 
 #include "Globals.h"
 
+#include "EntitySpace.h"
+
 //#include "Serialization.h"
 
 #include <glm/gtc/matrix_transform.hpp>

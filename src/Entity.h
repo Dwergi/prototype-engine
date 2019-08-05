@@ -1,24 +1,36 @@
-//
-// Entity.h - An entity handle.
-// Copyright (C) Sebastian Nordgren 
-// August 30th 2018
-//
-
 #pragma once
 
 namespace ddc
 {
-	static const int MAX_ENTITIES = 32 * 1024;
-	static const int MAX_COMPONENTS = 255;
-	static const int MAX_TAGS = 32;
+	enum class Tag : uint
+	{
+		None = 0,
+		Visible = 1,
+		Focused = 2,
+		Selected = 3,
+		Static = 4,
+		Dynamic = 5
+	};
+
+	struct EntitySpace;
 
 	struct Entity
 	{
-		friend struct World;
+		bool operator==(Entity other) const { return Handle == other.Handle && m_space == other.m_space; }
 
-		bool operator==( Entity other ) const { return Handle == other.Handle; }
+		bool IsValid() const;
+		bool IsAlive() const;
+		int Components() const;
 
-		bool IsValid() const { return Handle != ~0; }
+		void AddTag(ddc::Tag tag) const;
+		void RemoveTag(ddc::Tag tag) const;
+		bool HasTag(ddc::Tag tag) const;
+
+		template <typename TComponent> TComponent* Access() const;
+		template <typename TComponent> const TComponent* Get() const;
+		template <typename TComponent> bool Has() const;
+		template <typename TComponent> TComponent& Add() const;
+		template <typename TComponent> void Remove() const;
 
 		union
 		{
@@ -30,5 +42,12 @@ namespace ddc
 
 			uint Handle { ~0u };
 		};
+
+	private:
+		friend struct EntitySpace;
+		EntitySpace* m_space { nullptr };
 	};
+
+	// ASSUMPTION: Entity is included from EntitySpace.h, which is always included.
+	// All methods are defined in EntitySpace.h.
 }

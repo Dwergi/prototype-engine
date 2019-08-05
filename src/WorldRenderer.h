@@ -34,12 +34,12 @@ namespace ddr
 		//
 		// Initialize all registered renderers.
 		//
-		void InitializeRenderers( ddc::World& world );
+		void InitializeRenderers( ddc::EntitySpace& entities );
 
 		//
 		// Render all the registered renderers.
 		//
-		void Render( ddc::World& world, const ddr::ICamera& camera, float delta_t );
+		void Render( ddc::EntitySpace& entities, const ddr::ICamera& camera, float delta_t );
 
 		void ShutdownRenderer() {}
 
@@ -53,7 +53,7 @@ namespace ddr
 		//
 		// Draw the debug menu.
 		//
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 
 	private:
 		
@@ -86,10 +86,10 @@ namespace ddr
 
 		void RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render );
 
-		void BeginRender( const ddc::World& world, const ddr::ICamera& camera );
+		void BeginRender( const ddc::EntitySpace& entities, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		void CallRenderer( ddr::Renderer& renderer, ddc::World& world, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn ) const;
+		void CallRenderer( ddr::Renderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn ) const;
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

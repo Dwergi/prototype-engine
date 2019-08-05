@@ -11,11 +11,11 @@
 #include "GLError.h"
 #include "IDebugPanel.h"
 #include "InputMode.h"
-#include "InputSystem.h"
+#include "Input.h"
 #include "ImGuiBinding.h"
 #include "IWindow.h"
 
-static dd::Service<dd::InputSystem> s_input;
+static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::DebugUI> s_debugUI;
 
@@ -23,13 +23,13 @@ namespace dd
 {
 	void OnEnterDebugMode()
 	{
-		s_debugUI->SetMouseHandling(true);
+		ImGuiBinding::SetMouseHandling(true);
 		s_debugUI->SetDraw(true);
 	}
 
 	void OnExitDebugMode()
 	{
-		s_debugUI->SetMouseHandling(false);
+		ImGuiBinding::SetMouseHandling(false);
 		s_debugUI->SetDraw(false);
 	}
 
@@ -37,25 +37,17 @@ namespace dd
 	{
 		ImGuiBinding::Initialize();
 
-		dd::InputMode::Access(dd::InputMode::DEBUG)
-			->OnEnter(&OnEnterDebugMode)
+		dd::InputModeConfig::Create("debug")
+			.CaptureMouse(false)
+			.CentreMouse(false)
+			.ShowCursor(true)
+			.OnEnter(&OnEnterDebugMode)
 			.OnExit(&OnExitDebugMode);
 	}
 
 	DebugUI::~DebugUI()
 	{
 		ImGuiBinding::Shutdown();
-	}
-
-	DebugUI& DebugUI::SetMouseHandling(bool handle)
-	{
-		ImGuiBinding::SetMouseHandling(handle);
-		return *this;
-	}
-
-	bool DebugUI::IsMouseHandled() const
-	{
-		return ImGuiBinding::IsMouseHandled();
 	}
 
 	void DebugUI::StartFrame(float delta_t)
@@ -86,7 +78,7 @@ namespace dd
 		);
 	}
 
-	void DebugUI::RenderDebugPanels(ddc::World& world)
+	void DebugUI::RenderDebugPanels(ddc::EntitySpace& entities)
 	{
 		if (!m_draw)
 			return;
@@ -142,7 +134,7 @@ namespace dd
 			{
 				m_midWindow = true;
 
-				panel->DrawDebugPanel(world);
+				panel->DrawDebugPanel(entities);
 
 				m_midWindow = false;
 			}

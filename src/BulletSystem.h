@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "Entity.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
 #include "System.h"
@@ -19,7 +18,7 @@ namespace ddr
 namespace dd
 {
 	struct BulletComponent;
-	struct InputBindings;
+	struct InputKeyBindings;
 	struct HitState;
 	struct TransformComponent;
 
@@ -27,9 +26,7 @@ namespace dd
 	{
 		BulletSystem();
 
-		void BindActions( InputBindings& bindings );
-
-		virtual void Initialize( ddc::World& world ) override;
+		virtual void Initialize( ddc::EntitySpace& entities ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Bullets"; }
@@ -45,11 +42,10 @@ namespace dd
 		float m_intensity { 0 };
 		float m_attenuation { 0 };
 
-		void HandleInput( InputAction action, InputType type );
-		void FireBullet( ddc::World& world, const ddr::ICamera& camera );
-		void KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet );
-		bool HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos );
+		void FireBullet( ddc::EntitySpace& entities, const ddr::ICamera& camera );
+		void KillBullet( ddc::EntitySpace& entities, ddc::Entity entity, dd::BulletComponent& bullet );
+		bool HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateDataBuffer& meshes, float delta_t, glm::vec3& out_pos );
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

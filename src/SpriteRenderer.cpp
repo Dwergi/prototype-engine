@@ -44,7 +44,7 @@ namespace ddr
 		m_renderState.Depth = false;
 	}
 
-	void SpriteRenderer::RenderInit(ddc::World& world)
+	void SpriteRenderer::RenderInit(ddc::EntitySpace& entities)
 	{
 		s_shader = s_shaderManager->Load("sprite");
 
@@ -202,7 +202,7 @@ namespace ddr
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
-		const ddc::World& world = data.World();
+		const ddc::EntitySpace& entities = data.EntitySpace();
 
 		uniforms.Bind(*shader);
 

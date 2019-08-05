@@ -7,16 +7,15 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "IHandlesInput.h"
 #include "IInputSource.h"
 #include "System.h"
 
 namespace dd
 {
 	struct FPSCameraComponent;
-	struct InputBindings;
+	struct InputKeyBindings;
 
-	struct FreeCameraController : IDebugPanel, IHandlesInput, ddc::System
+	struct FreeCameraController : IDebugPanel, ddc::System
 	{
 		FreeCameraController();
 		FreeCameraController( FreeCameraController&& other );
@@ -26,7 +25,7 @@ namespace dd
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
 		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void BindActions( InputBindings& bindings ) override;
+		virtual void BindActions( InputKeyBindings& bindings ) override;
 
 		void UpdateMouse( const MousePosition& pos );
 		void UpdateScroll( const MousePosition& pos );
@@ -38,7 +37,7 @@ namespace dd
 
 	protected:
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	
 	private:
 

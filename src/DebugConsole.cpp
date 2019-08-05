@@ -48,7 +48,7 @@ namespace dd
 		m_scrollToBottom = true;
 	}
 
-	void DebugConsole::DrawDebugInternal( ddc::World& world )
+	void DebugConsole::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		DD_PROFILE_START( DebugConsole_Draw );
 

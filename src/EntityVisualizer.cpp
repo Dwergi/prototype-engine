@@ -7,8 +7,7 @@
 #include "PCH.h"
 #include "EntityVisualizer.h"
 
-#include "InputBindings.h"
-#include "World.h"
+#include "Input.h"
 
 #include <imgui/imgui.h>
 
@@ -123,8 +122,18 @@ namespace dd
 			break;
 		}
 	}
+	
+	static dd::Service<dd::Input> s_input;
 
-	void EntityVisualizer::DrawDebugInternal( ddc::World& world )
+	EntityVisualizer::EntityVisualizer()
+	{
+		s_input->RegisterActionHandler(InputAction::TOGGLE_ENTITY_DATA, [this]()
+			{
+				SetDebugPanelOpen(!IsDebugPanelOpen());
+			});
+	}
+
+	void EntityVisualizer::DrawDebugInternal( ddc::EntitySpace& space )
 	{
 		ImGui::SetWindowSize( ImVec2( 300, 500 ), ImGuiCond_Once );
 
@@ -133,7 +142,7 @@ namespace dd
 		tags.set( (int) ddc::Tag::Selected, true );
 
 		std::vector<ddc::Entity> entities;
-		world.FindAllWith( components, tags, entities );
+		space.FindAllWith( components, tags, entities );
 
 		if( entities.size() > 0 )
 		{
@@ -141,7 +150,7 @@ namespace dd
 
 			for( dd::ComponentID id = 0; id < ddc::MAX_COMPONENTS; ++id )
 			{
-				void* cmp_data = world.AccessComponent( entity, id );
+				void* cmp_data = space.AccessComponent( entity, id );
 				if( cmp_data != nullptr )
 				{
 					const dd::TypeInfo* typeInfo = dd::TypeInfo::GetComponent( id );
@@ -150,16 +159,5 @@ namespace dd
 				}
 			}
 		}
-	}
-
-	void EntityVisualizer::BindActions( InputBindings& bindings )
-	{
-		bindings.RegisterHandler( InputAction::TOGGLE_ENTITY_DATA, [this]( InputAction a, InputType t )
-		{
-			if( t == InputType::RELEASED )
-			{
-				SetDebugPanelOpen( !IsDebugPanelOpen() );
-			}
-		} );
 	}
 }

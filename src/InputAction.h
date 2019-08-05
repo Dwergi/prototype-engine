@@ -46,11 +46,4 @@ namespace dd
 		RETURN_TELEPORTER,
 		RESET
 	};
-
-	enum class InputType : unsigned int
-	{
-		NONE,
-		PRESSED,
-		RELEASED
-	};
 }

@@ -57,20 +57,20 @@ namespace dd
 		initial.Position = glm::vec3( 0 );
 	}
 
-	void TreeSystem::Initialize( ddc::World& world )
+	void TreeSystem::Initialize( ddc::EntitySpace& entities )
 	{
-		ddc::Entity entity = world.CreateEntity();
+		ddc::Entity entity = entities.CreateEntity();
 
-		dd::TransformComponent& transform = world.Add<dd::TransformComponent>( entity );
+		dd::TransformComponent& transform = entities.Add<dd::TransformComponent>( entity );
 		transform.Position = glm::vec3( 10, 0, 10 );
 		transform.Update();
 
-		dd::BoundBoxComponent& bound_box = world.Add<dd::BoundBoxComponent>( entity );
+		dd::BoundBoxComponent& bound_box = entities.Add<dd::BoundBoxComponent>( entity );
 		bound_box.BoundBox.Expand( transform.Position );
 
-		dd::LinesComponent& line_cmp = world.Add<dd::LinesComponent>( entity );
+		dd::LinesComponent& line_cmp = entities.Add<dd::LinesComponent>( entity );
 		
-		dd::TreeComponent& tree = world.Add<dd::TreeComponent>( entity );
+		dd::TreeComponent& tree = entities.Add<dd::TreeComponent>( entity );
 		InitializeTree( tree );
 	}
 
@@ -179,7 +179,7 @@ namespace dd
 		}
 	}
 
-	void TreeSystem::DrawDebugInternal( ddc::World& world )
+	void TreeSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::DragFloat( "Lifetime", &StartingLifetime, 0.01, 0, 20 );
 

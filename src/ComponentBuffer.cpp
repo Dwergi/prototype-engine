@@ -9,7 +9,7 @@
 
 namespace ddc
 {
-	ComponentBuffer::ComponentBuffer( const World& world, const std::vector<Entity>& entities, const DataRequest& req ) :
+	ComponentBuffer::ComponentBuffer( const EntitySpace& space, const std::vector<Entity>& entities, const DataRequest& req ) :
 		m_request( req )
 	{
 		m_count = entities.size();
@@ -25,7 +25,7 @@ namespace ddc
 
 		for( size_t i = 0; i < m_count; ++i )
 		{
-			const void* src = world.GetComponent( entities[i], req.Component().ComponentID() );
+			const void* src = space.GetComponent( entities[i], req.Component().ComponentID() );
 			DD_ASSERT( req.Optional() || src != nullptr );
 
 			if( src != nullptr )

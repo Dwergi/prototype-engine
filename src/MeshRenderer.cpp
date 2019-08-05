@@ -40,7 +40,7 @@ namespace ddr
 		Optional<dd::BoundSphereComponent>();
 	}
 
-	void MeshRenderer::RenderInit( ddc::World& world )
+	void MeshRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		dd::MeshUtils::CreateDefaultMaterial();
 		dd::MeshUtils::CreateUnitCube();
@@ -48,7 +48,7 @@ namespace ddr
 		dd::MeshUtils::CreateQuad();
 	}
 
-	void MeshRenderer::RenderUpdate( ddc::World& world )
+	void MeshRenderer::RenderUpdate( ddc::EntitySpace& entities )
 	{
 		size_t count = s_meshManager->LiveCount();
 		
@@ -89,7 +89,7 @@ namespace ddr
 			return;
 
 		const ddr::ICamera& camera = render_data.Camera();
-		const ddc::World& world = render_data.World();
+		const ddc::EntitySpace& entities = render_data.EntitySpace();
 		ddr::UniformStorage& uniforms = render_data.Uniforms();
 
 		++m_meshCount;
@@ -113,12 +113,12 @@ namespace ddr
 
 		glm::vec4 debug_multiplier( 1, 1, 1, 1 );
 
-		if( world.HasTag( entity, ddc::Tag::Focused ) )
+		if( entities.HasTag( entity, ddc::Tag::Focused ) )
 		{
 			debug_multiplier.z = 1.5f;
 		}
 
-		if( world.HasTag( entity, ddc::Tag::Selected ) )
+		if( entities.HasTag( entity, ddc::Tag::Selected ) )
 		{
 			debug_multiplier.y = 1.5f;
 		}
@@ -146,7 +146,7 @@ namespace ddr
 		cmd->Transform = transform_cmp.Transform();
 	}
 
-	void MeshRenderer::DrawDebugInternal( ddc::World& world )
+	void MeshRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );

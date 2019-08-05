@@ -6,49 +6,45 @@
 
 #pragma once
 
+#include "Flags.h"
+
 namespace dd
 {
-	struct InputMode
+	using InputModeID = uint16;
+	using InputModeFlags = dd::Flags<InputModeID>;
+	
+	struct InputModeConfig
 	{
-		enum Predefined : int16
-		{
-			NONE = 0,
-			GAME = 1 << 0,
-			DEBUG = 1 << 1,
-			ALL = (int16) 0xFF
-		};
+		static InputModeConfig& Create(std::string name);
+		static InputModeConfig* Find(std::string name);
+		static InputModeConfig* Access(InputModeID id);
 
-		static const int MAX_MODES = 16;
+		InputModeID ID() const { return (1 << m_index); }
 
-		static InputMode& Create(std::string name);
-		static InputMode* Find(std::string name);
-		static InputMode* Access(int16 id);
-
-		int16 ID() const { return 1 << m_index; }
-
-		InputMode& ShowCursor(bool show_cursor) { m_cursor = show_cursor; return *this; }
+		InputModeConfig& ShowCursor(bool show_cursor) { m_cursor = show_cursor; return *this; }
 		bool ShouldShowCursor() const { return m_cursor; }
 
-		InputMode& CaptureMouse(bool capture_mouse) { m_capture = capture_mouse; return *this; }
+		InputModeConfig& CaptureMouse(bool capture_mouse) { m_capture = capture_mouse; return *this; }
 		bool ShouldCaptureMouse() const { return m_capture; }
 
-		InputMode& CentreMouse(bool centre) { m_centre = centre; return *this; }
+		InputModeConfig& CentreMouse(bool centre) { m_centre = centre; return *this; }
 		bool ShouldCentreMouse() const { return m_centre; }
 
-		InputMode& OnEnter(void(*callback)()) { m_onEnter = callback; return *this; }
+		InputModeConfig& OnEnter(void(*callback)()) { m_onEnter = callback; return *this; }
 		void ModeEntered();
 
-		InputMode& OnExit(void(*callback)()) { m_onExit = callback; return *this; }
+		InputModeConfig& OnExit(void(*callback)()) { m_onExit = callback; return *this; }
 		void ModeExited();
 
 		std::string GetName() const { return m_name; }
 
 	private:
-		static InputMode s_modes[MAX_MODES];
-		static int16 s_used;
+		static const int MAX_MODES = sizeof(InputModeID) * 8;
+		static InputModeConfig s_modes[MAX_MODES];
+		static uint8 s_used;
 
 		std::string m_name;
-		int16 m_index { (int16) 0xFF };
+		uint8 m_index { 0xFF };
 		bool m_cursor { true };
 		bool m_capture { false };
 		bool m_centre { false };

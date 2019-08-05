@@ -11,7 +11,7 @@
 
 #include <mutex>
 
-namespace dd
+namespace ddc
 {
 	struct MessageSubscription;
 
@@ -38,7 +38,7 @@ namespace dd
 		static const size_t PAYLOAD_SIZE = 64;
 
 		byte m_payload[PAYLOAD_SIZE];
-		const TypeInfo* m_payloadType { nullptr };
+		const dd::TypeInfo* m_payloadType { nullptr };
 	};
 
 	struct MessageQueue
@@ -75,7 +75,7 @@ namespace dd
 		//
 		// Get the total number of subscribers.
 		//
-		int GetTotalSubscriberCount() const { return m_handlers.Size(); }
+		int GetTotalSubscriberCount() const { return (int) m_handlers.size(); }
 
 		//
 		// Get the number of pending messages.
@@ -86,9 +86,9 @@ namespace dd
 
 		std::mutex m_mutex;
 
-		DenseMap<MessageType, Vector<MessageHandlerID>> m_subscribers;
-		DenseMap<MessageHandlerID, std::function<void(Message)>> m_handlers;
-		DoubleBuffer<Vector<Message>> m_pendingMessages;
+		std::unordered_map<MessageType, std::vector<MessageHandlerID>> m_subscribers;
+		std::unordered_map<MessageHandlerID, std::function<void(Message)>> m_handlers;
+		dd::DoubleBuffer<std::vector<Message>> m_pendingMessages;
 
 		MessageHandlerID m_nextHandlerID;
 

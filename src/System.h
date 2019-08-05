@@ -11,11 +11,21 @@
 
 namespace ddc
 {
-	struct World;
+	struct EntitySpace;
 
 	struct System
 	{
 		System(const char* name);
+
+		virtual void Initialize(EntitySpace& space) {}
+		virtual void Update(const UpdateData& update_data) = 0;
+		virtual void Shutdown(EntitySpace& space) {}
+
+		//
+		// Allow the system to be updated for the given space. May be called multiple times. 
+		// If never called, then system will allow all spaces.
+		//
+		System& EnableForSpace(EntitySpace& space);
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
@@ -23,10 +33,6 @@ namespace ddc
 		const dd::Vector<const System*>& GetDependencies() const { return m_dependencies; }
 		std::bitset<MAX_TAGS> GetRequiredTags( const char* name = nullptr ) const;
 		const char* GetName() const { return m_name.c_str(); }
-
-		virtual void Initialize( World& world ) {}
-		virtual void Update( const UpdateData& update_data ) = 0;
-		virtual void Shutdown( World& world ) {}
 
 		int MaxPartitions() const { return m_partitions; }
 

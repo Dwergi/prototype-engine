@@ -16,7 +16,6 @@
 #include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
-#include "World.h"
 
 namespace dd
 {
@@ -146,22 +145,22 @@ namespace dd
 		mesh->SetBoundBox( bounds );
 	}
 
-	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::World& world )
+	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::EntitySpace& entities )
 	{
-		ddc::Entity entity = world.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
+		ddc::Entity entity = entities.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
 
-		TransformComponent* transform_cmp = world.Access<TransformComponent>( entity );
+		TransformComponent* transform_cmp = entities.Access<TransformComponent>( entity );
 		transform_cmp->Position = position;
 		transform_cmp->Scale = glm::vec3( TRENCH_CHUNK_LENGTH );
 		transform_cmp->Update();
 
-		MeshComponent* mesh_cmp = world.Access<MeshComponent>( entity );
+		MeshComponent* mesh_cmp = entities.Access<MeshComponent>( entity );
 		mesh_cmp->Mesh = m_chunkMesh;
 
-		ColourComponent* colour_cmp = world.Access<ColourComponent>( entity );
+		ColourComponent* colour_cmp = entities.Access<ColourComponent>( entity );
 		colour_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
 
-		world.AddTag( entity, ddc::Tag::Visible );
+		entities.AddTag( entity, ddc::Tag::Visible );
 		return entity;
 	}
 

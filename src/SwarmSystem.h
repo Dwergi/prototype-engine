@@ -18,7 +18,7 @@ namespace dd
 		SwarmSystem();
 		virtual ~SwarmSystem();
 
-		virtual void Initialize( ddc::World& world ) override;
+		virtual void Initialize( ddc::EntitySpace& entities ) override;
 
 		virtual void Update( const ddc::UpdateData& data ) override;
 
@@ -30,6 +30,6 @@ namespace dd
 
 		BVHTree m_agentsBVH;
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

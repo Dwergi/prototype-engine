@@ -48,7 +48,7 @@ namespace ddr
 		m_wireframe = new Wireframe();
 	}
 
-	void TerrainRenderer::RenderInit( ddc::World& world )
+	void TerrainRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		ddr::MaterialHandle material_h = s_materialManager->Create("terrain");
 
@@ -56,9 +56,9 @@ namespace ddr
 		material->Shader = s_shaderManager->Load("terrain");
 	}
 
-	void TerrainRenderer::RenderUpdate( ddc::World& world )
+	void TerrainRenderer::RenderUpdate( ddc::EntitySpace& entities )
 	{
-		world.ForAllWith<dd::TerrainChunkComponent>( []( ddc::Entity, dd::TerrainChunkComponent& chunk )
+		entities.ForAllWith<dd::TerrainChunkComponent>( []( ddc::Entity, dd::TerrainChunkComponent& chunk )
 		{
 			chunk.Chunk->RenderUpdate();
 		} );
@@ -70,7 +70,7 @@ namespace ddr
 		m_wireframe->UpdateUniforms( data.Uniforms() );
 	}
 
-	void TerrainRenderer::DrawDebugInternal( ddc::World& world )
+	void TerrainRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::Checkbox( "Enabled", &m_wireframe->Enabled );
 

@@ -8,7 +8,7 @@
 
 namespace ddc
 {
-	struct World;
+	struct EntitySpace;
 }
 
 namespace dd
@@ -25,7 +25,7 @@ namespace dd
 		template <typename T>
 		static T& Register(T& instance)
 		{
-			static_assert(!std::is_same_v<T, ddc::World>);
+			static_assert(!std::is_same_v<T, ddc::EntitySpace>);
 			Service<T>::Register(instance);
 
 			s_unregisterFuncs.push_back(&Service<T>::Unregister);
@@ -48,7 +48,7 @@ namespace dd
 		template <typename TInterface, typename TImpl>
 		static TInterface& RegisterInterface(TImpl& instance)
 		{
-			static_assert(!std::is_same_v<TImpl, ddc::World>);
+			static_assert(!std::is_same_v<TImpl, ddc::EntitySpace>);
 			static_assert(std::is_base_of_v<TInterface, TImpl>);
 			Service<TInterface>::Register(instance);
 

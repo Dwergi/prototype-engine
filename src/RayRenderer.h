@@ -18,7 +18,7 @@ namespace ddr
 		RayRenderer();
 		~RayRenderer();
 
-		virtual void RenderInit( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
 		virtual void Render( const ddr::RenderData& data ) override;
 
 	private:

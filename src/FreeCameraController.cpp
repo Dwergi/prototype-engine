@@ -8,7 +8,7 @@
 #include "FreeCameraController.h"
 
 #include "FPSCameraComponent.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 #include "TransformComponent.h"
 
 #include "fmt/format.h"
@@ -55,20 +55,21 @@ namespace dd
 
 	}
 
-	void FreeCameraController::BindActions( InputBindings& bindings )
+	void FreeCameraController::BindActions( InputKeyBindings& bindings )
 	{
 		auto handle_input = [this]( InputAction action, InputType type )
 		{
 			HandleInput( action, type );
 		};
 
-		bindings.RegisterHandler( InputAction::FORWARD, handle_input );
+		DD_TODO("Fix key handler bindings");
+		/*bindings.RegisterHandler( InputAction::FORWARD, handle_input );
 		bindings.RegisterHandler( InputAction::BACKWARD, handle_input );
 		bindings.RegisterHandler( InputAction::LEFT, handle_input );
 		bindings.RegisterHandler( InputAction::RIGHT, handle_input );
 		bindings.RegisterHandler( InputAction::UP, handle_input );
 		bindings.RegisterHandler( InputAction::DOWN, handle_input );
-		bindings.RegisterHandler( InputAction::BOOST, handle_input );
+		bindings.RegisterHandler( InputAction::BOOST, handle_input );*/
 	}
 
 	void FreeCameraController::HandleInput( InputAction action, InputType type )
@@ -80,14 +81,14 @@ namespace dd
 		if( state == nullptr )
 			return;
 
-		if( type == InputType::PRESSED )
+		if( type == InputType::Press )
 			*state = true;
 
-		if( type == InputType::RELEASED )
+		if( type == InputType::Release )
 			*state = false;
 	}
 
-	void FreeCameraController::DrawDebugInternal( ddc::World& world )
+	void FreeCameraController::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SetWindowPos( ImVec2( ImGui::GetIO().DisplaySize.x - 300, 30 ), ImGuiCond_FirstUseEver );
 

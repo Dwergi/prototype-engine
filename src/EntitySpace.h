@@ -1,45 +1,24 @@
 #pragma once
 
 #include "Entity.h"
-#include "FunctionView.h"
-#include "IDebugPanel.h"
-#include "MessageQueue.h"
-#include "SystemsSorting.h"
 
 namespace ddc
 {
-	enum class Tag : uint
-	{
-		None = 0,
-		Visible = 1,
-		Focused = 2,
-		Selected = 3,
-		Static = 4,
-		Dynamic = 5
-	};
+	static const int MAX_ENTITIES = 32 * 1024;
+	static const int MAX_COMPONENTS = 255;
+	static const int MAX_TAGS = 32;
 
 	typedef std::bitset<MAX_TAGS> TagBits;
 	typedef std::bitset<MAX_COMPONENTS> ComponentBits;
 
-	struct System;
-	struct SystemNode;
-
-	struct World : dd::IDebugPanel
+	struct EntitySpace
 	{
-		World();
+		EntitySpace(std::string name);
 
 		//
-		// Initialize all currently registered systems.
+		// Update the entity space - entities are created and deleted at this point.
 		//
-		void Initialize();
-
-		//
-		// Shut down all currently registered systems.
-		//
-		void Shutdown();
-
-		dd::MessageQueue& Messages() { return m_messages; }
-		const dd::MessageQueue& Messages() const { return m_messages; }
+		void Update(float delta_t);
 
 		//
 		// Create an entity. 
@@ -69,16 +48,6 @@ namespace ddc
 		// This will remain true for the remainder of the current frame after Destroy() is called on this entity.
 		//
 		bool IsAlive( Entity entity ) const;
-
-		//
-		// Update all registered systems with the given delta.
-		//
-		void Update( float delta_t );
-
-		//
-		// Register a system to be updated every update.
-		//
-		void RegisterSystem( System& system );
 
 		//
 		// Access a component from the given entity by type ID.
@@ -220,7 +189,10 @@ namespace ddc
 		//
 		TagBits GetAllTags( Entity e ) const;
 
-		virtual const char* GetDebugTitle() const override { return "World"; }
+		// 
+		// Get the name of this entity space.
+		//
+		std::string Name() const { return m_name; }
 
 	private:
 
@@ -244,28 +216,20 @@ namespace ddc
 			TagBits Tags;
 		};
 
-		dd::MessageQueue m_messages;
-
 		std::vector<EntityEntry> m_entities;
 		std::vector<uint> m_free;
 
 		std::vector<byte*> m_components;
 
-		std::vector<System*> m_systems;
-		std::vector<SystemNode> m_orderedSystems;
+		std::string m_name;
 
-		bool m_drawSystemsGraph { false };
-
-		void UpdateSystem( System* system, std::vector<std::shared_future<void>> dependencies, float delta_t );
-		void UpdateSystemsWithTreeScheduling( float delta_t );
-
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		//virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 
 	using ExpandType = int[];
 
 	template <typename... TComponents>
-	Entity World::CreateEntity()
+	Entity EntitySpace::CreateEntity()
 	{
 		Entity entity = CreateEntity();
 		
@@ -284,7 +248,7 @@ namespace ddc
 	}
 
 	template <typename... TComponents>
-	bool World::HasAll( Entity entity ) const
+	bool EntitySpace::HasAll( Entity entity ) const
 	{
 		ComponentBits mask;
 
@@ -307,7 +271,7 @@ namespace ddc
 	}
 
 	template <typename... TComponents>
-	void World::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
+	void EntitySpace::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
 	{
 		ComponentBits mask;
 
@@ -331,5 +295,60 @@ namespace ddc
 				}
 			}
 		}
+	}
+
+	bool Entity::IsValid() const
+	{
+		return m_space != nullptr && Handle != ~0;
+	}
+
+	bool Entity::IsAlive() const
+	{
+		return m_space != nullptr && m_space->IsAlive(*this);
+	}
+
+	template <typename TComponent>
+	TComponent* Entity::Access() const
+	{
+		return m_space->Access<TComponent>(*this);
+	}
+
+	template <typename TComponent>
+	const TComponent* Entity::Get() const
+	{
+		return m_space->Get<TComponent>(*this);
+	}
+
+	template <typename TComponent>
+	bool Entity::Has() const
+	{
+		return m_space->Has<TComponent>(*this);
+	}
+
+	template <typename TComponent>
+	TComponent& Entity::Add() const
+	{
+		return m_space->Add<TComponent>(*this);
+	}
+
+	template <typename TComponent>
+	void Entity::Remove() const
+	{
+		m_space->Remove<TComponent>(*this);
+	}
+
+	void Entity::AddTag(ddc::Tag tag) const
+	{
+		m_space->AddTag(*this, tag);
+	}
+
+	void Entity::RemoveTag(ddc::Tag tag) const
+	{
+		m_space->RemoveTag(*this, tag);
+	}
+
+	bool Entity::HasTag(ddc::Tag tag) const
+	{
+		return m_space->HasTag(*this, tag);
 	}
 }

@@ -8,7 +8,7 @@
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
 #include "HitTestSystem.h"
-#include "InputSystem.h"
+#include "Input.h"
 #include "LightComponent.h"
 #include "LightRenderer.h"
 #include "LinesRenderer.h"
@@ -33,13 +33,12 @@
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
 #include "IWindow.h"
-#include "World.h"
 #include "WorldRenderer.h"
 
 namespace neutrino
 {
-	static dd::Service<dd::InputBindings> s_inputBindings;
-	static dd::Service<dd::InputSystem> s_input;
+	static dd::Service<dd::InputKeyBindings> s_inputBindings;
+	static dd::Service<dd::Input> s_input;
 	//static dd::Service<dd::ShipSystem> s_shipSystem;
 	static dd::Service<dd::FreeCameraController> s_freeCamera;
 	static dd::Service<dd::FPSCameraComponent> s_player;
@@ -50,10 +49,11 @@ namespace neutrino
 	static dd::Service<dd::DebugUI> s_debugUI;
 	static dd::Service<dd::JobSystem> s_jobSystem;
 	static dd::Service<dd::FrameTimer> s_frameTimer;
+	static dd::Service<ddc::SystemManager> s_systemManager;
 
 	static void SetCameraPos(dd::InputAction action, dd::InputType type)
 	{
-		if (type != dd::InputType::RELEASED)
+		if (type != dd::InputType::Release)
 			return;
 
 		s_player->SetRotation(0, 0);
@@ -88,7 +88,7 @@ namespace neutrino
 		}
 	}
 
-	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::InputSystem& input, float delta_t)
+	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::Input& input, float delta_t)
 	{
 		if (s_freeCamera->IsEnabled() && s_input->GetMode() == dd::InputMode::GAME)
 		{
@@ -101,20 +101,20 @@ namespace neutrino
 
 	static void ToggleFreeCam(dd::InputAction action, dd::InputType type)
 	{
-		if (action == dd::InputAction::TOGGLE_FREECAM && type == dd::InputType::RELEASED)
+		if (action == dd::InputAction::TOGGLE_FREECAM && type == dd::InputType::Release)
 		{
 			s_freeCamera->Enable(!s_freeCamera->IsEnabled());
 			//s_shipSystem->Enable(!s_shipSystem->IsEnabled());
 		}
 	}
 
-	static void CreateEntities(ddc::World& world)
+	static void CreateEntities(ddc::EntitySpace& entities)
 	{
 		// player
 		{
-			ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
+			ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
 
-			dd::Services::Register(world.Access<dd::FPSCameraComponent>(entity));
+			dd::Services::Register(entities.Access<dd::FPSCameraComponent>(entity));
 			s_player->SetSize(s_window->GetSize());
 			s_player->SetVerticalFOV(glm::radians(45.0f));
 
@@ -124,31 +124,31 @@ namespace neutrino
 
 			s_debugUI->RegisterDebugPanel(s_shakyCamera);
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
 
 		}
 
 		// dir light
 		{
-			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-			world.AddTag(entity, ddc::Tag::Visible);
+			ddc::Entity entity = entities.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			entities.AddTag(entity, ddc::Tag::Visible);
 
-			dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
+			dd::LightComponent* light = entities.Access<dd::LightComponent>(entity);
 			light->LightType = dd::LightType::Directional;
 			light->Colour = glm::vec3(1, 1, 1);
 			light->Intensity = 0.7;
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
 			transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 1, 0));
 			transform->Update();
 		}
 
 		// point light
 		{
-			ddc::Entity entity = world.CreateEntity<dd::LightComponent, dd::TransformComponent>();
-			world.AddTag(entity, ddc::Tag::Visible);
+			ddc::Entity entity = entities.CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			entities.AddTag(entity, ddc::Tag::Visible);
 
-			dd::LightComponent* light = world.Access<dd::LightComponent>(entity);
+			dd::LightComponent* light = entities.Access<dd::LightComponent>(entity);
 			light->LightType = dd::LightType::Point;
 			light->Colour = glm::vec3(1, 1, 1);
 			light->Intensity = 3;
@@ -157,7 +157,7 @@ namespace neutrino
 			light->InnerAngle = glm::radians(30.f);
 			light->OuterAngle = glm::radians(45.f);
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>(entity);
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
 			transform->Position = glm::vec3(0, 30, 0);
 			transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 0, 0));
 			transform->Update();
@@ -165,30 +165,30 @@ namespace neutrino
 
 		// particle system
 		/*{
-			ddc::Entity entity = world.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
-			world.AddTag( entity, ddc::Tag::Visible );
-			world.AddTag( entity, ddc::Tag::Dynamic );
+			ddc::Entity entity = entities.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
+			entities.AddTag( entity, ddc::Tag::Visible );
+			entities.AddTag( entity, ddc::Tag::Dynamic );
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 			transform->Position = glm::vec3( 10, 60, 10 );
 			transform->Update();
 
-			dd::BoundBoxComponent* bounds = world.Access<dd::BoundBoxComponent>( entity );
+			dd::BoundBoxComponent* bounds = entities.Access<dd::BoundBoxComponent>( entity );
 			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
 
-			dd::ParticleSystemComponent* particle = world.Access<dd::ParticleSystemComponent>( entity );
+			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
 			particle->Lifetime = 1000;
 		}*/
 
 		// axes
-		dd::TestEntities::CreateAxes(world);
+		dd::TestEntities::CreateAxes(entities);
 
 		// physics
 		//dd::TestEntities::CreatePhysicsPlaneTestScene();
 	}
 
-	void NeutrinoGame::Initialize(ddc::World& world)
+	void NeutrinoGame::Initialize(ddc::EntitySpace& entities)
 	{
 		dd::SwarmSystem& swarm_system = dd::Services::Register(new dd::SwarmSystem());
 
@@ -223,23 +223,24 @@ namespace neutrino
 		dd::WaterSystem& water_system = dd::Services::Register(new dd::WaterSystem(terrain_system.GetTerrainParameters()));
 		water_system.DependsOn(terrain_system);
 
-		world.RegisterSystem(*s_freeCamera);
-		world.RegisterSystem(terrain_system);
-		world.RegisterSystem(particle_system);
-		world.RegisterSystem(*hit_testing_system);
-		world.RegisterSystem(bullet_system);
-		world.RegisterSystem(physics_system);
-		world.RegisterSystem(swarm_system);
-		world.RegisterSystem(tree_system);
-		world.RegisterSystem(water_system);
+		s_systemManager->Register(*s_freeCamera);
+		s_systemManager->Register(terrain_system);
+		s_systemManager->Register(particle_system);
+		s_systemManager->Register(*hit_testing_system);
+		s_systemManager->Register(bullet_system);
+		s_systemManager->Register(physics_system);
+		s_systemManager->Register(swarm_system);
+		s_systemManager->Register(tree_system);
+		s_systemManager->Register(water_system);
 
-		s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
+		DD_TODO("Fix input bindings");
+		/*s_inputBindings->RegisterHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
 		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_1, &SetCameraPos);
 		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_2, &SetCameraPos);
 		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_3, &SetCameraPos);
 		s_inputBindings->RegisterHandler(dd::InputAction::CAMERA_POS_4, &SetCameraPos);
 		s_inputBindings->RegisterHandler(dd::InputAction::INCREASE_DEPTH, &SetCameraPos);
-		s_inputBindings->RegisterHandler(dd::InputAction::DECREASE_DEPTH, &SetCameraPos);
+		s_inputBindings->RegisterHandler(dd::InputAction::DECREASE_DEPTH, &SetCameraPos);*/
 
 		ddr::ParticleSystemRenderer& particle_renderer = dd::Services::Register(new ddr::ParticleSystemRenderer());
 
@@ -285,21 +286,21 @@ namespace neutrino
 		s_debugUI->RegisterDebugPanel(tree_system);
 		s_debugUI->RegisterDebugPanel(water_system);
 
-		CreateEntities(world);
+		CreateEntities(entities);
 	}
 
-	void NeutrinoGame::Update(ddc::World& world)
+	void NeutrinoGame::Update(ddc::EntitySpace& entities)
 	{
 	}
 
-	void NeutrinoGame::RenderUpdate(ddc::World& world)
+	void NeutrinoGame::RenderUpdate(ddc::EntitySpace& entities)
 	{
 		s_player->SetSize(s_window->GetSize());
 
 		UpdateFreeCam(s_freeCamera, s_shakyCamera, s_input, s_frameTimer->AppDelta());
 	}
 
-	void NeutrinoGame::Shutdown(ddc::World& world)
+	void NeutrinoGame::Shutdown(ddc::EntitySpace& entities)
 	{
 
 	}

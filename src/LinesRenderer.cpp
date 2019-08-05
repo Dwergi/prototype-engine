@@ -36,7 +36,7 @@ namespace ddr
 		m_renderState.Depth = true;
 	}
 
-	void LinesRenderer::RenderInit( ddc::World& world )
+	void LinesRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );

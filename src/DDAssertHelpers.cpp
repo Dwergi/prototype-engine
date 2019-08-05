@@ -10,7 +10,7 @@
 #include "DebugUI.h"
 #include "FrameTimer.h"
 #include "IInputSource.h"
-#include "InputSystem.h"
+#include "Input.h"
 #include "Services.h"
 #include "IWindow.h"
 
@@ -108,7 +108,7 @@ namespace dd
 
 	static std::thread::id s_mainThread;
 	Service<dd::FrameTimer> s_frameTimer;
-	Service<dd::InputSystem> s_input;
+	Service<dd::Input> s_input;
 	Service<dd::DebugUI> s_debugUI;
 	Service<dd::IWindow> s_window;
 
@@ -145,6 +145,11 @@ namespace dd
 	{
 		s_mainThread = std::this_thread::get_id();
 
+		dd::InputModeConfig::Create("assert")
+			.CaptureMouse(false)
+			.CentreMouse(false)
+			.ShowCursor(true);
+
 		pempek::assert::implementation::setAssertHandler(OnAssert);
 	}
 
@@ -159,7 +164,7 @@ namespace dd
 			printf(s_message.c_str());
 			OutputDebugStringA(s_message.c_str());
 
-			s_input->GetSource().SetMouseCapture(false);
+			s_input->SetCurrentMode("assert");
 
 			if (s_debugUI->IsMidWindow())
 			{

@@ -12,7 +12,7 @@
 #include "BoundsHelpers.h"
 #include "ICamera.h"
 #include "IInputSource.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 #include "IWindow.h"
 #include "MeshComponent.h"
 #include "Mesh.h"
@@ -27,7 +27,7 @@
 #include "TransformComponent.h"
 #include "Uniforms.h"
 #include "UpdateData.h"
-#include "World.h"
+
 
 #include "HitTest.h"
 
@@ -55,7 +55,7 @@ namespace dd
 		RequireTag(ddc::Tag::Dynamic);
 	}
 
-	void MousePicking::BindActions(InputBindings& bindings)
+	void MousePicking::BindActions(InputKeyBindings& bindings)
 	{
 		auto handler = [this](InputAction action, InputType type)
 		{
@@ -68,12 +68,12 @@ namespace dd
 
 	void MousePicking::HandleInput(InputAction action, InputType type)
 	{
-		if (action == InputAction::SELECT_MESH && type == InputType::RELEASED)
+		if (action == InputAction::SELECT_MESH && type == InputType::Release)
 		{
 			m_select = true;
 		}
 
-		if (action == InputAction::TOGGLE_PICKING && type == InputType::RELEASED)
+		if (action == InputAction::TOGGLE_PICKING && type == InputType::Release)
 		{
 			m_enabled = !m_enabled;
 			IDebugPanel::SetDebugPanelOpen(true);
@@ -112,7 +112,7 @@ namespace dd
 		return base[index];
 	}
 
-	void MousePicking::RenderInit(ddc::World& world)
+	void MousePicking::RenderInit(ddc::EntitySpace& entities)
 	{
 		ddr::ShaderHandle shader = s_shaderManager->Load("picking");
 		m_material = s_materialManager->Create("picking");
@@ -121,8 +121,8 @@ namespace dd
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
 
-		m_previousRay = world.CreateEntity();
-		world.Add<dd::RayComponent>(m_previousRay);
+		m_previousRay = entities.CreateEntity();
+		entities.Add<dd::RayComponent>(m_previousRay);
 	}
 
 	void MousePicking::CreateFrameBuffer(glm::ivec2 window_size)
@@ -146,19 +146,19 @@ namespace dd
 		m_framebuffer.RenderInit();
 	}
 
-	void MousePicking::RenderUpdate(ddc::World& world)
+	void MousePicking::RenderUpdate(ddc::EntitySpace& entities)
 	{
 		// set focused
 		if (m_focused.IsValid())
 		{
-			world.RemoveTag(m_focused, ddc::Tag::Focused);
+			entities.RemoveTag(m_focused, ddc::Tag::Focused);
 		}
 
 		m_focused = m_hitEntity;
 
 		if (m_focused.IsValid())
 		{
-			world.AddTag(m_focused, ddc::Tag::Focused);
+			entities.AddTag(m_focused, ddc::Tag::Focused);
 		}
 
 		// select
@@ -166,24 +166,24 @@ namespace dd
 		{
 			if (m_selected.IsValid())
 			{
-				world.RemoveTag(m_selected, ddc::Tag::Selected);
+				entities.RemoveTag(m_selected, ddc::Tag::Selected);
 			}
 
 			m_selected = m_hitEntity;
 
 			if (m_selected.IsValid())
 			{
-				world.AddTag(m_focused, ddc::Tag::Selected);
+				entities.AddTag(m_focused, ddc::Tag::Selected);
 			}
 		}
 
 		if (m_visualizeRay)
 		{
-			world.AddTag(m_previousRay, ddc::Tag::Visible);
+			entities.AddTag(m_previousRay, ddc::Tag::Visible);
 		}
 		else
 		{
-			world.RemoveTag(m_previousRay, ddc::Tag::Visible);
+			entities.RemoveTag(m_previousRay, ddc::Tag::Visible);
 		}
 
 		m_select = false;
@@ -257,13 +257,13 @@ namespace dd
 		int id = GetEntityIDAt(m_position);
 		m_depth = (1.0f / GetDepthAt(m_position)) / 100.f;
 
-		ddc::Entity entity = data.World().GetEntity(id);
+		ddc::Entity entity = data.EntitySpace().GetEntity(id);
 		return entity;
 	}
 
 	ddc::Entity MousePicking::HitTestRay(const ddr::RenderData& data)
 	{
-		const ddc::World& world = data.World();
+		const ddc::EntitySpace& entities = data.EntitySpace();
 
 		if (m_pendingHit.Valid)
 		{
@@ -336,7 +336,7 @@ namespace dd
 
 		if (m_select)
 		{
-			dd::RayComponent* ray = world.Access<dd::RayComponent>(m_previousRay);
+			dd::RayComponent* ray = entities.Access<dd::RayComponent>(m_previousRay);
 			ray->Ray = screen_ray;
 			ray->Ray.Length = m_depth;
 		}
@@ -353,7 +353,7 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::DrawDebugInternal(ddc::World& world)
+	void MousePicking::DrawDebugInternal(ddc::EntitySpace& entities)
 	{
 		ImGui::SetWindowPos(ImVec2(2.0f, ImGui::GetIO().DisplaySize.y - 100), ImGuiCond_FirstUseEver);
 
@@ -400,7 +400,7 @@ namespace dd
 		{
 			ImGui::Checkbox("Visualize Ray", &m_visualizeRay);
 
-			const dd::RayComponent* ray_cmp = world.Get<dd::RayComponent>(m_previousRay);
+			const dd::RayComponent* ray_cmp = entities.Get<dd::RayComponent>(m_previousRay);
 
 			ImGui::Value("Ray Origin", ray_cmp->Ray.Origin());
 			ImGui::Value("Ray Dir", ray_cmp->Ray.Direction());
@@ -412,7 +412,7 @@ namespace dd
 		{
 			if (m_focused.IsValid())
 			{
-				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>(m_focused);
+				const dd::MeshComponent* mesh_cmp = entities.Get<MeshComponent>(m_focused);
 				if (mesh_cmp != nullptr)
 				{
 					const std::string& name = mesh_cmp->Mesh.Get()->Name();
@@ -423,7 +423,7 @@ namespace dd
 					ImGui::TextUnformatted("Mesh: <none>");
 				}
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>(m_focused)->Position;
+				glm::vec3 mesh_pos = entities.Get<TransformComponent>(m_focused)->Position;
 				ImGui::Value("Position", mesh_pos, "%.2f");
 			}
 			else
@@ -439,7 +439,7 @@ namespace dd
 		{
 			if (m_selected.IsValid())
 			{
-				const dd::MeshComponent* mesh_cmp = world.Get<MeshComponent>(m_selected);
+				const dd::MeshComponent* mesh_cmp = entities.Get<MeshComponent>(m_selected);
 				if (mesh_cmp != nullptr)
 				{
 					const std::string& name = mesh_cmp->Mesh.Get()->Name();
@@ -450,7 +450,7 @@ namespace dd
 					ImGui::TextUnformatted("Mesh: <none>");
 				}
 
-				glm::vec3 mesh_pos = world.Get<TransformComponent>(m_selected)->Position;
+				glm::vec3 mesh_pos = entities.Get<TransformComponent>(m_selected)->Position;
 				ImGui::Value("Position", mesh_pos, "%.2f");
 			}
 			else
@@ -464,7 +464,7 @@ namespace dd
 	}
 
 	//
-	// Unproject a point at the mouse coordinates at the near plane and at the far plane to get a world-space ray.
+	// Unproject a point at the mouse coordinates at the near plane and at the far plane to get a entities-space ray.
 	//
 	ddm::Ray MousePicking::GetScreenRay(const ddr::ICamera& camera, float length) const
 	{

@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include "Entity.h"
 #include "FrameBuffer.h"
 #include "IAsyncHitTest.h"
 #include "IDebugPanel.h"
-#include "IHandlesInput.h"
 #include "InputAction.h"
 #include "Material.h"
 #include "Ray.h"
@@ -35,14 +33,14 @@ namespace dd
 	struct IAsyncHitTest;
 	struct HitState;
 	struct IInputSource;
-	struct InputBindings;
+	struct InputKeyBindings;
 	struct MeshComponent;
 	struct MousePosition;
 	struct RayComponent;
 	struct TransformComponent;
 	struct Window;
 	
-	struct MousePicking : IDebugPanel, IHandlesInput, ddr::Renderer
+	struct MousePicking : IDebugPanel, ddr::Renderer
 	{
 		static const int DownScalingFactor = 2;
 
@@ -51,12 +49,12 @@ namespace dd
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;
 
-		virtual void BindActions( InputBindings& bindings ) override;
+		virtual void BindActions( InputKeyBindings& bindings ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
-		virtual void RenderInit( ddc::World& world ) override;
-		virtual void RenderUpdate( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
+		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
 		virtual void Render( const ddr::RenderData& render_data ) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
@@ -94,7 +92,7 @@ namespace dd
 
 		glm::ivec2 m_previousSize;
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 

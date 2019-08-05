@@ -36,8 +36,6 @@
 #define DD_DIAGNOSTIC( ... )
 #endif
 
-#define DD_STATIC_ASSERT PPK_STATIC_ASSERT
-
 namespace dd
 {
 	enum class AssertAction

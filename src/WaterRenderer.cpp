@@ -32,7 +32,7 @@ namespace ddr
 		Require<dd::ColourComponent>();
 	}
 
-	void WaterRenderer::RenderInit( ddc::World& world )
+	void WaterRenderer::RenderInit( ddc::EntitySpace& entities )
 	{
 		DD_TODO("This should be in renderer, irrelevant to system.");
 		ddr::MaterialHandle material_h = s_materialManager->Create("water");
@@ -45,9 +45,9 @@ namespace ddr
 		material->State.DepthWrite = false;
 	}
 
-	void WaterRenderer::RenderUpdate( ddc::World& world )
+	void WaterRenderer::RenderUpdate( ddc::EntitySpace& entities )
 	{
-		world.ForAllWith<dd::WaterComponent>( [&world]( ddc::Entity entity, dd::WaterComponent& water )
+		entities.ForAllWith<dd::WaterComponent>( [&entities]( ddc::Entity entity, dd::WaterComponent& water )
 		{
 			if( water.Dirty && water.Mesh.IsValid() )
 			{

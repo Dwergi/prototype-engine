@@ -7,19 +7,16 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "IHandlesInput.h"
 
 namespace dd
 {
-	struct InputBindings;
-
-	struct EntityVisualizer : IDebugPanel, IHandlesInput
+	struct EntityVisualizer : IDebugPanel
 	{
+		EntityVisualizer();
+
 		virtual const char* GetDebugTitle() const override { return "Entity Data"; }
 
-		virtual void BindActions( InputBindings& bindings ) override;
-
 	private:
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

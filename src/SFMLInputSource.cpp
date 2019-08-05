@@ -77,22 +77,22 @@ namespace dd
 		}
 	}
 
-	static uint8 GetModifiers( const sf::Event::KeyEvent& evt )
+	static ModifierFlags GetModifiers( const sf::Event::KeyEvent& evt )
 	{
-		uint8 modifiers = 0;
+		ModifierFlags modifiers;
 		if( evt.alt )
 		{
-			modifiers |= Modifiers::ALT;
+			modifiers.Set(Modifier::Alt);
 		}
 
 		if( evt.control )
 		{
-			modifiers |= Modifiers::CTRL;
+			modifiers.Set(Modifier::Ctrl);
 		}
 
 		if( evt.shift )
 		{
-			modifiers |= Modifiers::SHIFT;
+			modifiers.Set(Modifier::Shift);
 		}
 
 		return modifiers;
@@ -131,23 +131,23 @@ namespace dd
 				case sf::Event::KeyPressed:
 				{
 					Key key = GetKeyCode( evt.key.code );
-					int modifiers = GetModifiers( evt.key );
-					OnKey( key, modifiers, InputType::PRESSED );
+					ModifierFlags modifiers = GetModifiers( evt.key );
+					OnKey( key, modifiers, InputType::Press );
 					break;
 				}
 				case sf::Event::KeyReleased:
 				{
 					Key key = GetKeyCode(evt.key.code);
-					int modifiers = GetModifiers(evt.key);
-					OnKey(key, modifiers, InputType::RELEASED);
+					ModifierFlags modifiers = GetModifiers(evt.key);
+					OnKey(key, modifiers, InputType::Release);
 					break;
 				}
 				case sf::Event::MouseButtonPressed:
-					OnKey(GetMouseButton(evt.mouseButton), Modifiers::NONE, InputType::PRESSED);
+					OnKey(GetMouseButton(evt.mouseButton), Modifier::None, InputType::Press);
 					break;
 
 				case sf::Event::MouseButtonReleased:
-					OnKey(GetMouseButton(evt.mouseButton), Modifiers::NONE, InputType::RELEASED);
+					OnKey(GetMouseButton(evt.mouseButton), Modifier::None, InputType::Release);
 					break;
 
 				case sf::Event::MouseMoved:

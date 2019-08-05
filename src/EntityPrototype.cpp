@@ -48,33 +48,33 @@ namespace ddc
 		memcpy( cmp, Data, Size );
 	}
 
-	void EntityPrototype::PopulateFromEntity( ddc::Entity entity, const ddc::World& world )
+	void EntityPrototype::PopulateFromEntity( ddc::Entity entity, const ddc::EntitySpace& entities )
 	{
 		DD_ASSERT( Components.empty(), "Already initialized EntityPrototype!" );
 
-		Tags = world.GetAllTags( entity );
+		Tags = entities.GetAllTags( entity );
 
 		dd::Array<dd::ComponentID, MAX_COMPONENTS> components;
-		world.GetAllComponents( entity, components );
+		entities.GetAllComponents( entity, components );
 
 		for( dd::ComponentID id : components )
 		{
-			const void* cmp = world.GetComponent( entity, id );
+			const void* cmp = entities.GetComponent( entity, id );
 			Components.emplace_back( cmp, id );
 		}
 	}
 
-	ddc::Entity EntityPrototype::Instantiate( ddc::World& world )
+	ddc::Entity EntityPrototype::Instantiate( ddc::EntitySpace& entities )
 	{
-		ddc::Entity entity = world.CreateEntity();
+		ddc::Entity entity = entities.CreateEntity();
 
 		for( const ComponentPrototype& cmp : Components )
 		{
-			void* data = world.AddComponent( entity, cmp.ID );
+			void* data = entities.AddComponent( entity, cmp.ID );
 			cmp.CopyTo( data );
 		}
 
-		world.SetAllTags( entity, Tags );
+		entities.SetAllTags( entity, Tags );
 
 		return entity;
 	}

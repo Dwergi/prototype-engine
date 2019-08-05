@@ -11,9 +11,7 @@
 #include "Circle2DPhysicsComponent.h"
 #include "EntityPrototype.h"
 #include "File.h"
-#include "InputBindings.h"
-#include "IInputSource.h"
-#include "InputSystem.h"
+#include "Input.h"
 #include "IWindow.h"
 #include "Light2DComponent.h"
 #include "Light2DRenderer.h"
@@ -27,6 +25,7 @@
 #include "SpriteSheet.h"
 #include "SpriteTileComponent.h"
 #include "SpriteTileSystem.h"
+#include "SystemManager.h"
 #include "Texture.h"
 #include "WorldRenderer.h"
 
@@ -57,17 +56,12 @@ namespace lux
 	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<ddr::WorldRenderer> s_renderer;
-	static dd::Service<dd::IInputSource> s_inputSource;
-	static dd::Service<dd::InputBindings> s_inputBindings;
-	static dd::Service<dd::InputSystem> s_inputSystem;
+	static dd::Service<dd::Input> s_input;
+	static dd::Service<ddc::SystemManager> s_systemManager;
 
 	static ddc::Entity s_player;
 	static ddc::Entity s_teleporter;
 	static ddr::SpriteHandle s_teleporterDynamicSprite;
-
-	static bool s_shouldThrow { false };
-	static bool s_shouldReturn { false };
-	static bool s_shouldReset { false };
 
 	static LuxportMap* s_currentMap { nullptr };
 	static int s_desiredMapIndex { 1 };
@@ -84,7 +78,7 @@ namespace lux
 	static const char* const MAP_BACKGROUND = "spacestation_tileset.png";
 	static const char* const MAP_FOREGROUND = "spacestation_objects.png";
 
-	static std::vector<ddc::Entity> s_mapEntities;
+	static std::vector<ddc::Entity> s_mapspace;
 
 	static sf::Music* s_music = nullptr;
 	static sf::SoundBuffer* s_teleportSoundBuffer = nullptr;
@@ -96,58 +90,25 @@ namespace lux
 	static sf::Sound* s_activeSound2 = nullptr;
 	static sf::Listener* s_listener = nullptr;
 
-	static void OnSwitchMap(dd::InputAction action, dd::InputType type)
-	{
-		if (type == dd::InputType::RELEASED)
-		{
-			if (action == dd::InputAction::PREVIOUS_MAP)
-			{
-				--s_desiredMapIndex;
-				if (s_desiredMapIndex <= 0)
-				{
-					s_desiredMapIndex = MAX_MAP;
-				}
-			}
-			else if (action == dd::InputAction::NEXT_MAP)
-			{
-				++s_desiredMapIndex;
-
-				if (s_desiredMapIndex > MAX_MAP)
-				{
-					s_desiredMapIndex = 1;
-				}
-			}
-		}
-	}
-
 	static void OnThrowTeleporter(dd::InputAction action, dd::InputType type)
 	{
-		if (type == dd::InputType::RELEASED && action == dd::InputAction::SHOOT)
-		{
-			s_shouldThrow = true;
-		}
+		s_shouldThrow = true;
 	}
 
 	static void OnReturnTeleporter(dd::InputAction action, dd::InputType type)
 	{
-		if (type == dd::InputType::RELEASED && action == dd::InputAction::RETURN_TELEPORTER)
-		{
-			s_shouldReturn = true;
-		}
+		s_shouldReturn = true;
 	}
 
 	static void OnReset(dd::InputAction action, dd::InputType type)
 	{
-		if (type == dd::InputType::RELEASED && action == dd::InputAction::RESET)
-		{
-			s_shouldReset = true;
-		}
+		s_shouldReset = true;
 	}
 
-	static ddc::Entity CreateTeleporter(ddc::World& world)
+	static ddc::Entity CreateTeleporter(ddc::EntitySpace& space)
 	{
-		ddc::Entity teleporter = world.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent, dd::Circle2DPhysicsComponent, dd::SpriteAnimationComponent>();
-		world.AddTag(teleporter, ddc::Tag::Visible);
+		ddc::Entity teleporter = space.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent, dd::Circle2DPhysicsComponent, dd::SpriteAnimationComponent>();
+		space.AddTag(teleporter, ddc::Tag::Visible);
 
 		{
 			ddr::SpriteSheetHandle fg_spritesheet_h = s_spriteSheetManager->Find(MAP_FOREGROUND);
@@ -158,9 +119,9 @@ namespace lux
 		ddr::SpriteSheetHandle char_spritesheet_h = s_spriteSheetManager->Find(PLAYER_SPRITESHEET);
 		const ddr::SpriteSheet* char_spritesheet = char_spritesheet_h.Get();
 
-		dd::SpriteComponent* sprite_cmp = world.Access<dd::SpriteComponent>(teleporter);
+		dd::SpriteComponent* sprite_cmp = space.Access<dd::SpriteComponent>(teleporter);
 
-		dd::SpriteAnimationComponent* sprite_anim_cmp = world.Access<dd::SpriteAnimationComponent>(teleporter);
+		dd::SpriteAnimationComponent* sprite_anim_cmp = space.Access<dd::SpriteAnimationComponent>(teleporter);
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(4, 0));
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(5, 0));
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(6, 0));
@@ -170,37 +131,37 @@ namespace lux
 		sprite_cmp->Sprite = sprite_anim_cmp->Frames[0];
 		sprite_cmp->ZIndex = TELEPORTER_Z_INDEX;
 
-		lux::SpriteTileComponent* sprite_tile_cmp = world.Access<lux::SpriteTileComponent>(teleporter);
+		lux::SpriteTileComponent* sprite_tile_cmp = space.Access<lux::SpriteTileComponent>(teleporter);
 		sprite_tile_cmp->Scale = glm::vec2(2);
 
-		dd::Circle2DPhysicsComponent* physics = world.Access<dd::Circle2DPhysicsComponent>(teleporter);
+		dd::Circle2DPhysicsComponent* physics = space.Access<dd::Circle2DPhysicsComponent>(teleporter);
 		physics->Radius = TELEPORTER_RADIUS;
 		physics->Elasticity = TELEPORTER_ELASTICITY;
 
-		lux::Light2DComponent& light = world.Add<lux::Light2DComponent>(teleporter);
+		lux::Light2DComponent& light = space.Add<lux::Light2DComponent>(teleporter);
 		light.Type = lux::LightType::Teleporter;
 		return teleporter;
 	}
 
-	static ddc::Entity CreatePlayer(ddc::World& world)
+	static ddc::Entity CreatePlayer(ddc::EntitySpace& space)
 	{
-		ddc::Entity player = world.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent, dd::SpriteAnimationComponent, dd::Box2DPhysicsComponent>();
-		world.AddTag(player, ddc::Tag::Visible);
+		ddc::Entity player = space.CreateEntity<dd::SpriteComponent, lux::SpriteTileComponent, dd::SpriteAnimationComponent, dd::Box2DPhysicsComponent>();
+		space.AddTag(player, ddc::Tag::Visible);
 
 		ddr::SpriteSheetHandle spritesheet_h = s_spriteSheetManager->Find(PLAYER_SPRITESHEET);
 		const ddr::SpriteSheet* spritesheet = spritesheet_h.Get();
 
-		lux::SpriteTileComponent* sprite_tile_cmp = world.Access<lux::SpriteTileComponent>(player);
+		lux::SpriteTileComponent* sprite_tile_cmp = space.Access<lux::SpriteTileComponent>(player);
 		sprite_tile_cmp->Scale = glm::vec2(2);
 
-		dd::SpriteAnimationComponent* sprite_anim_cmp = world.Access<dd::SpriteAnimationComponent>(player);
+		dd::SpriteAnimationComponent* sprite_anim_cmp = space.Access<dd::SpriteAnimationComponent>(player);
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(0, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(1, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(2, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(3, 0));
 		sprite_anim_cmp->Framerate = 4;
 
-		dd::SpriteComponent* sprite_cmp = world.Access<dd::SpriteComponent>(player);
+		dd::SpriteComponent* sprite_cmp = space.Access<dd::SpriteComponent>(player);
 		sprite_cmp->Sprite = sprite_anim_cmp->Frames[0];
 		sprite_cmp->ZIndex = PLAYER_Z_INDEX;
 
@@ -209,7 +170,7 @@ namespace lux
 			DD_ASSERT(frame.IsValid());
 		}
 
-		dd::Box2DPhysicsComponent* physics = world.Access<dd::Box2DPhysicsComponent>(player);
+		dd::Box2DPhysicsComponent* physics = space.Access<dd::Box2DPhysicsComponent>(player);
 		physics->HitBoxMin = glm::vec2(0.28, 0.0625);
 		physics->HitBoxMax = glm::vec2(0.72, 1);
 		physics->Elasticity = 0;
@@ -217,7 +178,7 @@ namespace lux
 		return player;
 	}
 
-	void LuxportGame::Initialize(ddc::World& world)
+	void LuxportGame::Initialize(ddc::EntitySpace& space)
 	{
 		dd::Services::RegisterInterface<ddr::ICamera>(new ddr::OrthoCamera());
 
@@ -228,15 +189,15 @@ namespace lux
 		s_renderer->Register(sprite_renderer);
 
 		dd::Physics2DSystem& physics_system = dd::Services::Register(new dd::Physics2DSystem());
-		world.RegisterSystem(physics_system);
+		s_systemManager->Register(physics_system);
 
 		dd::SpriteAnimationSystem& sprite_anim_system = dd::Services::Register(new dd::SpriteAnimationSystem());
-		world.RegisterSystem(sprite_anim_system);
+		s_systemManager->Register(sprite_anim_system);
 
 		lux::SpriteTileSystem& sprite_tile_system = dd::Services::Register(new lux::SpriteTileSystem(MAP_SIZE, 16));
 		sprite_tile_system.DependsOn(physics_system);
 		sprite_tile_system.DependsOn(sprite_anim_system);
-		world.RegisterSystem(sprite_tile_system);
+		s_systemManager->Register(sprite_tile_system);
 
 		ddr::TextureHandle spritesheet_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
 		s_spriteSheetManager->Load(PLAYER_SPRITESHEET, spritesheet_tex_h, glm::ivec2(32));
@@ -247,24 +208,24 @@ namespace lux
 		ddr::TextureHandle foreground_tex_h = s_textureManager->Load(MAP_FOREGROUND);
 		s_spriteSheetManager->Load(MAP_FOREGROUND, foreground_tex_h, glm::ivec2(16));
 
-		s_teleporter = CreateTeleporter(world);
-		s_player = CreatePlayer(world);
+		s_teleporter = CreateTeleporter(space);
+		s_player = CreatePlayer(space);
 
-		dd::InputMode* game_input = dd::InputMode::Access(dd::InputMode::GAME);
-		game_input->ShowCursor(true)
+		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
+		game_input.ShowCursor(true)
 			.CaptureMouse(true)
 			.CentreMouse(false);
 
-		s_inputBindings->RegisterHandler(dd::InputAction::NEXT_MAP, &OnSwitchMap);
+		/*s_inputBindings->RegisterHandler(dd::InputAction::NEXT_MAP, &OnSwitchMap);
 		s_inputBindings->RegisterHandler(dd::InputAction::PREVIOUS_MAP, &OnSwitchMap);
 		s_inputBindings->RegisterHandler(dd::InputAction::SHOOT, &OnThrowTeleporter);
 		s_inputBindings->RegisterHandler(dd::InputAction::RETURN_TELEPORTER, &OnReturnTeleporter);
-		s_inputBindings->RegisterHandler(dd::InputAction::RESET, &OnReset);
+		s_inputBindings->RegisterHandler(dd::InputAction::RESET, &OnReset);*/
 
-		s_inputSource->BindKey(dd::InputAction::NEXT_MAP, dd::Key::ENTER);
+		/*s_inputSource->BindKey(dd::InputAction::NEXT_MAP, dd::Key::ENTER);
 		s_inputSource->BindKey(dd::InputAction::PREVIOUS_MAP, dd::Key::ENTER, dd::SHIFT);
 		s_inputSource->BindKey(dd::InputAction::RETURN_TELEPORTER, dd::Key::MOUSE_RIGHT);
-		s_inputSource->BindKey(dd::InputAction::RESET, dd::Key::R);
+		s_inputSource->BindKey(dd::InputAction::RESET, dd::Key::R);*/
 
 		s_music = new sf::Music();
 		std::filesystem::path sound_path = dd::File::GetDataRoot();
@@ -291,11 +252,11 @@ namespace lux
 		s_listener = new sf::Listener();
 	}
 
-	void LuxportGame::Shutdown(ddc::World& world)
+	void LuxportGame::Shutdown(ddc::EntitySpace& space)
 	{
 		if (s_currentMap != nullptr)
 		{
-			s_currentMap->Unload(world);
+			s_currentMap->Unload(space);
 			delete s_currentMap;
 		}
 
@@ -311,62 +272,64 @@ namespace lux
 		delete s_teleReturnSoundBuffer;
 	}
 
-	static void ReturnTeleporterToPlayer(ddc::World& world)
+	static void ReturnTeleporterToPlayer(ddc::EntitySpace& space)
 	{
-		world.RemoveTag(s_teleporter, ddc::Tag::Dynamic);
+		space.RemoveTag(s_teleporter, ddc::Tag::Dynamic);
 
-		lux::SpriteTileComponent* player_tile = world.Access<lux::SpriteTileComponent>(s_player);
+		lux::SpriteTileComponent* player_tile = s_player->Access<lux::SpriteTileComponent>();
 
-		lux::SpriteTileComponent* tele_tile = world.Access<lux::SpriteTileComponent>(s_teleporter);
+		lux::SpriteTileComponent* tele_tile = s_teleporter->Access<lux::SpriteTileComponent>(s_teleporter);
 		tele_tile->Coordinate = player_tile->Coordinate;
 		tele_tile->Scale = glm::vec2(2);
 
-		dd::Circle2DPhysicsComponent* tele_physics = world.Access<dd::Circle2DPhysicsComponent>(s_teleporter);
+		dd::Circle2DPhysicsComponent* tele_physics = s_teleporter->Access<dd::Circle2DPhysicsComponent>(s_teleporter);
 		tele_physics->Reset();
 
-		dd::SpriteAnimationComponent* player_anim = world.Access<dd::SpriteAnimationComponent>(s_player);
-		dd::SpriteAnimationComponent* tele_anim = world.Access<dd::SpriteAnimationComponent>(s_teleporter);
+		dd::SpriteAnimationComponent* player_anim = s_player->Access<dd::SpriteAnimationComponent>(s_player);
+		dd::SpriteAnimationComponent* tele_anim = s_teleporter->Access<dd::SpriteAnimationComponent>(s_teleporter);
 		tele_anim->CurrentFrame = player_anim->CurrentFrame;
 		tele_anim->Time = player_anim->Time;
 		tele_anim->IsPlaying = true;
 
-		dd::SpriteComponent* tele_sprite = world.Access<dd::SpriteComponent>(s_teleporter);
+		dd::SpriteComponent* tele_sprite = s_teleporter->Access<dd::SpriteComponent>();
 		tele_sprite->Sprite = tele_anim->Frames[tele_anim->CurrentFrame];
 	}
 
-	static void ResetPlayerToStart(ddc::World& world)
+	static void ResetPlayerToStart(ddc::EntitySpace& space)
 	{
+		DD_TODO("It would be good to be able to make a full copy of an entity as a scratch copy instead of hitting the EntitySpace multiple times a frame");
+
 		ddc::Entity start_entity = s_currentMap->GetStart();
-		lux::SpriteTileComponent* start_tile = world.Access<lux::SpriteTileComponent>(start_entity);
+		lux::SpriteTileComponent* start_tile = start_entity->Access<lux::SpriteTileComponent>();
 
 		glm::vec2 offset = glm::vec2(0, -1);
 
-		lux::SpriteTileComponent* player_tile = world.Access<lux::SpriteTileComponent>(s_player);
+		lux::SpriteTileComponent* player_tile = s_player->Access<lux::SpriteTileComponent>();
 		player_tile->Coordinate = start_tile->Coordinate + offset;
 
-		dd::Box2DPhysicsComponent* player_physics = world.Access<dd::Box2DPhysicsComponent>(s_player);
+		dd::Box2DPhysicsComponent* player_physics = s_player->Access<dd::Box2DPhysicsComponent>();
 		player_physics->Reset();
 
-		dd::SpriteAnimationComponent* player_anim = world.Access<dd::SpriteAnimationComponent>(s_player);
+		dd::SpriteAnimationComponent* player_anim = s_player->Access<dd::SpriteAnimationComponent>();
 		player_anim->PlayFromStart();
 
-		ReturnTeleporterToPlayer(world);
+		ReturnTeleporterToPlayer(space);
 	}
 
-	static void SwitchMapUpdate(ddc::World& world)
+	static void SwitchMap(ddc::EntitySpace& space, int index)
 	{
-		DD_ASSERT(s_desiredMapIndex > 0 && s_desiredMapIndex <= MAX_MAP);
+		DD_ASSERT(index > 0 && index <= MAX_MAP);
 
 		if (s_currentMap != nullptr)
 		{
-			s_currentMap->Unload(world);
+			s_currentMap->Unload(space);
 			delete s_currentMap;
 		}
 
-		s_currentMap = new lux::LuxportMap(s_desiredMapIndex);
-		s_currentMap->Load(world);
+		s_currentMap = new lux::LuxportMap(index);
+		s_currentMap->Load(space);
 
-		ResetPlayerToStart(world);
+		ResetPlayerToStart(space);
 	}
 
 	static const glm::vec2 TELEPORTER_DYNAMIC_OFFSET(1, 0.5);
@@ -437,66 +400,66 @@ namespace lux
 		}
 	}
 
-	static void ThrowTeleporter(ddc::World& world)
+	static void ThrowTeleporter(ddc::EntitySpace& space)
 	{
-		world.AddTag(s_teleporter, ddc::Tag::Dynamic);
+		space.AddTag(s_teleporter, ddc::Tag::Dynamic);
 
-		dd::SpriteAnimationComponent* tele_anim = world.Access<dd::SpriteAnimationComponent>(s_teleporter);
+		dd::SpriteAnimationComponent* tele_anim = space.Access<dd::SpriteAnimationComponent>(s_teleporter);
 		tele_anim->Stop();
 
-		dd::SpriteComponent* tele_sprite = world.Access<dd::SpriteComponent>(s_teleporter);
+		dd::SpriteComponent* tele_sprite = space.Access<dd::SpriteComponent>(s_teleporter);
 		tele_sprite->Sprite = s_teleporterDynamicSprite;
 
-		lux::SpriteTileComponent* tele_tile = world.Access<lux::SpriteTileComponent>(s_teleporter);
+		lux::SpriteTileComponent* tele_tile = space.Access<lux::SpriteTileComponent>(s_teleporter);
 		tele_tile->Coordinate += TELEPORTER_DYNAMIC_OFFSET;
 		tele_tile->Scale = glm::vec2(1);
 
-		dd::MousePosition mouse_pos = s_inputSource->GetMousePosition();
+		dd::MousePosition mouse_pos = s_input->GetMousePosition();
 		glm::vec2 coords = s_spriteTileSystem->PixelsToCoord(mouse_pos.Absolute);
 		float distance = glm::length(coords - tele_tile->Coordinate);
 
 		float strength = ddm::clamp(distance / TELEPORTER_DISTANCE_FACTOR, 0.0f, 1.0f);
 		glm::vec2 dir = (coords - tele_tile->Coordinate) / distance;
 
-		dd::Circle2DPhysicsComponent* tele_physics = world.Access<dd::Circle2DPhysicsComponent>(s_teleporter);
+		dd::Circle2DPhysicsComponent* tele_physics = space.Access<dd::Circle2DPhysicsComponent>(s_teleporter);
 		tele_physics->Reset(); 
 		tele_physics->Velocity = dir * ddm::clamp(TELEPORTER_MAX_SPEED * strength, TELEPORTER_MIN_SPEED, TELEPORTER_MAX_SPEED);
 
 		PlaySound(s_throwSoundBuffer, tele_tile->Coordinate);
 	}
 	
-	static void TeleportPlayer(ddc::World& world)
+	static void TeleportPlayer()
 	{
-		lux::SpriteTileComponent* tele_tile = world.Access<lux::SpriteTileComponent>(s_teleporter);
+		lux::SpriteTileComponent* tele_tile = s_teleporter->Access<lux::SpriteTileComponent>();
 
-		lux::SpriteTileComponent* player_tile = world.Access<lux::SpriteTileComponent>(s_player);
+		lux::SpriteTileComponent* player_tile = s_player->Access<lux::SpriteTileComponent>();
 		player_tile->Coordinate = tele_tile->Coordinate - glm::vec2(1.375, 1.375);
 
-		dd::Box2DPhysicsComponent* player_physics = world.Access<dd::Box2DPhysicsComponent>(s_player);
+		dd::Box2DPhysicsComponent* player_physics = s_player->Access<dd::Box2DPhysicsComponent>();
 		player_physics->Reset();
 
-		ReturnTeleporterToPlayer(world);
+		ReturnTeleporterToPlayer(space);
 
 		PlaySound(s_teleportSoundBuffer, tele_tile->Coordinate);
 	}
 
-	static void OnTeleporterInput(ddc::World& world)
+	static void OnTeleporterInput()
 	{
 		DD_ASSERT(s_teleporter.IsValid());
-		dd::Circle2DPhysicsComponent* tele_physics = world.Access<dd::Circle2DPhysicsComponent>(s_teleporter);
+		dd::Circle2DPhysicsComponent* tele_physics = space.Access<dd::Circle2DPhysicsComponent>(s_teleporter);
 
-		if (world.HasTag(s_teleporter, ddc::Tag::Dynamic))
+		if (s_teleporter->HasTag(ddc::Tag::Dynamic))
 		{
 			if (tele_physics->IsResting())
 			{
-				TeleportPlayer(world);
+				TeleportPlayer(space);
 			}
 
 			// teleporter still moving
 		}
 		else
 		{
-			ThrowTeleporter(world);
+			ThrowTeleporter(space);
 		}
 	}
 
@@ -505,47 +468,54 @@ namespace lux
 		return glm::all(glm::lessThanEqual(a_min, b_max)) && glm::all(glm::greaterThanEqual(a_max, b_min));
 	}
 
-	void LuxportGame::Update(ddc::World& world)
+	void LuxportGame::Update(dd::GameUpdateData& update)
 	{
-		if (s_currentMap == nullptr || s_currentMap->GetIndex() != s_desiredMapIndex)
+		if (s_currentMap == nullptr)
 		{
-			SwitchMapUpdate(world);
+			SwitchMap(update.Space(), 0);
 		}
 
-		lux::SpriteTileComponent* tele_tile = world.Access<lux::SpriteTileComponent>(s_teleporter);
-		lux::SpriteTileComponent* player_tile = world.Access<lux::SpriteTileComponent>(s_player);
-
-		if (s_shouldReset)
+		if (s_input->GotInput(dd::InputAction::NEXT_MAP))
 		{
-			ResetPlayerToStart(world);
+			SwitchMap(update.Space(), ddm::wrap(s_currentMap->GetIndex() + 1, 0, MAX_MAP));
+		}
+
+		if (s_input->GotInput(dd::InputAction::PREVIOUS_MAP))
+		{
+			SwitchMap(update.Space(), ddm::wrap(s_currentMap->GetIndex() - 1, 0, MAX_MAP));
+		}
+
+		lux::SpriteTileComponent* tele_tile = space.Access<lux::SpriteTileComponent>(s_teleporter);
+		lux::SpriteTileComponent* player_tile = space.Access<lux::SpriteTileComponent>(s_player);
+
+		if (s_input->GotInput(dd::InputAction::RESET))
+		{
+			ResetPlayerToStart(space);
 			PlaySound(s_teleReturnSoundBuffer, tele_tile->Coordinate);
-			s_shouldReset = false;
 		}
 
-		if (s_shouldThrow)
+		if (s_input->GotInput(dd::InputAction::SHOOT))
 		{
-			OnTeleporterInput(world);
-			s_shouldThrow = false;
+			OnTeleporterInput(space);
 		}
 
-		if (s_shouldReturn)
+		if (s_input->GotInput(dd::InputAction::RETURN_TELEPORTER))
 		{
 			PlaySound(s_teleReturnSoundBuffer, tele_tile->Coordinate);
 
-			ReturnTeleporterToPlayer(world);
-			s_shouldReturn = false;
+			ReturnTeleporterToPlayer(space);
 		}
 		 
 		if (player_tile->Coordinate.x < 0 || player_tile->Coordinate.x > MAP_SIZE.x ||
 			player_tile->Coordinate.y < 0 || player_tile->Coordinate.y > MAP_SIZE.y)
 		{
 			PlaySound(s_exitSoundBuffer, player_tile->Coordinate, true);
-			ResetPlayerToStart(world);
+			ResetPlayerToStart(space);
 		}
 
 		{
-			lux::SpriteTileComponent* end_tile = world.Access<lux::SpriteTileComponent>(s_currentMap->GetEnd());
-			dd::Box2DPhysicsComponent* player_box = world.Access<dd::Box2DPhysicsComponent>(s_player);
+			lux::SpriteTileComponent* end_tile = space.Access<lux::SpriteTileComponent>(s_currentMap->GetEnd());
+			dd::Box2DPhysicsComponent* player_box = space.Access<dd::Box2DPhysicsComponent>(s_player);
 			glm::vec2 player_min = player_tile->Coordinate + player_box->HitBoxMin * player_tile->Scale;
 			glm::vec2 player_max = player_tile->Coordinate + player_box->HitBoxMax * player_tile->Scale;
 			if (BoxBoxIntersect(player_min, player_max, end_tile->Coordinate - glm::vec2(1), end_tile->Coordinate + glm::vec2(2)))
@@ -555,21 +525,21 @@ namespace lux
 			}
 		}
 
-		if (!world.HasTag(s_teleporter, ddc::Tag::Dynamic))
+		if (!s_teleporter->HasTag(ddc::Tag::Dynamic))
 		{
-			ReturnTeleporterToPlayer(world);
+			ReturnTeleporterToPlayer(space);
 		}
 
 		if (tele_tile->Coordinate.x < 0 || tele_tile->Coordinate.x > MAP_SIZE.x ||
 			tele_tile->Coordinate.y < 0 || tele_tile->Coordinate.y > MAP_SIZE.y)
 		{
-			ReturnTeleporterToPlayer(world);
+			ReturnTeleporterToPlayer(space);
 		}
 
 		s_listener->setPosition(sf::Vector3(player_tile->Coordinate.x, player_tile->Coordinate.y, 0.0f));
 	}
 
-	void LuxportGame::RenderUpdate(ddc::World& world)
+	void LuxportGame::RenderUpdate(ddc::EntitySpace& space)
 	{
 
 	}

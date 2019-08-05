@@ -1,6 +1,4 @@
 #include "PCH.h"
-#include "World.h"
-
 #include "ComponentBuffer.h"
 #include "JobSystem.h"
 #include "UpdateData.h"
@@ -154,26 +152,26 @@ struct OnlyWriterSystem : ddc::System
 TEST_CASE( "EntityManager" )
 {
 	dd::JobSystem jobs( 0 );
-	ddc::World world( jobs );
+	ddc::EntitySpace entities( jobs );
 
-	ddc::Entity a = world.CreateEntity();
+	ddc::Entity a = entities.CreateEntity();
 	REQUIRE( a.ID == 0 );
 
-	ddc::Entity b = world.CreateEntity();
+	ddc::Entity b = entities.CreateEntity();
 	REQUIRE( b.ID == 1 );
 
-	ddc::Entity c = world.CreateEntity();
+	ddc::Entity c = entities.CreateEntity();
 	REQUIRE( c.ID == 2 );
 
-	world.DestroyEntity( a );
+	entities.DestroyEntity( a );
 	
-	ddc::Entity a2 = world.CreateEntity();
+	ddc::Entity a2 = entities.CreateEntity();
 	REQUIRE( a2.ID == a.ID );
 	REQUIRE( a2.Version == 1 );
 
-	world.DestroyEntity( b );
+	entities.DestroyEntity( b );
 
-	ddc::Entity b2 = world.CreateEntity();
+	ddc::Entity b2 = entities.CreateEntity();
 	REQUIRE( b2.ID == b.ID );
 	REQUIRE( b2.Version == 1 );
 }
@@ -181,51 +179,51 @@ TEST_CASE( "EntityManager" )
 TEST_CASE( "Component" )
 {
 	dd::JobSystem jobs( 0 ); 
-	ddc::World world( jobs );
-	ddc::Entity a = world.CreateEntity();
+	ddc::EntitySpace entities( jobs );
+	ddc::Entity a = entities.CreateEntity();
 
 	const dd::TypeInfo* type = DD_FIND_TYPE( FirstComponent );
 	REQUIRE( type->ComponentID() != dd::INVALID_COMPONENT );
 
-	bool found = world.Has<FirstComponent>( a );
+	bool found = entities.Has<FirstComponent>( a );
 	REQUIRE( found == false );
 
-	FirstComponent& cmp = world.Add<FirstComponent>( a );
+	FirstComponent& cmp = entities.Add<FirstComponent>( a );
 	REQUIRE( cmp.FirstValue == -100 );
 
 	cmp.FirstValue = 5;
 
-	const FirstComponent& cmp2 = *world.Access<FirstComponent>( a );
+	const FirstComponent& cmp2 = *entities.Access<FirstComponent>( a );
 	REQUIRE( cmp2.FirstValue == 5 );
 	REQUIRE( cmp.FirstValue == cmp2.FirstValue );
 
-	REQUIRE( world.Has<FirstComponent>( a ) );
+	REQUIRE( entities.Has<FirstComponent>( a ) );
 
-	world.Remove<FirstComponent>( a );
-	REQUIRE_FALSE( world.Has<FirstComponent>( a ) );
+	entities.Remove<FirstComponent>( a );
+	REQUIRE_FALSE( entities.Has<FirstComponent>( a ) );
 }
 
 TEST_CASE( "Update System" )
 {
 	dd::JobSystem jobs( 0 );
-	ddc::World world( jobs );
+	ddc::EntitySpace entities( jobs );
 
 	for( int i = 0; i < 8; ++i )
 	{
-		ddc::Entity e = world.CreateEntity();
+		ddc::Entity e = entities.CreateEntity();
 
-		FirstComponent& simple = world.Add<FirstComponent>( e );
+		FirstComponent& simple = entities.Add<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = world.Add<SecondComponent>( e );
+		SecondComponent& other = entities.Add<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
 	TestSystem system;
-	world.RegisterSystem( system );
-	world.Initialize();
+	entities.RegisterSystem( system );
+	entities.Initialize();
 
-	world.Update( 0 );
+	entities.Update( 0 );
 
 	for( int i = 0; i < 8; ++i )
 	{
@@ -233,10 +231,10 @@ TEST_CASE( "Update System" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *world.Access<FirstComponent>( e );
+		FirstComponent& simple = *entities.Access<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *world.Access<SecondComponent>( e );
+		SecondComponent& other = *entities.Access<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
@@ -246,27 +244,27 @@ TEST_CASE( "Update With Discontinuity" )
 	dd::TypeInfo::RegisterQueuedTypes();
 
 	dd::JobSystem jobs( 0 );
-	ddc::World world( jobs );
+	ddc::EntitySpace entities( jobs );
 
 	for( int i = 0; i < 5; ++i )
 	{
-		ddc::Entity e = world.CreateEntity();
+		ddc::Entity e = entities.CreateEntity();
 
 		if( i == 2 )
 			continue;
 		
-		FirstComponent& simple = world.Add<FirstComponent>( e );
+		FirstComponent& simple = entities.Add<FirstComponent>( e );
 		simple.FirstValue = i;
 
-		SecondComponent& other = world.Add<SecondComponent>( e );
+		SecondComponent& other = entities.Add<SecondComponent>( e );
 		other.SecondValue = -1;
 	}
 
 	TestSystem system;
-	world.RegisterSystem( system );
-	world.Initialize();
+	entities.RegisterSystem( system );
+	entities.Initialize();
 
-	world.Update( 0 );
+	entities.Update( 0 );
 
 	for( int i = 0; i < 5; ++i )
 	{
@@ -277,10 +275,10 @@ TEST_CASE( "Update With Discontinuity" )
 		e.ID = i;
 		e.Version = 0;
 
-		FirstComponent& simple = *world.Access<FirstComponent>( e );
+		FirstComponent& simple = *entities.Access<FirstComponent>( e );
 		REQUIRE( simple.FirstValue == e.ID );
 
-		SecondComponent& other = *world.Access<SecondComponent>( e );
+		SecondComponent& other = *entities.Access<SecondComponent>( e );
 		REQUIRE( other.SecondValue == e.ID );
 	}
 }
@@ -291,26 +289,26 @@ TEST_CASE( "Update Multiple Systems" )
 	DependentSystem b;
 
 	dd::JobSystem jobs( 0 );
-	ddc::World world( jobs );
-	world.RegisterSystem( a );
-	world.RegisterSystem( b );
-	world.Initialize();
+	ddc::EntitySpace entities( jobs );
+	entities.RegisterSystem( a );
+	entities.RegisterSystem( b );
+	entities.Initialize();
 
 	for( int i = 0; i < 4; ++i )
 	{
-		ddc::Entity e = world.CreateEntity();
+		ddc::Entity e = entities.CreateEntity();
 
-		FirstComponent& first = world.Add<FirstComponent>( e );
+		FirstComponent& first = entities.Add<FirstComponent>( e );
 		first.FirstValue = i;
 
-		SecondComponent& second = world.Add<SecondComponent>( e );
+		SecondComponent& second = entities.Add<SecondComponent>( e );
 		second.SecondValue = -1;
 
-		ThirdComponent& third = world.Add<ThirdComponent>( e );
+		ThirdComponent& third = entities.Add<ThirdComponent>( e );
 		third.ThirdValue = -1;
 	}
 
-	world.Update( 0.0f );
+	entities.Update( 0.0f );
 
 	for( int i = 0; i < 4; ++i )
 	{
@@ -318,11 +316,11 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		SecondComponent& second = *world.Access<SecondComponent>( e );
+		SecondComponent& second = *entities.Access<SecondComponent>( e );
 		REQUIRE( second.SecondValue == e.ID );
 	}
 
-	world.Update( 0 );
+	entities.Update( 0 );
 
 	for( int i = 0; i < 4; ++i )
 	{
@@ -330,7 +328,7 @@ TEST_CASE( "Update Multiple Systems" )
 		e.ID = i;
 		e.Version = 0;
 
-		ThirdComponent& third = *world.Access<ThirdComponent>( e );
+		ThirdComponent& third = *entities.Access<ThirdComponent>( e );
 		REQUIRE( third.ThirdValue == e.ID );
 	}
 }
@@ -528,12 +526,12 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 1 ].m_system == &b );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world( jobsystem );
-		world.RegisterSystem( a );
-		world.RegisterSystem( b );
-		world.Initialize();
+		ddc::EntitySpace entities( jobsystem );
+		entities.RegisterSystem( a );
+		entities.RegisterSystem( b );
+		entities.Initialize();
 
-		world.Update( 0 );
+		entities.Update( 0 );
 	}
 
 	SECTION( "Multiple Roots" )
@@ -557,12 +555,12 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 2 ].m_system == &c );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world( jobsystem );
-		world.RegisterSystem( a );
-		world.RegisterSystem( b );
-		world.Initialize();
+		ddc::EntitySpace entities( jobsystem );
+		entities.RegisterSystem( a );
+		entities.RegisterSystem( b );
+		entities.Initialize();
 
-		world.Update( 0 );
+		entities.Update( 0 );
 	}
 
 	SECTION( "Diamond" )
@@ -590,13 +588,13 @@ TEST_CASE( "Update With Tree Scheduling" )
 		REQUIRE( ordered[ 3 ].m_system == &d );
 
 		dd::JobSystem jobsystem( 0u );
-		ddc::World world( jobsystem );
-		world.RegisterSystem( a );
-		world.RegisterSystem( b );
-		world.RegisterSystem( c );
-		world.Initialize();
+		ddc::EntitySpace entities( jobsystem );
+		entities.RegisterSystem( a );
+		entities.RegisterSystem( b );
+		entities.RegisterSystem( c );
+		entities.Initialize();
 
-		world.Update( 0 );
+		entities.Update( 0 );
 	}
 }
 
@@ -609,25 +607,25 @@ TEST_CASE( "Full Update Loop" )
 	ddc::System* systems[] = { &a, &b, &c };
 	
 	dd::JobSystem jobsystem( 0u );
-	ddc::World world( jobsystem );
+	ddc::EntitySpace entities( jobsystem );
 
-	world.RegisterSystem( a );
-	world.RegisterSystem( b );
-	world.RegisterSystem( c );
-	world.Initialize();
+	entities.RegisterSystem( a );
+	entities.RegisterSystem( b );
+	entities.RegisterSystem( c );
+	entities.Initialize();
 
 	BENCHMARK( "Create Entities" )
 	{
 		for( int i = 0; i < 1000; ++i )
 		{
-			ddc::Entity e = world.CreateEntity();
-			FirstComponent& first = world.Add<FirstComponent>( e );
+			ddc::Entity e = entities.CreateEntity();
+			FirstComponent& first = entities.Add<FirstComponent>( e );
 			first.FirstValue = i;
 
-			SecondComponent& second = world.Add<SecondComponent>( e );
+			SecondComponent& second = entities.Add<SecondComponent>( e );
 			second.SecondValue = 0;
 
-			ThirdComponent& third = world.Add<ThirdComponent>( e );
+			ThirdComponent& third = entities.Add<ThirdComponent>( e );
 			third.ThirdValue = 0;
 		}
 	}
@@ -636,7 +634,7 @@ TEST_CASE( "Full Update Loop" )
 	{
 		for( int i = 0; i < 1000; ++i )
 		{
-			world.Update( 0.0f );
+			entities.Update( 0.0f );
 		}
 	}
 
@@ -646,10 +644,10 @@ TEST_CASE( "Full Update Loop" )
 		e.ID = i;
 		e.Version = 0;
 
-		const SecondComponent* second = world.Get<SecondComponent>( e );
+		const SecondComponent* second = entities.Get<SecondComponent>( e );
 		REQUIRE( second->SecondValue == i );
 
-		const ThirdComponent* third = world.Get<ThirdComponent>( e );
+		const ThirdComponent* third = entities.Get<ThirdComponent>( e );
 		REQUIRE( third->ThirdValue == i );
 	}
 }

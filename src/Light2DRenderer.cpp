@@ -24,7 +24,7 @@ namespace lux
 		s_timer.Start();
 	}
 
-	void Light2DRenderer::RenderInit(ddc::World& world)
+	void Light2DRenderer::RenderInit(ddc::EntitySpace& entities)
 	{
 		m_shader = ddr::ShaderHandle("sprite");
 	}

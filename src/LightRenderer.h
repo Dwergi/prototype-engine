@@ -17,8 +17,8 @@ namespace ddr
 	{
 		LightRenderer();
 
-		virtual void RenderInit( ddc::World& world ) override;
-		virtual void RenderUpdate( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
+		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
 		virtual void Render( const RenderData& render_data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Lights"; }
@@ -32,8 +32,8 @@ namespace ddr
 		ddc::Entity m_deleteLight;
 		std::vector<ddc::Entity> m_debugLights;
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 
-		void UpdateDebugPointLights( ddc::World& world );
+		void UpdateDebugPointLights( ddc::EntitySpace& entities );
 	};
 }

@@ -75,37 +75,37 @@ namespace dd
 
 	}
 
-	void SwarmSystem::Initialize( ddc::World& world )
+	void SwarmSystem::Initialize( ddc::EntitySpace& entities )
 	{
 		dd::RandomFloat rng( 0, 1 );
 
 		for( size_t i = 0; i < AgentCount; ++i )
 		{
-			ddc::Entity entity = world.CreateEntity<dd::TransformComponent, dd::SwarmAgentComponent, dd::MeshComponent, dd::RayComponent, dd::BoundBoxComponent, dd::ColourComponent>();
+			ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::SwarmAgentComponent, dd::MeshComponent, dd::RayComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 
-			dd::TransformComponent* transform = world.Access<dd::TransformComponent>( entity );
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
 			transform->Position = glm::vec3( 50 * rng.Next(), 50 * rng.Next(), 50 * rng.Next() );
 			transform->Rotation = glm::normalize( glm::quat( rng.Next(), rng.Next(), rng.Next(), rng.Next() ) );
 			transform->Scale = glm::vec3( 0.25f );
 			transform->Update();
 
-			dd::BoundBoxComponent* bb = world.Access<dd::BoundBoxComponent>( entity );
+			dd::BoundBoxComponent* bb = entities.Access<dd::BoundBoxComponent>( entity );
 			bb->BoundBox.Expand( glm::vec3( -0.25f ) );
 			bb->BoundBox.Expand( glm::vec3( 0.25f ) );
 			
-			dd::ColourComponent* colour = world.Access<dd::ColourComponent>( entity );
+			dd::ColourComponent* colour = entities.Access<dd::ColourComponent>( entity );
 			colour->Colour = glm::vec4( 1, 0, 0, 1 );
 
-			dd::SwarmAgentComponent* agent = world.Access<dd::SwarmAgentComponent>( entity );
+			dd::SwarmAgentComponent* agent = entities.Access<dd::SwarmAgentComponent>( entity );
 			agent->Velocity = transform->Rotation * glm::vec3( 0, 0, 10 * rng.Next() );
 
-			dd::MeshComponent* mesh = world.Access<dd::MeshComponent>( entity );
+			dd::MeshComponent* mesh = entities.Access<dd::MeshComponent>( entity );
 			mesh->Mesh = ddr::MeshHandle( "cube" );
 
-			dd::RayComponent* ray = world.Access<dd::RayComponent>( entity );
+			dd::RayComponent* ray = entities.Access<dd::RayComponent>( entity );
 			ray->Ray = ddm::Ray( glm::vec3( 0 ), glm::vec3( 0, 0, 1 ), 0.5f );
 
-			world.AddTag( entity, ddc::Tag::Visible );
+			entities.AddTag( entity, ddc::Tag::Visible );
 		}
 	}
 
@@ -253,7 +253,7 @@ namespace dd
 		}
 	}
 
-	void SwarmSystem::DrawDebugInternal( ddc::World& world )
+	void SwarmSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SliderInt( "Agents", &AgentCount, 0, 10000 );
 

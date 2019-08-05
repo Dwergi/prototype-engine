@@ -15,7 +15,7 @@
 #include "HitTest.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
-#include "InputBindings.h"
+#include "InputKeyBindings.h"
 #include "LightComponent.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
@@ -25,6 +25,7 @@
 #include "TransformComponent.h"
 
 static dd::Service<dd::IAsyncHitTest> s_hitTest;
+static dd::Service<ddc::MessageQueue> s_messageQueue;
 
 namespace dd
 {
@@ -50,60 +51,46 @@ namespace dd
 		RequireRead<dd::FPSCameraComponent>( "player" );
 	}
 
-	void BulletSystem::HandleInput( InputAction action, InputType type )
-	{
-		if( action == InputAction::SHOOT && type == InputType::RELEASED )
-		{
-			m_fireBullet = true;
-		}
-	}
-
-	void BulletSystem::BindActions( InputBindings& bindings )
-	{
-		bindings.RegisterHandler( InputAction::SHOOT, 
-			[this]( InputAction action, InputType type ) { HandleInput( action, type ); } );
-	}
-
-	void BulletSystem::Initialize( ddc::World& world )
+	void BulletSystem::Initialize( ddc::EntitySpace& entities )
 	{
 
 	}
 	
-	void BulletSystem::FireBullet( ddc::World& world, const ddr::ICamera& camera )
+	void BulletSystem::FireBullet( ddc::EntitySpace& entities, const ddr::ICamera& camera )
 	{
-		ddc::Entity entity = world.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
-		world.AddTag( entity, ddc::Tag::Visible );
+		ddc::Entity entity = entities.CreateEntity<dd::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
+		entities.AddTag( entity, ddc::Tag::Visible );
 
 		dd::TransformComponent* transform;
-		world.Access( entity, transform );
+		entities.Access( entity, transform );
 
 		transform->Scale = glm::vec3( m_scale );
 		transform->Position = camera.GetPosition();
 		transform->Update();
 
 		dd::BulletComponent* bullet;
-		world.Access( entity, bullet );
+		entities.Access( entity, bullet );
 		bullet->Velocity = camera.GetDirection() * m_speed;
 
 		dd::MeshComponent* mesh;
-		world.Access( entity, mesh );
+		entities.Access( entity, mesh );
 
 		mesh->Mesh = ddr::MeshHandle( "sphere" );
 
 		dd::ColourComponent* colour;
-		world.Access( entity, colour );
+		entities.Access( entity, colour );
 		colour->Colour = glm::vec4( m_colour, 1 );
 
 		dd::BoundSphereComponent* bsphere;
-		world.Access( entity, bsphere );
+		entities.Access( entity, bsphere );
 		bsphere->Sphere.Radius = 1.0f;
 
 		dd::BoundBoxComponent* bbox;
-		world.Access( entity, bbox );
+		entities.Access( entity, bbox );
 		bbox->BoundBox = mesh->Mesh.Get()->GetBoundBox();
 
 		dd::LightComponent* light;
-		world.Access( entity, light );
+		entities.Access( entity, light );
 		light->LightType = dd::LightType::Point;
 		light->Ambient = 0;
 		light->Intensity = m_intensity;
@@ -113,7 +100,7 @@ namespace dd
 		m_fireBullet = false;
 	}
 
-	void BulletSystem::KillBullet( ddc::World& world, ddc::Entity entity, dd::BulletComponent& bullet )
+	void BulletSystem::KillBullet( ddc::EntitySpace& space, ddc::Entity entity, dd::BulletComponent& bullet )
 	{
 		if( bullet.PendingHit.Valid )
 		{
@@ -127,17 +114,17 @@ namespace dd
 			payload.SurfaceNormal = bullet.HitNormal;
 			payload.Velocity = bullet.Velocity;
 
-			dd::Message msg;
-			msg.Type = dd::MessageType::BulletHit;
+			ddc::Message msg;
+			msg.Type = ddc::MessageType::BulletHit;
 			msg.SetPayload( payload );
 
-			world.Messages().Send( msg );
+			s_messageQueue->Send( msg );
 		}
 
-		world.DestroyEntity( entity );
+		space.DestroyEntity( entity );
 	}
 
-	bool BulletSystem::HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& bullet_transform, const ddc::DataBuffer& meshes, float delta_t, glm::vec3& out_pos )
+	bool BulletSystem::HitTestDynamicMeshes( dd::BulletComponent& bullet, dd::TransformComponent& bullet_transform, const ddc::UpdateDataBuffer& meshes, float delta_t, glm::vec3& out_pos )
 	{
 		auto mesh_cmps = meshes.Read<dd::MeshComponent>();
 		auto mesh_transforms = meshes.Read<dd::TransformComponent>();
@@ -168,18 +155,19 @@ namespace dd
 
 	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
-		ddc::World& world = update.World();
+		ddc::EntitySpace& entities = update.EntitySpace();
+		const std::vector<dd::InputAction>& actions = update.InputActions();
 
-		if( m_fireBullet )
+		if(std::find(actions.begin(), actions.end(), InputAction::SHOOT) != actions.end())
 		{
 			auto player = update.Data( "player" );
 			auto cameras = player.Read<dd::FPSCameraComponent>();
 
-			FireBullet( world, cameras[0] );
+			FireBullet( entities, cameras[0] );
 		}
 
-		const ddc::DataBuffer& dynamic_meshes = update.Data( "dynamic_meshes" );
-		const ddc::DataBuffer& bullet_data = update.Data( "bullets" );
+		auto dynamic_meshes = update.Data( "dynamic_meshes" );
+		auto bullet_data = update.Data( "bullets" );
 
 		auto bullets = bullet_data.Write<dd::BulletComponent>();
 		auto bullet_transforms = bullet_data.Write<dd::TransformComponent>();
@@ -195,7 +183,7 @@ namespace dd
 
 			if( bullet.Age >= bullet.Lifetime )
 			{
-				KillBullet( world, bullet_data.Entities()[i], bullet );
+				KillBullet( entities, bullet_data.Entities()[i], bullet );
 				continue;
 			}
 
@@ -244,7 +232,7 @@ namespace dd
 		}
 	}
 
-	void BulletSystem::DrawDebugInternal( ddc::World& world )
+	void BulletSystem::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 300 ), ImGuiCond_FirstUseEver );
 

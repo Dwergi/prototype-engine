@@ -11,7 +11,7 @@ struct ImGuiContext;
 
 namespace ddc
 {
-	struct World;
+	struct EntitySpace;
 }
 
 namespace dd
@@ -31,14 +31,11 @@ namespace dd
 		bool ShouldDraw() const { return m_draw; }
 		DebugUI& SetDraw(bool draw) { m_draw = draw; return *this; }
 
-		DebugUI& SetMouseHandling(bool handle);
-		bool IsMouseHandled() const;
-
 		bool IsMidFrame() const { return m_midFrame; }
 		bool IsMidWindow() const { return m_midWindow; }
 
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
-		void RenderDebugPanels( ddc::World& world );
+		void RenderDebugPanels( ddc::EntitySpace& entities );
 
 	private:
 		std::vector<IDebugPanel*> m_debugPanels;

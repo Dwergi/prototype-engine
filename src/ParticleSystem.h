@@ -7,12 +7,11 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "IHandlesInput.h"
 #include "System.h"
 
 namespace dd
 {
-	struct InputBindings;
+	struct InputKeyBindings;
 	struct ParticleSystemComponent;
 	struct TransformComponent;
 
@@ -21,11 +20,11 @@ namespace dd
 		ParticleSystem();
 		~ParticleSystem();
 
-		virtual void Initialize( ddc::World& ) override;
+		virtual void Initialize( ddc::EntitySpace& ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void Shutdown( ddc::World& ) override {}
+		virtual void Shutdown( ddc::EntitySpace& ) override {}
 
-		virtual void BindActions( dd::InputBindings& input_bindings ) override;
+		void BindActions( dd::InputKeyBindings& input_bindings );
 
 		ParticleSystem( const ParticleSystem& ) = delete;
 		ParticleSystem( ParticleSystem&& ) = delete;
@@ -52,12 +51,12 @@ namespace dd
 
 		std::vector<SpawnRequest> m_pendingSpawns;
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );
 		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const dd::TransformComponent& transform, float delta_t );
 
-		void OnBulletHitMessage( dd::Message msg );
+		void OnBulletHitMessage( ddc::Message msg );
 	};
 }

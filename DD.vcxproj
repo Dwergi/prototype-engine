@@ -355,15 +355,19 @@
     <ClInclude Include="src\Box2DPhysicsComponent.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
+    <ClInclude Include="src\UpdateDataBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
+    <ClInclude Include="src\EnumFlags.h" />
+    <ClInclude Include="src\Flags.h" />
     <ClInclude Include="src\IGame.h" />
     <ClInclude Include="src\HandleManager.h" />
-    <ClInclude Include="src\IHandlesInput.h" />
     <ClInclude Include="src\IInputSource.h" />
     <ClInclude Include="src\ImGuiBinding.h" />
+    <ClInclude Include="src\InputEvent.h" />
+    <ClInclude Include="src\InputKeys.h" />
     <ClInclude Include="src\InputMode.h" />
-    <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\IWindow.h" />
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\Light2DComponent.h" />
@@ -399,7 +403,6 @@
     <ClInclude Include="src\ComponentBuffer.h" />
     <ClInclude Include="src\DataRequest.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
-    <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\FPSCameraComponent.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -458,7 +461,7 @@
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\JobSystem.h" />
-    <ClInclude Include="src\InputBindings.h" />
+    <ClInclude Include="src\InputKeyBindings.h" />
     <ClInclude Include="src\MousePicking.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Memory.h" />
@@ -477,6 +480,7 @@
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
+    <ClInclude Include="src\SystemManager.h" />
     <ClInclude Include="src\TerrainRenderer.h" />
     <ClInclude Include="src\TestEntities.h" />
     <ClInclude Include="src\TreeComponent.h" />
@@ -541,7 +545,7 @@
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\VBO.h" />
     <ClInclude Include="src\Vector.h" />
-    <ClInclude Include="src\World.h" />
+    <ClInclude Include="src\EntitySpace.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\fmt\src\format.cc">
@@ -661,8 +665,9 @@
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
     <ClCompile Include="src\ImGuiBinding.cpp" />
+    <ClCompile Include="src\InputEvent.cpp" />
     <ClCompile Include="src\InputMode.cpp" />
-    <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\IWindow.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\Light2DRenderer.cpp" />
@@ -731,7 +736,7 @@
     </ClCompile>
     <ClCompile Include="src\GLError.cpp" />
     <ClCompile Include="src\IDebugPanel.cpp" />
-    <ClCompile Include="src\InputBindings.cpp" />
+    <ClCompile Include="src\InputKeyBindings.cpp" />
     <ClCompile Include="src\LightComponent.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
@@ -753,6 +758,7 @@
     <ClCompile Include="src\SpriteTileComponent.cpp" />
     <ClCompile Include="src\SpriteTileSystem.cpp" />
     <ClCompile Include="src\System.cpp" />
+    <ClCompile Include="src\SystemManager.cpp" />
     <ClCompile Include="src\TerrainParameters.cpp" />
     <ClCompile Include="src\TerrainRenderer.cpp" />
     <ClCompile Include="src\TestEntities.cpp" />
@@ -777,6 +783,7 @@
     <ClCompile Include="src\TreeComponent.cpp" />
     <ClCompile Include="src\TreeSystem.cpp" />
     <ClCompile Include="src\Triangulator.cpp" />
+    <ClCompile Include="src\UpdateDataBuffer.cpp" />
     <ClCompile Include="src\WaterComponent.cpp" />
     <ClCompile Include="src\WaterRenderer.cpp" />
     <ClCompile Include="src\WaterSystem.cpp" />
@@ -863,7 +870,7 @@
     <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
-    <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\EntitySpace.cpp" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
       <FileType>CppCode</FileType>

@@ -16,7 +16,7 @@ namespace dd
 
 		HitTestSystem();
 
-		virtual void Initialize( ddc::World& world ) override;
+		virtual void Initialize( ddc::EntitySpace& entities ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
 		virtual HitHandle ScheduleHitTest( const ddm::Ray& ray ) override;
@@ -47,6 +47,6 @@ namespace dd
 
 		// Inherited via IDebugPanel
 		virtual const char* GetDebugTitle() const override { return "Hit Testing"; }
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

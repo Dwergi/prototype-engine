@@ -10,7 +10,7 @@
 
 namespace ddc
 {
-	struct World;
+	struct EntitySpace;
 }
 
 namespace dd
@@ -22,7 +22,7 @@ namespace dd
 		{
 		}
 
-		void DrawDebugPanel( ddc::World& world );
+		void DrawDebugPanel( ddc::EntitySpace& entities );
 		void AddToMenu();
 
 		//
@@ -48,6 +48,6 @@ namespace dd
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
-		virtual void DrawDebugInternal( ddc::World& world ) = 0;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) = 0;
 	};
 }

@@ -15,7 +15,7 @@
 
 namespace dd
 {
-	struct InputBindings;
+	struct InputKeyBindings;
 }
 
 namespace ddr
@@ -25,9 +25,9 @@ namespace ddr
 		BoundsRenderer();
 		~BoundsRenderer();
 
-		void BindKeys( dd::InputBindings& bindings );
+		void BindKeys( dd::InputKeyBindings& bindings );
 
-		virtual void RenderInit( ddc::World& world ) override;
+		virtual void RenderInit( ddc::EntitySpace& entities ) override;
 		virtual void Render( const ddr::RenderData& data ) override;
 		virtual bool UsesAlpha() const { return true; }
 
@@ -52,7 +52,7 @@ namespace ddr
 		ShaderHandle m_shader;
 
 		virtual const char* GetDebugTitle() const override { return "Bounds"; }
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 
 		void UpdateBuffers();
 	};

@@ -54,6 +54,6 @@ namespace dd
 
 		ProfilerValue m_frameTimes;
 
-		virtual void DrawDebugInternal( ddc::World& world ) override;
+		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};
 }

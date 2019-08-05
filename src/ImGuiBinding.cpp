@@ -20,16 +20,6 @@ namespace dd
 
 	static int g_click[5];
 
-	static const char* GetClipboardText()
-	{
-		return s_inputSource->GetClipboardText();
-	}
-
-	static void SetClipboardText(void* user_data, const char* text)
-	{
-		return s_inputSource->SetClipboardText(text);
-	}
-
 	void ImGuiBinding::SetMouseHandling(bool handle)
 	{
 		s_handleMouse = true;
@@ -128,21 +118,21 @@ namespace dd
 
 		for (const InputEvent& evt : events)
 		{
-			if (!evt.IsMouse)
+			if (!evt.IsMouse())
 			{
 				continue;
 			}
 
 			int index = (int) evt.Key - (int) Key::MOUSE_LEFT;
 			
-			if (evt.Type == InputType::PRESSED)
+			if (evt.Type == InputType::Press)
 			{
 				io.MouseDown[index] = true;
 
 				++g_click[index];
 			}
 
-			if (evt.Type == InputType::RELEASED)
+			if (evt.Type == InputType::Release)
 			{
 				io.MouseDown[index] = false;
 
@@ -246,7 +236,7 @@ namespace dd
 
 		for (const InputEvent& evt : events)
 		{
-			if (evt.IsMouse)
+			if (evt.IsMouse())
 			{
 				continue;
 			}
@@ -257,25 +247,25 @@ namespace dd
 				continue;
 			}
 
-			if (evt.Type == InputType::PRESSED)
+			if (evt.Type == InputType::Press)
 			{
 				io.KeysDown[imkey] = true;
 
-				if (evt.Modifiers & Modifiers::ALT)
+				if (evt.Modifiers.Has(Modifier::Alt))
 				{
 					io.KeyAlt = true;
 				}
-				if (evt.Modifiers & Modifiers::SHIFT)
+				if (evt.Modifiers.Has(Modifier::Shift))
 				{
 					io.KeyShift = true;
 				}
-				if (evt.Modifiers & Modifiers::CTRL)
+				if (evt.Modifiers.Has(Modifier::Ctrl))
 				{
 					io.KeyCtrl = true;
 				}
 			}
 
-			if (evt.Type == InputType::RELEASED)
+			if (evt.Type == InputType::Release)
 			{
 				io.KeysDown[imkey] = false;
 			}
@@ -308,6 +298,9 @@ namespace dd
 		UpdateMouseCursor();
 
 		UpdateKeyboard();
+
+		s_inputSource->EnableKeyboard(!io.WantCaptureKeyboard);
+		s_inputSource->EnableKeyboard(!io.WantCaptureMouse);
 
 		ImGui::NewFrame();
 	}

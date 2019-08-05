@@ -72,7 +72,7 @@ namespace dd
 		m_frameTimes.EndFrame();
 	}
 
-	void FrameTimer::DrawDebugInternal( ddc::World& world )
+	void FrameTimer::DrawDebugInternal( ddc::EntitySpace& entities )
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiCond_FirstUseEver );
 
