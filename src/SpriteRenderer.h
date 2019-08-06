@@ -8,7 +8,7 @@
 
 #include "Renderer.h"
 #include "RenderState.h"
-#include "SpriteComponent.h"
+#include "d2d/SpriteComponent.h"
 #include "VAO.h"
 #include "VBO.h"
 
@@ -46,9 +46,9 @@ namespace ddr
 		std::vector<glm::vec4> m_colours;
 		VBO m_vboColours;
 
-		std::vector<dd::SpriteComponent> m_temp;
+		std::vector<d2d::SpriteComponent> m_temp;
 
-		using SpriteIterator = std::vector<dd::SpriteComponent>::iterator;
+		using SpriteIterator = std::vector<d2d::SpriteComponent>::iterator;
 		void DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
 		void DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
 	};

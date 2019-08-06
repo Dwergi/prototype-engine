@@ -41,12 +41,13 @@
 
 #include <filesystem>
 #include <nlohmann/json.hpp>
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
 // GAME TO USE
-#include "LuxportGame.h"
+#include "lux/LuxportGame.h"
 using TGame = lux::LuxportGame;
 static dd::Service<dd::IGame> s_game;
+//---------------------------------------------------------------------------
 
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;

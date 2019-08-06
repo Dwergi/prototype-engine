@@ -26,6 +26,8 @@ namespace ddc
 		void RemoveTag(ddc::Tag tag) const;
 		bool HasTag(ddc::Tag tag) const;
 
+		EntitySpace* Space() const { return m_space; }
+
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;
 		template <typename TComponent> bool Has() const;

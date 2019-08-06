@@ -236,6 +236,7 @@
       <ConformanceMode>false</ConformanceMode>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\extlibs\libs-msvc\x64;$(SolutionDir)include\sfml\out\build\x64-Release\lib</AdditionalLibraryDirectories>
@@ -285,29 +286,23 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Full</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST;UNICODE;_DEBUG;SFML_STATIC;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)src\;$(SolutionDir)include\;$(SolutionDir)include\gl3w\include\;$(SolutionDir)include\glfw\include\;$(SolutionDir)include\assimp\include\;$(SolutionDir)include\fmt\include\;$(SolutionDir)include\sfml\include\</AdditionalIncludeDirectories>
-      <AdditionalOptions>/RTCs %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>false</ConformanceMode>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-network-s-d.lib;sfml-window-s-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;advapi32.lib;winmm.lib;freetype.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)include\sfml\extlibs\libs-msvc\x64;$(SolutionDir)include\sfml\out\build\x64-Debug\lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <ShowProgress>NotSet</ShowProgress>
@@ -352,10 +347,40 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
-    <ClInclude Include="src\Box2DPhysicsComponent.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
+    <ClInclude Include="src\d2d\CirclePhysicsComponent.h" />
+    <ClInclude Include="src\d2d\Physics2DSystem.h" />
+    <ClInclude Include="src\d2d\BoxPhysicsComponent.h" />
+    <ClInclude Include="src\d2d\SpriteAnimationComponent.h" />
+    <ClInclude Include="src\d2d\SpriteAnimationSystem.h" />
+    <ClInclude Include="src\d2d\SpriteComponent.h" />
+    <ClInclude Include="src\d2d\SpriteTileComponent.h" />
+    <ClInclude Include="src\d2d\SpriteTileSystem.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\lux\LuxLightComponent.h" />
+    <ClInclude Include="src\lux\LuxLightRenderer.h" />
+    <ClInclude Include="src\lux\LuxportGame.h" />
+    <ClInclude Include="src\lux\LuxportMap.h" />
+    <ClInclude Include="src\neutrino\BulletComponent.h" />
+    <ClInclude Include="src\neutrino\BulletSystem.h" />
+    <ClInclude Include="src\neutrino\NeutrinoGame.h" />
+    <ClInclude Include="src\neutrino\ShipComponent.h" />
+    <ClInclude Include="src\neutrino\ShipSystem.h" />
+    <ClInclude Include="src\neutrino\SwarmAgentComponent.h" />
+    <ClInclude Include="src\neutrino\SwarmSystem.h" />
+    <ClInclude Include="src\neutrino\TerrainChunk.h" />
+    <ClInclude Include="src\neutrino\TerrainChunkComponent.h" />
+    <ClInclude Include="src\neutrino\TerrainParameters.h" />
+    <ClInclude Include="src\neutrino\TerrainRenderer.h" />
+    <ClInclude Include="src\neutrino\TerrainSystem.h" />
+    <ClInclude Include="src\neutrino\TreeComponent.h" />
+    <ClInclude Include="src\neutrino\TreeSystem.h" />
+    <ClInclude Include="src\neutrino\TrenchComponent.h" />
+    <ClInclude Include="src\neutrino\TrenchSystem.h" />
+    <ClInclude Include="src\neutrino\WaterComponent.h" />
+    <ClInclude Include="src\neutrino\WaterRenderer.h" />
+    <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\Tweakable.h" />
     <ClInclude Include="src\UpdateDataBuffer.h" />
@@ -373,18 +398,12 @@
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\IWindow.h" />
     <ClInclude Include="src\JSON.h" />
-    <ClInclude Include="src\Light2DComponent.h" />
-    <ClInclude Include="src\Light2DRenderer.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
-    <ClInclude Include="src\LuxportGame.h" />
-    <ClInclude Include="src\LuxportMap.h" />
     <ClInclude Include="src\MeshRenderCommand.h" />
-    <ClInclude Include="src\NeutrinoGame.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\OrthoCamera.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
-    <ClInclude Include="src\Physics2DSystem.h" />
     <ClInclude Include="src\PhysicsBase.h" />
     <ClInclude Include="src\PhysicsPlaneComponent.h" />
     <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
@@ -400,8 +419,6 @@
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
-    <ClInclude Include="src\BulletComponent.h" />
-    <ClInclude Include="src\BulletSystem.h" />
     <ClInclude Include="src\BVHTree.h" />
     <ClInclude Include="src\ComponentBuffer.h" />
     <ClInclude Include="src\DataRequest.h" />
@@ -423,15 +440,9 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RayComponent.h" />
     <ClInclude Include="src\RayRenderer.h" />
-    <ClInclude Include="src\Circle2DPhysicsComponent.h" />
     <ClInclude Include="src\Sprite.h" />
-    <ClInclude Include="src\SpriteAnimationComponent.h" />
-    <ClInclude Include="src\SpriteAnimationSystem.h" />
-    <ClInclude Include="src\SpriteComponent.h" />
     <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\SpriteSheet.h" />
-    <ClInclude Include="src\SpriteTileComponent.h" />
-    <ClInclude Include="src\SpriteTileSystem.h" />
     <ClInclude Include="src\System.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
@@ -484,36 +495,20 @@
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\SystemManager.h" />
-    <ClInclude Include="src\TerrainRenderer.h" />
     <ClInclude Include="src\TestEntities.h" />
-    <ClInclude Include="src\TreeComponent.h" />
-    <ClInclude Include="src\TreeSystem.h" />
     <ClInclude Include="src\Triangulator.h" />
-    <ClInclude Include="src\WaterComponent.h" />
-    <ClInclude Include="src\WaterRenderer.h" />
-    <ClInclude Include="src\WaterSystem.h" />
     <ClInclude Include="src\WorldRenderer.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
-    <ClInclude Include="src\ScriptComponent.h" />
-    <ClInclude Include="src\ScriptSystem.h" />
     <ClInclude Include="src\ShaderPart.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
-    <ClInclude Include="src\ShipComponent.h" />
-    <ClInclude Include="src\ShipSystem.h" />
     <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\Array.h" />
     <ClInclude Include="src\Span.h" />
     <ClInclude Include="src\String_dd.h" />
-    <ClInclude Include="src\SwarmAgentComponent.h" />
-    <ClInclude Include="src\SwarmSystem.h" />
     <ClInclude Include="src\SystemsSorting.h" />
-    <ClInclude Include="src\TerrainChunk.h" />
-    <ClInclude Include="src\TerrainChunkComponent.h" />
-    <ClInclude Include="src\TerrainParameters.h" />
-    <ClInclude Include="src\TerrainSystem.h" />
     <ClInclude Include="src\Tests.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
@@ -532,8 +527,6 @@
     </ClInclude>
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Timer.h" />
-    <ClInclude Include="src\TrenchComponent.h" />
-    <ClInclude Include="src\TrenchSystem.h" />
     <ClInclude Include="src\Typedefs.h" />
     <ClInclude Include="src\TypeInfo.h" />
     <ClInclude Include="src\TypeInfoHelpers.h" />
@@ -650,20 +643,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\AABB.cpp" />
-    <ClCompile Include="src\AngelScriptTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\BoundBoxComponent.cpp" />
     <ClCompile Include="src\BoundsHelpers.cpp" />
-    <ClCompile Include="src\BulletComponent.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
     <ClCompile Include="src\CommandBuffer.cpp" />
+    <ClCompile Include="src\d2d\Physics2DSystem.cpp" />
+    <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp" />
+    <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp" />
+    <ClCompile Include="src\d2d\SpriteComponent.cpp" />
+    <ClCompile Include="src\d2d\SpriteTileComponent.cpp" />
+    <ClCompile Include="src\d2d\SpriteTileSystem.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
@@ -673,18 +663,34 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\IWindow.cpp" />
     <ClCompile Include="src\JSON.cpp" />
-    <ClCompile Include="src\Light2DRenderer.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
-    <ClCompile Include="src\LuxportGame.cpp" />
-    <ClCompile Include="src\LuxportMap.cpp" />
+    <ClCompile Include="src\lux\LuxLightRenderer.cpp" />
+    <ClCompile Include="src\lux\LuxportGame.cpp" />
+    <ClCompile Include="src\lux\LuxportMap.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
-    <ClCompile Include="src\NeutrinoGame.cpp" />
+    <ClCompile Include="src\neutrino\BulletComponent.cpp" />
+    <ClCompile Include="src\neutrino\BulletSystem.cpp" />
+    <ClCompile Include="src\neutrino\NeutrinoGame.cpp" />
+    <ClCompile Include="src\neutrino\ShipSystem.cpp" />
+    <ClCompile Include="src\neutrino\SwarmAgentComponent.cpp" />
+    <ClCompile Include="src\neutrino\SwarmSystem.cpp" />
+    <ClCompile Include="src\neutrino\TerrainChunk.cpp" />
+    <ClCompile Include="src\neutrino\TerrainChunkComponent.cpp" />
+    <ClCompile Include="src\neutrino\TerrainParameters.cpp" />
+    <ClCompile Include="src\neutrino\TerrainRenderer.cpp" />
+    <ClCompile Include="src\neutrino\TerrainSystem.cpp" />
+    <ClCompile Include="src\neutrino\TreeComponent.cpp" />
+    <ClCompile Include="src\neutrino\TreeSystem.cpp" />
+    <ClCompile Include="src\neutrino\TrenchComponent.cpp" />
+    <ClCompile Include="src\neutrino\TrenchSystem.cpp" />
+    <ClCompile Include="src\neutrino\WaterComponent.cpp" />
+    <ClCompile Include="src\neutrino\WaterRenderer.cpp" />
+    <ClCompile Include="src\neutrino\WaterSystem.cpp" />
     <ClCompile Include="src\Noise.cpp" />
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
-    <ClCompile Include="src\Physics2DSystem.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />
@@ -700,6 +706,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\RenderState.cpp" />
+    <ClCompile Include="src\ScratchEntity.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\SFMLInputSource.cpp" />
     <ClCompile Include="src\SFMLWindow.cpp" />
@@ -707,7 +714,6 @@
     <ClCompile Include="src\BoundSphereComponent.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
-    <ClCompile Include="src\BulletSystem.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
     <ClCompile Include="src\ComponentBuffer.cpp" />
     <ClCompile Include="src\DataRequest.cpp" />
@@ -753,17 +759,10 @@
     <ClCompile Include="src\RayRenderer.cpp" />
     <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
-    <ClCompile Include="src\SpriteAnimationComponent.cpp" />
-    <ClCompile Include="src\SpriteAnimationSystem.cpp" />
-    <ClCompile Include="src\SpriteComponent.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\SpriteSheet.cpp" />
-    <ClCompile Include="src\SpriteTileComponent.cpp" />
-    <ClCompile Include="src\SpriteTileSystem.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\SystemManager.cpp" />
-    <ClCompile Include="src\TerrainParameters.cpp" />
-    <ClCompile Include="src\TerrainRenderer.cpp" />
     <ClCompile Include="src\TestEntities.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -783,25 +782,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\TreeComponent.cpp" />
-    <ClCompile Include="src\TreeSystem.cpp" />
     <ClCompile Include="src\Triangulator.cpp" />
     <ClCompile Include="src\UpdateDataBuffer.cpp" />
-    <ClCompile Include="src\WaterComponent.cpp" />
-    <ClCompile Include="src\WaterRenderer.cpp" />
-    <ClCompile Include="src\WaterSystem.cpp" />
     <ClCompile Include="src\WorldRenderer.cpp" />
-    <ClCompile Include="src\ScriptComponent.cpp" />
-    <ClCompile Include="src\ScriptSystem.cpp" />
     <ClCompile Include="src\ShaderPart.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
-    <ClCompile Include="src\ShipSystem.cpp" />
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\SystemsSorting.cpp" />
-    <ClCompile Include="src\TerrainChunk.cpp" />
-    <ClCompile Include="src\TerrainChunkComponent.cpp" />
-    <ClCompile Include="src\TerrainSystem.cpp" />
     <ClCompile Include="src\Tests\BinarySerializerTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
@@ -840,14 +828,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Tests\ScriptSystemTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\Tests\TerrainChunkTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -866,8 +846,6 @@
     </ClCompile>
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TransformComponent.cpp" />
-    <ClCompile Include="src\TrenchComponent.cpp" />
-    <ClCompile Include="src\TrenchSystem.cpp" />
     <ClCompile Include="src\Uniforms.cpp" />
     <ClCompile Include="src\Units.cpp" />
     <ClCompile Include="src\UpdateData.cpp" />
@@ -926,8 +904,6 @@
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\SharedString.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
-    <ClCompile Include="src\SwarmAgentComponent.cpp" />
-    <ClCompile Include="src\SwarmSystem.cpp" />
     <ClCompile Include="src\Tests\ArrayTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
@@ -993,14 +969,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Tests\RecorderTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Tests\ScriptTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

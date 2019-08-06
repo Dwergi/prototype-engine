@@ -31,7 +31,7 @@ namespace dd
 		bool IsHeld(dd::InputAction action) const;
 
 		// Get ALL actions that occurred last frame. Probably better to use GotInput().
-		const std::vector<dd::InputAction> GetInputs() const { return m_actions; }
+		const std::vector<dd::InputAction>& GetInputs() const { return m_actions; }
 		
 		MousePosition GetMousePosition() const;
 		MousePosition GetMouseScroll() const;

@@ -87,7 +87,7 @@ namespace ArrayTests
 
 		REQUIRE( int_a.Size() == int_b.Size() );
 
-		for( uint i = 0; i < int_a.Size(); ++i )
+		for( int i = 0; i < int_a.Size(); ++i )
 		{
 			REQUIRE( int_a[ i ] == int_b[ i ] );
 		}

@@ -14,7 +14,7 @@
 #include "PhysicsPlaneComponent.h"
 #include "PlayerComponent.h"
 #include "RayComponent.h"
-#include "ShipComponent.h"
+#include "neutrino/ShipComponent.h"
 #include "TransformComponent.h"
 
 namespace dd

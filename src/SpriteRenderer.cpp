@@ -13,8 +13,9 @@
 #include "Services.h"
 #include "ShaderPart.h"
 #include "Shader.h"
-#include "SpriteComponent.h"
 #include "Uniforms.h"
+
+#include "d2d/SpriteComponent.h"
 
 namespace ddr
 {
@@ -36,7 +37,7 @@ namespace ddr
 	SpriteRenderer::SpriteRenderer() :
 		ddr::Renderer("Sprites")
 	{
-		Require<dd::SpriteComponent>();
+		Require<d2d::SpriteComponent>();
 		RequireTag(ddc::Tag::Visible);
 
 		m_renderState.BackfaceCulling = false;
@@ -210,7 +211,7 @@ namespace ddr
 
 		m_vao.Bind();
 
-		auto sprite_cmps = data.Get<dd::SpriteComponent>();
+		auto sprite_cmps = data.Get<d2d::SpriteComponent>();
 		
 		// copy components to temp
 		m_temp.clear();

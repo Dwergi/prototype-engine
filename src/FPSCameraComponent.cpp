@@ -12,7 +12,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-DD_TYPE_CPP( dd::FPSCameraComponent );
+DD_TYPE_CPP(dd::FPSCameraComponent);
 
 namespace dd
 {
@@ -21,9 +21,9 @@ namespace dd
 		return m_position;
 	}
 
-	void FPSCameraComponent::SetPosition( const glm::vec3& pos )
+	void FPSCameraComponent::SetPosition(const glm::vec3& pos)
 	{
-		if( m_position == pos )
+		if (m_position == pos)
 		{
 			return;
 		}
@@ -31,29 +31,29 @@ namespace dd
 		m_position = pos;
 	}
 
-	void FPSCameraComponent::SetRotation( float yaw, float pitch )
+	void FPSCameraComponent::SetRotation(float yaw, float pitch)
 	{
-		if( m_yaw == yaw && m_pitch == pitch )
+		if (m_yaw == yaw && m_pitch == pitch)
 		{
 			return;
 		}
 
 		// wrap yaw
-		m_yaw = ddm::wrap( yaw, 0.0f, glm::two_pi<float>() );
+		m_yaw = ddm::wrap(yaw, 0.0f, glm::two_pi<float>());
 
 		// clamp pitch to vertical up/down
 		const float max_pitch = glm::half_pi<float>() - 0.00001f;
-		m_pitch = glm::clamp( pitch, -max_pitch, max_pitch );
+		m_pitch = glm::clamp(pitch, -max_pitch, max_pitch);
 	}
 
 	glm::vec3 FPSCameraComponent::GetDirection() const
 	{
-		return ddm::DirectionFromPitchYaw( m_pitch, m_yaw );
+		return ddm::DirectionFromPitchYaw(m_pitch, m_yaw);
 	}
 
-	void FPSCameraComponent::SetDirection( const glm::vec3& dir )
+	void FPSCameraComponent::SetDirection(const glm::vec3& dir)
 	{
-		ddm::PitchYawFromDirection( glm::normalize( dir ), m_pitch, m_yaw );
+		ddm::PitchYawFromDirection(glm::normalize(dir), m_pitch, m_yaw);
 	}
 
 	float FPSCameraComponent::GetNear() const
@@ -61,9 +61,9 @@ namespace dd
 		return m_near;
 	}
 
-	void FPSCameraComponent::SetNear( float dist_near )
+	void FPSCameraComponent::SetNear(float dist_near)
 	{
-		if( dist_near != m_near )
+		if (dist_near != m_near)
 		{
 			m_near = dist_near;
 		}
@@ -74,9 +74,9 @@ namespace dd
 		return m_far;
 	}
 
-	void FPSCameraComponent::SetFar( float dist_far )
+	void FPSCameraComponent::SetFar(float dist_far)
 	{
-		if( dist_far != m_far )
+		if (dist_far != m_far)
 		{
 			m_far = dist_far;
 		}
@@ -87,9 +87,9 @@ namespace dd
 		return m_vfov;
 	}
 
-	void FPSCameraComponent::SetVerticalFOV( float vfov )
+	void FPSCameraComponent::SetVerticalFOV(float vfov)
 	{
-		if( m_vfov != vfov )
+		if (m_vfov != vfov)
 		{
 			m_vfov = vfov;
 		}
@@ -100,36 +100,36 @@ namespace dd
 		return m_aspectRatio;
 	}
 
-	void FPSCameraComponent::SetSize(glm::ivec2 size)
+	void FPSCameraComponent::SetWindowSize(glm::ivec2 size)
 	{
-		float aspectRatio = (float) size.x / (float) size.y;
-		if( aspectRatio != m_aspectRatio )
+		float aspect_ratio = (float) size.x / (float) size.y;
+		if (aspect_ratio != m_aspectRatio)
 		{
-			m_aspectRatio = aspectRatio;
+			m_aspectRatio = aspect_ratio;
 		}
 	}
 
 	glm::mat4 FPSCameraComponent::GetProjectionMatrix() const
 	{
-		float fov = 1.0f / glm::tan( m_vfov / 2.0f );
+		float fov = 1.0f / glm::tan(m_vfov / 2.0f);
 		return glm::mat4(
 			fov / m_aspectRatio, 0.0f, 0.0f, 0.0f,
 			0.0f, fov, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, -1.0f,
-			0.0f, 0.0f, m_near, 0.0f );
+			0.0f, 0.0f, m_near, 0.0f);
 	}
 
 	glm::mat4 FPSCameraComponent::GetViewMatrix() const
 	{
-		return glm::lookAt( m_position, m_position + GetDirection(), glm::vec3( 0, 1, 0 ) );
+		return glm::lookAt(m_position, m_position + GetDirection(), glm::vec3(0, 1, 0));
 	}
 
-	void FPSCameraComponent::Update( float delta_t )
+	void FPSCameraComponent::Update(float delta_t)
 	{
-		m_frustum.Update( *this );
+		m_frustum.Update(*this);
 	}
 
-	void FPSCameraComponent::CopyValuesFrom( const FPSCameraComponent& other )
+	void FPSCameraComponent::CopyValuesFrom(const FPSCameraComponent& other)
 	{
 		m_vfov = other.m_vfov;
 		m_aspectRatio = other.m_aspectRatio;

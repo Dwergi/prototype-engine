@@ -8,7 +8,6 @@
 #include "ParticleSystem.h"
 
 #include "BoundBoxComponent.h"
-#include "BulletComponent.h"
 #include "ParticleSystemComponent.h"
 #include "DataRequest.h"
 #include "Input.h"
@@ -41,19 +40,22 @@ namespace dd
 
 	void ParticleSystem::Initialize( ddc::EntitySpace& entities )
 	{
-		entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
+		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
+		//entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
 
 		s_input->AddHandler(dd::InputAction::START_PARTICLE, [this](){ m_startEmitting = true; });
 	}
 	
 	void ParticleSystem::OnBulletHitMessage( ddc::Message msg )
 	{
-		dd::BulletHitMessage payload = msg.GetPayload<dd::BulletHitMessage>();
+		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
+
+		/*dd::BulletHitMessage payload = msg.GetPayload<dd::BulletHitMessage>();
 		SpawnRequest req;
 		req.Position = payload.Position;
 		req.Normal = payload.SurfaceNormal;
 
-		m_pendingSpawns.push_back( req );
+		m_pendingSpawns.push_back( req );*/
 	}
 	
 	void ParticleSystem::Update( const ddc::UpdateData& update )

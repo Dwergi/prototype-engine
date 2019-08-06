@@ -13,7 +13,7 @@
 TEST_CASE( "[Frustum]" )
 {
 	dd::FPSCameraComponent cam;
-	cam.SetSize( 16, 9 );
+	cam.SetWindowSize( glm::ivec2(16, 9) );
 	cam.SetDirection( glm::vec3( 0, 0, 1 ) );
 	cam.SetPosition( glm::vec3( 0, 0, 0 ) );
 	cam.SetFar( 100 );

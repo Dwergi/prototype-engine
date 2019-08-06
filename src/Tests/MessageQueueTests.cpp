@@ -12,28 +12,28 @@
 
 bool called = false;
 
-dd::MessageType InvalidMessageID =  dd::MessageType::Unknown;
-dd::MessageType TestMessageID = dd::MessageType::Test;
+ddc::MessageType InvalidMessageID =  ddc::MessageType::Unknown;
+ddc::MessageType TestMessageID = ddc::MessageType::Test;
 
 int Received;
 
-void TestFunction( dd::Message msg )
+void TestFunction( ddc::Message msg )
 {
 	Received = msg.GetPayload<int>();
 }
 
 int Received2;
 
-void TestFunction2( dd::Message msg )
+void TestFunction2( ddc::Message msg )
 {
 	Received2 = msg.GetPayload<int>();
 }
 
 TEST_CASE( "[MessageSystem]" )
 {
-	DD_REGISTER_CLASS( dd::Message );
+	DD_REGISTER_CLASS( ddc::Message );
 
-	dd::MessageQueue system;
+	ddc::MessageQueue system;
 	Received = 0;
 	Received2 = 0;
 
@@ -42,7 +42,7 @@ TEST_CASE( "[MessageSystem]" )
 		REQUIRE( system.GetTotalSubscriberCount() == 0 );
 		REQUIRE( system.GetSubscriberCount( TestMessageID ) == 0 );
 
-		dd::MessageSubscription subbed = system.Subscribe( TestMessageID, TestFunction );
+		ddc::MessageSubscription subbed = system.Subscribe( TestMessageID, TestFunction );
 
 		REQUIRE( system.GetSubscriberCount( TestMessageID ) == 1 );
 		REQUIRE( system.GetTotalSubscriberCount() == 1 );
@@ -57,7 +57,7 @@ TEST_CASE( "[MessageSystem]" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		dd::Message msg;
+		ddc::Message msg;
 		msg.Type = TestMessageID;
 		msg.SetPayload( 50 );
 
@@ -71,7 +71,7 @@ TEST_CASE( "[MessageSystem]" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		dd::Message msg;
+		ddc::Message msg;
 		msg.Type = InvalidMessageID;
 		msg.SetPayload( 50 );
 
@@ -85,9 +85,9 @@ TEST_CASE( "[MessageSystem]" )
 	{
 		system.Subscribe( TestMessageID, TestFunction );
 
-		dd::MessageSubscription sub = system.Subscribe( TestMessageID, TestFunction2 );
+		ddc::MessageSubscription sub = system.Subscribe( TestMessageID, TestFunction2 );
 
-		dd::Message msg;
+		ddc::Message msg;
 		msg.Type = TestMessageID;
 		msg.SetPayload( 50 );
 

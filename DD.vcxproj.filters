@@ -97,9 +97,6 @@
     <Filter Include="Rendering\Commands">
       <UniqueIdentifier>{ad0517d3-bcdf-4c04-a0a6-73b304d9b410}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{0e52d069-7158-418c-bb41-833200ce8a97}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\tinygltf">
       <UniqueIdentifier>{904a51d6-0d08-4c61-bddc-9f3cdb0adcdd}</UniqueIdentifier>
     </Filter>
@@ -109,10 +106,13 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{5729b7d4-6f1b-40aa-ac36-3b353e12b793}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Lux">
+    <Filter Include="Games">
+      <UniqueIdentifier>{0e52d069-7158-418c-bb41-833200ce8a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\Lux">
       <UniqueIdentifier>{a6c54984-6d7a-4674-b2f4-9cef58b6aecd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Neutrino">
+    <Filter Include="Games\Neutrino">
       <UniqueIdentifier>{f1d03ad5-bd78-497a-8b18-658df003f9e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -146,12 +146,6 @@
     </ClInclude>
     <ClInclude Include="src\Timer.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SwarmAgentComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SwarmSystem.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\Vector.h">
       <Filter>Containers</Filter>
@@ -312,32 +306,14 @@
     <ClInclude Include="src\File.h">
       <Filter>File</Filter>
     </ClInclude>
-    <ClInclude Include="src\TrenchSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TrenchComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\MousePicking.h">
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="src\Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\ShipComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShipSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\FrameTimer.h">
       <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScriptComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScriptSystem.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\LightComponent.h">
       <Filter>Components</Filter>
@@ -347,9 +323,6 @@
     </ClInclude>
     <ClInclude Include="src\ICamera.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainChunkComponent.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\OpenGL.h">
       <Filter>Rendering</Filter>
@@ -365,9 +338,6 @@
     </ClInclude>
     <ClInclude Include="src\DDAssertHelpers.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainParameters.h">
-      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\Span.h">
       <Filter>Containers</Filter>
@@ -392,9 +362,6 @@
     </ClInclude>
     <ClInclude Include="src\RenderData.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainChunk.h">
-      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\ComponentBuffer.h">
       <Filter>Entities</Filter>
@@ -441,17 +408,8 @@
     <ClInclude Include="src\IAsyncHitTest.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\BulletComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BulletSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\HitResult.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainSystem.h">
-      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\PhysicsSystem.h">
       <Filter>Systems</Filter>
@@ -485,9 +443,6 @@
     </ClInclude>
     <ClInclude Include="src\PCH.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TerrainRenderer.h">
-      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\MessageType.h">
       <Filter>Messaging</Filter>
@@ -543,17 +498,8 @@
     <ClInclude Include="src\RenderState.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\FPSCameraComponent.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShaderPart.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TreeSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TreeComponent.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\LinesComponent.h">
       <Filter>Components</Filter>
@@ -564,20 +510,11 @@
     <ClInclude Include="src\Noise.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\WaterSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WaterComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\MeshUtils.h">
       <Filter>Mesh</Filter>
     </ClInclude>
     <ClInclude Include="src\Triangulator.h">
       <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WaterRenderer.h">
-      <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="src\MeshRenderCommand.h">
       <Filter>Rendering\Commands</Filter>
@@ -598,7 +535,7 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\IGame.h">
-      <Filter>Game</Filter>
+      <Filter>Games</Filter>
     </ClInclude>
     <ClInclude Include="include\stb\stb_image.h">
       <Filter>Includes\stb</Filter>
@@ -654,9 +591,6 @@
     <ClInclude Include="src\SpriteRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="src\SpriteComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\ParticleSystemRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
@@ -681,40 +615,8 @@
     <ClInclude Include="src\InputMode.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\SpriteAnimationComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SpriteTileComponent.h" />
-    <ClInclude Include="src\SpriteTileSystem.h" />
-    <ClInclude Include="src\Box2DPhysicsComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Circle2DPhysicsComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics2DSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\SpriteSheet.h">
       <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Light2DComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Light2DRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LuxportGame.h">
-      <Filter>Game\Lux</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LuxportMap.h">
-      <Filter>Game\Lux</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NeutrinoGame.h">
-      <Filter>Game\Neutrino</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SpriteAnimationSystem.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\EnumFlags.h">
       <Filter>Containers</Filter>
@@ -752,6 +654,102 @@
     <ClInclude Include="src\Tweakable.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\FPSCameraComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\BulletComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\BulletSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\NeutrinoGame.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\SwarmAgentComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\SwarmSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TreeComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TreeSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TrenchComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TrenchSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\WaterComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\WaterRenderer.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\WaterSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\LuxportGame.h">
+      <Filter>Games\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\LuxportMap.h">
+      <Filter>Games\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\ShipComponent.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\ShipSystem.h">
+      <Filter>Games\Neutrino</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\LuxLightRenderer.h">
+      <Filter>Games\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\LuxLightComponent.h">
+      <Filter>Games\Lux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\CirclePhysicsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteAnimationComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteTileComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\Physics2DSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\BoxPhysicsComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TerrainChunk.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TerrainChunkComponent.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TerrainParameters.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TerrainRenderer.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\neutrino\TerrainSystem.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteAnimationSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteTileSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -787,12 +785,6 @@
     </ClCompile>
     <ClCompile Include="src\Tests\TimerTests.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SwarmAgentComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SwarmSystem.cpp">
-      <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Hash.cpp">
       <Filter>Containers</Filter>
@@ -834,9 +826,6 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\RandomTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tests\ScriptTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\SerializerTests.cpp">
@@ -923,9 +912,6 @@
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
     </ClCompile>
-    <ClCompile Include="src\AngelScriptTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\Socket.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
@@ -938,9 +924,6 @@
     <ClCompile Include="src\DoubleBuffer.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\TrenchSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\TransformComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -950,14 +933,8 @@
     <ClCompile Include="src\MousePicking.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\ShipSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\FrameTimer.cpp">
       <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScriptComponent.cpp">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\PlaneTests.cpp">
       <Filter>Tests</Filter>
@@ -965,20 +942,11 @@
     <ClCompile Include="src\Tests\TerrainChunkTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\ScriptSystemTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScriptSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\LightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\ShakyCamera.cpp">
       <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainChunkComponent.cpp">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
@@ -1022,14 +990,8 @@
     <ClCompile Include="src\RenderData.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\TerrainChunk.cpp">
-      <Filter>Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="src\ComponentBuffer.cpp">
       <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TrenchComponent.cpp">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\PlayerComponent.cpp">
       <Filter>Components</Filter>
@@ -1076,17 +1038,8 @@
     <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\BulletSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\HitResult.cpp">
       <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainSystem.cpp">
-      <Filter>Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainParameters.cpp">
-      <Filter>Terrain</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\MeshUtilsTests.cpp">
       <Filter>Tests</Filter>
@@ -1124,14 +1077,8 @@
     <ClCompile Include="src\PhysicsSphereComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\BulletComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="src\OctreeComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TerrainRenderer.cpp">
-      <Filter>Terrain</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityPrototype.cpp">
       <Filter>Entities</Filter>
@@ -1157,16 +1104,7 @@
     <ClCompile Include="src\RenderState.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\FPSCameraComponent.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TreeSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\LinesComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TreeComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\LinesRenderer.cpp">
@@ -1178,20 +1116,11 @@
     <ClCompile Include="src\Noise.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\WaterSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WaterComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="src\MeshUtils.cpp">
       <Filter>Mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\Triangulator.cpp">
       <Filter>Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WaterRenderer.cpp">
-      <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="src\CommandBuffer.cpp">
       <Filter>Rendering\Commands</Filter>
@@ -1277,41 +1206,14 @@
     <ClCompile Include="src\Material.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
-    <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\InputMode.cpp">
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Sprite.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\SpriteComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SpriteAnimationComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SpriteTileComponent.cpp" />
-    <ClCompile Include="src\SpriteTileSystem.cpp" />
-    <ClCompile Include="src\Physics2DSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\SpriteSheet.cpp">
       <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Light2DRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LuxportGame.cpp">
-      <Filter>Game\Lux</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LuxportMap.cpp">
-      <Filter>Game\Lux</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NeutrinoGame.cpp">
-      <Filter>Game\Neutrino</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SpriteAnimationSystem.cpp">
-      <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\InputKeyBindings.cpp">
       <Filter>Input</Filter>
@@ -1330,6 +1232,96 @@
     </ClCompile>
     <ClCompile Include="src\InputEvent.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScratchEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OrthoCamera.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FPSCameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\BulletComponent.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\BulletSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\NeutrinoGame.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\SwarmAgentComponent.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\SwarmSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TreeComponent.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TreeSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TrenchComponent.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TrenchSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\WaterComponent.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\WaterRenderer.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\WaterSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\LuxportGame.cpp">
+      <Filter>Games\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\LuxportMap.cpp">
+      <Filter>Games\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\ShipSystem.cpp">
+      <Filter>Games\Neutrino</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\LuxLightRenderer.cpp">
+      <Filter>Games\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteTileComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\Physics2DSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TerrainChunk.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TerrainChunkComponent.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TerrainParameters.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TerrainRenderer.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neutrino\TerrainSystem.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

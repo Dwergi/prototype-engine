@@ -11,7 +11,7 @@
 
 namespace dd
 {
-	struct PhysicsSystem : ddc::System, IDebugPanel
+	struct PhysicsSystem : ddc::System, dd::IDebugPanel
 	{
 		PhysicsSystem();
 

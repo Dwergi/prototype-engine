@@ -5,36 +5,62 @@ namespace ddc
 	struct ScratchEntity
 	{
 		ScratchEntity(ddc::Entity entity);
-		ScratchEntity(const ScratchEntity& other);
 		~ScratchEntity();
 
-		int Components() const;
+		// could support move, but not sure it's necessary...
+		ScratchEntity(const ScratchEntity&) = delete;
 
-		bool IsValid() const;
-		bool IsAlive() const;
+		// Commit changes to the entity.
+		// If this goes out of scope without Commit() being called, all changes are discarded.
+		bool Commit();
 
-		void AddTag(ddc::Tag tag) const;
-		void RemoveTag(ddc::Tag tag) const;
+		int Components() const { return m_components.Size(); }
+
+		void AddTag(ddc::Tag tag);
+		void RemoveTag(ddc::Tag tag);
 		bool HasTag(ddc::Tag tag) const;
 
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;
 		template <typename TComponent> bool Has() const;
-		template <typename TComponent> TComponent& Add() const;
-		template <typename TComponent> void Remove() const;
 
 	private:
 
 		struct ComponentEntry
 		{
-			ComponentID Type;
-			size_t Offset;
+			dd::ComponentID Type { 0 };
+			size_t Offset { 0 };
+			size_t Size { 0 };
+			uint64 Hash { 0 }; // hash of storage prior to modification
 		};
 
-		Array<ComponentEntry, MAX_COMPONENTS> m_offsets;
-		byte* m_storage;
+		ddc::Entity m_entity;
+		dd::Array<ComponentEntry, MAX_COMPONENTS> m_components;
+		TagBits m_tags;
+		byte* m_storage { nullptr };
 
-		// hash of storage prior to modification
-		size_t m_hash; 
+		void* FindComponent(dd::ComponentID id) const;
 	};
+
+	template <typename TComponent>
+	TComponent* ScratchEntity::Access() const
+	{
+		dd::ComponentID id = DD_FIND_TYPE(TComponent)->ComponentID();
+		return (TComponent*) FindComponent(id);
+	}
+
+	template <typename TComponent>
+	const TComponent* ScratchEntity::Get() const
+	{
+		dd::ComponentID id = DD_FIND_TYPE(TComponent)->ComponentID();
+		return (const TComponent*) FindComponent(id);
+	}
+
+	template <typename TComponent>
+	bool ScratchEntity::Has() const
+	{
+		dd::ComponentID id = DD_FIND_TYPE(TComponent)->ComponentID();
+		void* data = FindComponent(id);
+		return data != nullptr;
+	}
 }

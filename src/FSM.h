@@ -2,7 +2,7 @@
 
 namespace dd
 {
-	
+	// Example graph for an FSM, used for creating FSM instances.
 	struct FSMPrototype
 	{
 		struct State

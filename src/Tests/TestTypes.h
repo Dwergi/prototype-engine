@@ -36,9 +36,8 @@ namespace Test
 		int SecondInt;
 
 		DD_BEGIN_CLASS( Test::NestedStruct )
-		{
-			DD_MEMBER( Test::NestedStruct, Nested );
-			DD_MEMBER( Test::NestedStruct, SecondInt );
-		}
+			DD_MEMBER( Nested );
+			DD_MEMBER( SecondInt );
+		DD_END_CLASS()
 	};
 }
