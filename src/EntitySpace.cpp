@@ -3,11 +3,21 @@
 
 namespace ddc
 {
-	static_assert( sizeof( Entity ) <= sizeof( uint ) + sizeof( uint ) + sizeof( EntitySpace* ) );
+	static_assert( sizeof( ddc::Entity ) == sizeof( uint64 ), "Entity should only be 64 bits." );
+
+	static const uint8 MAX_SPACES = 8;
+
+	static EntitySpace* s_spaceInstances[MAX_SPACES];
+	static uint8 s_used = 0;
 
 	EntitySpace::EntitySpace(std::string name) :
 		m_name(name)
 	{
+		DD_ASSERT(s_used < MAX_SPACES);
+		s_spaceInstances[s_used] = this;
+		m_instanceIndex = s_used;
+		++s_used;
+
 		m_components.resize( dd::TypeInfo::ComponentCount() );
 
 		for( dd::ComponentID i = 0; i < m_components.size(); ++i )
@@ -57,7 +67,7 @@ namespace ddc
 			EntityEntry new_entry;
 			new_entry.Entity.ID = m_entities.size();
 			new_entry.Entity.Version = -1;
-			new_entry.Entity.m_space = this;
+			new_entry.Entity.m_space = m_instanceIndex;
 
 			m_entities.push_back( new_entry );
 		}
@@ -241,28 +251,37 @@ namespace ddc
 		return m_entities[ e.ID ].Tags;
 	}
 
+	EntitySpace* Entity::Space() const
+	{
+		if (m_space < s_used)
+		{
+			return s_spaceInstances[m_space];
+		}
+		return nullptr;
+	}
+
 	bool Entity::IsValid() const
 	{
-		return m_space != nullptr && Handle != ~0;
+		return Handle != ~0;
 	}
 
 	bool Entity::IsAlive() const
 	{
-		return m_space != nullptr && m_space->IsAlive(*this);
+		return IsValid() && Space()->IsAlive(*this);
 	}
 
 	void Entity::AddTag(ddc::Tag tag) const
 	{
-		m_space->AddTag(*this, tag);
+		Space()->AddTag(*this, tag);
 	}
 
 	void Entity::RemoveTag(ddc::Tag tag) const
 	{
-		m_space->RemoveTag(*this, tag);
+		Space()->RemoveTag(*this, tag);
 	}
 
 	bool Entity::HasTag(ddc::Tag tag) const
 	{
-		return m_space->HasTag(*this, tag);
+		return Space()->HasTag(*this, tag);
 	}
 }

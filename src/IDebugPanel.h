@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Typedefs.h"
+
 #include "imgui/imgui.h"
 
 namespace ddc
@@ -50,4 +52,13 @@ namespace dd
 		//
 		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) = 0;
 	};
+}
+
+namespace ImGui
+{
+	void Value(const char* prefix, const uint64& value);
+	void Value(const char* prefix, const glm::ivec2& value);
+	void Value(const char* prefix, const glm::vec2& value, const char* float_format = nullptr);
+	void Value(const char* prefix, const glm::vec3& value, const char* float_format = nullptr);
+	void Value(const char* prefix, const glm::vec4& value, const char* float_format = nullptr);
 }

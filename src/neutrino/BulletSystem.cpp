@@ -157,9 +157,8 @@ namespace neut
 	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
 		ddc::EntitySpace& entities = update.EntitySpace();
-		const std::vector<dd::InputAction>& actions = s_input->GetInputs();
 		
-		if(std::find(actions.begin(), actions.end(), dd::InputAction::SHOOT) != actions.end())
+		if(s_input->GotInput(dd::InputAction::SHOOT))
 		{
 			auto player = update.Data( "player" );
 			auto cameras = player.Read<dd::FPSCameraComponent>();

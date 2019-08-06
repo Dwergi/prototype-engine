@@ -66,6 +66,16 @@ namespace dd
 		m_midFrame = false;
 	}
 
+	void DebugUI::EndWindow()
+	{
+		if (m_midWindow)
+		{
+			ImGui::End();
+
+			m_midWindow = false;
+		}
+	}
+
 	void DebugUI::RegisterDebugPanel(IDebugPanel& debug_panel)
 	{
 		m_debugPanels.push_back(&debug_panel);

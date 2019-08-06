@@ -16,8 +16,6 @@
 
 static dd::Service<dd::IWindow> s_window;
 
-#pragma optimize("", off)
-
 namespace dd
 {
 	Input::Input()
@@ -48,8 +46,6 @@ namespace dd
 		m_actions.clear();
 
 		dd::Array<InputEvent, 64> input_events;
-		dd::Array<ActionKey, 64> dispatch_actions;
-
 		for (IInputSource* source : m_sources)
 		{
 			input_events.Clear();
@@ -73,21 +69,19 @@ namespace dd
 
 				if (bound)
 				{
-					dispatch_actions.Add(ActionKey { action, evt.Type });
+					m_actions.push_back(InputReceived { action, evt.Type });
 
 					if (UpdateHeldState(action, evt))
 					{
-						dispatch_actions.Add(ActionKey { action, InputType::Hold });
+						m_actions.push_back(InputReceived { action, InputType::Hold });
 					}
 				}
-
-				m_actions.push_back(action);
 			}
 		}
 
-		for (ActionKey& entry : dispatch_actions)
+		for (InputReceived& recv : m_actions)
 		{
-			DispatchAction(entry.Action, entry.Type);
+			DispatchAction(recv.Action, recv.Type);
 		}
 	}
 
@@ -105,7 +99,13 @@ namespace dd
 
 	bool Input::GotInput(dd::InputAction action) const
 	{
-		auto it = std::find(m_actions.begin(), m_actions.end(), action);
+		return GotInput(action, InputType::Release);
+	}
+
+	bool Input::GotInput(dd::InputAction action, dd::InputType type) const
+	{
+		InputReceived recv { action, type };
+		auto it = std::find(m_actions.begin(), m_actions.end(), recv);
 		return it != m_actions.end();
 	}
 
@@ -153,7 +153,7 @@ namespace dd
 	{
 		DD_TODO("Probably need a remove handler?");
 
-		ActionKey key { action, type };
+		InputReceived key { action, type };
 
 		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
@@ -168,7 +168,7 @@ namespace dd
 
 	void Input::AddHeldHandler(InputAction action)
 	{
-		ActionKey key { action, InputType::Hold };
+		InputReceived key { action, InputType::Hold };
 
 		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
@@ -179,7 +179,7 @@ namespace dd
 
 	void Input::DispatchAction(InputAction action, InputType type) const
 	{
-		ActionKey key { action, type };
+		InputReceived key { action, type };
 
 		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())

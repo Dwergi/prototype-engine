@@ -18,6 +18,14 @@ namespace dd
 
 	using InputHandler = std::function<void()>;
 
+	struct InputReceived
+	{
+		dd::InputAction Action;
+		dd::InputType Type;
+
+		bool operator==(const InputReceived& other) const { return Action == other.Action && Type == other.Type; }
+	};
+
 	struct Input
 	{
 		Input();
@@ -29,12 +37,10 @@ namespace dd
 
 		void Update(float delta_t);
 
-		// Did the given input occur in the last frame?
+		// Did the given input occur in the last frame? If type is not given, assumes InputType::Release.
 		bool GotInput(dd::InputAction action) const;
+		bool GotInput(dd::InputAction action, dd::InputType type) const;
 		bool IsHeld(dd::InputAction action) const;
-
-		// Get ALL actions that occurred last frame. Probably better to use GotInput().
-		const std::vector<dd::InputAction>& GetInputs() const { return m_actions; }
 		
 		MousePosition GetMousePosition() const;
 		MousePosition GetMouseScroll() const;
@@ -52,27 +58,21 @@ namespace dd
 		void EnableMouse(bool enabled) { m_mouseEnabled = enabled; }
 		void EnableKeyboard(bool enabled) { m_keyboardEnabled = enabled; }
 
-		void SetKeyBindings(const InputKeyBindings& bindings) { m_bindings = &bindings; }
+		void SetKeyBindings(InputKeyBindings& bindings) { m_bindings = &bindings; }
+		InputKeyBindings* GetKeyBindings() const { return m_bindings; }
 
 	private:
 
-		struct ActionKey
-		{
-			dd::InputAction Action;
-			dd::InputType Type;
-		};
-
-		struct ActionKeyHash { std::size_t operator()(const ActionKey& key) const { return ((size_t) key.Action << 32) | ((size_t) key.Type); } };
-		struct ActionKeyEqual { std::size_t operator()(const ActionKey& a, const ActionKey& b) const { return a.Action == b.Action && a.Type == b.Type; } };
+		struct InputRecvHash { std::size_t operator()(const InputReceived& key) const { return ((size_t) key.Action << 32) | ((size_t) key.Type); } };
 
 		// All actions that were triggered last frame.
-		std::vector<InputAction> m_actions;
+		std::vector<InputReceived> m_actions;
 		std::vector<IInputSource*> m_sources;
 
-		std::unordered_map<ActionKey, std::vector<InputHandler>, ActionKeyHash, ActionKeyEqual> m_handlers;
+		std::unordered_map<InputReceived, std::vector<InputHandler>, InputRecvHash> m_handlers;
 		std::unordered_map<InputAction, bool> m_held;
 
-		const InputKeyBindings* m_bindings { nullptr };
+		InputKeyBindings* m_bindings { nullptr };
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
 

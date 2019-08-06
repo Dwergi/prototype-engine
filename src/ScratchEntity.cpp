@@ -5,42 +5,40 @@ namespace ddc
 {
 	ScratchEntity::ScratchEntity(ddc::Entity entity)
 	{
-		DD_ASSERT(entity.IsValid());
-		DD_ASSERT(entity.IsAlive());
+		DD_ASSERT(entity.IsValid() && entity.IsAlive());
+
+		m_entity = entity;
 		
 		EntitySpace* space = entity.Space();
 		size_t total_size = 0;
 
-		dd::Array<const dd::TypeInfo*, MAX_COMPONENTS> cmp_types;
 		for (dd::ComponentID id = 0; id < dd::TypeInfo::ComponentCount(); ++id)
 		{
 			if (space->HasComponent(entity, id))
 			{
-				const dd::TypeInfo* type_info = dd::TypeInfo::GetComponent(id);
-				cmp_types.Add(type_info);
+				ComponentEntry entry;
+				entry.Type = dd::TypeInfo::GetComponent(id);
+				m_components.Add(entry);
 
-				total_size += type_info->Size();
+				total_size += entry.Type->Size();
 			}
 		}
 
 		m_storage = new byte[total_size];
+		memset(m_storage, 0xCC, total_size);
 
 		size_t current_offset = 0;
-		for (const dd::TypeInfo* type : cmp_types)
+		for (ComponentEntry& entry : m_components)
 		{
-			dd::ComponentID id = type->ComponentID();
-			size_t size = type->Size();
+			dd::ComponentID id = entry.Type->ComponentID();
+			size_t size = entry.Type->Size();
 
 			const byte* data = (const byte*)space->GetComponent(entity, id);
 			memcpy(m_storage + current_offset, data, size);
-			current_offset += size;
-
-			ComponentEntry entry;
-			entry.Type = id;
-			entry.Offset = current_offset;
+			
 			entry.Hash = dd::HashBytes(data, size);
-			entry.Size = size;
-			m_components.Add(entry);
+
+			current_offset += size;
 		}
 
 		m_tags = space->GetAllTags(entity);
@@ -72,18 +70,22 @@ namespace ddc
 
 		bool changed = false;
 
+		size_t current_offset = 0;
 		for (const ComponentEntry& entry : m_components)
 		{
-			const byte* data = m_storage + entry.Offset;
-			uint64 new_hash = dd::HashBytes(data, entry.Size);
+			const byte* data = m_storage + current_offset;
+			size_t size = entry.Type->Size();
 
+			uint64 new_hash = dd::HashBytes(data, size);
 			if (new_hash != entry.Hash)
 			{
-				void* cmp_data = space->AccessComponent(m_entity, entry.Type);
-				memcpy(cmp_data, data, entry.Size);
+				void* cmp_data = space->AccessComponent(m_entity, entry.Type->ComponentID());
+				memcpy(cmp_data, data, size);
 
 				changed = true;
 			}
+
+			current_offset += size;
 		}
 
 		if (m_tags != space->GetAllTags(m_entity))
@@ -97,12 +99,15 @@ namespace ddc
 
 	void* ScratchEntity::FindComponent(dd::ComponentID id) const
 	{
+		size_t current_offset = 0;
 		for (const ComponentEntry& entry : m_components)
 		{
-			if (entry.Type == id)
+			if (entry.Type->ComponentID() == id)
 			{
-				return m_storage + entry.Offset;
+				return m_storage + current_offset;
 			}
+
+			current_offset += entry.Type->Size();
 		}
 		return nullptr;
 	}

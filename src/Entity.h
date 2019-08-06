@@ -26,7 +26,7 @@ namespace ddc
 		void RemoveTag(ddc::Tag tag) const;
 		bool HasTag(ddc::Tag tag) const;
 
-		EntitySpace* Space() const { return m_space; }
+		EntitySpace* Space() const;
 
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;
@@ -38,18 +38,18 @@ namespace ddc
 		{
 			struct
 			{
-				uint ID : 22;
-				uint Version : 10;
+				uint64 ID : 32;
+				uint64 Version : 28;
+				uint64 m_space : 4;
 			};
 
-			uint Handle { ~0u };
+			uint64 Handle { ~0u };
 		};
 
 	private:
 		friend struct EntitySpace;
-		EntitySpace* m_space { nullptr };
 	};
 
 	// ASSUMPTION: Entity is included from EntitySpace.h, which is always included.
-	// All methods are defined in EntitySpace.h.
+	// All methods are defined in EntitySpace.h/cpp.
 }

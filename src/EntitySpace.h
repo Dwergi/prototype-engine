@@ -12,6 +12,10 @@ namespace ddc
 	typedef std::bitset<MAX_TAGS> TagBits;
 	typedef std::bitset<MAX_COMPONENTS> ComponentBits;
 
+	//
+	// An entity space is a set of entities that can interact with each other, but not with anything in any other spaces.
+	// Eg. a menu might run a simulation, but it is not the same simulation as the game.
+	//
 	struct EntitySpace
 	{
 		EntitySpace(std::string name);
@@ -205,7 +209,7 @@ namespace ddc
 
 		struct EntityEntry
 		{
-			Entity Entity;
+			ddc::Entity Entity;
 
 			union
 			{
@@ -228,9 +232,10 @@ namespace ddc
 
 		std::vector<byte*> m_components;
 
-		std::string m_name;
-
 		ddc::MessageQueue m_messages;
+
+		std::string m_name;
+		uint8 m_instanceIndex { 0 };
 	};
 
 	using ExpandType = int[];
@@ -307,30 +312,30 @@ namespace ddc
 	template <typename TComponent>
 	TComponent* Entity::Access() const
 	{
-		return m_space->Access<TComponent>(*this);
+		return Space()->Access<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	const TComponent* Entity::Get() const
 	{
-		return m_space->Get<TComponent>(*this);
+		return Space()->Get<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	bool Entity::Has() const
 	{
-		return m_space->Has<TComponent>(*this);
+		return Space()->Has<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	TComponent& Entity::Add() const
 	{
-		return m_space->Add<TComponent>(*this);
+		return Space()->Add<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	void Entity::Remove() const
 	{
-		m_space->Remove<TComponent>(*this);
+		Space()->Remove<TComponent>(*this);
 	}
 }

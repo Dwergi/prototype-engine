@@ -10,7 +10,9 @@
 #include "DebugUI.h"
 #include "FrameTimer.h"
 #include "IInputSource.h"
+#include "ImGuiBinding.h"
 #include "Input.h"
+#include "OpenGL.h"
 #include "Services.h"
 #include "IWindow.h"
 
@@ -154,6 +156,31 @@ namespace dd
 		pempek::assert::implementation::setAssertHandler(OnAssert);
 	}
 
+	static void StartFrame()
+	{
+		dd::Profiler::BeginFrame();
+
+		s_frameTimer->Update();
+		float delta_t = s_frameTimer->AppDelta();
+
+		s_window->Update(delta_t);
+		s_input->Update(delta_t);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		s_debugUI->StartFrame(delta_t);
+	}
+
+	static void EndFrame()
+	{
+		s_debugUI->EndFrame();
+		s_window->Swap();
+
+		s_frameTimer->DelayFrame();
+
+		dd::Profiler::EndFrame();
+	}
+
 	void CheckAssert()
 	{
 		if (s_assert.Open)
@@ -165,35 +192,51 @@ namespace dd
 			printf(s_message.c_str());
 			OutputDebugStringA(s_message.c_str());
 
+			std::string input_mode = s_input->GetCurrentMode();
 			s_input->SetCurrentMode("assert");
 
-			if (s_debugUI->IsMidWindow())
+			ImGuiBinding::SetMouseHandling(true);
+
+			bool was_mid_window = s_debugUI->IsMidWindow();
+			if (was_mid_window)
 			{
-				ImGui::End();
+				s_debugUI->EndWindow();
 			}
 
-			if (s_debugUI->IsMidFrame())
+			bool was_mid_frame = s_debugUI->IsMidFrame();
+			if (was_mid_frame)
 			{
-				s_debugUI->EndFrame();
-				s_window->Swap();
+				EndFrame();
 			}
 
+			static int s_frameCount;
+			s_frameCount = 0;
 			do
 			{
-				s_frameTimer->Update();
-
-				float delta_t = s_frameTimer->AppDelta();
-
-				s_input->Update(delta_t);
-
-				s_debugUI->StartFrame(delta_t);
+				StartFrame();
 
 				DrawAssertDialog(s_window->GetSize(), s_assert);
 
-				s_debugUI->EndFrame();
-				s_window->Swap();
+				EndFrame();
+
+				++s_frameCount;
 			}
 			while (s_assert.Open);
+
+			// try to clean up
+			if (was_mid_frame)
+			{
+				StartFrame();
+			}
+
+			if (was_mid_window)
+			{
+				ImGui::Begin("post_assert");
+			}
+
+			ImGuiBinding::SetMouseHandling(false);
+
+			s_input->SetCurrentMode(input_mode);
 		}
 	}
 }

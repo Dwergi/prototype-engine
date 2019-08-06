@@ -7,28 +7,32 @@
 #include "PCH.h"
 #include "LuxportGame.h"
 
-#include "d2d/BoxPhysicsComponent.h"
-#include "d2d/CirclePhysicsComponent.h"
 #include "EntityPrototype.h"
 #include "File.h"
 #include "HitTest.h"
+#include "InputKeyBindings.h"
 #include "Input.h"
 #include "IWindow.h"
-#include "lux/LuxLightComponent.h"
-#include "lux/LuxLightRenderer.h"
-#include "lux/LuxportMap.h"
 #include "OrthoCamera.h"
-#include "d2d/Physics2DSystem.h"
-#include "d2d/SpriteAnimationComponent.h"
-#include "d2d/SpriteAnimationSystem.h"
-#include "d2d/SpriteComponent.h"
+#include "ScratchEntity.h"
 #include "SpriteRenderer.h"
 #include "SpriteSheet.h"
-#include "d2d/SpriteTileComponent.h"
-#include "d2d/SpriteTileSystem.h"
 #include "SystemManager.h"
 #include "Texture.h"
 #include "WorldRenderer.h"
+
+#include "d2d/BoxPhysicsComponent.h"
+#include "d2d/CirclePhysicsComponent.h"
+#include "d2d/Physics2DSystem.h"
+#include "d2d/SpriteTileComponent.h"
+#include "d2d/SpriteTileSystem.h"
+#include "d2d/SpriteAnimationComponent.h"
+#include "d2d/SpriteAnimationSystem.h"
+#include "d2d/SpriteComponent.h"
+
+#include "lux/LuxLightComponent.h"
+#include "lux/LuxLightRenderer.h"
+#include "lux/LuxportMap.h"
 
 // magic: https://stackoverflow.com/questions/30412951/unresolved-external-symbol-imp-fprintf-and-imp-iob-func-sdl2
 FILE _iob[] = { *stdin, *stdout, *stderr };
@@ -59,6 +63,8 @@ namespace lux
 	static dd::Service<ddr::WorldRenderer> s_renderer;
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<ddc::SystemManager> s_systemManager;
+
+	static dd::InputKeyBindings* s_keybindings;
 
 	static ddc::Entity s_player;
 	static ddc::Entity s_teleporter;
@@ -209,16 +215,16 @@ namespace lux
 
 		s_input->SetCurrentMode("game");
 
-		/*s_inputBindings->AddHandler(dd::InputAction::NEXT_MAP, &OnSwitchMap);
-		s_inputBindings->AddHandler(dd::InputAction::PREVIOUS_MAP, &OnSwitchMap);
-		s_inputBindings->AddHandler(dd::InputAction::SHOOT, &OnThrowTeleporter);
-		s_inputBindings->AddHandler(dd::InputAction::RETURN_TELEPORTER, &OnReturnTeleporter);
-		s_inputBindings->AddHandler(dd::InputAction::RESET, &OnReset);*/
+		DD_TODO("Should provide key bindings by default?");
+		s_keybindings = new dd::InputKeyBindings("luxport");
+		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		s_keybindings->BindKey(dd::Key::MOUSE_RIGHT, dd::InputAction::RETURN_TELEPORTER, "game");
+		s_keybindings->BindKey(dd::Key::R, dd::InputAction::RESET, "game");
+		s_keybindings->BindKey(dd::Key::ENTER, dd::InputAction::NEXT_MAP);
+		s_keybindings->BindKey(dd::Key::ENTER, dd::ModifierFlags(dd::Modifier::Shift), dd::InputAction::PREVIOUS_MAP);
 
-		/*s_inputSource->BindKey(dd::InputAction::NEXT_MAP, dd::Key::ENTER);
-		s_inputSource->BindKey(dd::InputAction::PREVIOUS_MAP, dd::Key::ENTER, dd::SHIFT);
-		s_inputSource->BindKey(dd::InputAction::RETURN_TELEPORTER, dd::Key::MOUSE_RIGHT);
-		s_inputSource->BindKey(dd::InputAction::RESET, dd::Key::R);*/
+		s_input->SetKeyBindings(*s_keybindings);
 
 		s_music = new sf::Music();
 		std::filesystem::path sound_path = dd::File::GetDataRoot();
@@ -228,7 +234,7 @@ namespace lux
 		s_music->openFromFile(music_path.string());
 		s_music->setVolume(50);
 		s_music->setLoop(true);
-		s_music->play();
+		//s_music->play();
 
 		s_teleportSoundBuffer = new sf::SoundBuffer();
 		s_teleportSoundBuffer->loadFromFile((sound_path / "teleport.wav").string());
@@ -263,6 +269,7 @@ namespace lux
 		delete s_exitSoundBuffer; 
 		delete s_throwSoundBuffer;
 		delete s_teleReturnSoundBuffer;
+		delete s_keybindings;
 	}
 
 	static void ReturnTeleporterToPlayer()
@@ -461,19 +468,19 @@ namespace lux
 		s_spriteManager->Update();
 		s_spriteSheetManager->Update();
 
-		if (s_currentMap == nullptr)
-		{
-			SwitchMap(update.EntitySpace(), 1);
-		}
-
 		if (s_input->GotInput(dd::InputAction::NEXT_MAP))
 		{
-			SwitchMap(update.EntitySpace(), ddm::wrap(s_currentMap->GetIndex() + 1, 0, MAX_MAP));
+			s_desiredMapIndex = ddm::wrap(s_desiredMapIndex + 1, 1, MAX_MAP);
 		}
 
 		if (s_input->GotInput(dd::InputAction::PREVIOUS_MAP))
 		{
-			SwitchMap(update.EntitySpace(), ddm::wrap(s_currentMap->GetIndex() - 1, 0, MAX_MAP));
+			s_desiredMapIndex = ddm::wrap(s_desiredMapIndex - 1, 1, MAX_MAP);
+		}
+
+		if (s_currentMap == nullptr || s_desiredMapIndex != s_currentMap->GetIndex())
+		{
+			SwitchMap(update.EntitySpace(), s_desiredMapIndex);
 		}
 
 		d2d::SpriteTileComponent* tele_tile = s_teleporter.Access<d2d::SpriteTileComponent>();

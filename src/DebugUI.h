@@ -32,7 +32,9 @@ namespace dd
 		DebugUI& SetDraw(bool draw) { m_draw = draw; return *this; }
 
 		bool IsMidFrame() const { return m_midFrame; }
+		
 		bool IsMidWindow() const { return m_midWindow; }
+		void EndWindow();
 
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
 		void RenderDebugPanels( ddc::EntitySpace& entities );

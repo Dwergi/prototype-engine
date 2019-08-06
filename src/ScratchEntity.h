@@ -28,9 +28,7 @@ namespace ddc
 
 		struct ComponentEntry
 		{
-			dd::ComponentID Type { 0 };
-			size_t Offset { 0 };
-			size_t Size { 0 };
+			const dd::TypeInfo* Type { nullptr };
 			uint64 Hash { 0 }; // hash of storage prior to modification
 		};
 

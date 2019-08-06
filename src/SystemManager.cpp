@@ -31,8 +31,6 @@ namespace ddc
 
 	void SystemManager::Initialize(EntitySpace& space)
 	{
-		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
-
 		for (System* system : m_systems)
 		{
 			if (system->IsEnabledForSpace(space))
@@ -57,6 +55,8 @@ namespace ddc
 
 	void SystemManager::Update(EntitySpace& space, float delta_t)
 	{
+		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
+
 		UpdateSystemsWithTreeScheduling(space, delta_t);
 
 		std::vector<std::shared_future<void>> updates;

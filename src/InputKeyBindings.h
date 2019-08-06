@@ -13,16 +13,17 @@ namespace dd
 {
 	struct InputKeyBindings
 	{
-		InputKeyBindings();
+		InputKeyBindings(std::string name);
 		~InputKeyBindings();
 
 		bool FindBinding(InputModeID mode, const InputEvent& evt, InputAction& out_action) const;
 
-		void BindKey(Key key, InputAction action);
-		void BindKey(Key key, InputAction action, std::string mode_name);
-		void BindKey(Key key, InputAction action, InputModeFlags modes);
-		void BindKey(Key key, ModifierFlags modifiers, InputAction action, std::string mode_name);
-		void BindKey(Key key, ModifierFlags modifiers, InputAction action, InputModeFlags modes);
+		void BindKey(dd::Key key, InputAction action);
+		void BindKey(dd::Key key, InputAction action, std::string mode_name);
+		void BindKey(dd::Key key, InputAction action, InputModeFlags modes);
+		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action);
+		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action, std::string mode_name);
+		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action, InputModeFlags modes);
 
 	private:
 
@@ -34,6 +35,7 @@ namespace dd
 			dd::InputAction Action;
 		};
 		
+		std::string m_name;
 		std::vector<KeyBinding> m_bindings;
 	};
 }

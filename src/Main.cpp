@@ -51,7 +51,6 @@ static dd::Service<dd::IGame> s_game;
 
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;
-static dd::Service<dd::InputKeyBindings> s_inputBindings;
 static dd::Service<dd::IInputSource> s_inputSource;
 static dd::Service<dd::DebugUI> s_debugUI;
 static dd::Service<ddr::WorldRenderer> s_renderer;
@@ -127,6 +126,28 @@ static void UpdateAssetManagers()
 	s_entityProtoManager->Update();
 }
 
+static void StartFrame()
+{
+	dd::Profiler::BeginFrame();
+
+	s_frameTimer->Update();
+
+	s_window->Update(s_frameTimer->AppDelta());
+	s_input->Update(s_frameTimer->AppDelta());
+
+	s_debugUI->StartFrame(s_frameTimer->AppDelta());
+}
+
+static void EndFrame()
+{
+	s_debugUI->EndFrame();
+	s_window->Swap();
+
+	s_frameTimer->DelayFrame();
+
+	dd::Profiler::EndFrame();
+}
+
 static int GameMain()
 {
 	DD_PROFILE_INIT();
@@ -152,10 +173,7 @@ static int GameMain()
 
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 
-		dd::Services::Register(new dd::InputKeyBindings());
-
 		dd::Services::Register(new dd::Input());
-		s_input->SetKeyBindings(*s_inputBindings);
 		s_input->AddInputSource(*s_inputSource);
 		s_input->Initialize();
 
@@ -191,6 +209,7 @@ static int GameMain()
 			s_game->Initialize(initial_update);
 		}
 
+		s_systemManager->Initialize(*g_tempSpace);
 		s_renderer->InitializeRenderers(*g_tempSpace);
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
@@ -201,13 +220,7 @@ static int GameMain()
 		{
 			DD_PROFILE_SCOPED(Frame);
 
-			dd::Profiler::BeginFrame();
-
-			s_frameTimer->Update();
-
-			s_window->Update(s_frameTimer->AppDelta());
-			s_input->Update(s_frameTimer->AppDelta());
-			s_debugUI->StartFrame(s_frameTimer->AppDelta());
+			StartFrame();
 
 			UpdateAssetManagers();
 
@@ -227,12 +240,7 @@ static int GameMain()
 			s_frameTimer->DrawFPSCounter();
 			s_debugUI->RenderDebugPanels(*g_tempSpace);
 
-			s_debugUI->EndFrame();
-			s_window->Swap();
-
-			s_frameTimer->DelayFrame();
-
-			dd::Profiler::EndFrame();
+			EndFrame();
 		}
 	}
 

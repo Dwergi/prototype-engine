@@ -6,12 +6,14 @@
 
 #pragma once
 
+#include "CommandBuffer.h"
 #include "FrameBuffer.h"
 #include "IDebugPanel.h"
 #include "Mesh.h"
 #include "RenderState.h"
 #include "System.h"
 #include "Texture.h"
+#include "Uniforms.h"
 
 namespace dd
 {
@@ -20,11 +22,9 @@ namespace dd
 
 namespace ddr
 {
-	struct CommandBuffer;
 	struct ICamera;
 	struct Renderer;
 	struct RenderData;
-	struct UniformStorage;
 
 	struct WorldRenderer : dd::IDebugPanel
 	{
@@ -77,10 +77,11 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_reloadShaders { false };
 		
-		MeshHandle m_cube;
+		// TODO: This shouldn't be here.
+		ddr::MeshHandle m_cube;
 
-		CommandBuffer* m_commands { nullptr }; 
-		ddr::UniformStorage* m_uniforms { nullptr };
+		ddr::CommandBuffer m_commands; 
+		ddr::UniformStorage m_uniforms;
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
@@ -89,7 +90,8 @@ namespace ddr
 		void BeginRender( const ddc::EntitySpace& entities, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		void CallRenderer( ddr::Renderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, std::function<void( Renderer&, const RenderData& )> fn ) const;
+		using CallRendererFn = std::function<void(Renderer&, const RenderData&)>;
+		void CallRenderer( ddr::Renderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, const CallRendererFn& fn );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

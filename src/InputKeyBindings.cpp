@@ -10,8 +10,9 @@
 
 namespace dd
 {
-	InputKeyBindings::InputKeyBindings()
+	InputKeyBindings::InputKeyBindings(std::string name)
 	{
+		m_name = name;
 	}
 
 	InputKeyBindings::~InputKeyBindings()
@@ -35,32 +36,39 @@ namespace dd
 		return false;
 	}
 
-	void InputKeyBindings::BindKey(Key key, InputAction action)
+	void InputKeyBindings::BindKey(dd::Key key, dd::InputAction action)
 	{
-		InputModeFlags modes;
+		dd::InputModeFlags modes;
 		modes.Fill();
-		BindKey(key, ModifierFlags(), action, modes);
+		BindKey(key, dd::ModifierFlags(), action, modes);
 	}
 
-	void InputKeyBindings::BindKey(Key key, InputAction action, std::string mode_name)
+	void InputKeyBindings::BindKey(dd::Key key, dd::InputAction action, std::string mode_name)
 	{
-		BindKey(key, ModifierFlags(), action, mode_name);
+		BindKey(key, dd::ModifierFlags(), action, mode_name);
 	}
 
-	void InputKeyBindings::BindKey(Key key, InputAction action, InputModeFlags modes)
+	void InputKeyBindings::BindKey(dd::Key key, dd::InputAction action, dd::InputModeFlags modes)
 	{
-		BindKey(key, ModifierFlags(), action, modes);
+		BindKey(key, dd::ModifierFlags(), action, modes);
 	}
 
-	void InputKeyBindings::BindKey(Key key, ModifierFlags modifiers, InputAction action, std::string mode_name)
+	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action)
 	{
-		InputModeConfig* mode = InputModeConfig::Find(mode_name);
+		dd::InputModeFlags modes;
+		modes.Fill();
+		BindKey(key, modifiers, action, modes);
+	}
+
+	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action, std::string mode_name)
+	{
+		dd::InputModeConfig* mode = dd::InputModeConfig::Find(mode_name);
 		DD_ASSERT(mode != nullptr, "Mode '%s' not registered!", mode_name.c_str());
 
 		BindKey(key, modifiers, action, mode->ID());
 	}
 
-	void InputKeyBindings::BindKey(Key key, ModifierFlags modifiers, InputAction action, InputModeFlags modes)
+	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action, InputModeFlags modes)
 	{
 		for (KeyBinding& binding : m_bindings)
 		{

@@ -31,10 +31,15 @@ namespace dd
 
 		m_lastFrameTime = m_currentFrameTime;
 		m_currentFrameTime = (float) m_timer.Time();
-		
+
 		m_appDelta = m_currentFrameTime - m_lastFrameTime;
 
-		if( m_appDelta > 1.0f && dd::DebuggerAttached() )
+		if (m_appDelta <= 0)
+		{
+			m_appDelta = m_targetDelta;
+		}
+
+		if( m_appDelta > 0.5f && dd::DebuggerAttached() )
 		{
 			m_appDelta = m_targetDelta;
 		}

@@ -8,7 +8,6 @@
 #include "WorldRenderer.h"
 
 #include "AABB.h"
-#include "CommandBuffer.h"
 #include "GLError.h"
 #include "Frustum.h"
 #include "ICamera.h"
@@ -23,7 +22,6 @@
 #include "ShaderPart.h"
 #include "Shader.h"
 #include "TransformComponent.h"
-#include "Uniforms.h"
 #include "IWindow.h"
 
 namespace ddr
@@ -50,9 +48,7 @@ namespace ddr
 
 	WorldRenderer::WorldRenderer()
 	{
-		m_uniforms = new ddr::UniformStorage();
-		m_commands = new ddr::CommandBuffer();
-
+		DD_TODO("Rename this");
 		m_defaultState.Blending = false;
 		m_defaultState.BackfaceCulling = true;
 		m_defaultState.Depth = true;
@@ -64,8 +60,6 @@ namespace ddr
 
 	WorldRenderer::~WorldRenderer()
 	{
-		delete m_uniforms;
-		delete m_commands;
 	}
 
 	void WorldRenderer::InitializeRenderers(ddc::EntitySpace& entities)
@@ -127,7 +121,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void WorldRenderer::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, std::function<void(Renderer&, const RenderData&)> fn) const
+	void WorldRenderer::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -148,7 +142,7 @@ namespace ddr
 			return;
 		}
 
-		RenderData data(space, camera, *m_uniforms, *m_commands, entities, renderer.GetRequirements());
+		RenderData data(space, camera, m_uniforms, m_commands, entities, renderer.GetRequirements());
 
 		fn(renderer, data);
 	}
@@ -157,7 +151,7 @@ namespace ddr
 	{
 		m_time += delta_t;
 
-		m_commands->Clear();
+		m_commands.Clear();
 
 		for (ddr::Renderer* r : m_renderers)
 		{
@@ -198,10 +192,10 @@ namespace ddr
 			}
 		}
 
-		m_commands->Sort(camera);
-		m_commands->Dispatch(*m_uniforms);
+		m_commands.Sort(camera);
+		m_commands.Dispatch(m_uniforms);
 
-		EndRender(*m_uniforms, camera);
+		EndRender(m_uniforms, camera);
 	}
 
 	void WorldRenderer::BeginRender(const ddc::EntitySpace& entspaceities, const ddr::ICamera& camera)
@@ -236,13 +230,13 @@ namespace ddr
 			m_defaultState.Use(true);
 		}
 
-		s_fog.UpdateUniforms(*m_uniforms);
+		s_fog.UpdateUniforms(m_uniforms);
 
-		m_uniforms->Set("ViewPosition", camera.GetPosition());
-		m_uniforms->Set("View", camera.GetViewMatrix());
-		m_uniforms->Set("Projection", camera.GetProjectionMatrix());
-		m_uniforms->Set("DrawNormals", m_debugDrawNormals);
-		m_uniforms->Set("Time", m_time);
+		m_uniforms.Set("ViewPosition", camera.GetPosition());
+		m_uniforms.Set("View", camera.GetViewMatrix());
+		m_uniforms.Set("Projection", camera.GetProjectionMatrix());
+		m_uniforms.Set("DrawNormals", m_debugDrawNormals);
+		m_uniforms.Set("Time", m_time);
 	}
 
 	void WorldRenderer::EndRender(ddr::UniformStorage& uniforms, const ddr::ICamera& camera)
