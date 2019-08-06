@@ -33,14 +33,14 @@ namespace dd
 	template <typename T>
 	Flags<T>::Flags(T flag)
 	{
-		DD_ASSERT((T) flag % 2 == 0);
+		DD_ASSERT(flag == 1 || flag % 2 == 0);
 		m_flags = (T) flag;
 	}
 
 	template <typename T>
 	bool Flags<T>::Has(T flag) const
 	{
-		DD_ASSERT((T) flag % 2 == 0);
+		DD_ASSERT(flag == 1 || flag % 2 == 0);
 		return (m_flags & (T) flag) != 0;
 	}
 
@@ -53,13 +53,13 @@ namespace dd
 	template <typename T>
 	bool Flags<T>::HasAll(Flags<T> flags) const
 	{
-		return (m_flags ^ flags.m_flags) == 0;
+		return (m_flags & flags.m_flags) == flags.m_flags;
 	}
 
 	template <typename T>
 	void Flags<T>::Set(T flag)
 	{
-		DD_ASSERT((T) flag % 2 == 0);
+		DD_ASSERT(flag == 1 || flag % 2 == 0);
 		m_flags |= (T) flag;
 	}
 
@@ -72,7 +72,7 @@ namespace dd
 	template <typename T>
 	void Flags<T>::Unset(T flag)
 	{
-		DD_ASSERT((T) flag % 2 == 0);
+		DD_ASSERT(flag == 1 || flag % 2 == 0);
 		m_flags &= ~(T) flag;
 	}
 

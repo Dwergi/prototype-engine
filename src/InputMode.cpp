@@ -51,7 +51,7 @@ namespace dd
 
 	InputModeConfig* InputModeConfig::Access(InputModeID id)
 	{
-		DD_ASSERT(id % 2 == 0);
+		DD_ASSERT(id == 1 || id % 2 == 0);
 
 		uint8 index = 0;
 		while (id > 1)

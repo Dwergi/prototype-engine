@@ -1,10 +1,11 @@
 #include "PCH.h"
-#include "SpriteTileSystem.h"
+#include "d2d/SpriteTileSystem.h"
 
 #include "Math_dd.h"
-#include "SpriteComponent.h"
-#include "SpriteTileComponent.h" 
 #include "IWindow.h"
+
+#include "d2d/SpriteComponent.h"
+#include "d2d/SpriteTileComponent.h" 
 
 namespace d2d
 {

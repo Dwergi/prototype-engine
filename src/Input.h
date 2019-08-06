@@ -14,6 +14,7 @@
 namespace dd
 {
 	struct InputKeyBindings;
+	struct IInputSource;
 
 	using InputHandler = std::function<void()>;
 
@@ -23,6 +24,8 @@ namespace dd
 
 		void Initialize();
 		void Shutdown();
+
+		void AddInputSource(dd::IInputSource& source);
 
 		void Update(float delta_t);
 
@@ -64,6 +67,7 @@ namespace dd
 
 		// All actions that were triggered last frame.
 		std::vector<InputAction> m_actions;
+		std::vector<IInputSource*> m_sources;
 
 		std::unordered_map<ActionKey, std::vector<InputHandler>, ActionKeyHash, ActionKeyEqual> m_handlers;
 		std::unordered_map<InputAction, bool> m_held;

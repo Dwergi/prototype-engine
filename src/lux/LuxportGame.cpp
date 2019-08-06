@@ -207,6 +207,8 @@ namespace lux
 			.CaptureMouse(true)
 			.CentreMouse(false);
 
+		s_input->SetCurrentMode("game");
+
 		/*s_inputBindings->AddHandler(dd::InputAction::NEXT_MAP, &OnSwitchMap);
 		s_inputBindings->AddHandler(dd::InputAction::PREVIOUS_MAP, &OnSwitchMap);
 		s_inputBindings->AddHandler(dd::InputAction::SHOOT, &OnThrowTeleporter);
@@ -461,7 +463,7 @@ namespace lux
 
 		if (s_currentMap == nullptr)
 		{
-			SwitchMap(update.EntitySpace(), 0);
+			SwitchMap(update.EntitySpace(), 1);
 		}
 
 		if (s_input->GotInput(dd::InputAction::NEXT_MAP))

@@ -38,27 +38,27 @@ namespace dd
 	template <typename T>
 	EnumFlags<T>::EnumFlags(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
+		DD_ASSERT(( TStorage) flag == 1 || ( TStorage) flag % 2 == 0);
 		m_flags = (TStorage) flag;
 	}
 
 	template <typename T>
 	bool EnumFlags<T>::Has(T flag) const
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
+		DD_ASSERT(( TStorage) flag == 1 || ( TStorage) flag % 2 == 0);
 		return (m_flags & (TStorage) flag) != 0;
 	}
 
 	template <typename T>
 	bool EnumFlags<T>::HasAll(EnumFlags<T> flags) const
 	{
-		return (m_flags & flags.m_flags) != 0;
+		return (m_flags & flags.m_flags) == flags.m_flags;
 	}
 
 	template <typename T>
 	void EnumFlags<T>::Set(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
+		DD_ASSERT((TStorage) flag == 1 || (TStorage) flag % 2 == 0);
 		m_flags |= (TStorage) flag;
 	}
 
@@ -71,7 +71,7 @@ namespace dd
 	template <typename T>
 	void EnumFlags<T>::Unset(T flag)
 	{
-		DD_ASSERT((TStorage) flag % 2 == 0);
+		DD_ASSERT(( TStorage) flag == 1 || ( TStorage) flag % 2 == 0);
 		m_flags &= ~(TStorage) flag;
 	}
 

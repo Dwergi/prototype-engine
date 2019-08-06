@@ -14,8 +14,9 @@
 
 #include <imgui/imgui.h>
 
-static dd::Service<dd::IInputSource> s_source;
 static dd::Service<dd::IWindow> s_window;
+
+#pragma optimize("", off)
 
 namespace dd
 {
@@ -25,75 +26,81 @@ namespace dd
 
 	void Input::Initialize()
 	{
-		InputModeConfig& game_mode = InputModeConfig::Create("game")
-			.CaptureMouse(true)
-			.CentreMouse(true)
-			.ShowCursor(false);
-
-		DD_ASSERT(game_mode.ID() == (1 << 0));
-
-		InputModeConfig& debug_mode = InputModeConfig::Create("debug")
-			.CaptureMouse(false)
-			.CentreMouse(false)
-			.ShowCursor(true);
-
-		DD_ASSERT(debug_mode.ID() == (1 << 1));
 	}
 
 	void Input::Shutdown()
 	{
+	}
 
+	void Input::AddInputSource(IInputSource& source)
+	{
+		m_sources.push_back(&source);
 	}
 
 	void Input::Update(float delta_t)
 	{
-		DD_ASSERT(m_bindings != nullptr, "Key bindings still null in Input::Update!");
+		DD_ASSERT(m_bindings != nullptr, "Key bindings not set!");
 
 		// switch mode
 		UpdateMode();
-		
-		bool should_capture = s_window->IsFocused() && m_currentMode != nullptr && m_currentMode->ShouldCaptureMouse();
-		s_source->SetCaptureMouse(should_capture);
-
-		s_source->UpdateInput();
-
-		Array<InputEvent, 64> events;
-		s_source->GetEvents(events);
+		DD_ASSERT(m_currentMode != nullptr, "Input mode not set!");
 
 		m_actions.clear();
 
-		for (const InputEvent& evt : events)
+		dd::Array<InputEvent, 64> input_events;
+		dd::Array<ActionKey, 64> dispatch_actions;
+
+		for (IInputSource* source : m_sources)
 		{
-			bool bound = false;
-			InputAction action;
-			if ((evt.IsMouse() && m_mouseEnabled) || 
-				(evt.IsKeyboard() && m_keyboardEnabled))
-			{
-				bound = m_bindings->FindBinding(m_currentMode->ID(), evt, action);
-			}
+			input_events.Clear();
 
-			if (bound)
+			bool should_capture = s_window->IsFocused() && m_currentMode->ShouldCaptureMouse();
+			source->SetCaptureMouse(should_capture);
+
+			source->UpdateInput();
+
+			source->GetEvents(input_events);
+
+			for (const InputEvent& evt : input_events)
 			{
-				DispatchAction(action, evt.Type);
-				
-				if (UpdateHeldState(action, evt))
+				bool bound = false;
+				InputAction action;
+				if ((evt.IsMouse() && m_mouseEnabled) ||
+					(evt.IsKeyboard() && m_keyboardEnabled))
 				{
-					DispatchAction(action, InputType::Hold);
+					bound = m_bindings->FindBinding(m_currentMode->ID(), evt, action);
 				}
-			}
 
-			m_actions.push_back(action);
+				if (bound)
+				{
+					dispatch_actions.Add(ActionKey { action, evt.Type });
+
+					if (UpdateHeldState(action, evt))
+					{
+						dispatch_actions.Add(ActionKey { action, InputType::Hold });
+					}
+				}
+
+				m_actions.push_back(action);
+			}
+		}
+
+		for (ActionKey& entry : dispatch_actions)
+		{
+			DispatchAction(entry.Action, entry.Type);
 		}
 	}
 
 	MousePosition Input::GetMousePosition() const
 	{
-		return s_source->GetMousePosition();
+		DD_TODO("Maybe just cache last mouse position?");
+		return m_sources[0]->GetMousePosition();
 	}
 
 	MousePosition Input::GetMouseScroll() const
 	{
-		return s_source->GetMousePosition();
+		DD_TODO("Maybe just cache last mouse position?");
+		return m_sources[0]->GetMousePosition();
 	}
 
 	bool Input::GotInput(dd::InputAction action) const
@@ -197,7 +204,11 @@ namespace dd
 				m_currentMode->ModeExited();
 			}
 
-			s_source->SetCentreMouse(next_mode->ShouldCentreMouse());
+			for (IInputSource* source : m_sources)
+			{
+				source->SetCentreMouse(next_mode->ShouldCentreMouse());
+			}
+
 			s_window->SetCursor(next_mode->ShouldShowCursor() ? dd::Cursor::Arrow : dd::Cursor::Hidden);
 
 			next_mode->ModeEntered();

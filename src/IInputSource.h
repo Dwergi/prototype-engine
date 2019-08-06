@@ -27,12 +27,9 @@ namespace dd
 		IInputSource& SetCaptureMouse(bool capture);
 		bool IsMouseCaptured() const { return m_mouseCaptured; }
 
-		IInputSource& SetCentreMouse(bool centre) { m_mouseRecenter = true; return *this; }
+		IInputSource& SetCentreMouse(bool centre) { m_mouseRecenter = centre; return *this; }
 
 		void GetEvents(IArray<InputEvent>& out) const { out = m_events.Read(); }
-
-		virtual const char* GetClipboardText() const = 0;
-		virtual void SetClipboardText(const char* text) = 0;
 
 	protected:
 		

@@ -107,10 +107,11 @@ namespace dd
 	}
 
 	static std::thread::id s_mainThread;
-	Service<dd::FrameTimer> s_frameTimer;
-	Service<dd::Input> s_input;
-	Service<dd::DebugUI> s_debugUI;
-	Service<dd::IWindow> s_window;
+
+	static dd::Service<dd::FrameTimer> s_frameTimer;
+	static dd::Service<dd::Input> s_input;
+	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IWindow> s_window;
 
 	static pempek::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
 		int level, const char* message)

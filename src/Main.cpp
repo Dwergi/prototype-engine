@@ -156,8 +156,8 @@ static int GameMain()
 
 		dd::Services::Register(new dd::Input());
 		s_input->SetKeyBindings(*s_inputBindings);
+		s_input->AddInputSource(*s_inputSource);
 		s_input->Initialize();
-		s_input->SetCurrentMode("game");
 
 		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
 		s_input->AddHandler(dd::InputAction::EXIT, &Exit);
@@ -214,6 +214,7 @@ static int GameMain()
 			{
 				DD_TODO("Add a loop over all available entity spaces.");
 				g_tempSpace->Update(s_frameTimer->GameDelta());
+				s_systemManager->Update(*g_tempSpace, s_frameTimer->GameDelta());
 
 				dd::GameUpdateData update_data(*g_tempSpace, *s_input, s_frameTimer->GameDelta());
 				s_game->Update(update_data);

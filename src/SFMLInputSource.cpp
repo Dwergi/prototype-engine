@@ -182,14 +182,4 @@ namespace dd
 	{
 		m_sfmlWindow->setMouseCursorGrabbed(capture);
 	}
-
-	const char* SFMLInputSource::GetClipboardText() const
-	{
-		return sf::Clipboard::getString().toAnsiString().c_str();
-	}
-
-	void SFMLInputSource::SetClipboardText(const char* text)
-	{
-		sf::Clipboard::setString(text);
-	}
 }
