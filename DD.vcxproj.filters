@@ -657,9 +657,6 @@
     <ClInclude Include="src\Entity.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tweakable.h">
-      <Filter>DebugUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\FPSCameraComponent.h">
       <Filter>Components</Filter>
     </ClInclude>

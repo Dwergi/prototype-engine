@@ -383,7 +383,6 @@
     <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
-    <ClInclude Include="src\Tweakable.h" />
     <ClInclude Include="src\UpdateDataBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
