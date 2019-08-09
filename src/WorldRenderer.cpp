@@ -198,7 +198,7 @@ namespace ddr
 		EndRender(m_uniforms, camera);
 	}
 
-	void WorldRenderer::BeginRender(const ddc::EntitySpace& entspaceities, const ddr::ICamera& camera)
+	void WorldRenderer::BeginRender(const ddc::EntitySpace& space, const ddr::ICamera& camera)
 	{
 		if (m_reloadShaders)
 		{

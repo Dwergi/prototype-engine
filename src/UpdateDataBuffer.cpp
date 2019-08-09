@@ -3,7 +3,7 @@
 
 namespace ddc
 {
-	UpdateDataBuffer::UpdateDataBuffer(ddc::EntitySpace& space, const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name) :
+	UpdateDataBuffer::UpdateDataBuffer(ddc::EntitySpace& space, const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name) :
 		m_entities(entities)
 	{
 		m_buffers.reserve(MAX_BUFFERS);
@@ -13,7 +13,7 @@ namespace ddc
 			m_name = name;
 		}
 
-		for (const DataRequest* req : requests)
+		for (DataRequest* req : requests)
 		{
 			DD_ASSERT(req->Name() == m_name);
 

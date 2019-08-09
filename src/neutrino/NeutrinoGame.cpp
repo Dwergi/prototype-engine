@@ -45,13 +45,12 @@ namespace neut
 	static dd::Service<dd::FreeCameraController> s_freeCamera;
 	static dd::Service<dd::FPSCameraComponent> s_player;
 	static dd::Service<dd::ShakyCamera> s_shakyCamera;
-	static dd::Service<ddr::WorldRenderer> s_renderer;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::IInputSource> s_inputSource;
 	static dd::Service<dd::DebugUI> s_debugUI;
 	static dd::Service<dd::JobSystem> s_jobSystem;
 	static dd::Service<dd::FrameTimer> s_frameTimer;
-	static dd::Service<ddc::SystemManager> s_systemManager;
+	static dd::Service<neut::TerrainSystem> s_terrain;
 
 	enum class CameraPos
 	{
@@ -121,7 +120,7 @@ namespace neut
 		{
 			ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
 
-			dd::Services::Register(entities.Access<dd::FPSCameraComponent>(entity));
+			dd::Services::Register(entity.Access<dd::FPSCameraComponent>());
 			s_player->SetWindowSize(s_window->GetSize());
 			s_player->SetVerticalFOV(glm::radians(45.0f));
 
@@ -130,9 +129,6 @@ namespace neut
 			dd::Services::RegisterInterface<ddr::ICamera>(s_shakyCamera.Get());
 
 			s_debugUI->RegisterDebugPanel(s_shakyCamera);
-
-			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
-
 		}
 
 		// dir light
@@ -195,48 +191,8 @@ namespace neut
 		//dd::TestEntities::CreatePhysicsPlaneTestScene();
 	}
 
-	void NeutrinoGame::Initialize(const dd::GameUpdateData& update_data)
+	void NeutrinoGame::Initialize()
 	{
-		neut::SwarmSystem& swarm_system = dd::Services::Register(new neut::SwarmSystem());
-
-		//neut::TrenchSystem trench_system( *s_shakyCam  );
-		//trench_system.CreateRenderResources();
-
-		dd::Services::Register(new dd::FreeCameraController());
-
-		dd::HitTestSystem* hit_testing_system = new dd::HitTestSystem();
-		dd::Services::RegisterInterface<dd::IAsyncHitTest>(hit_testing_system);
-		hit_testing_system->DependsOn(*s_freeCamera);
-
-		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
-
-		//Services::Register(new ShipSystem( *s_shakyCam  ));
-		//s_shipSystem->BindActions( bindings );
-		//s_shipSystem->CreateShip( *s_world );
-
-		neut::TerrainSystem& terrain_system = dd::Services::Register(new neut::TerrainSystem());
-
-		neut::BulletSystem& bullet_system = dd::Services::Register(new neut::BulletSystem());
-		bullet_system.DependsOn(*s_freeCamera);
-		bullet_system.DependsOn(*hit_testing_system);
-
-		dd::ParticleSystem& particle_system = dd::Services::Register(new dd::ParticleSystem());
-
-		neut::TreeSystem& tree_system = dd::Services::Register(new neut::TreeSystem());
-
-		neut::WaterSystem& water_system = dd::Services::Register(new neut::WaterSystem(terrain_system.GetTerrainParameters()));
-		water_system.DependsOn(terrain_system);
-
-		s_systemManager->Register(*s_freeCamera);
-		s_systemManager->Register(terrain_system);
-		s_systemManager->Register(particle_system);
-		s_systemManager->Register(*hit_testing_system);
-		s_systemManager->Register(bullet_system);
-		s_systemManager->Register(physics_system);
-		s_systemManager->Register(swarm_system);
-		s_systemManager->Register(tree_system);
-		s_systemManager->Register(water_system);
-
 		dd::InputModeFlags all_modes;
 		all_modes.Fill();
 
@@ -276,57 +232,9 @@ namespace neut
 		s_input->AddHandler(dd::InputAction::CAMERA_POS_4, dd::InputType::Release, []() { SetCameraPos(CameraPos::Four); });
 		s_input->AddHandler(dd::InputAction::INCREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::IncreaseDepth); });
 		s_input->AddHandler(dd::InputAction::DECREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::DecreaseDepth); });
-
-		ddr::ParticleSystemRenderer& particle_renderer = dd::Services::Register(new ddr::ParticleSystemRenderer());
-
-		dd::MousePicking& mouse_picking = dd::Services::Register(new dd::MousePicking());
-
-		ddr::MeshRenderer& mesh_renderer = dd::Services::Register(new ddr::MeshRenderer());
-		ddr::LightRenderer& light_renderer = dd::Services::Register(new ddr::LightRenderer());
-
-		ddr::BoundsRenderer& bounds_renderer = dd::Services::Register(new ddr::BoundsRenderer());
-
-		ddr::RayRenderer& ray_renderer = dd::Services::Register(new ddr::RayRenderer());
-
-		ddr::LinesRenderer& lines_renderer = dd::Services::Register(new ddr::LinesRenderer());
-
-		neut::TerrainRenderer& terrain_renderer = dd::Services::Register(new neut::TerrainRenderer(terrain_system.GetTerrainParameters()));
-
-		neut::WaterRenderer& water_renderer = dd::Services::Register(new neut::WaterRenderer());
-
-		s_renderer->Register(mouse_picking);
-		s_renderer->Register(light_renderer);
-		s_renderer->Register(terrain_renderer);
-		s_renderer->Register(particle_renderer);
-		s_renderer->Register(mesh_renderer);
-		s_renderer->Register(bounds_renderer);
-		s_renderer->Register(ray_renderer);
-		s_renderer->Register(lines_renderer);
-		s_renderer->Register(water_renderer);
-
-		s_debugUI->RegisterDebugPanel(*s_freeCamera);
-		s_debugUI->RegisterDebugPanel(mouse_picking);
-		s_debugUI->RegisterDebugPanel(particle_system);
-		s_debugUI->RegisterDebugPanel(terrain_system);
-		s_debugUI->RegisterDebugPanel(mesh_renderer);
-		s_debugUI->RegisterDebugPanel(bounds_renderer);
-		s_debugUI->RegisterDebugPanel(light_renderer);
-		s_debugUI->RegisterDebugPanel(*hit_testing_system);
-		s_debugUI->RegisterDebugPanel(bullet_system);
-		s_debugUI->RegisterDebugPanel(physics_system);
-		s_debugUI->RegisterDebugPanel(terrain_renderer);
-		s_debugUI->RegisterDebugPanel(swarm_system);
-		s_debugUI->RegisterDebugPanel(tree_system);
-		s_debugUI->RegisterDebugPanel(water_system);
-
-		CreateEntities(update_data.EntitySpace());
 	}
 
 	void NeutrinoGame::Update(const dd::GameUpdateData& update_data)
-	{
-	}
-
-	void NeutrinoGame::RenderUpdate(const dd::GameUpdateData& update_data)
 	{
 		s_player->SetWindowSize(s_window->GetSize());
 
@@ -338,10 +246,99 @@ namespace neut
 
 	}
 
-	std::vector<ddc::EntitySpace*> s_spaces;
-
-	const std::vector<ddc::EntitySpace*>& NeutrinoGame::GetEntitySpaces() const
+	void NeutrinoGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces)
 	{
-		return s_spaces;
+		entity_spaces.push_back(new ddc::EntitySpace("game"));
+
+		CreateEntities(*entity_spaces[0]);
+	}
+
+	void NeutrinoGame::RegisterRenderers(ddr::WorldRenderer& renderer)
+	{
+		dd::Service<dd::MousePicking> mouse_picking;
+
+		ddr::LightRenderer& light_renderer = dd::Services::Register(new ddr::LightRenderer());
+		s_debugUI->RegisterDebugPanel(light_renderer);
+
+		neut::TerrainRenderer& terrain_renderer = dd::Services::Register(new neut::TerrainRenderer(s_terrain->GetTerrainParameters()));
+		s_debugUI->RegisterDebugPanel(terrain_renderer);
+
+		ddr::ParticleSystemRenderer& particle_renderer = dd::Services::Register(new ddr::ParticleSystemRenderer());
+
+		ddr::MeshRenderer& mesh_renderer = dd::Services::Register(new ddr::MeshRenderer());
+		s_debugUI->RegisterDebugPanel(mesh_renderer);
+		
+		ddr::BoundsRenderer& bounds_renderer = dd::Services::Register(new ddr::BoundsRenderer());
+		s_debugUI->RegisterDebugPanel(bounds_renderer);
+
+		ddr::RayRenderer& ray_renderer = dd::Services::Register(new ddr::RayRenderer());
+		ddr::LinesRenderer& lines_renderer = dd::Services::Register(new ddr::LinesRenderer());
+
+		neut::WaterRenderer& water_renderer = dd::Services::Register(new neut::WaterRenderer());
+
+		renderer.Register(*mouse_picking);
+		renderer.Register(light_renderer);
+		renderer.Register(terrain_renderer);
+		renderer.Register(particle_renderer);
+		renderer.Register(mesh_renderer);
+		renderer.Register(bounds_renderer);
+		renderer.Register(ray_renderer);
+		renderer.Register(lines_renderer);
+		renderer.Register(water_renderer);
+	}
+
+	void NeutrinoGame::RegisterSystems(ddc::SystemManager& system_manager)
+	{
+		dd::Services::Register(new dd::FreeCameraController());
+		s_debugUI->RegisterDebugPanel(*s_freeCamera);
+
+		dd::MousePicking& mouse_picking = dd::Services::Register(new dd::MousePicking());
+		s_debugUI->RegisterDebugPanel(mouse_picking);
+
+		neut::SwarmSystem& swarm_system = dd::Services::Register(new neut::SwarmSystem());
+		s_debugUI->RegisterDebugPanel(swarm_system);
+
+		//neut::TrenchSystem trench_system( *s_shakyCam  );
+		//trench_system.CreateRenderResources();
+
+		dd::HitTestSystem* hit_testing_system = new dd::HitTestSystem();
+		dd::Services::RegisterInterface<dd::IAsyncHitTest>(hit_testing_system);
+		hit_testing_system->DependsOn(*s_freeCamera);
+		s_debugUI->RegisterDebugPanel(*hit_testing_system);
+
+		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
+		s_debugUI->RegisterDebugPanel(physics_system);
+
+		//Services::Register(new ShipSystem( *s_shakyCam  ));
+		//s_shipSystem->BindActions( bindings );
+		//s_shipSystem->CreateShip( *s_world );
+
+		neut::TerrainSystem& terrain_system = dd::Services::Register(new neut::TerrainSystem());
+		s_debugUI->RegisterDebugPanel(terrain_system);
+
+		neut::BulletSystem& bullet_system = dd::Services::Register(new neut::BulletSystem());
+		bullet_system.DependsOn(*s_freeCamera);
+		bullet_system.DependsOn(*hit_testing_system);
+		s_debugUI->RegisterDebugPanel(bullet_system);
+
+		dd::ParticleSystem& particle_system = dd::Services::Register(new dd::ParticleSystem());
+		s_debugUI->RegisterDebugPanel(particle_system);
+
+		neut::TreeSystem& tree_system = dd::Services::Register(new neut::TreeSystem());
+		s_debugUI->RegisterDebugPanel(tree_system);
+
+		neut::WaterSystem& water_system = dd::Services::Register(new neut::WaterSystem(terrain_system.GetTerrainParameters()));
+		water_system.DependsOn(terrain_system);
+		s_debugUI->RegisterDebugPanel(water_system);
+
+		system_manager.Register(*s_freeCamera);
+		system_manager.Register(terrain_system);
+		system_manager.Register(particle_system);
+		system_manager.Register(*hit_testing_system);
+		system_manager.Register(bullet_system);
+		system_manager.Register(physics_system);
+		system_manager.Register(swarm_system);
+		system_manager.Register(tree_system);
+		system_manager.Register(water_system);
 	}
 }

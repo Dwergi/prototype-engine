@@ -9,10 +9,11 @@
 
 namespace dd
 {
+	static dd::ProfilerValue& s_frameTimes = dd::Profiler::GetValue("Frame Time", 1.0f / 120);
+
 	FrameTimer::FrameTimer() : 
 		m_maxFPS(120),
-		m_targetDelta(1.0f / m_maxFPS),
-		m_frameTimes( "Frame Time", m_targetDelta)
+		m_targetDelta(1.0f / m_maxFPS)
 	{
 		m_lastFrameTime = 0.0f;
 		m_currentFrameTime = -m_targetDelta;
@@ -53,8 +54,8 @@ namespace dd
 			m_gameDelta = 0;
 		}
 
-		m_frameTimes.BeginFrame();
-		m_frameTimes.SetValue( m_deltaWithoutDelay * 1000.f );
+		s_frameTimes.BeginFrame();
+		s_frameTimes.SetValue( m_deltaWithoutDelay * 1000.f );
 	}
 
 	void FrameTimer::DelayFrame()
@@ -74,7 +75,12 @@ namespace dd
 			delta_t = (float) m_timer.Time() - m_lastFrameTime;
 		}
 
-		m_frameTimes.EndFrame();
+		s_frameTimes.EndFrame();
+	}
+
+	float FrameTimer::SlidingDelta() const
+	{
+		return s_frameTimes.SlidingAverage();
 	}
 
 	void FrameTimer::DrawDebugInternal( ddc::EntitySpace& entities )
@@ -84,9 +90,9 @@ namespace dd
 		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
 		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
 
-		ImGui::Value( "FPS: ", 1000.f / m_frameTimes.SlidingAverage(), "%.1f" );
+		ImGui::Value( "FPS: ", 1000.f / s_frameTimes.SlidingAverage(), "%.1f" );
 
-		m_frameTimes.Draw();
+		s_frameTimes.Draw();
 	}
 
 	void FrameTimer::DrawFPSCounter()
@@ -101,7 +107,7 @@ namespace dd
 			ImGui::PushStyleVar( ImGuiStyleVar_ItemInnerSpacing, ImVec2( 0, 0 ) );
 
 			ImGui::Begin( "CompactFPS", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs );
-			ImGui::Text( "%.1f", 1000.f / m_frameTimes.SlidingAverage() );
+			ImGui::Text( "%.1f", 1000.f / s_frameTimes.SlidingAverage() );
 			ImGui::SameLine();
 			ImGui::End();
 

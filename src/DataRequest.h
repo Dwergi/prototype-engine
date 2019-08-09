@@ -28,9 +28,9 @@ namespace ddc
 	{
 		DataRequest( const DataRequest& other );
 
-		virtual ~DataRequest() { delete[] m_buffer; }
+		virtual ~DataRequest();
 
-		byte* Buffer() const { return m_buffer; }
+		byte* GetBuffer(size_t count);
 		const dd::String& Name() const { return m_name; }
 		DataCardinality Cardinality() const { return m_cardinality; }
 		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
@@ -46,7 +46,7 @@ namespace ddc
 		DataCardinality m_cardinality { DataCardinality::Invalid };
 
 		dd::String16 m_name;
-		byte* m_buffer { nullptr };
+		dd::Buffer<byte> m_buffer;
 	};
 
 	template <typename TComponent>

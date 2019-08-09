@@ -6,9 +6,6 @@
 #include "d2d/SpriteTileComponent.h"
 #include "d2d/SpriteTileSystem.h"
 
-DD_TYPE_CPP(d2d::BoxPhysicsComponent);
-DD_TYPE_CPP(d2d::CirclePhysicsComponent);
-
 dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
 
 namespace d2d

@@ -13,6 +13,8 @@ DD_POD_CPP(ddr::MaterialHandle);
 
 namespace ddr
 {
+	static dd::ProfilerValue& g_materialChanged = dd::Profiler::GetValue("Material Changed");
+
 	Material::Material()
 	{
 		
@@ -27,7 +29,7 @@ namespace ddr
 	{
 		DD_ASSERT( !m_inUse, "Material already in use when bound!" );
 
-		dd::Profiler::MaterialChanged();
+		g_materialChanged.Increment();
 
 		uniforms.Set( "Material.Shininess", Shininess );
 		uniforms.Set( "Material.Specular", Specular );

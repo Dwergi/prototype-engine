@@ -17,7 +17,7 @@ namespace ddc
 	{
 	}
 
-	void UpdateData::AddData(const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name)
+	void UpdateData::AddData(const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name)
 	{
 		UpdateDataBuffer buffer(m_entitySpace, entities, requests, name);
 		m_dataBuffers.push_back(buffer);

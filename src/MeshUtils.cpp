@@ -488,7 +488,6 @@ namespace dd
 		mesh.SetBoundBox( bounds );
 	}
 
-
 	void MeshUtils::CreateDefaultMaterial()
 	{
 		ddr::ShaderHandle shader_h = s_shaderManager->Find("mesh");
@@ -512,7 +511,7 @@ namespace dd
 		}
 	}
 
-	void MeshUtils::CreateUnitCube()
+	ddr::MeshHandle MeshUtils::CreateUnitCube()
 	{
 		ddr::MeshHandle cube_h = s_meshManager->Find( "cube" );
 		DD_ASSERT(!cube_h.IsValid(), "Unit cube has already been created!");
@@ -531,9 +530,11 @@ namespace dd
 
 			MakeUnitCube(*cube_mesh);
 		}
+
+		return cube_h;
 	}
 
-	void MeshUtils::CreateUnitSphere()
+	ddr::MeshHandle MeshUtils::CreateUnitSphere()
 	{
 		ddr::MeshHandle sphere_h = s_meshManager->Find( "sphere" );
 		DD_ASSERT(!sphere_h.IsValid(), "Unit sphere has already been created!");
@@ -552,9 +553,11 @@ namespace dd
 
 			MakeIcosphere( *sphere_mesh, 2 );
 		}
+
+		return sphere_h;
 	}
 
-	void MeshUtils::CreateQuad()
+	ddr::MeshHandle MeshUtils::CreateQuad()
 	{
 		ddr::MeshHandle quad_h = s_meshManager->Find( "quad" );
 		DD_ASSERT(!quad_h.IsValid(), "Quad has already been created!");
@@ -573,6 +576,8 @@ namespace dd
 
 			MakeQuad( *quad_mesh);
 		}
+
+		return quad_h;
 	}
 
 	static const glm::vec3 s_quadPositions[] = {

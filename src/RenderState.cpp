@@ -7,26 +7,28 @@ namespace ddr
 {
 	const RenderState* RenderState::m_current = nullptr;
 
-	ScopedRenderState::ScopedRenderState( RenderState& state ) :
-		m_state( &state )
+	static dd::ProfilerValue& s_renderStateChanged = dd::Profiler::GetValue("Render State Changed");
+
+	ScopedRenderState::ScopedRenderState(RenderState& state) :
+		m_state(&state)
 	{
-		m_state->Use( true );
+		m_state->Use(true);
 	}
 
-	ScopedRenderState::ScopedRenderState( ScopedRenderState&& other ) :
-		m_state( other.m_state )
+	ScopedRenderState::ScopedRenderState(ScopedRenderState&& other) :
+		m_state(other.m_state)
 	{
-		
+
 	}
 
 	ScopedRenderState::~ScopedRenderState()
 	{
-		m_state->Use( false );
+		m_state->Use(false);
 	}
 
 	ScopedRenderState RenderState::UseScoped()
 	{
-		return ScopedRenderState( *this );
+		return ScopedRenderState(*this);
 	}
 
 	RenderState::RenderState()
@@ -37,24 +39,24 @@ namespace ddr
 		DepthWrite = true;
 	}
 
-	void RenderState::Use( bool use )
+	void RenderState::Use(bool use)
 	{
-		if( use )
+		if (use)
 		{
-			DD_ASSERT( !m_inUse, "Render state already in use!" );
+			DD_ASSERT(!m_inUse, "Render state already in use!");
 
 			m_previous = m_current;
-			RenderState::Apply( *this );
+			RenderState::Apply(*this);
 
 			m_inUse = true;
 		}
 		else
 		{
-			DD_ASSERT( m_inUse, "Render state not in use!" );
+			DD_ASSERT(m_inUse, "Render state not in use!");
 
-			if( m_previous != nullptr )
+			if (m_previous != nullptr)
 			{
-				RenderState::Apply( *m_previous );
+				RenderState::Apply(*m_previous);
 			}
 			else
 			{
@@ -65,98 +67,98 @@ namespace ddr
 		}
 	}
 
-	void RenderState::Apply( const RenderState& state )
+	void RenderState::Apply(const RenderState& state)
 	{
-		if( m_current == nullptr )
+		if (m_current == nullptr)
 		{
-			ApplyBackfaceCulling( state );
-			ApplyBlending( state );
-			ApplyDepth( state );
+			ApplyBackfaceCulling(state);
+			ApplyBlending(state);
+			ApplyDepth(state);
 		}
 		else
 		{
-			if( m_current->BackfaceCulling != state.BackfaceCulling )
+			if (m_current->BackfaceCulling != state.BackfaceCulling)
 			{
-				ApplyBackfaceCulling( state );
+				ApplyBackfaceCulling(state);
 			}
 
-			if( m_current->Blending != state.Blending )
+			if (m_current->Blending != state.Blending)
 			{
-				ApplyBlending( state );
+				ApplyBlending(state);
 			}
 
-			if( m_current->Depth != state.Depth )
+			if (m_current->Depth != state.Depth)
 			{
-				ApplyDepth( state );
+				ApplyDepth(state);
 			}
 
-			if( m_current->DepthWrite != state.DepthWrite )
+			if (m_current->DepthWrite != state.DepthWrite)
 			{
-				ApplyDepthWrite( state );
+				ApplyDepthWrite(state);
 			}
 		}
 
 		m_current = &state;
 	}
 
-	void RenderState::ApplyDepth( const RenderState& state )
+	void RenderState::ApplyDepth(const RenderState& state)
 	{
-		dd::Profiler::RenderStateChanged();
+		s_renderStateChanged.Increment();
 
-		if( state.Depth )
+		if (state.Depth)
 		{
-			glEnable( GL_DEPTH_TEST );
-			glDepthFunc( GL_GREATER );
-			glClipControl( GL_LOWER_LEFT, GL_ZERO_TO_ONE );
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_GREATER);
+			glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 		}
 		else
 		{
-			glDisable( GL_DEPTH_TEST );
+			glDisable(GL_DEPTH_TEST);
 		}
 	}
 
-	void RenderState::ApplyBackfaceCulling( const RenderState& state )
+	void RenderState::ApplyBackfaceCulling(const RenderState& state)
 	{
-		dd::Profiler::RenderStateChanged();
+		s_renderStateChanged.Increment();
 
-		if( state.BackfaceCulling )
+		if (state.BackfaceCulling)
 		{
-			glEnable( GL_CULL_FACE );
-			glFrontFace( GL_CCW );
-			glCullFace( GL_BACK );
+			glEnable(GL_CULL_FACE);
+			glFrontFace(GL_CCW);
+			glCullFace(GL_BACK);
 		}
 		else
 		{
-			glDisable( GL_CULL_FACE );
+			glDisable(GL_CULL_FACE);
 		}
 	}
 
-	void RenderState::ApplyBlending( const RenderState& state )
+	void RenderState::ApplyBlending(const RenderState& state)
 	{
-		dd::Profiler::RenderStateChanged();
+		s_renderStateChanged.Increment();
 
-		if( state.Blending )
+		if (state.Blending)
 		{
-			glEnable( GL_BLEND );
-			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 		else
 		{
-			glDisable( GL_BLEND );
+			glDisable(GL_BLEND);
 		}
 	}
 
-	void RenderState::ApplyDepthWrite( const RenderState& state )
+	void RenderState::ApplyDepthWrite(const RenderState& state)
 	{
-		dd::Profiler::RenderStateChanged();
+		s_renderStateChanged.Increment();
 
-		if( state.DepthWrite )
+		if (state.DepthWrite)
 		{
-			glDepthMask( GL_TRUE );
+			glDepthMask(GL_TRUE);
 		}
 		else
 		{
-			glDepthMask( GL_FALSE );
+			glDepthMask(GL_FALSE);
 		}
 	}
 }

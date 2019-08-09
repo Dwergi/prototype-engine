@@ -1,4 +1,4 @@
 #include "PCH.h"
 #include "SpriteTileComponent.h"
 
-DD_TYPE_CPP(d2d::SpriteTileComponent);
+DD_COMPONENT_CPP(d2d::SpriteTileComponent);

@@ -24,7 +24,7 @@ namespace ddc
 
 		friend struct SystemManager; // for AddData and Commit
 
-		void AddData(const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name);
+		void AddData(const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name);
 		void Commit();
 
 		float m_delta { 0 };

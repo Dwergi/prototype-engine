@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "BoundSphereComponent.h"
 
-DD_TYPE_CPP( dd::BoundSphereComponent );
+DD_COMPONENT_CPP( dd::BoundSphereComponent );

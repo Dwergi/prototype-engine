@@ -1,3 +1,9 @@
+//
+// LuxportMap.h
+// Copyright (C) Sebastian Nordgren 
+// August 4th 2019
+//
+
 #include "PCH.h"
 #include "LuxportMap.h"
 

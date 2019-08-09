@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "LightComponent.h"
 
-DD_TYPE_CPP( dd::LightComponent );
+DD_COMPONENT_CPP( dd::LightComponent );
 
 DD_ENUM_CPP( dd::LightType )
 {

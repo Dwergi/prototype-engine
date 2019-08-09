@@ -24,9 +24,9 @@ namespace ddc
 		return true;
 	}
 
-	bool System::CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const
+	bool System::CheckDuplicates( const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality, const char* name ) const
 	{
-		for( const DataRequest* req : m_requests )
+		for( const ddc::DataRequest* req : m_requests )
 		{
 			if( req->Component() == *component &&
 				req->Usage() == usage && 

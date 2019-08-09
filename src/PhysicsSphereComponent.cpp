@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "PhysicsSphereComponent.h"
 
-DD_TYPE_CPP( dd::PhysicsSphereComponent );
+DD_COMPONENT_CPP( dd::PhysicsSphereComponent );

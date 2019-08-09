@@ -17,6 +17,8 @@
 
 DD_POD_CPP(ddr::ShaderHandle);
 
+static dd::ProfilerValue& g_shaderChanged = dd::Profiler::GetValue("Shader Changed");
+
 namespace ddr
 {
 	ScopedShader::ScopedShader( Shader& shader ) :
@@ -149,7 +151,7 @@ namespace ddr
 	{
 		DD_ASSERT( use != m_inUse, "ShaderProgram '%s': Trying to use shader that is already in use!", m_name.c_str() );
 
-		dd::Profiler::ShaderChanged();
+		g_shaderChanged.Increment();
 
 		int current;
 		glGetIntegerv( GL_CURRENT_PROGRAM, &current );

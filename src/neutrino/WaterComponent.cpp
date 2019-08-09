@@ -7,6 +7,6 @@
 #include "PCH.h"
 #include "neutrino/WaterComponent.h"
 
-DD_TYPE_CPP( neut::WaterComponent );
+DD_COMPONENT_CPP( neut::WaterComponent );
 
 const int neut::WaterComponent::VertexCount = 32;

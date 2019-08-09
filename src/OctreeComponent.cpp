@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "OctreeComponent.h"
 
-DD_TYPE_CPP( dd::OctreeComponent );
+DD_COMPONENT_CPP( dd::OctreeComponent );

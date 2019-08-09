@@ -7,14 +7,21 @@
 #include "PCH.h"
 #include "Profiler.h"
 
-#include "fmt/format.h"
+#include "IWindow.h"
+
+#include <fmt/format.h>
 
 namespace dd
 {
-	ProfilerValue::ProfilerValue( const char* name, float initial ) :
-		m_name( name )
+	std::vector<dd::ProfilerValue*> dd::Profiler::s_instances;
+	bool dd::Profiler::s_draw = false;
+
+	static dd::Service<dd::IWindow> s_window;
+
+	ProfilerValue::ProfilerValue(const char* name, float initial) :
+		m_name(name)
 	{
-		for( float& f : m_values )
+		for (float& f : m_values)
 		{
 			f = initial;
 		}
@@ -27,23 +34,24 @@ namespace dd
 		++m_values[m_index];
 	}
 
-	void ProfilerValue::SetValue( float value )
+	void ProfilerValue::SetValue(float value)
 	{
 		m_values[m_index] = value;
 	}
 
-	float ProfilerValue::GetValue( int index ) const
+	float ProfilerValue::GetValue(int index) const
 	{
-		DD_ASSERT( index >= 0 && index < VALUE_COUNT );
+		DD_ASSERT(index >= 0 && index < FRAME_COUNT);
 
 		return m_values[index];
 	}
 
 	void ProfilerValue::BeginFrame()
 	{
+		++m_frameCount;
 		++m_index;
 
-		if( m_index == VALUE_COUNT )
+		if (m_index == FRAME_COUNT)
 		{
 			m_index = 0;
 		}
@@ -54,96 +62,94 @@ namespace dd
 	void ProfilerValue::EndFrame()
 	{
 		float total = 0;
-		for( float i : m_values )
+		int frames = ddm::min(m_frameCount, FRAME_COUNT);
+		for (int i = 0; i < frames; ++i)
 		{
-			total += i;
+			total += m_values[i];
 		}
 
-		m_sliding = total / VALUE_COUNT;
+		m_sliding = total / FRAME_COUNT;
 	}
 
-	float ProfilerValueGetter( void* data, int index )
+	float ProfilerValueGetter(void* data, int index)
 	{
-		ProfilerValue* value = (ProfilerValue*) data;
+		ProfilerValue* value = ( ProfilerValue*) data;
 
 		int actual = value->Index() + index + 1;
-		if( actual >= ProfilerValue::VALUE_COUNT )
+		if (actual >= ProfilerValue::FRAME_COUNT)
 		{
-			actual -= ProfilerValue::VALUE_COUNT;
+			actual -= ProfilerValue::FRAME_COUNT;
 		}
 
-		float f = value->GetValue( actual );
+		float f = value->GetValue(actual);
 		return f;
 	}
 
 	void ProfilerValue::Draw()
 	{
-		if( ImGui::TreeNodeEx( this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), m_sliding ) )
+		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), m_sliding))
 		{
-			ImGui::PlotLines( "", &ProfilerValueGetter, this, VALUE_COUNT - 1, 0, nullptr, 0, 50, ImVec2( 200, 50 ) );
-
-			ImGui::TreePop();
+			ImGui::PlotLines("", &ProfilerValueGetter, this, FRAME_COUNT - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
 		}
 	}
 
-	static ProfilerValue g_materialChanged( "Material Changes" );
-	static ProfilerValue g_shaderChanged( "Shader Changes" );
-	static ProfilerValue g_renderStateChanged( "Render State Changes" );
-	static ProfilerValue g_meshesRendered( "Meshes Rendered" );
-	static bool g_draw = false;
 
-	void Profiler::MaterialChanged()
+	ProfilerValue& Profiler::GetValue(const char* name, float initial)
 	{
-		g_materialChanged.Increment();
+		for (dd::ProfilerValue* value : s_instances)
+		{
+			if (value->Name() == name)
+			{
+				return *value;
+			}
+		}
+
+		ProfilerValue* value = new ProfilerValue(name, initial);
+		s_instances.push_back(value);
+		return *value;
 	}
 
-	void Profiler::ShaderChanged()
-	{
-		g_shaderChanged.Increment();
-	}
-
-	void Profiler::RenderStateChanged()
-	{
-		g_renderStateChanged.Increment();
-	}
-
-	void Profiler::MeshRendered()
-	{
-		g_meshesRendered.Increment();
-	}
 
 	void Profiler::BeginFrame()
 	{
-		g_materialChanged.BeginFrame();
-		g_shaderChanged.BeginFrame();
-		g_renderStateChanged.BeginFrame();
-		g_meshesRendered.BeginFrame();
+		for (dd::ProfilerValue* value : s_instances)
+		{
+			value->BeginFrame();
+		}
 	}
 
 	void Profiler::EndFrame()
 	{
-		g_materialChanged.EndFrame();
-		g_shaderChanged.EndFrame();
-		g_renderStateChanged.EndFrame();
-		g_meshesRendered.EndFrame();
+		for (dd::ProfilerValue* value : s_instances)
+		{
+			value->EndFrame();
+		}
 	}
 
 	void Profiler::Draw()
 	{
-		g_materialChanged.Draw();
-		g_shaderChanged.Draw();
-		g_renderStateChanged.Draw();
-		g_meshesRendered.Draw();
+		if (!s_draw)
+		{
+			return;
+		}
+
+		glm::ivec2 window_size = s_window->GetSize();
+		ImGui::SetNextWindowPos(ImVec2(window_size.x - 200.f, 30), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("Profiler", &s_draw, ImVec2(170, 170), 0.4f))
+		{
+			for (dd::ProfilerValue* value : s_instances)
+			{
+				value->Draw();
+			}
+
+			ImGui::End();
+		}
 	}
 
-	void Profiler::EnableDraw( bool draw )
+	void Profiler::EnableDraw(bool draw)
 	{
-		g_draw = draw;
-	}
-
-	bool Profiler::ShouldDraw()
-	{
-		return g_draw;
+		s_draw = draw;
 	}
 }
 

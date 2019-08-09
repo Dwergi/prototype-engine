@@ -8,7 +8,7 @@ namespace ddc
 
 	struct UpdateDataBuffer
 	{
-		UpdateDataBuffer(ddc::EntitySpace& space, const std::vector<Entity>& entities, const dd::IArray<const DataRequest*>& requests, const char* name);
+		UpdateDataBuffer(ddc::EntitySpace& space, const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name);
 		UpdateDataBuffer(const UpdateDataBuffer& other);
 
 		const std::vector<Entity>& Entities() const { return m_entities; }

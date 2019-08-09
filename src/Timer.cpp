@@ -37,8 +37,10 @@ namespace dd
 	{
 		DD_ASSERT( m_start > 0 );
 
-		Pause();
-		return Time();
+		float time = Time();
+		m_elapsed = 0;
+		m_start = 0;
+		return time;
 	}
 
 	float Timer::Time() const

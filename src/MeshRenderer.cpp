@@ -94,19 +94,22 @@ namespace ddr
 
 		++m_meshCount;
 
-		ddm::AABB world_aabb;
-		ddm::Sphere world_sphere;
-		if( !dd::GetWorldBoundBoxAndSphere( bbox_cmp, bsphere_cmp, transform_cmp, world_aabb, world_sphere ) )
+		if (bbox_cmp != nullptr || bsphere_cmp != nullptr)
 		{
-			return;
-		}
+			ddm::AABB world_aabb;
+			ddm::Sphere world_sphere;
+			if (!dd::GetWorldBoundBoxAndSphere(bbox_cmp, bsphere_cmp, transform_cmp, world_aabb, world_sphere))
+			{
+				return;
+			}
 
-		// check if it intersects with the frustum
-		if( m_frustumCull && 
-			!camera.GetFrustum().Intersects( world_sphere ) &&
-			!camera.GetFrustum().Intersects( world_aabb ) )
-		{
-			return;
+			// check if it intersects with the frustum
+			if (m_frustumCull &&
+				!camera.GetFrustum().Intersects(world_sphere) &&
+				!camera.GetFrustum().Intersects(world_aabb))
+			{
+				return;
+			}
 		}
 
 		++m_unculledMeshCount;

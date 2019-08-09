@@ -37,7 +37,7 @@ namespace dd
 
 	void Input::Update(float delta_t)
 	{
-		DD_ASSERT(m_bindings != nullptr, "Key bindings not set!");
+		DD_ASSERT_FATAL(m_bindings != nullptr, "Key bindings not set!");
 
 		// switch mode
 		UpdateMode();

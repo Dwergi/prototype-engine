@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "PhysicsRigidBodyComponent.h"
 
-DD_TYPE_CPP( dd::PhysicsRigidBodyComponent );
+DD_COMPONENT_CPP( dd::PhysicsRigidBodyComponent );

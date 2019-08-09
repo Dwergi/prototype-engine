@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "TerrainChunkComponent.h"
 
-DD_TYPE_CPP(neut::TerrainChunkComponent );
+DD_COMPONENT_CPP(neut::TerrainChunkComponent );

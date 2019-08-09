@@ -34,9 +34,9 @@ struct ThirdComponent
 	DD_END_CLASS()
 };
 
-DD_TYPE_CPP(FirstComponent);
-DD_TYPE_CPP(SecondComponent);
-DD_TYPE_CPP(ThirdComponent);
+DD_COMPONENT_CPP(FirstComponent);
+DD_COMPONENT_CPP(SecondComponent);
+DD_COMPONENT_CPP(ThirdComponent);
 
 struct TestSystem : ddc::System
 {

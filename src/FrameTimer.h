@@ -30,7 +30,7 @@ namespace dd
 		float GameDelta() const { return m_gameDelta; }
 		float AppDelta() const { return m_appDelta; }
 
-		float SlidingDelta() const { return m_frameTimes.SlidingAverage(); }
+		float SlidingDelta() const;
 		float DeltaWithoutDelay() const { return m_deltaWithoutDelay; }
 
 		virtual const char* GetDebugTitle() const override { return "FPS"; }
@@ -51,8 +51,6 @@ namespace dd
 		bool m_drawCompact { true };
 		bool m_paused { false };
 		uint m_frame { 0 };
-
-		ProfilerValue m_frameTimes;
 
 		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
 	};

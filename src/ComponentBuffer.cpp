@@ -9,11 +9,11 @@
 
 namespace ddc
 {
-	ComponentBuffer::ComponentBuffer( const EntitySpace& space, const std::vector<Entity>& entities, const DataRequest& req ) :
+	ComponentBuffer::ComponentBuffer( const EntitySpace& space, const std::vector<Entity>& entities, DataRequest& req ) :
 		m_request( req )
 	{
 		m_count = entities.size();
-		m_storage = req.Buffer();
+		m_storage = req.GetBuffer(entities.size());
 
 		if( req.Optional() )
 		{

@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "RayComponent.h"
 
-DD_TYPE_CPP( dd::RayComponent );
+DD_COMPONENT_CPP( dd::RayComponent );

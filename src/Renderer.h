@@ -25,23 +25,35 @@ namespace ddr
 
 		virtual bool UsesAlpha() const { return false; }
 
-		const dd::IArray<const ddc::DataRequest*>& GetRequirements() const { return m_requests; }
+		const dd::IArray<ddc::DataRequest*>& GetRequirements() const { return m_requests; }
 		const std::bitset<ddc::MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 	protected:
 
 		template <typename T>
-		void Require() { m_requests.Add( new ddc::ReadRequirement<T>( nullptr ) ); }
+		void Require()
+		{
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, ddc::DataUsage::Read, ddc::DataCardinality::Required);
+			m_requests.Add( new ddc::ReadRequirement<T>( nullptr ) );
+		}
 
 		template <typename T>
-		void Optional() { m_requests.Add( new ddc::ReadOptional<T>( nullptr ) ); }
+		void Optional()
+		{
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, ddc::DataUsage::Read, ddc::DataCardinality::Optional);
+			m_requests.Add(new ddc::ReadOptional<T>(nullptr));
+		}
 
 		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
 
 	private:
-		dd::Array<const ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requests;
+		dd::Array<ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requests;
 		std::bitset<ddc::MAX_TAGS> m_tags;
 
 		dd::String64 m_name;
+
+		bool CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality);
 	};
 }

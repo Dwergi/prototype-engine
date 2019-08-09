@@ -5,8 +5,7 @@
 
 namespace ddc
 {
-	static const int MAX_ENTITIES = 32 * 1024;
-	static const int MAX_COMPONENTS = 255;
+	static const int MAX_COMPONENTS = 256;
 	static const int MAX_TAGS = 32;
 
 	typedef std::bitset<MAX_TAGS> TagBits;
@@ -19,6 +18,7 @@ namespace ddc
 	struct EntitySpace
 	{
 		EntitySpace(std::string name);
+		~EntitySpace();
 
 		//
 		// Update the entity space - entities are created and deleted at this point.
@@ -53,6 +53,9 @@ namespace ddc
 		// This will remain true for the remainder of the current frame after Destroy() is called on this entity.
 		//
 		bool IsAlive( Entity entity ) const;
+
+		uint LiveCount() const { return (uint) (m_entities.size() - m_free.size()); }
+		uint Size() const { return (uint) m_entities.size(); }
 
 		//
 		// Access a component from the given entity by type ID.
@@ -227,6 +230,8 @@ namespace ddc
 			TagBits Tags;
 		};
 
+		uint m_maxEntities { 0 };
+
 		std::vector<EntityEntry> m_entities;
 		std::vector<uint> m_free;
 
@@ -236,6 +241,8 @@ namespace ddc
 
 		std::string m_name;
 		uint8 m_instanceIndex { 0 };
+
+		void UpdateStorage();
 	};
 
 	using ExpandType = int[];

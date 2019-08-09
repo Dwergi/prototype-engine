@@ -8,4 +8,4 @@
 #include "neutrino/BulletComponent.h"
 
 DD_TYPE_CPP(neut::BulletHitMessage);
-DD_TYPE_CPP(neut::BulletComponent);
+DD_COMPONENT_CPP(neut::BulletComponent);

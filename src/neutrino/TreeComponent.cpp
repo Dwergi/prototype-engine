@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "neutrino/TreeComponent.h"
 
-DD_TYPE_CPP( neut::TreeComponent );
+DD_COMPONENT_CPP( neut::TreeComponent );

@@ -62,7 +62,7 @@ namespace ddr
 	public:
 		RenderData( const ddc::EntitySpace& entity_space, const ddr::ICamera& camera, 
 			ddr::UniformStorage& uniforms, ddr::CommandBuffer& commands,
-			const std::vector<ddc::Entity>& entities, const dd::IArray<const ddc::DataRequest*>& requirements );
+			const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requirements );
 
 		const ddc::EntitySpace& EntitySpace() const { return m_space; }
 		const ddr::ICamera& Camera() const { return m_camera; }

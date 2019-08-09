@@ -18,23 +18,59 @@ namespace ddc
 		m_instanceIndex = s_used;
 		++s_used;
 
-		m_components.resize( dd::TypeInfo::ComponentCount() );
+		m_maxEntities = 1024;
+		UpdateStorage();
+	}
 
-		for( dd::ComponentID i = 0; i < m_components.size(); ++i )
+	EntitySpace::~EntitySpace()
+	{
+		for (byte* buffer : m_components)
 		{
-			const dd::TypeInfo* type = dd::TypeInfo::GetComponent( i );
-			DD_ASSERT( type != nullptr );
+			free(buffer);
+		}
+	}
 
-			size_t buffer_size = type->Size() * MAX_ENTITIES;
-			DD_ASSERT( buffer_size < 1024 * 1024 * 1024 );
+	void EntitySpace::UpdateStorage()
+	{
+		if (m_entities.size() <= m_maxEntities && m_components.size() == dd::TypeInfo::ComponentCount())
+		{
+			return;
+		}
+		
+		int old_max_entities = m_maxEntities;
+		if (m_entities.size() > m_maxEntities)
+		{
+			m_maxEntities *= 2;
+		}
 
-			m_components[i] = new byte[buffer_size];
-			memset( m_components[i], 0, buffer_size );
+		m_components.resize(dd::TypeInfo::ComponentCount());
+
+		for (dd::ComponentID i = 0; i < dd::TypeInfo::ComponentCount(); ++i)
+		{
+			const dd::TypeInfo* type = dd::TypeInfo::GetComponent(i);
+			DD_ASSERT(type != nullptr);
+
+			size_t buffer_size = type->Size() * m_maxEntities;
+			DD_ASSERT(buffer_size < 1024 * 1024 * 1024);
+
+			if (m_components[i] == nullptr)
+			{
+				m_components[i] = (byte*) malloc(buffer_size);
+				memset(m_components[i], 0, buffer_size);
+			}
+			else
+			{
+				size_t old_buffer_size = old_max_entities * type->Size();
+				m_components[i] = (byte*) realloc(m_components[i], buffer_size);
+				memset(m_components[i] + old_buffer_size, 0, buffer_size - old_buffer_size);
+			}
 		}
 	}
 
 	void EntitySpace::Update( float delta_t )
 	{
+		UpdateStorage();
+
 		for( int id = 0; id < m_entities.size(); ++id )
 		{
 			EntityEntry& entry = m_entities[id];
@@ -70,15 +106,11 @@ namespace ddc
 			new_entry.Entity.m_space = m_instanceIndex;
 
 			m_entities.push_back( new_entry );
+			UpdateStorage();
 		}
 
 		uint idx = dd::pop_front( m_free );
-
-		if( idx > MAX_ENTITIES )
-		{
-			DD_ASSERT( false, "Went over the max entity count!" );
-			throw std::exception( "Went over the max entity count!" );
-		}
+		DD_ASSERT(idx < m_maxEntities, "Went over the max entity count!");
 
 		EntityEntry& entry = m_entities[ idx ];
 		entry.Entity.Version++;
@@ -262,7 +294,7 @@ namespace ddc
 
 	bool Entity::IsValid() const
 	{
-		return Handle != ~0;
+		return Handle != INVALID_HANDLE;
 	}
 
 	bool Entity::IsAlive() const

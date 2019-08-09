@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "BoundBoxComponent.h"
 
-DD_TYPE_CPP( dd::BoundBoxComponent );
+DD_COMPONENT_CPP( dd::BoundBoxComponent );

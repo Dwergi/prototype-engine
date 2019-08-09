@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "PlayerComponent.h"
 
-DD_TYPE_CPP( dd::PlayerComponent );
+DD_COMPONENT_CPP( dd::PlayerComponent );

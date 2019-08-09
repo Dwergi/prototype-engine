@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "TrenchComponent.h"
 
-DD_TYPE_CPP( dd::TrenchComponent );
+DD_COMPONENT_CPP( dd::TrenchComponent );

@@ -39,43 +39,55 @@
 
 namespace dd
 {
-	struct Profiler
-	{
-		static void MaterialChanged();
-		static void ShaderChanged();
-		static void RenderStateChanged();
-		static void MeshRendered();
-
-		static void BeginFrame();
-		static void EndFrame();
-
-		static void Draw();
-
-		static void EnableDraw( bool draw );
-		static bool ShouldDraw();
-	};
+	struct Profiler;
 
 	struct ProfilerValue
 	{
-		static const int VALUE_COUNT = 100;
+		static const int FRAME_COUNT = 100;
 
-		ProfilerValue( const char* name, float initial = 0 );
+		ProfilerValue(const ProfilerValue&) = delete;
+		ProfilerValue(ProfilerValue&&) = delete;
 
 		void Increment();
-		void SetValue( float value );
-		float GetValue( int index ) const;
+
+		void SetValue(float value);
+		float GetValue(int index) const;
+
 		int Index() const { return m_index; }
 
 		void BeginFrame();
 		void EndFrame();
 
+		const std::string& Name() const { return m_name; }
+
 		void Draw();
 		float SlidingAverage() const { return m_sliding; }
 
 	private:
+		friend struct Profiler;
+
 		std::string m_name;
+		int m_frameCount { 0 };
 		int m_index { 0 };
 		float m_sliding { 0 };
-		float m_values[VALUE_COUNT] = { 0 };
+		float m_values[FRAME_COUNT] = { 0 };
+
+		ProfilerValue(const char* name, float initial);
+	};
+
+	struct Profiler
+	{
+		static void BeginFrame();
+		static void EndFrame();
+
+		static void Draw();
+		static void EnableDraw( bool draw );
+		static bool ShouldDraw() { return s_draw; }
+
+		static ProfilerValue& GetValue(const char* name, float initial = 0);
+		
+	private:
+		static std::vector<ProfilerValue*> s_instances;
+		static bool s_draw;
 	};
 }

@@ -11,8 +11,6 @@
 
 #include <fmt/format.h>
 
-DD_TYPE_CPP(lux::LuxLightComponent);
-
 namespace lux
 {
 	static dd::Timer s_timer;

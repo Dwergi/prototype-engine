@@ -19,6 +19,8 @@
 
 DD_POD_CPP(ddr::MeshHandle);
 
+static dd::ProfilerValue& s_meshRendered = dd::Profiler::GetValue("Mesh Rendered");
+
 namespace ddr
 {
 	Mesh::Mesh()
@@ -198,7 +200,7 @@ namespace ddr
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
-		dd::Profiler::MeshRendered();
+		s_meshRendered.Increment();
 
 		m_vao.Bind();
 

@@ -30,7 +30,7 @@ namespace ddc
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
-		const dd::Vector<const DataRequest*>& GetRequests() const { return m_requests; }
+		const dd::Vector<DataRequest*>& GetRequests() const { return m_requests; }
 		const dd::Vector<const System*>& GetDependencies() const { return m_dependencies; }
 		std::bitset<MAX_TAGS> GetRequiredTags( const char* name = nullptr ) const;
 		const char* GetName() const { return m_name.c_str(); }
@@ -42,28 +42,32 @@ namespace ddc
 		template <typename T>
 		void RequireRead( const char* name = nullptr ) 
 		{ 
-			CheckDuplicates( DD_FIND_TYPE( T ), DataUsage::Read, DataCardinality::Required, name );
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, DataUsage::Read, DataCardinality::Required, name);
 			m_requests.Add( new ReadRequirement<T>( name ) );
 		}
 
 		template <typename T>
 		void RequireWrite( const char* name = nullptr ) 
 		{
-			CheckDuplicates( DD_FIND_TYPE( T ), DataUsage::Write, DataCardinality::Required, name );
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, DataUsage::Write, DataCardinality::Required, name );
 			m_requests.Add( new WriteRequirement<T>( name ) );
 		}
 
 		template <typename T>
 		void OptionalRead( const char* name = nullptr )
 		{
-			CheckDuplicates( DD_FIND_TYPE( T ), DataUsage::Read, DataCardinality::Optional, name );
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, DataUsage::Read, DataCardinality::Optional, name);
 			m_requests.Add( new ReadOptional<T>( name ) );
 		}
 
 		template <typename T>
 		void OptionalWrite( const char* name = nullptr )
 		{
-			CheckDuplicates( DD_FIND_TYPE( T ), DataUsage::Write, DataCardinality::Optional, name );
+			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
+			CheckDuplicates(type, DataUsage::Write, DataCardinality::Optional, name);
 			m_requests.Add( new WriteOptional<T>( name ) );
 		}
 
@@ -84,7 +88,7 @@ namespace ddc
 			std::bitset<MAX_TAGS> Tags;
 		};
 
-		dd::Vector<const DataRequest*> m_requests;
+		dd::Vector<DataRequest*> m_requests;
 		dd::Vector<TagRequest> m_tags;
 
 		dd::Vector<const System*> m_dependencies;

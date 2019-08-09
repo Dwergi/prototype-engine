@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "LinesComponent.h"
 
-DD_TYPE_CPP( dd::LinesComponent );
+DD_COMPONENT_CPP( dd::LinesComponent );

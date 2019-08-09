@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "ParticleSystemComponent.h"
 
-DD_TYPE_CPP( dd::ParticleSystemComponent );
+DD_COMPONENT_CPP( dd::ParticleSystemComponent );
 
 namespace dd
 {

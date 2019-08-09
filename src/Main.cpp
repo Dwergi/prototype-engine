@@ -44,8 +44,8 @@
 
 //---------------------------------------------------------------------------
 // GAME TO USE
-#include "lux/LuxportGame.h"
-using TGame = lux::LuxportGame;
+#include "stress/StressTestGame.h"
+using TGame = stress::StressTestGame;
 static dd::Service<dd::IGame> s_game;
 //---------------------------------------------------------------------------
 
@@ -56,10 +56,16 @@ static dd::Service<dd::DebugUI> s_debugUI;
 static dd::Service<ddr::WorldRenderer> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
-static dd::Service<ddr::ICamera> s_camera;
 static dd::Service<ddc::SystemManager> s_systemManager;
 
 static ddc::EntitySpace* g_tempSpace;
+
+// Profiler values
+static dd::ProfilerValue& s_entityUpdateProfiler = dd::Profiler::GetValue("Entity Update");
+static dd::ProfilerValue& s_systemsUpdateProfiler = dd::Profiler::GetValue("Systems Update");
+static dd::ProfilerValue& s_gameUpdateProfiler = dd::Profiler::GetValue("Game Update");
+static dd::ProfilerValue& s_gameRenderUpdateProfiler = dd::Profiler::GetValue("Game Render Update");
+static dd::ProfilerValue& s_renderProfiler = dd::Profiler::GetValue("Render");
 
 std::thread::id g_mainThread;
 
@@ -159,8 +165,6 @@ static int GameMain()
 
 	dd::Services::RegisterInterface<dd::IGame>(new TGame());
 
-	DD_TODO("Should fetch EntitySpaces from game.");
-
 	{
 		dd::IWindow& window = *new dd::SFMLWindow();
 		window.SetTitle(s_game->GetTitle())
@@ -187,9 +191,6 @@ static int GameMain()
 
 		dd::Services::Register(new ddc::SystemManager());
 
-		DD_TODO("IGame should provide EntitySpace, update all");
-		g_tempSpace = new ddc::EntitySpace("default");
-
 		dd::Services::Register(new ddr::WorldRenderer());
 
 		dd::Services::Register(new dd::FrameTimer());
@@ -204,17 +205,26 @@ static int GameMain()
 
 		CreateAssetManagers();
 
-		{
-			dd::GameUpdateData initial_update(*g_tempSpace, *s_input, 0);
-			s_game->Initialize(initial_update);
-		}
+		std::vector<ddc::EntitySpace*> entity_spaces;
 
-		s_systemManager->Initialize(*g_tempSpace);
-		s_renderer->InitializeRenderers(*g_tempSpace);
+		{
+			s_game->Initialize();
+			s_game->RegisterSystems(*s_systemManager);
+			s_game->RegisterRenderers(*s_renderer);
+			s_game->CreateEntitySpaces(entity_spaces);
+
+			for (ddc::EntitySpace* space : entity_spaces)
+			{
+				s_systemManager->Initialize(*space);
+				s_renderer->InitializeRenderers(*space);
+			}
+		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
 		dd::InitializeAssert();
 		ShowSystemConsole(false);
+
+		dd::Timer profiler_timer;
 
 		while (!s_window->IsClosing())
 		{
@@ -225,16 +235,44 @@ static int GameMain()
 			UpdateAssetManagers();
 
 			{
-				DD_TODO("Add a loop over all available entity spaces.");
-				g_tempSpace->Update(s_frameTimer->GameDelta());
-				s_systemManager->Update(*g_tempSpace, s_frameTimer->GameDelta());
+				{
+					profiler_timer.Start();
+					for (ddc::EntitySpace* space : entity_spaces)
+					{
+						space->Update(s_frameTimer->GameDelta());
+					}
+					s_entityUpdateProfiler.SetValue(profiler_timer.Stop());
+				}
 
-				dd::GameUpdateData update_data(*g_tempSpace, *s_input, s_frameTimer->GameDelta());
-				s_game->Update(update_data);
+				{
+					profiler_timer.Start();
+					for (ddc::EntitySpace* space : entity_spaces)
+					{
+						s_systemManager->Update(*space, s_frameTimer->GameDelta());
+					}
+					s_systemsUpdateProfiler.SetValue(profiler_timer.Stop());
+				}
 
-				s_game->RenderUpdate(update_data);
+				{
+					profiler_timer.Start();
+					for (ddc::EntitySpace* space : entity_spaces)
+					{
+						dd::GameUpdateData update_data(*space, *s_input, s_frameTimer->GameDelta());
+						s_game->Update(update_data);
+					}
+					s_gameUpdateProfiler.SetValue(profiler_timer.Stop());
+				}
 
-				s_renderer->Render(*g_tempSpace, s_camera, s_frameTimer->GameDelta());
+				{
+					profiler_timer.Start();
+					for (ddc::EntitySpace* space : entity_spaces)
+					{
+						DD_TODO("Camera can't currently be relocated, which is bad. Should game be providing the camera?");
+						ddr::ICamera* camera = nullptr; // = ???
+						s_renderer->Render(*space, *camera, s_frameTimer->GameDelta());
+					}
+					s_renderProfiler.SetValue(profiler_timer.Stop());
+				}
 			}
 
 			s_frameTimer->DrawFPSCounter();

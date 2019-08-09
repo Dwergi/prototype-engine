@@ -1,3 +1,9 @@
+//
+// LuxLightComponent.h
+// Copyright (C) Sebastian Nordgren 
+// August 3rd 2019
+//
+
 #pragma once
 
 namespace lux

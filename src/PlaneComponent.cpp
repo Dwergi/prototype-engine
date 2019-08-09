@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "PlaneComponent.h"
 
-DD_TYPE_CPP( dd::PlaneComponent );
+DD_COMPONENT_CPP( dd::PlaneComponent );

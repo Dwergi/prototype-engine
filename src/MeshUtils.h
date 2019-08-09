@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Mesh.h"
+
 namespace ddr
 {
 	struct Mesh;
@@ -17,9 +19,9 @@ namespace dd
 	struct MeshUtils
 	{
 		static void CreateDefaultMaterial();
-		static void CreateUnitCube();
-		static void CreateUnitSphere();
-		static void CreateQuad();
+		static ddr::MeshHandle CreateUnitCube();
+		static ddr::MeshHandle CreateUnitSphere();
+		static ddr::MeshHandle CreateQuad();
 
 		static void MakeQuad(ddr::Mesh& mesh);
 

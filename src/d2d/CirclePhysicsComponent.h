@@ -1,3 +1,9 @@
+//
+// CirclePhysicsComponent.h - Component for the physics of a 2D circle.
+// Copyright (C) Sebastian Nordgren 
+// August 3rd 2019
+//
+
 #pragma once
 
 namespace d2d

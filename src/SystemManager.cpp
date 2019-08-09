@@ -112,8 +112,8 @@ namespace ddc
 		for (const dd::String& name : names)
 		{
 			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
-			dd::Array<const DataRequest*, MAX_COMPONENTS> requests;
-			for (const DataRequest* req : system->GetRequests())
+			dd::Array<DataRequest*, MAX_COMPONENTS> requests;
+			for (DataRequest* req : system->GetRequests())
 			{
 				if (name == req->Name())
 				{

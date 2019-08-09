@@ -382,6 +382,7 @@
     <ClInclude Include="src\neutrino\WaterRenderer.h" />
     <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\ScratchEntity.h" />
+    <ClInclude Include="src\stress\StressTestGame.h" />
     <ClInclude Include="src\Tweakable.h" />
     <ClInclude Include="src\UpdateDataBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
@@ -648,6 +649,8 @@
     <ClCompile Include="src\BoundsHelpers.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
     <ClCompile Include="src\CommandBuffer.cpp" />
+    <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp" />
+    <ClCompile Include="src\d2d\CirclePhysicsComponent.cpp" />
     <ClCompile Include="src\d2d\Physics2DSystem.cpp" />
     <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp" />
@@ -665,6 +668,7 @@
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />
+    <ClCompile Include="src\lux\LuxLightComponent.cpp" />
     <ClCompile Include="src\lux\LuxLightRenderer.cpp" />
     <ClCompile Include="src\lux\LuxportGame.cpp" />
     <ClCompile Include="src\lux\LuxportMap.cpp" />
@@ -761,6 +765,8 @@
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\SpriteSheet.cpp" />
+    <ClCompile Include="src\stress\Renderer.cpp" />
+    <ClCompile Include="src\stress\StressTestGame.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\SystemManager.cpp" />
     <ClCompile Include="src\TestEntities.cpp" />

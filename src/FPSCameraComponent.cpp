@@ -12,7 +12,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-DD_TYPE_CPP(dd::FPSCameraComponent);
+DD_COMPONENT_CPP(dd::FPSCameraComponent);
 
 namespace dd
 {

@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "d2d/SpriteComponent.h"
 
-DD_TYPE_CPP(d2d::SpriteComponent);
+DD_COMPONENT_CPP(d2d::SpriteComponent);
 
 namespace d2d
 {

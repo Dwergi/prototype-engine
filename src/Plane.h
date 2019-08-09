@@ -28,7 +28,6 @@ namespace ddm
 		glm::vec4 Parameters;
 
 		DD_BEGIN_CLASS( ddm::Plane )
-			DD_COMPONENT();
 			DD_MEMBER( Parameters );
 		DD_END_CLASS()
 	};

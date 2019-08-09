@@ -1,5 +1,5 @@
 //
-// Luxport.h - Game file for Luxport GMTK Game Jame 2019.
+// LuxportGame.cpp - Game file for Luxport GMTK Game Jame 2019.
 // Copyright (C) Sebastian Nordgren 
 // August 3rd 2019
 //
@@ -60,9 +60,7 @@ namespace lux
 	static dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
 	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
-	static dd::Service<ddr::WorldRenderer> s_renderer;
 	static dd::Service<dd::Input> s_input;
-	static dd::Service<ddc::SystemManager> s_systemManager;
 
 	static dd::InputKeyBindings* s_keybindings;
 
@@ -170,31 +168,43 @@ namespace lux
 		return player;
 	}
 
-	void LuxportGame::Initialize(const dd::GameUpdateData& update_data)
+	void LuxportGame::RegisterSystems(ddc::SystemManager& system_manager)
 	{
-		dd::Services::RegisterInterface<ddr::ICamera>(new ddr::OrthoCamera());
-
-		ddc::EntitySpace& space = update_data.EntitySpace();
-
-		dd::Services::Register(new ddr::SpriteManager());
-		dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
-
-		lux::LuxLightRenderer& lights_renderer = dd::Services::Register(new lux::LuxLightRenderer());
-		s_renderer->Register(lights_renderer);
-
-		ddr::SpriteRenderer& sprite_renderer = dd::Services::Register(new ddr::SpriteRenderer());
-		s_renderer->Register(sprite_renderer);
-
 		d2d::PhysicsSystem& physics_system = dd::Services::Register(new d2d::PhysicsSystem());
-		s_systemManager->Register(physics_system);
+		system_manager.Register(physics_system);
 
 		d2d::SpriteAnimationSystem& sprite_anim_system = dd::Services::Register(new d2d::SpriteAnimationSystem());
-		s_systemManager->Register(sprite_anim_system);
+		system_manager.Register(sprite_anim_system);
 
 		d2d::SpriteTileSystem& sprite_tile_system = dd::Services::Register(new d2d::SpriteTileSystem(MAP_SIZE, 16));
 		sprite_tile_system.DependsOn(physics_system);
 		sprite_tile_system.DependsOn(sprite_anim_system);
-		s_systemManager->Register(sprite_tile_system);
+		system_manager.Register(sprite_tile_system);
+	}
+
+	void LuxportGame::RegisterRenderers(ddr::WorldRenderer& renderer)
+	{
+		lux::LuxLightRenderer& lights_renderer = dd::Services::Register(new lux::LuxLightRenderer());
+		renderer.Register(lights_renderer);
+
+		ddr::SpriteRenderer& sprite_renderer = dd::Services::Register(new ddr::SpriteRenderer());
+		renderer.Register(sprite_renderer);
+	}
+
+	void LuxportGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces)
+	{
+		entity_spaces.push_back(new ddc::EntitySpace("game"));
+
+		s_teleporter = CreateTeleporter(*entity_spaces[0]);
+		s_player = CreatePlayer(*entity_spaces[0]);
+	}
+
+	void LuxportGame::Initialize()
+	{
+		dd::Services::RegisterInterface<ddr::ICamera>(new ddr::OrthoCamera());
+
+		dd::Services::Register(new ddr::SpriteManager());
+		dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
 
 		ddr::TextureHandle spritesheet_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
 		s_spriteSheetManager->Load(PLAYER_SPRITESHEET, spritesheet_tex_h, glm::ivec2(32));
@@ -204,9 +214,6 @@ namespace lux
 
 		ddr::TextureHandle foreground_tex_h = s_textureManager->Load(MAP_FOREGROUND);
 		s_spriteSheetManager->Load(MAP_FOREGROUND, foreground_tex_h, glm::ivec2(16));
-
-		s_teleporter = CreateTeleporter(space);
-		s_player = CreatePlayer(space);
 
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
 		game_input.ShowCursor(true)
@@ -535,17 +542,5 @@ namespace lux
 		}
 
 		s_listener->setPosition(sf::Vector3(player_tile->Coordinate.x, player_tile->Coordinate.y, 0.0f));
-	}
-
-	void LuxportGame::RenderUpdate(const dd::GameUpdateData& update_data)
-	{
-
-	}
-
-	static std::vector<ddc::EntitySpace*> s_spaces;
-
-	const std::vector<ddc::EntitySpace*>& LuxportGame::GetEntitySpaces() const
-	{
-		return s_spaces;
 	}
 }

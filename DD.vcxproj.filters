@@ -115,6 +115,12 @@
     <Filter Include="Games\Neutrino">
       <UniqueIdentifier>{f1d03ad5-bd78-497a-8b18-658df003f9e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\d2d">
+      <UniqueIdentifier>{f817f31e-77d0-4376-a44d-aa0f67ce28c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\StressTest">
+      <UniqueIdentifier>{a0bb3619-55c3-4da2-9d50-a761aaadd759}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -711,9 +717,6 @@
     <ClInclude Include="src\lux\LuxLightComponent.h">
       <Filter>Games\Lux</Filter>
     </ClInclude>
-    <ClInclude Include="src\d2d\CirclePhysicsComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="src\d2d\SpriteAnimationComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -725,9 +728,6 @@
     </ClInclude>
     <ClInclude Include="src\d2d\Physics2DSystem.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d2d\BoxPhysicsComponent.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\neutrino\TerrainChunk.h">
       <Filter>Terrain</Filter>
@@ -749,6 +749,15 @@
     </ClInclude>
     <ClInclude Include="src\d2d\SpriteTileSystem.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\BoxPhysicsComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\CirclePhysicsComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stress\StressTestGame.h">
+      <Filter>Games\StressTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1322,6 +1331,21 @@
     </ClCompile>
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\CirclePhysicsComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\LuxLightComponent.cpp">
+      <Filter>Games\Lux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stress\StressTestGame.cpp">
+      <Filter>Games\StressTest</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stress\Renderer.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

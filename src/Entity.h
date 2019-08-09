@@ -34,6 +34,8 @@ namespace ddc
 		template <typename TComponent> TComponent& Add() const;
 		template <typename TComponent> void Remove() const;
 
+		static const uint64 INVALID_HANDLE = 0xFFFFFFFF;
+
 		union
 		{
 			struct
@@ -43,7 +45,7 @@ namespace ddc
 				uint64 m_space : 4;
 			};
 
-			uint64 Handle { ~0u };
+			uint64 Handle { INVALID_HANDLE };
 		};
 
 	private:

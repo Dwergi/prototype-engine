@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "neutrino/SwarmAgentComponent.h"
 
-DD_TYPE_CPP( neut::SwarmAgentComponent );
+DD_COMPONENT_CPP( neut::SwarmAgentComponent );

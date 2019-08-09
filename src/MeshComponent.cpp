@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "MeshComponent.h"
 
-DD_TYPE_CPP( dd::MeshComponent );
+DD_COMPONENT_CPP( dd::MeshComponent );

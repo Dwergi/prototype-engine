@@ -133,10 +133,7 @@ namespace dd
 			ImGui::EndMainMenuBar();
 		}
 
-		if (dd::Profiler::ShouldDraw())
-		{
-			dd::Profiler::Draw();
-		}
+		dd::Profiler::Draw();
 
 		for (IDebugPanel* panel : m_debugPanels)
 		{
