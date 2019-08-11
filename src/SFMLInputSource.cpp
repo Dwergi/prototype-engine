@@ -1,7 +1,7 @@
 //
-// Input.cpp - Wrappers around GLFW input functions.
+// SFMLInputSource.cpp
 // Copyright (C) Sebastian Nordgren 
-// August 6th 2015
+// August 2nd 2018
 //
 
 #include "PCH.h"

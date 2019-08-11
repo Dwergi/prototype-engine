@@ -24,8 +24,7 @@ namespace dd
 		{
 		}
 
-		void DrawDebugPanel( ddc::EntitySpace& entities );
-		void AddToMenu();
+		void DrawDebugPanel();
 
 		//
 		// Is this debug menu open?
@@ -50,7 +49,7 @@ namespace dd
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().
 		//
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) = 0;
+		virtual void DrawDebugInternal() = 0;
 	};
 }
 

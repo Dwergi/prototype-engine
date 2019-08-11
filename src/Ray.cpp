@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "Ray.h"
 
-DD_TYPE_CPP( ddm::Ray );
+DD_CLASS_CPP( ddm::Ray );
 
 namespace ddm
 {

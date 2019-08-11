@@ -36,8 +36,8 @@
 #include "IWindow.h"
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
-#include "SystemManager.h"
-#include "WorldRenderer.h"
+#include "SystemsManager.h"
+#include "RenderManager.h"
 
 #include <filesystem>
 #include <nlohmann/json.hpp>
@@ -53,19 +53,12 @@ static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IInputSource> s_inputSource;
 static dd::Service<dd::DebugUI> s_debugUI;
-static dd::Service<ddr::WorldRenderer> s_renderer;
+static dd::Service<ddr::RenderManager> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
-static dd::Service<ddc::SystemManager> s_systemManager;
+static dd::Service<ddc::SystemsManager> s_systemsManager;
 
 static ddc::EntitySpace* g_tempSpace;
-
-// Profiler values
-static dd::ProfilerValue& s_entityUpdateProfiler = dd::Profiler::GetValue("Entity Update");
-static dd::ProfilerValue& s_systemsUpdateProfiler = dd::Profiler::GetValue("Systems Update");
-static dd::ProfilerValue& s_gameUpdateProfiler = dd::Profiler::GetValue("Game Update");
-static dd::ProfilerValue& s_gameRenderUpdateProfiler = dd::Profiler::GetValue("Game Render Update");
-static dd::ProfilerValue& s_renderProfiler = dd::Profiler::GetValue("Render");
 
 std::thread::id g_mainThread;
 
@@ -132,6 +125,8 @@ static void UpdateAssetManagers()
 	s_entityProtoManager->Update();
 }
 
+static dd::Timer s_profilerTimer;
+
 static void StartFrame()
 {
 	dd::Profiler::BeginFrame();
@@ -153,6 +148,16 @@ static void EndFrame()
 
 	dd::Profiler::EndFrame();
 }
+
+
+// Profiler values
+static dd::ProfilerValue& s_startFrameProfiler = dd::Profiler::GetValue("Start Frame");
+static dd::ProfilerValue& s_entityUpdateProfiler = dd::Profiler::GetValue("Entity Update");
+static dd::ProfilerValue& s_systemsUpdateProfiler = dd::Profiler::GetValue("Systems Update");
+static dd::ProfilerValue& s_gameUpdateProfiler = dd::Profiler::GetValue("Game Update");
+static dd::ProfilerValue& s_renderProfiler = dd::Profiler::GetValue("Render");
+static dd::ProfilerValue& s_debugUIProfiler = dd::Profiler::GetValue("Debug UI");
+static dd::ProfilerValue& s_endFrameProfiler = dd::Profiler::GetValue("End Frame");
 
 static int GameMain()
 {
@@ -189,9 +194,9 @@ static int GameMain()
 
 		dd::Services::Register(new dd::DebugUI());
 
-		dd::Services::Register(new ddc::SystemManager());
+		dd::Services::Register(new ddc::SystemsManager());
 
-		dd::Services::Register(new ddr::WorldRenderer());
+		dd::Services::Register(new ddr::RenderManager());
 
 		dd::Services::Register(new dd::FrameTimer());
 		s_frameTimer->SetMaxFPS(60);
@@ -200,7 +205,7 @@ static int GameMain()
 
 		s_debugUI->RegisterDebugPanel(*s_frameTimer);
 		s_debugUI->RegisterDebugPanel(*s_renderer);
-		s_debugUI->RegisterDebugPanel(*s_systemManager);
+		s_debugUI->RegisterDebugPanel(*s_systemsManager);
 		s_debugUI->RegisterDebugPanel(entity_visualizer);
 
 		CreateAssetManagers();
@@ -209,14 +214,14 @@ static int GameMain()
 
 		{
 			s_game->Initialize();
-			s_game->RegisterSystems(*s_systemManager);
+			s_game->RegisterSystems(*s_systemsManager);
 			s_game->RegisterRenderers(*s_renderer);
 			s_game->CreateEntitySpaces(entity_spaces);
 
 			for (ddc::EntitySpace* space : entity_spaces)
 			{
-				s_systemManager->Initialize(*space);
-				s_renderer->InitializeRenderers(*space);
+				s_systemsManager->Initialize(*space);
+				s_renderer->Initialize(*space);
 			}
 		}
 
@@ -224,62 +229,98 @@ static int GameMain()
 		dd::InitializeAssert();
 		ShowSystemConsole(false);
 
-		dd::Timer profiler_timer;
-
 		while (!s_window->IsClosing())
 		{
 			DD_PROFILE_SCOPED(Frame);
 
-			StartFrame();
+			{
+				DD_TODO("Should make a scoped profile timer.");
+				s_profilerTimer.Start();
+
+				StartFrame();
+
+				float time = s_profilerTimer.Stop();
+				s_startFrameProfiler.SetValue(time);
+			}
 
 			UpdateAssetManagers();
 
 			{
 				{
-					profiler_timer.Start();
+					s_profilerTimer.Start();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						space->Update(s_frameTimer->GameDelta());
 					}
-					s_entityUpdateProfiler.SetValue(profiler_timer.Stop());
+					float time = s_profilerTimer.Stop();
+					s_entityUpdateProfiler.SetValue(time);
 				}
 
 				{
-					profiler_timer.Start();
+					s_profilerTimer.Start();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
-						s_systemManager->Update(*space, s_frameTimer->GameDelta());
+						s_systemsManager->Update(*space, s_frameTimer->GameDelta());
 					}
-					s_systemsUpdateProfiler.SetValue(profiler_timer.Stop());
+					float time = s_profilerTimer.Stop();
+					s_systemsUpdateProfiler.SetValue(time);
 				}
 
 				{
-					profiler_timer.Start();
+					s_profilerTimer.Start();
+
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						dd::GameUpdateData update_data(*space, *s_input, s_frameTimer->GameDelta());
 						s_game->Update(update_data);
 					}
-					s_gameUpdateProfiler.SetValue(profiler_timer.Stop());
+					float time = s_profilerTimer.Stop();
+					s_gameUpdateProfiler.SetValue(time);
 				}
 
 				{
-					profiler_timer.Start();
+					s_profilerTimer.Start();
+
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
-						DD_TODO("Camera can't currently be relocated, which is bad. Should game be providing the camera?");
-						ddr::ICamera* camera = nullptr; // = ???
-						s_renderer->Render(*space, *camera, s_frameTimer->GameDelta());
+						s_renderer->Render(*space, s_game->GetCamera(), s_frameTimer->GameDelta());
 					}
-					s_renderProfiler.SetValue(profiler_timer.Stop());
+					float time = s_profilerTimer.Stop();
+					s_renderProfiler.SetValue(time);
 				}
 			}
 
-			s_frameTimer->DrawFPSCounter();
-			s_debugUI->RenderDebugPanels(*g_tempSpace);
+			{
+				s_profilerTimer.Start();
 
-			EndFrame();
+				s_frameTimer->DrawFPSCounter();
+				s_debugUI->RenderDebugPanels();
+
+				float time = s_profilerTimer.Stop();
+				s_debugUIProfiler.SetValue(time);
+			}
+
+			{
+				s_profilerTimer.Start();
+
+				EndFrame();
+
+				float time = s_profilerTimer.Stop();
+				s_endFrameProfiler.SetValue(time);
+			}
 		}
+
+		for (ddc::EntitySpace* space : entity_spaces)
+		{
+			s_systemsManager->Shutdown(*space);
+
+			delete space;
+		}
+
+		entity_spaces.clear();
+
+		s_renderer->Shutdown();
+		s_game->Shutdown();
 	}
 
 	dd::Services::UnregisterAll();

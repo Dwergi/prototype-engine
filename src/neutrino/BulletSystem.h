@@ -50,6 +50,6 @@ namespace neut
 		void KillBullet( ddc::EntitySpace& entities, ddc::Entity entity, neut::BulletComponent& bullet );
 		bool HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateDataBuffer& meshes, float delta_t, glm::vec3& out_pos );
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }

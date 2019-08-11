@@ -188,7 +188,7 @@ namespace dd
 		}
 	}
 
-	void ParticleSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void ParticleSystem::DrawDebugInternal()
 	{
 		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES );
 

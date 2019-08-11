@@ -17,16 +17,16 @@ namespace ddc
 	{
 		System(const char* name);
 
-		virtual void Initialize(EntitySpace& space) {}
-		virtual void Update(const UpdateData& update_data) = 0;
-		virtual void Shutdown(EntitySpace& space) {}
+		virtual void Initialize(ddc::EntitySpace& space) {}
+		virtual void Update(const ddc::UpdateData& update_data) = 0;
+		virtual void Shutdown(ddc::EntitySpace& space) {}
 
 		//
 		// Allow the system to be updated for the given space. May be called multiple times. 
 		// If never called, then system will allow all spaces.
 		//
-		void EnableForSpace(const EntitySpace& space);
-		bool IsEnabledForSpace(const EntitySpace& space) const;
+		void EnableForSpace(const ddc::EntitySpace& space);
+		bool IsEnabledForSpace(const ddc::EntitySpace& space) const;
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
@@ -93,6 +93,8 @@ namespace ddc
 
 		dd::Vector<const System*> m_dependencies;
 		dd::String32 m_name;
+
+		std::vector<const ddc::EntitySpace*> m_spaces;
 
 		const static int MAX_PARTITIONS = 8;
 		int m_partitions { MAX_PARTITIONS };

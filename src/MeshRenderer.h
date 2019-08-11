@@ -46,7 +46,7 @@ namespace ddr
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data );
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }
 	};
 }

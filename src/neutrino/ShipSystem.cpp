@@ -179,7 +179,7 @@ namespace neut
 	{
 	}
 
-	void ShipSystem::DrawDebugInternal(ddc::EntitySpace& entities)
+	void ShipSystem::DrawDebugInternal()
 	{
 		if (m_lastShip.IsValid())
 		{

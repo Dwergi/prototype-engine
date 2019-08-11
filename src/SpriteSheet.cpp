@@ -3,7 +3,7 @@
 
 #include <fmt/format.h>
 
-DD_TYPE_CPP(ddr::SpriteSheet);
+DD_CLASS_CPP(ddr::SpriteSheet);
 DD_POD_CPP(ddr::SpriteSheetHandle);
 
 namespace ddr

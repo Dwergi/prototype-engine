@@ -32,8 +32,8 @@ void test_int_prop( dd::Property* int_prop )
 	REQUIRE( i == 20 );
 }
 
-DD_TYPE_CPP( Test::SimpleStruct );
-DD_TYPE_CPP( Test::NestedStruct );
+DD_CLASS_CPP( Test::SimpleStruct );
+DD_CLASS_CPP( Test::NestedStruct );
 
 TEST_CASE( "[Property] Integer properties" )
 {

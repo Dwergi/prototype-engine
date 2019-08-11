@@ -1,3 +1,9 @@
+//
+// SFMLInputSource.h
+// Copyright (C) Sebastian Nordgren 
+// August 2nd 2018
+//
+
 #pragma once
 
 #include "IInputSource.h"

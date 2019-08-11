@@ -327,7 +327,7 @@ namespace dd
 		}
 	}
 
-	void PhysicsSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void PhysicsSystem::DrawDebugInternal()
 	{
 		ImGui::DragFloat3( "Gravity", glm::value_ptr( m_gravity ) );
 	}

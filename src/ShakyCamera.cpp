@@ -74,7 +74,7 @@ namespace dd
 		m_trauma = glm::clamp( m_trauma, 0.0f, 1.0f );
 	}
 
-	void ShakyCamera::DrawDebugInternal( ddc::EntitySpace& entities )
+	void ShakyCamera::DrawDebugInternal()
 	{
 		ImGui::ProgressBar( m_trauma );
 		ImGui::DragFloat( "Decay Rate", &ShakyCamera::TraumaDecayRate, 0.01f, 0.0f, 1.0f );

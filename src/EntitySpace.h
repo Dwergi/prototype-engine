@@ -5,7 +5,7 @@
 
 namespace ddc
 {
-	static const int MAX_COMPONENTS = 256;
+	static const int MAX_COMPONENTS = 64;
 	static const int MAX_TAGS = 32;
 
 	typedef std::bitset<MAX_TAGS> TagBits;
@@ -56,6 +56,16 @@ namespace ddc
 
 		uint LiveCount() const { return (uint) (m_entities.size() - m_free.size()); }
 		uint Size() const { return (uint) m_entities.size(); }
+		 
+		//
+		// Get the number of components the entity has.
+		//
+		int ComponentCount(Entity entity) const;
+
+		//
+		// Get the component ID of the Nth component in the entity.
+		//
+		dd::ComponentID GetNthComponentID(Entity entity, int index) const;
 
 		//
 		// Access a component from the given entity by type ID.

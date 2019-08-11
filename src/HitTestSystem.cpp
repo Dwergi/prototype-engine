@@ -161,7 +161,7 @@ namespace dd
 		}
 	}
 
-	void HitTestSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void HitTestSystem::DrawDebugInternal()
 	{
 		ImGui::SliderInt( "Hit Tests", &m_hitTests, 0, MAX_HITS / 2 );
 

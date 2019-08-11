@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "SystemManager.h"
+#include "SystemsManager.h"
 
 #include "JobSystem.h"
 #include "System.h"
@@ -29,7 +29,7 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::Initialize(EntitySpace& space)
+	void SystemsManager::Initialize(EntitySpace& space)
 	{
 		for (System* system : m_systems)
 		{
@@ -42,7 +42,7 @@ namespace ddc
 		ddc::OrderSystemsByDependencies(dd::Span<System*>(m_systems), m_orderedSystems);
 	}
 
-	void SystemManager::Shutdown(EntitySpace& space)
+	void SystemsManager::Shutdown(EntitySpace& space)
 	{
 		for (System* system : m_systems)
 		{
@@ -53,7 +53,7 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::Update(EntitySpace& space, float delta_t)
+	void SystemsManager::Update(EntitySpace& space, float delta_t)
 	{
 		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
 
@@ -75,12 +75,12 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::Register(System& system)
+	void SystemsManager::Register(System& system)
 	{
 		m_systems.push_back(&system);
 	}
 
-	void SystemManager::UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t)
+	void SystemsManager::UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t)
 	{
 		DD_ASSERT(system != nullptr);
 
@@ -153,7 +153,7 @@ namespace ddc
 		return futures;
 	}
 
-	void SystemManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
+	void SystemsManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
 	{
 		for (SystemNode& s : m_orderedSystems)
 		{
@@ -204,7 +204,7 @@ namespace ddc
 		}
 	}
 
-	void SystemManager::DrawDebugInternal(ddc::EntitySpace& entities)
+	void SystemsManager::DrawDebugInternal(ddc::EntitySpace& entities)
 	{
 		ImGui::Checkbox("Systems Graph", &m_drawSystemsGraph);
 

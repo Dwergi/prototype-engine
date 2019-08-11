@@ -83,7 +83,7 @@ namespace neut
 
 		int m_activeCount { 0 };
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 
 		ddc::Entity CreateChunk( ddc::EntitySpace& entities, glm::vec2 pos, int lod );
 

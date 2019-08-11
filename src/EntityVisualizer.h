@@ -7,16 +7,22 @@
 #pragma once
 
 #include "IDebugPanel.h"
+#include "System.h"
 
 namespace dd
 {
-	struct EntityVisualizer : IDebugPanel
+	struct EntityVisualizer : IDebugPanel, ddc::System
 	{
 		EntityVisualizer();
+
+		// Inherited via System
+		virtual void Update(const ddc::UpdateData& update_data) override;
 
 		virtual const char* GetDebugTitle() const override { return "Entity Data"; }
 
 	private:
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
+
+		ddc::Entity m_selected;
 	};
 }

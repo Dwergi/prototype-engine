@@ -88,7 +88,7 @@ namespace dd
 		);
 	}
 
-	void DebugUI::RenderDebugPanels(ddc::EntitySpace& entities)
+	void DebugUI::RenderDebugPanels()
 	{
 		if (!m_draw)
 			return;
@@ -141,7 +141,7 @@ namespace dd
 			{
 				m_midWindow = true;
 
-				panel->DrawDebugPanel(entities);
+				panel->DrawDebugPanel();
 
 				m_midWindow = false;
 			}

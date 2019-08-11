@@ -16,12 +16,21 @@ namespace ddc
 
 	void System::EnableForSpace(const ddc::EntitySpace& space)
 	{
+		if (!IsEnabledForSpace(space))
+		{
+			m_spaces.push_back(&space);
+		}
 	}
 
 	bool System::IsEnabledForSpace(const ddc::EntitySpace& space) const
 	{
-		DD_TODO("Think about this space enabling thing...");
-		return true;
+		if (m_spaces.empty())
+		{
+			return true;
+		}
+
+		auto it = std::find(m_spaces.begin(), m_spaces.end(), &space);
+		return it != m_spaces.end();
 	}
 
 	bool System::CheckDuplicates( const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality, const char* name ) const

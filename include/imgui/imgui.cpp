@@ -469,7 +469,7 @@ CODE
  - 2017/08/15 (1.51) - marked the weird IMGUI_ONCE_UPON_A_FRAME helper macro as obsolete. prefer using the more explicit ImGuiOnceUponAFrame type.
  - 2017/08/15 (1.51) - changed parameter order for BeginPopupContextWindow() from (const char*,int buttons,bool also_over_items) to (const char*,int buttons,bool also_over_items). Note that most calls relied on default parameters completely.
  - 2017/08/13 (1.51) - renamed ImGuiCol_Column to ImGuiCol_Separator, ImGuiCol_ColumnHovered to ImGuiCol_SeparatorHovered, ImGuiCol_ColumnActive to ImGuiCol_SeparatorActive. Kept redirection enums (will obsolete).
- - 2017/08/11 (1.51) - renamed ImGuiCond_Always to ImGuiCond_Always, ImGuiCond_Once to ImGuiCond_Once, ImGuiCond_FirstUseEver to ImGuiCond_FirstUseEver, ImGuiCond_Appearing to ImGuiCond_Appearing. Kept redirection enums (will obsolete).
+ - 2017/08/11 (1.51) - renamed ImGuiCond_Always to ImGuiCond_Always, ImGuiCond_Once to ImGuiCond_Once, ImGuiCond_Once to ImGuiCond_Once, ImGuiCond_Appearing to ImGuiCond_Appearing. Kept redirection enums (will obsolete).
  - 2017/08/09 (1.51) - removed ValueColor() helpers, they are equivalent to calling Text(label) + SameLine() + ColorButton().
  - 2017/08/08 (1.51) - removed ColorEditMode() and ImGuiColorEditMode in favor of ImGuiColorEditFlags and parameters to the various Color*() functions. The SetColorEditOptions() allows to initialize default but the user can still change them with right-click context menu.
                      - changed prototype of 'ColorEdit4(const char* label, float col[4], bool show_alpha = true)' to 'ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flags = 0)', where passing flags = 0x01 is a safe no-op (hello dodgy backward compatibility!). - check and run the demo window, under "Color/Picker Widgets", to understand the various new options.
@@ -2695,7 +2695,7 @@ ImGuiWindow::ImGuiWindow(ImGuiContext* context, const char* name)
     AutoFitChildAxises = 0x00;
     AutoPosLastDirection = ImGuiDir_None;
     HiddenFramesCanSkipItems = HiddenFramesCannotSkipItems = 0;
-    SetWindowPosAllowFlags = SetWindowSizeAllowFlags = SetWindowCollapsedAllowFlags = ImGuiCond_Always | ImGuiCond_Once | ImGuiCond_FirstUseEver | ImGuiCond_Appearing;
+    SetWindowPosAllowFlags = SetWindowSizeAllowFlags = SetWindowCollapsedAllowFlags = ImGuiCond_Always | ImGuiCond_Once | ImGuiCond_Once | ImGuiCond_Appearing;
     SetWindowPosVal = SetWindowPosPivot = ImVec2(FLT_MAX, FLT_MAX);
 
     LastFrameActive = -1;
@@ -3841,7 +3841,7 @@ void ImGui::NewFrame()
     // Create implicit/fallback window - which we will only render it if the user has added something to it.
     // We don't use "Debug" to avoid colliding with user trying to create a "Debug" window with custom flags.
     // This fallback is particularly important as it avoid ImGui:: calls from crashing.
-    SetNextWindowSize(ImVec2(400,400), ImGuiCond_FirstUseEver);
+    SetNextWindowSize(ImVec2(400,400), ImGuiCond_Once);
     Begin("Debug##Default");
     g.FrameScopePushedImplicitWindow = true;
 
@@ -4826,7 +4826,7 @@ static ImGuiWindow* CreateNewWindow(const char* name, ImVec2 size, ImGuiWindowFl
         {
             // Retrieve settings from .ini file
             window->SettingsIdx = g.SettingsWindows.index_from_ptr(settings);
-            SetWindowConditionAllowFlags(window, ImGuiCond_FirstUseEver, false);
+            SetWindowConditionAllowFlags(window, ImGuiCond_Once, false);
             window->Pos = ImFloor(settings->Pos);
             window->Collapsed = settings->Collapsed;
             if (ImLengthSqr(settings->Size) > 0.00001f)
@@ -5430,7 +5430,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
             // FIXME: Look into removing the branch so everything can go through this same code path for consistency.
             window->SetWindowPosVal = g.NextWindowData.PosVal;
             window->SetWindowPosPivot = g.NextWindowData.PosPivotVal;
-            window->SetWindowPosAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_FirstUseEver | ImGuiCond_Appearing);
+            window->SetWindowPosAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_Once | ImGuiCond_Appearing);
         }
         else
         {
@@ -5944,7 +5944,7 @@ bool ImGui::Begin(const char* name, bool* p_open, const ImVec2& size_first_use, 
 {
     // Old API feature: we could pass the initial window size as a parameter. This was misleading because it only had an effect if the window didn't have data in the .ini file.
     if (size_first_use.x != 0.0f || size_first_use.y != 0.0f)
-        SetNextWindowSize(size_first_use, ImGuiCond_FirstUseEver);
+        SetNextWindowSize(size_first_use, ImGuiCond_Once);
 
     // Old API feature: override the window background alpha with a parameter.
     if (bg_alpha_override >= 0.0f)
@@ -6544,7 +6544,7 @@ void ImGui::SetWindowPos(ImGuiWindow* window, const ImVec2& pos, ImGuiCond cond)
         return;
 
     IM_ASSERT(cond == 0 || ImIsPowerOfTwo(cond)); // Make sure the user doesn't attempt to combine multiple condition flags.
-    window->SetWindowPosAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_FirstUseEver | ImGuiCond_Appearing);
+    window->SetWindowPosAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_Once | ImGuiCond_Appearing);
     window->SetWindowPosVal = ImVec2(FLT_MAX, FLT_MAX);
 
     // Set
@@ -6581,7 +6581,7 @@ void ImGui::SetWindowSize(ImGuiWindow* window, const ImVec2& size, ImGuiCond con
         return;
 
     IM_ASSERT(cond == 0 || ImIsPowerOfTwo(cond)); // Make sure the user doesn't attempt to combine multiple condition flags.
-    window->SetWindowSizeAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_FirstUseEver | ImGuiCond_Appearing);
+    window->SetWindowSizeAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_Once | ImGuiCond_Appearing);
 
     // Set
     if (size.x > 0.0f)
@@ -6622,7 +6622,7 @@ void ImGui::SetWindowCollapsed(ImGuiWindow* window, bool collapsed, ImGuiCond co
     // Test condition (NB: bit 0 is always true) and clear flags for next time
     if (cond && (window->SetWindowCollapsedAllowFlags & cond) == 0)
         return;
-    window->SetWindowCollapsedAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_FirstUseEver | ImGuiCond_Appearing);
+    window->SetWindowCollapsedAllowFlags &= ~(ImGuiCond_Once | ImGuiCond_Once | ImGuiCond_Appearing);
 
     // Set
     window->Collapsed = collapsed;

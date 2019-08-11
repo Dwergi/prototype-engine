@@ -112,15 +112,15 @@ namespace ddr
 		}
 	}
 
-	void LightRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
+	void LightRenderer::DrawDebugInternal()
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 400 ), ImGuiCond_FirstUseEver );
 
 		for( size_t i = 0; i < m_debugLights.size(); ++i )
 		{
 			ddc::Entity entity = m_debugLights[i];
-			dd::LightComponent* light = entities.Access<dd::LightComponent>( entity );
-			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
+			dd::LightComponent* light = entity.Access<dd::LightComponent>();
+			dd::TransformComponent* transform = entity.Access<dd::TransformComponent>();
 
 			if( light == nullptr )
 				continue;

@@ -8,7 +8,7 @@ namespace ddc
 	struct System;
 	struct SystemNode;
 
-	struct SystemManager : dd::IDebugPanel
+	struct SystemsManager : dd::IDebugPanel
 	{
 		//
 		// Initialize all currently registered systems.

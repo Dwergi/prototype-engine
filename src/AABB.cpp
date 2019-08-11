@@ -10,7 +10,7 @@
 #include "Sphere.h"
 #include "Ray.h"
 
-DD_TYPE_CPP( ddm::AABB );
+DD_CLASS_CPP( ddm::AABB );
 
 namespace ddm
 {

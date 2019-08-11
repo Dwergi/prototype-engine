@@ -71,7 +71,7 @@ namespace neut
 		m_wireframe->UpdateUniforms( data.Uniforms() );
 	}
 
-	void TerrainRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
+	void TerrainRenderer::DrawDebugInternal()
 	{
 		ImGui::Checkbox( "Enabled", &m_wireframe->Enabled );
 

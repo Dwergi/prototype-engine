@@ -1,11 +1,11 @@
 //
-// WorldRenderer.cpp - Master renderer class, coordinates all rendering.
+// RenderManager.cpp - Master renderer class, coordinates all rendering.
 // Copyright (C) Sebastian Nordgren 
 // April 14th 2016
 //
 
 #include "PCH.h"
-#include "WorldRenderer.h"
+#include "RenderManager.h"
 
 #include "AABB.h"
 #include "GLError.h"
@@ -46,7 +46,7 @@ namespace ddr
 
 	Fog s_fog;
 
-	WorldRenderer::WorldRenderer()
+	RenderManager::RenderManager()
 	{
 		DD_TODO("Rename this");
 		m_defaultState.Blending = false;
@@ -58,11 +58,11 @@ namespace ddr
 		m_depthState.Depth = false;
 	}
 
-	WorldRenderer::~WorldRenderer()
+	RenderManager::~RenderManager()
 	{
 	}
 
-	void WorldRenderer::InitializeRenderers(ddc::EntitySpace& entities)
+	void RenderManager::Initialize(ddc::EntitySpace& entities)
 	{
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
@@ -73,12 +73,20 @@ namespace ddr
 		}
 	}
 
-	void WorldRenderer::Register(ddr::Renderer& renderer)
+	void RenderManager::Shutdown()
+	{
+		for (ddr::Renderer* current : m_renderers)
+		{
+			current->RenderShutdown();
+		}
+	}
+
+	void RenderManager::Register(ddr::Renderer& renderer)
 	{
 		m_renderers.push_back(&renderer);
 	}
 
-	void WorldRenderer::CreateFrameBuffer(glm::ivec2 size)
+	void RenderManager::CreateFrameBuffer(glm::ivec2 size)
 	{
 		m_colourTexture.Initialize(size, GL_SRGB8_ALPHA8, 1);
 		m_colourTexture.Create();
@@ -92,7 +100,7 @@ namespace ddr
 		m_framebuffer.RenderInit();
 	}
 
-	void WorldRenderer::DrawDebugInternal(ddc::EntitySpace& entities)
+	void RenderManager::DrawDebugInternal()
 	{
 		ImGui::Checkbox("Draw Depth", &m_debugDrawDepth);
 		ImGui::Checkbox("Draw Normals", &m_debugDrawNormals);
@@ -112,7 +120,7 @@ namespace ddr
 		}
 	}
 
-	void WorldRenderer::RenderDebug(const ddr::RenderData& data, ddr::Renderer& debug_render)
+	void RenderManager::RenderDebug(const ddr::RenderData& data, ddr::Renderer& debug_render)
 	{
 		m_framebuffer.BindDraw();
 
@@ -121,7 +129,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void WorldRenderer::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
+	void RenderManager::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -147,7 +155,7 @@ namespace ddr
 		fn(renderer, data);
 	}
 
-	void WorldRenderer::Render(ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
+	void RenderManager::Render(ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
@@ -198,7 +206,7 @@ namespace ddr
 		EndRender(m_uniforms, camera);
 	}
 
-	void WorldRenderer::BeginRender(const ddc::EntitySpace& space, const ddr::ICamera& camera)
+	void RenderManager::BeginRender(const ddc::EntitySpace& space, const ddr::ICamera& camera)
 	{
 		if (m_reloadShaders)
 		{
@@ -239,7 +247,7 @@ namespace ddr
 		m_uniforms.Set("Time", m_time);
 	}
 
-	void WorldRenderer::EndRender(ddr::UniformStorage& uniforms, const ddr::ICamera& camera)
+	void RenderManager::EndRender(ddr::UniformStorage& uniforms, const ddr::ICamera& camera)
 	{
 		m_framebuffer.BindRead();
 

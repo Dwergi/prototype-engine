@@ -125,39 +125,47 @@ namespace dd
 	
 	static dd::Service<dd::Input> s_input;
 
-	EntityVisualizer::EntityVisualizer()
+	EntityVisualizer::EntityVisualizer() : 
+		ddc::System("Entity Visualizer")
 	{
 		s_input->AddHandler(InputAction::TOGGLE_ENTITY_DATA, InputType::Release, 
 			[this]()
 			{
 				SetDebugPanelOpen(!IsDebugPanelOpen());
 			});
+
+		RequireTag(ddc::Tag::Selected);
 	}
 
-	void EntityVisualizer::DrawDebugInternal( ddc::EntitySpace& space )
+	void EntityVisualizer::Update(const ddc::UpdateData& update_data)
+	{
+		if (!update_data.Data().Entities().empty())
+		{
+			m_selected = update_data.Data().Entities()[0];
+		}
+	}
+
+	void EntityVisualizer::DrawDebugInternal()
 	{
 		ImGui::SetWindowSize( ImVec2( 300, 500 ), ImGuiCond_Once );
 
-		dd::Array<dd::ComponentID, 1> components;
-		ddc::TagBits tags;
-		tags.set( (int) ddc::Tag::Selected, true );
-
-		std::vector<ddc::Entity> entities;
-		space.FindAllWith( components, tags, entities );
-
-		if( entities.size() > 0 )
+		if( m_selected.IsValid() )
 		{
-			ddc::Entity entity = entities.front();
+			ImGui::Text("Entity - ID: %d, Version: %d", m_selected.ID, m_selected.Version);
+			ImGui::Text("Components: %d", m_selected.Components());
 
-			for( dd::ComponentID id = 0; id < ddc::MAX_COMPONENTS; ++id )
+			const ddc::EntitySpace* space = m_selected.Space();
+
+			for( int i = 0; i < m_selected.Components(); ++i )
 			{
-				void* cmp_data = space.AccessComponent( entity, id );
-				if( cmp_data != nullptr )
-				{
-					const dd::TypeInfo* typeInfo = dd::TypeInfo::GetComponent( id );
+				dd::ComponentID cmp_id = space->GetNthComponentID(m_selected, i);
 
-					AddClass( typeInfo->Name(), Variable( typeInfo, cmp_data ) );
-				}
+				void* cmp_data = space->AccessComponent(m_selected, cmp_id);
+				DD_ASSERT(cmp_data != nullptr);
+
+				const dd::TypeInfo* typeInfo = dd::TypeInfo::GetComponent(cmp_id);
+
+				AddClass( typeInfo->Name(), Variable( typeInfo, cmp_data ) );
 			}
 		}
 	}

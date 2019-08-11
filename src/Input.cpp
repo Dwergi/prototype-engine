@@ -55,6 +55,12 @@ namespace dd
 
 			source->UpdateInput();
 
+			if (source->GotMouseInput())
+			{
+				m_mousePosition = source->GetMousePosition();
+				m_mouseScroll = source->GetMouseScroll();
+			}
+
 			source->GetEvents(input_events);
 
 			for (const InputEvent& evt : input_events)
@@ -87,14 +93,12 @@ namespace dd
 
 	MousePosition Input::GetMousePosition() const
 	{
-		DD_TODO("Maybe just cache last mouse position?");
-		return m_sources[0]->GetMousePosition();
+		return m_mousePosition;
 	}
 
 	MousePosition Input::GetMouseScroll() const
 	{
-		DD_TODO("Maybe just cache last mouse position?");
-		return m_sources[0]->GetMousePosition();
+		return m_mouseScroll;
 	}
 
 	bool Input::GotInput(dd::InputAction action) const

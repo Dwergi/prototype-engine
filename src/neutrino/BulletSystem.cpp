@@ -232,7 +232,7 @@ namespace neut
 		}
 	}
 
-	void BulletSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void BulletSystem::DrawDebugInternal()
 	{
 		ImGui::SetWindowSize( ImVec2( 200, 300 ), ImGuiCond_FirstUseEver );
 

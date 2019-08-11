@@ -149,7 +149,7 @@ namespace ddr
 		cmd->Transform = transform_cmp.Transform();
 	}
 
-	void MeshRenderer::DrawDebugInternal( ddc::EntitySpace& entities )
+	void MeshRenderer::DrawDebugInternal()
 	{
 		ImGui::Value( "Meshes", m_meshCount );
 		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );

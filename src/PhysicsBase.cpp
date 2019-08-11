@@ -7,4 +7,4 @@
 #include "PCH.h"
 #include "PhysicsBase.h"
 
-DD_TYPE_CPP( dd::PhysicsBase );
+DD_CLASS_CPP( dd::PhysicsBase );

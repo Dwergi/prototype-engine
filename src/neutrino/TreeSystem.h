@@ -22,6 +22,6 @@ namespace neut
 
 	private:
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities );
+		virtual void DrawDebugInternal();
 	};
 }

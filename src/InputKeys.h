@@ -1,3 +1,9 @@
+//
+// InputKeys.h
+// Copyright (C) Sebastian Nordgren 
+// August 2nd 2018
+//
+
 #pragma once
 
 #include "EnumFlags.h"
@@ -75,7 +81,7 @@ namespace dd
 		LCTRL = 341,
 		LALT = 342,
 
-		LAST_KEY = 511,
+		KB_LAST = 511,
 		MOUSE_LEFT = 512,
 		MOUSE_RIGHT,
 		MOUSE_MIDDLE,

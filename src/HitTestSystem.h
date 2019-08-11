@@ -47,6 +47,6 @@ namespace dd
 
 		// Inherited via IDebugPanel
 		virtual const char* GetDebugTitle() const override { return "Hit Testing"; }
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }

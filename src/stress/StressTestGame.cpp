@@ -20,7 +20,7 @@
 #include "RayRenderer.h"
 #include "TestEntities.h"
 #include "IWindow.h"
-#include "WorldRenderer.h"
+#include "RenderManager.h"
 
 #include "ColourComponent.h"
 #include "FPSCameraComponent.h"
@@ -37,6 +37,8 @@ namespace stress
 	static dd::InputKeyBindings* s_keybindings;
 
 	static ddr::MeshHandle s_unitCube;
+
+	static ddc::Entity s_camera;
 
 	void StressTestGame::Initialize()
 	{
@@ -55,7 +57,7 @@ namespace stress
 		s_debugUI->RegisterDebugPanel(*this);
 	}
 
-	void StressTestGame::Shutdown(const dd::GameUpdateData& update_data)
+	void StressTestGame::Shutdown()
 	{
 
 	}
@@ -148,11 +150,15 @@ namespace stress
 	{
 		entity_spaces.push_back(new ddc::EntitySpace("game"));
 
-		ddc::Entity entity = entity_spaces[0]->CreateEntity<dd::TransformComponent, dd::FPSCameraComponent>();
+		s_camera = entity_spaces[0]->CreateEntity<dd::TransformComponent, dd::FPSCameraComponent>();
 
-		dd::FPSCameraComponent* camera = entity.Access<dd::FPSCameraComponent>();
+		dd::FPSCameraComponent* camera = s_camera.Access<dd::FPSCameraComponent>();
 		camera->SetWindowSize(s_window->GetSize());
 		camera->SetVerticalFOV(glm::radians(45.0f));
+
+		glm::vec3 cam_pos(MAX_POSITION, MAX_POSITION, MAX_POSITION);
+		camera->SetPosition(cam_pos);
+		camera->SetDirection(glm::vec3(0) - cam_pos);
 
 		dd::TestEntities::CreateAxes(*entity_spaces[0]);
 
@@ -172,13 +178,13 @@ namespace stress
 		}
 	}
 
-	void StressTestGame::DrawDebugInternal(ddc::EntitySpace& entities)
+	void StressTestGame::DrawDebugInternal()
 	{
 		ImGui::SliderInt("Entity Count", &m_entityCount, 0, 1024 * 1024);
 		ImGui::SliderInt("Create/Destroy Count", &m_createCount, 0, 1024 * 1024);
 	}
-
-	void StressTestGame::RegisterRenderers(ddr::WorldRenderer& renderer)
+	
+	void StressTestGame::RegisterRenderers(ddr::RenderManager& render_manager)
 	{
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
 		s_debugUI->RegisterDebugPanel(*light_renderer);
@@ -188,14 +194,20 @@ namespace stress
 
 		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 
-		renderer.Register(*light_renderer);
-		renderer.Register(*mesh_renderer);
-		renderer.Register(*ray_renderer);
+		render_manager.Register(*light_renderer);
+		render_manager.Register(*mesh_renderer);
+		render_manager.Register(*ray_renderer);
 	}
 
-	void StressTestGame::RegisterSystems(ddc::SystemManager& system_manager)
+	void StressTestGame::RegisterSystems(ddc::SystemsManager& system_manager)
 	{
 		dd::FreeCameraController& free_cam = dd::Services::Register(new dd::FreeCameraController());
 		s_debugUI->RegisterDebugPanel(free_cam);
+	}
+
+	ddr::ICamera& StressTestGame::GetCamera() const
+	{
+		DD_ASSERT(s_camera.IsAlive());
+		return *s_camera.Access<dd::FPSCameraComponent>();
 	}
 }

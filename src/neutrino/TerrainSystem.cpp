@@ -322,7 +322,7 @@ namespace neut
 		} );
 	}
 
-	void TerrainSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void TerrainSystem::DrawDebugInternal()
 	{
 		ImGui::Checkbox( "Enabled", &m_enabled );
 

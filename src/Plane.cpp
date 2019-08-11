@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "Plane.h"
 
-DD_TYPE_CPP( ddm::Plane );
+DD_CLASS_CPP( ddm::Plane );
 
 namespace ddm
 {

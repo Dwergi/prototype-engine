@@ -61,7 +61,7 @@
 
 #define DD_POD_CPP( TypeName ) static dd::PODRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 
-#define DD_TYPE_CPP( TypeName ) static dd::ClassRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
+#define DD_CLASS_CPP( TypeName ) static dd::ClassRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 
 #define DD_ENUM_CPP( TypeName ) static dd::EnumRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName ); \
 	template <> void dd::RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )

@@ -350,6 +350,7 @@
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
     <ClInclude Include="src\d2d\CirclePhysicsComponent.h" />
+    <ClInclude Include="src\d2d\Physics2DBase.h" />
     <ClInclude Include="src\d2d\Physics2DSystem.h" />
     <ClInclude Include="src\d2d\BoxPhysicsComponent.h" />
     <ClInclude Include="src\d2d\SpriteAnimationComponent.h" />
@@ -357,6 +358,9 @@
     <ClInclude Include="src\d2d\SpriteComponent.h" />
     <ClInclude Include="src\d2d\SpriteTileComponent.h" />
     <ClInclude Include="src\d2d\SpriteTileSystem.h" />
+    <ClInclude Include="src\d2d\Transform2DComponent.h" />
+    <ClInclude Include="src\ddm\AABB2D.h" />
+    <ClInclude Include="src\ddm\Circle.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\lux\LuxLightComponent.h" />
     <ClInclude Include="src\lux\LuxLightRenderer.h" />
@@ -494,10 +498,10 @@
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\RenderData.h" />
-    <ClInclude Include="src\SystemManager.h" />
+    <ClInclude Include="src\SystemsManager.h" />
     <ClInclude Include="src\TestEntities.h" />
     <ClInclude Include="src\Triangulator.h" />
-    <ClInclude Include="src\WorldRenderer.h" />
+    <ClInclude Include="src\RenderManager.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
     <ClInclude Include="src\ShaderPart.h" />
@@ -650,12 +654,16 @@
     <ClCompile Include="src\CommandBuffer.cpp" />
     <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp" />
     <ClCompile Include="src\d2d\CirclePhysicsComponent.cpp" />
+    <ClCompile Include="src\d2d\Physics2DBase.cpp" />
     <ClCompile Include="src\d2d\Physics2DSystem.cpp" />
     <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp" />
     <ClCompile Include="src\d2d\SpriteComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteTileComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp" />
+    <ClCompile Include="src\d2d\Transform2DComponent.cpp" />
+    <ClCompile Include="src\ddm\AABB2D.cpp" />
+    <ClCompile Include="src\ddm\Circle.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
@@ -767,7 +775,7 @@
     <ClCompile Include="src\stress\Renderer.cpp" />
     <ClCompile Include="src\stress\StressTestGame.cpp" />
     <ClCompile Include="src\System.cpp" />
-    <ClCompile Include="src\SystemManager.cpp" />
+    <ClCompile Include="src\SystemsManager.cpp" />
     <ClCompile Include="src\TestEntities.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -789,7 +797,7 @@
     </ClCompile>
     <ClCompile Include="src\Triangulator.cpp" />
     <ClCompile Include="src\UpdateDataBuffer.cpp" />
-    <ClCompile Include="src\WorldRenderer.cpp" />
+    <ClCompile Include="src\RenderManager.cpp" />
     <ClCompile Include="src\ShaderPart.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
@@ -857,6 +865,7 @@
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
     <ClCompile Include="src\EntitySpace.cpp" />
+    <None Include="cpp.hint" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
       <FileType>CppCode</FileType>

@@ -210,7 +210,7 @@ namespace ddr
 		m_vao.Unbind();
 	}
 
-	void BoundsRenderer::DrawDebugInternal(ddc::EntitySpace& entities)
+	void BoundsRenderer::DrawDebugInternal()
 	{
 		ImGui::SetWindowSize(ImVec2(200, 120), ImGuiCond_Once);
 

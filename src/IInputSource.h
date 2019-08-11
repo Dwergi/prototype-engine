@@ -19,6 +19,8 @@ namespace dd
 
 		void UpdateInput();
 
+		bool GotMouseInput() const { return m_gotMouseInput; }
+
 		IInputSource& SetMousePosition(glm::vec2 position);
 		MousePosition GetMousePosition() const { return m_mousePosition.Read(); }
 
@@ -47,6 +49,7 @@ namespace dd
 		DoubleBuffer<MousePosition> m_mousePosition;
 		DoubleBuffer<MousePosition> m_mouseScroll;
 
+		bool m_gotMouseInput { false };
 		bool m_mouseCaptured { false };
 		bool m_mouseRecenter { false };
 

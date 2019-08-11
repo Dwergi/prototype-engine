@@ -1,5 +1,5 @@
 //
-// WorldRenderer.h - Master renderer class, coordinates all rendering.
+// RenderManager.h - Master renderer class, coordinates all rendering.
 // Copyright (C) Sebastian Nordgren 
 // April 14th 2016
 //
@@ -26,22 +26,21 @@ namespace ddr
 	struct Renderer;
 	struct RenderData;
 
-	struct WorldRenderer : dd::IDebugPanel
+	struct RenderManager : dd::IDebugPanel
 	{
-		WorldRenderer();
-		~WorldRenderer();
+		RenderManager();
+		~RenderManager();
 
 		//
 		// Initialize all registered renderers.
 		//
-		void InitializeRenderers( ddc::EntitySpace& entities );
+		void Initialize( ddc::EntitySpace& entities );
+		void Shutdown();
 
 		//
 		// Render all the registered renderers.
 		//
 		void Render( ddc::EntitySpace& entities, const ddr::ICamera& camera, float delta_t );
-
-		void ShutdownRenderer() {}
 
 		//
 		// Register a renderer.
@@ -53,7 +52,7 @@ namespace ddr
 		//
 		// Draw the debug menu.
 		//
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 
 	private:
 		

@@ -50,7 +50,7 @@ namespace dd
 
 		std::vector<SpawnRequest> m_pendingSpawns;
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const {	return "Particles"; }
 
 		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );

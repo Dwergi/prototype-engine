@@ -76,6 +76,9 @@ namespace dd
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
 
+		MousePosition m_mousePosition;
+		MousePosition m_mouseScroll;
+
 		bool m_mouseEnabled { true };
 		bool m_keyboardEnabled { true };
 

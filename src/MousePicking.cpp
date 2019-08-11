@@ -333,7 +333,7 @@ namespace dd
 		m_framebuffer.UnbindRead();
 	}
 
-	void MousePicking::DrawDebugInternal(ddc::EntitySpace& space)
+	void MousePicking::DrawDebugInternal()
 	{
 		ImGui::SetWindowPos(ImVec2(2.0f, ImGui::GetIO().DisplaySize.y - 100), ImGuiCond_FirstUseEver);
 

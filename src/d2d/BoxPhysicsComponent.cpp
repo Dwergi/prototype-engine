@@ -1,7 +1,7 @@
 //
 // BoxPhysicsComponent.h - Component for the physics of a 2D box.
 // Copyright (C) Sebastian Nordgren 
-// August 3rd 2019
+// August 4th 2019
 //
 
 #include "PCH.h"

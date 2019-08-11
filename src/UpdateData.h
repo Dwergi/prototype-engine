@@ -22,7 +22,7 @@ namespace ddc
 
 	private:
 
-		friend struct SystemManager; // for AddData and Commit
+		friend struct SystemsManager; // for AddData and Commit
 
 		void AddData(const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name);
 		void Commit();

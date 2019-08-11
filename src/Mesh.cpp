@@ -15,11 +15,11 @@
 #include "Shader.h"
 #include "Triangulator.h"
 #include "Uniforms.h"
-#include "WorldRenderer.h"
+#include "RenderManager.h"
 
 DD_POD_CPP(ddr::MeshHandle);
 
-static dd::ProfilerValue& s_meshRendered = dd::Profiler::GetValue("Mesh Rendered");
+static dd::ProfilerValue& s_meshesRendered = dd::Profiler::GetValue("Meshes Rendered");
 
 namespace ddr
 {
@@ -200,7 +200,7 @@ namespace ddr
 	{
 		DD_PROFILE_SCOPED( Mesh_Render );
 
-		s_meshRendered.Increment();
+		s_meshesRendered.Increment();
 
 		m_vao.Bind();
 

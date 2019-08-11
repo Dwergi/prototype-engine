@@ -253,7 +253,7 @@ namespace neut
 		}
 	}
 
-	void SwarmSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void SwarmSystem::DrawDebugInternal()
 	{
 		ImGui::SliderInt( "Agents", &AgentCount, 0, 10000 );
 

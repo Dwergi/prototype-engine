@@ -12,8 +12,8 @@ namespace dd
 	{
 	public:
 
-		glm::vec3 Position;
-		glm::quat Rotation;
+		glm::vec3 Position { 0.0f };
+		glm::quat Rotation { 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 Scale { 1.0f };
 
 		const glm::mat4& Transform() const
@@ -28,7 +28,7 @@ namespace dd
 			m_transform = CalculateTransform();
 		}
 
-		ALIGNED_ALLOCATORS( 16 );
+		DD_ALIGNED_ALLOCATORS( 16 );
 
 		DD_BEGIN_CLASS( dd::TransformComponent )
 			DD_COMPONENT();

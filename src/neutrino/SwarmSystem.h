@@ -30,6 +30,6 @@ namespace neut
 
 		dd::BVHTree m_agentsBVH;
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }

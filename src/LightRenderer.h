@@ -32,7 +32,7 @@ namespace ddr
 		ddc::Entity m_deleteLight;
 		std::vector<ddc::Entity> m_debugLights;
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 
 		void UpdateDebugPointLights( ddc::EntitySpace& entities );
 	};

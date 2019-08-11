@@ -1,12 +1,15 @@
+//
+// Physics2DSystem.h
+// Copyright (C) Sebastian Nordgren 
+// August 4th 2018
+//
+
 #include "PCH.h"
 #include "Physics2DSystem.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
-#include "d2d/SpriteTileComponent.h"
-#include "d2d/SpriteTileSystem.h"
-
-dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
+#include "d2d/Transform2DComponent.h"
 
 namespace d2d
 {
@@ -16,59 +19,121 @@ namespace d2d
 		RequireTag(ddc::Tag::Visible, "circles");
 		RequireTag(ddc::Tag::Dynamic, "circles");
 		RequireWrite<d2d::CirclePhysicsComponent>("circles");
-		RequireWrite<d2d::SpriteTileComponent>("circles");
+		RequireWrite<d2d::Transform2DComponent>("circles");
 
-		RequireTag(ddc::Tag::Visible, "dynamic_boxes");
-		RequireTag(ddc::Tag::Dynamic, "dynamic_boxes");
-		RequireWrite<d2d::BoxPhysicsComponent>("dynamic_boxes");
-		RequireWrite<d2d::SpriteTileComponent>("dynamic_boxes");
-
-		RequireTag(ddc::Tag::Visible, "static_boxes");
-		RequireTag(ddc::Tag::Static, "static_boxes");
-		RequireRead<d2d::BoxPhysicsComponent>("static_boxes");
-		RequireRead<d2d::SpriteTileComponent>("static_boxes");
-	}
-
-	static glm::vec2 NearestPointBox(glm::vec2 pt, glm::vec2 box_min, glm::vec2 box_max)
-	{
-		return glm::clamp(pt, box_min, box_max);
-	}
-
-	glm::vec2 GetBoxNormal(glm::vec2 dir)
-	{
-		if (std::abs(dir.x) > std::abs(dir.y))
-		{
-			// closer on x than y
-			if (dir.x < 0) { return glm::vec2(-1, 0); }
-			else { return glm::vec2(1, 0); }
-		}
-		else
-		{
-			if (dir.y < 0) { return glm::vec2(0, -1); }
-			else { return glm::vec2(0, 1); }
-		}
-	}
-
-	static bool BoxBoxIntersect(glm::vec2 a_min, glm::vec2 a_max, glm::vec2 b_min, glm::vec2 b_max)
-	{
-		return glm::all(glm::lessThanEqual(a_min, b_max)) && glm::all(glm::greaterThanEqual(a_max, b_min));
+		RequireTag(ddc::Tag::Visible, "boxes");
+		RequireTag(ddc::Tag::Dynamic, "boxes");
+		RequireWrite<d2d::BoxPhysicsComponent>("boxes");
+		RequireWrite<d2d::Transform2DComponent>("boxes");
 	}
 
 	static const glm::vec2 GRAVITY(0, 10);
-	static const int REST_THRESHOLD = 10;
+
+	static void ResolveCollision(d2d::Physics2DBase& a, d2d::Physics2DBase& b, glm::vec2 normal, float penetration)
+	{
+		glm::vec2 rel_velocity = b.Velocity - a.Velocity;
+
+		float velocity_in_normal = glm::dot(rel_velocity, normal);
+
+		if (velocity_in_normal > 0)
+		{
+			return;
+		}
+
+		const float elasticity = ddm::min(a.Elasticity, b.Elasticity);
+
+		// Calculate impulse scalar
+		float j = (-(1 + elasticity) * velocity_in_normal) / (a.InverseMass + b.InverseMass);
+
+		// Apply impulse
+		glm::vec2 impulse = j * normal;
+		a.Velocity -= a.InverseMass * impulse;
+		b.Velocity += b.InverseMass * impulse;
+	}
+
+	static void PositionalCorrection(glm::vec2& a_pos, float a_inv_mass, glm::vec2& b_pos, float b_inv_mass, float penetration, glm::vec2 normal)
+	{
+		const float CORRECTION_PERCENT = 0.2f;
+
+		glm::vec2 correction = (penetration / (a_inv_mass + b_inv_mass)) * normal * CORRECTION_PERCENT;
+		a_pos -= correction * a_inv_mass;
+		b_pos += correction * b_inv_mass;
+	}
+
+	struct CollisionManifold
+	{
+		d2d::Physics2DBase* APhysics; 
+		d2d::Transform2DComponent* ATransform;
+		d2d::Physics2DBase* BPhysics;
+		d2d::Transform2DComponent* BTransform;
+
+		glm::vec2 Normal;
+		float Penetration;
+	};
 	
 	void PhysicsSystem::Update(const ddc::UpdateData& update_data)
 	{
-		auto static_boxes = update_data.Data("static_boxes");
-		auto static_box_physics = static_boxes.Read<d2d::BoxPhysicsComponent>();
-		auto static_box_tiles = static_boxes.Read<d2d::SpriteTileComponent>();
+		float delta_t = update_data.Delta();
 
 		auto circles = update_data.Data("circles");
 		auto circle_physics = circles.Write<d2d::CirclePhysicsComponent>();
-		auto circle_tiles = circles.Write<d2d::SpriteTileComponent>();
+		auto circle_transforms = circles.Write<d2d::Transform2DComponent>();
 
-		float delta_t = update_data.Delta();
+		auto boxes = update_data.Data("static_boxes");
+		auto box_physics = boxes.Write<d2d::BoxPhysicsComponent>();
+		auto box_transforms = boxes.Write<d2d::Transform2DComponent>();
 
+		std::vector<CollisionManifold> collisions;
+
+		for (int a = 0; a < boxes.Size(); ++a)
+		{
+			d2d::CirclePhysicsComponent& a_physics = circle_physics[a];
+			d2d::Transform2DComponent& a_transform = circle_transforms[a];
+
+			for (int b = 0; b < boxes.Size(); ++b)
+			{
+				d2d::CirclePhysicsComponent& b_physics = circle_physics[b];
+				d2d::Transform2DComponent& b_transform = circle_transforms[a];
+
+				if (a_physics.HitCircle.Intersects(b_physics.HitCircle))
+				{
+					CollisionManifold& manifold = collisions.emplace_back();
+					manifold.APhysics = &a_physics;
+					manifold.ATransform = &a_transform;
+					manifold.BPhysics = &b_physics;
+					manifold.BTransform = &b_transform;
+					 
+					glm::vec2 diff = b_transform.Position - a_transform.Position;
+					float distance = glm::length(diff);
+
+					DD_ASSERT(distance != 0);
+
+					manifold.Penetration = (a_physics.HitCircle.Radius + b_physics.HitCircle.Radius) - distance;
+					manifold.Normal = diff / distance;
+				}
+			}
+		}
+
+		for (int b1 = 0; b1 < boxes.Size(); ++b1)
+		{
+			d2d::BoxPhysicsComponent& box1_physics = box_physics[b1];
+
+			for (int b2 = 0; b2 < boxes.Size(); ++b2)
+			{
+				d2d::BoxPhysicsComponent& box2_physics = box_physics[b2];
+
+				if (box1_physics.HitBox.Intersects(box2_physics.HitBox))
+				{
+					//ResolveCollision(box1_physics, box2_physics, )
+				}
+			}
+		}
+	}
+
+
+
+	/*void OldPhysics(ddc::UpdateDataBuffer& circles, ddc::WriteView<d2d::SpriteTileComponent>& circle_tiles, ddc::WriteView<d2d::CirclePhysicsComponent>& circle_physics, float delta_t, ddc::UpdateDataBuffer& static_boxes, ddc::ReadView<d2d::SpriteTileComponent>& static_box_tiles, ddc::ReadView<d2d::BoxPhysicsComponent>& static_box_physics, const ddc::UpdateData& update_data)
+	{
 		for (int c = 0; c < circles.Size(); ++c)
 		{
 			glm::vec2 tile_pos = circle_tiles[c].Coordinate;
@@ -228,5 +293,5 @@ namespace d2d
 				}
 			}
 		}
-	}
+	}*/
 }

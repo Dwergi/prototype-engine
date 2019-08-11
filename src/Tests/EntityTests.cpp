@@ -2,7 +2,7 @@
 #include "ComponentBuffer.h"
 #include "UpdateData.h"
 #include "System.h"
-#include "SystemManager.h"
+#include "SystemsManager.h"
 #include "SystemsSorting.h"
 
 #include "catch2/catch.hpp"
@@ -218,7 +218,7 @@ TEST_CASE("Update System")
 
 	TestSystem system;
 
-	ddc::SystemManager system_mgr;
+	ddc::SystemsManager system_mgr;
 	system_mgr.Register(system);
 	system_mgr.Initialize(space);
 	system_mgr.Update(space, 0);
@@ -259,7 +259,7 @@ TEST_CASE("Update With Discontinuity")
 
 	TestSystem system;
 
-	ddc::SystemManager system_mgr;
+	ddc::SystemsManager system_mgr;
 	system_mgr.Register(system);
 	system_mgr.Initialize(space);
 	system_mgr.Update(space, 0);
@@ -288,7 +288,7 @@ TEST_CASE("Update Multiple Systems")
 
 	ddc::EntitySpace space("test");
 
-	ddc::SystemManager system_mgr;
+	ddc::SystemsManager system_mgr;
 	system_mgr.Register(a);
 	system_mgr.Register(b);
 	system_mgr.Initialize(space);
@@ -526,7 +526,7 @@ TEST_CASE("Update With Tree Scheduling")
 
 		ddc::EntitySpace space("test");
 
-		ddc::SystemManager system_mgr;
+		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
 		system_mgr.Initialize(space);
@@ -556,7 +556,7 @@ TEST_CASE("Update With Tree Scheduling")
 
 		ddc::EntitySpace space("test");
 
-		ddc::SystemManager system_mgr;
+		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
 		system_mgr.Initialize(space);
@@ -590,7 +590,7 @@ TEST_CASE("Update With Tree Scheduling")
 
 		ddc::EntitySpace space("test");
 
-		ddc::SystemManager system_mgr;
+		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
 		system_mgr.Register(c);
@@ -610,7 +610,7 @@ TEST_CASE("Full Update Loop")
 
 	ddc::EntitySpace space("test");
 
-	ddc::SystemManager system_mgr;
+	ddc::SystemsManager system_mgr;
 	system_mgr.Register(a);
 	system_mgr.Register(b);
 	system_mgr.Register(c);

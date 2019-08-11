@@ -180,7 +180,7 @@ namespace neut
 		}
 	}
 
-	void TreeSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void TreeSystem::DrawDebugInternal()
 	{
 		ImGui::DragFloat( "Lifetime", &StartingLifetime, 0.01, 0, 20 );
 

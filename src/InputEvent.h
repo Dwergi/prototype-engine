@@ -31,7 +31,7 @@ namespace dd
 		ModifierFlags Modifiers { dd::Modifier::None };
 		InputType Type { InputType::None };
 
-		bool IsMouse() const { return Key > Key::LAST_KEY; }
-		bool IsKeyboard() const { return Key < Key::LAST_KEY; }
+		bool IsMouse() const { return Key > Key::KB_LAST; }
+		bool IsKeyboard() const { return Key < Key::KB_LAST; }
 	};
 }

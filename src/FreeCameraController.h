@@ -37,7 +37,7 @@ namespace dd
 
 	protected:
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	
 	private:
 

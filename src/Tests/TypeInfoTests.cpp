@@ -22,8 +22,8 @@ namespace Test
 	};
 }
 
-DD_TYPE_CPP( Test::SimpleStruct );
-DD_TYPE_CPP( Test::DerivedStruct );
+DD_CLASS_CPP( Test::SimpleStruct );
+DD_CLASS_CPP( Test::DerivedStruct );
 
 TEST_CASE( "[TypeInfo] Find" )
 {

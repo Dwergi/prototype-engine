@@ -47,6 +47,6 @@ namespace neut
 
 		void CreateShip( ddc::EntitySpace& entities );
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }

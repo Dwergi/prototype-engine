@@ -83,7 +83,7 @@ namespace dd
 		return s_frameTimes.SlidingAverage();
 	}
 
-	void FrameTimer::DrawDebugInternal( ddc::EntitySpace& entities )
+	void FrameTimer::DrawDebugInternal()
 	{
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiCond_FirstUseEver );
 

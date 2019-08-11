@@ -121,6 +121,9 @@
     <Filter Include="Games\StressTest">
       <UniqueIdentifier>{a0bb3619-55c3-4da2-9d50-a761aaadd759}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\d2d">
+      <UniqueIdentifier>{16196c79-8335-4ef1-a760-25120d744197}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -393,9 +396,6 @@
     <ClInclude Include="src\MeshRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="src\WorldRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="src\ParticleSystemComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -642,9 +642,6 @@
     <ClInclude Include="src\EntitySpace.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\SystemManager.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\Flags.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -714,18 +711,6 @@
     <ClInclude Include="src\lux\LuxLightComponent.h">
       <Filter>Games\Lux</Filter>
     </ClInclude>
-    <ClInclude Include="src\d2d\SpriteAnimationComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d2d\SpriteComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d2d\SpriteTileComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d2d\Physics2DSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\neutrino\TerrainChunk.h">
       <Filter>Terrain</Filter>
     </ClInclude>
@@ -741,12 +726,6 @@
     <ClInclude Include="src\neutrino\TerrainSystem.h">
       <Filter>Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="src\d2d\SpriteAnimationSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d2d\SpriteTileSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\d2d\BoxPhysicsComponent.h">
       <Filter>Components\d2d</Filter>
     </ClInclude>
@@ -755,6 +734,42 @@
     </ClInclude>
     <ClInclude Include="src\stress\StressTestGame.h">
       <Filter>Games\StressTest</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Circle.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\AABB2D.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteTileComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteAnimationComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\Transform2DComponent.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\Physics2DBase.h">
+      <Filter>Components\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteAnimationSystem.h">
+      <Filter>Systems\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\Physics2DSystem.h">
+      <Filter>Systems\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d2d\SpriteTileSystem.h">
+      <Filter>Systems\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderManager.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemsManager.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1020,9 +1035,6 @@
     <ClCompile Include="src\MeshRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="src\WorldRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="src\ParticleSystemComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -1230,9 +1242,6 @@
     <ClCompile Include="src\EntitySpace.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\SystemManager.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\UpdateDataBuffer.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1296,18 +1305,6 @@
     <ClCompile Include="src\lux\LuxLightRenderer.cpp">
       <Filter>Games\Lux</Filter>
     </ClCompile>
-    <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\d2d\SpriteComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\d2d\SpriteTileComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\d2d\Physics2DSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\neutrino\TerrainChunk.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
@@ -1323,12 +1320,6 @@
     <ClCompile Include="src\neutrino\TerrainSystem.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp">
       <Filter>Components\d2d</Filter>
     </ClCompile>
@@ -1343,6 +1334,42 @@
     </ClCompile>
     <ClCompile Include="src\stress\Renderer.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Circle.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\AABB2D.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteTileComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\Transform2DComponent.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\Physics2DBase.cpp">
+      <Filter>Components\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp">
+      <Filter>Systems\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\Physics2DSystem.cpp">
+      <Filter>Systems\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
+      <Filter>Systems\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderManager.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemsManager.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1373,5 +1400,6 @@
     <None Include="src\HandleManager.inl">
       <Filter>Containers</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

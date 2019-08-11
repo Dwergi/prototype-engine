@@ -7,5 +7,5 @@
 #include "PCH.h"
 #include "neutrino/BulletComponent.h"
 
-DD_TYPE_CPP(neut::BulletHitMessage);
+DD_CLASS_CPP(neut::BulletHitMessage);
 DD_COMPONENT_CPP(neut::BulletComponent);

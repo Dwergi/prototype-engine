@@ -18,6 +18,8 @@ namespace dd
 
 	void IInputSource::UpdateInput()
 	{
+		m_gotMouseInput = false;
+
 		OnUpdateInput();
 
 		m_events.Swap();
@@ -75,17 +77,26 @@ namespace dd
 			return;
 		}
 
+		if (key > Key::KB_LAST)
+		{
+			m_gotMouseInput = true;
+		}
+
 		InputEvent evt(key, modifiers, type);
 		m_events.Write().Add(evt);
 	}
 
 	void IInputSource::OnMousePosition(glm::vec2 absolute)
 	{
+		m_gotMouseInput = true;
+
 		m_mousePosition.Write().Absolute = absolute;
 	}
 
 	void IInputSource::OnMouseWheel(glm::vec2 absolute)
 	{
+		m_gotMouseInput = true;
+
 		m_mouseScroll.Write().Absolute = absolute;
 	}
 }

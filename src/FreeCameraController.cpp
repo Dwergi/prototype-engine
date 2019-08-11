@@ -48,7 +48,7 @@ namespace dd
 
 	}
 
-	void FreeCameraController::DrawDebugInternal(ddc::EntitySpace& entities)
+	void FreeCameraController::DrawDebugInternal()
 	{
 		ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 300, 30), ImGuiCond_FirstUseEver);
 

@@ -12,7 +12,7 @@
 
 #include <glm/gtx/intersect.hpp>
 
-DD_TYPE_CPP( ddm::Sphere );
+DD_CLASS_CPP( ddm::Sphere );
 
 namespace ddm
 {

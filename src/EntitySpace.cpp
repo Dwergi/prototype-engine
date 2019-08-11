@@ -37,7 +37,7 @@ namespace ddc
 			return;
 		}
 		
-		int old_max_entities = m_maxEntities;
+		uint old_max_entities = m_maxEntities;
 		if (m_entities.size() > m_maxEntities)
 		{
 			m_maxEntities *= 2;
@@ -145,9 +145,35 @@ namespace ddc
 			(entry.Alive || entry.Create);
 	}
 
+	int EntitySpace::ComponentCount(Entity entity) const
+	{
+		DD_ASSERT(IsAlive(entity));
+
+		const EntityEntry& entry = m_entities[entity.ID];
+		return (int) entry.Ownership.count();
+	}
+
+	dd::ComponentID EntitySpace::GetNthComponentID(Entity entity, int index) const
+	{
+		DD_ASSERT(IsAlive(entity));
+
+		const EntityEntry& entry = m_entities[entity.ID];
+
+		size_t i = 0;
+		while (index > 0 && i < MAX_COMPONENTS)
+		{
+			if (entry.Ownership.test(i))
+			{
+				--index;
+			}
+		}
+
+		return (dd::ComponentID) i;
+	}
+
 	bool EntitySpace::HasComponent( Entity entity, dd::ComponentID id ) const
 	{
-		DD_ASSERT( id != dd::INVALID_COMPONENT );
+		DD_ASSERT(entity.IsValid());
 
 		if( !IsAlive( entity ) )
 		{
@@ -315,5 +341,10 @@ namespace ddc
 	bool Entity::HasTag(ddc::Tag tag) const
 	{
 		return Space()->HasTag(*this, tag);
+	}
+
+	int Entity::Components() const
+	{
+		return Space()->ComponentCount(*this);
 	}
 }

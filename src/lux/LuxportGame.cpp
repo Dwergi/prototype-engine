@@ -17,9 +17,9 @@
 #include "ScratchEntity.h"
 #include "SpriteRenderer.h"
 #include "SpriteSheet.h"
-#include "SystemManager.h"
+#include "SystemsManager.h"
 #include "Texture.h"
-#include "WorldRenderer.h"
+#include "RenderManager.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
@@ -29,6 +29,7 @@
 #include "d2d/SpriteAnimationComponent.h"
 #include "d2d/SpriteAnimationSystem.h"
 #include "d2d/SpriteComponent.h"
+#include "d2d/Transform2DComponent.h"
 
 #include "lux/LuxLightComponent.h"
 #include "lux/LuxLightRenderer.h"
@@ -61,6 +62,8 @@ namespace lux
 	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
+
+	static ddr::OrthoCamera* s_camera;
 
 	static dd::InputKeyBindings* s_keybindings;
 
@@ -125,7 +128,7 @@ namespace lux
 		sprite_tile_cmp->Scale = glm::vec2(2);
 
 		d2d::CirclePhysicsComponent* physics = space.Access<d2d::CirclePhysicsComponent>(teleporter);
-		physics->Radius = TELEPORTER_RADIUS;
+		physics->HitCircle.Radius = TELEPORTER_RADIUS;
 		physics->Elasticity = TELEPORTER_ELASTICITY;
 
 		lux::LuxLightComponent& light = space.Add<lux::LuxLightComponent>(teleporter);
@@ -161,14 +164,14 @@ namespace lux
 		}
 
 		d2d::BoxPhysicsComponent* physics = space.Access<d2d::BoxPhysicsComponent>(player);
-		physics->HitBoxMin = glm::vec2(0.28, 0.0625);
-		physics->HitBoxMax = glm::vec2(0.72, 1);
+		physics->HitBox.Min = glm::vec2(0.28, 0.0625);
+		physics->HitBox.Max = glm::vec2(0.72, 1);
 		physics->Elasticity = 0;
 
 		return player;
 	}
 
-	void LuxportGame::RegisterSystems(ddc::SystemManager& system_manager)
+	void LuxportGame::RegisterSystems(ddc::SystemsManager& system_manager)
 	{
 		d2d::PhysicsSystem& physics_system = dd::Services::Register(new d2d::PhysicsSystem());
 		system_manager.Register(physics_system);
@@ -182,7 +185,7 @@ namespace lux
 		system_manager.Register(sprite_tile_system);
 	}
 
-	void LuxportGame::RegisterRenderers(ddr::WorldRenderer& renderer)
+	void LuxportGame::RegisterRenderers(ddr::RenderManager& renderer)
 	{
 		lux::LuxLightRenderer& lights_renderer = dd::Services::Register(new lux::LuxLightRenderer());
 		renderer.Register(lights_renderer);
@@ -201,7 +204,7 @@ namespace lux
 
 	void LuxportGame::Initialize()
 	{
-		dd::Services::RegisterInterface<ddr::ICamera>(new ddr::OrthoCamera());
+		s_camera = new ddr::OrthoCamera();
 
 		dd::Services::Register(new ddr::SpriteManager());
 		dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
@@ -258,11 +261,10 @@ namespace lux
 		s_listener = new sf::Listener();
 	}
 
-	void LuxportGame::Shutdown(const dd::GameUpdateData& update_data)
+	void LuxportGame::Shutdown()
 	{
 		if (s_currentMap != nullptr)
 		{
-			s_currentMap->Unload(update_data.EntitySpace());
 			delete s_currentMap;
 		}
 
@@ -290,7 +292,8 @@ namespace lux
 		tele_tile->Scale = glm::vec2(2);
 
 		d2d::CirclePhysicsComponent* tele_physics = s_teleporter.Access<d2d::CirclePhysicsComponent>();
-		tele_physics->Reset();
+		tele_physics->Velocity = glm::vec2(0);
+		tele_physics->RestingFrames = 0;
 
 		d2d::SpriteAnimationComponent* player_anim = s_player.Access<d2d::SpriteAnimationComponent>();
 		d2d::SpriteAnimationComponent* tele_anim = s_teleporter.Access<d2d::SpriteAnimationComponent>();
@@ -315,7 +318,8 @@ namespace lux
 		player_tile->Coordinate = start_tile->Coordinate + offset;
 
 		d2d::BoxPhysicsComponent* player_physics = s_player.Access<d2d::BoxPhysicsComponent>();
-		player_physics->Reset();
+		player_physics->Velocity = glm::vec2(0);
+		player_physics->RestingFrames = 0;
 
 		d2d::SpriteAnimationComponent* player_anim = s_player.Access<d2d::SpriteAnimationComponent>();
 		player_anim->PlayFromStart();
@@ -429,7 +433,7 @@ namespace lux
 		glm::vec2 dir = (coords - tele_tile->Coordinate) / distance;
 
 		d2d::CirclePhysicsComponent* tele_physics = s_teleporter.Access<d2d::CirclePhysicsComponent>();
-		tele_physics->Reset(); 
+		tele_physics->RestingFrames = 0;
 		tele_physics->Velocity = dir * ddm::clamp(TELEPORTER_MAX_SPEED * strength, TELEPORTER_MIN_SPEED, TELEPORTER_MAX_SPEED);
 
 		PlaySound(s_throwSoundBuffer, tele_tile->Coordinate);
@@ -443,7 +447,8 @@ namespace lux
 		player_tile->Coordinate = tele_tile->Coordinate - glm::vec2(1.375, 1.375);
 
 		d2d::BoxPhysicsComponent* player_physics = s_player.Access<d2d::BoxPhysicsComponent>();
-		player_physics->Reset();
+		player_physics->RestingFrames = 0;
+		player_physics->Velocity = glm::vec2(0);
 
 		ReturnTeleporterToPlayer();
 
@@ -521,8 +526,8 @@ namespace lux
 		{
 			d2d::SpriteTileComponent* end_tile = s_currentMap->GetEnd().Access<d2d::SpriteTileComponent>();
 			d2d::BoxPhysicsComponent* player_box = s_player.Access<d2d::BoxPhysicsComponent>();
-			glm::vec2 player_min = player_tile->Coordinate + player_box->HitBoxMin * player_tile->Scale;
-			glm::vec2 player_max = player_tile->Coordinate + player_box->HitBoxMax * player_tile->Scale;
+			glm::vec2 player_min = player_tile->Coordinate + player_box->HitBox.Min * player_tile->Scale;
+			glm::vec2 player_max = player_tile->Coordinate + player_box->HitBox.Max * player_tile->Scale;
 			if (ddm::BoxBoxIntersect(player_min, player_max, end_tile->Coordinate - glm::vec2(1), end_tile->Coordinate + glm::vec2(2)))
 			{
 				s_desiredMapIndex = s_currentMap->GetIndex() + 1;
@@ -542,5 +547,10 @@ namespace lux
 		}
 
 		s_listener->setPosition(sf::Vector3(player_tile->Coordinate.x, player_tile->Coordinate.y, 0.0f));
+	}
+
+	ddr::ICamera& LuxportGame::GetCamera() const
+	{
+		return *s_camera;
 	}
 }

@@ -3,5 +3,5 @@
 
 #include <fmt/format.h>
 
-DD_TYPE_CPP(ddr::Sprite);
+DD_CLASS_CPP(ddr::Sprite);
 DD_POD_CPP(ddr::SpriteHandle);

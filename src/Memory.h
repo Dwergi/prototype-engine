@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define ALIGNED_ALLOCATORS( Align ) \
+#define DD_ALIGNED_ALLOCATORS( Align ) \
 void* operator new( size_t sz ) { return _aligned_malloc( sz, Align ); } \
 void* operator new(size_t sz, void* ptr) { return ptr; } \
 void operator delete(void* p) {	_aligned_free( p ); } \

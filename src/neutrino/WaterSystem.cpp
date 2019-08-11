@@ -162,7 +162,7 @@ namespace neut
 		}
 	}
 
-	void WaterSystem::DrawDebugInternal( ddc::EntitySpace& entities )
+	void WaterSystem::DrawDebugInternal()
 	{
 		ImGui::Value( "Chunks", m_waterChunks );
 		ImGui::DragFloat( "Water Height", &m_waterHeight, 0.1, 0, m_terrainParams.HeightRange, "%.1f" );

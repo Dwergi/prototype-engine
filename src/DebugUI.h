@@ -37,7 +37,7 @@ namespace dd
 		void EndWindow();
 
 		void RegisterDebugPanel( IDebugPanel& debug_panel );
-		void RenderDebugPanels( ddc::EntitySpace& entities );
+		void RenderDebugPanels();
 
 	private:
 		std::vector<IDebugPanel*> m_debugPanels;

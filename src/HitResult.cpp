@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "HitResult.h"
 
-DD_TYPE_CPP( dd::HitHandle );
+DD_CLASS_CPP( dd::HitHandle );
 
 namespace dd
 {

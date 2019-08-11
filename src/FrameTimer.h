@@ -52,6 +52,6 @@ namespace dd
 		bool m_paused { false };
 		uint m_frame { 0 };
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }

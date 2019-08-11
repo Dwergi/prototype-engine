@@ -9,12 +9,13 @@
 namespace ddc
 {
 	struct EntitySpace;
-	struct SystemManager;
+	struct SystemsManager;
 }
 
 namespace ddr
 {
-	struct WorldRenderer;
+	struct ICamera;
+	struct RenderManager;
 }
 
 namespace dd
@@ -44,14 +45,16 @@ namespace dd
 	{
 		// Initialization occurs in this order.
 		virtual void Initialize() = 0;
-		virtual void RegisterSystems(ddc::SystemManager& system_manager) = 0;
-		virtual void RegisterRenderers(ddr::WorldRenderer& renderer) = 0;
+		virtual void RegisterSystems(ddc::SystemsManager& system_manager) = 0;
+		virtual void RegisterRenderers(ddr::RenderManager& renderer) = 0;
 		// Last initialization step - it is valid to populate the entity space here if desired.
 		virtual void CreateEntitySpaces(std::vector<ddc::EntitySpace*>& spaces) = 0;
 
-		virtual void Shutdown(const dd::GameUpdateData& update_data) = 0;
+		virtual void Shutdown() = 0;
+
 		virtual void Update(const dd::GameUpdateData& update_data) = 0;
 
+		virtual ddr::ICamera& GetCamera() const = 0;
 		virtual const char* GetTitle() const { return "DD"; }
 	};
 }

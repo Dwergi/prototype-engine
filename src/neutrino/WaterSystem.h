@@ -41,7 +41,7 @@ namespace neut
 		bool m_regenerate { false };
 
 		virtual const char* GetDebugTitle() const override { return "Water"; }
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 
 		ddc::Entity CreateWaterEntity( ddc::EntitySpace& entities, glm::vec2 chunk_pos ) const;
 	};

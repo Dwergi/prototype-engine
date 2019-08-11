@@ -89,7 +89,7 @@ namespace dd
 
 		glm::ivec2 m_previousSize;
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 
 		void CreateFrameBuffer( glm::ivec2 window_size );
 

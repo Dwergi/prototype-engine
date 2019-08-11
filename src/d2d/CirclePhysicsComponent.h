@@ -6,28 +6,22 @@
 
 #pragma once
 
+#include "d2d/Physics2DBase.h"
+
+#include "ddm/Circle.h"
+
 namespace d2d
 {
-	struct CirclePhysicsComponent
+	struct CirclePhysicsComponent : d2d::Physics2DBase
 	{
-		float Radius { 0.5f };
-		float Elasticity { 1 };
-		glm::vec2 Velocity { 0, 0 };
-		int RestingFrames { 0 };
-
-		void Reset()
-		{
-			Velocity = glm::vec2(0);
-			RestingFrames = 0;
-		}
-		bool IsResting() const { return RestingFrames >= 10; }
+		// Hit circle is relative to the size of the sprite.
+		ddm::Circle HitCircle;
 
 		DD_BEGIN_CLASS(d2d::CirclePhysicsComponent)
 			DD_COMPONENT();
-			DD_MEMBER(Radius); 
-			DD_MEMBER(Elasticity);
-			DD_MEMBER(Velocity);
-			DD_MEMBER(RestingFrames);
+			DD_PARENT(d2d::Physics2DBase);
+
+			DD_MEMBER(HitCircle); 
 		DD_END_CLASS()
 	};
 }

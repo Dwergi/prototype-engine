@@ -48,6 +48,6 @@ namespace neut
 		const neut::TerrainParameters& m_params;
 		neut::Wireframe* m_wireframe { nullptr };
 
-		virtual void DrawDebugInternal( ddc::EntitySpace& entities ) override;
+		virtual void DrawDebugInternal() override;
 	};
 }
