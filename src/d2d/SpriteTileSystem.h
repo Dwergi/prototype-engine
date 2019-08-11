@@ -18,6 +18,10 @@ namespace d2d
 		glm::ivec2 m_mapDimensions { 0, 0 };
 		int m_tileSize { 0 };
 
-		int GetScalingFactor() const;
+		float m_scaledTileSize { 0 };
+		glm::vec2 m_edgeOffset { 0, 0 };
+
+		void UpdateConstants();
+		int GetScalingFactor(glm::ivec2 window_size) const;
 	};
 }

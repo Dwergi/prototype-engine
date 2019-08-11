@@ -10,6 +10,8 @@ namespace ddm
 {
 	struct Circle
 	{
+		Circle GetTransformed(glm::vec2 translate, glm::vec2 scale) const;
+
 		bool Intersects(const Circle& other) const;
 
 		glm::vec2 Centre;

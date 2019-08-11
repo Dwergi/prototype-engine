@@ -1,0 +1,35 @@
+#include "PCH.h"
+#include "Physics2DGame.h"
+
+namespace phys2d
+{
+	void Physics2DGame::Initialize()
+	{
+	}
+
+	void Physics2DGame::RegisterSystems(ddc::SystemsManager& system_manager)
+	{
+
+	}
+
+	void Physics2DGame::RegisterRenderers(ddr::RenderManager& renderer)
+	{
+	}
+
+	void Physics2DGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& spaces)
+	{
+	}
+
+	void Physics2DGame::Shutdown()
+	{
+	}
+
+	void Physics2DGame::Update(const dd::GameUpdateData& update_data)
+	{
+	}
+
+	ddr::ICamera& Physics2DGame::GetCamera() const
+	{
+		
+	}
+}

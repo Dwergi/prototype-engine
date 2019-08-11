@@ -10,15 +10,15 @@ namespace d2d
 {
 	struct Transform2DComponent
 	{
-		glm::vec2 Position;
+		glm::vec2 Position { 0, 0 };
 
 		// radians rotated, clockwise
-		float Rotation;
-		glm::vec2 Scale;
+		float Rotation { 0 };
+		glm::vec2 Scale { 1, 1 };
 
-		const glm::mat2& Transform() const
+		const glm::mat3& Transform() const
 		{
-			//DD_ASSERT( m_transform == CalculateTransform() );
+			DD_ASSERT( m_transform == CalculateTransform() );
 			return m_transform;
 		}
 

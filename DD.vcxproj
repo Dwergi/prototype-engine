@@ -356,7 +356,6 @@
     <ClInclude Include="src\d2d\SpriteAnimationComponent.h" />
     <ClInclude Include="src\d2d\SpriteAnimationSystem.h" />
     <ClInclude Include="src\d2d\SpriteComponent.h" />
-    <ClInclude Include="src\d2d\SpriteTileComponent.h" />
     <ClInclude Include="src\d2d\SpriteTileSystem.h" />
     <ClInclude Include="src\d2d\Transform2DComponent.h" />
     <ClInclude Include="src\ddm\AABB2D.h" />
@@ -385,6 +384,7 @@
     <ClInclude Include="src\neutrino\WaterComponent.h" />
     <ClInclude Include="src\neutrino\WaterRenderer.h" />
     <ClInclude Include="src\neutrino\WaterSystem.h" />
+    <ClInclude Include="src\Physics2DGame.h" />
     <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
     <ClInclude Include="src\UpdateDataBuffer.h" />
@@ -659,7 +659,6 @@
     <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteAnimationSystem.cpp" />
     <ClCompile Include="src\d2d\SpriteComponent.cpp" />
-    <ClCompile Include="src\d2d\SpriteTileComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp" />
     <ClCompile Include="src\d2d\Transform2DComponent.cpp" />
     <ClCompile Include="src\ddm\AABB2D.cpp" />
@@ -702,6 +701,7 @@
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
+    <ClCompile Include="src\Physics2DGame.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />

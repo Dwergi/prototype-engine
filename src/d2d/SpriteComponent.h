@@ -1,12 +1,13 @@
 #pragma once
 
+#include "ddm/AABB2D.h"
 #include "Sprite.h"
 
 namespace d2d
 {
 	struct SpriteComponent
 	{
-		SpriteComponent() = default;
+		SpriteComponent();
 		SpriteComponent(const SpriteComponent& other);
 		SpriteComponent& operator=(const SpriteComponent& other);
 
@@ -16,14 +17,17 @@ namespace d2d
 		// Z-index of the sprite - higher is more forward
 		int ZIndex { 0 };
 
-		// normalized device coordinates [-1, 1] of where to draw the sprite
+		// screen position of where to draw the sprite in pixels
 		glm::vec2 Position { 0, 0 };
 
-		// size in normalized device coordinates [-1, 1]
+		// size in pixels
 		glm::vec2 Size { 0, 0 };
 
 		// colour to modulate sprite with
 		glm::vec4 Colour { 1, 1, 1, 1 };
+
+		// hit box in relation to the sprite size (default (0,0)-(1,1))
+		ddm::AABB2D HitBox;
 
 		DD_BEGIN_CLASS(d2d::SpriteComponent)
 			DD_COMPONENT();

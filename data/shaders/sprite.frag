@@ -24,7 +24,7 @@ const float MIN_INTENSITY = 0.001;
 
 void main()
 {
-	vec4 light_colour = vec4(0, 0, 0, 1);
+	vec4 light_colour = vec4(0.5, 0.5, 0.5, 1);
 
 	for (int i = 0; i < LightCount; ++i)
 	{

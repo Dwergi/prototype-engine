@@ -44,11 +44,13 @@
 
 //---------------------------------------------------------------------------
 // GAME TO USE
-#include "stress/StressTestGame.h"
-using TGame = stress::StressTestGame;
-static dd::Service<dd::IGame> s_game;
+//#include "stress/StressTestGame.h"
+//using TGame = stress::StressTestGame;
+#include "lux/LuxportGame.h"
+using TGame = lux::LuxportGame;
 //---------------------------------------------------------------------------
 
+static dd::Service<dd::IGame> s_game;
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IInputSource> s_inputSource;

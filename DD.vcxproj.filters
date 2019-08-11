@@ -124,6 +124,9 @@
     <Filter Include="Systems\d2d">
       <UniqueIdentifier>{16196c79-8335-4ef1-a760-25120d744197}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Games\Physics2D">
+      <UniqueIdentifier>{65206d0c-22b2-4941-98ff-f2324986ae7b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -741,9 +744,6 @@
     <ClInclude Include="src\ddm\AABB2D.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\d2d\SpriteTileComponent.h">
-      <Filter>Components\d2d</Filter>
-    </ClInclude>
     <ClInclude Include="src\d2d\SpriteAnimationComponent.h">
       <Filter>Components\d2d</Filter>
     </ClInclude>
@@ -770,6 +770,9 @@
     </ClInclude>
     <ClInclude Include="src\SystemsManager.h">
       <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics2DGame.h">
+      <Filter>Games\Physics2D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1341,9 +1344,6 @@
     <ClCompile Include="src\d2d\SpriteComponent.cpp">
       <Filter>Components\d2d</Filter>
     </ClCompile>
-    <ClCompile Include="src\d2d\SpriteTileComponent.cpp">
-      <Filter>Components\d2d</Filter>
-    </ClCompile>
     <ClCompile Include="src\d2d\SpriteAnimationComponent.cpp">
       <Filter>Components\d2d</Filter>
     </ClCompile>
@@ -1368,6 +1368,7 @@
     <ClCompile Include="src\SystemsManager.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics2DGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

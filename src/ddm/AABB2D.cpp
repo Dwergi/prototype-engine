@@ -30,7 +30,12 @@ namespace ddm
 		return glm::clamp(pt, Min, Max);
 	}
 
-	glm::vec2 ddm::AABB2D::NearestNormal(glm::vec2 dir) const
+	glm::vec2 ddm::AABB2D::HalfExtents() const
+	{
+		return (Max - Min) / 2.0f;
+	}
+
+	glm::vec2 ddm::AABB2D::NearestNormal(glm::vec2 dir)
 	{
 		if (std::abs(dir.x) > std::abs(dir.y))
 		{

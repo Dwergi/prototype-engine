@@ -7,13 +7,14 @@
 #include "PCH.h"
 #include "LuxportMap.h"
 
-#include "d2d/BoxPhysicsComponent.h"
-#include "d2d/CirclePhysicsComponent.h"
 #include "File.h"
 #include "lux/LuxLightComponent.h"
 #include "SpriteSheet.h"
+
+#include "d2d/BoxPhysicsComponent.h"
+#include "d2d/CirclePhysicsComponent.h"
 #include "d2d/SpriteComponent.h" 
-#include "d2d/SpriteTileComponent.h"
+#include "d2d/Transform2DComponent.h"
 
 #include <fmt/format.h>
 
@@ -70,15 +71,16 @@ namespace lux
 
 	static ddc::Entity CreateSpriteEntity(ddc::EntitySpace& entities, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
 	{
-		ddc::Entity new_entity = entities.CreateEntity<d2d::SpriteComponent, d2d::SpriteTileComponent>();
+		ddc::Entity new_entity = entities.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent>();
 		entities.AddTag(new_entity, ddc::Tag::Visible);
 
 		d2d::SpriteComponent* sprite_cmp = entities.Access<d2d::SpriteComponent>(new_entity);
 		sprite_cmp->Sprite = sprite_h;
 		sprite_cmp->ZIndex = z_index;
 
-		d2d::SpriteTileComponent* sprite_tile_cmp = entities.Access<d2d::SpriteTileComponent>(new_entity);
-		sprite_tile_cmp->Coordinate = coord;
+		d2d::Transform2DComponent* transform_cmp = entities.Access<d2d::Transform2DComponent>(new_entity);
+		transform_cmp->Position = coord;
+		transform_cmp->Update();
 
 		return new_entity;
 	}

@@ -11,125 +11,271 @@
 #include "d2d/CirclePhysicsComponent.h"
 #include "d2d/Transform2DComponent.h"
 
+#pragma optimize("", off)
+
 namespace d2d
 {
 	PhysicsSystem::PhysicsSystem() :
 		ddc::System( "Physics 2D" )
 	{
+		DD_TODO("Need static boxes/circles");
+
 		RequireTag(ddc::Tag::Visible, "circles");
-		RequireTag(ddc::Tag::Dynamic, "circles");
 		RequireWrite<d2d::CirclePhysicsComponent>("circles");
 		RequireWrite<d2d::Transform2DComponent>("circles");
 
 		RequireTag(ddc::Tag::Visible, "boxes");
-		RequireTag(ddc::Tag::Dynamic, "boxes");
 		RequireWrite<d2d::BoxPhysicsComponent>("boxes");
 		RequireWrite<d2d::Transform2DComponent>("boxes");
 	}
 
 	static const glm::vec2 GRAVITY(0, 10);
 
-	static void ResolveCollision(d2d::Physics2DBase& a, d2d::Physics2DBase& b, glm::vec2 normal, float penetration)
+	struct CollisionObject
 	{
-		glm::vec2 rel_velocity = b.Velocity - a.Velocity;
+		CollisionObject() {}
+		CollisionObject(d2d::Physics2DBase& physics, d2d::Transform2DComponent& transform) :
+			Physics(&physics), Transform(&transform) {}
 
-		float velocity_in_normal = glm::dot(rel_velocity, normal);
+		d2d::Physics2DBase* Physics { nullptr };
+		d2d::Transform2DComponent* Transform { nullptr };
+	};
+
+	struct CollisionManifold
+	{
+		CollisionManifold() {};
+		CollisionManifold(CollisionManifold&& other) noexcept :
+			A(*other.A.Physics, *other.A.Transform),
+			B(*other.B.Physics, *other.B.Transform),
+			Normal(other.Normal),
+			Penetration(other.Penetration)
+		{
+		}
+
+		CollisionObject A;
+		CollisionObject B;
+
+		glm::vec2 Normal { 0, 0 };
+		float Penetration { 0 };
+	};
+
+	static void PositionalCorrection(const CollisionManifold& manifold)
+	{
+		const float CORRECTION_PERCENT = 0.2f;
+
+		glm::vec2 correction = (manifold.Penetration / (manifold.A.Physics->InverseMass + manifold.B.Physics->InverseMass)) * manifold.Normal * CORRECTION_PERCENT;
+		manifold.A.Transform->Position -= correction * manifold.A.Physics->InverseMass;
+		manifold.A.Transform->Update();
+
+		manifold.B.Transform->Position -= correction * manifold.A.Physics->InverseMass;
+		manifold.B.Transform->Update();
+	}
+
+	static void ResolveCollision(const CollisionManifold& manifold)
+	{
+		glm::vec2 rel_velocity = manifold.B.Physics->Velocity - manifold.A.Physics->Velocity;
+
+		float velocity_in_normal = glm::dot(rel_velocity, manifold.Normal);
 
 		if (velocity_in_normal > 0)
 		{
 			return;
 		}
 
-		const float elasticity = ddm::min(a.Elasticity, b.Elasticity);
+		const float elasticity = ddm::min(manifold.A.Physics->Elasticity, manifold.B.Physics->Elasticity);
 
 		// Calculate impulse scalar
-		float j = (-(1 + elasticity) * velocity_in_normal) / (a.InverseMass + b.InverseMass);
+		float j = (-(1 + elasticity) * velocity_in_normal) / (manifold.A.Physics->InverseMass + manifold.B.Physics->InverseMass);
 
 		// Apply impulse
-		glm::vec2 impulse = j * normal;
-		a.Velocity -= a.InverseMass * impulse;
-		b.Velocity += b.InverseMass * impulse;
+		glm::vec2 impulse = j * manifold.Normal;
+		manifold.A.Physics->Velocity -= manifold.A.Physics->InverseMass * impulse;
+		manifold.B.Physics->Velocity += manifold.B.Physics->InverseMass * impulse;
+
+		PositionalCorrection(manifold);
 	}
-
-	static void PositionalCorrection(glm::vec2& a_pos, float a_inv_mass, glm::vec2& b_pos, float b_inv_mass, float penetration, glm::vec2 normal)
-	{
-		const float CORRECTION_PERCENT = 0.2f;
-
-		glm::vec2 correction = (penetration / (a_inv_mass + b_inv_mass)) * normal * CORRECTION_PERCENT;
-		a_pos -= correction * a_inv_mass;
-		b_pos += correction * b_inv_mass;
-	}
-
-	struct CollisionManifold
-	{
-		d2d::Physics2DBase* APhysics; 
-		d2d::Transform2DComponent* ATransform;
-		d2d::Physics2DBase* BPhysics;
-		d2d::Transform2DComponent* BTransform;
-
-		glm::vec2 Normal;
-		float Penetration;
-	};
 	
 	void PhysicsSystem::Update(const ddc::UpdateData& update_data)
 	{
 		float delta_t = update_data.Delta();
+		glm::vec2 accel_change = GRAVITY * delta_t;
 
 		auto circles = update_data.Data("circles");
+		auto circle_entities = circles.Entities();
 		auto circle_physics = circles.Write<d2d::CirclePhysicsComponent>();
 		auto circle_transforms = circles.Write<d2d::Transform2DComponent>();
 
-		auto boxes = update_data.Data("static_boxes");
+		auto boxes = update_data.Data("boxes");
+		auto box_entities = boxes.Entities();
 		auto box_physics = boxes.Write<d2d::BoxPhysicsComponent>();
 		auto box_transforms = boxes.Write<d2d::Transform2DComponent>();
 
+		// update positions
+		for (int i = 0; i < circles.Size(); ++i)
+		{
+			if (circle_entities[i].HasTag(ddc::Tag::Static))
+			{
+				DD_TODO("Hack, filter in UpdateData.");
+				continue;
+			}
+
+			circle_physics[i].Velocity += accel_change;
+
+			glm::vec2 displacement = circle_physics[i].Velocity * delta_t;
+			circle_transforms[i].Position += displacement;
+			circle_transforms[i].Update();
+		}
+
+		for (int i = 0; i < boxes.Size(); ++i)
+		{
+			if (box_entities[i].HasTag(ddc::Tag::Static))
+			{
+				DD_TODO("Hack, filter in UpdateData.");
+				continue;
+			}
+
+			box_physics[i].Velocity += accel_change;
+
+			glm::vec2 displacement = box_physics[i].Velocity * delta_t;
+			box_transforms[i].Position += displacement;
+			box_transforms[i].Update();
+		}
+
+		// find collision manifolds
 		std::vector<CollisionManifold> collisions;
 
-		for (int a = 0; a < boxes.Size(); ++a)
+		for (int a = 0; a < circles.Size(); ++a)
 		{
 			d2d::CirclePhysicsComponent& a_physics = circle_physics[a];
 			d2d::Transform2DComponent& a_transform = circle_transforms[a];
 
-			for (int b = 0; b < boxes.Size(); ++b)
+			for (int b = 0; b < circles.Size(); ++b)
 			{
+				if (a == b)
+				{
+					continue;
+				}
+
 				d2d::CirclePhysicsComponent& b_physics = circle_physics[b];
 				d2d::Transform2DComponent& b_transform = circle_transforms[a];
 
 				if (a_physics.HitCircle.Intersects(b_physics.HitCircle))
 				{
-					CollisionManifold& manifold = collisions.emplace_back();
-					manifold.APhysics = &a_physics;
-					manifold.ATransform = &a_transform;
-					manifold.BPhysics = &b_physics;
-					manifold.BTransform = &b_transform;
-					 
 					glm::vec2 diff = b_transform.Position - a_transform.Position;
 					float distance = glm::length(diff);
 
 					DD_ASSERT(distance != 0);
 
+					CollisionManifold& manifold = collisions.emplace_back();
+					manifold.A = CollisionObject(a_physics, a_transform);
+					manifold.B = CollisionObject(b_physics, b_transform);
 					manifold.Penetration = (a_physics.HitCircle.Radius + b_physics.HitCircle.Radius) - distance;
 					manifold.Normal = diff / distance;
 				}
 			}
+
+			for (int b = 0; b < boxes.Size(); ++b)
+			{
+				d2d::BoxPhysicsComponent& b_physics = box_physics[b];
+				d2d::Transform2DComponent& b_transform = box_transforms[b];
+
+				glm::vec2 b_half_extents = b_physics.HitBox.HalfExtents();
+
+				glm::vec2 diff = b_transform.Position - a_transform.Position;
+				glm::vec2 nearest = b_physics.HitBox.NearestPoint(a_physics.HitCircle.Centre);
+
+				bool inside = false;
+
+				if (diff == nearest)
+				{
+					// inside AABB
+					inside = true;
+					
+					if (std::abs(diff.x) > std::abs(diff.y))
+					{
+						if (diff.x > 0)
+						{
+							nearest.x = b_half_extents.x;
+						}
+						else
+						{
+							nearest.x = -b_half_extents.x;
+						}
+					}
+					else
+					{
+						if (diff.y > 0)
+						{
+							nearest.y = b_half_extents.y;
+						}
+						else
+						{
+							nearest.y = -b_half_extents.y;
+						}
+					}
+				}
+
+				glm::vec2 normal = diff - nearest;
+				float distance = glm::length2(normal);
+
+				if (distance > a_physics.HitCircle.Radius * a_physics.HitCircle.Radius)
+				{
+					continue;
+				}
+
+				distance = std::sqrtf(distance);
+
+				CollisionManifold& manifold = collisions.emplace_back();
+				manifold.A = CollisionObject(a_physics, a_transform);
+				manifold.B = CollisionObject(b_physics, b_transform);
+				manifold.Penetration = distance - a_physics.HitCircle.Radius;
+				manifold.Normal = inside ? -(normal / distance) : (normal / distance);
+			}
 		}
 
-		for (int b1 = 0; b1 < boxes.Size(); ++b1)
+		for (int a = 0; a < boxes.Size(); ++a)
 		{
-			d2d::BoxPhysicsComponent& box1_physics = box_physics[b1];
+			d2d::BoxPhysicsComponent& a_physics = box_physics[a];
+			d2d::Transform2DComponent& a_transform = box_transforms[a];
 
-			for (int b2 = 0; b2 < boxes.Size(); ++b2)
+			glm::vec2 a_half_extents = a_physics.HitBox.HalfExtents();
+
+			for (int b = 0; b < boxes.Size(); ++b)
 			{
-				d2d::BoxPhysicsComponent& box2_physics = box_physics[b2];
-
-				if (box1_physics.HitBox.Intersects(box2_physics.HitBox))
+				if (a == b)
 				{
-					//ResolveCollision(box1_physics, box2_physics, )
+					continue;
+				}
+
+				d2d::BoxPhysicsComponent& b_physics = box_physics[b];
+				d2d::Transform2DComponent& b_transform = box_transforms[b];
+
+				glm::vec2 b_half_extents = b_physics.HitBox.HalfExtents();
+
+				glm::vec2 diff = b_transform.Position - a_transform.Position;
+				glm::vec2 overlap = a_half_extents + b_half_extents - glm::abs(diff);
+
+				if (overlap.x > 0 || overlap.y > 0)
+				{
+					CollisionManifold& manifold = collisions.emplace_back();
+					manifold.A = CollisionObject(a_physics, a_transform);
+					manifold.B = CollisionObject(b_physics, b_transform);
+					manifold.Penetration = ddm::min(overlap.x, overlap.y);
+					manifold.Normal = ddm::AABB2D::NearestNormal(diff);
 				}
 			}
 		}
+
+		for (CollisionManifold& manifold : collisions)
+		{
+			//ResolveCollision(manifold);
+		}
 	}
 
+	void PhysicsSystem::DrawDebugInternal()
+	{
+		ImGui::Value("Collision Count", m_collisionCount);
+	}
 
 
 	/*void OldPhysics(ddc::UpdateDataBuffer& circles, ddc::WriteView<d2d::SpriteTileComponent>& circle_tiles, ddc::WriteView<d2d::CirclePhysicsComponent>& circle_physics, float delta_t, ddc::UpdateDataBuffer& static_boxes, ddc::ReadView<d2d::SpriteTileComponent>& static_box_tiles, ddc::ReadView<d2d::BoxPhysicsComponent>& static_box_physics, const ddc::UpdateData& update_data)
