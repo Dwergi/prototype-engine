@@ -80,17 +80,20 @@ namespace ddc
 		m_systems.push_back(&system);
 	}
 
-	void SystemsManager::UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t)
+	void SystemsManager::UpdateSystem(System& system, EntitySpace& space, std::vector<std::shared_future<void>> dependencies, float delta_t)
 	{
-		DD_ASSERT(system != nullptr);
-
 		WaitForAllFutures(dependencies);
+
+		if (!system.IsEnabledForSpace(space))
+		{
+			return;
+		}
 
 		ddc::UpdateData update(space, delta_t);
 
 		// get names
 		dd::Array<dd::String16, 8> names;
-		for (const DataRequest* req : system->GetRequests())
+		for (const DataRequest* req : system.GetRequests())
 		{
 			bool found = false;
 			for (const dd::String& name : names)
@@ -113,7 +116,7 @@ namespace ddc
 		{
 			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
 			dd::Array<DataRequest*, MAX_COMPONENTS> requests;
-			for (DataRequest* req : system->GetRequests())
+			for (DataRequest* req : system.GetRequests())
 			{
 				if (name == req->Name())
 				{
@@ -126,7 +129,7 @@ namespace ddc
 				}
 			}
 
-			TagBits tags = system->GetRequiredTags(name.c_str());
+			TagBits tags = system.GetRequiredTags(name.c_str());
 
 			// find entities with requirements
 			std::vector<Entity> entities;
@@ -135,7 +138,7 @@ namespace ddc
 			update.AddData(entities, requests, name.c_str());
 		}
 
-		system->Update(update);
+		system.Update(update);
 
 		update.Commit();
 	}
@@ -164,7 +167,7 @@ namespace ddc
 
 			s.m_update = s_jobsystem->Schedule([this, &space, system, futures, delta_t]()
 				{
-					UpdateSystem(space, system, futures, delta_t);
+					UpdateSystem(*system, space, futures, delta_t);
 				}).share();
 		}
 	}

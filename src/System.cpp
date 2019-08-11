@@ -24,6 +24,11 @@ namespace ddc
 
 	bool System::IsEnabledForSpace(const ddc::EntitySpace& space) const
 	{
+		if (!m_enabled)
+		{
+			return false;
+		}
+
 		if (m_spaces.empty())
 		{
 			return true;

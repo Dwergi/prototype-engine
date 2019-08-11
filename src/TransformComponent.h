@@ -18,7 +18,7 @@ namespace dd
 
 		const glm::mat4& Transform() const
 		{
-			//DD_ASSERT( m_transform == CalculateTransform() );
+			DD_ASSERT( m_transform == CalculateTransform() );
 			return m_transform;
 		}
 

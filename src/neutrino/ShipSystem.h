@@ -25,15 +25,6 @@ namespace neut
 		ShipSystem();
 		ShipSystem( const ShipSystem& other ) = delete;
 
-		virtual void Initialize( ddc::EntitySpace& entities ) override {}
-		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void Shutdown( ddc::EntitySpace& entities ) override;
-
-		void Enable( bool enabled ) { m_enabled = enabled; }
-		bool IsEnabled() const { return m_enabled; }
-
-		virtual const char* GetDebugTitle() const override { return "Ship"; }
-
 	private:
 
 		glm::vec3 m_nextCameraPos;
@@ -47,6 +38,13 @@ namespace neut
 
 		void CreateShip( ddc::EntitySpace& entities );
 
-		virtual void DrawDebugInternal() override;
+		// IDebugPanel implementation
+		virtual void DrawDebugInternal() override; 
+		virtual const char* GetDebugTitle() const override { return "Ship"; }
+
+		// System implementation
+		virtual void Initialize(ddc::EntitySpace& entities) override {}
+		virtual void Update(const ddc::UpdateData& data) override;
+		virtual void Shutdown(ddc::EntitySpace& entities) override;
 	};
 }

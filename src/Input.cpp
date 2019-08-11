@@ -53,6 +53,9 @@ namespace dd
 			bool should_capture = s_window->IsFocused() && m_currentMode->ShouldCaptureMouse();
 			source->SetCaptureMouse(should_capture);
 
+			bool should_centre = s_window->IsFocused() && m_currentMode->ShouldCentreMouse();
+			source->SetCentreMouse(should_centre);
+
 			source->UpdateInput();
 
 			if (source->GotMouseInput())
@@ -206,11 +209,6 @@ namespace dd
 			if (m_currentMode != nullptr)
 			{
 				m_currentMode->ModeExited();
-			}
-
-			for (IInputSource* source : m_sources)
-			{
-				source->SetCentreMouse(next_mode->ShouldCentreMouse());
 			}
 
 			s_window->SetCursor(next_mode->ShouldShowCursor() ? dd::Cursor::Arrow : dd::Cursor::Hidden);

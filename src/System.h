@@ -28,6 +28,12 @@ namespace ddc
 		void EnableForSpace(const ddc::EntitySpace& space);
 		bool IsEnabledForSpace(const ddc::EntitySpace& space) const;
 
+		// 
+		// Master flag for enabling a system. (default = true)
+		// 
+		void SetEnabled(bool enabled) { m_enabled = enabled; }
+		bool IsEnabled() const { return m_enabled; }
+
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
 		const dd::Vector<DataRequest*>& GetRequests() const { return m_requests; }
@@ -94,6 +100,7 @@ namespace ddc
 		dd::Vector<const System*> m_dependencies;
 		dd::String32 m_name;
 
+		bool m_enabled { true };
 		std::vector<const ddc::EntitySpace*> m_spaces;
 
 		const static int MAX_PARTITIONS = 8;

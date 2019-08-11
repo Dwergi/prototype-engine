@@ -119,6 +119,9 @@ namespace dd
 		auto cameras = data.Write<FPSCameraComponent>();
 		auto transforms = data.Write<TransformComponent>();
 
+		dd::MousePosition mouse_pos = s_input->GetMousePosition();
+		dd::MousePosition mouse_scroll = s_input->GetMouseScroll();
+
 		for (size_t i = 0; i < data.Size(); ++i)
 		{
 			FPSCameraComponent& camera = cameras[i];
@@ -127,9 +130,9 @@ namespace dd
 			m_cameras.push_back(&camera);
 
 			float yaw = camera.GetYaw();
-			yaw += glm::radians(m_mouseDelta.x * TurnSpeed);
+			yaw += glm::radians(mouse_pos.Delta.x * TurnSpeed);
 
-			float y_delta = glm::radians(m_mouseDelta.y * TurnSpeed);
+			float y_delta = glm::radians(mouse_pos.Delta.y * TurnSpeed);
 
 			if (m_invert)
 				y_delta = -y_delta;
@@ -186,7 +189,7 @@ namespace dd
 
 				float degs = glm::degrees(vfov);
 
-				degs *= std::powf(2.f, -m_scrollDelta.y * ZoomSpeed);
+				degs *= std::powf(2.f, -mouse_scroll.Delta.y * ZoomSpeed);
 				degs = glm::clamp(degs, 5.f, 89.f);
 
 				camera.SetVerticalFOV(glm::radians(degs));
@@ -197,15 +200,5 @@ namespace dd
 
 			camera.Update(dt);
 		}
-	}
-
-	void FreeCameraController::UpdateMouse(const MousePosition& pos)
-	{
-		m_mouseDelta = pos.Delta;
-	}
-
-	void FreeCameraController::UpdateScroll(const MousePosition& pos)
-	{
-		m_scrollDelta = pos.Delta;
 	}
 }

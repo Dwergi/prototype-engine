@@ -155,7 +155,10 @@ namespace dd
 					break;
 
 				case sf::Event::MouseWheelScrolled:
-					OnMouseWheel(glm::vec2(evt.mouseWheelScroll.x, evt.mouseWheelScroll.y));
+					glm::vec2 delta;
+					delta.x = evt.mouseWheelScroll.wheel == sf::Mouse::Wheel::HorizontalWheel ? evt.mouseWheelScroll.delta : 0;
+					delta.y = evt.mouseWheelScroll.wheel == sf::Mouse::Wheel::VerticalWheel ? evt.mouseWheelScroll.delta : 0;
+					OnMouseWheel(delta);
 					break;
 
 				case sf::Event::TextEntered:

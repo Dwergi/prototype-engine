@@ -942,9 +942,6 @@
     <ClCompile Include="src\File.cpp">
       <Filter>File</Filter>
     </ClCompile>
-    <ClCompile Include="src\DoubleBuffer.cpp">
-      <Filter>Containers</Filter>
-    </ClCompile>
     <ClCompile Include="src\TransformComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>

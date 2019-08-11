@@ -18,9 +18,10 @@
 #include "MeshRenderer.h"
 #include "Random.h"
 #include "RayRenderer.h"
+#include "RenderManager.h"
 #include "TestEntities.h"
 #include "IWindow.h"
-#include "RenderManager.h"
+#include "SystemsManager.h"
 
 #include "ColourComponent.h"
 #include "FPSCameraComponent.h"
@@ -33,6 +34,7 @@ namespace stress
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::DebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
+	static dd::Service<dd::FreeCameraController> s_freeCam;
 
 	static dd::InputKeyBindings* s_keybindings;
 
@@ -43,14 +45,21 @@ namespace stress
 	void StressTestGame::Initialize()
 	{
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
-		game_input.ShowCursor(true)
+		game_input.ShowCursor(false)
 			.CaptureMouse(true)
-			.CentreMouse(false);
+			.CentreMouse(true);
 
 		s_input->SetCurrentMode("game");
 
 		s_keybindings = new dd::InputKeyBindings("stress_test");
 		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		s_keybindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
+		s_keybindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
+		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
+		s_keybindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
+		s_keybindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
+		s_keybindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
+		s_keybindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
 
 		s_input->SetKeyBindings(*s_keybindings);
 
@@ -103,6 +112,7 @@ namespace stress
 
 			dd::TransformComponent* transform = entity.Access<dd::TransformComponent>();
 			transform->Position = glm::vec3(rng.Next() * MAX_POSITION, rng.Next() * MAX_POSITION, rng.Next() * MAX_POSITION);
+			transform->Update();
 
 			dd::ColourComponent* colour = entity.Access<dd::ColourComponent>();
 			colour->Colour = glm::vec4(rng.Next(), rng.Next(), rng.Next(), 1);
@@ -119,6 +129,9 @@ namespace stress
 	void StressTestGame::Update(const dd::GameUpdateData& update_data)
 	{
 		ddc::EntitySpace& space = update_data.EntitySpace();
+		
+		s_freeCam->SetEnabled(s_input->GetCurrentMode() == "game");
+
 		int entity_count = space.LiveCount();
 
 		if (s_first)
@@ -199,9 +212,10 @@ namespace stress
 		render_manager.Register(*ray_renderer);
 	}
 
-	void StressTestGame::RegisterSystems(ddc::SystemsManager& system_manager)
+	void StressTestGame::RegisterSystems(ddc::SystemsManager& systems_manager)
 	{
 		dd::FreeCameraController& free_cam = dd::Services::Register(new dd::FreeCameraController());
+		systems_manager.Register(free_cam);
 		s_debugUI->RegisterDebugPanel(free_cam);
 	}
 

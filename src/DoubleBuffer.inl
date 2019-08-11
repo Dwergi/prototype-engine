@@ -10,19 +10,32 @@ namespace dd
 
 	template <typename T>
 	DoubleBuffer<T>::DoubleBuffer( T* read, T* write, bool is_owner )
-		: IDoubleBuffer( read, write, is_owner )
 	{
+		m_read = read;
+		m_write = write;
+		m_owner = is_owner;
 	}
 
 	template <typename T>
 	DoubleBuffer<T>::~DoubleBuffer()
 	{
+		if (m_owner)
+		{
+			delete m_read;
+			delete m_write;
+		}
 	}
 
 	template <typename T>
 	void DoubleBuffer<T>::Duplicate() const
 	{
 		Write() = Read();
+	}
+
+	template <typename T>
+	void DoubleBuffer<T>::Swap()
+	{
+		std::swap(m_read, m_write);
 	}
 
 	template <typename T>

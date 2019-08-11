@@ -10,39 +10,8 @@
 
 namespace dd
 {
-	class IDoubleBuffer
-	{
-	public:
-
-		virtual ~IDoubleBuffer();
-
-		IDoubleBuffer( const IDoubleBuffer& ) = delete;
-		IDoubleBuffer( IDoubleBuffer&& ) = delete;
-
-		IDoubleBuffer& operator=( const IDoubleBuffer& ) = delete;
-		IDoubleBuffer& operator=( IDoubleBuffer&& ) = delete;
-
-		//
-		// Swap the read and write buffers.
-		//
-		void Swap();
-
-		virtual void Duplicate() const = 0;
-
-		void* GetWriteVoid() const { return m_write; }
-
-	protected:
-
-		void* m_write;
-		void* m_read;
-
-		bool m_isOwner;
-
-		IDoubleBuffer( void* read, void* write, bool is_owner );
-	};
-
 	template <typename T>
-	class DoubleBuffer : public IDoubleBuffer
+	class DoubleBuffer
 	{
 	public:
 
@@ -58,7 +27,12 @@ namespace dd
 		//
 		// Duplicate the read buffer into the write buffer.
 		//
-		virtual void Duplicate() const override;
+		void Duplicate() const;
+
+		//
+		// Swap the read and write buffers.
+		//
+		void Swap();
 
 		//
 		// Get the read buffer.
@@ -71,6 +45,12 @@ namespace dd
 		T& Write() const;
 
 		DD_BASIC_TYPE( DoubleBuffer<T> )
+
+	private:
+
+		T* m_write { nullptr };
+		T* m_read { nullptr };
+		bool m_owner { true };
 	};
 }
 

@@ -49,7 +49,7 @@ namespace dd
 		void AddHandler(dd::InputAction action, dd::InputHandler handler);
 		void AddHandler(dd::InputAction action, dd::InputType type, dd::InputHandler handler);
 
-		// Just mark the given action as being handled by IsHeld().
+		// Just mark the given action as being handled by IsHeld(). Requires manual checking of IsHeld().
 		void AddHeldHandler(dd::InputAction action);
 
 		void SetCurrentMode(std::string mode_name);

@@ -39,7 +39,7 @@ namespace dd
 		void OnText(uint32 char_code);
 		void OnKey(Key key, ModifierFlags modifiers, InputType action);
 		void OnMousePosition(glm::vec2 absolute);
-		void OnMouseWheel(glm::vec2 absolute);
+		void OnMouseWheel(glm::vec2 delta);
 
 	private:
 		static const int MAX_EVENTS = 32;

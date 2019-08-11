@@ -27,12 +27,6 @@ namespace dd
 		virtual void Initialize(ddc::EntitySpace& space) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
-		void UpdateMouse( const MousePosition& pos );
-		void UpdateScroll( const MousePosition& pos );
-
-		void Enable( bool enabled ) { m_enabled = enabled; }
-		bool IsEnabled() const { return m_enabled; }
-
 		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
 
 	protected:
@@ -43,7 +37,6 @@ namespace dd
 
 		std::vector<FPSCameraComponent*> m_cameras;
 		glm::vec2 m_mouseDelta { 0, 0 };
-		glm::vec2 m_scrollDelta { 0, 0 };
 
 		bool m_enabled { true };
 		bool m_invert { false };

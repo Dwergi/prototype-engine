@@ -104,20 +104,13 @@ namespace neut
 
 	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::Input& input, float delta_t)
 	{
-		DD_TODO("This shouldn't really be doing a string comparison...");
-		if (s_freeCamera->IsEnabled() && s_input->GetCurrentMode() == "game")
-		{
-			free_cam.UpdateMouse(s_inputSource->GetMousePosition());
-			free_cam.UpdateScroll(s_inputSource->GetMouseScroll());
-		}
-
 		shaky_cam.Update(delta_t);
 	}
 
 	static void ToggleFreeCam()
 	{
-		s_freeCamera->Enable(!s_freeCamera->IsEnabled());
-		//s_shipSystem->Enable(!s_shipSystem->IsEnabled());
+		s_freeCamera->SetEnabled(!s_freeCamera->IsEnabled());
+		//s_shipSystem->SetEnabled(!s_shipSystem->IsEnabled());
 	}
 
 	static void CreateEntities(ddc::EntitySpace& entities)

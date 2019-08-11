@@ -37,7 +37,7 @@ namespace ddc
 
 		bool m_drawSystemsGraph { false };
 
-		void UpdateSystem(EntitySpace& space, System* system, std::vector<std::shared_future<void>> dependencies, float delta_t);
+		void UpdateSystem(System& system, EntitySpace& space, std::vector<std::shared_future<void>> dependencies, float delta_t);
 		void UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t);
 
 		void DrawDebugInternal();

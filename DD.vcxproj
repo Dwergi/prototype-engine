@@ -730,7 +730,6 @@
     <ClCompile Include="src\DataRequest.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCameraComponent.cpp" />
-    <ClCompile Include="src\DoubleBuffer.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\HitResult.cpp" />

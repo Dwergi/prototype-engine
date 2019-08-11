@@ -42,9 +42,13 @@ namespace dd
 			m_mousePosition.Write().Delta = m_mousePosition.Write().Absolute - m_mousePosition.Read().Absolute;
 		}
 		m_mousePosition.Swap();
+		m_mousePosition.Duplicate();
+		m_mousePosition.Write().Delta = glm::vec2(0);
 
 		m_mouseScroll.Write().Delta = m_mouseScroll.Write().Absolute - m_mouseScroll.Read().Absolute;
 		m_mouseScroll.Swap();
+		m_mouseScroll.Duplicate();
+		m_mouseScroll.Write().Delta = glm::vec2(0);
 	}
 
 	IInputSource& IInputSource::SetMousePosition(glm::vec2 position)
@@ -93,10 +97,11 @@ namespace dd
 		m_mousePosition.Write().Absolute = absolute;
 	}
 
-	void IInputSource::OnMouseWheel(glm::vec2 absolute)
+	void IInputSource::OnMouseWheel(glm::vec2 delta)
 	{
 		m_gotMouseInput = true;
 
-		m_mouseScroll.Write().Absolute = absolute;
+		m_mouseScroll.Write().Delta = delta;
+		m_mouseScroll.Write().Absolute += delta;
 	}
 }
