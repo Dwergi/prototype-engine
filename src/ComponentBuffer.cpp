@@ -17,11 +17,13 @@ namespace ddc
 
 		if( req.Optional() )
 		{
-			m_exists.reserve( m_count );
+			m_exists.resize( m_count );
 		}
 
 		size_t component_size = req.Component().Size();
 		byte* dest = m_storage;
+
+		memset(dest, 0, component_size * m_count);
 
 		for( size_t i = 0; i < m_count; ++i )
 		{
@@ -34,16 +36,14 @@ namespace ddc
 
 				if( req.Optional() )
 				{
-					m_exists.push_back( true );
+					m_exists[i] = true;
 				}
 			}
 			else
 			{
-				memset( dest, 0, component_size );
-
 				if( req.Optional() )
 				{
-					m_exists.push_back( false );
+					m_exists[i] = false;
 				}
 			}
 
