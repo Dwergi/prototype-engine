@@ -201,23 +201,32 @@ namespace ddr
 		m_bvh = new dd::BVHTree();
 		m_bvh->StartBatch();
 
+		ddm::AABB total_bounds;
+
 		const dd::ConstBuffer<glm::vec3>& positions = GetPositions();
 		const dd::ConstBuffer<uint>& indices = GetIndices();
 
-		dd::ConstTriangulator triangulator( positions, indices );
-		for( size_t i = 0; i < triangulator.Size(); ++i )
+		dd::ConstTriangulator triangulator(positions, indices);
+		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
-			dd::ConstTriangle tri = triangulator[ i ];
+			dd::ConstTriangle tri = triangulator[i];
 
 			ddm::AABB bounds;
-			bounds.Expand( tri.p0 );
-			bounds.Expand( tri.p1 );
-			bounds.Expand( tri.p2 );
+			bounds.Expand(tri.p0);
+			bounds.Expand(tri.p1);
+			bounds.Expand(tri.p2);
 
-			m_bvh->Add( bounds );
+			total_bounds.Expand(bounds);
+
+			m_bvh->Add(bounds);
 		}
 
 		m_bvh->EndBatch();
+
+		if (!m_hasBounds)
+		{
+			m_bounds = total_bounds;
+		}
 
 		m_rebuilding = false;
 	}

@@ -49,7 +49,7 @@ namespace neut
 		m_wireframe = new Wireframe();
 	}
 
-	void TerrainRenderer::RenderInit( ddc::EntitySpace& entities )
+	void TerrainRenderer::Initialize()
 	{
 		ddr::MaterialHandle material_h = s_materialManager->Create("terrain");
 
@@ -57,11 +57,11 @@ namespace neut
 		material->Shader = s_shaderManager->Load("terrain");
 	}
 
-	void TerrainRenderer::RenderUpdate( ddc::EntitySpace& entities )
+	void TerrainRenderer::Update(ddr::RenderData& data)
 	{
-		entities.ForAllWith<neut::TerrainChunkComponent>( []( ddc::Entity, neut::TerrainChunkComponent& chunk )
+		data.EntitySpace().ForAllWith<neut::TerrainChunkComponent>( []( ddc::Entity, neut::TerrainChunkComponent& chunk )
 		{
-			chunk.Chunk->RenderUpdate();
+			chunk.Chunk->Update();
 		} );
 	}
 

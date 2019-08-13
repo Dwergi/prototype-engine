@@ -17,9 +17,9 @@ namespace ddr
 	{
 		LightRenderer();
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
-		virtual void Render( const RenderData& render_data ) override;
+		virtual void Initialize() override;
+		virtual void Update(ddr::RenderData& data) override;
+		virtual void Render(const ddr::RenderData& render_data) override;
 
 		virtual const char* GetDebugTitle() const override { return "Lights"; }
 

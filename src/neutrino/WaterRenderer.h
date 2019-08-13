@@ -24,9 +24,9 @@ namespace neut
 	{
 		WaterRenderer();
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
-		virtual void Render( const ddr::RenderData& render_data ) override;
+		virtual void Initialize() override;
+		virtual void Update(ddr::RenderData& render_data) override;
+		virtual void Render(const ddr::RenderData& render_data) override;
 
 	private:
 		ddr::RenderState m_renderState;

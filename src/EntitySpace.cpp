@@ -141,8 +141,7 @@ namespace ddc
 
 		const EntityEntry& entry = m_entities[ entity.ID ];
 
-		return entry.Entity.Version == entity.Version &&
-			(entry.Alive || entry.Create);
+		return entry.Entity.Version == entity.Version && (entry.Alive || entry.Create);
 	}
 
 	int EntitySpace::ComponentCount(Entity entity) const

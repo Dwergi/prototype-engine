@@ -36,7 +36,7 @@ namespace ddr
 		m_renderState.Depth = true;
 	}
 
-	void LinesRenderer::RenderInit( ddc::EntitySpace& entities )
+	void LinesRenderer::Initialize()
 	{
 		m_shader = s_shaderManager->Load( "line" );
 		DD_ASSERT( m_shader.IsValid() );
@@ -57,7 +57,7 @@ namespace ddr
 		m_vao.Unbind();
 	}
 
-	void LinesRenderer::Render( const RenderData& render_data )
+	void LinesRenderer::Render(const ddr::RenderData& render_data)
 	{
 		auto lines = render_data.Get<dd::LinesComponent>();
 		auto transforms = render_data.Get<dd::TransformComponent>();

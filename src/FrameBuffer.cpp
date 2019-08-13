@@ -102,7 +102,7 @@ namespace ddr
 		return true;
 	}
 
-	void FrameBuffer::RenderInit()
+	void FrameBuffer::Initialize()
 	{
 		if( !m_blitShader.IsValid() )
 		{

@@ -52,14 +52,26 @@ namespace dd
 			case sf::Keyboard::X: return Key::X;
 			case sf::Keyboard::Y: return Key::Y;
 			case sf::Keyboard::Z: return Key::Z;
+			case sf::Keyboard::LShift: return Key::LSHIFT;
+			case sf::Keyboard::LControl: return Key::LCTRL;
+			case sf::Keyboard::LAlt: return Key::LALT;
+			case sf::Keyboard::Hyphen: return Key::HYPHEN;
+			case sf::Keyboard::Period: return Key::PERIOD;
 			case sf::Keyboard::Escape: return Key::ESCAPE;
+			case sf::Keyboard::Space: return Key::SPACE;
 			case sf::Keyboard::Enter: return Key::ENTER;
+			case sf::Keyboard::Backspace: return Key::BACKSPACE;
 			case sf::Keyboard::Tab: return Key::TAB;
 			case sf::Keyboard::PageUp: return Key::PAGE_UP;
 			case sf::Keyboard::PageDown: return Key::PAGE_DOWN;
 			case sf::Keyboard::Home: return Key::HOME;
 			case sf::Keyboard::End: return Key::END;
+			case sf::Keyboard::Delete: return Key::DEL;
 			case sf::Keyboard::Pause: return Key::PAUSE;
+			case sf::Keyboard::Left: return Key::LEFT_ARROW;
+			case sf::Keyboard::Right: return Key::RIGHT_ARROW;
+			case sf::Keyboard::Up: return Key::UP_ARROW;
+			case sf::Keyboard::Down: return Key::DOWN_ARROW;
 			case sf::Keyboard::F1: return Key::F1;
 			case sf::Keyboard::F2: return Key::F2;
 			case sf::Keyboard::F3: return Key::F3;
@@ -70,9 +82,7 @@ namespace dd
 			case sf::Keyboard::F8: return Key::F8;
 			case sf::Keyboard::F9: return Key::F9;
 			case sf::Keyboard::F10: return Key::F10;
-			case sf::Keyboard::LShift: return Key::LSHIFT;
-			case sf::Keyboard::LControl: return Key::LCTRL;
-			case sf::Keyboard::LAlt: return Key::LALT;
+
 			default: return Key::NONE;
 		}
 	}

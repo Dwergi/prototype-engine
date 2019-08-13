@@ -18,7 +18,7 @@ namespace dd
 	struct BoundSphereComponent;
 	struct ColourComponent;
 	struct JobSystem;
-	struct MeshComponent; 
+	struct MeshComponent;
 	struct TransformComponent;
 }
 
@@ -29,15 +29,15 @@ namespace ddr
 	public:
 		MeshRenderer();
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
-		virtual void Render( const ddr::RenderData& render_data ) override;
+		virtual void Initialize() override;
+		virtual void Update(ddr::RenderData& data) override;
+		virtual void Render(const ddr::RenderData& render_data) override;
 
 	private:
 
 		int m_meshCount { 0 };
 		int m_unculledMeshCount { 0 };
-		
+
 		bool m_frustumCull { true };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_drawNormals { false };
@@ -48,10 +48,10 @@ namespace ddr
 		MeshHandle m_cube;
 
 		ddr::CommandBuffer<ddr::MeshRenderCommand> m_commands;
-		
-		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+
+		void RenderMesh(ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
-			const ddr::RenderData& render_data );
+			const ddr::RenderData& render_data);
 
 		void ProcessCommands(ddr::UniformStorage& uniforms);
 		void DrawMeshInstances(Mesh* mesh, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);

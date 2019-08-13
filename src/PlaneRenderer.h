@@ -20,8 +20,8 @@ namespace ddr
 		PlaneRenderer();
 		~PlaneRenderer();
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
-		virtual void Render( const ddr::RenderData& data ) override;
+		virtual void Initialize() override;
+		virtual void Render(const ddr::RenderData& data) override;
 		virtual bool UsesAlpha() const { return true; }
 
 	private:

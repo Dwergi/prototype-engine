@@ -51,9 +51,9 @@ namespace dd
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
 		
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
-		virtual void Render( const ddr::RenderData& render_data ) override;
+		virtual void Initialize() override;
+		virtual void Update(ddr::RenderData& data) override;
+		virtual void Render(const ddr::RenderData& render_data) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
 		virtual void RenderDebug( const ddr::RenderData& data ) override;
@@ -67,7 +67,7 @@ namespace dd
 		ddc::Entity m_selected;
 		ddc::Entity m_focused;
 
-		glm::vec2 m_position;
+		glm::vec2 m_position { 0, 0 };
 		float m_depth { 0.0f };
 
 		ddr::MaterialHandle m_material;
@@ -87,7 +87,7 @@ namespace dd
 		dd::HitResult m_hitResult;
 		dd::HitHandle m_pendingHit;
 
-		glm::ivec2 m_previousSize;
+		glm::ivec2 m_previousSize { 0, 0 };
 
 		virtual void DrawDebugInternal() override;
 

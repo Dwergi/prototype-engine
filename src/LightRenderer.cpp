@@ -60,18 +60,18 @@ namespace ddr
 		}
 	}
 
-	void LightRenderer::RenderInit( ddc::EntitySpace& entities )
+	void LightRenderer::Initialize()
 	{
 		m_shader = ddr::ShaderHandle( "mesh" );
 		m_mesh = ddr::MeshHandle( "sphere" );
 	}
 
-	void LightRenderer::RenderUpdate( ddc::EntitySpace& entities )
+	void LightRenderer::Update(ddr::RenderData& data)
 	{
-		UpdateDebugPointLights( entities );
+		UpdateDebugPointLights(data.EntitySpace());
 	}
 
-	void LightRenderer::Render( const RenderData& data )
+	void LightRenderer::Render(const ddr::RenderData& data)
 	{
 		auto lights = data.Get<dd::LightComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();

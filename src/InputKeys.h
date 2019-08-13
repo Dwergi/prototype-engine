@@ -14,6 +14,8 @@ namespace dd
 	{
 		NONE = -1,
 		SPACE = 32,
+		HYPHEN = 45,
+		PERIOD = 46,
 		KEY_0 = 48,
 		KEY_1 = 49,
 		KEY_2 = 50,

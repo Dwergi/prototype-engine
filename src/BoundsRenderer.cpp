@@ -70,7 +70,7 @@ namespace ddr
 
 	}
 
-	void BoundsRenderer::RenderInit(ddc::EntitySpace& entities)
+	void BoundsRenderer::Initialize()
 	{
 		auto handler = [this]()
 		{

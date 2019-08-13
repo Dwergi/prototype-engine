@@ -21,6 +21,8 @@ namespace dd
 
 	struct InputEvent
 	{
+		static const int MAX_EVENTS = 32;
+
 		InputEvent() {}
 		InputEvent(const InputEvent& other);
 		InputEvent(Key k, ModifierFlags mods, InputType t) : Key(k), Modifiers(mods), Type(t) {}

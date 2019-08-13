@@ -225,8 +225,9 @@ static int GameMain()
 			for (ddc::EntitySpace* space : entity_spaces)
 			{
 				s_systemsManager->Initialize(*space);
-				s_renderer->Initialize(*space);
 			}
+
+			s_renderer->Initialize();
 		}
 
 		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
@@ -238,7 +239,6 @@ static int GameMain()
 			DD_PROFILE_SCOPED(Frame);
 
 			{
-				DD_TODO("Should make a scoped profile timer.");
 				s_profilerTimer.Restart();
 
 				StartFrame();

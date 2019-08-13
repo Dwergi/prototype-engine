@@ -21,8 +21,8 @@ namespace ddm
 
 		glm::vec2 NearestPoint(glm::vec2 pt) const;
 
-		glm::vec2 Min;
-		glm::vec2 Max;
+		glm::vec2 Min { 0, 0 };
+		glm::vec2 Max { 1, 1 };
 
 		// Get the nearest normal to the direction.
 		static glm::vec2 NearestNormal(glm::vec2 dir);

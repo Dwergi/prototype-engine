@@ -14,8 +14,9 @@ namespace stress
 	struct StressTestGame : dd::IGame, dd::IDebugPanel
 	{
 	private:
-		int m_entityCount { 32 * 1024 };
+		int m_entityCount { 0 };
 		int m_createCount { 0 };
+		bool m_physics { true };
 
 		// IDebugPanel implementation
 		virtual void DrawDebugInternal() override;

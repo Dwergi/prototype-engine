@@ -33,6 +33,8 @@ namespace dd
 
 		void GetEvents(IArray<InputEvent>& out) const { out = m_events.Read(); }
 
+		const Array<uint32, InputEvent::MAX_EVENTS>& GetText() const { return m_text.Read(); }
+
 	protected:
 		
 		// use these to register key events during OnUpdateInput
@@ -42,10 +44,9 @@ namespace dd
 		void OnMouseWheel(glm::vec2 delta);
 
 	private:
-		static const int MAX_EVENTS = 32;
 
-		DoubleBuffer<Array<InputEvent, MAX_EVENTS>> m_events;
-		DoubleBuffer<Array<uint32, MAX_EVENTS>> m_text;
+		DoubleBuffer<Array<InputEvent, InputEvent::MAX_EVENTS>> m_events;
+		DoubleBuffer<Array<uint32, InputEvent::MAX_EVENTS>> m_text;
 		DoubleBuffer<MousePosition> m_mousePosition;
 		DoubleBuffer<MousePosition> m_mouseScroll;
 

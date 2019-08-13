@@ -60,16 +60,23 @@ namespace ddr
 	struct RenderData
 	{
 	public:
-		RenderData( const ddc::EntitySpace& entity_space, const ddr::ICamera& camera, 
-			ddr::UniformStorage& uniforms, const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requirements );
+		RenderData(ddc::EntitySpace& entity_space, const ddr::ICamera& camera, ddr::UniformStorage& uniforms, 
+			const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requirements, float delta_t);
+
+		RenderData(RenderData&& data);
 
 		const ddc::EntitySpace& EntitySpace() const { return m_space; }
+		ddc::EntitySpace& EntitySpace() { return m_space; }
+
 		const ddr::ICamera& Camera() const { return m_camera; }
 
 		ddr::UniformStorage& Uniforms() const { return m_uniforms; }
 
+		float Delta() const { return m_delta; }
+
 		const std::vector<ddc::Entity>& Entities() const { return m_entities; }
 		size_t Size() const { return m_entities.size(); }
+
 
 		template <typename T>
 		ddc::ReadView<T> Get() const
@@ -88,9 +95,10 @@ namespace ddr
 		}
 
 	private:
-		const ddc::EntitySpace& m_space;
+		ddc::EntitySpace& m_space;
 		const ddr::ICamera& m_camera;
 		ddr::UniformStorage& m_uniforms;
+		float m_delta { 0 };
 
 		std::vector<ddc::Entity> m_entities;
 		std::vector<ddc::ComponentBuffer> m_buffers;

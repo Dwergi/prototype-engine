@@ -52,7 +52,7 @@ namespace ddr
 		m_renderState.Depth = true;
 	}
 
-	void ParticleSystemRenderer::RenderInit( ddc::EntitySpace& entities )
+	void ParticleSystemRenderer::Initialize()
 	{
 		s_shaderParticle = s_shaderManager->Load( "particle" );
 

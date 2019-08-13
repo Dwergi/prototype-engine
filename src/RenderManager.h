@@ -34,7 +34,11 @@ namespace ddr
 		//
 		// Initialize all registered renderers.
 		//
-		void Initialize( ddc::EntitySpace& entities );
+		void Initialize();
+
+		//
+		// Shutdown all registered renderers.
+		//
 		void Shutdown();
 
 		//
@@ -85,8 +89,7 @@ namespace ddr
 		void BeginRender( const ddc::EntitySpace& entities, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		using CallRendererFn = std::function<void(IRenderer&, const RenderData&)>;
-		void CallRenderer( ddr::IRenderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, const CallRendererFn& fn );
+		RenderData CreateRenderData(ddr::IRenderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, float delta_t);
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

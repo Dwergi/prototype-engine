@@ -48,7 +48,7 @@ namespace ddr
 		//
 		// Set the bounds of this mesh.
 		//
-		void SetBoundBox( const ddm::AABB& bounds ) { m_bounds = bounds; }
+		void SetBoundBox(const ddm::AABB& bounds) { m_bounds = bounds; m_hasBounds = true; }
 
 		//
 		// Set the positions that the mesh will use.
@@ -169,6 +169,7 @@ namespace ddr
 		
 		VAO m_vao;
 
+		bool m_hasBounds { false };
 		ddm::AABB m_bounds;
 
 		bool m_enableBVH { true };

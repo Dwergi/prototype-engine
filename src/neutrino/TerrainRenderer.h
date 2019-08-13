@@ -26,12 +26,12 @@ namespace neut
 		//
 		// Initialize render resources for the terrain system.
 		//
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
+		virtual void Initialize() override;
 
 		//
 		// Update terrain chunks on the render thread.
 		//
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) override;
+		virtual void Update(ddr::RenderData& data) override;
 
 		//
 		// Commit uniforms to the renderer.

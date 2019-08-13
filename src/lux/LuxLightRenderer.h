@@ -9,8 +9,8 @@ namespace lux
 	{
 		LuxLightRenderer();
 
+		virtual void Initialize() override;
 		virtual void Render(const ddr::RenderData& render_data) override;
-		virtual void RenderInit(ddc::EntitySpace& entities) override;
 
 	private: 
 		ddr::ShaderHandle m_shader;

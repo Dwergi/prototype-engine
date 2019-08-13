@@ -20,8 +20,6 @@ namespace dd
 	PhysicsSystem::PhysicsSystem() :
 		ddc::System( "Physics" )
 	{
-		m_gravity = glm::vec3( 0, -9.81, 0 );
-
 		RequireWrite<dd::TransformComponent>( "dynamic_spheres" );
 		RequireWrite<dd::PhysicsSphereComponent>( "dynamic_spheres" );
 		RequireTag( ddc::Tag::Dynamic, "dynamic_spheres" );
@@ -89,14 +87,14 @@ namespace dd
 		float a = glm::dot( v, v );
 		if( a < 0.001f )
 		{
-			// spheres not sphere relative to each other
+			// spheres not moving relative to each other
 			return false;
 		}
 
 		float b_index = glm::dot( v, s );
 		if( b_index > 0 )
 		{
-			// spheres not sphere towards each other
+			// spheres not moving towards each other
 			return false;
 		}
 
@@ -273,6 +271,8 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED( PhysicsSystem_Update );
 
+		m_collisions = 0;
+
 		float delta_t = update.Delta();
 		
 		auto static_planes = update.Data( "static_planes" );
@@ -314,6 +314,11 @@ namespace dd
 
 			glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
 
+			if (collision)
+			{
+				++m_collisions;
+			}
+
 			if( !collision )
 			{
 				ds_transform.Position = ds_transform.Position + velocity * delta_t;
@@ -330,5 +335,7 @@ namespace dd
 	void PhysicsSystem::DrawDebugInternal()
 	{
 		ImGui::DragFloat3( "Gravity", glm::value_ptr( m_gravity ) );
+
+		ImGui::Value("Collisions", m_collisions);
 	}
 }

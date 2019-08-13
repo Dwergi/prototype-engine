@@ -45,7 +45,7 @@ namespace ddr
 		m_renderState.Depth = false;
 	}
 
-	void SpriteRenderer::RenderInit(ddc::EntitySpace& entities)
+	void SpriteRenderer::Initialize()
 	{
 		s_shader = s_shaderManager->Load("sprite");
 

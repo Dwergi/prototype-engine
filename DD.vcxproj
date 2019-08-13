@@ -349,6 +349,7 @@
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
+    <ClInclude Include="src\d2d\Bounds2DRenderer.h" />
     <ClInclude Include="src\d2d\CirclePhysicsComponent.h" />
     <ClInclude Include="src\d2d\Physics2DBase.h" />
     <ClInclude Include="src\d2d\Physics2DSystem.h" />
@@ -652,6 +653,7 @@
     <ClCompile Include="src\BoundsHelpers.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
     <ClCompile Include="src\CommandBuffer.cpp" />
+    <ClCompile Include="src\d2d\Bounds2DRenderer.cpp" />
     <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp" />
     <ClCompile Include="src\d2d\CirclePhysicsComponent.cpp" />
     <ClCompile Include="src\d2d\Physics2DBase.cpp" />

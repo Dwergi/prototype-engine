@@ -41,7 +41,7 @@ namespace ddr
 		Optional<dd::BoundSphereComponent>();
 	}
 
-	void MeshRenderer::RenderInit( ddc::EntitySpace& entities )
+	void MeshRenderer::Initialize()
 	{
 		dd::MeshUtils::CreateDefaultMaterial();
 		dd::MeshUtils::CreateUnitCube();
@@ -52,7 +52,7 @@ namespace ddr
 		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 	}
 
-	void MeshRenderer::RenderUpdate( ddc::EntitySpace& entities )
+	void MeshRenderer::Update(ddr::RenderData& data)
 	{
 		size_t count = s_meshManager->LiveCount();
 		

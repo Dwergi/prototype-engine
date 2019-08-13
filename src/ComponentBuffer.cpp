@@ -23,7 +23,10 @@ namespace ddc
 		size_t component_size = req.Component().Size();
 		byte* dest = m_storage;
 
-		memset(dest, 0, component_size * m_count);
+		std::memset(dest, 0, component_size * m_count);
+
+		size_t copy_size = 0;
+		byte* copy_start = nullptr;
 
 		for( size_t i = 0; i < m_count; ++i )
 		{
@@ -32,12 +35,17 @@ namespace ddc
 
 			if( src != nullptr )
 			{
-				memcpy( dest, src, component_size );
-
 				if( req.Optional() )
 				{
 					m_exists[i] = true;
 				}
+
+				if (copy_start == nullptr)
+				{
+					copy_start = (byte*) src;
+				}
+
+				copy_size += component_size;
 			}
 			else
 			{
@@ -45,9 +53,21 @@ namespace ddc
 				{
 					m_exists[i] = false;
 				}
-			}
 
-			dest += component_size;
+				if (copy_start != nullptr && copy_size > 0)
+				{
+					std::memcpy(dest, copy_start, copy_size);
+
+					dest += copy_size;
+					copy_size = 0;
+					copy_start = nullptr;
+				}
+			}
+		}
+
+		if (copy_start != nullptr && copy_size > 0)
+		{
+			std::memcpy(dest, copy_start, copy_size);
 		}
 
 		DD_ASSERT( m_exists.size() == 0 || req.Optional() );

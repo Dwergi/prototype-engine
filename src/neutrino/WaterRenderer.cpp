@@ -30,7 +30,7 @@ namespace neut
 		Require<neut::WaterComponent>();
 	}
 
-	void WaterRenderer::RenderInit( ddc::EntitySpace& entities )
+	void WaterRenderer::Initialize()
 	{
 		ddr::MaterialHandle material_h = s_materialManager->Create("water");
 
@@ -42,9 +42,11 @@ namespace neut
 		material->State.DepthWrite = false;
 	}
 
-	void WaterRenderer::RenderUpdate( ddc::EntitySpace& entities )
+	void WaterRenderer::Update(ddr::RenderData& render_data)
 	{
-		entities.ForAllWith<neut::WaterComponent>( [&entities]( ddc::Entity entity, neut::WaterComponent& water )
+		ddc::EntitySpace& space = render_data.EntitySpace();
+
+		space.ForAllWith<neut::WaterComponent>( [&space]( ddc::Entity entity, neut::WaterComponent& water )
 		{
 			if( water.Dirty && water.Mesh.IsValid() )
 			{

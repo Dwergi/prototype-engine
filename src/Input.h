@@ -61,6 +61,8 @@ namespace dd
 		void SetKeyBindings(InputKeyBindings& bindings) { m_bindings = &bindings; }
 		InputKeyBindings* GetKeyBindings() const { return m_bindings; }
 
+		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> GetText() const { return m_text; }
+
 	private:
 
 		struct InputRecvHash { std::size_t operator()(const InputReceived& key) const { return ((size_t) key.Action << 32) | ((size_t) key.Type); } };
@@ -75,6 +77,8 @@ namespace dd
 		InputKeyBindings* m_bindings { nullptr };
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
+
+		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> m_text;
 
 		MousePosition m_mousePosition;
 		MousePosition m_mouseScroll;

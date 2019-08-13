@@ -24,7 +24,7 @@ namespace lux
 		s_timer.Start();
 	}
 
-	void LuxLightRenderer::RenderInit(ddc::EntitySpace& entities)
+	void LuxLightRenderer::Initialize()
 	{
 		m_shader = ddr::ShaderHandle("sprite");
 	}

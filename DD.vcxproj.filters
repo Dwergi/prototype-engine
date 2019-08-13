@@ -774,6 +774,9 @@
     <ClInclude Include="src\IRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\d2d\Bounds2DRenderer.h">
+      <Filter>Systems\d2d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1368,6 +1371,9 @@
     <ClCompile Include="src\Physics2DGame.cpp" />
     <ClCompile Include="src\stress\IRenderer.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d2d\Bounds2DRenderer.cpp">
+      <Filter>Systems\d2d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

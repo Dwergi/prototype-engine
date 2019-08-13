@@ -20,9 +20,9 @@ namespace ddr
 
 		ParticleSystemRenderer();
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) override;
+		virtual void Initialize() override;
 		virtual bool UsesAlpha() const override { return true; }
-		virtual void Render( const ddr::RenderData& data );
+		virtual void Render(const ddr::RenderData& data);
 
 	private:
 		

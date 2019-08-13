@@ -51,7 +51,7 @@ namespace ddr
 		Texture* GetColourTexture() const { return m_texColour; }
 		Texture* GetDepthTexture() const { return m_texDepth; }
 
-		void RenderInit();
+		void Initialize();
 
 		void Render( ddr::UniformStorage& uniforms );
 		void RenderDepth( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );

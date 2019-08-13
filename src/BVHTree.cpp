@@ -24,8 +24,6 @@ namespace dd
 
 	size_t BVHTree::Add( const ddm::AABB& bounds )
 	{
-		DD_ASSERT( m_entries.size() < 32 * 1024, "Oversized BVH!" );
-
 		if( m_freeEntries.empty() )
 		{
 			m_freeEntries.push_back( (int) m_entries.size() );
@@ -410,9 +408,6 @@ namespace dd
 		right.SplitAxis = split_axis;
 		right.Parent = parent_index;
 
-		/*DD_ASSERT( left.Region.Volume() > 0 );
-		DD_ASSERT( right.Region.Volume() > 0 );*/
-
 		parent_bucket.Left = left_index;
 		parent_bucket.Right = right_index;
 
@@ -422,7 +417,7 @@ namespace dd
 			const BVHEntry& entry = m_entries[ entry_index ];
 			glm::vec3 center = entry.Bounds.Center();
 
-			if( left.Region.Contains( center ) )
+			if (left.Region.Contains(center))
 			{
 				left.Entries.Add( entry_index );
 				left.Bounds.Expand( entry.Bounds );
@@ -444,6 +439,7 @@ namespace dd
 		glm::vec3 center = entry.Bounds.Center();
 
 		size_t current_index = 0;
+		int already_split = false;
 
 		while( true )
 		{
@@ -461,11 +457,16 @@ namespace dd
 				{
 					// split and re-loop with the current bucket no longer being a leaf
 					SplitBucket( current_index );
+					++already_split;
+
+					DD_TODO("This isn't really working out - getting massively unbalanced trees. Rethink entirely.");
+					DD_ASSERT(already_split < 5);
 				}
 			}
 			else
 			{
 				BVHBucket& left = m_buckets[ current.Left ];
+
 				if( left.Region.Contains( center ) )
 				{
 					current_index = current.Left;

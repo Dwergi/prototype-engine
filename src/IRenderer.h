@@ -15,11 +15,11 @@ namespace ddr
 	{
 		IRenderer( const char* renderer ) : m_name( renderer ) {}
 
-		virtual void RenderInit( ddc::EntitySpace& entities ) {}
+		virtual void Initialize() {} 
+		virtual void Shutdown() {}
 
-		virtual void RenderUpdate(ddc::EntitySpace& entities) { DD_TODO("This should probably take a RenderData?"); }
-		virtual void Render( const RenderData& render_data ) {}
-		virtual void RenderShutdown() {}
+		virtual void Update(RenderData& render_data) {}
+		virtual void Render(const RenderData& render_data) {}
 
 		virtual bool ShouldRenderDebug() const { return false; }
 		virtual void RenderDebug( const RenderData& render_data ) {}

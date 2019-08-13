@@ -16,6 +16,8 @@
 #include "LightComponent.h"
 #include "LightRenderer.h"
 #include "MeshRenderer.h"
+#include "PhysicsSphereComponent.h"
+#include "PhysicsSystem.h"
 #include "Random.h"
 #include "RayRenderer.h"
 #include "RenderManager.h"
@@ -49,6 +51,8 @@ namespace stress
 
 	void StressTestGame::Initialize()
 	{
+		m_entityCount = 2 * 1024;
+
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
 		game_input.ShowCursor(false)
 			.CaptureMouse(true)
@@ -81,23 +85,32 @@ namespace stress
 
 	static uint s_entitiesStart = 0;
 
-	static void DestroyEntities(ddc::EntitySpace& space, size_t count)
+	static void DestroyEntities(ddc::EntitySpace& space, uint count)
 	{
 		if (count == 0)
 		{
 			return;
 		}
 
-		dd::Random32 rng(s_entitiesStart, space.Size() - 1);
+		dd::RandomFloat rng;
 
 		// destroy entities
-		while (count > 0)
+		for (uint i = s_entitiesStart; i < space.Size(); ++i)
 		{
-			ddc::Entity entity = space.GetEntity(rng.Next());
+			ddc::Entity entity = space.GetEntity(i);
 			if (entity.IsAlive())
 			{
-				space.DestroyEntity(entity);
-				--count;
+				float value = rng.Next() > 0.5f;
+				if (value > 0.5f)
+				{
+					space.DestroyEntity(entity);
+					--count;
+				}
+			}
+
+			if (count == 0)
+			{
+				break;
 			}
 		}
 	}
@@ -115,12 +128,17 @@ namespace stress
 
 		while (count > 0)
 		{
-			ddc::Entity entity = space.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::ColourComponent>();
+			ddc::Entity entity = space.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::ColourComponent, dd::PhysicsSphereComponent>();
 			entity.AddTag(ddc::Tag::Visible);
+			entity.AddTag(ddc::Tag::Dynamic);
 
 			dd::TransformComponent* transform = entity.Access<dd::TransformComponent>();
 			transform->Position = glm::vec3(rng.Next() * MAX_POSITION, rng.Next() * MAX_POSITION, rng.Next() * MAX_POSITION);
 			transform->Update();
+
+			dd::PhysicsSphereComponent* physics = entity.Access<dd::PhysicsSphereComponent>();
+			physics->Sphere.Radius = 0.5f;
+			physics->Sphere.Centre = glm::vec3(0.5f);
 
 			dd::ColourComponent* colour = entity.Access<dd::ColourComponent>();
 			colour->Colour = glm::vec4(rng.Next(), rng.Next(), rng.Next(), 1);
@@ -137,7 +155,7 @@ namespace stress
 	void StressTestGame::Update(const dd::GameUpdateData& update_data)
 	{
 		ddc::EntitySpace& space = update_data.EntitySpace();
-		
+
 		s_freeCam->SetEnabled(s_input->GetCurrentMode() == "game");
 
 		int entity_count = space.LiveCount();
@@ -162,6 +180,26 @@ namespace stress
 			uint to_create = (uint) (m_entityCount - entity_count);
 			CreateEntities(space, to_create);
 		}
+
+		ddc::EntitySpace& entities = update_data.EntitySpace();
+		entities.ForAllWith<dd::TransformComponent, dd::PhysicsSphereComponent>(
+			[this](ddc::Entity e, auto& transform, auto& physics)
+			{
+				if (m_physics)
+				{
+					e.AddTag(ddc::Tag::Dynamic);
+				}
+				else
+				{
+					e.RemoveTag(ddc::Tag::Dynamic);
+				}
+
+				if (transform.Position.y < 0.0f)
+				{
+					transform.Position.y = MAX_POSITION;
+					physics.Momentum = glm::vec3(0.0f); 
+				}
+			});
 
 		CreateEntities(space, m_createCount);
 		DestroyEntities(space, m_createCount);
@@ -201,8 +239,13 @@ namespace stress
 
 	void StressTestGame::DrawDebugInternal()
 	{
-		ImGui::SliderInt("Entity Count", &m_entityCount, 0, 1024 * 1024);
-		ImGui::SliderInt("Create/Destroy Count", &m_createCount, 0, 1024 * 1024);
+		int count = m_entityCount / 1024;
+		if (ImGui::SliderInt("Entity Count (K)", &count, 0, 128))
+		{
+			m_entityCount = count * 1024;
+		}
+		ImGui::SliderInt("Create/Destroy Count", &m_createCount, 0, m_entityCount / 2);
+		ImGui::Checkbox("Physics", &m_physics);
 	}
 	
 	void StressTestGame::RegisterRenderers(ddr::RenderManager& render_manager)
@@ -225,6 +268,10 @@ namespace stress
 		dd::FreeCameraController& free_cam = dd::Services::Register(new dd::FreeCameraController());
 		systems_manager.Register(free_cam);
 		s_debugUI->RegisterDebugPanel(free_cam);
+
+		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
+		systems_manager.Register(physics_system);
+		s_debugUI->RegisterDebugPanel(physics_system);
 	}
 
 	ddr::ICamera& StressTestGame::GetCamera() const

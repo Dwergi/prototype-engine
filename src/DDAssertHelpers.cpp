@@ -132,12 +132,10 @@ namespace dd
 		{
 			if (std::this_thread::get_id() == s_mainThread)
 			{
-				__debugbreak();
 				CheckAssert();
 			}
 			else
 			{
-				__debugbreak();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 		} while (s_assert.Action == AssertAction::None);

@@ -10,6 +10,8 @@
 
 namespace dd
 {
+#pragma optimize("", off)
+
 	static dd::Service<IWindow> s_window;
 	static dd::Service<IInputSource> s_inputSource;
 	static dd::Service<Input> s_input;
@@ -242,25 +244,17 @@ namespace dd
 				continue;
 			}
 
-			ImGuiKey_ imkey = GetImGuiKey(evt.Key);
-			if (imkey >= ImGuiKey_COUNT)
-			{
-				continue;
-			}
-
 			if (evt.Type == InputType::Press)
 			{
-				io.KeysDown[imkey] = true;
-
-				if (evt.Modifiers.Has(Modifier::Alt))
+				if (evt.Key == Key::LALT)
 				{
 					io.KeyAlt = true;
 				}
-				if (evt.Modifiers.Has(Modifier::Shift))
+				if (evt.Key == Key::LSHIFT)
 				{
 					io.KeyShift = true;
 				}
-				if (evt.Modifiers.Has(Modifier::Ctrl))
+				if (evt.Key == Key::LCTRL)
 				{
 					io.KeyCtrl = true;
 				}
@@ -268,7 +262,28 @@ namespace dd
 
 			if (evt.Type == InputType::Release)
 			{
-				io.KeysDown[imkey] = false;
+				if (evt.Key == Key::LALT)
+				{
+					io.KeyAlt = false;
+				}
+				if (evt.Key == Key::LSHIFT)
+				{
+					io.KeyShift = false;
+				}
+				if (evt.Key == Key::LCTRL)
+				{
+					io.KeyCtrl = false;
+				}
+			}
+
+			if (evt.Type == InputType::Press)
+			{
+				io.KeysDown[(int) evt.Key] = true;
+			}
+
+			if (evt.Type == InputType::Release)
+			{
+				io.KeysDown[(int) evt.Key] = false;
 			}
 		}
 	}
@@ -301,7 +316,16 @@ namespace dd
 		UpdateKeyboard();
 
 		s_input->EnableKeyboard(!io.WantCaptureKeyboard);
-		s_input->EnableKeyboard(!io.WantCaptureMouse);
+		s_input->EnableMouse(!io.WantCaptureMouse);
+
+		if (io.WantTextInput)
+		{
+			dd::Array<uint32, dd::InputEvent::MAX_EVENTS> text = s_input->GetText();
+			for (uint32 ch : text)
+			{
+				io.AddInputCharacter(ch);
+			}
+		}
 
 		ImGui::NewFrame();
 	}

@@ -23,6 +23,8 @@ namespace dd
 	private:
 		virtual void DrawDebugInternal() override;
 		
-		glm::vec3 m_gravity;
+		glm::vec3 m_gravity { 0, -9.81, 0 };
+
+		int m_collisions { 0 };
 	};
 }

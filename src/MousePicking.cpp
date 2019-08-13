@@ -87,7 +87,7 @@ namespace dd
 		return base[index];
 	}
 
-	void MousePicking::RenderInit(ddc::EntitySpace& entities)
+	void MousePicking::Initialize()
 	{
 		ddr::ShaderHandle shader = s_shaderManager->Load("picking");
 		m_material = s_materialManager->Create("picking");
@@ -95,9 +95,6 @@ namespace dd
 
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
-
-		m_previousRay = entities.CreateEntity();
-		entities.Add<dd::RayComponent>(m_previousRay);
 	}
 
 	void MousePicking::CreateFrameBuffer(glm::ivec2 window_size)
@@ -118,22 +115,27 @@ namespace dd
 		m_framebuffer.SetClearDepth(0.0f);
 		m_framebuffer.SetClearColour(glm::vec4(1));
 		m_framebuffer.Create(m_idTexture, &m_depthTexture);
-		m_framebuffer.RenderInit();
+		m_framebuffer.Initialize();
 	}
 
-	void MousePicking::RenderUpdate(ddc::EntitySpace& entities)
+	void MousePicking::Update(ddr::RenderData& data)
 	{
+		if (!m_previousRay.IsValid())
+		{
+			m_previousRay = data.EntitySpace().CreateEntity<dd::RayComponent>();
+		}
+
 		// set focused
 		if (m_focused.IsValid())
 		{
-			entities.RemoveTag(m_focused, ddc::Tag::Focused);
+			m_focused.RemoveTag(ddc::Tag::Focused);
 		}
 
 		m_focused = m_hitEntity;
 
 		if (m_focused.IsValid())
 		{
-			entities.AddTag(m_focused, ddc::Tag::Focused);
+			m_focused.AddTag(ddc::Tag::Focused);
 		}
 
 		// select
@@ -141,14 +143,14 @@ namespace dd
 		{
 			if (m_selected.IsValid())
 			{
-				entities.RemoveTag(m_selected, ddc::Tag::Selected);
+				m_selected.RemoveTag(ddc::Tag::Selected);
 			}
 
 			m_selected = m_hitEntity;
 
 			if (m_selected.IsValid())
 			{
-				entities.AddTag(m_focused, ddc::Tag::Selected);
+				m_selected.AddTag(ddc::Tag::Selected);
 			}
 		}
 
@@ -160,11 +162,11 @@ namespace dd
 
 		if (m_visualizeRay)
 		{
-			entities.AddTag(m_previousRay, ddc::Tag::Visible);
+			m_previousRay.AddTag(ddc::Tag::Visible);
 		}
 		else
 		{
-			entities.RemoveTag(m_previousRay, ddc::Tag::Visible);
+			m_previousRay.RemoveTag(ddc::Tag::Visible);
 		}
 	}
 

@@ -86,6 +86,8 @@ namespace dd
 					}
 				}
 			}
+
+			m_text = source->GetText();
 		}
 
 		for (InputReceived& recv : m_actions)

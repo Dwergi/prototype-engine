@@ -8,8 +8,8 @@ static dd::Service<dd::IWindow> s_window;
 namespace dd
 {
 	IInputSource::IInputSource() :
-		m_events(new Array<InputEvent, MAX_EVENTS>(), new Array<InputEvent, MAX_EVENTS>()),
-		m_text(new Array<uint32, MAX_EVENTS>(), new Array<uint32, MAX_EVENTS>()),
+		m_events(new Array<InputEvent, dd::InputEvent::MAX_EVENTS>(), new Array<InputEvent, dd::InputEvent::MAX_EVENTS>()),
+		m_text(new Array<uint32, dd::InputEvent::MAX_EVENTS>(), new Array<uint32, dd::InputEvent::MAX_EVENTS>()),
 		m_mousePosition(new MousePosition(), new MousePosition()),
 		m_mouseScroll(new MousePosition(), new MousePosition())
 	{
@@ -41,6 +41,7 @@ namespace dd
 		{
 			m_mousePosition.Write().Delta = m_mousePosition.Write().Absolute - m_mousePosition.Read().Absolute;
 		}
+
 		m_mousePosition.Swap();
 		m_mousePosition.Duplicate();
 		m_mousePosition.Write().Delta = glm::vec2(0);

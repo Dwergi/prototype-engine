@@ -62,14 +62,14 @@ namespace ddr
 	{
 	}
 
-	void RenderManager::Initialize(ddc::EntitySpace& entities)
+	void RenderManager::Initialize()
 	{
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
 
 		for (ddr::IRenderer* current : m_renderers)
 		{
-			current->RenderInit(entities);
+			current->Initialize();
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace ddr
 	{
 		for (ddr::IRenderer* current : m_renderers)
 		{
-			current->RenderShutdown();
+			current->Shutdown();
 		}
 	}
 
@@ -97,7 +97,7 @@ namespace ddr
 		m_framebuffer.SetClearColour(glm::vec4(0));
 		m_framebuffer.SetClearDepth(0.0f);
 		m_framebuffer.Create(m_colourTexture, &m_depthTexture);
-		m_framebuffer.RenderInit();
+		m_framebuffer.Initialize();
 	}
 
 	void RenderManager::DrawDebugInternal()
@@ -129,7 +129,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void RenderManager::CallRenderer(ddr::IRenderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
+	RenderData RenderManager::CreateRenderData(ddr::IRenderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -145,56 +145,60 @@ namespace ddr
 		std::vector<ddc::Entity> entities;
 		space.FindAllWith(required, tags, entities);
 
-		if (entities.size() == 0)
-		{
-			return;
-		}
-
-		RenderData data(space, camera, m_uniforms, entities, renderer.GetRequirements());
-
-		fn(renderer, data);
+		return RenderData(space, camera, m_uniforms, entities, renderer.GetRequirements(), delta_t);
 	}
 
 	void RenderManager::Render(ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
-		for (ddr::IRenderer* r : m_renderers)
+		std::vector<RenderData> render_data;
+		render_data.reserve(m_renderers.size());
+		render_data.clear();
+
+		// create render data
+		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			r->RenderUpdate(space);
+			render_data.emplace_back(CreateRenderData(*m_renderers[i], space, camera, delta_t));
+		}
+
+		// update
+		for (size_t i = 0; i < m_renderers.size(); ++i)
+		{
+			m_renderers[i]->Update(render_data[i]);
 		}
 
 		ddr::IRenderer* debug_render = nullptr;
 
 		BeginRender(space, camera);
 
-		for (ddr::IRenderer* r : m_renderers)
+		// render non-alpha
+		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			if (!r->UsesAlpha())
+			ddr::IRenderer& renderer = *m_renderers[i];
+			if (!renderer.UsesAlpha())
 			{
-				CallRenderer(*r, space, camera,
-					[](IRenderer& rend, const RenderData& data) { rend.Render(data); });
-			}
-
-			if (r->ShouldRenderDebug())
-			{
-				debug_render = r;
-				break;
+				renderer.Render(render_data[i]);
 			}
 		}
 
-		if (debug_render != nullptr)
+		// render debug
+		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			CallRenderer(*debug_render, space, camera,
-				[](IRenderer& rend, const RenderData& data) { rend.RenderDebug(data); });
+			ddr::IRenderer& renderer = *m_renderers[i];
+			if (renderer.ShouldRenderDebug())
+			{
+				renderer.RenderDebug(render_data[i]);
+			}
 		}
 
-		for (ddr::IRenderer* r : m_renderers)
+		// render alpha
+		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			if (r->UsesAlpha())
+			ddr::IRenderer& renderer = *m_renderers[i];
+			if (renderer.UsesAlpha())
 			{
-				CallRenderer(*r, space, camera,
-					[](IRenderer& rend, const RenderData& data) { rend.Render(data); });
+				renderer.Render(render_data[i]);
 			}
 		}
 
