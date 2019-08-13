@@ -31,7 +31,7 @@ void wait( float f )
 TEST_CASE( "Timer", "[timer]" )
 {
 	dd::Timer timer;
-	float start = timer.Time();
+	float start = timer.TimeInSeconds();
 	REQUIRE( start == 0 );
 
 	SECTION( "Counts up" )
@@ -40,7 +40,7 @@ TEST_CASE( "Timer", "[timer]" )
 		
 		wait( 0.01f );
 
-		float t = timer.Time();
+		float t = timer.TimeInSeconds();
 
 		REQUIRE( start < t );
 	}
@@ -53,16 +53,16 @@ TEST_CASE( "Timer", "[timer]" )
 
 		wait( 0.01f );
 
-		REQUIRE( stopped == timer.Time() );
+		REQUIRE( stopped == timer.TimeInSeconds() );
 
 		SECTION( "Resumes" )
 		{
-			float resumed = timer.Time();
+			float resumed = timer.TimeInSeconds();
 			timer.Start();
 
 			wait( 0.01f );
 
-			REQUIRE( timer.Time() > resumed );
+			REQUIRE( timer.TimeInSeconds() > resumed );
 		}
 	}
 }

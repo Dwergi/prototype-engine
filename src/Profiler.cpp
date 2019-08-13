@@ -15,18 +15,14 @@ namespace dd
 {
 	std::vector<dd::ProfilerValue*> dd::Profiler::s_instances;
 	bool dd::Profiler::s_draw = false;
+	bool dd::Profiler::s_inFrame = false;
 
 	static dd::Service<dd::IWindow> s_window;
 
-	ProfilerValue::ProfilerValue(const char* name, float initial) :
+	ProfilerValue::ProfilerValue(const char* name) :
 		m_name(name)
 	{
-		for (float& f : m_values)
-		{
-			f = initial;
-		}
-
-		m_sliding = initial;
+		m_sliding = 0;
 	}
 
 	void ProfilerValue::Increment()
@@ -56,7 +52,7 @@ namespace dd
 		++m_frameCount;
 		++m_index;
 
-		if (m_index == FRAME_COUNT)
+		if (m_index >= FRAME_COUNT)
 		{
 			m_index = 0;
 		}
@@ -73,7 +69,7 @@ namespace dd
 			total += m_values[i];
 		}
 
-		m_sliding = total / FRAME_COUNT;
+		m_sliding = total / frames;
 	}
 
 	float ProfilerValueGetter(void* data, int index)
@@ -94,12 +90,14 @@ namespace dd
 	{
 		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), GetValue()))
 		{
-			ImGui::PlotLines("", &ProfilerValueGetter, this, FRAME_COUNT - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
-			ImGui::Value("Average", m_sliding);
+			int frames = ddm::min(m_frameCount, FRAME_COUNT);
+
+			ImGui::PlotLines("", &ProfilerValueGetter, this, frames - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
+			ImGui::Value("Average Over 100", m_sliding);
 		}
 	}
 
-	ProfilerValue& Profiler::GetValue(const char* name, float initial)
+	ProfilerValue& Profiler::GetValue(const char* name)
 	{
 		for (dd::ProfilerValue* value : s_instances)
 		{
@@ -109,7 +107,7 @@ namespace dd
 			}
 		}
 
-		ProfilerValue* value = new ProfilerValue(name, initial);
+		ProfilerValue* value = new ProfilerValue(name);
 		s_instances.push_back(value);
 		return *value;
 	}
@@ -117,6 +115,9 @@ namespace dd
 
 	void Profiler::BeginFrame()
 	{
+		DD_ASSERT(!s_inFrame);
+		s_inFrame = true;
+
 		for (dd::ProfilerValue* value : s_instances)
 		{
 			value->BeginFrame();
@@ -125,6 +126,9 @@ namespace dd
 
 	void Profiler::EndFrame()
 	{
+		DD_ASSERT(s_inFrame);
+		s_inFrame = false;
+
 		for (dd::ProfilerValue* value : s_instances)
 		{
 			value->EndFrame();

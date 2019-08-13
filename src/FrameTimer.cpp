@@ -9,7 +9,7 @@
 
 namespace dd
 {
-	static dd::ProfilerValue& s_frameTimes = dd::Profiler::GetValue("Frame Time", 1.0f / 120);
+	static dd::ProfilerValue& s_frameTimes = dd::Profiler::GetValue("Frame Time");
 
 	FrameTimer::FrameTimer() : 
 		m_maxFPS(120),
@@ -31,7 +31,7 @@ namespace dd
 		m_targetDelta = 1.0f / m_maxFPS;
 
 		m_lastFrameTime = m_currentFrameTime;
-		m_currentFrameTime = (float) m_timer.Time();
+		m_currentFrameTime = (float) m_timer.TimeInSeconds();
 
 		m_appDelta = m_currentFrameTime - m_lastFrameTime;
 
@@ -54,15 +54,14 @@ namespace dd
 			m_gameDelta = 0;
 		}
 
-		s_frameTimes.BeginFrame();
-		s_frameTimes.SetValue( m_deltaWithoutDelay * 1000.f );
+		s_frameTimes.SetValue(m_deltaWithoutDelay * 1000.f);
 	}
 
 	void FrameTimer::DelayFrame()
 	{
 		DD_PROFILE_SCOPED( FrameTimer_DelayFrame );
 
-		float now = (float) m_timer.Time();
+		float now = (float) m_timer.TimeInSeconds();
 		float delta_t = (now - m_lastFrameTime);
 
 		m_deltaWithoutDelay = delta_t;
@@ -72,10 +71,8 @@ namespace dd
 			float remainder_t = m_targetDelta - delta_t;
 			std::this_thread::sleep_for( std::chrono::milliseconds( (int) remainder_t * 1000 ) );
 
-			delta_t = (float) m_timer.Time() - m_lastFrameTime;
+			delta_t = (float) m_timer.TimeInSeconds() - m_lastFrameTime;
 		}
-
-		s_frameTimes.EndFrame();
 	}
 
 	float FrameTimer::SlidingDelta() const
@@ -91,8 +88,6 @@ namespace dd
 		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
 
 		ImGui::Value( "FPS: ", 1000.f / s_frameTimes.SlidingAverage(), "%.1f" );
-
-		s_frameTimes.Draw();
 	}
 
 	void FrameTimer::DrawFPSCounter()

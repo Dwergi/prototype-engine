@@ -55,13 +55,7 @@ namespace dd
 		float GetValueAtIndex(int index) const;
 
 		int Index() const { return m_index; }
-
-		void BeginFrame();
-		void EndFrame();
-
 		const std::string& Name() const { return m_name; }
-
-		void Draw();
 		float SlidingAverage() const { return m_sliding; }
 
 	private:
@@ -69,11 +63,16 @@ namespace dd
 
 		std::string m_name;
 		int m_frameCount { 0 };
-		int m_index { 0 };
+		int m_index { -1 };
 		float m_sliding { 0 };
 		float m_values[FRAME_COUNT] = { 0 };
 
-		ProfilerValue(const char* name, float initial);
+		ProfilerValue(const char* name);
+
+		void BeginFrame();
+		void EndFrame();
+		void Draw();
+
 	};
 
 	struct Profiler
@@ -85,10 +84,11 @@ namespace dd
 		static void EnableDraw( bool draw );
 		static bool ShouldDraw() { return s_draw; }
 
-		static ProfilerValue& GetValue(const char* name, float initial = 0);
+		static ProfilerValue& GetValue(const char* name);
 		
 	private:
 		static std::vector<ProfilerValue*> s_instances;
 		static bool s_draw;
+		static bool s_inFrame;
 	};
 }

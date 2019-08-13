@@ -48,6 +48,6 @@ namespace lux
 		}
 
 		uniforms.Set("LightCount", (int) lights.Size());
-		uniforms.Set("Time", s_timer.Time());
+		uniforms.Set("Time", s_timer.TimeInSeconds());
 	}
 }

@@ -208,7 +208,7 @@ namespace ddr
 		colours.clear();
 
 		m_vboColours.Bind();
-		m_vboColours.SetData(transforms.data(), transforms.capacity());
+		m_vboColours.SetData(colours.data(), colours.capacity());
 		m_vboColours.Unbind();
 
 		MaterialHandle current_mat_h;

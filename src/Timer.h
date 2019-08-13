@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <chrono>
+
 namespace dd
 {
 	class Timer
@@ -13,13 +15,15 @@ namespace dd
 	public:
 		Timer();
 		void Start();
+		void Restart();
 		void Pause();
 		float Stop();
-		float Time() const;
+		float TimeInSeconds() const;
+		float TimeInMilliseconds() const;
 
 	private:
 
-		std::time_t m_elapsed;
-		std::time_t m_start;
+		std::chrono::microseconds m_elapsed;
+		std::chrono::high_resolution_clock::time_point m_start;
 	};
 }

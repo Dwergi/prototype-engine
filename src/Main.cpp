@@ -239,79 +239,70 @@ static int GameMain()
 
 			{
 				DD_TODO("Should make a scoped profile timer.");
-				s_profilerTimer.Start();
+				s_profilerTimer.Restart();
 
 				StartFrame();
 
-				float time = s_profilerTimer.Stop();
-				s_startFrameProfiler.SetValue(time);
+				s_startFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
 
 			UpdateAssetManagers();
 
 			{
 				{
-					s_profilerTimer.Start();
+					s_profilerTimer.Restart();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						space->Update(s_frameTimer->GameDelta());
 					}
-					float time = s_profilerTimer.Stop();
-					s_entityUpdateProfiler.SetValue(time);
+					s_entityUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 
 				{
-					s_profilerTimer.Start();
+					s_profilerTimer.Restart();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						s_systemsManager->Update(*space, s_frameTimer->GameDelta());
 					}
-					float time = s_profilerTimer.Stop();
-					s_systemsUpdateProfiler.SetValue(time);
+					s_systemsUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 
 				{
-					s_profilerTimer.Start();
-
+					s_profilerTimer.Restart();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						dd::GameUpdateData update_data(*space, *s_input, s_frameTimer->GameDelta());
 						s_game->Update(update_data);
 					}
-					float time = s_profilerTimer.Stop();
-					s_gameUpdateProfiler.SetValue(time);
+					s_gameUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 
 				{
-					s_profilerTimer.Start();
-
+					s_profilerTimer.Restart();
 					for (ddc::EntitySpace* space : entity_spaces)
 					{
 						s_renderer->Render(*space, s_game->GetCamera(), s_frameTimer->GameDelta());
 					}
-					float time = s_profilerTimer.Stop();
-					s_renderProfiler.SetValue(time);
+					s_renderProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 			}
 
 			{
-				s_profilerTimer.Start();
+				s_profilerTimer.Restart();
 
 				s_frameTimer->DrawFPSCounter();
 				s_debugUI->RenderDebugPanels();
 				dd::Profiler::Draw();
 
-				float time = s_profilerTimer.Stop();
-				s_debugUIProfiler.SetValue(time);
+				s_debugUIProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
 
 			{
-				s_profilerTimer.Start();
+				s_profilerTimer.Restart();
 
 				EndFrame();
 
-				float time = s_profilerTimer.Stop();
-				s_endFrameProfiler.SetValue(time);
+				s_endFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
 		}
 
