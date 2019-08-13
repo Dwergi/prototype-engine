@@ -36,7 +36,7 @@ namespace ddr
 	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, dd::ArrayLength( s_lines ) );
 
 	RayRenderer::RayRenderer() :
-		Renderer( "Ray" )
+		IRenderer( "Ray" )
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::RayComponent>();

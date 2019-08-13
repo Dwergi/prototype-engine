@@ -14,13 +14,11 @@
 namespace ddr
 {
 	RenderData::RenderData( const ddc::EntitySpace& space, const ddr::ICamera& camera, 
-		ddr::UniformStorage& uniforms, ddr::CommandBuffer& commands,
-		const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requests  ) :
+		ddr::UniformStorage& uniforms, const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requests  ) :
 		m_camera( camera ),
 		m_uniforms( uniforms ),
 		m_entities( entities ),
-		m_space( space ),
-		m_commands( commands )
+		m_space( space )
 	{
 		m_buffers.reserve( requests.Size() );
 

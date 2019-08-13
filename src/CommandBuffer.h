@@ -12,18 +12,24 @@ namespace ddr
 	struct RenderCommand;
 	struct UniformStorage;
 
+	template <typename T>
 	struct CommandBuffer
 	{
+		static_assert(std::is_base_of_v<RenderCommand, T>);
+
 		CommandBuffer() {}
 		CommandBuffer( const CommandBuffer& other ) = delete;
 
 		void Clear();
 
-		template <typename T>
-		void Allocate( T*& out_ptr );
+		T& Allocate();
 
-		void Sort( const ICamera& camera );
+		void Sort();
 		void Dispatch( UniformStorage& uniforms );
+
+		int Size() const { return (int) m_offsets.size(); }
+		const T& Get(int index) const;
+		T& Access(int index);
 
 	private:
 
@@ -31,19 +37,53 @@ namespace ddr
 
 		std::vector<byte> m_storage;
 		std::vector<size_t> m_offsets;
-
-		RenderCommand* Access( int index );
 	};
 
 	template <typename T>
-	void CommandBuffer::Allocate( T*& out_ptr )
+	void CommandBuffer<T>::Clear()
 	{
-		static_assert(std::is_base_of<RenderCommand, T>::value);
+		m_storage.clear();
+		m_offsets.clear();
+	}
 
+	template <typename T>
+	void CommandBuffer<T>::Sort()
+	{
+		std::sort(m_offsets.begin(), m_offsets.end(),
+			[this](size_t a, size_t b)
+			{
+				const T* ptr_a = reinterpret_cast<const T*>(&m_storage[a]);
+				const T* ptr_b = reinterpret_cast<const T*>(&m_storage[b]);
+
+				return ptr_a->Key > ptr_b->Key;
+			});
+	}
+
+	template <typename T>
+	T& CommandBuffer<T>::Allocate()
+	{
 		size_t offset = m_storage.size();
 		m_storage.resize( offset + sizeof( T ) );
 
-		out_ptr = new (&m_storage[ offset ]) T();
+		T* out_ptr = new (&m_storage[ offset ]) T();
 		m_offsets.push_back( offset );
+
+		return *out_ptr;
+	}
+
+	template <typename T>
+	const T& CommandBuffer<T>::Get(int index) const
+	{
+		DD_ASSERT(index >= 0 && index < m_offsets.size());
+		const void* ptr = &m_storage[m_offsets[index]];
+		return *reinterpret_cast<const T*>(ptr);
+	}
+
+	template <typename T>
+	T& CommandBuffer<T>::Access(int index)
+	{
+		DD_ASSERT(index >= 0 && index < m_offsets.size());
+		void* ptr = &m_storage[m_offsets[index]];
+		return *reinterpret_cast<T*>(ptr);
 	}
 }

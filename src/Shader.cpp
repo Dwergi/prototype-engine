@@ -260,20 +260,49 @@ namespace ddr
 
 	bool Shader::BindAttributeFloat( std::string name, uint components, bool normalized )
 	{
-		GLint currentVAO = VAO::GetCurrentVAO();
-		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
-
-		GLint currentVBO = VBO::GetCurrentVBO( GL_ARRAY_BUFFER );
-		DD_ASSERT( currentVBO != OpenGL::InvalidID, "No VBO is bound!" );
+		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!" );
+		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!" );
+		DD_ASSERT(components > 0 && components <= 4);
 
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )
 		{
+			glEnableVertexAttribArray(loc);
+			CheckOGLError();
+
 			glVertexAttribPointer( loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, 0, nullptr );
 			CheckOGLError();
 
-			glEnableVertexAttribArray( loc );
-			CheckOGLError();
+			return true;
+		}
+
+		return false;
+	}
+
+	bool Shader::BindAttributeMat4(std::string name, bool instanced)
+	{
+		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
+		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
+
+		ShaderLocation loc = GetAttribute(name);
+		if (loc != InvalidLocation)
+		{
+			size_t offset = sizeof(float) * 4;
+			GLsizei stride = (GLsizei) (offset * 4);
+
+			for (int i = 0; i < 4; ++i)
+			{
+				glEnableVertexAttribArray(loc + i);
+				CheckOGLError();
+
+				glVertexAttribPointer(loc + i, 4, GL_FLOAT, GL_FALSE, stride, (void*) (i * offset));
+				CheckOGLError();
+
+				if (instanced)
+				{
+					glVertexAttribDivisor(loc + i, 1);
+				}
+			}
 
 			return true;
 		}
@@ -283,8 +312,9 @@ namespace ddr
 
 	bool Shader::SetAttributeInstanced( std::string name )
 	{
-		GLint currentVAO = VAO::GetCurrentVAO();
-		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
+		DD_TODO("This is a bit wasteful, since it ends up looking the shader location twice.");
+
+		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!" );
 
 		ShaderLocation loc = GetAttribute( name );
 		if( loc != InvalidLocation )

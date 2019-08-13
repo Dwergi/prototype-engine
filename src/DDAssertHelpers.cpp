@@ -132,6 +132,7 @@ namespace dd
 		{
 			if (std::this_thread::get_id() == s_mainThread)
 			{
+				__debugbreak();
 				CheckAssert();
 			}
 			else

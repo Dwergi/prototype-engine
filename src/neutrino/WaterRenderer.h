@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "RenderState.h"
 #include "Material.h"
 #include "Shader.h"
@@ -20,7 +20,7 @@ namespace dd
 
 namespace neut
 {
-	struct WaterRenderer : ddr::Renderer
+	struct WaterRenderer : ddr::IRenderer
 	{
 		WaterRenderer();
 

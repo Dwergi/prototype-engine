@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 
 namespace ddc
 {
@@ -19,7 +19,7 @@ namespace neut
 	struct TerrainParameters;
 	struct Wireframe;
 
-	struct TerrainRenderer : ddr::Renderer, dd::IDebugPanel
+	struct TerrainRenderer : ddr::IRenderer, dd::IDebugPanel
 	{
 		TerrainRenderer( const neut::TerrainParameters& params );
 

@@ -384,9 +384,6 @@
     <ClInclude Include="src\UpdateData.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\HitTest.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -773,6 +770,9 @@
     </ClInclude>
     <ClInclude Include="src\Physics2DGame.h">
       <Filter>Games\Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRenderer.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1332,9 +1332,6 @@
     <ClCompile Include="src\stress\StressTestGame.cpp">
       <Filter>Games\StressTest</Filter>
     </ClCompile>
-    <ClCompile Include="src\stress\Renderer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\ddm\Circle.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -1369,6 +1366,9 @@
       <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics2DGame.cpp" />
+    <ClCompile Include="src\stress\IRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

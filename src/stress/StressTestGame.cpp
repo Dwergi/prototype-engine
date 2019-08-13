@@ -42,6 +42,11 @@ namespace stress
 
 	static ddc::Entity s_camera;
 
+	static void ToggleProfiler()
+	{
+		dd::Profiler::EnableDraw(!dd::Profiler::ShouldDraw());
+	}
+
 	void StressTestGame::Initialize()
 	{
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
@@ -51,8 +56,11 @@ namespace stress
 
 		s_input->SetCurrentMode("game");
 
+		s_input->AddHandler(dd::InputAction::TOGGLE_PROFILER, &ToggleProfiler);
+
 		s_keybindings = new dd::InputKeyBindings("stress_test");
 		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		s_keybindings->BindKey(dd::Key::P, dd::InputAction::TOGGLE_PROFILER);
 		s_keybindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
 		s_keybindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
 		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT);

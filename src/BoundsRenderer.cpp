@@ -53,7 +53,7 @@ namespace ddr
 	static dd::ConstBuffer<uint> s_indicesBuffer(s_indices, dd::ArrayLength(s_indices));
 
 	BoundsRenderer::BoundsRenderer() :
-		Renderer("Bounds")
+		IRenderer("Bounds")
 	{
 		Require<dd::TransformComponent>();
 		Optional<dd::BoundBoxComponent>();

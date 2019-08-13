@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "RenderState.h"
 #include "Shader.h"
 #include "VAO.h"
@@ -14,7 +14,7 @@
 
 namespace ddr
 {
-	struct LinesRenderer : Renderer
+	struct LinesRenderer : IRenderer
 	{
 		LinesRenderer();
 

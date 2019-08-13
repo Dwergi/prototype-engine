@@ -8,12 +8,12 @@
 
 #include "IDebugPanel.h"
 #include "Mesh.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "Shader.h"
 
 namespace ddr
 {
-	struct LightRenderer : Renderer, dd::IDebugPanel
+	struct LightRenderer : IRenderer, dd::IDebugPanel
 	{
 		LightRenderer();
 

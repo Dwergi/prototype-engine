@@ -22,7 +22,7 @@ namespace ddr
 	dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	LinesRenderer::LinesRenderer() :
-		Renderer( "Lines" )
+		IRenderer( "Lines" )
 	{
 		Require<dd::LinesComponent>();
 		Require<dd::TransformComponent>();

@@ -51,7 +51,8 @@ namespace dd
 		void Increment();
 
 		void SetValue(float value);
-		float GetValue(int index) const;
+		float GetValue() const;
+		float GetValueAtIndex(int index) const;
 
 		int Index() const { return m_index; }
 

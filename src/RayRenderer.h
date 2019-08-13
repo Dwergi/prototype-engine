@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
 
 namespace ddr
 {
-	struct RayRenderer : Renderer
+	struct RayRenderer : IRenderer
 	{
 		RayRenderer();
 		~RayRenderer();

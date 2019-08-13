@@ -9,6 +9,8 @@
 
 namespace ddr
 {
+	static_assert(sizeof(CommandKey) == sizeof(CommandKey::Key));
+
 	uint DistanceToDepth( float distance, bool transparent )
 	{
 		constexpr int INT_BITS = 18;

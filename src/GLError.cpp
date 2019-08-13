@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	void _CheckGLError( const char* file, int line, bool ignore )
+	void _CheckOGLError( const char* file, int line, bool ignore )
 	{
 		GLenum err( glGetError() );
 

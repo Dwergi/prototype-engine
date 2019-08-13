@@ -26,17 +26,8 @@ namespace ddr
 		Key.Opaque = material->State.Blending;
 
 		float depth = glm::distance( Transform[3].xyz(), camera.GetPosition() );
-		Key.Depth = ddr::DistanceToDepth( depth, Key.Opaque );
-		Key.Material = Material.GetID() & 0xFF;
-	}
-
-	void MeshRenderCommand::Dispatch( UniformStorage& uniforms ) const
-	{
-		ddr::Mesh* mesh = Mesh.Access();
-
-		uniforms.Set( "Model", Transform );
-		uniforms.Set( "ObjectColour", Colour );
-
-		mesh->Render();
+		Key.Depth = ddr::DistanceToDepth(depth, Key.Opaque);
+		Key.Mesh = Mesh.GetID() & 0xFFF;
+		Key.Material = Material.GetID() & 0xFFF;
 	}
 }

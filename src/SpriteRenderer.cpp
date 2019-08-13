@@ -35,7 +35,7 @@ namespace ddr
 	static ShaderHandle s_shader;
 
 	SpriteRenderer::SpriteRenderer() :
-		ddr::Renderer("Sprites")
+		ddr::IRenderer("Sprites")
 	{
 		Require<d2d::SpriteComponent>();
 		RequireTag(ddc::Tag::Visible);
@@ -164,7 +164,7 @@ namespace ddr
 		m_vboColours.CommitData();
 		m_vboColours.Unbind();
 
-		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, (GLsizei) count);
+		OpenGL::DrawArraysInstanced(6, (int) count);
 		CheckOGLError();
 
 		texture->Unbind();

@@ -23,7 +23,7 @@ namespace dd
 namespace ddr
 {
 	struct ICamera;
-	struct Renderer;
+	struct IRenderer;
 	struct RenderData;
 
 	struct RenderManager : dd::IDebugPanel
@@ -45,7 +45,7 @@ namespace ddr
 		//
 		// Register a renderer.
 		//
-		void Register( ddr::Renderer& renderer );
+		void Register( ddr::IRenderer& renderer );
 
 	protected:
 
@@ -63,7 +63,7 @@ namespace ddr
 		RenderState m_defaultState;
 		RenderState m_depthState;
 		
-		std::vector<ddr::Renderer*> m_renderers;
+		std::vector<ddr::IRenderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
 
@@ -76,21 +76,17 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_reloadShaders { false };
 		
-		// TODO: This shouldn't be here.
-		ddr::MeshHandle m_cube;
-
-		ddr::CommandBuffer m_commands; 
 		ddr::UniformStorage m_uniforms;
 
 		void CreateFrameBuffer( glm::ivec2 size );
 
-		void RenderDebug( const ddr::RenderData& data, ddr::Renderer& debug_render );
+		void RenderDebug( const ddr::RenderData& data, ddr::IRenderer& debug_render );
 
 		void BeginRender( const ddc::EntitySpace& entities, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		using CallRendererFn = std::function<void(Renderer&, const RenderData&)>;
-		void CallRenderer( ddr::Renderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, const CallRendererFn& fn );
+		using CallRendererFn = std::function<void(IRenderer&, const RenderData&)>;
+		void CallRenderer( ddr::IRenderer& renderer, ddc::EntitySpace& entities, const ddr::ICamera& camera, const CallRendererFn& fn );
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

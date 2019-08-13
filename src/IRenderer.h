@@ -11,12 +11,13 @@
 
 namespace ddr
 {
-	struct Renderer
+	struct IRenderer
 	{
-		Renderer( const char* renderer ) : m_name( renderer ) {}
+		IRenderer( const char* renderer ) : m_name( renderer ) {}
 
 		virtual void RenderInit( ddc::EntitySpace& entities ) {}
-		virtual void RenderUpdate( ddc::EntitySpace& entities ) {}
+
+		virtual void RenderUpdate(ddc::EntitySpace& entities) { DD_TODO("This should probably take a RenderData?"); }
 		virtual void Render( const RenderData& render_data ) {}
 		virtual void RenderShutdown() {}
 

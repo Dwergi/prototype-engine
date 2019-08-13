@@ -41,11 +41,6 @@ namespace ddr
 	struct Mesh : dd::HandleTarget
 	{
 		//
-		// Render this mesh, with the current material.
-		//
-		void Render();
-
-		//
 		// Retrieve the axis-aligned bounds of this mesh.
 		//
 		const ddm::AABB& GetBoundBox() const { return m_bounds; }
@@ -143,6 +138,11 @@ namespace ddr
 		// Get the BVH of this mesh.
 		//
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
+
+		//
+		// Get the VAO of this mesh.
+		// 
+		VAO& AccessVAO() { return m_vao; }
 
 		//
 		// Do not create directly, use MeshManager.

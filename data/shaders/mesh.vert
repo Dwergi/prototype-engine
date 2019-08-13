@@ -2,6 +2,9 @@
 
 layout( location = 0 ) in vec3 Position;
 
+layout( location = 1 ) in vec4 ColourInstanced;
+layout( location = 2 ) in mat4 TransformInstanced;
+
 out struct FragmentData
 {
 	vec3 Position;
@@ -9,15 +12,15 @@ out struct FragmentData
 } 
 Fragment;
 
-uniform vec4 ObjectColour;
-uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
 
 void main()
 {
-	Fragment.Position = (Model * vec4( Position, 1 )).xyz;
-	Fragment.Colour = ObjectColour;
+	vec4 posTransformed = TransformInstanced * vec4( Position, 1 );
 
-	gl_Position = Projection * View * Model * vec4( Position, 1 );
+	Fragment.Position = posTransformed.xyz;
+	Fragment.Colour = ColourInstanced;
+
+	gl_Position = Projection * View * posTransformed;
 }

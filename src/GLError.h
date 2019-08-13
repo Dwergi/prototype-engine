@@ -6,10 +6,10 @@
 
 #pragma once
 
-#define CheckOGLError() dd::_CheckGLError(__FILE__, __LINE__, false )
-#define DiscardOGLError() dd::_CheckGLError(__FILE__, __LINE__, true )
+#define CheckOGLError() dd::_CheckOGLError(__FILE__, __LINE__, false )
+#define DiscardOGLError() dd::_CheckOGLError(__FILE__, __LINE__, true )
 
 namespace dd
 {
-	void _CheckGLError( const char* file, int line, bool ignore );
+	void _CheckOGLError( const char* file, int line, bool ignore );
 }

@@ -20,25 +20,9 @@ namespace ddr
 		
 	}
 
-	VAO::VAO( const VAO& other ) :
-		m_id( other.m_id )
-	{
-		DD_ASSERT( !other.m_bound, "Can't try to copy a bound VAO!" );
-	}
-
 	VAO::~VAO()
 	{
-		
-	}
-
-	VAO& VAO::operator=( const VAO& other )
-	{
-		DD_ASSERT( !other.m_bound, "Can't try to copy a bound VAO!" );
-
-		m_id = other.m_id;
-		m_bound = false;
-
-		return *this;
+		DD_ASSERT(!m_bound, "Bound VAO shouldn't be destroyed!");
 	}
 
 	void VAO::Create()

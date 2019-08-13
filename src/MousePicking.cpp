@@ -43,7 +43,7 @@ static dd::Service<dd::IAsyncHitTest> s_hitTest;
 namespace dd
 {
 	MousePicking::MousePicking() :
-		ddr::Renderer("Mouse Picking")
+		ddr::IRenderer("Mouse Picking")
 	{
 		Require<dd::TransformComponent>();
 
@@ -215,17 +215,13 @@ namespace dd
 
 		for (size_t i = 0; i < data.Size(); ++i)
 		{
-			uniforms.Set("ID", ( int) entities[i].ID);
+			uniforms.Set("ID", (int) entities[i].ID);
 			uniforms.Set("Model", transforms[i].Transform());
 
 			if (!meshes[i].Mesh.IsValid())
 				continue;
 
-			ddr::MeshRenderCommand* cmd;
-			data.Commands().Allocate(cmd);
-
-			cmd->Mesh = meshes[i].Mesh;
-			cmd->Transform = transforms[i].Transform();
+			DD_TODO("Removed mesh render command here.");
 		}
 
 		m_framebuffer.UnbindRead();

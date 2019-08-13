@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Physics2DGame.h"
 
+#include "FPSCameraComponent.h"
+
 namespace phys2d
 {
 	void Physics2DGame::Initialize()
@@ -28,8 +30,9 @@ namespace phys2d
 	{
 	}
 
+	static dd::FPSCameraComponent s_camera;
 	ddr::ICamera& Physics2DGame::GetCamera() const
 	{
-		
+		return s_camera;
 	}
 }

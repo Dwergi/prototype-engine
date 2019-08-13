@@ -19,8 +19,6 @@
 
 DD_POD_CPP(ddr::MeshHandle);
 
-static dd::ProfilerValue& s_meshesRendered = dd::Profiler::GetValue("Meshes Rendered");
-
 namespace ddr
 {
 	Mesh::Mesh()
@@ -194,28 +192,6 @@ namespace ddr
 			shader.BindUVs();
 			m_vboUV.Unbind();
 		}
-	}
-
-	void Mesh::Render()
-	{
-		DD_PROFILE_SCOPED( Mesh_Render );
-
-		s_meshesRendered.Increment();
-
-		m_vao.Bind();
-
-		if( m_vboIndex.IsValid() )
-		{
-			glDrawElements( GL_TRIANGLES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0 );
-			CheckOGLError();
-		}
-		else
-		{
-			glDrawArrays( GL_TRIANGLES, 0, m_vboPosition.GetDataSize() );
-			CheckOGLError();
-		}
-
-		m_vao.Unbind();
 	}
 
 	void Mesh::RebuildBVH()

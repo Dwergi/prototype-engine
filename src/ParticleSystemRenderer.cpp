@@ -42,7 +42,7 @@ namespace ddr
 	static ShaderHandle s_shaderParticle;
 
 	ParticleSystemRenderer::ParticleSystemRenderer() :
-		ddr::Renderer( "Particle Systems" )
+		ddr::IRenderer( "Particle Systems" )
 	{
 		Require<dd::ParticleSystemComponent>();
 		RequireTag( ddc::Tag::Visible );
@@ -168,7 +168,7 @@ namespace ddr
 			m_vboColours.CommitData();
 			m_vboColours.Unbind();
 
-			glDrawArraysInstanced( GL_TRIANGLES, 0, 6, count);
+			OpenGL::DrawArraysInstanced(m_vboPosition.GetDataSize(), count);
 		}
 
 		m_vaoParticle.Unbind();

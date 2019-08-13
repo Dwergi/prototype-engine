@@ -448,7 +448,7 @@
     <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\SpriteSheet.h" />
     <ClInclude Include="src\System.h" />
-    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\IRenderer.h" />
     <ClInclude Include="src\FrameBuffer.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\DebugConsole.h" />
@@ -771,7 +771,7 @@
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\SpriteSheet.cpp" />
-    <ClCompile Include="src\stress\Renderer.cpp" />
+    <ClCompile Include="src\stress\IRenderer.cpp" />
     <ClCompile Include="src\stress\StressTestGame.cpp" />
     <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\SystemsManager.cpp" />

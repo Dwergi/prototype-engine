@@ -50,9 +50,9 @@ namespace ddr
 	{
 		DD_ASSERT( m_inUse, "Material not in use when unbound!" );
 
-		ddr::Shader* shader = Shader.Access();
 		uniforms.Unbind();
 
+		ddr::Shader* shader = Shader.Access();
 		shader->Use( false );
 
 		State.Use( false );

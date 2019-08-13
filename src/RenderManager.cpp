@@ -67,7 +67,7 @@ namespace ddr
 		CreateFrameBuffer(s_window->GetSize());
 		m_previousSize = s_window->GetSize();
 
-		for (ddr::Renderer* current : m_renderers)
+		for (ddr::IRenderer* current : m_renderers)
 		{
 			current->RenderInit(entities);
 		}
@@ -75,13 +75,13 @@ namespace ddr
 
 	void RenderManager::Shutdown()
 	{
-		for (ddr::Renderer* current : m_renderers)
+		for (ddr::IRenderer* current : m_renderers)
 		{
 			current->RenderShutdown();
 		}
 	}
 
-	void RenderManager::Register(ddr::Renderer& renderer)
+	void RenderManager::Register(ddr::IRenderer& renderer)
 	{
 		m_renderers.push_back(&renderer);
 	}
@@ -120,7 +120,7 @@ namespace ddr
 		}
 	}
 
-	void RenderManager::RenderDebug(const ddr::RenderData& data, ddr::Renderer& debug_render)
+	void RenderManager::RenderDebug(const ddr::RenderData& data, ddr::IRenderer& debug_render)
 	{
 		m_framebuffer.BindDraw();
 
@@ -129,7 +129,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void RenderManager::CallRenderer(ddr::Renderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
+	void RenderManager::CallRenderer(ddr::IRenderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, const CallRendererFn& fn)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -150,7 +150,7 @@ namespace ddr
 			return;
 		}
 
-		RenderData data(space, camera, m_uniforms, m_commands, entities, renderer.GetRequirements());
+		RenderData data(space, camera, m_uniforms, entities, renderer.GetRequirements());
 
 		fn(renderer, data);
 	}
@@ -159,23 +159,21 @@ namespace ddr
 	{
 		m_time += delta_t;
 
-		m_commands.Clear();
-
-		for (ddr::Renderer* r : m_renderers)
+		for (ddr::IRenderer* r : m_renderers)
 		{
 			r->RenderUpdate(space);
 		}
 
-		ddr::Renderer* debug_render = nullptr;
+		ddr::IRenderer* debug_render = nullptr;
 
 		BeginRender(space, camera);
 
-		for (ddr::Renderer* r : m_renderers)
+		for (ddr::IRenderer* r : m_renderers)
 		{
 			if (!r->UsesAlpha())
 			{
 				CallRenderer(*r, space, camera,
-					[](Renderer& rend, const RenderData& data) { rend.Render(data); });
+					[](IRenderer& rend, const RenderData& data) { rend.Render(data); });
 			}
 
 			if (r->ShouldRenderDebug())
@@ -188,20 +186,17 @@ namespace ddr
 		if (debug_render != nullptr)
 		{
 			CallRenderer(*debug_render, space, camera,
-				[](Renderer& rend, const RenderData& data) { rend.RenderDebug(data); });
+				[](IRenderer& rend, const RenderData& data) { rend.RenderDebug(data); });
 		}
 
-		for (ddr::Renderer* r : m_renderers)
+		for (ddr::IRenderer* r : m_renderers)
 		{
 			if (r->UsesAlpha())
 			{
 				CallRenderer(*r, space, camera,
-					[](Renderer& rend, const RenderData& data) { rend.Render(data); });
+					[](IRenderer& rend, const RenderData& data) { rend.Render(data); });
 			}
 		}
-
-		m_commands.Sort(camera);
-		m_commands.Dispatch(m_uniforms);
 
 		EndRender(m_uniforms, camera);
 	}

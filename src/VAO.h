@@ -16,7 +16,7 @@ namespace ddr
 	public:
 
 		VAO();
-		VAO( const VAO& other );
+		VAO(const VAO& other) = delete;
 		~VAO();
 
 		void Create();
@@ -27,8 +27,6 @@ namespace ddr
 
 		bool IsValid() const { return m_id != 0; }
 		GLuint ID() const { return m_id; }
-
-		VAO& operator=( const VAO& other );
 
 		static GLint GetCurrentVAO();
 

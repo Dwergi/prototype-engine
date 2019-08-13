@@ -7,14 +7,14 @@
 #pragma once
 
 #include "ParticleSystemComponent.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "RenderState.h"
 #include "VAO.h"
 #include "VBO.h"
 
 namespace ddr
 {
-	struct ParticleSystemRenderer : ddr::Renderer
+	struct ParticleSystemRenderer : ddr::IRenderer
 	{
 	public:
 

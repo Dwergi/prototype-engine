@@ -22,6 +22,5 @@ namespace ddr
 		MeshRenderCommand();
 
 		void InitializeKey( const ICamera& camera );
-		void Dispatch( UniformStorage& uniforms ) const;
 	};
 }

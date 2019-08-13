@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "RenderState.h"
 #include "d2d/SpriteComponent.h"
 #include "VAO.h"
@@ -16,7 +16,7 @@ namespace ddr
 {
 	const int MAX_SPRITES = 1024;
 
-	struct SpriteRenderer : ddr::Renderer
+	struct SpriteRenderer : ddr::IRenderer
 	{
 	public:
 

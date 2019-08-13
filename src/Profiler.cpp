@@ -39,7 +39,12 @@ namespace dd
 		m_values[m_index] = value;
 	}
 
-	float ProfilerValue::GetValue(int index) const
+	float ProfilerValue::GetValue() const
+	{
+		return m_values[m_index];
+	}
+
+	float ProfilerValue::GetValueAtIndex(int index) const
 	{
 		DD_ASSERT(index >= 0 && index < FRAME_COUNT);
 
@@ -73,7 +78,7 @@ namespace dd
 
 	float ProfilerValueGetter(void* data, int index)
 	{
-		ProfilerValue* value = ( ProfilerValue*) data;
+		ProfilerValue* value = (ProfilerValue*) data;
 
 		int actual = value->Index() + index + 1;
 		if (actual >= ProfilerValue::FRAME_COUNT)
@@ -81,18 +86,18 @@ namespace dd
 			actual -= ProfilerValue::FRAME_COUNT;
 		}
 
-		float f = value->GetValue(actual);
+		float f = value->GetValueAtIndex(actual);
 		return f;
 	}
 
 	void ProfilerValue::Draw()
 	{
-		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), m_sliding))
+		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), GetValue()))
 		{
 			ImGui::PlotLines("", &ProfilerValueGetter, this, FRAME_COUNT - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
+			ImGui::Value("Average", m_sliding);
 		}
 	}
-
 
 	ProfilerValue& Profiler::GetValue(const char* name, float initial)
 	{

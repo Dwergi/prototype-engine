@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "Shader.h"
 
 namespace lux
 {
-	struct LuxLightRenderer : ddr::Renderer
+	struct LuxLightRenderer : ddr::IRenderer
 	{
 		LuxLightRenderer();
 

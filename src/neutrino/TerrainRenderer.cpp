@@ -43,7 +43,7 @@ namespace neut
 	};
 
 	TerrainRenderer::TerrainRenderer( const neut::TerrainParameters& params ) : 
-		Renderer( "Terrain" ),
+		IRenderer( "Terrain" ),
 		m_params( params )
 	{
 		m_wireframe = new Wireframe();

@@ -19,6 +19,10 @@ namespace OpenGL
 	static const GLuint InvalidID = 0;
 
 	bool Initialize();
+
+	void DrawArrays(int verts);
+	void DrawArraysInstanced(int verts, int instances);
+	void DrawElementsInstanced(int indices, int instances);
 }
 
 namespace ddr

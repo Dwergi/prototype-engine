@@ -7,7 +7,7 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "RenderState.h"
 #include "Shader.h"
 #include "VAO.h"
@@ -20,7 +20,7 @@ namespace dd
 
 namespace ddr
 {
-	struct BoundsRenderer : ddr::Renderer, dd::IDebugPanel
+	struct BoundsRenderer : ddr::IRenderer, dd::IDebugPanel
 	{
 		BoundsRenderer();
 		~BoundsRenderer();

@@ -49,7 +49,7 @@ namespace ddr
 	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, dd::ArrayLength( s_lines ) );
 
 	PlaneRenderer::PlaneRenderer() :
-		Renderer( "Plane" )
+		IRenderer( "Plane" )
 	{
 		RequireTag( ddc::Tag::Visible );
 		Require<dd::PlaneComponent>();
@@ -158,14 +158,6 @@ namespace ddr
 			glDrawArrays( GL_LINES, 0, m_vbo.GetDataSize() );
 
 			colour.a = 0.3f;
-
-			MeshRenderCommand* cmd;
-			data.Commands().Allocate( cmd );
-
-			cmd->Material = m_meshMaterial;
-			cmd->Mesh = m_mesh;
-			cmd->Colour = colour;
-			cmd->Transform = model;
 		}
 
 		m_vbo.Unbind();

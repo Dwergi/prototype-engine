@@ -12,7 +12,7 @@
 #include "InputAction.h"
 #include "Material.h"
 #include "Ray.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "System.h"
 #include "Texture.h"
 
@@ -40,7 +40,7 @@ namespace dd
 	struct TransformComponent;
 	struct Window;
 	
-	struct MousePicking : IDebugPanel, ddr::Renderer
+	struct MousePicking : IDebugPanel, ddr::IRenderer
 	{
 		static const int DownScalingFactor = 2;
 

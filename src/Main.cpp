@@ -44,10 +44,12 @@
 
 //---------------------------------------------------------------------------
 // GAME TO USE
-//#include "stress/StressTestGame.h"
-//using TGame = stress::StressTestGame;
-#include "lux/LuxportGame.h"
-using TGame = lux::LuxportGame;
+#include "stress/StressTestGame.h"
+using TGame = stress::StressTestGame;
+//#include "lux/LuxportGame.h"
+//using TGame = lux::LuxportGame;
+//#include "neutrino/NeutrinoGame.h"
+//using TGame = neut::NeutrinoGame;
 //---------------------------------------------------------------------------
 
 static dd::Service<dd::IGame> s_game;
@@ -297,6 +299,7 @@ static int GameMain()
 
 				s_frameTimer->DrawFPSCounter();
 				s_debugUI->RenderDebugPanels();
+				dd::Profiler::Draw();
 
 				float time = s_profilerTimer.Stop();
 				s_debugUIProfiler.SetValue(time);

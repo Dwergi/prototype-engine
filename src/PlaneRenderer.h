@@ -8,14 +8,14 @@
 
 #include "Material.h"
 #include "Mesh.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
 
 namespace ddr
 {
-	struct PlaneRenderer : Renderer
+	struct PlaneRenderer : IRenderer
 	{
 		PlaneRenderer();
 		~PlaneRenderer();

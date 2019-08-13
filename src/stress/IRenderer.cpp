@@ -1,9 +1,9 @@
 #include "PCH.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 
 namespace ddr
 {
-	bool Renderer::CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality)
+	bool IRenderer::CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality)
 	{
 		for (const ddc::DataRequest* req : m_requests)
 		{

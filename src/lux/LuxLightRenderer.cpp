@@ -16,7 +16,7 @@ namespace lux
 	static dd::Timer s_timer;
 
 	LuxLightRenderer::LuxLightRenderer() :
-		Renderer("2D Lights")
+		IRenderer("2D Lights")
 	{
 		RequireTag(ddc::Tag::Visible);
 		Require<lux::LuxLightComponent>();

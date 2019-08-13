@@ -6,9 +6,11 @@
 
 #pragma once
 
+#include "CommandBuffer.h"
 #include "IDebugPanel.h"
+#include "IRenderer.h"
 #include "Mesh.h"
-#include "Renderer.h"
+#include "MeshRenderCommand.h"
 
 namespace dd
 {
@@ -22,7 +24,7 @@ namespace dd
 
 namespace ddr
 {
-	class MeshRenderer : public dd::IDebugPanel, public ddr::Renderer
+	class MeshRenderer : public dd::IDebugPanel, public ddr::IRenderer
 	{
 	public:
 		MeshRenderer();
@@ -40,11 +42,19 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_drawNormals { false };
 
+		VBO m_vboTransforms;
+		VBO m_vboColours;
+
 		MeshHandle m_cube;
+
+		ddr::CommandBuffer<ddr::MeshRenderCommand> m_commands;
 		
 		void RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data );
+
+		void ProcessCommands(ddr::UniformStorage& uniforms);
+		void DrawMeshInstances(Mesh* mesh, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);
 
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }
