@@ -31,7 +31,7 @@ namespace dd
 		m_targetDelta = 1.0f / m_maxFPS;
 
 		m_lastFrameTime = m_currentFrameTime;
-		m_currentFrameTime = (float) m_timer.TimeInSeconds();
+		m_currentFrameTime = m_timer.TimeInSeconds();
 
 		m_appDelta = m_currentFrameTime - m_lastFrameTime;
 
@@ -62,7 +62,7 @@ namespace dd
 		DD_PROFILE_SCOPED( FrameTimer_DelayFrame );
 
 		float now = (float) m_timer.TimeInSeconds();
-		float delta_t = (now - m_lastFrameTime);
+		float delta_t = (now - m_currentFrameTime);
 
 		m_deltaWithoutDelay = delta_t;
 
@@ -71,7 +71,7 @@ namespace dd
 			float remainder_t = m_targetDelta - delta_t;
 			std::this_thread::sleep_for( std::chrono::milliseconds( (int) remainder_t * 1000 ) );
 
-			delta_t = (float) m_timer.TimeInSeconds() - m_lastFrameTime;
+			delta_t = (float) m_timer.TimeInSeconds() - m_currentFrameTime;
 		}
 	}
 
