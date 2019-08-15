@@ -11,74 +11,72 @@
 
 namespace dd
 {
+	enum class BVHHandle : uint32 {};
+
+	namespace BVH
+	{
+		constexpr BVHHandle Invalid = (BVHHandle) -1;
+	}
+
 	struct BVHIntersection
 	{
-		size_t Handle;
-		float Distance;
+		BVHHandle Handle { BVH::Invalid };
+		float Distance { 0 };
 
-		bool IsValid() const { return Handle != -1; }
+		bool IsValid() const { return Handle != BVH::Invalid; }
 	};
 
-	typedef std::function<float(size_t)> HitTestFn;
+	using HitTestFn = std::function<float(BVHHandle)>;
 
+	//
+	// BVH that cannot be removed from (because it simplifies things, like, a lot).
+	// 
 	struct BVHTree
 	{
 		BVHTree();
 		~BVHTree();
 
-		size_t Add( const ddm::AABB& bounds );
-		void Remove( size_t handle );
+		BVHHandle Add(const ddm::AABB& bounds);
+		void Build();
 
 		void Clear();
 
-		BVHIntersection IntersectsRay( const ddm::Ray& ray ) const;
-		BVHIntersection IntersectsRayFn( const ddm::Ray& ray, const HitTestFn& fn ) const;
+		BVHIntersection IntersectsRay(const ddm::Ray& ray) const;
+		BVHIntersection IntersectsRayFn(const ddm::Ray& ray, const HitTestFn& fn) const;
 
-		bool WithinBoundBox( const ddm::AABB& bounds, std::vector<size_t>& outHits ) const;
-		bool WithinBoundSphere( const ddm::Sphere& sphere, std::vector<size_t>& outHits ) const;
+		bool WithinBoundBox(const ddm::AABB& bounds, std::vector<BVHHandle>& out_hits) const;
+		bool WithinBoundSphere(const ddm::Sphere& sphere, std::vector<BVHHandle>& out_hits) const;
 
-		ddm::AABB GetEntryBounds( int handle ) const { DD_ASSERT( !IsFreeEntry( handle ) ); return m_entries[ handle ].Bounds; }
-		ddm::AABB GetBounds() const { return m_buckets[ 0 ].Bounds; }
+		ddm::AABB GetBVHBounds() { return m_buckets[0].Bounds; }
 
-		size_t GetEntryCount() const { return m_entries.size() - m_freeEntries.size(); }
-		size_t GetBucketCount() const { return m_buckets.size() - m_freeBuckets.size(); }
+		size_t GetEntryCount() const { return m_entries.size(); }
 
 		//
 		// Reserve a number of entries to avoid allocations.
 		// 
-		void Reserve( size_t count )
+		void Reserve(size_t count)
 		{
-			m_entries.reserve( count );
-			m_buckets.reserve( count * 2 );
+			m_entries.reserve(count);
+			m_buckets.reserve(count * 2);
 		}
 
-		//
-		// Start a batch operation, which will prevent the tree from being rebuilt.
-		//
-		void StartBatch() { m_batch = true; }
-
-		//
-		// End a batch and force the tree to rebuild.
-		//
-		void EndBatch() { m_batch = false; RebuildTree(); }
-
 		// diagnostics
-		void CountBucketSplits( int& x, int& y, int& z ) const;
-		void EnsureAllBucketsEmpty() const;
-		int GetRebuildCount() const { return m_rebuildCount; }
+		void CountBucketSplits(int& x, int& y, int& z) const;
+		size_t GetBucketCount() const { return m_buckets.size(); }
 
 	private:
 
 		static const size_t MAX_ENTRIES = 8;
-		static const size_t INVALID = -1;
 
 		struct BVHEntry
 		{
+			dd::BVHHandle Handle { BVH::Invalid };
 			ddm::AABB Bounds;
 		};
 
-		enum class Axis
+		enum class Axis : int8
 		{
+			None = -1,
 			X,
 			Y,
 			Z
@@ -86,39 +84,43 @@ namespace dd
 
 		struct BVHBucket
 		{
+			static const size_t INVALID = -1;
+
 			// The region to use for comparisons.
 			ddm::AABB Region;
 
 			// The actual bounds of the entries in the region.
 			ddm::AABB Bounds;
 
-			size_t Parent { INVALID };
+			bool IsLeaf { true };
+
+			// If leaf, the start of the entries in this bucket.
+			// If not leaf, left bucket index.
 			size_t Left { INVALID };
+
+			// If leaf, the end of the entries in this bucket.
+			// If not leaf, right bucket index.
 			size_t Right { INVALID };
-			dd::Array<size_t, MAX_ENTRIES> Entries;
 
 			// The axis along which this node was split. (Diagnostic)
-			Axis SplitAxis { Axis::X };
+			Axis SplitAxis { Axis::None };
 
-			bool IsLeaf() const { return Left == INVALID && Right == INVALID; }
-			bool IsEmpty() const { return IsLeaf() && Entries.Size() == 0; }
+			size_t Count() const { return Right - Left; }
+			bool IsEmpty() const { return IsLeaf && Count() == 0; }
 		};
 
 		std::vector<BVHEntry> m_entries;
 		std::vector<BVHBucket> m_buckets;
-		std::vector<size_t> m_freeEntries;
-		std::vector<size_t> m_freeBuckets;
+		std::vector<std::shared_future<void>> m_futures;
 
-		bool m_batch { false };
-		int m_rebuildCount { 0 };
+		bool m_built { false };
+		std::atomic<int> m_bucketCount { 0 };
+		std::atomic<int> m_futureCount { 0 };
 
-		void RebuildTree();
-		void SplitBucket( size_t parent_index );
-		void InsertEntry( size_t entry_index );
-		ddm::AABB CalculateBucketBounds( const BVHBucket& bucket ) const;
-		void MergeEmptyBuckets( size_t parent_index );
+		void ClearBuckets();
 
-		bool IsFreeEntry( size_t entry_index ) const;
-		bool IsFreeBucket( size_t bucket_index ) const;
+		void SplitBucket(BVHBucket& parent);
+		void CalculateBucketBounds(BVHBucket& bucket);
+		bool AllBucketsEmpty() const;
 	};
 }

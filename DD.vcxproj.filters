@@ -255,12 +255,6 @@
     <ClInclude Include="src\Profiler.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="include\glm\fwd.hpp">
-      <Filter>Includes\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="include\glm\glm.hpp">
-      <Filter>Includes\glm</Filter>
-    </ClInclude>
     <ClInclude Include="src\AABB.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -776,6 +770,75 @@
     </ClInclude>
     <ClInclude Include="src\d2d\Bounds2DRenderer.h">
       <Filter>Systems\d2d</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\common.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\exponential.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\ext.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\fwd.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\geometric.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\glm.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\integer.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat2x2.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat2x3.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat2x4.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat3x2.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat3x3.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat3x4.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat4x2.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat4x3.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\mat4x4.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\matrix.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\packing.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\trigonometric.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\vec2.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\vec3.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\vec4.hpp">
+      <Filter>Includes\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\vector_relational.hpp">
+      <Filter>Includes\glm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

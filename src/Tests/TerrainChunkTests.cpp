@@ -7,10 +7,10 @@
 #include "PCH.h"
 #include "catch2/catch.hpp"
 
-#include "TerrainChunk.h"
-#include "TerrainParameters.h"
+#include "neutrino/TerrainChunk.h"
+#include "neutrino/TerrainParameters.h"
 
 TEST_CASE( "[TerrainChunk] Generate" )
 {
-	dd::TerrainParameters params;
+	neut::TerrainParameters params;
 }

@@ -10,25 +10,6 @@ namespace ddc
 {
 	static dd::Service<dd::JobSystem> s_jobsystem;
 
-	static void WaitForAllFutures(std::vector<std::shared_future<void>>& futures)
-	{
-		DD_TODO("Add a way to check for asserts here.");
-
-		size_t ready = 0;
-		while (ready < futures.size())
-		{
-			ready = 0;
-			for (std::shared_future<void>& f : futures)
-			{
-				std::future_status s = f.wait_for(std::chrono::microseconds(1));
-				if (s == std::future_status::ready)
-				{
-					++ready;
-				}
-			}
-		}
-	}
-
 	void SystemsManager::Initialize(EntitySpace& space)
 	{
 		for (System* system : m_systems)
@@ -67,7 +48,7 @@ namespace ddc
 			updates.push_back(s.m_update);
 		}
 
-		WaitForAllFutures(updates);
+		dd::JobSystem::WaitForAll(updates);
 
 		for (SystemNode& s : m_orderedSystems)
 		{
@@ -82,7 +63,7 @@ namespace ddc
 
 	void SystemsManager::UpdateSystem(System& system, EntitySpace& space, std::vector<std::shared_future<void>> dependencies, float delta_t)
 	{
-		WaitForAllFutures(dependencies);
+		dd::JobSystem::WaitForAll(dependencies);
 
 		if (!system.IsEnabledForSpace(space))
 		{

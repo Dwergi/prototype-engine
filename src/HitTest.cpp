@@ -83,9 +83,9 @@ namespace ddm
 		DD_ASSERT( triangulator.Size() > 0 );
 
 		dd::BVHIntersection intersection = 
-			bvh->IntersectsRayFn( ddm::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( size_t i )
+			bvh->IntersectsRayFn( ddm::Ray( origin, dir ), [&origin, &dir, &triangulator, &transform, &out_normal]( dd::BVHHandle h )
 		{
-			dd::ConstTriangle tri = triangulator[i];
+			dd::ConstTriangle tri = triangulator[(int) h];
 
 			float distance = 0;
 			glm::vec2 bary;

@@ -189,7 +189,7 @@ namespace dd
 		return false;
 	}
 
-	static std::vector<size_t> s_hits;
+	static std::vector<BVHHandle> s_hits;
 
 	static bool DynamicSpheresCollisions( const ddc::WriteView<dd::TransformComponent>& dynamic_sphere_transforms, 
 		const ddc::WriteView<dd::PhysicsSphereComponent>& dynamic_sphere_physics, const dd::BVHTree& bvh, size_t a_index, float delta_t )
@@ -210,8 +210,9 @@ namespace dd
 		s_hits.clear();
 		bvh.WithinBoundSphere( a_expanded, s_hits );
 
-		for( size_t b_index : s_hits )
+		for(BVHHandle hit : s_hits )
 		{
+			size_t b_index = (size_t) hit;
 			if( a_index == b_index )
 				continue;
 
@@ -283,18 +284,17 @@ namespace dd
 		auto dynamic_sphere_physics = dynamic_spheres.Write<dd::PhysicsSphereComponent>();
 		
 		// build BVH for broadphase
-		BVHTree bvh;
-		bvh.StartBatch();
-		bvh.Reserve( dynamic_spheres.Size() );
+		m_broadphase.Clear();
+		m_broadphase.Reserve(dynamic_spheres.Size());
 
 		for( size_t i = 0; i < dynamic_spheres.Size(); ++i )
 		{
 			glm::vec3 velocity = dynamic_sphere_physics[i].Momentum / dynamic_sphere_physics[i].Mass;
 
-			AddSphereToBVH( bvh, dynamic_sphere_physics[i].Sphere, velocity, dynamic_sphere_transforms[i].Transform() );
+			AddSphereToBVH(m_broadphase, dynamic_sphere_physics[i].Sphere, velocity, dynamic_sphere_transforms[i].Transform());
 		}
 
-		bvh.EndBatch();
+		m_broadphase.Build();
 
 		for( size_t sphere_idx = 0; sphere_idx < dynamic_spheres.Size(); ++sphere_idx )
 		{
@@ -310,7 +310,7 @@ namespace dd
 			bool collision = false;
 			collision |= IntersectStaticPlanes( static_planes, ds_physics, ds_transform, delta_t );
 			collision |= IntersectStaticSpheres( static_spheres, ds_physics, ds_transform, delta_t );
-			collision |= DynamicSpheresCollisions( dynamic_sphere_transforms, dynamic_sphere_physics, bvh, sphere_idx, delta_t );
+			collision |= DynamicSpheresCollisions( dynamic_sphere_transforms, dynamic_sphere_physics, m_broadphase, sphere_idx, delta_t );
 
 			glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
 

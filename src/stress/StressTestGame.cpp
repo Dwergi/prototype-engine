@@ -51,7 +51,7 @@ namespace stress
 
 	void StressTestGame::Initialize()
 	{
-		m_entityCount = 2 * 1024;
+		m_entityCount = 32 * 1024;
 
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
 		game_input.ShowCursor(false)

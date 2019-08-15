@@ -61,4 +61,42 @@ namespace dd
 			task();
 		}
 	}
+
+	void JobSystem::WaitForAll(std::vector<std::future<void>>& futures)
+	{
+		size_t valid = std::count_if(futures.begin(), futures.end(), [](const std::future<void>& f) { return f.valid(); });
+		size_t ready = 0;
+
+		while (ready < valid)
+		{
+			for (std::future<void>& f : futures)
+			{
+				if (f.valid())
+				{
+					std::future_status s = f.wait_for(std::chrono::microseconds(1));
+					if (s == std::future_status::ready)
+					{
+						++ready;
+					}
+				}
+			}
+		} 
+	}
+
+	void JobSystem::WaitForAll(std::vector<std::shared_future<void>>& futures)
+	{
+		size_t ready = 0;
+		while (ready < futures.size())
+		{
+			ready = 0;
+			for (std::shared_future<void>& f : futures)
+			{
+				std::future_status s = f.wait_for(std::chrono::microseconds(1));
+				if (s == std::future_status::ready)
+				{
+					++ready;
+				}
+			}
+		}
+	}
 }

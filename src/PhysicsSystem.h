@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "BVHTree.h"
 #include "IDebugPanel.h"
 #include "System.h"
 
@@ -26,5 +27,6 @@ namespace dd
 		glm::vec3 m_gravity { 0, -9.81, 0 };
 
 		int m_collisions { 0 };
+		BVHTree m_broadphase;
 	};
 }

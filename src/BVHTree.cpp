@@ -8,13 +8,15 @@
 #include "BVHTree.h"
 
 #include "AABB.h"
+#include "JobSystem.h"
 
+static dd::Service<dd::JobSystem> s_jobsystem;
 
 namespace dd
 {
 	BVHTree::BVHTree()
 	{
-		m_buckets.emplace_back( BVHBucket() );
+		ClearBuckets();
 	}
 
 	BVHTree::~BVHTree()
@@ -22,233 +24,121 @@ namespace dd
 
 	}
 
-	size_t BVHTree::Add( const ddm::AABB& bounds )
+	BVHHandle BVHTree::Add(const ddm::AABB& bounds)
 	{
-		if( m_freeEntries.empty() )
-		{
-			m_freeEntries.push_back( (int) m_entries.size() );
-			m_entries.emplace_back( BVHEntry() );
-		}
-
-		size_t index = dd::pop_front( m_freeEntries );
-
-		BVHEntry& entry = m_entries[ index ];
+		BVHEntry& entry = m_entries.emplace_back(BVHEntry());
 		entry.Bounds = bounds;
+		entry.Handle = (BVHHandle) (m_entries.size() - 1);
 
-		if( m_batch )
-		{
-			return index;
-		}
+		m_buckets[0].Region.Expand(bounds);
 
-		DD_ASSERT( m_buckets[ 0 ].Region == m_buckets[ 0 ].Bounds );
-
-		if( !m_buckets[ 0 ].Region.Contains( entry.Bounds ) )
-		{
-			// root is too small, need to rebuild
-			RebuildTree();
-		}
-		else
-		{
-			InsertEntry( index );
-		}
-
-		return index;
+		return entry.Handle;
 	}
 
-	void BVHTree::MergeEmptyBuckets( size_t bucket_index )
+	void BVHTree::ClearBuckets()
 	{
-		if( bucket_index != INVALID )
-		{
-			BVHBucket& bucket = m_buckets[ bucket_index ];
+		m_buckets.clear();
+		m_buckets.emplace_back(BVHBucket());
+		m_bucketCount = 1;
 
-			if( bucket.IsLeaf() )
-			{
-				if( bucket.Entries.Size() == 0 )
-				{
-					MergeEmptyBuckets( bucket.Parent );
-				}
-			}
-			else if( m_buckets[ bucket.Left ].IsEmpty() && m_buckets[ bucket.Right ].IsEmpty() )
-			{
-				// both children empty, merge
-				m_freeBuckets.push_back( bucket.Left );
-				m_freeBuckets.push_back( bucket.Right );
-
-				bucket.Left = INVALID;
-				bucket.Right = INVALID;
-
-				MergeEmptyBuckets( bucket.Parent );
-			}
-		}
-	}
-
-	void BVHTree::Remove( size_t handle )
-	{
-		if( IsFreeEntry( handle ) )
-		{
-			return;
-		}
-
-		BVHEntry& entry = m_entries[ handle ];
-		glm::vec3 center = entry.Bounds.Center();
-
-		// find the bucket
-		size_t current_index = 0;
-		while( true )
-		{
-			BVHBucket& current = m_buckets[ current_index ];
-			if( current.IsLeaf() )
-			{
-				break;
-			}
-			
-			if( m_buckets[ current.Left ].Region.Contains( center ) )
-			{
-				current_index = current.Left;
-			}
-			else
-			{
-				current_index = current.Right;
-			}
-		}
-
-		BVHBucket& bucket = m_buckets[ current_index ];
-
-		int remove_at = -1;
-		for( int i = 0; i < bucket.Entries.Size(); ++i )
-		{
-			if( bucket.Entries[ i ] == handle )
-			{
-				remove_at = i;
-				break;
-			}
-		}
-
-		DD_ASSERT( remove_at != -1 );
-
-		int entry_count = bucket.Entries.Size();
-
-		bucket.Entries.RemoveAt( remove_at );
-
-		DD_ASSERT( bucket.Entries.Size() == entry_count - 1 );
-
-		bucket.Bounds = CalculateBucketBounds( bucket );
-
-		MergeEmptyBuckets( current_index );
-		std::sort( m_freeBuckets.begin(), m_freeBuckets.end() );
-
-		m_freeEntries.push_back( handle );
-		std::sort( m_freeEntries.begin(), m_freeEntries.end() );
+		m_built = false;
 	}
 
 	void BVHTree::Clear()
 	{
-		m_buckets[0] = BVHBucket();
+		m_entries.clear();
 
-		m_freeBuckets.clear();
-
-		for( size_t b = 1; b < m_buckets.size(); ++b )
-		{
-			m_buckets[b] = BVHBucket();
-
-			m_freeBuckets.push_back( b );
-		}
-
-		m_freeEntries.clear();
-
-		for( size_t e = 0; e < m_entries.size(); ++e )
-		{
-			m_entries[e] = BVHEntry();
-			
-			m_freeEntries.push_back( e );
-		}
-
-		m_rebuildCount = 0;
+		ClearBuckets();
 	}
 
-	BVHIntersection BVHTree::IntersectsRay( const ddm::Ray& ray ) const
+	BVHIntersection BVHTree::IntersectsRay(const ddm::Ray& ray) const
 	{
+		DD_ASSERT(m_built);
+
 		dd::Array<size_t, 64> stack;
-		stack.Add( 0 );
+		stack.Add(0);
 
 		BVHIntersection nearest;
 		nearest.Distance = FLT_MAX;
-		nearest.Handle = INVALID;
+		nearest.Handle = BVH::Invalid;
 
 		int buckets_tested = 0;
 
-		while( stack.Size() > 0 )
-		{
-			++buckets_tested;
-
-			const BVHBucket& bucket = m_buckets[ stack.Pop() ];
-
-			float bucket_distance;
-			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
-				bucket_distance < nearest.Distance &&
-				bucket_distance < ray.Length )
-			{
-				if( bucket.IsLeaf() )
-				{
-					for( size_t e : bucket.Entries )
-					{
-						float distance;
-						const BVHEntry& entry = m_entries[ e ];
-						if( entry.Bounds.IntersectsRay( ray, distance ) &&
-							distance < nearest.Distance )
-						{
-							nearest.Handle = e;
-							nearest.Distance = distance;
-						}
-					}
-				}
-				else
-				{
-					stack.Add( bucket.Left );
-					stack.Add( bucket.Right );
-				}
-			}
-		}
-
-		//DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
-
-		return nearest;
-	}
-
-	BVHIntersection BVHTree::IntersectsRayFn( const ddm::Ray& ray, const HitTestFn& fn ) const
-	{
-		dd::Array<size_t, 64> stack;
-		stack.Add( 0 );
-
-		BVHIntersection nearest;
-		nearest.Distance = FLT_MAX;
-		nearest.Handle = INVALID;
-
-		int buckets_tested = 0;
-
-		while( stack.Size() > 0 )
+		while (stack.Size() > 0)
 		{
 			++buckets_tested;
 
 			const BVHBucket& bucket = m_buckets[stack.Pop()];
 
 			float bucket_distance;
-			if( bucket.Bounds.IntersectsRay( ray, bucket_distance ) &&
-				bucket_distance < nearest.Distance && 
-				bucket_distance < ray.Length )
+			if (bucket.Bounds.IntersectsRay(ray, bucket_distance) &&
+				bucket_distance < nearest.Distance &&
+				bucket_distance < ray.Length)
 			{
-				if( bucket.IsLeaf() )
+				if (bucket.IsLeaf)
 				{
-					for( size_t e : bucket.Entries )
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
-						float entry_distance;
-						if( m_entries[e].Bounds.IntersectsRay( ray, entry_distance ) &&
-							entry_distance < nearest.Distance )
+						float distance;
+						const BVHEntry& entry = m_entries[e];
+						if (entry.Bounds.IntersectsRay(ray, distance) &&
+							distance < nearest.Distance)
 						{
-							float actual_distance = fn( e );
-							if( actual_distance < nearest.Distance )
+							nearest.Handle = entry.Handle;
+							nearest.Distance = distance;
+						}
+					}
+				}
+				else
+				{
+					stack.Add(bucket.Left);
+					stack.Add(bucket.Right);
+				}
+			}
+		}
+
+		//DD_DIAGNOSTIC("[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+
+		return nearest;
+	}
+
+	BVHIntersection BVHTree::IntersectsRayFn(const ddm::Ray& ray, const HitTestFn& fn) const
+	{
+		DD_ASSERT(m_built);
+
+		dd::Array<size_t, 64> stack;
+		stack.Add(0);
+
+		BVHIntersection nearest;
+		nearest.Distance = FLT_MAX;
+		nearest.Handle = BVH::Invalid;
+
+		int buckets_tested = 0;
+
+		while (stack.Size() > 0)
+		{
+			++buckets_tested;
+
+			const BVHBucket& bucket = m_buckets[stack.Pop()];
+
+			float bucket_distance;
+			if (bucket.Bounds.IntersectsRay(ray, bucket_distance) &&
+				bucket_distance < nearest.Distance &&
+				bucket_distance < ray.Length)
+			{
+				if (bucket.IsLeaf)
+				{
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
+					{
+						const BVHEntry& entry = m_entries[e];
+						float entry_distance;
+						if (entry.Bounds.IntersectsRay(ray, entry_distance) &&
+							entry_distance < nearest.Distance)
+						{
+							float actual_distance = fn(entry.Handle);
+							if (actual_distance < nearest.Distance)
 							{
-								nearest.Handle = e;
+								nearest.Handle = entry.Handle;
 								nearest.Distance = actual_distance;
 							}
 						}
@@ -256,306 +146,278 @@ namespace dd
 				}
 				else
 				{
-					stack.Add( bucket.Left );
-					stack.Add( bucket.Right );
+					stack.Add(bucket.Left);
+					stack.Add(bucket.Right);
 				}
 			}
 		}
 
-		//DD_DIAGNOSTIC( "[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC("[BVHTree] IntersectsRay - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return nearest;
 	}
 
-	bool BVHTree::WithinBoundBox( const ddm::AABB& bounds, std::vector<size_t>& out_hits ) const
+	bool BVHTree::WithinBoundBox(const ddm::AABB& bounds, std::vector<BVHHandle>& out_hits) const
 	{
+		DD_ASSERT(m_built);
+
 		int buckets_tested = 0;
 
 		dd::Array<size_t, 64> stack;
-		stack.Add( 0 );
+		stack.Add(0);
 
 		bool hit = false;
 
-		while( stack.Size() > 0 )
-		{
-			++buckets_tested;
-
-			const BVHBucket& bucket = m_buckets[ stack.Pop() ];
-
-			if( bucket.Bounds.Intersects( bounds ) )
-			{
-				if( bucket.IsLeaf() )
-				{
-					for( size_t e : bucket.Entries )
-					{
-						if( m_entries[e].Bounds.Intersects( bounds ) )
-						{
-							out_hits.push_back( e );
-							hit = true;
-						}
-					}
-				}
-				else
-				{
-					stack.Add( bucket.Left );
-					stack.Add( bucket.Right );
-				}
-			}
-		}
-
-		//DD_DIAGNOSTIC( "[BVHTree] WithinBoundBox - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
-
-		return hit;
-	}
-
-	bool BVHTree::WithinBoundSphere( const ddm::Sphere& sphere, std::vector<size_t>& out_hits ) const
-	{
-		int buckets_tested = 0;
-
-		dd::Array<size_t, 64> stack;
-		stack.Add( 0 );
-
-		bool hit = false;
-
-		while( stack.Size() > 0 )
+		while (stack.Size() > 0)
 		{
 			++buckets_tested;
 
 			const BVHBucket& bucket = m_buckets[stack.Pop()];
-			if( bucket.Bounds.Intersects( sphere ) )
+
+			if (bucket.Bounds.Intersects(bounds))
 			{
-				if( bucket.IsLeaf() )
+				if (bucket.IsLeaf)
 				{
-					for( size_t e : bucket.Entries )
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
-						if( m_entries[e].Bounds.Intersects( sphere ) )
+						const BVHEntry& entry = m_entries[e];
+						if (entry.Bounds.Intersects(bounds))
 						{
-							out_hits.push_back( e );
+							out_hits.push_back(entry.Handle);
 							hit = true;
 						}
 					}
 				}
 				else
 				{
-					stack.Add( bucket.Left );
-					stack.Add( bucket.Right );
+					stack.Add(bucket.Left);
+					stack.Add(bucket.Right);
 				}
 			}
 		}
 
-		//DD_DIAGNOSTIC( "[BVHTree] WithinBoundSphere - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
+		//DD_DIAGNOSTIC("[BVHTree] WithinBoundBox - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
 		return hit;
 	}
 
-	void BVHTree::SplitBucket( size_t parent_index )
+	bool BVHTree::WithinBoundSphere(const ddm::Sphere& sphere, std::vector<BVHHandle>& out_hits) const
 	{
-		if( m_freeBuckets.empty() )
+		DD_ASSERT(m_built);
+
+		int buckets_tested = 0;
+
+		dd::Array<size_t, 64> stack;
+		stack.Add(0);
+
+		bool hit = false;
+
+		while (stack.Size() > 0)
 		{
-			m_buckets.reserve( m_buckets.size() + 2 );
+			++buckets_tested;
 
-			m_freeBuckets.push_back( m_buckets.size() );
-			m_buckets.push_back( BVHBucket() );
-
-			m_freeBuckets.push_back( m_buckets.size() );
-			m_buckets.push_back( BVHBucket() );
+			const BVHBucket& bucket = m_buckets[stack.Pop()];
+			if (bucket.Bounds.Intersects(sphere))
+			{
+				if (bucket.IsLeaf)
+				{
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
+					{
+						const BVHEntry& entry = m_entries[e];
+						if (entry.Bounds.Intersects(sphere))
+						{
+							out_hits.push_back(entry.Handle);
+							hit = true;
+						}
+					}
+				}
+				else
+				{
+					stack.Add(bucket.Left);
+					stack.Add(bucket.Right);
+				}
+			}
 		}
 
-		BVHBucket& parent_bucket = m_buckets[ parent_index ];
+		//DD_DIAGNOSTIC("[BVHTree] WithinBoundSphere - Buckets Used: %d/%zu\n", buckets_tested, m_buckets.size() );
 
-		DD_ASSERT( parent_bucket.IsLeaf() );
+		return hit;
+	}
 
-		glm::vec3 split_offset = parent_bucket.Region.Extents();
-		Axis split_axis;
+	void BVHTree::CalculateBucketBounds(BVHBucket& bucket)
+	{
+		bucket.Bounds.Clear();
 
-		if( split_offset.z >= split_offset.x && split_offset.z >= split_offset.y )
+		if (bucket.IsLeaf)
 		{
-			split_offset.x = 0;
-			split_offset.y = 0;
-			split_offset.z *= 0.5f;
-
-			split_axis = Axis::Z;
-
-		}
-		else if( split_offset.y >= split_offset.x && split_offset.y >= split_offset.z )
-		{
-			split_offset.x = 0;
-			split_offset.y *= 0.5f;
-			split_offset.z = 0;
-
-			split_axis = Axis::Y;
+			for (size_t e = bucket.Left; e < bucket.Right; ++e)
+			{
+				bucket.Bounds.Expand(m_entries[e].Bounds);
+			}
 		}
 		else
 		{
-			split_offset.x *= 0.5f;
-			split_offset.y = 0;
-			split_offset.z = 0;
+			bucket.Bounds.Expand(m_buckets[bucket.Left].Bounds);
+			bucket.Bounds.Expand(m_buckets[bucket.Right].Bounds);
+		}
+	}
 
-			split_axis = Axis::X;
+#pragma optimize("", off)
+	void BVHTree::SplitBucket(BVHBucket& parent)
+	{
+		DD_ASSERT(parent.IsLeaf);
+		DD_ASSERT(parent.Region.IsValid());
+		DD_TODO("Might be better to make this stack-based?");
+
+		// recursion condition
+		if (parent.Count() <= MAX_ENTRIES)
+		{
+			return;
 		}
 
-		size_t left_index = dd::pop_front( m_freeBuckets );
-		BVHBucket& left = m_buckets[ left_index ];
-		left.Region.Min = parent_bucket.Region.Min;
-		left.Region.Max = parent_bucket.Region.Max - split_offset;
-		left.SplitAxis = split_axis;
-		left.Parent = parent_index;
+		// figure out the split axis
+		glm::vec3 half_extents = parent.Region.Extents() / 2.0f;
 
-		size_t right_index = dd::pop_front( m_freeBuckets );
-		BVHBucket& right = m_buckets[ right_index ];
-		right.Region.Min = parent_bucket.Region.Min + split_offset;
-		right.Region.Max = parent_bucket.Region.Max;
-		right.SplitAxis = split_axis;
-		right.Parent = parent_index;
+		int split_axis = 0;
+		if (half_extents.z >= half_extents.x && half_extents.z >= half_extents.y)
+		{
+			split_axis = 2;
+		}
+		else if (half_extents.y >= half_extents.x && half_extents.y >= half_extents.z)
+		{
+			split_axis = 1;
+		}
 
-		parent_bucket.Left = left_index;
-		parent_bucket.Right = right_index;
+		float split_coord = parent.Region.Min[split_axis] + half_extents[split_axis];
+		parent.SplitAxis = (Axis) split_axis;
+
+		size_t start = parent.Left;
+		size_t mid = start;
+		size_t end = parent.Right;
+
+		// create sub-buckets
+		size_t left_index = m_bucketCount++;
+		BVHBucket& left = m_buckets[left_index];
+		left.Region.Min = parent.Region.Min;
+		left.Region.Max = parent.Region.Max;
+		left.Region.Max[split_axis] = split_coord;
+
+		left.IsLeaf = true;
+		left.Left = start;
+		left.Right = start;
+
+		size_t right_index = m_bucketCount++;
+		BVHBucket right = m_buckets[right_index];
+		right.Region.Min = parent.Region.Min;
+		right.Region.Min[split_axis] = split_coord;
+		right.Region.Max = parent.Region.Max;
+
+		right.IsLeaf = true;
+		right.Left = end;
+		right.Right = end;
+
+		parent.IsLeaf = false;
+		parent.Left = left_index;
+		parent.Right = right_index;
 
 		// split the current entries between the two buckets
-		for( size_t entry_index : parent_bucket.Entries )
+		for (size_t i = start; i < end; ++i)
 		{
-			const BVHEntry& entry = m_entries[ entry_index ];
-			glm::vec3 center = entry.Bounds.Center();
-
-			if (left.Region.Contains(center))
+			glm::vec3 center = m_entries[i].Bounds.Center();
+			if (center[split_axis] < split_coord)
 			{
-				left.Entries.Add( entry_index );
-				left.Bounds.Expand( entry.Bounds );
-			}
-			else
-			{
-				right.Entries.Add( entry_index );
-				right.Bounds.Expand( entry.Bounds );
+				std::swap(m_entries[mid], m_entries[i]);
+				++mid;
 			}
 		}
 
-		parent_bucket.Entries.Clear();
-	}
-
-	void BVHTree::InsertEntry( size_t entry_index )
-	{
-		const BVHEntry& entry = m_entries[ entry_index ];
-
-		glm::vec3 center = entry.Bounds.Center();
-
-		size_t current_index = 0;
-		int already_split = false;
-
-		while( true )
+		// bad split, just arbitrarily use the middle
+		if (mid == start || mid == end)
 		{
-			BVHBucket& current = m_buckets[ current_index ];
-			current.Bounds.Expand( entry.Bounds );
+			mid = start + (end - start) / 2;
+		}
 
-			if( current.IsLeaf() )
-			{
-				if( current.Entries.Size() < MAX_ENTRIES )
-				{
-					m_buckets[ current_index ].Entries.Add( entry_index );
-					break;
-				}
-				else
-				{
-					// split and re-loop with the current bucket no longer being a leaf
-					SplitBucket( current_index );
-					++already_split;
+		DD_ASSERT(mid != start && mid != end);
 
-					DD_TODO("This isn't really working out - getting massively unbalanced trees. Rethink entirely.");
-					DD_ASSERT(already_split < 5);
-				}
-			}
-			else
-			{
-				BVHBucket& left = m_buckets[ current.Left ];
+		left.Right = mid;
+		right.Left = mid;
 
-				if( left.Region.Contains( center ) )
-				{
-					current_index = current.Left;
-				}
-				else
-				{
-					current_index = current.Right;
-				}
-			}
+		auto fn = [this](BVHBucket& bucket)
+		{
+			SplitBucket(bucket);
+		};
+
+		if (left.Count() > 512)
+		{
+			size_t future_idx = m_futureCount++;
+			m_futures[future_idx] = s_jobsystem->Schedule(fn, left).share();
+		}
+		else
+		{
+			fn(left);
+		}
+
+		if (right.Count() > 512)
+		{
+			size_t future_idx = m_futureCount++;
+			m_futures[future_idx] = s_jobsystem->Schedule(fn, right).share();
+		}
+		else
+		{
+			fn(right);
 		}
 	}
 
-	void BVHTree::RebuildTree()
+	void BVHTree::Build()
 	{
-		m_buckets.reserve( m_entries.size() * 2 );
-
-		m_buckets[ 0 ] = BVHBucket();
-		BVHBucket& root = m_buckets[ 0 ];
-
-		// calculate new root bounds
-		for( size_t e = 0; e < m_entries.size(); ++e )
+		if (m_built)
 		{
-			if( IsFreeEntry( e ) )
-				continue;
-
-			root.Region.Expand( m_entries[ e ].Bounds );
+			ClearBuckets();
 		}
 
+		if (m_entries.size() == 0)
+		{
+			m_built = true;
+			return;
+		}
+
+		m_buckets.resize(m_entries.size() * 2);
+		m_futures.resize((m_entries.size() / 512) * 2);
+
+		BVHBucket& root = m_buckets[0];
 		root.Bounds = root.Region;
+		root.IsLeaf = true;
+		root.Left = 0;
+		root.Right = m_entries.size();
 
-		// free all buckets except root
-		m_freeBuckets.clear();
+		DD_ASSERT(AllBucketsEmpty());
 
-		for( size_t b = 1; b < m_buckets.size(); ++b )
+		SplitBucket(root);
+
+		dd::JobSystem::WaitForAll(m_futures);
+
+		m_buckets.resize(m_bucketCount);
+		m_futures.clear();
+
+		for (size_t b = m_buckets.size(); b > 0; --b)
 		{
-			m_buckets[ b ] = BVHBucket();
-
-			m_freeBuckets.push_back( b );
+			CalculateBucketBounds(m_buckets[b - 1]);
 		}
 
-		// insert all entries
-		for( size_t e = 0; e < m_entries.size(); ++e )
-		{
-			if( IsFreeEntry( e ) )
-				continue;
-
-			InsertEntry( e );
-		}
-
-		++m_rebuildCount;
+		m_built = true;
 	}
 
-	bool BVHTree::IsFreeEntry( size_t entry_index ) const
-	{
-		DD_ASSERT( entry_index < m_entries.size() );
-
-		return std::binary_search( m_freeEntries.begin(), m_freeEntries.end(), entry_index );
-	}
-
-	bool BVHTree::IsFreeBucket( size_t bucket_index ) const
-	{
-		DD_ASSERT( bucket_index < m_buckets.size() );
-
-		return std::binary_search( m_freeBuckets.begin(), m_freeBuckets.end(), bucket_index );
-	}
-
-	ddm::AABB BVHTree::CalculateBucketBounds( const BVHBucket& bucket ) const
-	{
-		ddm::AABB bounds;
-
-		for( size_t e : bucket.Entries )
-		{
-			bounds.Expand( m_entries[ e ].Bounds );
-		}
-
-		return bounds;
-	}
-
-	void BVHTree::CountBucketSplits( int& x, int& y, int& z ) const
+	void BVHTree::CountBucketSplits(int& x, int& y, int& z) const
 	{
 		x = y = z = 0;
 
-		for( const BVHBucket& bucket : m_buckets )
+		for (const BVHBucket& bucket : m_buckets)
 		{
-			if( bucket.SplitAxis == Axis::X )
+			if (bucket.SplitAxis == Axis::X)
 			{
 				++x;
 			}
-			else if( bucket.SplitAxis == Axis::Y )
+			else if (bucket.SplitAxis == Axis::Y)
 			{
 				++y;
 			}
@@ -566,12 +428,17 @@ namespace dd
 		}
 	}
 
-	void BVHTree::EnsureAllBucketsEmpty() const
+	bool BVHTree::AllBucketsEmpty() const
 	{
-		for( const BVHBucket& bucket : m_buckets )
+		for (size_t i = 1; i < m_buckets.size(); ++i)
 		{
-			DD_ASSERT( bucket.IsLeaf() );
-			DD_ASSERT( bucket.Entries.Size() == 0 );
+			const BVHBucket& bucket = m_buckets[i];
+			if (!bucket.IsLeaf || bucket.Left != bucket.Right)
+			{
+				return false;
+			}
 		}
+
+		return true;
 	}
 }

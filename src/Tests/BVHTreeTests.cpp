@@ -12,6 +12,19 @@
 
 #include "catch2/catch.hpp"
 
+TEST_CASE("[BVHTree] Controlled Build")
+{
+	dd::BVHTree tree;
+
+	for (float f = 1; f < 20; f += 1)
+	{
+		tree.Add(ddm::AABB(glm::vec3(f), glm::vec3(f + 1)));
+		tree.Add(ddm::AABB(glm::vec3(-f), glm::vec3(-f - 1)));
+	}
+
+	tree.Build();
+}
+
 TEST_CASE( "[BVHTree] Add" )
 {
 	dd::BVHTree tree;
@@ -28,73 +41,10 @@ TEST_CASE( "[BVHTree] Add" )
 		tree.Add( new_entry );
 	}
 
-	REQUIRE( tree.GetEntryCount() == 256 );
-	REQUIRE( bounds.Contains( tree.GetBounds() ) );
-}
-
-TEST_CASE( "[BVHTree] Remove" )
-{
-	dd::BVHTree tree;
-
-	dd::RandomInt rng( -500, 500, 1 );
-
-	for( int i = 0; i < 256; ++i )
-	{
-		ddm::AABB new_entry;
-		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
-		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
-
-		tree.Add( new_entry );
-	}
+	tree.Build();
 
 	REQUIRE( tree.GetEntryCount() == 256 );
-
-	for( int i = 0; i < 256; ++i )
-	{
-		tree.Remove( i );
-	}
-
-	REQUIRE( tree.GetEntryCount() == 0 );
-}
-
-TEST_CASE( "[BVHTree] Remove and Add" )
-{
-	dd::BVHTree tree;
-
-	dd::RandomInt rng( -500, 500, 1 );
-
-	dd::Array<ddm::AABB, 256> entries;
-
-	for( int i = 0; i < 256; ++i )
-	{
-		ddm::AABB new_entry;
-		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
-		new_entry.Expand( glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
-
-		entries.Add( new_entry );
-		tree.Add( new_entry );
-	}
-
-	size_t bucket_count = tree.GetBucketCount();
-	REQUIRE( tree.GetEntryCount() == 256 );
-
-	for( int i = 0; i < 256; ++i )
-	{
-		tree.Remove( i );
-	}
-
-	tree.EnsureAllBucketsEmpty();
-
-	REQUIRE( tree.GetBucketCount() == 1 );
-	REQUIRE( tree.GetEntryCount() == 0 );
-
-	for( const ddm::AABB& entry : entries )
-	{
-		tree.Add( entry );
-	}
-
-	// tree building should be deterministic
-	REQUIRE( tree.GetBucketCount() == bucket_count );
+	REQUIRE( bounds.Contains( tree.GetBVHBounds() ) );
 }
 
 TEST_CASE( "[BVHTree] Intersects" )
@@ -104,7 +54,7 @@ TEST_CASE( "[BVHTree] Intersects" )
 	dd::RandomInt rng( 100, 500, 1 );
 
 	ddm::AABB entry_bb( glm::vec3( 0, 0, 0 ), glm::vec3( 10, 10, 10 ) );
-	size_t entry_h = tree.Add( entry_bb );
+	dd::BVHHandle entry_h = tree.Add( entry_bb );
 
 	for( int i = 0; i < 256; ++i )
 	{
@@ -114,6 +64,8 @@ TEST_CASE( "[BVHTree] Intersects" )
 
 		tree.Add( new_entry );
 	}
+
+	tree.Build();
 
 	ddm::Ray ray( glm::vec3( 0, -5, 0 ), glm::vec3( 0, 1, 0 ) );
 
@@ -141,6 +93,8 @@ TEST_CASE( "[BVHTree] Misses Root" )
 		tree.Add( new_entry );
 	}
 
+	tree.Build();
+
 	ddm::Ray ray( glm::vec3( 1000, 1000, 1000 ), glm::vec3( 0, 1, 0 ) );
 
 	dd::BVHIntersection hit = tree.IntersectsRay( ray );
@@ -162,7 +116,9 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 		tree.Add( new_entry );
 	}
 
-	DD_DIAGNOSTIC( "Entries: %zu, Buckets: %zu, Tree Rebuilds: %d\n", tree.GetEntryCount(), tree.GetBucketCount(), tree.GetRebuildCount() );
+	tree.Build();
+
+	DD_DIAGNOSTIC("Entries: %zu, Buckets: %zu\n", tree.GetEntryCount(), tree.GetBucketCount());
 
 	int x, y, z;
 	tree.CountBucketSplits( x, y, z );
@@ -197,8 +153,10 @@ TEST_CASE( "[BVHTree] Within Bounds" )
 		tree.Add( new_entry );
 	}
 
+	tree.Build();
+
 	ddm::AABB test( glm::vec3( -10 ), glm::vec3( 10 ) );
-	std::vector<size_t> hits;
+	std::vector<dd::BVHHandle> hits;
 
 	REQUIRE( tree.WithinBoundBox( test, hits ) );
 }

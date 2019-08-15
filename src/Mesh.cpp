@@ -199,7 +199,6 @@ namespace ddr
 		DD_ASSERT( m_rebuilding );
 
 		m_bvh = new dd::BVHTree();
-		m_bvh->StartBatch();
 
 		ddm::AABB total_bounds;
 
@@ -221,7 +220,7 @@ namespace ddr
 			m_bvh->Add(bounds);
 		}
 
-		m_bvh->EndBatch();
+		m_bvh->Build();
 
 		if (!m_hasBounds)
 		{

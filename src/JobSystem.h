@@ -14,10 +14,13 @@ namespace dd
 		~JobSystem();
 
 		template<class F, class... Args>
-		auto Schedule( F&& f, Args&&... args )
-			-> std::future<std::invoke_result_t<F, Args...>>;
+		std::future<std::invoke_result_t<F, Args...>> Schedule(F&& f, Args&& ... args);
+
+		// Wait for all futures to be ready.
+		static void WaitForAll(std::vector<std::future<void>>& futures);
+		static void WaitForAll(std::vector<std::shared_future<void>>& futures);
+
 	private:
-		
 		std::vector<std::thread> m_workers;
 		std::queue<std::function<void()>> m_tasks;
 

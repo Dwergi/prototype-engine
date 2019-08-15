@@ -126,7 +126,6 @@ namespace neut
 		glm::vec3 player_pos = player_transforms[0].Position;
 
 		m_agentsBVH.Clear();
-		m_agentsBVH.StartBatch();
 
 		// fill BVH
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -139,11 +138,11 @@ namespace neut
 			m_agentsBVH.Add( bb );
 		}
 
-		m_agentsBVH.EndBatch();
+		m_agentsBVH.Build();
 
 		dd::RandomFloat rng( -MaxRandom, MaxRandom );
 
-		std::vector<size_t> temp_entries;
+		std::vector<dd::BVHHandle> temp_entries;
 		temp_entries.reserve( data.Size() );
 
 		for( size_t i = 0; i < data.Size(); ++i )
@@ -169,16 +168,17 @@ namespace neut
 			glm::vec3 dir_avoid( 0 );
 
 			// calculate the average of velocities and positions of surrounding agents
-			for( size_t entry : temp_entries )
+			for( dd::BVHHandle entry : temp_entries )
 			{
+				size_t entry_idx = (size_t) entry;
 				// skip self
-				if( entry == i )
+				if(entry_idx == i)
 					continue;
 
-				DD_ASSERT( entry >= 0 && entry < transforms.Size() );
+				DD_ASSERT(entry_idx >= 0 && entry_idx < transforms.Size());
 
-				const neut::SwarmAgentComponent& other_agent = swarm_agents[entry];
-				const dd::TransformComponent& other_transform = transforms[entry];
+				const neut::SwarmAgentComponent& other_agent = swarm_agents[entry_idx];
+				const dd::TransformComponent& other_transform = transforms[entry_idx];
 
 				++friend_count;
 

@@ -137,6 +137,7 @@ namespace dd
 			else
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				__debugbreak();
 			}
 		} while (s_assert.Action == AssertAction::None);
 
