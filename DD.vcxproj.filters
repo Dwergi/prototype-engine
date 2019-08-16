@@ -840,6 +840,9 @@
     <ClInclude Include="include\glm\vector_relational.hpp">
       <Filter>Includes\glm</Filter>
     </ClInclude>
+    <ClInclude Include="src\JobSystemStealing.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1437,6 +1440,9 @@
     </ClCompile>
     <ClCompile Include="src\d2d\Bounds2DRenderer.cpp">
       <Filter>Systems\d2d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JobSystemStealing.cpp">
+      <Filter>Jobs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

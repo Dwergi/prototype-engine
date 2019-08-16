@@ -95,7 +95,7 @@ namespace dd
 		T value = vec.front();
 		vec.erase( vec.begin() );
 
-		return value;
+		return std::move(value);
 	}
 
 	bool DebuggerAttached();

@@ -350,7 +350,7 @@ namespace dd
 		if (left.Count() > 512)
 		{
 			size_t future_idx = m_futureCount++;
-			m_futures[future_idx] = s_jobsystem->Schedule(fn, left).share();
+			//s_jobsystem->ScheduleCategory((uint64) this, fn, left).share();
 		}
 		else
 		{
@@ -360,7 +360,7 @@ namespace dd
 		if (right.Count() > 512)
 		{
 			size_t future_idx = m_futureCount++;
-			m_futures[future_idx] = s_jobsystem->Schedule(fn, right).share();
+			//s_jobsystem->ScheduleCategory((uint64) this, fn, right).share();
 		}
 		else
 		{

@@ -383,6 +383,7 @@
     <ClInclude Include="src\ddm\AABB2D.h" />
     <ClInclude Include="src\ddm\Circle.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\JobSystemStealing.h" />
     <ClInclude Include="src\lux\LuxLightComponent.h" />
     <ClInclude Include="src\lux\LuxLightRenderer.h" />
     <ClInclude Include="src\lux\LuxportGame.h" />
@@ -694,6 +695,7 @@
     <ClCompile Include="src\InputMode.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\IWindow.cpp" />
+    <ClCompile Include="src\JobSystemStealing.cpp" />
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LinesComponent.cpp" />
     <ClCompile Include="src\LinesRenderer.cpp" />

@@ -42,61 +42,90 @@ namespace dd
 		}
 	}
 
+	void JobSystem::RunSingleTask()
+	{
+		Task task;
+		{
+			std::unique_lock<std::mutex> lock(m_queueMutex);
+			m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
+
+			if (m_stop && m_tasks.empty())
+				return;
+
+			task = dd::pop_front(m_tasks);
+		}
+		task.Function();
+	}
+
 	void JobSystem::WorkerFunction()
 	{
 		while( true )
 		{
-			std::function<void()> task;
-			{
-				std::unique_lock<std::mutex> lock( m_queueMutex );
-				m_condition.wait( lock, [this] { return m_stop || !m_tasks.empty(); } );
-
-				if( m_stop && m_tasks.empty() )
-					return;
-
-				task = std::move( m_tasks.front() );
-				m_tasks.pop();
-			}
-
-			task();
+			RunSingleTask();
 		}
 	}
 
-	void JobSystem::WaitForAll(std::vector<std::future<void>>& futures)
+
+	template <typename T>
+	void WaitForAllInternal(const std::vector<T>& futures)
 	{
-		size_t valid = std::count_if(futures.begin(), futures.end(), [](const std::future<void>& f) { return f.valid(); });
+		size_t valid = std::count_if(futures.begin(), futures.end(), [](const auto& f) { return f.valid(); });
 		size_t ready = 0;
 
 		while (ready < valid)
 		{
-			for (std::future<void>& f : futures)
+			ready = 0;
+
+			for (auto& f : futures)
 			{
 				if (f.valid())
 				{
-					std::future_status s = f.wait_for(std::chrono::microseconds(1));
+					std::future_status s = f.wait_for(std::chrono::microseconds(0));
 					if (s == std::future_status::ready)
 					{
 						++ready;
 					}
 				}
 			}
-		} 
+
+			if (ready < valid)
+			{
+				std::this_thread::yield();
+			}
+		}
 	}
 
-	void JobSystem::WaitForAll(std::vector<std::shared_future<void>>& futures)
+	void JobSystem::WaitForAll(const std::vector<std::future<void>>& futures)
 	{
-		size_t ready = 0;
-		while (ready < futures.size())
+		WaitForAllInternal(futures);
+	}
+
+	void JobSystem::WaitForAll(const std::vector<std::shared_future<void>>& futures)
+	{
+		WaitForAllInternal(futures);
+	}
+
+	void JobSystem::WaitForCategory(uint64 category)
+	{
+		bool found_any = true;
+
+		while (found_any)
 		{
-			ready = 0;
-			for (std::shared_future<void>& f : futures)
+			found_any = false;
+
 			{
-				std::future_status s = f.wait_for(std::chrono::microseconds(1));
-				if (s == std::future_status::ready)
+				std::unique_lock<std::mutex> lock(m_queueMutex);
+				for (const Task& task : m_tasks)
 				{
-					++ready;
+					if (task.Category == category)
+					{
+						found_any = true;
+						break;
+					}
 				}
 			}
+
+			RunSingleTask();
 		}
 	}
 }

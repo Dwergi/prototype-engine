@@ -130,7 +130,7 @@ namespace dd
 
 		do
 		{
-			if (std::this_thread::get_id() == s_mainThread)
+			if (IsMainThread())
 			{
 				CheckAssert();
 			}
@@ -142,6 +142,11 @@ namespace dd
 		} while (s_assert.Action == AssertAction::None);
 
 		return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
+	}
+
+	bool IsMainThread()
+	{
+		return std::this_thread::get_id() == s_mainThread;
 	}
 
 	void InitializeAssert()
