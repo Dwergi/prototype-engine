@@ -186,7 +186,7 @@ namespace dd
 		void AssertType() const;
 
 		template <typename... Args, std::size_t... Index>
-		void CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const;
+		void CreateVariables( Variable* arg_stack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const;
 	};
 
 	// Static functions with return value
@@ -337,12 +337,12 @@ namespace dd
 	}
 
 	template <typename... Args, std::size_t... Index>
-	void Function::CreateVariables( Variable* argStack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const
+	void Function::CreateVariables( Variable* arg_stack, const std::tuple<Args...>& tuple, std::index_sequence<Index...> ) const
 	{
 		// Expand the side effects using template fuckery.
 		ExpandType
 		{
-			0, (argStack[Index] = Variable( std::get<Index>( tuple ) ), AssertType<Index, Args...>(), 0)...
+			0, (arg_stack[Index] = Variable( std::get<Index>( tuple ) ), AssertType<Index, Args...>(), 0)...
 		};
 	}
 
@@ -354,12 +354,12 @@ namespace dd
 
 		DD_ASSERT( m_sig.ArgCount() == ArgCount );
 		
-		Variable argStack[ArgCount];
+		Variable arg_stack[ArgCount];
 		std::tuple<Args...> tuple = std::make_tuple( args... );
 
-		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
+		CreateVariables( arg_stack, tuple, std::make_index_sequence<ArgCount>() );
 
-		m_callHelper( &ret, m_context.Data(), argStack );
+		m_callHelper( &ret, m_context.Data(), arg_stack );
 
 		DD_ASSERT( ret.Type() == m_sig.GetRet() );
 	}
@@ -372,11 +372,11 @@ namespace dd
 
 		DD_ASSERT( m_sig.ArgCount() == ArgCount );
 
-		Variable argStack[ArgCount];
+		Variable arg_stack[ArgCount];
 		std::tuple<Args...> tuple = std::make_tuple( args... );
 
-		CreateVariables( argStack, tuple, std::make_index_sequence<ArgCount>() );
+		CreateVariables( arg_stack, tuple, std::make_index_sequence<ArgCount>() );
 
-		m_callHelper( nullptr, m_context.Data(), argStack );
+		m_callHelper( nullptr, m_context.Data(), arg_stack );
 	}
 }

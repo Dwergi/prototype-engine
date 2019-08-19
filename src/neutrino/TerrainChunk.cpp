@@ -241,7 +241,7 @@ namespace neut
 	{
 		if( m_state == INITIALIZE_PENDING )
 		{
-			s_jobsystem->Schedule( [this]() { Initialize(); } );
+			s_jobsystem->ScheduleMethod(this, &TerrainChunk::Initialize);
 		}
 
 		if( m_state == INITIALIZE_DONE )
@@ -267,7 +267,7 @@ namespace neut
 		{
 			if( !m_updating.exchange( true ) )
 			{
-				s_jobsystem->Schedule( [this]() { UpdateVertices(); } );
+				s_jobsystem->ScheduleMethod(this, &TerrainChunk::UpdateVertices);
 			}
 		}
 

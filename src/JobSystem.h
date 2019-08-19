@@ -1,92 +1,98 @@
-// JobSystem.h
+// Work-stealing jobsystem based on: https://blog.molecular-matters.com/2015/08/24/job-system-2-0-lock-free-work-stealing-part-1-basics/
 
 #pragma once
 
-#include <condition_variable>
+#include <atomic>
+
+#include "Random.h"
 
 namespace dd
 {
-	struct JobSystem
+	struct JobSystem;
+
+	struct Job
 	{
-		JobSystem( size_t threads );
-		~JobSystem();
-
-		template<class F, class... Args>
-		auto Schedule(F&& f, Args&& ... args)
-			->std::future<std::invoke_result_t<F, Args...>>;
-
-		template<class F, class... Args>
-		auto ScheduleCategory(uint64 category, F&& f, Args&& ... args)
-			->std::future<std::invoke_result_t<F, Args...>>;
-
-		// Wait for all tasks of the given category to be ready.
-		void WaitForCategory(uint64 category);
-
-		// Wait for all given futures to be ready.
-		static void WaitForAll(const std::vector<std::future<void>>& futures);
-		static void WaitForAll(const std::vector<std::shared_future<void>>& futures);
+		void Run();
+		bool IsFinished() const;
 
 	private:
-		std::vector<std::thread> m_workers;
+		friend struct JobSystem;
 
-		struct Task
+		void Finish();
+
+		void (*m_function)(Job*);
+		Job* m_parent { nullptr };
+		std::atomic<int> m_pendingJobs { 0 };
+
+		static constexpr size_t MaxSize = 64;
+		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs);
+		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
+
+		byte m_argument[PaddingBytes] { 0 };
+
+		template <typename T>
+		size_t SetArgument(size_t offset, T value)
 		{
-			uint64 Category;
-			std::function<void()> Function;
-		};
-		std::vector<Task> m_tasks;
+			std::memcpy(m_argument + offset, &value, sizeof(T));
+			return offset + sizeof(T);
+		}
 
-		std::mutex m_queueMutex;
-		std::condition_variable m_condition;
-		bool m_stop { false };
-		bool m_useThreads { true };
+		template <typename T>
+		size_t GetArgument(size_t offset, T& value) const
+		{
+			value = *reinterpret_cast<const T*>(m_argument + offset);
+			return offset + sizeof(T);
+		}
 
-		void WorkerFunction();
-		void RunSingleTask();
+		template <typename TClass, typename TArg>
+		static void CallMethodArg(Job* job);
+		template <typename TClass>
+		static void CallMethod(Job* job);
+		template <typename TArg>
+		static void CallArg(Job* job);
+		static void CallVoid(Job* job);
 	};
 
-	// add new work item to the pool
-	template<class F, class... Args>
-	auto JobSystem::ScheduleCategory(uint64 category, F&& f, Args&&... args)
-		-> std::future<std::invoke_result_t<F, Args...>>
+	struct JobSystem
 	{
-		using return_type = std::invoke_result_t<F, Args...>;
+		JobSystem(uint threads);
 
-		// don't allow enqueuing after stopping the pool
-		if( m_stop )
-		{
-			DD_ASSERT( false, "Scheduled job on stopped JobSystem" );
-		}
+		// TODO: Multiple arguments would be nice...
+		template <typename TClass, typename TArg>
+		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg);
+		template <typename TClass>
+		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(void));
+		template <typename TArg>
+		Job* Create(void (*fn)(TArg), const TArg& arg);
+		Job* Create(void (*fn)());
 
-		auto packaged_task = std::make_shared<std::packaged_task<return_type()>>(
-			std::bind( std::forward<F>( f ), std::forward<Args>( args )... )
-			);
+		template <typename TClass, typename TArg>
+		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg);
+		template <typename TClass>
+		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(void));
+		template <typename TArg>
+		Job* CreateChild(Job* parent, void (*fn)(TArg), const TArg& arg);
+		Job* CreateChild(Job* parent, void (*fn)());
 
-		std::future<return_type> res = packaged_task->get_future();
+		void Schedule(Job* job);
+		void Wait(const Job* job);
 
-		if (m_useThreads)
-		{
-			std::unique_lock<std::mutex> lock(m_queueMutex);
+	private:
+		friend struct JobQueue;
 
-			Task task;
-			task.Category = category;
-			task.Function = [packaged_task]() { (*packaged_task)(); };
-			m_tasks.emplace_back(task);
+		dd::Random32 m_rng;
 
-			m_condition.notify_one();
-		}
-		else
-		{
-			f( args... );
-		}
+		bool m_stop { false };
+		std::vector<std::thread> m_workers;
+		std::vector<JobQueue*> m_queues;
 
-		return res;
-	}
-
-	template<class F, class... Args>
-	auto JobSystem::Schedule(F&& f, Args&& ... args)
-		-> std::future<std::invoke_result_t<F, Args...>>
-	{
-		return ScheduleCategory(0, std::forward<F>(f), std::forward<Args>(args)...);
-	}
+		JobQueue* GetRandomQueue();
+		JobQueue* FindQueue(std::thread::id tid) const;
+		void WorkerThread(uint index);
+		
+		Job* Allocate();
+		void Push(Job& job);
+	};
 }
+
+#include "JobSystem.inl"

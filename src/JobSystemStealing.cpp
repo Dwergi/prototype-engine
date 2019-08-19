@@ -1,9 +1,7 @@
 #include "PCH.h"
-#include "JobSystemStealing.h"
+#include "JobSystem.h"
 
 #include "DDAssertHelpers.h"
-
-#define COMPILER_BARRIER() _ReadWriteBarrier()
 
 namespace dd
 {
@@ -14,7 +12,7 @@ namespace dd
 	thread_local Job g_jobs[MAX_JOBS];
 	thread_local int g_currentJob = 0;
 
-	JobSystemStealing::JobSystemStealing(uint threads)
+	JobSystem::JobSystem(uint threads)
 	{
 		DD_ASSERT(dd::IsMainThread());
 
@@ -29,7 +27,7 @@ namespace dd
 		}
 	}
 
-	void JobSystemStealing::WorkerThread(uint this_index)
+	void JobSystem::WorkerThread(uint this_index)
 	{
 		m_queues[this_index] = new JobQueue(*this, std::this_thread::get_id());
 
@@ -47,7 +45,7 @@ namespace dd
 		}
 	}
 
-	void JobSystemStealing::Wait(const Job* job)
+	void JobSystem::Wait(const Job* job)
 	{
 		JobQueue* queue = FindQueue(std::this_thread::get_id());
 
@@ -65,7 +63,7 @@ namespace dd
 		}
 	}
 	
-	JobQueue* JobSystemStealing::FindQueue(std::thread::id tid) const
+	JobQueue* JobSystem::FindQueue(std::thread::id tid) const
 	{
 		for (JobQueue* queue : m_queues)
 		{
@@ -78,17 +76,17 @@ namespace dd
 		return nullptr;
 	}
 
-	JobQueue* JobSystemStealing::GetRandomQueue()
+	JobQueue* JobSystem::GetRandomQueue()
 	{
 		return m_queues[m_rng.Next()];
 	}
 
-	JobQueue::JobQueue(JobSystemStealing& system, std::thread::id tid)
+	JobQueue::JobQueue(JobSystem& system, std::thread::id tid)
 	{
 		m_system = &system;
 		m_ownerThread = tid;
-		m_tail = 0;
-		m_head = 0;
+		m_bottom = 0;
+		m_top = 0;
 		Clear();
 	}
 
@@ -123,60 +121,70 @@ namespace dd
 		return job;
 	}
 
+	void JobQueue::Push(Job& job)
+	{
+		int bottom = m_bottom;
+		m_pending[bottom & PENDING_MASK] = &job;
+		m_bottom = bottom + 1;
+	}
 
 	Job* JobQueue::Pop()
 	{
 		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
 		
-		int tail = m_tail - 1;
-		m_tail.exchange(tail);
+		int bottom = m_bottom - 1;
+		m_bottom.exchange(bottom);
 
-		int head = m_head;
-		if (head >= tail)
+		int top = m_top;
+
+		if (bottom > top)
 		{
-			m_tail = head;
+			// empty queue
+			m_bottom = top;
 			return nullptr;
 		}
-
-		if (tail > (head + 1))
+		else
 		{
 			// more than one item
-			Job* job = m_pending[tail & PENDING_MASK];
+			Job* job = m_pending[bottom & PENDING_MASK];
+			if (top != bottom)
+			{
+				// more than one job left
+				return job;
+			}
+
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				job = nullptr;
+			}
+
+			m_bottom = top + 1;
+			return job;
 		}
 
 		return nullptr;
 	}
 
-	void JobQueue::Push(Job& job)
-	{
-		int tail = m_tail;
-		m_pending[tail & PENDING_MASK] = &job;
-		m_tail = tail + 1;
-	}
-
 	Job* JobQueue::Steal()
 	{
 		DD_ASSERT(std::this_thread::get_id() != m_ownerThread);
-		DD_ASSERT(m_head < MAX_PENDING);
+		DD_ASSERT(m_top < MAX_PENDING);
 		
-		int head = m_head;
+		int top = m_top;
+		int bottom = m_bottom;
 
-		COMPILER_BARRIER();
-
-		int tail = m_tail;
-
-		if (head == tail)
+		if (top < bottom)
 		{
-			return nullptr;
+			Job* job = m_pending[top & PENDING_MASK];
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				return nullptr;
+			}
+
+			return job;
 		}
 
-		if (!m_head.compare_exchange_strong(head, head + 1))
-		{
-			return nullptr;
-		}
-
-		Job* job = m_pending[head & MASK];
-		return job;
+		return nullptr;
 	}
 
 	void Job::Run()

@@ -1,131 +1,322 @@
-// JobSystem.cpp - Modified from https://github.com/progschj/ThreadPool/blob/master/ThreadPool.h
-
 #include "PCH.h"
 #include "JobSystem.h"
 
-#define JOBSYSTEM_NO_THREADS
+#include "DDAssertHelpers.h"
 
 namespace dd
 {
-	// the constructor just launches some amount of workers
-	JobSystem::JobSystem( size_t threads )
-	{
-		if( threads == 0 )
-		{
-			m_useThreads = false;
-			return;
-		}
+	static constexpr int MAX_JOBS = 4096;
+	static constexpr uint MASK = MAX_JOBS - 1;
+	
+	thread_local Job g_jobs[MAX_JOBS];
+	thread_local int g_currentJob = 0;
 
-		for( size_t i = 0; i < threads; ++i )
+	struct JobQueue
+	{
+		JobQueue(JobSystem& system, std::thread::id tid);
+
+		// Create a new job.
+		Job* Allocate();
+
+		// Get a new job to work on.
+		Job* GetJob();
+
+		std::thread::id Owner() const { return m_ownerThread; }
+
+		// Push is always called from the owning thread.
+		void Push(Job& job);
+
+		// Clear the queue.
+		void Clear();
+
+	private:
+		std::thread::id m_ownerThread;
+		std::atomic<int> m_top;
+		std::atomic<int> m_bottom;
+
+		JobSystem* m_system { nullptr };
+
+		static constexpr int MAX_PENDING = 1024;
+		static constexpr int PENDING_MASK = MAX_PENDING - 1;
+		Job* m_pending[MAX_PENDING];
+
+		// Pop is always called from the owning thread.
+		Job* Pop();
+
+		// Steal is always called from another thread.
+		Job* Steal();
+	};
+
+	JobSystem::JobSystem(uint threads)
+	{
+		DD_ASSERT(dd::IsMainThread());
+
+		m_queues.resize(threads);
+		m_queues[0] = new JobQueue(*this, std::this_thread::get_id());
+		
+		m_rng = Random32(0, threads - 1);
+
+		for (uint i = 1; i < threads; ++i)
 		{
-			m_workers.emplace_back( [this]() { WorkerFunction(); } ); 
+			m_workers.emplace_back([this, i]() { WorkerThread(i); });
 		}
 	}
 
-
-	// the destructor joins all threads
-	JobSystem::~JobSystem()
+	void JobSystem::WorkerThread(uint this_index)
 	{
-		if( m_useThreads )
+		m_queues[this_index] = new JobQueue(*this, std::this_thread::get_id());
+
+		while (!m_stop)
 		{
+			Job* job = m_queues[this_index]->GetJob();
+			if (job != nullptr)
 			{
-				std::unique_lock<std::mutex> lock( m_queueMutex );
-				m_stop = true;
+				job->Run();
 			}
-
-			m_condition.notify_all();
-
-			for( std::thread& worker : m_workers )
-			{
-				worker.join();
-			}
-		}
-	}
-
-	void JobSystem::RunSingleTask()
-	{
-		Task task;
-		{
-			std::unique_lock<std::mutex> lock(m_queueMutex);
-			m_condition.wait(lock, [this] { return m_stop || !m_tasks.empty(); });
-
-			if (m_stop && m_tasks.empty())
-				return;
-
-			task = dd::pop_front(m_tasks);
-		}
-		task.Function();
-	}
-
-	void JobSystem::WorkerFunction()
-	{
-		while( true )
-		{
-			RunSingleTask();
-		}
-	}
-
-
-	template <typename T>
-	void WaitForAllInternal(const std::vector<T>& futures)
-	{
-		size_t valid = std::count_if(futures.begin(), futures.end(), [](const auto& f) { return f.valid(); });
-		size_t ready = 0;
-
-		while (ready < valid)
-		{
-			ready = 0;
-
-			for (auto& f : futures)
-			{
-				if (f.valid())
-				{
-					std::future_status s = f.wait_for(std::chrono::microseconds(0));
-					if (s == std::future_status::ready)
-					{
-						++ready;
-					}
-				}
-			}
-
-			if (ready < valid)
+			else
 			{
 				std::this_thread::yield();
 			}
 		}
 	}
 
-	void JobSystem::WaitForAll(const std::vector<std::future<void>>& futures)
+	Job* JobSystem::Allocate()
 	{
-		WaitForAllInternal(futures);
-	}
-
-	void JobSystem::WaitForAll(const std::vector<std::shared_future<void>>& futures)
-	{
-		WaitForAllInternal(futures);
-	}
-
-	void JobSystem::WaitForCategory(uint64 category)
-	{
-		bool found_any = true;
-
-		while (found_any)
+		JobQueue* queue = FindQueue(std::this_thread::get_id());
+		if (queue == nullptr)
 		{
-			found_any = false;
+			DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");
+			return nullptr;
+		}
 
+		Job* job = queue->Allocate();
+		return job;
+	}
+
+	Job* JobSystem::Create(void (*fn)())
+	{
+		return CreateChild(nullptr, fn);
+	}
+
+	Job* JobSystem::CreateChild(Job* parent, void (*fn)())
+	{
+		static_assert(sizeof(fn) < Job::PaddingBytes);
+
+		Job* job = Allocate();
+		if (job == nullptr)
+		{
+			DD_ASSERT(job != nullptr);
+			return nullptr;
+		}
+
+		job->m_parent = parent;
+		if (job->m_parent != nullptr)
+		{
+			job->m_parent->m_pendingJobs++;
+		}
+
+		job->m_pendingJobs = 1;
+		job->m_function = &Job::CallVoid;
+
+		size_t offset = 0;
+		offset = job->SetArgument(offset, fn);
+
+		Push(*job);
+
+		return job;
+	}
+
+	void JobSystem::Schedule(Job* job)
+	{
+		if (job == nullptr)
+		{
+			DD_ASSERT(job != nullptr, "Scheduling a null job!");
+			return;
+		}
+
+		JobQueue* queue = FindQueue(std::this_thread::get_id());
+		if (queue == nullptr)
+		{
+			DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");
+			return;
+		}
+
+		queue->Push(*job);
+	}
+
+	void JobSystem::Wait(const Job* job)
+	{
+		JobQueue* queue = FindQueue(std::this_thread::get_id());
+
+		while (!job->IsFinished())
+		{
+			Job* work = queue->GetJob();
+			if (work != nullptr)
 			{
-				std::unique_lock<std::mutex> lock(m_queueMutex);
-				for (const Task& task : m_tasks)
-				{
-					if (task.Category == category)
-					{
-						found_any = true;
-						break;
-					}
-				}
+				work->Run();
+			}
+			else
+			{
+				std::this_thread::yield();
+			}
+		}
+	}
+	
+	JobQueue* JobSystem::FindQueue(std::thread::id tid) const
+	{
+		for (JobQueue* queue : m_queues)
+		{
+			if (queue->Owner() == tid)
+			{
+				return queue;
+			}
+		}
+
+		return nullptr;
+	}
+
+	JobQueue* JobSystem::GetRandomQueue()
+	{
+		return m_queues[m_rng.Next()];
+	}
+
+	JobQueue::JobQueue(JobSystem& system, std::thread::id tid)
+	{
+		m_system = &system;
+		m_ownerThread = tid;
+		m_bottom = 0;
+		m_top = 0;
+		Clear();
+	}
+
+	void JobQueue::Clear()
+	{
+		std::memset(g_jobs, 0, sizeof(Job) * MAX_JOBS);
+		g_currentJob = 0;
+	}
+
+	Job* JobQueue::Allocate()
+	{
+		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+
+		Job* job = &g_jobs[g_currentJob];
+		std::memset(job, 0, sizeof(Job));
+		++g_currentJob;
+		return job;
+	}
+
+	Job* JobQueue::GetJob()
+	{
+		Job* job = Pop();
+		if (job == nullptr)
+		{
+			JobQueue* queue = m_system->GetRandomQueue();
+			if (queue != this)
+			{
+				job = queue->Steal();
+			}
+		}
+
+		return job;
+	}
+
+	void JobQueue::Push(Job& job)
+	{
+		int bottom = m_bottom;
+		m_pending[bottom & PENDING_MASK] = &job;
+		m_bottom = bottom + 1;
+	}
+
+	Job* JobQueue::Pop()
+	{
+		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+		
+		int bottom = m_bottom - 1;
+		m_bottom.exchange(bottom);
+
+		int top = m_top;
+
+		if (bottom > top)
+		{
+			// empty queue
+			m_bottom = top;
+			return nullptr;
+		}
+		else
+		{
+			// more than one item
+			Job* job = m_pending[bottom & PENDING_MASK];
+			if (top != bottom)
+			{
+				// more than one job left
+				return job;
 			}
 
-			RunSingleTask();
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				job = nullptr;
+			}
+
+			m_bottom = top + 1;
+			return job;
 		}
+
+		return nullptr;
+	}
+
+	Job* JobQueue::Steal()
+	{
+		DD_ASSERT(std::this_thread::get_id() != m_ownerThread);
+		DD_ASSERT(m_top < MAX_PENDING);
+		
+		int top = m_top;
+		int bottom = m_bottom;
+
+		if (top < bottom)
+		{
+			Job* job = m_pending[top & PENDING_MASK];
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				return nullptr;
+			}
+
+			return job;
+		}
+
+		return nullptr;
+	}
+
+	void Job::Run()
+	{
+		if (m_function != nullptr)
+		{
+			m_function(this);
+		}
+
+		Finish();
+	}
+
+	void Job::Finish()
+	{
+		int pending = --m_pendingJobs;
+		if (pending == 0 && m_parent != nullptr)
+		{
+			m_parent->Finish();
+		}
+	}
+
+	bool Job::IsFinished() const
+	{
+		return m_pendingJobs == 0;
+	}
+
+	void Job::CallVoid(Job* job)
+	{
+		size_t offset = 0;
+
+		void(*fn)();
+		offset = job->GetArgument(offset, fn);
+
+		fn();
 	}
 }

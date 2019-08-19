@@ -161,7 +161,7 @@ namespace ddr
 					delete m_bvh;
 				}
 
-				jobsystem.Schedule( [this]() { RebuildBVH(); } );
+				jobsystem.ScheduleMethod(this, &Mesh::RebuildBVH);
 			}
 		}
 

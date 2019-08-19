@@ -263,8 +263,9 @@ namespace dd
 	}
 
 #pragma optimize("", off)
-	void BVHTree::SplitBucket(BVHBucket& parent)
+	void BVHTree::SplitBucket(size_t parent_idx)
 	{
+		BVHBucket& parent = m_buckets[parent_idx];
 		DD_ASSERT(parent.IsLeaf);
 		DD_ASSERT(parent.Region.IsValid());
 		DD_TODO("Might be better to make this stack-based?");
@@ -342,29 +343,22 @@ namespace dd
 		left.Right = mid;
 		right.Left = mid;
 
-		auto fn = [this](BVHBucket& bucket)
-		{
-			SplitBucket(bucket);
-		};
-
 		if (left.Count() > 512)
 		{
-			size_t future_idx = m_futureCount++;
-			//s_jobsystem->ScheduleCategory((uint64) this, fn, left).share();
+			s_jobsystem->ScheduleMethodChild(m_job, this, &BVHTree::SplitBucket, left_index);
 		}
 		else
 		{
-			fn(left);
+			SplitBucket(left_index);
 		}
 
 		if (right.Count() > 512)
 		{
-			size_t future_idx = m_futureCount++;
-			//s_jobsystem->ScheduleCategory((uint64) this, fn, right).share();
+			s_jobsystem->ScheduleMethodChild(m_job, this, &BVHTree::SplitBucket, right_index);
 		}
 		else
 		{
-			fn(right);
+			SplitBucket(right_index);
 		}
 	}
 
@@ -382,7 +376,6 @@ namespace dd
 		}
 
 		m_buckets.resize(m_entries.size() * 2);
-		m_futures.resize((m_entries.size() / 512) * 2);
 
 		BVHBucket& root = m_buckets[0];
 		root.Bounds = root.Region;
@@ -392,12 +385,13 @@ namespace dd
 
 		DD_ASSERT(AllBucketsEmpty());
 
-		SplitBucket(root);
+		m_job = s_jobsystem->CreateMethod(this, &BVHTree::SplitBucket, (size_t) 0);
+		s_jobsystem->Schedule(m_job);
+		s_jobsystem->Wait(m_job);
 
-		dd::JobSystem::WaitForAll(m_futures);
+		m_job = nullptr;
 
 		m_buckets.resize(m_bucketCount);
-		m_futures.clear();
 
 		for (size_t b = m_buckets.size(); b > 0; --b)
 		{

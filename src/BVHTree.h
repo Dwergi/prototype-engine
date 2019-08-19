@@ -11,6 +11,8 @@
 
 namespace dd
 {
+	struct Job;
+
 	enum class BVHHandle : uint32 {};
 
 	namespace BVH
@@ -111,15 +113,16 @@ namespace dd
 
 		std::vector<BVHEntry> m_entries;
 		std::vector<BVHBucket> m_buckets;
-		std::vector<std::shared_future<void>> m_futures;
 
 		bool m_built { false };
 		std::atomic<int> m_bucketCount { 0 };
 		std::atomic<int> m_futureCount { 0 };
 
+		Job* m_job { nullptr };
+
 		void ClearBuckets();
 
-		void SplitBucket(BVHBucket& parent);
+		void SplitBucket(size_t parent_idx);
 		void CalculateBucketBounds(BVHBucket& bucket);
 		bool AllBucketsEmpty() const;
 	};

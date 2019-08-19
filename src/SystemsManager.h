@@ -3,6 +3,11 @@
 #include "IDebugPanel.h"
 #include "SystemsSorting.h"
 
+namespace dd
+{
+	struct Job;
+}
+
 namespace ddc
 {
 	struct System;
@@ -37,7 +42,7 @@ namespace ddc
 
 		bool m_drawSystemsGraph { false };
 
-		void UpdateSystem(System& system, EntitySpace& space, std::vector<std::shared_future<void>> dependencies, float delta_t);
+		void UpdateSystem(System& system, EntitySpace& space, dd::Job* dependencies, float delta_t);
 		void UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t);
 
 		void DrawDebugInternal();

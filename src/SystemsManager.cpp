@@ -39,21 +39,6 @@ namespace ddc
 		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
 
 		UpdateSystemsWithTreeScheduling(space, delta_t);
-
-		std::vector<std::shared_future<void>> updates;
-		updates.reserve(m_orderedSystems.size());
-
-		for (SystemNode& s : m_orderedSystems)
-		{
-			updates.push_back(s.m_update);
-		}
-
-		dd::JobSystem::WaitForAll(updates);
-
-		for (SystemNode& s : m_orderedSystems)
-		{
-			s.m_update = std::shared_future<void>();
-		}
 	}
 
 	void SystemsManager::Register(System& system)
@@ -61,20 +46,27 @@ namespace ddc
 		m_systems.push_back(&system);
 	}
 
-	void SystemsManager::UpdateSystem(System& system, EntitySpace& space, std::vector<std::shared_future<void>> dependencies, float delta_t)
+	struct SystemUpdate
 	{
-		dd::JobSystem::WaitForAll(dependencies);
+		System* System { nullptr };
+		EntitySpace* Space { nullptr };
+		dd::Job* Dependencies { nullptr };
+		float DeltaT { 0 };
+	};
 
-		if (!system.IsEnabledForSpace(space))
+	dd::Job* SystemsManager::UpdateSystem(SystemUpdate update)
+	{
+		if (!update.System->IsEnabledForSpace(*update.Space))
 		{
 			return;
 		}
 
-		ddc::UpdateData update(space, delta_t);
+		ddc::UpdateData update_data(*update.Space, update.DeltaT);
 
 		// get names
+		DD_TODO("This could be cached in the system post-Initialize.");
 		dd::Array<dd::String16, 8> names;
-		for (const DataRequest* req : system.GetRequests())
+		for (const DataRequest* req : update.System->GetRequests())
 		{
 			bool found = false;
 			for (const dd::String& name : names)
@@ -92,12 +84,14 @@ namespace ddc
 			}
 		}
 
-		// for each name filter requests
+		s_jobsystem->Wait(update.Dependencies);
+
+		// for each named data buffer, filter by requests
 		for (const dd::String& name : names)
 		{
 			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
 			dd::Array<DataRequest*, MAX_COMPONENTS> requests;
-			for (DataRequest* req : system.GetRequests())
+			for (DataRequest* req : update.System->GetRequests())
 			{
 				if (name == req->Name())
 				{
@@ -110,46 +104,45 @@ namespace ddc
 				}
 			}
 
-			TagBits tags = system.GetRequiredTags(name.c_str());
+			TagBits tags = update.System->GetRequiredTags(name.c_str());
 
 			// find entities with requirements
 			std::vector<Entity> entities;
-			space.FindAllWith(required, tags, entities);
+			update.Space->FindAllWith(required, tags, entities);
 
-			update.AddData(entities, requests, name.c_str());
+			update_data.AddData(entities, requests, name.c_str());
 		}
 
-		system.Update(update);
+		update.System->Update(update_data);
 
-		update.Commit();
+		update_data.Commit();
 	}
 
-	std::vector<std::shared_future<void>> GetFutures(SystemNode& s, std::vector<SystemNode>& systems)
+	void EmptyJob()
 	{
-		std::vector<std::shared_future<void>> futures;
 
-		for (SystemNode::Edge& e : s.m_in)
-		{
-			SystemNode& dep = systems[e.m_from];
-			futures.push_back(dep.m_update);
-		}
-
-		return futures;
 	}
 
 	void SystemsManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
 	{
+		dd::Job* root_job = s_jobsystem->Schedule(&EmptyJob);
+
 		for (SystemNode& s : m_orderedSystems)
 		{
 			DD_ASSERT(s.m_system != nullptr);
 
 			System* system = s.m_system;
-			auto futures = GetFutures(s, m_orderedSystems);
+			for (SystemNode::Edge& e : s.m_in)
+			{
 
-			s.m_update = s_jobsystem->Schedule([this, &space, system, futures, delta_t]()
-				{
-					UpdateSystem(*system, space, futures, delta_t);
-				}).share();
+			}
+
+			SystemUpdate update;
+			update.System = s.m_system;
+			update.Space = &space;
+			update.DeltaT = delta_t;
+
+			s_jobsystem->ScheduleMethodChild(this, &SystemsManager::UpdateSystem, update);
 		}
 	}
 

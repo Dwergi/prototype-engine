@@ -16,8 +16,6 @@ namespace ddc
 
 		std::vector<Edge> m_in;
 		std::vector<Edge> m_out;
-
-		std::shared_future<void> m_update;
 	};
 
 	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems );
