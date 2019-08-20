@@ -1,27 +1,22 @@
 namespace dd
 {
-	template <typename TClass, typename TArg>
-	Job* JobSystem::CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg)
+	template <typename TClass, typename... TArgs>
+	Job* JobSystem::CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
 	{
-		return CreateMethodChild(nullptr, this_ptr, fn, arg);
+		return CreateMethodChild(nullptr, this_ptr, fn, args...);
 	}
 
-	template <typename TClass>
-	Job* JobSystem::CreateMethod(TClass* this_ptr, void (TClass::* fn)(void))
+	template <typename... TArgs>
+	Job* JobSystem::Create(void (*fn)(TArgs...), TArgs... args)
 	{
-		return CreateMethodChild(nullptr, this_ptr, fn);
+		return CreateChild(nullptr, fn, args...);
 	}
 
-	template <typename TArg>
-	Job* JobSystem::Create(void (*fn)(TArg), const TArg& arg)
+	template <typename TClass, typename... TArgs>
+	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
 	{
-		return CreateChild(nullptr, fn, arg);
-	}
-
-	template <typename TClass, typename TArg>
-	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg)
-	{
-		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(TArg)) < Job::PaddingBytes);
+		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
+		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(args_tuple)) < Job::PaddingBytes);
 		
 		Job* job = Allocate();
 		if (job == nullptr)
@@ -37,21 +32,21 @@ namespace dd
 		}
 
 		job->m_pendingJobs = 1;
-		job->m_function = &Job::CallMethodArg<TClass, TArg>;
+		job->m_function = &Job::CallMethod<TClass, TArgs...>;
 
 		size_t offset = 0;
 		offset = job->SetArgument(offset, this_ptr);
 		offset = job->SetArgument(offset, fn);
-		offset = job->SetArgument(offset, arg);
 
-		Push(*job);
+		job->SetArgument(offset, args_tuple);
 		return job;
 	}
 
-	template <typename TClass>
-	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(void))
+	template <typename... TArgs>
+	Job* JobSystem::CreateChild(Job* parent, void (*fn)(TArgs...), TArgs... args)
 	{
-		static_assert((sizeof(TClass*) + sizeof(fn)) < Job::PaddingBytes);
+		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
+		static_assert(sizeof(fn) + sizeof(args_tuple) < Job::PaddingBytes);
 
 		Job* job = Allocate();
 		if (job == nullptr)
@@ -67,67 +62,18 @@ namespace dd
 		}
 
 		job->m_pendingJobs = 1;
-		job->m_function = &Job::CallMethod<TClass>;
-
-		size_t offset = 0;
-		offset = job->SetArgument(offset, this_ptr);
-		offset = job->SetArgument(offset, fn);
-
-		Push(*job);
-		return job;
-	}
-
-	template <typename TArg>
-	Job* JobSystem::CreateChild(Job* parent, void (*fn)(TArg), const TArg& arg)
-	{
-		static_assert(sizeof(fn) + sizeof(args) < Job::PaddingBytes);
-
-		Job* job = Allocate();
-		if (job == nullptr)
-		{
-			DD_ASSERT(job != nullptr);
-			return nullptr;
-		}
-
-		job->m_parent = parent;
-		if (job->m_parent != nullptr)
-		{
-			job->m_parent->m_pendingJobs++;
-		}
-
-		job->m_pendingJobs = 1;
-		job->m_function = &Job::CallArg<TArg>;
+		job->m_function = &Job::CallFunction<TArgs...>;
 
 		size_t offset = 0;
 		offset = job->SetArgument(offset, fn);
 		offset = job->SetArgument(offset, arg);
-
-		Push(*job);
-
 		return job;
 	}
 
-	template <typename TClass, typename TArg>
-	void Job::CallMethodArg(Job* job)
-	{
-		using TMethod = void (TClass::*)(TArg);
-
-		size_t offset = 0;
-
-		TClass* this_ptr;
-		offset = job->GetArgument(offset, this_ptr);
-		TMethod method;
-		offset = job->GetArgument(offset, method);
-		TArg arg;
-		offset = job->GetArgument(offset, arg);
-
-		std::invoke(method, this_ptr, arg);
-	}
-
-	template <typename TClass>
+	template <typename TClass, typename... TArgs>
 	void Job::CallMethod(Job* job)
 	{
-		using TMethod = void (TClass::*)();
+		using TMethod = void (TClass::*)(TArgs...);
 
 		size_t offset = 0;
 
@@ -136,19 +82,29 @@ namespace dd
 		TMethod method;
 		offset = job->GetArgument(offset, method);
 
-		std::invoke(method, this_ptr);
+		std::tuple<TArgs...> args_tuple;
+		offset = job->GetArgument(offset, args_tuple);
+
+		auto wrapper = [this_ptr, method](TArgs... args)
+		{
+			std::invoke(method, this_ptr, std::forward<TArgs>(args)...);
+		};
+		std::apply(wrapper, args_tuple);
 	}
 
-	template <typename TArg>
-	void Job::CallArg(Job* job)
+	template <typename... TArgs>
+	void Job::CallFunction(Job* job)
 	{
 		size_t offset = 0;
 
-		void (*fn)(TArg);
+		void (*fn)(TArgs...);
 		offset = job->GetArgument(offset, fn);
 		TArg arg;
 		offset = job->GetArgument(offset, arg);
 
-		fn(arg);
+		std::tuple<TArgs...> args_tuple;
+		offset = job->GetArgument(offset, args_tuple);
+
+		std::apply(fn, args_tuple);
 	}
 }

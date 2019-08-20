@@ -42,7 +42,15 @@ namespace ddc
 
 		bool m_drawSystemsGraph { false };
 
-		void UpdateSystem(System& system, EntitySpace& space, dd::Job* dependencies, float delta_t);
+		struct SystemUpdate
+		{
+			System* System { nullptr };
+			EntitySpace* Space { nullptr };
+			dd::Job* Dependencies { nullptr };
+			float DeltaT { 0 };
+		};
+
+		void UpdateSystem(SystemUpdate update);
 		void UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t);
 
 		void DrawDebugInternal();

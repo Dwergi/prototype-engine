@@ -24,7 +24,7 @@ namespace dd
 		Job* m_parent { nullptr };
 		std::atomic<int> m_pendingJobs { 0 };
 
-		static constexpr size_t MaxSize = 64;
+		static constexpr size_t MaxSize = 128;
 		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs);
 		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
 
@@ -44,35 +44,26 @@ namespace dd
 			return offset + sizeof(T);
 		}
 
-		template <typename TClass, typename TArg>
-		static void CallMethodArg(Job* job);
-		template <typename TClass>
+		template <typename TClass, typename... TArgs>
 		static void CallMethod(Job* job);
-		template <typename TArg>
-		static void CallArg(Job* job);
-		static void CallVoid(Job* job);
+		template <typename... TArgs>
+		static void CallFunction(Job* job);
 	};
 
 	struct JobSystem
 	{
 		JobSystem(uint threads);
 
-		// TODO: Multiple arguments would be nice...
-		template <typename TClass, typename TArg>
-		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg);
-		template <typename TClass>
-		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(void));
-		template <typename TArg>
-		Job* Create(void (*fn)(TArg), const TArg& arg);
-		Job* Create(void (*fn)());
+		template <typename TClass, typename... TArgs>
+		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... arg);
+		template <typename... TArgs>
+		Job* Create(void (*fn)(TArgs...), TArgs... arg);
+		Job* Create();
 
-		template <typename TClass, typename TArg>
-		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArg), const TArg& arg);
-		template <typename TClass>
-		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(void));
-		template <typename TArg>
-		Job* CreateChild(Job* parent, void (*fn)(TArg), const TArg& arg);
-		Job* CreateChild(Job* parent, void (*fn)());
+		template <typename TClass, typename... TArgs>
+		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args);
+		template <typename... TArgs>
+		Job* CreateChild(Job* parent, void (*fn)(TArgs...), TArgs... args);
 
 		void Schedule(Job* job);
 		void Wait(const Job* job);
@@ -91,7 +82,6 @@ namespace dd
 		void WorkerThread(uint index);
 		
 		Job* Allocate();
-		void Push(Job& job);
 	};
 }
 

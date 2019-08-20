@@ -46,15 +46,8 @@ namespace ddc
 		m_systems.push_back(&system);
 	}
 
-	struct SystemUpdate
-	{
-		System* System { nullptr };
-		EntitySpace* Space { nullptr };
-		dd::Job* Dependencies { nullptr };
-		float DeltaT { 0 };
-	};
 
-	dd::Job* SystemsManager::UpdateSystem(SystemUpdate update)
+	void SystemsManager::UpdateSystem(SystemUpdate update)
 	{
 		if (!update.System->IsEnabledForSpace(*update.Space))
 		{
@@ -118,32 +111,33 @@ namespace ddc
 		update_data.Commit();
 	}
 
-	void EmptyJob()
-	{
-
-	}
-
 	void SystemsManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
 	{
-		dd::Job* root_job = s_jobsystem->Schedule(&EmptyJob);
+		dd::Job* root_job = s_jobsystem->Create();
 
-		for (SystemNode& s : m_orderedSystems)
+		for (int i = m_orderedSystems.size() - 1; i >= 0; --i)
 		{
-			DD_ASSERT(s.m_system != nullptr);
+			SystemNode& s = m_orderedSystems[i];
+
+			dd::Job* dependencies = s_jobsystem->Create();
 
 			System* system = s.m_system;
 			for (SystemNode::Edge& e : s.m_in)
 			{
-
+				m_orderedSystems[e.m_from].m_job;
 			}
 
 			SystemUpdate update;
 			update.System = s.m_system;
 			update.Space = &space;
+			update.Dependencies = nullptr;
 			update.DeltaT = delta_t;
 
-			s_jobsystem->ScheduleMethodChild(this, &SystemsManager::UpdateSystem, update);
+			s.Job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
+			s_jobsystem->Schedule(job);
 		}
+		s_jobsystem->Schedule(root_job);
+		s_jobsystem->Wait(root_job);
 	}
 
 	namespace

@@ -118,11 +118,9 @@ namespace dd
 		std::atomic<int> m_bucketCount { 0 };
 		std::atomic<int> m_futureCount { 0 };
 
-		Job* m_job { nullptr };
-
 		void ClearBuckets();
 
-		void SplitBucket(size_t parent_idx);
+		void SplitBucket(size_t parent_idx, dd::Job* parent_job);
 		void CalculateBucketBounds(BVHBucket& bucket);
 		bool AllBucketsEmpty() const;
 	};

@@ -93,15 +93,8 @@ namespace dd
 		return job;
 	}
 
-	Job* JobSystem::Create(void (*fn)())
+	Job* JobSystem::Create()
 	{
-		return CreateChild(nullptr, fn);
-	}
-
-	Job* JobSystem::CreateChild(Job* parent, void (*fn)())
-	{
-		static_assert(sizeof(fn) < Job::PaddingBytes);
-
 		Job* job = Allocate();
 		if (job == nullptr)
 		{
@@ -109,23 +102,12 @@ namespace dd
 			return nullptr;
 		}
 
-		job->m_parent = parent;
-		if (job->m_parent != nullptr)
-		{
-			job->m_parent->m_pendingJobs++;
-		}
-
+		job->m_parent = nullptr;
 		job->m_pendingJobs = 1;
-		job->m_function = &Job::CallVoid;
-
-		size_t offset = 0;
-		offset = job->SetArgument(offset, fn);
-
-		Push(*job);
 
 		return job;
 	}
-
+	
 	void JobSystem::Schedule(Job* job)
 	{
 		if (job == nullptr)
@@ -308,15 +290,5 @@ namespace dd
 	bool Job::IsFinished() const
 	{
 		return m_pendingJobs == 0;
-	}
-
-	void Job::CallVoid(Job* job)
-	{
-		size_t offset = 0;
-
-		void(*fn)();
-		offset = job->GetArgument(offset, fn);
-
-		fn();
 	}
 }
