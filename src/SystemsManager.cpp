@@ -10,35 +10,35 @@ namespace ddc
 {
 	static dd::Service<dd::JobSystem> s_jobsystem;
 
-	void SystemsManager::Initialize(EntitySpace& space)
+	void SystemsManager::Initialize(EntityLayer& layer)
 	{
 		for (System* system : m_systems)
 		{
-			if (system->IsEnabledForSpace(space))
+			if (system->IsEnabledForLayer(layer))
 			{
-				system->Initialize(space);
+				system->Initialize(layer);
 			}
 		}
 
 		ddc::OrderSystemsByDependencies(dd::Span<System*>(m_systems), m_orderedSystems);
 	}
 
-	void SystemsManager::Shutdown(EntitySpace& space)
+	void SystemsManager::Shutdown(EntityLayer& layer)
 	{
 		for (System* system : m_systems)
 		{
-			if (system->IsEnabledForSpace(space))
+			if (system->IsEnabledForLayer(layer))
 			{
-				system->Shutdown(space);
+				system->Shutdown(layer);
 			}
 		}
 	}
 
-	void SystemsManager::Update(EntitySpace& space, float delta_t)
+	void SystemsManager::Update(EntityLayer& layer, float delta_t)
 	{
 		DD_ASSERT(m_systems.size() == m_orderedSystems.size(), "System mismatch, Initialize not called!");
 
-		UpdateSystemsWithTreeScheduling(space, delta_t);
+		UpdateSystemsWithTreeScheduling(layer, delta_t);
 	}
 
 	void SystemsManager::Register(System& system)
@@ -49,33 +49,18 @@ namespace ddc
 
 	void SystemsManager::UpdateSystem(SystemUpdate update)
 	{
-		if (!update.System->IsEnabledForSpace(*update.Space))
+		System& system = *update.SystemNode->m_system;
+
+		if (!system.IsEnabledForLayer(*update.Layer))
 		{
 			return;
 		}
 
-		ddc::UpdateData update_data(*update.Space, update.DeltaT);
+		ddc::UpdateData update_data(*update.Layer, update.DeltaT);
 
 		// get names
-		DD_TODO("This could be cached in the system post-Initialize.");
-		dd::Array<dd::String16, 8> names;
-		for (const DataRequest* req : update.System->GetRequests())
-		{
-			bool found = false;
-			for (const dd::String& name : names)
-			{
-				if (name == req->Name())
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-			{
-				names.Add(req->Name());
-			}
-		}
+		dd::IArray<dd::String16> names = system.GetRequestNames();
+		dd::IArray<DataRequest*> all_requests = system.GetRequests();
 
 		s_jobsystem->Wait(update.Dependencies);
 
@@ -84,7 +69,7 @@ namespace ddc
 		{
 			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
 			dd::Array<DataRequest*, MAX_COMPONENTS> requests;
-			for (DataRequest* req : update.System->GetRequests())
+			for (DataRequest* req : all_requests)
 			{
 				if (name == req->Name())
 				{
@@ -97,25 +82,25 @@ namespace ddc
 				}
 			}
 
-			TagBits tags = update.System->GetRequiredTags(name.c_str());
+			TagBits tags = system.GetRequiredTags(name.c_str());
 
 			// find entities with requirements
 			std::vector<Entity> entities;
-			update.Space->FindAllWith(required, tags, entities);
+			update.Layer->FindAllWith(required, tags, entities);
 
 			update_data.AddData(entities, requests, name.c_str());
 		}
 
-		update.System->Update(update_data);
+		system.Update(update_data);
 
 		update_data.Commit();
 	}
 
-	void SystemsManager::UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t)
+	void SystemsManager::UpdateSystemsWithTreeScheduling(EntityLayer& layer, float delta_t)
 	{
 		dd::Job* root_job = s_jobsystem->Create();
 
-		for (int i = m_orderedSystems.size() - 1; i >= 0; --i)
+		for (int i = (int) m_orderedSystems.size() - 1; i >= 0; --i)
 		{
 			SystemNode& s = m_orderedSystems[i];
 
@@ -128,13 +113,13 @@ namespace ddc
 			}
 
 			SystemUpdate update;
-			update.System = s.m_system;
-			update.Space = &space;
+			update.SystemNode = &s;
+			update.Layer = &layer;
 			update.Dependencies = nullptr;
 			update.DeltaT = delta_t;
 
-			s.Job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
-			s_jobsystem->Schedule(job);
+			s.m_job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
+			s_jobsystem->Schedule(s.m_job);
 		}
 		s_jobsystem->Schedule(root_job);
 		s_jobsystem->Wait(root_job);

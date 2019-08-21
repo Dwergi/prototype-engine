@@ -143,6 +143,14 @@ namespace dd
 			}
 		}
 	}
+
+	void JobSystem::WaitForAll(const std::vector<Job*>& jobs)
+	{
+		for (Job* job : jobs)
+		{
+			Wait(job);
+		}
+	}
 	
 	JobQueue* JobSystem::FindQueue(std::thread::id tid) const
 	{

@@ -51,10 +51,10 @@ namespace ddr
 
 	private:
 
-		// corners of the frustum in entities space
+		// corners of the frustum in entity space
 		dd::Buffer<glm::vec3> m_corners;
 
-		// planes of the frustum in entities space
+		// planes of the frustum in entity space
 		ddm::Plane m_planes[6];
 
 		glm::mat4 m_transform;

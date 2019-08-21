@@ -63,7 +63,7 @@
 
 #include "Globals.h"
 
-#include "EntitySpace.h"
+#include "EntityLayer.h"
 
 //#include "Serialization.h"
 

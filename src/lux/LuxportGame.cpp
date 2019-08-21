@@ -85,8 +85,6 @@ namespace lux
 	static const char* const MAP_BACKGROUND = "spacestation_tileset.png";
 	static const char* const MAP_FOREGROUND = "spacestation_objects.png";
 
-	static std::vector<ddc::Entity> s_mapspace;
-
 	static sf::Music* s_music = nullptr;
 	static sf::SoundBuffer* s_teleportSoundBuffer = nullptr;
 	static sf::SoundBuffer* s_exitSoundBuffer = nullptr;
@@ -97,10 +95,10 @@ namespace lux
 	static sf::Sound* s_activeSound2 = nullptr;
 	static sf::Listener* s_listener = nullptr;
 
-	static ddc::Entity CreateTeleporter(ddc::EntitySpace& space)
+	static ddc::Entity CreateTeleporter(ddc::EntityLayer& layer)
 	{
-		ddc::Entity teleporter = space.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::CirclePhysicsComponent, d2d::SpriteAnimationComponent>();
-		space.AddTag(teleporter, ddc::Tag::Visible);
+		ddc::Entity teleporter = layer.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::CirclePhysicsComponent, d2d::SpriteAnimationComponent>();
+		layer.AddTag(teleporter, ddc::Tag::Visible);
 
 		{
 			ddr::SpriteSheetHandle fg_spritesheet_h = s_spriteSheetManager->Find(MAP_FOREGROUND);
@@ -111,9 +109,9 @@ namespace lux
 		ddr::SpriteSheetHandle char_spritesheet_h = s_spriteSheetManager->Find(PLAYER_SPRITESHEET);
 		const ddr::SpriteSheet* char_spritesheet = char_spritesheet_h.Get();
 
-		d2d::SpriteComponent* sprite_cmp = space.Access<d2d::SpriteComponent>(teleporter);
+		d2d::SpriteComponent* sprite_cmp = teleporter.Access<d2d::SpriteComponent>();
 
-		d2d::SpriteAnimationComponent* sprite_anim_cmp = space.Access<d2d::SpriteAnimationComponent>(teleporter);
+		d2d::SpriteAnimationComponent* sprite_anim_cmp = teleporter.Access<d2d::SpriteAnimationComponent>();
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(4, 0));
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(5, 0));
 		sprite_anim_cmp->Frames.Add(char_spritesheet->Get(6, 0));
@@ -123,40 +121,40 @@ namespace lux
 		sprite_cmp->Sprite = sprite_anim_cmp->Frames[0];
 		sprite_cmp->ZIndex = TELEPORTER_Z_INDEX;
 
-		d2d::Transform2DComponent* transform_cmp = space.Access<d2d::Transform2DComponent>(teleporter);
+		d2d::Transform2DComponent* transform_cmp = teleporter.Access<d2d::Transform2DComponent>();
 		transform_cmp->Scale = glm::vec2(2);
 		transform_cmp->Update();
 
-		d2d::CirclePhysicsComponent* physics = space.Access<d2d::CirclePhysicsComponent>(teleporter);
-		physics->HitCircle.Radius = TELEPORTER_RADIUS;
-		physics->Elasticity = TELEPORTER_ELASTICITY;
+		d2d::CirclePhysicsComponent* tele_physics = teleporter.Access<d2d::CirclePhysicsComponent>();
+		tele_physics->HitCircle.Radius = TELEPORTER_RADIUS;
+		tele_physics->Elasticity = TELEPORTER_ELASTICITY;
 
-		lux::LuxLightComponent& light = space.Add<lux::LuxLightComponent>(teleporter);
-		light.Type = lux::LightType::Teleporter;
+		lux::LuxLightComponent& tele_light = teleporter.Add<lux::LuxLightComponent>();
+		tele_light.Type = lux::LightType::Teleporter;
 		return teleporter;
 	}
 
-	static ddc::Entity CreatePlayer(ddc::EntitySpace& space)
+	static ddc::Entity CreatePlayer(ddc::EntityLayer& layer)
 	{
-		ddc::Entity player = space.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::SpriteAnimationComponent, d2d::BoxPhysicsComponent>();
-		space.AddTag(player, ddc::Tag::Visible);
-		space.AddTag(player, ddc::Tag::Static);
+		ddc::Entity player = layer.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::SpriteAnimationComponent, d2d::BoxPhysicsComponent>();
+		layer.AddTag(player, ddc::Tag::Visible);
+		layer.AddTag(player, ddc::Tag::Static);
 
 		ddr::SpriteSheetHandle spritesheet_h = s_spriteSheetManager->Find(PLAYER_SPRITESHEET);
 		const ddr::SpriteSheet* spritesheet = spritesheet_h.Get();
 
-		d2d::Transform2DComponent* transform_cmp = space.Access<d2d::Transform2DComponent>(player);
+		d2d::Transform2DComponent* transform_cmp = player.Access<d2d::Transform2DComponent>();
 		transform_cmp->Scale = glm::vec2(2);
 		transform_cmp->Update();
 
-		d2d::SpriteAnimationComponent* sprite_anim_cmp = space.Access<d2d::SpriteAnimationComponent>(player);
+		d2d::SpriteAnimationComponent* sprite_anim_cmp = player.Access<d2d::SpriteAnimationComponent>();
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(0, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(1, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(2, 0));
 		sprite_anim_cmp->Frames.Add(spritesheet->Get(3, 0));
 		sprite_anim_cmp->Framerate = 4;
 
-		d2d::SpriteComponent* sprite_cmp = space.Access<d2d::SpriteComponent>(player);
+		d2d::SpriteComponent* sprite_cmp = player.Access<d2d::SpriteComponent>();
 		sprite_cmp->Sprite = sprite_anim_cmp->Frames[0];
 		sprite_cmp->ZIndex = PLAYER_Z_INDEX;
 
@@ -165,7 +163,7 @@ namespace lux
 			DD_ASSERT(frame.IsValid());
 		}
 
-		d2d::BoxPhysicsComponent* physics = space.Access<d2d::BoxPhysicsComponent>(player);
+		d2d::BoxPhysicsComponent* physics = player.Access<d2d::BoxPhysicsComponent>();
 		physics->HitBox.Min = glm::vec2(0.28, 0.0625);
 		physics->HitBox.Max = glm::vec2(0.72, 1);
 		physics->Elasticity = 0;
@@ -197,12 +195,12 @@ namespace lux
 		renderer.Register(sprite_renderer);
 	}
 
-	void LuxportGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces)
+	void LuxportGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers)
 	{
-		entity_spaces.push_back(new ddc::EntitySpace("game"));
+		entity_layers.push_back(new ddc::EntityLayer("game"));
 
-		s_teleporter = CreateTeleporter(*entity_spaces[0]);
-		s_player = CreatePlayer(*entity_spaces[0]);
+		s_teleporter = CreateTeleporter(*entity_layers[0]);
+		s_player = CreatePlayer(*entity_layers[0]);
 	}
 
 	void LuxportGame::Initialize()
@@ -311,7 +309,7 @@ namespace lux
 
 	static void ResetPlayerToStart()
 	{
-		DD_TODO("It would be good to be able to make a full copy of an entity as a scratch copy instead of hitting the EntitySpace multiple times a frame");
+		DD_TODO("It would be good to be able to make a full copy of an entity as a scratch copy instead of hitting the EntityLayer multiple times a frame");
 
 		ddc::Entity start_entity = s_currentMap->GetStart();
 		d2d::Transform2DComponent* start_tile = start_entity.Access<d2d::Transform2DComponent>();
@@ -332,18 +330,18 @@ namespace lux
 		ReturnTeleporterToPlayer();
 	}
 
-	static void SwitchMap(ddc::EntitySpace& space, int index)
+	static void SwitchMap(ddc::EntityLayer& layer, int index)
 	{
 		DD_ASSERT(index > 0 && index <= MAX_MAP);
 
 		if (s_currentMap != nullptr)
 		{
-			s_currentMap->Unload(space);
+			s_currentMap->Unload(layer);
 			delete s_currentMap;
 		}
 
 		s_currentMap = new lux::LuxportMap(index);
-		s_currentMap->Load(space);
+		s_currentMap->Load(layer);
 
 		ResetPlayerToStart();
 	}
@@ -502,7 +500,7 @@ namespace lux
 
 		if (s_currentMap == nullptr || s_desiredMapIndex != s_currentMap->GetIndex())
 		{
-			SwitchMap(update.EntitySpace(), s_desiredMapIndex);
+			SwitchMap(update.EntityLayer(), s_desiredMapIndex);
 		}
 
 		d2d::Transform2DComponent* tele_transform = s_teleporter.Access<d2d::Transform2DComponent>();

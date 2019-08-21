@@ -21,7 +21,7 @@ namespace dd
 {
 	static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
 
-	ddc::Entity TestEntities::CreateMeshEntity(ddc::EntitySpace& entities, const ddr::MeshHandle& mesh_h, glm::vec4 colour, glm::vec3 pos, glm::quat rot, glm::vec3 scale)
+	ddc::Entity TestEntities::CreateMeshEntity(ddc::EntityLayer& entities, const ddr::MeshHandle& mesh_h, glm::vec4 colour, glm::vec3 pos, glm::quat rot, glm::vec3 scale)
 	{
 		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 
@@ -45,7 +45,7 @@ namespace dd
 		return entity;
 	}
 
-	ddc::Entity TestEntities::CreateBall(ddc::EntitySpace& entities, glm::vec3 translation, glm::vec4 colour, float size)
+	ddc::Entity TestEntities::CreateBall(ddc::EntityLayer& entities, glm::vec3 translation, glm::vec4 colour, float size)
 	{
 		ddr::MeshHandle mesh_h("sphere");
 
@@ -67,7 +67,7 @@ namespace dd
 		return entity;
 	}
 
-	void TestEntities::CreatePhysicsPlaneTestScene(ddc::EntitySpace& entities)
+	void TestEntities::CreatePhysicsPlaneTestScene(ddc::EntityLayer& entities)
 	{
 		float sphere_size = 3;
 
@@ -180,7 +180,7 @@ namespace dd
 			});
 	}
 
-	void TestEntities::CreateAxes(ddc::EntitySpace& entities)
+	void TestEntities::CreateAxes(ddc::EntityLayer& entities)
 	{
 		{
 			ddc::Entity x_entity = entities.CreateEntity<dd::RayComponent, dd::ColourComponent>();

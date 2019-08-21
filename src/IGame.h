@@ -8,7 +8,7 @@
 
 namespace ddc
 {
-	struct EntitySpace;
+	struct EntityLayer;
 	struct SystemsManager;
 }
 
@@ -24,10 +24,10 @@ namespace dd
 
 	struct GameUpdateData
 	{
-		GameUpdateData(ddc::EntitySpace& space, dd::Input& input, float delta_t) : m_space(space), m_input(input), m_delta(delta_t) {}
+		GameUpdateData(ddc::EntityLayer& layer, dd::Input& input, float delta_t) : m_layer(layer), m_input(input), m_delta(delta_t) {}
 
 		// Get the entity space.
-		ddc::EntitySpace& EntitySpace() const { return m_space; }
+		ddc::EntityLayer& EntityLayer() const { return m_layer; }
 
 		// Get the input system.
 		dd::Input& Input() const { return m_input; }
@@ -36,7 +36,7 @@ namespace dd
 		float Delta() const { return m_delta; }
 
 	private:
-		ddc::EntitySpace& m_space;
+		ddc::EntityLayer& m_layer;
 		dd::Input& m_input;
 		float m_delta;
 	};
@@ -47,8 +47,8 @@ namespace dd
 		virtual void Initialize() = 0;
 		virtual void RegisterSystems(ddc::SystemsManager& system_manager) = 0;
 		virtual void RegisterRenderers(ddr::RenderManager& renderer) = 0;
-		// Last initialization step - it is valid to populate the entity space here if desired.
-		virtual void CreateEntitySpaces(std::vector<ddc::EntitySpace*>& spaces) = 0;
+		// Last initialization step - it is valid to populate the entity layer here if desired.
+		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& layers) = 0;
 
 		virtual void Shutdown() = 0;
 

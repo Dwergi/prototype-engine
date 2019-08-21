@@ -22,7 +22,7 @@ namespace neut
 		WaterSystem( const TerrainParameters& params );
 
 		virtual void Update( const ddc::UpdateData& update_data ) override;
-		virtual void Initialize( ddc::EntitySpace& entities ) override;
+		virtual void Initialize( ddc::EntityLayer& entities ) override;
 
 	private:
 
@@ -43,6 +43,6 @@ namespace neut
 		virtual const char* GetDebugTitle() const override { return "Water"; }
 		virtual void DrawDebugInternal() override;
 
-		ddc::Entity CreateWaterEntity( ddc::EntitySpace& entities, glm::vec2 chunk_pos ) const;
+		ddc::Entity CreateWaterEntity( ddc::EntityLayer& entities, glm::vec2 chunk_pos ) const;
 	};
 }

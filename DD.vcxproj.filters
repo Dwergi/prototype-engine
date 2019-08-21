@@ -630,9 +630,6 @@
     <ClInclude Include="src\Input.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntitySpace.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\Flags.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -839,6 +836,9 @@
     </ClInclude>
     <ClInclude Include="src\JobSystem.h">
       <Filter>Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityLayer.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1302,9 +1302,6 @@
     <ClCompile Include="src\Input.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntitySpace.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\UpdateDataBuffer.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1437,6 +1434,9 @@
     </ClCompile>
     <ClCompile Include="src\JobSystem.cpp">
       <Filter>Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityLayer.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

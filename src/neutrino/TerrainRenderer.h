@@ -11,7 +11,7 @@
 
 namespace ddc
 {
-	struct EntitySpace;
+	struct EntityLayer;
 }
 
 namespace neut

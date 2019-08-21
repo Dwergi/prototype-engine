@@ -48,7 +48,7 @@ namespace ddc
 		memcpy( cmp, Data, Size );
 	}
 
-	void EntityPrototype::PopulateFromEntity( ddc::Entity entity, const ddc::EntitySpace& entities )
+	void EntityPrototype::PopulateFromEntity( ddc::Entity entity, const ddc::EntityLayer& entities )
 	{
 		DD_ASSERT( Components.empty(), "Already initialized EntityPrototype!" );
 
@@ -64,7 +64,7 @@ namespace ddc
 		}
 	}
 
-	ddc::Entity EntityPrototype::Instantiate( ddc::EntitySpace& entities )
+	ddc::Entity EntityPrototype::Instantiate( ddc::EntityLayer& entities )
 	{
 		ddc::Entity entity = entities.CreateEntity();
 

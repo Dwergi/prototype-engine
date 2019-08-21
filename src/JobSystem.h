@@ -67,6 +67,7 @@ namespace dd
 
 		void Schedule(Job* job);
 		void Wait(const Job* job);
+		void WaitForAll(const std::vector<Job*>& jobs);
 
 	private:
 		friend struct JobQueue;

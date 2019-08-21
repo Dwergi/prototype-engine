@@ -27,7 +27,7 @@ namespace ddr
 		RequireTag( ddc::Tag::Visible );
 	}
 
-	ddc::Entity CreatePointLight( ddc::EntitySpace& entities )
+	ddc::Entity CreatePointLight( ddc::EntityLayer& entities )
 	{
 		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, dd::LightComponent>();
 		entities.AddTag( entity, ddc::Tag::Visible );
@@ -45,7 +45,7 @@ namespace ddr
 		return entity;
 	}
 
-	void LightRenderer::UpdateDebugPointLights( ddc::EntitySpace& entities )
+	void LightRenderer::UpdateDebugPointLights( ddc::EntityLayer& entities )
 	{
 		if( m_createLight )
 		{
@@ -68,7 +68,7 @@ namespace ddr
 
 	void LightRenderer::Update(ddr::RenderData& data)
 	{
-		UpdateDebugPointLights(data.EntitySpace());
+		UpdateDebugPointLights(data.EntityLayer());
 	}
 
 	void LightRenderer::Render(const ddr::RenderData& data)

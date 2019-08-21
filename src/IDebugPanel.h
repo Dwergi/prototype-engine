@@ -12,7 +12,7 @@
 
 namespace ddc
 {
-	struct EntitySpace;
+	struct EntityLayer;
 }
 
 namespace dd

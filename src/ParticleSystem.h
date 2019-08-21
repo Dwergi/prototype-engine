@@ -21,9 +21,9 @@ namespace dd
 		ParticleSystem();
 		~ParticleSystem();
 
-		virtual void Initialize( ddc::EntitySpace& ) override;
+		virtual void Initialize( ddc::EntityLayer& ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void Shutdown( ddc::EntitySpace& ) override {}
+		virtual void Shutdown( ddc::EntityLayer& ) override {}
 
 		ParticleSystem( const ParticleSystem& ) = delete;
 		ParticleSystem( ParticleSystem&& ) = delete;

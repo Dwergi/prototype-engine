@@ -44,9 +44,9 @@ namespace neut
 
 	void WaterRenderer::Update(ddr::RenderData& render_data)
 	{
-		ddc::EntitySpace& space = render_data.EntitySpace();
+		ddc::EntityLayer& layer = render_data.EntityLayer();
 
-		space.ForAllWith<neut::WaterComponent>( [&space]( ddc::Entity entity, neut::WaterComponent& water )
+		layer.ForAllWith<neut::WaterComponent>( []( ddc::Entity entity, neut::WaterComponent& water )
 		{
 			if( water.Dirty && water.Mesh.IsValid() )
 			{

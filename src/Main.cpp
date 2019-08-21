@@ -62,7 +62,7 @@ static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
 static dd::Service<ddc::SystemsManager> s_systemsManager;
 
-static ddc::EntitySpace* g_tempSpace;
+static ddc::EntityLayer* g_tempSpace;
 
 std::thread::id g_mainThread;
 
@@ -214,15 +214,15 @@ static int GameMain()
 
 		CreateAssetManagers();
 
-		std::vector<ddc::EntitySpace*> entity_spaces;
+		std::vector<ddc::EntityLayer*> entity_layers;
 
 		{
 			s_game->Initialize();
 			s_game->RegisterSystems(*s_systemsManager);
 			s_game->RegisterRenderers(*s_renderer);
-			s_game->CreateEntitySpaces(entity_spaces);
+			s_game->CreateEntityLayers(entity_layers);
 
-			for (ddc::EntitySpace* space : entity_spaces)
+			for (ddc::EntityLayer* space : entity_layers)
 			{
 				s_systemsManager->Initialize(*space);
 			}
@@ -230,7 +230,7 @@ static int GameMain()
 			s_renderer->Initialize();
 		}
 
-		// everything's set up, so we can start using ImGui - asserts before this will be handled by the default console
+		// everything is set up, so we can start using ImGui - asserts before this will be handled by the default console
 		dd::InitializeAssert();
 		ShowSystemConsole(false);
 
@@ -251,7 +251,7 @@ static int GameMain()
 			{
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntitySpace* space : entity_spaces)
+					for (ddc::EntityLayer* space : entity_layers)
 					{
 						space->Update(s_frameTimer->GameDelta());
 					}
@@ -260,7 +260,7 @@ static int GameMain()
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntitySpace* space : entity_spaces)
+					for (ddc::EntityLayer* space : entity_layers)
 					{
 						s_systemsManager->Update(*space, s_frameTimer->GameDelta());
 					}
@@ -269,7 +269,7 @@ static int GameMain()
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntitySpace* space : entity_spaces)
+					for (ddc::EntityLayer* space : entity_layers)
 					{
 						dd::GameUpdateData update_data(*space, *s_input, s_frameTimer->GameDelta());
 						s_game->Update(update_data);
@@ -279,7 +279,7 @@ static int GameMain()
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntitySpace* space : entity_spaces)
+					for (ddc::EntityLayer* space : entity_layers)
 					{
 						s_renderer->Render(*space, s_game->GetCamera(), s_frameTimer->GameDelta());
 					}
@@ -306,14 +306,14 @@ static int GameMain()
 			}
 		}
 
-		for (ddc::EntitySpace* space : entity_spaces)
+		for (ddc::EntityLayer* space : entity_layers)
 		{
 			s_systemsManager->Shutdown(*space);
 
 			delete space;
 		}
 
-		entity_spaces.clear();
+		entity_layers.clear();
 
 		s_renderer->Shutdown();
 		s_game->Shutdown();

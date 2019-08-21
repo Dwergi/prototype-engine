@@ -12,8 +12,8 @@ namespace lux
 	{
 		LuxportMap(int index);
 
-		void Load(ddc::EntitySpace& entities);
-		void Unload(ddc::EntitySpace& entities);
+		void Load(ddc::EntityLayer& entities);
+		void Unload(ddc::EntityLayer& entities);
 
 		int GetIndex() const { return m_index; }
 
@@ -28,7 +28,7 @@ namespace lux
 		ddc::Entity m_start;
 		ddc::Entity m_end;
 
-		void LoadLayer(ddc::EntitySpace& entities, int layer);
-		void HandleSpecialTiles(ddc::EntitySpace& entities, ddc::Entity entity, std::string tileset, int tile_index);
+		void LoadLayer(ddc::EntityLayer& entities, int layer);
+		void HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string tileset, int tile_index);
 	};
 }

@@ -129,7 +129,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	RenderData RenderManager::CreateRenderData(ddr::IRenderer& renderer, ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
+	RenderData RenderManager::CreateRenderData(ddr::IRenderer& renderer, ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -143,12 +143,12 @@ namespace ddr
 		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();
 
 		std::vector<ddc::Entity> entities;
-		space.FindAllWith(required, tags, entities);
+		layer.FindAllWith(required, tags, entities);
 
-		return RenderData(space, camera, m_uniforms, entities, renderer.GetRequirements(), delta_t);
+		return RenderData(layer, camera, m_uniforms, entities, renderer.GetRequirements(), delta_t);
 	}
 
-	void RenderManager::Render(ddc::EntitySpace& space, const ddr::ICamera& camera, float delta_t)
+	void RenderManager::Render(ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
@@ -159,7 +159,7 @@ namespace ddr
 		// create render data
 		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			render_data.emplace_back(CreateRenderData(*m_renderers[i], space, camera, delta_t));
+			render_data.emplace_back(CreateRenderData(*m_renderers[i], layer, camera, delta_t));
 		}
 
 		// update
@@ -170,7 +170,7 @@ namespace ddr
 
 		ddr::IRenderer* debug_render = nullptr;
 
-		BeginRender(space, camera);
+		BeginRender(layer, camera);
 
 		// render non-alpha
 		for (size_t i = 0; i < m_renderers.size(); ++i)
@@ -205,7 +205,7 @@ namespace ddr
 		EndRender(m_uniforms, camera);
 	}
 
-	void RenderManager::BeginRender(const ddc::EntitySpace& space, const ddr::ICamera& camera)
+	void RenderManager::BeginRender(const ddc::EntityLayer& layer, const ddr::ICamera& camera)
 	{
 		if (m_reloadShaders)
 		{

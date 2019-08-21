@@ -66,7 +66,7 @@ namespace neut
 			} );*/
 	}
 
-	void ShipSystem::CreateShip(ddc::EntitySpace& entities)
+	void ShipSystem::CreateShip(ddc::EntityLayer& entities)
 	{
 		DD_TODO("Uncomment");
 		/*
@@ -175,7 +175,7 @@ namespace neut
 		//m_camera.SetDirection( m_camera.GetPosition() - transform.GetWorldPosition() );
 	}
 
-	void ShipSystem::Shutdown(ddc::EntitySpace& entities)
+	void ShipSystem::Shutdown(ddc::EntityLayer& entities)
 	{
 	}
 

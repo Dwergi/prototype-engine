@@ -49,7 +49,7 @@ namespace neut
 		//
 		// Initialize the terrain system.
 		//
-		virtual void Initialize( ddc::EntitySpace& entities ) override;
+		virtual void Initialize( ddc::EntityLayer& entities ) override;
 
 		//
 		// Update the terrain system.
@@ -59,12 +59,12 @@ namespace neut
 		//
 		// Shut down the terrain system and destroy terrain chunk meshes.
 		//
-		virtual void Shutdown( ddc::EntitySpace& entities ) override;
+		virtual void Shutdown( ddc::EntityLayer& entities ) override;
 
 		//
 		// Save the heightmaps of the terrain chunks generated.
 		//
-		void SaveChunkImages( const ddc::EntitySpace& entities ) const;
+		void SaveChunkImages( const ddc::EntityLayer& entities ) const;
 
 		//
 		// The name to display in the debug view list.
@@ -85,15 +85,15 @@ namespace neut
 
 		virtual void DrawDebugInternal() override;
 
-		ddc::Entity CreateChunk( ddc::EntitySpace& entities, glm::vec2 pos, int lod );
+		ddc::Entity CreateChunk( ddc::EntityLayer& entities, glm::vec2 pos, int lod );
 
-		void UpdateChunk( ddc::EntitySpace& entities, ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
+		void UpdateChunk( ddc::EntityLayer& entities, ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
 			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp, 
 			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos );
 
-		void GenerateChunks( ddc::EntitySpace& entities, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos );
+		void GenerateChunks( ddc::EntityLayer& entities, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos );
 
-		void DestroyChunks( ddc::EntitySpace& entities );
+		void DestroyChunks( ddc::EntityLayer& entities );
 
 		int CalculateLOD( glm::vec2 chunk_middle, glm::vec2 camera_pos ) const;
 	};

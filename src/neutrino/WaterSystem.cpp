@@ -42,7 +42,7 @@ namespace neut
 		m_noiseParams.Wavelength = 32;
 	}
 
-	ddc::Entity WaterSystem::CreateWaterEntity( ddc::EntitySpace& entities, glm::vec2 chunk_pos ) const
+	ddc::Entity WaterSystem::CreateWaterEntity( ddc::EntityLayer& entities, glm::vec2 chunk_pos ) const
 	{
 		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, neut::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 		entities.AddTag( entity, ddc::Tag::Visible );
@@ -87,7 +87,7 @@ namespace neut
 		return entity;
 	}	
 
-	void WaterSystem::Initialize( ddc::EntitySpace& entities )
+	void WaterSystem::Initialize( ddc::EntityLayer& entities )
 	{
 	}
 
@@ -129,7 +129,7 @@ namespace neut
 		auto water = update_data.Data( "water" );
 		PopulateWaterCache( water );
 
-		ddc::EntitySpace& entities = update_data.EntitySpace();
+		ddc::EntityLayer& entities = update_data.EntityLayer();
 
 		const ddm::Plane water_plane( glm::vec3( 0, m_waterHeight, 0 ), glm::vec3( 0, -1, 0 ) );
 
@@ -155,7 +155,7 @@ namespace neut
 			ddc::Entity water_entity = FindWater( terrain_chunk->GetPosition() );
 			if( !water_entity.IsValid() )
 			{
-				water_entity = CreateWaterEntity( update_data.EntitySpace(), terrain_chunk->GetPosition() );
+				water_entity = CreateWaterEntity( update_data.EntityLayer(), terrain_chunk->GetPosition() );
 
 				++m_waterChunks;
 			}

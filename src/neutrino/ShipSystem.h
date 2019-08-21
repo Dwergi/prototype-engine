@@ -36,15 +36,15 @@ namespace neut
 	
 		void UpdateShip( dd::TransformComponent& transform, neut::ShipComponent& ship, float delta_t );
 
-		void CreateShip( ddc::EntitySpace& entities );
+		void CreateShip( ddc::EntityLayer& entities );
 
 		// IDebugPanel implementation
 		virtual void DrawDebugInternal() override; 
 		virtual const char* GetDebugTitle() const override { return "Ship"; }
 
 		// System implementation
-		virtual void Initialize(ddc::EntitySpace& entities) override {}
+		virtual void Initialize(ddc::EntityLayer& entities) override {}
 		virtual void Update(const ddc::UpdateData& data) override;
-		virtual void Shutdown(ddc::EntitySpace& entities) override;
+		virtual void Shutdown(ddc::EntityLayer& entities) override;
 	};
 }

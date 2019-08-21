@@ -151,7 +151,7 @@ struct OnlyWriterSystem : ddc::System
 
 TEST_CASE("EntityManager")
 {
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 
 	ddc::Entity a = space.CreateEntity();
 	REQUIRE(a.ID == 0);
@@ -177,7 +177,7 @@ TEST_CASE("EntityManager")
 
 TEST_CASE("Component")
 {
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 	ddc::Entity a = space.CreateEntity();
 
 	const dd::TypeInfo* type = DD_FIND_TYPE(FirstComponent);
@@ -203,7 +203,7 @@ TEST_CASE("Component")
 
 TEST_CASE("Update System")
 {
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 
 	for (int i = 0; i < 8; ++i)
 	{
@@ -241,7 +241,7 @@ TEST_CASE("Update With Discontinuity")
 {
 	dd::TypeInfo::RegisterQueuedTypes();
 
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -286,7 +286,7 @@ TEST_CASE("Update Multiple Systems")
 	TestSystem a;
 	DependentSystem b;
 
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 
 	ddc::SystemsManager system_mgr;
 	system_mgr.Register(a);
@@ -524,7 +524,7 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[0].m_system == &a);
 		REQUIRE(ordered[1].m_system == &b);
 
-		ddc::EntitySpace space("test");
+		ddc::EntityLayer space("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
@@ -554,7 +554,7 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[1].m_system == &b);
 		REQUIRE(ordered[2].m_system == &c);
 
-		ddc::EntitySpace space("test");
+		ddc::EntityLayer space("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
@@ -588,7 +588,7 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[2].m_system == &c);
 		REQUIRE(ordered[3].m_system == &d);
 
-		ddc::EntitySpace space("test");
+		ddc::EntityLayer space("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
@@ -608,7 +608,7 @@ TEST_CASE("Full Update Loop")
 
 	ddc::System* systems[] = { &a, &b, &c };
 
-	ddc::EntitySpace space("test");
+	ddc::EntityLayer space("test");
 
 	ddc::SystemsManager system_mgr;
 	system_mgr.Register(a);

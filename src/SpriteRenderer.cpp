@@ -203,7 +203,7 @@ namespace ddr
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
-		const ddc::EntitySpace& entities = data.EntitySpace();
+		const ddc::EntityLayer& entities = data.EntityLayer();
 
 		uniforms.Bind(*shader);
 

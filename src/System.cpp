@@ -14,28 +14,28 @@ namespace ddc
 	{
 	}
 
-	void System::EnableForSpace(const ddc::EntitySpace& space)
+	void System::EnableForLayer(const ddc::EntityLayer& layer)
 	{
-		if (!IsEnabledForSpace(space))
+		if (!IsEnabledForLayer(layer))
 		{
-			m_spaces.push_back(&space);
+			m_layers.push_back(&layer);
 		}
 	}
 
-	bool System::IsEnabledForSpace(const ddc::EntitySpace& space) const
+	bool System::IsEnabledForLayer(const ddc::EntityLayer& layer) const
 	{
 		if (!m_enabled)
 		{
 			return false;
 		}
 
-		if (m_spaces.empty())
+		if (m_layers.empty())
 		{
 			return true;
 		}
 
-		auto it = std::find(m_spaces.begin(), m_spaces.end(), &space);
-		return it != m_spaces.end();
+		auto it = std::find(m_layers.begin(), m_layers.end(), &layer);
+		return it != m_layers.end();
 	}
 
 	bool System::CheckDuplicates( const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality, const char* name ) const

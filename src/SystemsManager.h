@@ -18,12 +18,12 @@ namespace ddc
 		//
 		// Initialize all currently registered systems.
 		//
-		void Initialize(EntitySpace& space);
+		void Initialize(EntityLayer& layer);
 
 		//
 		// Shut down all currently registered systems.
 		//
-		void Shutdown(EntitySpace& space);
+		void Shutdown(EntityLayer& layer);
 
 		// 
 		// Register a system to be updated every frame.
@@ -33,7 +33,7 @@ namespace ddc
 		//
 		// Update all registered systems that are enabled for the given space with the given delta.
 		//
-		void Update(EntitySpace& space, float delta_t);
+		void Update(EntityLayer& layer, float delta_t);
 
 	private:
 
@@ -44,14 +44,14 @@ namespace ddc
 
 		struct SystemUpdate
 		{
-			System* System { nullptr };
-			EntitySpace* Space { nullptr };
+			SystemNode* SystemNode { nullptr };
+			EntityLayer* Layer { nullptr };
 			dd::Job* Dependencies { nullptr };
 			float DeltaT { 0 };
 		};
 
 		void UpdateSystem(SystemUpdate update);
-		void UpdateSystemsWithTreeScheduling(EntitySpace& space, float delta_t);
+		void UpdateSystemsWithTreeScheduling(EntityLayer& layer, float delta_t);
 
 		void DrawDebugInternal();
 

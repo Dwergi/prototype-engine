@@ -10,7 +10,7 @@
 
 namespace ddc
 {
-	struct EntitySpace;
+	struct EntityLayer;
 
 	struct ComponentPrototype
 	{
@@ -37,8 +37,8 @@ namespace ddc
 
 		void AddTag( ddc::Tag tag );
 
-		void PopulateFromEntity( ddc::Entity entity, const ddc::EntitySpace& entities );
-		ddc::Entity Instantiate( ddc::EntitySpace& entities );
+		void PopulateFromEntity( ddc::Entity entity, const ddc::EntityLayer& entities );
+		ddc::Entity Instantiate( ddc::EntityLayer& entities );
 
 		TagBits Tags;
 		std::vector<ComponentPrototype> Components;

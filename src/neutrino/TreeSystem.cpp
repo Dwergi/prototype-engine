@@ -58,7 +58,7 @@ namespace neut
 		initial.Position = glm::vec3( 0 );
 	}
 
-	void TreeSystem::Initialize( ddc::EntitySpace& entities )
+	void TreeSystem::Initialize( ddc::EntityLayer& entities )
 	{
 		ddc::Entity entity = entities.CreateEntity();
 

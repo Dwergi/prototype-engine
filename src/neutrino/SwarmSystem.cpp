@@ -75,7 +75,7 @@ namespace neut
 
 	}
 
-	void SwarmSystem::Initialize( ddc::EntitySpace& entities )
+	void SwarmSystem::Initialize( ddc::EntityLayer& entities )
 	{
 		dd::RandomFloat rng( 0, 1 );
 

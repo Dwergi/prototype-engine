@@ -16,7 +16,7 @@ namespace dd
 	{
 		PhysicsSystem();
 
-		virtual void Initialize( ddc::EntitySpace& entities ) override;
+		virtual void Initialize( ddc::EntityLayer& entities ) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Physics"; }

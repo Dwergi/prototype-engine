@@ -1,3 +1,9 @@
+//
+// Entity.h
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #pragma once
 
 namespace ddc
@@ -12,11 +18,11 @@ namespace ddc
 		Dynamic = 5
 	};
 
-	struct EntitySpace;
+	struct EntityLayer;
 
 	struct Entity
 	{
-		bool operator==(Entity other) const { return Handle == other.Handle && m_space == other.m_space; }
+		bool operator==(Entity other) const { return Handle == other.Handle && m_layer == other.m_layer; }
 
 		bool IsValid() const;
 		bool IsAlive() const;
@@ -26,7 +32,9 @@ namespace ddc
 		void RemoveTag(ddc::Tag tag) const;
 		bool HasTag(ddc::Tag tag) const;
 
-		EntitySpace* Space() const;
+		void Destroy() const;
+
+		EntityLayer* Layer() const;
 
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;
@@ -42,16 +50,16 @@ namespace ddc
 			{
 				uint64 ID : 32;
 				uint64 Version : 28;
-				uint64 m_space : 4;
+				uint64 m_layer : 4;
 			};
 
 			uint64 Handle { INVALID_HANDLE };
 		};
 
 	private:
-		friend struct EntitySpace;
+		friend struct EntityLayer;
 	};
 
-	// ASSUMPTION: Entity is included from EntitySpace.h, which is always included.
-	// All methods are defined in EntitySpace.h/cpp.
+	// ASSUMPTION: Entity is included from EntityLayer.h, which is always included.
+	// All methods are defined in EntityLayer.h/cpp.
 }

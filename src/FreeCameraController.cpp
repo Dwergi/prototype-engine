@@ -96,7 +96,7 @@ namespace dd
 		}
 	}
 
-	void FreeCameraController::Initialize(ddc::EntitySpace& space)
+	void FreeCameraController::Initialize(ddc::EntityLayer& layer)
 	{
 		s_input->AddHeldHandler(InputAction::FORWARD);
 		s_input->AddHeldHandler(InputAction::BACKWARD);

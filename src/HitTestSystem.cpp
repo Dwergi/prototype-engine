@@ -33,7 +33,7 @@ namespace dd
 		RequireTag( ddc::Tag::Static );
 	}
 
-	void HitTestSystem::Initialize( ddc::EntitySpace& entities )
+	void HitTestSystem::Initialize( ddc::EntityLayer& entities )
 	{
 
 	}

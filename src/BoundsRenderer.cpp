@@ -156,7 +156,7 @@ namespace ddr
 		m_vboPosition.Bind();
 		m_vboIndex.Bind();
 
-		const ddc::EntitySpace& entity_space = data.EntitySpace();
+		const ddc::EntityLayer& entity_space = data.EntityLayer();
 
 		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
 

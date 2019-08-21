@@ -28,7 +28,7 @@ namespace stress
 
 		virtual void Update(const dd::GameUpdateData& update_data) override;
 
-		virtual void CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces) override;
+		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers) override;
 		virtual void RegisterRenderers(ddr::RenderManager& renderer) override;
 		virtual void RegisterSystems(ddc::SystemsManager& system_manager) override;
 

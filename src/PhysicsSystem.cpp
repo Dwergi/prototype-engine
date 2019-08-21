@@ -33,7 +33,7 @@ namespace dd
 		RequireTag( ddc::Tag::Static, "static_planes" );
 	}
 
-	void PhysicsSystem::Initialize( ddc::EntitySpace& entities )
+	void PhysicsSystem::Initialize( ddc::EntityLayer& entities )
 	{
 
 	}

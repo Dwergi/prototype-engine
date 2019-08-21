@@ -9,12 +9,12 @@ namespace ddc
 
 		m_entity = entity;
 		
-		EntitySpace* space = entity.Space();
+		EntityLayer* layer = entity.Layer();
 		size_t total_size = 0;
 
 		for (dd::ComponentID id = 0; id < dd::TypeInfo::ComponentCount(); ++id)
 		{
-			if (space->HasComponent(entity, id))
+			if (layer->HasComponent(entity, id))
 			{
 				ComponentEntry entry;
 				entry.Type = dd::TypeInfo::GetComponent(id);
@@ -33,7 +33,7 @@ namespace ddc
 			dd::ComponentID id = entry.Type->ComponentID();
 			size_t size = entry.Type->Size();
 
-			const byte* data = (const byte*)space->GetComponent(entity, id);
+			const byte* data = (const byte*) layer->GetComponent(entity, id);
 			memcpy(m_storage + current_offset, data, size);
 			
 			entry.Hash = dd::HashBytes(data, size);
@@ -41,7 +41,7 @@ namespace ddc
 			current_offset += size;
 		}
 
-		m_tags = space->GetAllTags(entity);
+		m_tags = layer->GetAllTags(entity);
 	}
 
 	void ScratchEntity::AddTag(ddc::Tag tag)
@@ -66,7 +66,7 @@ namespace ddc
 
 	bool ScratchEntity::Commit()
 	{
-		EntitySpace* space = m_entity.Space();
+		EntityLayer* layer = m_entity.Layer();
 
 		bool changed = false;
 
@@ -79,8 +79,8 @@ namespace ddc
 			uint64 new_hash = dd::HashBytes(data, size);
 			if (new_hash != entry.Hash)
 			{
-				void* cmp_data = space->AccessComponent(m_entity, entry.Type->ComponentID());
-				memcpy(cmp_data, data, size);
+				void* cmp_data = layer->AccessComponent(m_entity, entry.Type->ComponentID());
+				std::memcpy(cmp_data, data, size);
 
 				changed = true;
 			}
@@ -88,9 +88,9 @@ namespace ddc
 			current_offset += size;
 		}
 
-		if (m_tags != space->GetAllTags(m_entity))
+		if (m_tags != layer->GetAllTags(m_entity))
 		{
-			space->SetAllTags(m_entity, m_tags);
+			layer->SetAllTags(m_entity, m_tags);
 			changed = true;
 		}
 

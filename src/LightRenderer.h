@@ -34,6 +34,6 @@ namespace ddr
 
 		virtual void DrawDebugInternal() override;
 
-		void UpdateDebugPointLights( ddc::EntitySpace& entities );
+		void UpdateDebugPointLights( ddc::EntityLayer& entities );
 	};
 }

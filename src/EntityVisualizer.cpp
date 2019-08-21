@@ -154,13 +154,13 @@ namespace dd
 			ImGui::Text("Entity - ID: %d, Version: %d", m_selected.ID, m_selected.Version);
 			ImGui::Text("Components: %d", m_selected.Components());
 
-			const ddc::EntitySpace* space = m_selected.Space();
+			const ddc::EntityLayer* layer = m_selected.Layer();
 
 			for( int i = 0; i < m_selected.Components(); ++i )
 			{
-				dd::ComponentID cmp_id = space->GetNthComponentID(m_selected, i);
+				dd::ComponentID cmp_id = layer->GetNthComponentID(m_selected, i);
 
-				void* cmp_data = space->AccessComponent(m_selected, cmp_id);
+				void* cmp_data = layer->AccessComponent(m_selected, cmp_id);
 				DD_ASSERT(cmp_data != nullptr);
 
 				const dd::TypeInfo* typeInfo = dd::TypeInfo::GetComponent(cmp_id);

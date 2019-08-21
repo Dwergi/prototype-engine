@@ -13,11 +13,11 @@ namespace ddc
 {
 	struct UpdateData
 	{
-		UpdateData( ddc::EntitySpace& entities, float delta_t );
+		UpdateData( ddc::EntityLayer& layer, float delta_t );
 		UpdateData( const UpdateData& other ) = delete;
 
 		float Delta() const { return m_delta; }
-		ddc::EntitySpace& EntitySpace() const { return m_entitySpace; }
+		ddc::EntityLayer& EntityLayer() const { return m_layer; }
 		const UpdateDataBuffer& Data( const char* name = nullptr ) const;
 
 	private:
@@ -28,7 +28,7 @@ namespace ddc
 		void Commit();
 
 		float m_delta { 0 };
-		ddc::EntitySpace& m_entitySpace;
+		ddc::EntityLayer& m_layer;
 		std::vector<UpdateDataBuffer> m_dataBuffers;
 	};
 }

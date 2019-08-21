@@ -69,7 +69,7 @@ namespace lux
 
 	static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 
-	static ddc::Entity CreateSpriteEntity(ddc::EntitySpace& entities, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
+	static ddc::Entity CreateSpriteEntity(ddc::EntityLayer& entities, ddr::SpriteHandle sprite_h, glm::ivec2 coord, int z_index)
 	{
 		ddc::Entity new_entity = entities.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent>();
 		entities.AddTag(new_entity, ddc::Tag::Visible);
@@ -85,7 +85,7 @@ namespace lux
 		return new_entity;
 	}
 
-	void LuxportMap::HandleSpecialTiles(ddc::EntitySpace& entities, ddc::Entity entity, std::string tileset, int tile_index)
+	void LuxportMap::HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string tileset, int tile_index)
 	{
 		const bool solid_tileset = tileset == SpecialTiles::SolidTileSet;
 
@@ -133,7 +133,7 @@ namespace lux
 		m_folder = fmt::format("map{}\\", index);
 	}
 
-	void LuxportMap::LoadLayer(ddc::EntitySpace& entities, int layer)
+	void LuxportMap::LoadLayer(ddc::EntityLayer& entities, int layer)
 	{
 		std::string filename = fmt::format("{}layer_{}.csv", m_folder, layer);
 		if (!dd::File::Exists(filename))
@@ -194,7 +194,7 @@ namespace lux
 		}
 	}
 
-	void LuxportMap::Load(ddc::EntitySpace& entities)
+	void LuxportMap::Load(ddc::EntityLayer& entities)
 	{
 		const int MAX_LAYERS = 5;
 
@@ -207,7 +207,7 @@ namespace lux
 		DD_ASSERT(m_end.IsValid());
 	}
 
-	void LuxportMap::Unload(ddc::EntitySpace& entities)
+	void LuxportMap::Unload(ddc::EntityLayer& entities)
 	{
 		for (ddc::Entity e : m_entities)
 		{

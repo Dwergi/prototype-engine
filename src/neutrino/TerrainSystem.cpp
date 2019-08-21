@@ -86,30 +86,30 @@ namespace neut
 		
 	}
 
-	void TerrainSystem::Shutdown(ddc::EntitySpace& space)
+	void TerrainSystem::Shutdown(ddc::EntityLayer& layer)
 	{
-		DestroyChunks(space);
+		DestroyChunks(layer);
 	}
 	
-	void TerrainSystem::Initialize(ddc::EntitySpace& space)
+	void TerrainSystem::Initialize(ddc::EntityLayer& layer)
 	{
 		neut::TerrainChunk::InitializeShared();
 	}
 
 	void TerrainSystem::Update( const ddc::UpdateData& update_data )
 	{
-		ddc::EntitySpace& space = update_data.EntitySpace();
+		ddc::EntityLayer& layer = update_data.EntityLayer();
 
 		if( m_requiresRegeneration )
 		{
-			DestroyChunks(space);
+			DestroyChunks(layer);
 
 			m_requiresRegeneration = false;
 		}
 
 		if( m_saveChunkImages )
 		{
-			SaveChunkImages(space);
+			SaveChunkImages(layer);
 
 			m_saveChunkImages = false;
 		}
@@ -126,7 +126,7 @@ namespace neut
 
 		glm::vec2 player_offset = player_transforms[0].Position.xz;
 
-		GenerateChunks(space, chunks_data, player_offset );
+		GenerateChunks(layer, chunks_data, player_offset );
 
 		DD_TODO( "Hmm, this means that the first generated chunks won't be updated/rendered the first frame." );
 
@@ -147,7 +147,7 @@ namespace neut
 				entities[i].RemoveTag( ddc::Tag::Visible );
 			}
 
-			UpdateChunk(space, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
+			UpdateChunk(layer, entities[ i ], chunks[ i ], bounds[ i ], transforms[ i ], colours[ i ], player_offset );
 		}
 	}
 
@@ -169,7 +169,7 @@ namespace neut
 		return neut::TerrainParameters::LODs - 1;
 	}
 
-	void TerrainSystem::UpdateChunk( ddc::EntitySpace& entities, ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
+	void TerrainSystem::UpdateChunk( ddc::EntityLayer& layer, ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
 		dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp, 
 		dd::ColourComponent& colour_cmp, glm::vec2 camera_pos )
 	{
@@ -194,15 +194,15 @@ namespace neut
 
 		if( chunk_cmp.Chunk->GetMesh().IsValid() )
 		{
-			if( !entities.Has<dd::MeshComponent>( e ) )
+			if( !e.Has<dd::MeshComponent>() )
 			{
-				dd::MeshComponent& mesh_cmp = entities.Add<dd::MeshComponent>( e );
+				dd::MeshComponent& mesh_cmp = e.Add<dd::MeshComponent>();
 				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 			}
 		}
 	}
 
-	void TerrainSystem::GenerateChunks( ddc::EntitySpace& space, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos )
+	void TerrainSystem::GenerateChunks( ddc::EntityLayer& layer, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos )
 	{
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto entities = data.Entities();
@@ -269,12 +269,12 @@ namespace neut
 		for( glm::vec2 pos : missing_chunks )
 		{
 			int lod = CalculateLOD( pos, camera_pos );
-			ddc::Entity created = CreateChunk( space, pos, lod );
+			ddc::Entity created = CreateChunk(layer, pos, lod );
 			existing.insert( std::make_pair( pos, created ) );
 		}
 	}
 
-	ddc::Entity TerrainSystem::CreateChunk( ddc::EntitySpace& entities, glm::vec2 pos, int lod )
+	ddc::Entity TerrainSystem::CreateChunk( ddc::EntityLayer& entities, glm::vec2 pos, int lod )
 	{
 		DD_PROFILE_SCOPED( TerrainSystem_CreateChunk );
 
@@ -297,28 +297,24 @@ namespace neut
 		return entity;
 	}
 
-	void TerrainSystem::DestroyChunks( ddc::EntitySpace& space )
+	void TerrainSystem::DestroyChunks( ddc::EntityLayer& layer )
 	{
-		space.ForAllWith<neut::TerrainChunkComponent>( [&space]( ddc::Entity entity, neut::TerrainChunkComponent& chunk )
+		layer.ForAllWith<neut::TerrainChunkComponent>( [&layer]( ddc::Entity entity, neut::TerrainChunkComponent& chunk )
 		{
 			delete chunk.Chunk;
 			chunk.Chunk = nullptr;
-			space.DestroyEntity( entity );
+			layer.DestroyEntity( entity );
 		} );
 	}
 
-	void TerrainSystem::SaveChunkImages( const ddc::EntitySpace& entities ) const
+	void TerrainSystem::SaveChunkImages( const ddc::EntityLayer& entities ) const
 	{
-		int chunk_index = 0;
-
-		entities.ForAllWith<neut::TerrainChunkComponent>( [&chunk_index]( ddc::Entity& entity, neut::TerrainChunkComponent& chunk )
+		entities.ForAllWith<neut::TerrainChunkComponent>( []( ddc::Entity& entity, neut::TerrainChunkComponent& chunk )
 		{
 			glm::ivec2 pos = (glm::ivec2) chunk.Chunk->GetPosition();
 			std::string file = fmt::format( "terrain_{}x{}_{}.tga", pos.x, pos.y, chunk.Chunk->GetLOD() );
 
 			chunk.Chunk->WriteHeightImage( file.c_str() );
-
-			++chunk_index;
 		} );
 	}
 

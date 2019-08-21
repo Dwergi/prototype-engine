@@ -24,7 +24,7 @@ namespace dd
 		FreeCameraController( const FreeCameraController& ) = delete;
 		FreeCameraController& operator=( const FreeCameraController& ) = delete;
 
-		virtual void Initialize(ddc::EntitySpace& space) override;
+		virtual void Initialize(ddc::EntityLayer& layer) override;
 		virtual void Update( const ddc::UpdateData& data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Free Camera"; }

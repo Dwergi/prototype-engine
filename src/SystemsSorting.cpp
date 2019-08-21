@@ -1,3 +1,9 @@
+//
+// SystemsSorting.cpp
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #include "PCH.h"
 #include "SystemsSorting.h"
 

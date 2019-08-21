@@ -567,7 +567,7 @@
     <ClInclude Include="src\Variable.h" />
     <ClInclude Include="src\VBO.h" />
     <ClInclude Include="src\Vector.h" />
-    <ClInclude Include="src\EntitySpace.h" />
+    <ClInclude Include="src\EntityLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\fmt\src\format.cc">
@@ -887,7 +887,7 @@
     <ClCompile Include="src\UpdateData.cpp" />
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\VBO.cpp" />
-    <ClCompile Include="src\EntitySpace.cpp" />
+    <ClCompile Include="src\EntityLayer.cpp" />
     <None Include="cpp.hint" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">

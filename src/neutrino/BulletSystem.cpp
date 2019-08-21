@@ -52,12 +52,12 @@ namespace neut
 		RequireRead<dd::FPSCameraComponent>( "player" );
 	}
 
-	void BulletSystem::Initialize( ddc::EntitySpace& entities )
+	void BulletSystem::Initialize( ddc::EntityLayer& entities )
 	{
 
 	}
 	
-	void BulletSystem::FireBullet( ddc::EntitySpace& entities, const ddr::ICamera& camera )
+	void BulletSystem::FireBullet( ddc::EntityLayer& entities, const ddr::ICamera& camera )
 	{
 		ddc::Entity entity = entities.CreateEntity<neut::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
 		entities.AddTag( entity, ddc::Tag::Visible );
@@ -101,7 +101,7 @@ namespace neut
 		m_fireBullet = false;
 	}
 
-	void BulletSystem::KillBullet( ddc::EntitySpace& space, ddc::Entity entity, neut::BulletComponent& bullet )
+	void BulletSystem::KillBullet( ddc::EntityLayer& layer, ddc::Entity entity, neut::BulletComponent& bullet )
 	{
 		if( bullet.PendingHit.Valid )
 		{
@@ -122,7 +122,7 @@ namespace neut
 			s_messageQueue->Send( msg );
 		}
 
-		space.DestroyEntity( entity );
+		layer.DestroyEntity( entity );
 	}
 
 	bool BulletSystem::HitTestDynamicMeshes( neut::BulletComponent& bullet, dd::TransformComponent& bullet_transform, const ddc::UpdateDataBuffer& meshes, float delta_t, glm::vec3& out_pos )
@@ -156,7 +156,7 @@ namespace neut
 
 	void BulletSystem::Update( const ddc::UpdateData& update )
 	{
-		ddc::EntitySpace& entities = update.EntitySpace();
+		ddc::EntityLayer& entities = update.EntityLayer();
 		
 		if(s_input->GotInput(dd::InputAction::SHOOT))
 		{

@@ -1,4 +1,15 @@
+//
+// SystemsSorting.h
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #pragma once
+
+namespace dd
+{
+	struct Job;
+}
 
 namespace ddc
 {

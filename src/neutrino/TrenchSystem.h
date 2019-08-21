@@ -39,6 +39,6 @@ namespace dd
 		glm::vec3 m_trenchOrigin;
 		DenseMap<glm::vec3, ddc::Entity> m_chunks;
 
-		ddc::Entity CreateTrenchChunk( glm::vec3 position, ddc::EntitySpace& entities );
+		ddc::Entity CreateTrenchChunk( glm::vec3 position, ddc::EntityLayer& entities );
 	};
 }

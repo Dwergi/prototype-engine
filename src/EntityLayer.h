@@ -1,3 +1,9 @@
+//
+// EntityLayer.h
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #pragma once
 
 #include "Entity.h"
@@ -12,16 +18,16 @@ namespace ddc
 	typedef std::bitset<MAX_COMPONENTS> ComponentBits;
 
 	//
-	// An entity space is a set of entities that can interact with each other, but not with anything in any other spaces.
+	// An entity layer is a set of entities that can interact with each other, but not with anything in any other layers.
 	// Eg. a menu might run a simulation, but it is not the same simulation as the game.
 	//
-	struct EntitySpace
+	struct EntityLayer
 	{
-		EntitySpace(std::string name);
-		~EntitySpace();
+		EntityLayer(std::string name);
+		~EntityLayer();
 
 		//
-		// Update the entity space - entities are created and deleted at this point.
+		// Update the entity layer - entities are created and deleted at this point.
 		//
 		void Update(float delta_t);
 
@@ -73,7 +79,7 @@ namespace ddc
 		void* AccessComponent( Entity entity, dd::ComponentID id ) const;
 
 		//
-		// Access the message queue of this entity space.
+		// Access the message queue of this entity layer.
 		// 
 		ddc::MessageQueue& Messages() { return m_messages; }
 		const ddc::MessageQueue& Messages() const { return m_messages; }
@@ -214,7 +220,7 @@ namespace ddc
 		TagBits GetAllTags( Entity e ) const;
 
 		// 
-		// Get the name of this entity space.
+		// Get the name of this entity layer.
 		//
 		std::string Name() const { return m_name; }
 
@@ -258,7 +264,7 @@ namespace ddc
 	using ExpandType = int[];
 
 	template <typename... TComponents>
-	Entity EntitySpace::CreateEntity()
+	Entity EntityLayer::CreateEntity()
 	{
 		Entity entity = CreateEntity();
 		
@@ -277,7 +283,7 @@ namespace ddc
 	}
 
 	template <typename... TComponents>
-	bool EntitySpace::HasAll( Entity entity ) const
+	bool EntityLayer::HasAll( Entity entity ) const
 	{
 		ComponentBits mask;
 
@@ -300,7 +306,7 @@ namespace ddc
 	}
 
 	template <typename... TComponents>
-	void EntitySpace::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
+	void EntityLayer::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
 	{
 		ComponentBits mask;
 
@@ -329,30 +335,30 @@ namespace ddc
 	template <typename TComponent>
 	TComponent* Entity::Access() const
 	{
-		return Space()->Access<TComponent>(*this);
+		return Layer()->Access<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	const TComponent* Entity::Get() const
 	{
-		return Space()->Get<TComponent>(*this);
+		return Layer()->Get<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	bool Entity::Has() const
 	{
-		return Space()->Has<TComponent>(*this);
+		return Layer()->Has<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	TComponent& Entity::Add() const
 	{
-		return Space()->Add<TComponent>(*this);
+		return Layer()->Add<TComponent>(*this);
 	}
 
 	template <typename TComponent>
 	void Entity::Remove() const
 	{
-		Space()->Remove<TComponent>(*this);
+		Layer()->Remove<TComponent>(*this);
 	}
 }

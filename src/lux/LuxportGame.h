@@ -15,7 +15,7 @@ namespace lux
 	private:
 		virtual void RegisterRenderers(ddr::RenderManager& renderer) override;
 		virtual void RegisterSystems(ddc::SystemsManager& system_manager) override;
-		virtual void CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces) override;
+		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers) override;
 
 		virtual void Initialize() override;
 		virtual void Shutdown() override;

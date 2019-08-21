@@ -1,3 +1,9 @@
+//
+// NeutrinoGame.cpp
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #include "PCH.h"
 #include "NeutrinoGame.h"
 
@@ -113,7 +119,7 @@ namespace neut
 		//s_shipSystem->SetEnabled(!s_shipSystem->IsEnabled());
 	}
 
-	static void CreateEntities(ddc::EntitySpace& entities)
+	static void CreateEntities(ddc::EntityLayer& entities)
 	{
 		// player
 		{
@@ -243,11 +249,11 @@ namespace neut
 
 	}
 
-	void NeutrinoGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces)
+	void NeutrinoGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers)
 	{
-		entity_spaces.push_back(new ddc::EntitySpace("game"));
+		entity_layers.push_back(new ddc::EntityLayer("game"));
 
-		CreateEntities(*entity_spaces[0]);
+		CreateEntities(*entity_layers[0]);
 	}
 
 	void NeutrinoGame::RegisterRenderers(ddr::RenderManager& renderer)

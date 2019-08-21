@@ -16,7 +16,7 @@ namespace ddc
 {
 	struct DataRequest;
 	struct Entity;
-	struct EntitySpace;
+	struct EntityLayer;
 }
 
 namespace ddr
@@ -60,13 +60,13 @@ namespace ddr
 	struct RenderData
 	{
 	public:
-		RenderData(ddc::EntitySpace& entity_space, const ddr::ICamera& camera, ddr::UniformStorage& uniforms, 
+		RenderData(ddc::EntityLayer& entity_space, const ddr::ICamera& camera, ddr::UniformStorage& uniforms, 
 			const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requirements, float delta_t);
 
 		RenderData(RenderData&& data);
 
-		const ddc::EntitySpace& EntitySpace() const { return m_space; }
-		ddc::EntitySpace& EntitySpace() { return m_space; }
+		const ddc::EntityLayer& EntityLayer() const { return m_layer; }
+		ddc::EntityLayer& EntityLayer() { return m_layer; }
 
 		const ddr::ICamera& Camera() const { return m_camera; }
 
@@ -95,7 +95,7 @@ namespace ddr
 		}
 
 	private:
-		ddc::EntitySpace& m_space;
+		ddc::EntityLayer& m_layer;
 		const ddr::ICamera& m_camera;
 		ddr::UniformStorage& m_uniforms;
 		float m_delta { 0 };

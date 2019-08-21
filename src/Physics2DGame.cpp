@@ -18,7 +18,7 @@ namespace phys2d
 	{
 	}
 
-	void Physics2DGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& spaces)
+	void Physics2DGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& spaces)
 	{
 	}
 

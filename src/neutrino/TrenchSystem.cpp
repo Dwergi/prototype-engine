@@ -145,7 +145,7 @@ namespace dd
 		mesh->SetBoundBox( bounds );
 	}
 
-	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::EntitySpace& entities )
+	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::EntityLayer& entities )
 	{
 		ddc::Entity entity = entities.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
 

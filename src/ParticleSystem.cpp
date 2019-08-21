@@ -38,7 +38,7 @@ namespace dd
 
 	}
 
-	void ParticleSystem::Initialize( ddc::EntitySpace& entities )
+	void ParticleSystem::Initialize( ddc::EntityLayer& entities )
 	{
 		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
 		//entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
@@ -61,7 +61,7 @@ namespace dd
 	void ParticleSystem::Update( const ddc::UpdateData& update )
 	{
 		auto data = update.Data();
-		ddc::EntitySpace& entities = update.EntitySpace();
+		ddc::EntityLayer& entities = update.EntityLayer();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();

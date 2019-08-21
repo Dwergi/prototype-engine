@@ -1,5 +1,11 @@
+//
+// EntityLayer.cpp
+// Copyright (C) Sebastian Nordgren 
+// August 21st 2019
+//
+
 #include "PCH.h"
-#include "EntitySpace.h"
+#include "EntityLayer.h"
 
 namespace ddc
 {
@@ -7,22 +13,22 @@ namespace ddc
 
 	static const uint8 MAX_SPACES = 8;
 
-	static EntitySpace* s_spaceInstances[MAX_SPACES];
-	static uint8 s_used = 0;
+	static EntityLayer* s_spaceInstances[MAX_SPACES];
+	static uint8 s_maxLayer = 0;
 
-	EntitySpace::EntitySpace(std::string name) :
+	EntityLayer::EntityLayer(std::string name) :
 		m_name(name)
 	{
-		DD_ASSERT(s_used < MAX_SPACES);
-		s_spaceInstances[s_used] = this;
-		m_instanceIndex = s_used;
-		++s_used;
+		DD_ASSERT(s_maxLayer < MAX_SPACES);
+		s_spaceInstances[s_maxLayer] = this;
+		m_instanceIndex = s_maxLayer;
+		++s_maxLayer;
 
 		m_maxEntities = 1024;
 		UpdateStorage();
 	}
 
-	EntitySpace::~EntitySpace()
+	EntityLayer::~EntityLayer()
 	{
 		for (byte* buffer : m_components)
 		{
@@ -30,7 +36,7 @@ namespace ddc
 		}
 	}
 
-	void EntitySpace::UpdateStorage()
+	void EntityLayer::UpdateStorage()
 	{
 		if (m_entities.size() <= m_maxEntities && m_components.size() == dd::TypeInfo::ComponentCount())
 		{
@@ -67,7 +73,7 @@ namespace ddc
 		}
 	}
 
-	void EntitySpace::Update( float delta_t )
+	void EntityLayer::Update( float delta_t )
 	{
 		UpdateStorage();
 
@@ -94,7 +100,7 @@ namespace ddc
 		}
 	}
 
-	Entity EntitySpace::CreateEntity()
+	Entity EntityLayer::CreateEntity()
 	{
 		if( m_free.empty() )
 		{
@@ -103,7 +109,7 @@ namespace ddc
 			EntityEntry new_entry;
 			new_entry.Entity.ID = m_entities.size();
 			new_entry.Entity.Version = -1;
-			new_entry.Entity.m_space = m_instanceIndex;
+			new_entry.Entity.m_layer = m_instanceIndex;
 
 			m_entities.push_back( new_entry );
 			UpdateStorage();
@@ -118,14 +124,14 @@ namespace ddc
 		return entry.Entity;
 	}
 
-	void EntitySpace::DestroyEntity( Entity entity )
+	void EntityLayer::DestroyEntity( Entity entity )
 	{
 		DD_ASSERT( IsAlive( entity ), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version );
 
 		m_entities[ entity.ID ].Destroy = true;
 	}
 
-	Entity EntitySpace::GetEntity( uint id ) const
+	Entity EntityLayer::GetEntity( uint id ) const
 	{
 		if( id < m_entities.size() )
 		{
@@ -135,7 +141,7 @@ namespace ddc
 		return Entity();
 	}
 
-	bool EntitySpace::IsAlive( Entity entity ) const
+	bool EntityLayer::IsAlive( Entity entity ) const
 	{
 		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
 
@@ -144,7 +150,7 @@ namespace ddc
 		return entry.Entity.Version == entity.Version && (entry.Alive || entry.Create);
 	}
 
-	int EntitySpace::ComponentCount(Entity entity) const
+	int EntityLayer::ComponentCount(Entity entity) const
 	{
 		DD_ASSERT(IsAlive(entity));
 
@@ -152,7 +158,7 @@ namespace ddc
 		return (int) entry.Ownership.count();
 	}
 
-	dd::ComponentID EntitySpace::GetNthComponentID(Entity entity, int index) const
+	dd::ComponentID EntityLayer::GetNthComponentID(Entity entity, int index) const
 	{
 		DD_ASSERT(IsAlive(entity));
 
@@ -170,7 +176,7 @@ namespace ddc
 		return (dd::ComponentID) i;
 	}
 
-	bool EntitySpace::HasComponent( Entity entity, dd::ComponentID id ) const
+	bool EntityLayer::HasComponent( Entity entity, dd::ComponentID id ) const
 	{
 		DD_ASSERT(entity.IsValid());
 
@@ -182,7 +188,7 @@ namespace ddc
 		return m_entities[entity.ID].Ownership.test( id );
 	}
 
-	void* EntitySpace::AddComponent( Entity entity, dd::ComponentID id )
+	void* EntityLayer::AddComponent( Entity entity, dd::ComponentID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
@@ -199,7 +205,7 @@ namespace ddc
 		return ptr;
 	}
 
-	void* EntitySpace::AccessComponent( Entity entity, dd::ComponentID id ) const
+	void* EntityLayer::AccessComponent( Entity entity, dd::ComponentID id ) const
 	{
 		if( !HasComponent( entity, id ) )
 		{
@@ -210,7 +216,7 @@ namespace ddc
 		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	const void* EntitySpace::GetComponent( Entity entity, dd::ComponentID id ) const
+	const void* EntityLayer::GetComponent( Entity entity, dd::ComponentID id ) const
 	{
 		if( !HasComponent( entity, id ) )
 		{
@@ -221,7 +227,7 @@ namespace ddc
 		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	void EntitySpace::RemoveComponent( Entity entity, dd::ComponentID id )
+	void EntityLayer::RemoveComponent( Entity entity, dd::ComponentID id )
 	{
 		if( HasComponent( entity, id ) )
 		{
@@ -233,7 +239,7 @@ namespace ddc
 		}
 	}
 
-	void EntitySpace::GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const
+	void EntityLayer::GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const
 	{
 		DD_ASSERT( IsAlive( entity ) );
 
@@ -246,7 +252,7 @@ namespace ddc
 		}
 	}
 
-	void EntitySpace::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const
+	void EntityLayer::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const
 	{
 		ComponentBits required;
 		for( dd::ComponentID type : components )
@@ -270,7 +276,7 @@ namespace ddc
 		}
 	}
 
-	bool EntitySpace::HasTag( Entity e, Tag tag ) const
+	bool EntityLayer::HasTag( Entity e, Tag tag ) const
 	{
 		DD_ASSERT( IsAlive( e ) );
 		DD_ASSERT( tag != Tag::None );
@@ -278,7 +284,7 @@ namespace ddc
 		return m_entities[ e.ID ].Tags.test( (uint) tag );
 	}
 
-	void EntitySpace::AddTag( Entity e, Tag tag )
+	void EntityLayer::AddTag( Entity e, Tag tag )
 	{
 		DD_ASSERT( IsAlive( e ) );
 		DD_ASSERT( tag != Tag::None );
@@ -286,7 +292,7 @@ namespace ddc
 		m_entities[ e.ID ].Tags.set( (uint) tag );
 	}
 
-	void EntitySpace::RemoveTag( Entity e, Tag tag )
+	void EntityLayer::RemoveTag( Entity e, Tag tag )
 	{
 		DD_ASSERT( IsAlive( e ) );
 		DD_ASSERT( tag != Tag::None );
@@ -294,25 +300,25 @@ namespace ddc
 		m_entities[ e.ID ].Tags.reset( (uint) tag );
 	}
 
-	void EntitySpace::SetAllTags( Entity e, TagBits tags )
+	void EntityLayer::SetAllTags( Entity e, TagBits tags )
 	{
 		DD_ASSERT( IsAlive( e ) );
 
 		m_entities[ e.ID ].Tags = tags;
 	}
 
-	TagBits EntitySpace::GetAllTags( Entity e ) const
+	TagBits EntityLayer::GetAllTags( Entity e ) const
 	{
 		DD_ASSERT( IsAlive( e ) );
 
 		return m_entities[ e.ID ].Tags;
 	}
 
-	EntitySpace* Entity::Space() const
+	EntityLayer* Entity::Layer() const
 	{
-		if (m_space < s_used)
+		if (m_layer < s_maxLayer)
 		{
-			return s_spaceInstances[m_space];
+			return s_spaceInstances[m_layer];
 		}
 		return nullptr;
 	}
@@ -324,26 +330,31 @@ namespace ddc
 
 	bool Entity::IsAlive() const
 	{
-		return IsValid() && Space()->IsAlive(*this);
+		return IsValid() && Layer()->IsAlive(*this);
 	}
 
 	void Entity::AddTag(ddc::Tag tag) const
 	{
-		Space()->AddTag(*this, tag);
+		Layer()->AddTag(*this, tag);
 	}
 
 	void Entity::RemoveTag(ddc::Tag tag) const
 	{
-		Space()->RemoveTag(*this, tag);
+		Layer()->RemoveTag(*this, tag);
 	}
 
 	bool Entity::HasTag(ddc::Tag tag) const
 	{
-		return Space()->HasTag(*this, tag);
+		return Layer()->HasTag(*this, tag);
 	}
 
 	int Entity::Components() const
 	{
-		return Space()->ComponentCount(*this);
+		return Layer()->ComponentCount(*this);
+	}
+
+	void Entity::Destroy() const
+	{
+		return Layer()->DestroyEntity(*this);
 	}
 }

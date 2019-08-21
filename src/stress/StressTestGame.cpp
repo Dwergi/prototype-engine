@@ -85,7 +85,7 @@ namespace stress
 
 	static uint s_entitiesStart = 0;
 
-	static void DestroyEntities(ddc::EntitySpace& space, uint count)
+	static void DestroyEntities(ddc::EntityLayer& layer, uint count)
 	{
 		if (count == 0)
 		{
@@ -95,15 +95,15 @@ namespace stress
 		dd::RandomFloat rng;
 
 		// destroy entities
-		for (uint i = s_entitiesStart; i < space.Size(); ++i)
+		for (uint i = s_entitiesStart; i < layer.Size(); ++i)
 		{
-			ddc::Entity entity = space.GetEntity(i);
+			ddc::Entity entity = layer.GetEntity(i);
 			if (entity.IsAlive())
 			{
 				float value = rng.Next() > 0.5f;
 				if (value > 0.5f)
 				{
-					space.DestroyEntity(entity);
+					layer.DestroyEntity(entity);
 					--count;
 				}
 			}
@@ -117,7 +117,7 @@ namespace stress
 
 	static const int MAX_POSITION = 1000;
 
-	static void CreateEntities(ddc::EntitySpace& space, uint count)
+	static void CreateEntities(ddc::EntityLayer& layer, uint count)
 	{
 		if (count == 0)
 		{
@@ -128,7 +128,7 @@ namespace stress
 
 		while (count > 0)
 		{
-			ddc::Entity entity = space.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::ColourComponent, dd::PhysicsSphereComponent>();
+			ddc::Entity entity = layer.CreateEntity<dd::TransformComponent, dd::MeshComponent, dd::ColourComponent, dd::PhysicsSphereComponent>();
 			entity.AddTag(ddc::Tag::Visible);
 			entity.AddTag(ddc::Tag::Dynamic);
 
@@ -154,11 +154,11 @@ namespace stress
 
 	void StressTestGame::Update(const dd::GameUpdateData& update_data)
 	{
-		ddc::EntitySpace& space = update_data.EntitySpace();
+		ddc::EntityLayer& layer = update_data.EntityLayer();
 
 		s_freeCam->SetEnabled(s_input->GetCurrentMode() == "game");
 
-		int entity_count = space.LiveCount();
+		int entity_count = layer.LiveCount();
 
 		if (s_first)
 		{
@@ -172,16 +172,16 @@ namespace stress
 		if (entity_count > m_entityCount)
 		{
 			uint to_destroy = entity_count - m_entityCount;
-			DestroyEntities(space, to_destroy);
+			DestroyEntities(layer, to_destroy);
 		}
 		else if (entity_count < m_entityCount)
 		{
 			// create entities
 			uint to_create = (uint) (m_entityCount - entity_count);
-			CreateEntities(space, to_create);
+			CreateEntities(layer, to_create);
 		}
 
-		ddc::EntitySpace& entities = update_data.EntitySpace();
+		ddc::EntityLayer& entities = update_data.EntityLayer();
 		entities.ForAllWith<dd::TransformComponent, dd::PhysicsSphereComponent>(
 			[this](ddc::Entity e, auto& transform, auto& physics)
 			{
@@ -201,15 +201,15 @@ namespace stress
 				}
 			});
 
-		CreateEntities(space, m_createCount);
-		DestroyEntities(space, m_createCount);
+		CreateEntities(layer, m_createCount);
+		DestroyEntities(layer, m_createCount);
 	}
 
-	void StressTestGame::CreateEntitySpaces(std::vector<ddc::EntitySpace*>& entity_spaces)
+	void StressTestGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers)
 	{
-		entity_spaces.push_back(new ddc::EntitySpace("game"));
+		entity_layers.push_back(new ddc::EntityLayer("game"));
 
-		s_camera = entity_spaces[0]->CreateEntity<dd::TransformComponent, dd::FPSCameraComponent>();
+		s_camera = entity_layers[0]->CreateEntity<dd::TransformComponent, dd::FPSCameraComponent>();
 
 		dd::FPSCameraComponent* camera = s_camera.Access<dd::FPSCameraComponent>();
 		camera->SetWindowSize(s_window->GetSize());
@@ -219,11 +219,11 @@ namespace stress
 		camera->SetPosition(cam_pos);
 		camera->SetDirection(glm::vec3(0) - cam_pos);
 
-		dd::TestEntities::CreateAxes(*entity_spaces[0]);
+		dd::TestEntities::CreateAxes(*entity_layers[0]);
 
 		// dir light
 		{
-			ddc::Entity entity = entity_spaces[0]->CreateEntity<dd::LightComponent, dd::TransformComponent>();
+			ddc::Entity entity = entity_layers[0]->CreateEntity<dd::LightComponent, dd::TransformComponent>();
 			entity.AddTag(ddc::Tag::Visible);
 
 			dd::LightComponent* light = entity.Access<dd::LightComponent>();
