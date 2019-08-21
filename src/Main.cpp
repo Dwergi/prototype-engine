@@ -168,6 +168,8 @@ static int GameMain()
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME("Main");
 
+	dd::SetAsMainThread();
+
 	dd::TypeInfo::RegisterQueuedTypes();
 
 	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));

@@ -108,8 +108,6 @@ namespace dd
 		}
 	}
 
-	static std::thread::id s_mainThread;
-
 	static dd::Service<dd::FrameTimer> s_frameTimer;
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::DebugUI> s_debugUI;
@@ -130,7 +128,7 @@ namespace dd
 
 		do
 		{
-			if (IsMainThread())
+			if (dd::IsMainThread())
 			{
 				CheckAssert();
 			}
@@ -144,15 +142,8 @@ namespace dd
 		return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 	}
 
-	bool IsMainThread()
-	{
-		return std::this_thread::get_id() == s_mainThread;
-	}
-
 	void InitializeAssert()
 	{
-		s_mainThread = std::this_thread::get_id();
-
 		dd::InputModeConfig::Create("assert")
 			.CaptureMouse(false)
 			.CentreMouse(false)

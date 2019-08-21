@@ -10,6 +10,4 @@ namespace dd
 {
 	void InitializeAssert();
 	void CheckAssert();
-
-	bool IsMainThread();
 }

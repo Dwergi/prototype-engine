@@ -309,8 +309,6 @@ namespace lux
 
 	static void ResetPlayerToStart()
 	{
-		DD_TODO("It would be good to be able to make a full copy of an entity as a scratch copy instead of hitting the EntityLayer multiple times a frame");
-
 		ddc::Entity start_entity = s_currentMap->GetStart();
 		d2d::Transform2DComponent* start_tile = start_entity.Access<d2d::Transform2DComponent>();
 
@@ -502,6 +500,8 @@ namespace lux
 		{
 			SwitchMap(update.EntityLayer(), s_desiredMapIndex);
 		}
+
+		DD_TODO("Try using ScratchEntity here.");
 
 		d2d::Transform2DComponent* tele_transform = s_teleporter.Access<d2d::Transform2DComponent>();
 		d2d::Transform2DComponent* player_transform = s_player.Access<d2d::Transform2DComponent>();

@@ -46,11 +46,15 @@ namespace ddc
 		m_systems.push_back(&system);
 	}
 
-
 	void SystemsManager::UpdateSystem(SystemUpdate update)
 	{
-		System& system = *update.SystemNode->m_system;
+		// wait for all dependencies
+		for (ddc::SystemNode::Edge& dep : update.SystemNode->m_in)
+		{
+			s_jobsystem->Wait(m_orderedSystems[dep.m_from].m_job);
+		}
 
+		System& system = *update.SystemNode->m_system;
 		if (!system.IsEnabledForLayer(*update.Layer))
 		{
 			return;
@@ -61,8 +65,6 @@ namespace ddc
 		// get names
 		dd::IArray<dd::String16> names = system.GetRequestNames();
 		dd::IArray<DataRequest*> all_requests = system.GetRequests();
-
-		s_jobsystem->Wait(update.Dependencies);
 
 		// for each named data buffer, filter by requests
 		for (const dd::String& name : names)
@@ -100,27 +102,17 @@ namespace ddc
 	{
 		dd::Job* root_job = s_jobsystem->Create();
 
-		for (int i = (int) m_orderedSystems.size() - 1; i >= 0; --i)
+		for (SystemNode& node : m_orderedSystems)
 		{
-			SystemNode& s = m_orderedSystems[i];
-
-			dd::Job* dependencies = s_jobsystem->Create();
-
-			System* system = s.m_system;
-			for (SystemNode::Edge& e : s.m_in)
-			{
-				m_orderedSystems[e.m_from].m_job;
-			}
-
 			SystemUpdate update;
-			update.SystemNode = &s;
+			update.SystemNode = &node;
 			update.Layer = &layer;
-			update.Dependencies = nullptr;
 			update.DeltaT = delta_t;
 
-			s.m_job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
-			s_jobsystem->Schedule(s.m_job);
+			node.m_job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
+			s_jobsystem->Schedule(node.m_job);
 		}
+
 		s_jobsystem->Schedule(root_job);
 		s_jobsystem->Wait(root_job);
 	}

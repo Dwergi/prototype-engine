@@ -101,10 +101,11 @@ namespace dd
 			m_stackData[ 0 ] = '\0';
 		}
 
-		explicit InplaceString( const char* other )
+		explicit InplaceString( const char* str )
 			: String( m_stackData, Size )
 		{
-			SetString( other, (int) strlen( other ) );
+			int length = str != nullptr ? (int) strlen(str) : 0;
+			SetString(str, length);
 		}
 
 		InplaceString( const char* other, int length )

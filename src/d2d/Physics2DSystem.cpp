@@ -11,8 +11,6 @@
 #include "d2d/CirclePhysicsComponent.h"
 #include "d2d/Transform2DComponent.h"
 
-#pragma optimize("", off)
-
 namespace d2d
 {
 	PhysicsSystem::PhysicsSystem() :

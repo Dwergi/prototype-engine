@@ -10,8 +10,6 @@
 
 namespace dd
 {
-#pragma optimize("", off)
-
 	static dd::Service<IWindow> s_window;
 	static dd::Service<IInputSource> s_inputSource;
 	static dd::Service<Input> s_input;

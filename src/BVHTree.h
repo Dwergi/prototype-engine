@@ -88,6 +88,10 @@ namespace dd
 		{
 			static const size_t INVALID = -1;
 
+			BVHBucket() = default;
+			BVHBucket(const BVHBucket&) = delete;
+			BVHBucket(BVHBucket&&) = default;
+
 			// The region to use for comparisons.
 			ddm::AABB Region;
 

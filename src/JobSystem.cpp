@@ -58,17 +58,18 @@ namespace dd
 
 		for (uint i = 1; i < threads; ++i)
 		{
-			m_workers.emplace_back([this, i]() { WorkerThread(i); });
+			m_workers.emplace_back(&JobSystem::WorkerThread, this, i);
 		}
 	}
 
 	void JobSystem::WorkerThread(uint this_index)
 	{
-		m_queues[this_index] = new JobQueue(*this, std::this_thread::get_id());
+		JobQueue* this_queue = new JobQueue(*this, std::this_thread::get_id());
+		m_queues[this_index] = this_queue;
 
 		while (!m_stop)
 		{
-			Job* job = m_queues[this_index]->GetJob();
+			Job* job = this_queue->GetJob();
 			if (job != nullptr)
 			{
 				job->Run();
@@ -182,6 +183,7 @@ namespace dd
 	void JobQueue::Clear()
 	{
 		std::memset(g_jobs, 0, sizeof(Job) * MAX_JOBS);
+		std::memset(m_pending, 0, sizeof(Job*) * MAX_PENDING);
 		g_currentJob = 0;
 	}
 
@@ -201,7 +203,7 @@ namespace dd
 		if (job == nullptr)
 		{
 			JobQueue* queue = m_system->GetRandomQueue();
-			if (queue != this)
+			if (queue != nullptr && queue != this)
 			{
 				job = queue->Steal();
 			}

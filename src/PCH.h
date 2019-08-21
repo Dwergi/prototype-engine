@@ -99,6 +99,9 @@ namespace dd
 	}
 
 	bool DebuggerAttached();
+
+	void SetAsMainThread();
+	bool IsMainThread();
 }
 
 #define DD_TOSTRING2( X ) #X

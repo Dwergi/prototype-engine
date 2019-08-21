@@ -11,8 +11,6 @@
 
 namespace ddm
 {
-#pragma optimize("",off)
-
 	float GetNoise( glm::vec2 pos, const NoiseParameters& params )
 	{
 		float height = 0;

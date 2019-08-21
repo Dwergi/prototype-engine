@@ -30,4 +30,17 @@ namespace dd
 		return false;
 	}
 #endif
+
+	static std::thread::id s_mainThread;
+
+	void SetAsMainThread()
+	{
+		s_mainThread = std::this_thread::get_id();
+	}
+
+	bool IsMainThread()
+	{
+		return std::this_thread::get_id() == s_mainThread;
+	}
+
 }

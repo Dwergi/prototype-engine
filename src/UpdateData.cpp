@@ -65,7 +65,7 @@ namespace ddc
 					{
 						if (dest_start == nullptr)
 						{
-							dest_start = (byte*) src;
+							dest_start = (byte*) dest;
 						}
 
 						copy_size += cmp_size;

@@ -262,7 +262,6 @@ namespace dd
 		}
 	}
 
-#pragma optimize("", off)
 	void BVHTree::SplitBucket(size_t parent_index, Job* parent_job)
 	{
 		BVHBucket& parent = m_buckets[parent_index];
@@ -298,6 +297,7 @@ namespace dd
 
 		// create sub-buckets
 		size_t left_index = m_bucketCount++;
+
 		BVHBucket& left = m_buckets[left_index];
 		left.Region.Min = parent.Region.Min;
 		left.Region.Max = parent.Region.Max;
@@ -308,7 +308,8 @@ namespace dd
 		left.Right = start;
 
 		size_t right_index = m_bucketCount++;
-		BVHBucket right = m_buckets[right_index];
+
+		BVHBucket& right = m_buckets[right_index];
 		right.Region.Min = parent.Region.Min;
 		right.Region.Min[split_axis] = split_coord;
 		right.Region.Max = parent.Region.Max;

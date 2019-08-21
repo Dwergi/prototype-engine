@@ -46,7 +46,6 @@ namespace ddc
 		{
 			SystemNode* SystemNode { nullptr };
 			EntityLayer* Layer { nullptr };
-			dd::Job* Dependencies { nullptr };
 			float DeltaT { 0 };
 		};
 
