@@ -252,7 +252,9 @@ namespace ddc
 		}
 	}
 
-	void EntityLayer::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const
+#pragma optimize("", off)
+
+	void EntityLayer::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const
 	{
 		ComponentBits required;
 		for( dd::ComponentID type : components )
@@ -270,11 +272,13 @@ namespace ddc
 				if( entity_components.count() == required.count() && 
 					entity_tags.count() == tags.count() )
 				{
-					outEntities.push_back( entry.Entity );
+					out_entities.push_back( entry.Entity );
 				}
 			}
 		}
 	}
+
+#pragma optimize("", on)
 
 	bool EntityLayer::HasTag( Entity e, Tag tag ) const
 	{
@@ -316,11 +320,9 @@ namespace ddc
 
 	EntityLayer* Entity::Layer() const
 	{
-		if (m_layer < s_maxLayer)
-		{
-			return s_spaceInstances[m_layer];
-		}
-		return nullptr;
+		DD_ASSERT(m_layer < s_maxLayer);
+		
+		return s_spaceInstances[m_layer];
 	}
 
 	bool Entity::IsValid() const
@@ -356,5 +358,20 @@ namespace ddc
 	void Entity::Destroy() const
 	{
 		return Layer()->DestroyEntity(*this);
+	}
+
+	void* Entity::AccessComponent(dd::ComponentID id) const
+	{
+		return Layer()->AccessComponent(*this, id);
+	}
+
+	const void* Entity::GetComponent(dd::ComponentID id) const
+	{
+		return Layer()->GetComponent(*this, id);
+	}
+
+	bool Entity::HasComponent(dd::ComponentID id) const
+	{
+		return Layer()->HasComponent(*this, id);
 	}
 }

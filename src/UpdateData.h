@@ -11,10 +11,12 @@
 
 namespace ddc
 {
+	struct System;
+
 	struct UpdateData
 	{
-		UpdateData();
-		UpdateData( const UpdateData& other ) = delete;
+		UpdateData() {}
+		UpdateData(const UpdateData& other) = delete;
 
 		float Delta() const { return m_delta; }
 		ddc::EntityLayer& EntityLayer() const { return *m_layer; }
@@ -23,6 +25,7 @@ namespace ddc
 	private:
 
 		friend struct System;
+		friend struct SystemsManager;
 
 		void Fill(ddc::EntityLayer& layer, float delta_t);
 		void Commit();
@@ -30,7 +33,7 @@ namespace ddc
 		ddc::UpdateDataBuffer& Create(const char* name);
 
 		float m_delta { 0 };
-		ddc::EntityLayer* m_layer;
-		std::vector<UpdateDataBuffer> m_dataBuffers;
+		ddc::EntityLayer* m_layer { nullptr };
+		dd::Array<UpdateDataBuffer, 8> m_dataBuffers;
 	};
 }

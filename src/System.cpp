@@ -38,23 +38,6 @@ namespace ddc
 		return it != m_layers.end();
 	}
 
-	bool System::CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality, const char* name) const
-	{
-		for( const ddc::DataRequest* req : m_requests )
-		{
-			if( req->Component() == *component &&
-				req->Usage() == usage && 
-				req->Cardinality() == cardinality && 
-				req->Name() == name )
-			{
-				DD_ASSERT( false, "Duplicate DataRequest found!" );
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	void System::RequireTag( ddc::Tag tag, const char* name )
 	{
 		ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);

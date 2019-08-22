@@ -36,6 +36,10 @@ namespace ddc
 
 		EntityLayer* Layer() const;
 
+		void* AccessComponent(dd::ComponentID id) const;
+		const void* GetComponent(dd::ComponentID id) const;
+		bool HasComponent(dd::ComponentID id) const;
+
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;
 		template <typename TComponent> bool Has() const;

@@ -19,7 +19,7 @@ namespace ddr
 		LinesRenderer();
 
 		virtual void Initialize() override;
-		virtual void Render( const RenderData& render_data ) override;
+		virtual void Render( const ddr::RenderData& render_data ) override;
 
 	private:
 

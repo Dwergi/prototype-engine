@@ -30,5 +30,5 @@ namespace ddr
 	typedef GLint ShaderLocation;
 	static const ShaderLocation InvalidLocation = -1;
 
-	dd::String128 GetArrayUniformName( const char* arrayName, size_t index, const char* uniform = nullptr );
+	dd::String64 GetArrayUniformName(const char* arrayName, size_t index, const char* uniform = nullptr);
 }

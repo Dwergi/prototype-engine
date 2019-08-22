@@ -11,22 +11,19 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData()
-	{
-	}
-
 	UpdateDataBuffer& UpdateData::Create(const char* name)
 	{
+		dd::String16 str_name(name);
+
 		for (UpdateDataBuffer& buffer : m_dataBuffers)
 		{
-			if ((name == nullptr && buffer.Name().IsEmpty()) ||
-				buffer.Name() == name)
+			if (buffer.Name() == str_name)
 			{
 				return buffer;
 			}
 		}
 
-		return m_dataBuffers.emplace_back(name);
+		return m_dataBuffers.Add(UpdateDataBuffer(name));
 	}
 
 	const UpdateDataBuffer& UpdateData::Data(const char* name) const
@@ -60,48 +57,9 @@ namespace ddc
 
 	void UpdateData::Commit()
 	{
-		for (const UpdateDataBuffer& data_buffer : m_dataBuffers)
+		for (UpdateDataBuffer& data_buffer : m_dataBuffers)
 		{
-			for (const ComponentBuffer& buffer : data_buffer.ComponentBuffers())
-			{
-				if (buffer.Usage() != DataUsage::Write)
-				{
-					continue;
-				}
-
-				const size_t cmp_size = buffer.Component().Size();
-
-				size_t copy_size = 0;
-				byte* dest_start = nullptr;
-				const byte* src = buffer.Data();
-
-				for (Entity entity : data_buffer.Entities())
-				{
-					void* dest = m_layer.AccessComponent(entity, buffer.Component().ComponentID());
-					if (dest != nullptr)
-					{
-						if (dest_start == nullptr)
-						{
-							dest_start = (byte*) dest;
-						}
-
-						copy_size += cmp_size;
-					}
-					else if (dest_start != nullptr && copy_size > 0)
-					{
-						std::memcpy(dest_start, src, copy_size);
-
-						src += copy_size;
-						copy_size = 0;
-						dest_start = nullptr;
-					}
-				}
-
-				if (dest_start != nullptr && copy_size > 0)
-				{
-					std::memcpy(dest_start, src, copy_size);
-				}
-			}
+			data_buffer.Commit();
 		}
 	}
 }

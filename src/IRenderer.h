@@ -13,7 +13,7 @@ namespace ddr
 {
 	struct IRenderer
 	{
-		IRenderer( const char* renderer ) : m_name( renderer ) {}
+		IRenderer(const char* name) : m_name(name) {}
 
 		virtual void Initialize() {} 
 		virtual void Shutdown() {}
@@ -22,12 +22,9 @@ namespace ddr
 		virtual void Render(const RenderData& render_data) {}
 
 		virtual bool ShouldRenderDebug() const { return false; }
-		virtual void RenderDebug( const RenderData& render_data ) {}
+		virtual void RenderDebug(const RenderData& render_data) {}
 
 		virtual bool UsesAlpha() const { return false; }
-
-		const dd::IArray<ddc::DataRequest*>& GetRequirements() const { return m_requests; }
-		const std::bitset<ddc::MAX_TAGS>& GetRequiredTags() const { return m_tags; }
 
 	protected:
 
@@ -35,31 +32,25 @@ namespace ddr
 		void Require()
 		{
 			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, ddc::DataUsage::Read, ddc::DataCardinality::Required);
-			m_requests.Add( new ddc::ReadRequired<T>( nullptr ) );
+			m_data.RequestData(new ddc::ReadRequired<T>());
 		}
 
 		template <typename T>
 		void Optional()
 		{
 			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, ddc::DataUsage::Read, ddc::DataCardinality::Optional);
-			m_requests.Add(new ddc::ReadOptional<T>(nullptr));
+			m_data.RequestData(new ddc::ReadOptional<T>());
 		}
 
-		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
+		void RequireTag(ddc::Tag tag) { m_data.RequireTag(tag); }
 
 	private:
 		friend struct RenderManager;
 
-		ddr::RenderData m_data;
-		dd::Array<ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requests;
-		std::bitset<ddc::MAX_TAGS> m_tags;
-
 		dd::String64 m_name;
+		ddr::RenderData m_data;
 
-		ddr::RenderData& AccessRenderData() { return m_data; }
-
-		bool CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality);
+		const ddr::RenderData& RenderData() const { return m_data; }
+		ddr::RenderData& RenderData() { return m_data; }
 	};
 }

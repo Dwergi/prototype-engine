@@ -5,8 +5,6 @@ namespace ddc
 {
 	UpdateDataBuffer::UpdateDataBuffer(const char* name)
 	{
-		m_buffers.reserve(MAX_BUFFERS);
-
 		if (name != nullptr)
 		{
 			m_name = name;
@@ -17,46 +15,46 @@ namespace ddc
 		m_name(other.m_name),
 		m_entities(std::move(other.m_entities)),
 		m_buffers(std::move(other.m_buffers)),
+		m_requests(std::move(other.m_requests)),
+		m_requiredComponents(std::move(other.m_requiredComponents)),
 		m_tags(std::move(other.m_tags))
 	{
 	}
 
-	void UpdateDataBuffer::RequireTag(ddc::Tag tag)
+	void UpdateDataBuffer::RequestData(DataRequest* request)
 	{
-		m_tags.set((int) tag);
-	}
-
-	void UpdateDataBuffer::AddRequest(const DataRequest& request)
-	{
-		CheckDuplicates(type, DataUsage::Write, DataCardinality::Optional, name);
-		m_requests.Add(new WriteOptional<T>(name));
-
-		dd::String16 name_str(name);
-		if (!m_requestNames.Contains(name_str))
+		if (CheckDuplicates(request->Component(), request->Usage(), request->Cardinality()))
 		{
-			m_requestNames.Add(name_str);
+			m_requests.Add(request);
+			m_buffers.Add(ComponentBuffer(request));
+
+			if (!request->Optional())
+			{
+				m_requiredComponents.Add(request->Component().ComponentID());
+			}
 		}
-		m_requests.Add(request);
+		else
+		{
+			delete request;
+		}
 	}
 
 	void UpdateDataBuffer::Fill(ddc::EntityLayer& layer)
 	{
-		for (DataRequest* req : m_requests)
-		{
-			DD_ASSERT(req->Name() == m_name);
+		m_entities.clear();
+		layer.FindAllWith(m_requiredComponents, m_tags, m_entities);
 
-			ComponentBuffer component_buffer(layer, m_entities, *req);
-			m_buffers.push_back(component_buffer);
+		for (ComponentBuffer& buffer : m_buffers)
+		{
+			buffer.Fill(m_entities);
 		}
 	}
 
-	bool UpdateDataBuffer::CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality) const
+	bool UpdateDataBuffer::CheckDuplicates(const dd::TypeInfo& component, ddc::DataUsage usage, ddc::DataCardinality cardinality) const
 	{
 		for (const DataRequest* req : m_requests)
 		{
-			if (req->Component() == *component &&
-				req->Usage() == usage &&
-				req->Cardinality() == cardinality)
+			if (req->Component() == component)
 			{
 				DD_ASSERT(false, "Duplicate DataRequest found!");
 				return false;
@@ -64,5 +62,18 @@ namespace ddc
 		}
 
 		return true;
+	}
+
+	void UpdateDataBuffer::Commit()
+	{
+		for (ComponentBuffer& buffer : m_buffers)
+		{
+			if (buffer.Usage() != DataUsage::Write)
+			{
+				continue;
+			}
+
+			buffer.Commit(m_entities);
+		}
 	}
 }

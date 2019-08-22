@@ -8,25 +8,31 @@
 
 #include "DataRequest.h"
 
-
 namespace ddc
 {
 	struct ComponentBuffer
 	{
-		ComponentBuffer( const EntityLayer& layer, const std::vector<Entity>& entities, DataRequest& req );
+		ComponentBuffer();
+		explicit ComponentBuffer(DataRequest* request);
+		ComponentBuffer(ComponentBuffer&& other);
 
-		const dd::TypeInfo& Component() const { return m_request.Component(); }
-		DataUsage Usage() const { return m_request.Usage(); }
+		const dd::TypeInfo& Component() const { return m_request->Component(); }
+		DataUsage Usage() const { return m_request->Usage(); }
 
 		size_t Size() const { return m_count; }
 		byte* Data() const { return m_storage; }
 
-		bool Optional() const { return m_request.Optional(); }
+		bool Optional() const { return m_request->Optional(); }
 		bool Has( size_t i ) const { return !Optional() || m_exists.at( i ); }
 		
 	private:
+
+		friend struct UpdateDataBuffer;
+
+		void Fill(const std::vector<Entity>& entities);
+		void Commit(const std::vector<ddc::Entity>& entities);
 		
-		const DataRequest& m_request;
+		DataRequest* m_request { nullptr };
 		size_t m_count { 0 };
 
 		std::vector<bool> m_exists;

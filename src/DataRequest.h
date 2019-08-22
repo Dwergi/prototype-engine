@@ -30,14 +30,14 @@ namespace ddc
 
 		virtual ~DataRequest();
 
-		byte* GetBuffer(size_t count);
+		byte* AccessBuffer(size_t count);
 		DataCardinality Cardinality() const { return m_cardinality; }
 		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
 		DataUsage Usage() const { return m_usage; }
 		const dd::TypeInfo& Component() const { DD_ASSERT( m_component != nullptr ); return *m_component; }
 
 	protected:
-		DataRequest( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name );
+		DataRequest(const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality);
 
 	private:
 		const dd::TypeInfo* m_component { nullptr };

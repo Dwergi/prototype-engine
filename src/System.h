@@ -49,7 +49,7 @@ namespace ddc
 			dd::ComponentRegistration<T>::Register();
 
 			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.AddRequest(new ReadRequired<T>());
+			data_buffer.RequestData(new ReadRequired<T>());
 		}
 
 		template <typename T>
@@ -58,7 +58,7 @@ namespace ddc
 			dd::ComponentRegistration<T>::Register();
 
 			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.AddRequest(new WriteRequired<T>());
+			data_buffer.RequestData(new WriteRequired<T>());
 		}
 
 		template <typename T>
@@ -67,7 +67,7 @@ namespace ddc
 			dd::ComponentRegistration<T>::Register();
 
 			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.AddRequest(new WriteOptional<T>());
+			data_buffer.RequestData(new WriteOptional<T>());
 		}
 
 		template <typename T>
@@ -76,10 +76,8 @@ namespace ddc
 			dd::ComponentRegistration<T>::Register();
 
 			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.AddRequest(new WriteOptional<T>());
+			data_buffer.RequestData(new WriteOptional<T>());
 		}
-
-		bool CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const;
 
 		void RequireTag( Tag tag, const char* name = nullptr );
 

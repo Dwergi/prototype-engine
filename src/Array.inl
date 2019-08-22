@@ -16,15 +16,42 @@ namespace dd
 	Array<T, MaxCapacity>::Array(const Array<T, MaxCapacity>& other)
 		: IArray(m_inline, MaxCapacity)
 	{
-		CopyRange(other.m_inline, m_inline, other.m_size);
-
 		m_size = other.m_size;
+
+		CopyRange(other.m_inline, m_inline, m_size);
+	}
+
+	template <typename T, int MaxCapacity>
+	Array<T, MaxCapacity>::Array(Array<T, MaxCapacity>&& other)
+		: IArray(m_inline, MaxCapacity)
+	{
+		m_size = other.m_size;
+
+		MoveRange(other.m_inline, m_inline, m_size);
 	}
 
 	template <typename T, int MaxCapacity>
 	Array<T, MaxCapacity>::~Array()
 	{
 
+	}
+
+	template <typename T, int MaxCapacity>
+	Array<T, MaxCapacity>& Array<T, MaxCapacity>::operator=(const Array<T, MaxCapacity>& other)
+	{
+		Clear();
+		PushAll(other);
+
+		return *this;
+	}
+	
+	template <typename T, int MaxCapacity>
+	Array<T, MaxCapacity>& Array<T, MaxCapacity>::operator=(Array<T, MaxCapacity>&& other)
+	{
+		Clear();
+		PushAll(std::move(other));
+
+		return *this;
 	}
 
 	template <typename T>
@@ -35,10 +62,11 @@ namespace dd
 	}
 
 	template <typename T>
-	IArray<T>::IArray(T* buffer, int capacity)
-		: m_data(buffer, capacity),
+	IArray<T>::IArray(T* buffer, int capacity) :
+		m_data(buffer, capacity),
 		m_size(0)
 	{
+		std::memset(m_data.Access(), 0, m_data.SizeBytes());
 	}
 
 	template <typename T>
@@ -54,6 +82,18 @@ namespace dd
 	}
 
 	template <typename T>
+	IArray<T>& IArray<T>::operator=(IArray<T>&& other)
+	{
+		DD_ASSERT(other.Size() <= m_data.Size());
+
+		// clear, then push the entire other array
+		Clear();
+		PushAll(std::move(other));
+
+		return *this;
+	}
+
+	template <typename T>
 	const T& IArray<T>::operator[](size_t index) const
 	{
 		DD_ASSERT(index < m_size, "Indexing unallocated memory!");
@@ -62,18 +102,25 @@ namespace dd
 	}
 
 	template <typename T>
-	void IArray<T>::Push(const T& value)
+	T& IArray<T>::Push(const T& value)
 	{
 		DD_ASSERT(m_size < m_data.Size());
 
-		new (&m_data[m_size]) T(value);
+		T* entry = new (&m_data[m_size]) T(value);
 		++m_size;
+
+		return *entry;
 	}
 
 	template <typename T>
-	void IArray<T>::Add(const T& value)
+	T& IArray<T>::Push(T&& value)
 	{
-		Push(value);
+		DD_ASSERT(m_size < m_data.Size());
+
+		T* entry = new (&m_data[m_size]) T(std::move(value));
+		++m_size;
+		
+		return *entry;
 	}
 
 	template <typename T>
@@ -84,6 +131,17 @@ namespace dd
 		for (int i = 0; i < other.m_size; ++i)
 		{
 			Push(other[i]);
+		}
+	}
+
+	template <typename T>
+	void IArray<T>::PushAll(IArray<T>&& other)
+	{
+		DD_ASSERT(m_data.Size() - m_size >= other.Size());
+
+		for (int i = 0; i < other.m_size; ++i)
+		{
+			Push(std::move(other[i]));
 		}
 	}
 

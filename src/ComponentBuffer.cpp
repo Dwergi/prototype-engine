@@ -9,18 +9,38 @@
 
 namespace ddc
 {
-	ComponentBuffer::ComponentBuffer( const EntityLayer& layer, const std::vector<Entity>& entities, DataRequest& req ) :
-		m_request( req )
+	ComponentBuffer::ComponentBuffer()
+	{
+	}
+
+	ComponentBuffer::ComponentBuffer(DataRequest* request) :
+		m_request(request)
+	{
+		DD_ASSERT(m_request != nullptr);
+	}
+
+	ComponentBuffer::ComponentBuffer(ComponentBuffer&& other) :
+		m_request(other.m_request)
+	{
+		DD_ASSERT(m_request != nullptr);
+	}
+
+	void ComponentBuffer::Fill(const std::vector<Entity>& entities)
 	{
 		m_count = entities.size();
-		m_storage = req.GetBuffer(entities.size());
+		m_storage = m_request->AccessBuffer(entities.size());
+		
+		m_exists.clear();
+		m_exists.reserve(m_count);
 
-		if( req.Optional() )
+		if (m_count == 0)
 		{
-			m_exists.resize( m_count );
+			return;
 		}
 
-		size_t component_size = req.Component().Size();
+		const size_t component_size = m_request->Component().Size();
+		const dd::ComponentID component_id = m_request->Component().ComponentID();
+		
 		byte* dest = m_storage;
 
 		std::memset(dest, 0, component_size * m_count);
@@ -28,17 +48,14 @@ namespace ddc
 		size_t copy_size = 0;
 		byte* copy_start = nullptr;
 
-		for( size_t i = 0; i < m_count; ++i )
+		for (size_t i = 0; i < m_count; ++i)
 		{
-			const void* src = layer.GetComponent( entities[i], req.Component().ComponentID() );
-			DD_ASSERT( req.Optional() || src != nullptr );
+			const void* src = entities[i].GetComponent(component_id);
+			DD_ASSERT(m_request->Optional() || src != nullptr);
 
-			if( src != nullptr )
+			if (src != nullptr)
 			{
-				if( req.Optional() )
-				{
-					m_exists[i] = true;
-				}
+				m_exists.push_back(true);
 
 				if (copy_start == nullptr)
 				{
@@ -49,10 +66,7 @@ namespace ddc
 			}
 			else
 			{
-				if( req.Optional() )
-				{
-					m_exists[i] = false;
-				}
+				m_exists.push_back(false);
 
 				if (copy_start != nullptr && copy_size > 0)
 				{
@@ -69,7 +83,42 @@ namespace ddc
 		{
 			std::memcpy(dest, copy_start, copy_size);
 		}
+	}
 
-		DD_ASSERT( m_exists.size() == 0 || req.Optional() );
+	void ComponentBuffer::Commit(const std::vector<ddc::Entity>& entities)
+	{
+		const size_t cmp_size = m_request->Component().Size();
+		const dd::ComponentID cmp_id = m_request->Component().ComponentID();
+
+		size_t copy_size = 0;
+		byte* dest_start = nullptr;
+		const byte* src = m_storage;
+
+		for (Entity entity : entities)
+		{
+			void* dest = entity.AccessComponent(cmp_id);
+			if (dest != nullptr)
+			{
+				if (dest_start == nullptr)
+				{
+					dest_start = (byte*) dest;
+				}
+
+				copy_size += cmp_size;
+			}
+			else if (dest_start != nullptr && copy_size > 0)
+			{
+				std::memcpy(dest_start, src, copy_size);
+
+				src += copy_size;
+				copy_size = 0;
+				dest_start = nullptr;
+			}
+		}
+
+		if (dest_start != nullptr && copy_size > 0)
+		{
+			std::memcpy(dest_start, src, copy_size);
+		}
 	}
 }

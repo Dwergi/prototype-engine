@@ -19,6 +19,8 @@
 
 namespace ddr
 {
+	static std::vector<dd::String64> s_uniformNames;
+
 	LightRenderer::LightRenderer() :
 		ddr::IRenderer( "Lights" )
 	{
@@ -60,10 +62,29 @@ namespace ddr
 		}
 	}
 
+	constexpr int NAME_STRIDE = 10;
+	constexpr int LIGHT_MAX = 10;
+
 	void LightRenderer::Initialize()
 	{
 		m_shader = ddr::ShaderHandle( "mesh" );
 		m_mesh = ddr::MeshHandle( "sphere" );
+
+		for (size_t i = 0; i < 10; ++i)
+		{
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Type"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Position"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Colour"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Intensity"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Attenuation"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "AmbientStrength"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "SpecularStrength"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "Direction"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "CosInnerAngle"));
+			s_uniformNames.push_back(GetArrayUniformName("Lights", i, "CosOuterAngle"));
+		}
+
+		DD_ASSERT(s_uniformNames.size() == NAME_STRIDE * LIGHT_MAX);
 	}
 
 	void LightRenderer::Update(ddr::RenderData& data)
@@ -96,20 +117,21 @@ namespace ddr
 
 			m_debugLights.push_back( entities[ i ] );
 
-			DD_TODO("These strings are static, should pre-generate to avoid allocs.");
+			const size_t name_index = i * NAME_STRIDE;
+
 			glm::vec4 position( transform.Position, 1 );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Type" ).c_str(), (int) light.LightType );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Colour" ).c_str(), light.Colour );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Intensity" ).c_str(), light.Intensity );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Attenuation" ).c_str(), light.Attenuation );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "AmbientStrength" ).c_str(), light.Ambient );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "SpecularStrength" ).c_str(), light.Specular );
+			uniforms.Set(s_uniformNames[i].c_str(), (int) light.LightType);
+			uniforms.Set(s_uniformNames[i+1].c_str(), position);
+			uniforms.Set(s_uniformNames[i+2].c_str(), light.Colour);
+			uniforms.Set(s_uniformNames[i+3].c_str(), light.Intensity);
+			uniforms.Set(s_uniformNames[i+4].c_str(), light.Attenuation);
+			uniforms.Set(s_uniformNames[i+5].c_str(), light.Ambient );
+			uniforms.Set(s_uniformNames[i+6].c_str(), light.Specular );
 
 			glm::vec4 direction = transform.Transform() * glm::vec4( glm::vec3( 0, 0, 1 ), 0 );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "Direction" ).c_str(), direction.xyz );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "CosInnerAngle" ).c_str(), glm::cos( light.InnerAngle ) );
-			uniforms.Set( GetArrayUniformName( "Lights", i, "CosOuterAngle" ).c_str(), glm::cos( light.OuterAngle ) );
+			uniforms.Set(s_uniformNames[i+7].c_str(), direction.xyz);
+			uniforms.Set(s_uniformNames[i+8].c_str(), glm::cos( light.InnerAngle ));
+			uniforms.Set(s_uniformNames[i+9].c_str(), glm::cos( light.OuterAngle ));
 		}
 	}
 

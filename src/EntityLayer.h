@@ -177,7 +177,7 @@ namespace ddc
 		// Find all entities with the given type and return them in the given vector.
 		//
 		template <typename... TComponents>
-		void FindAllWith( std::vector<Entity>& outEntities ) const
+		void FindAllWith(std::vector<Entity>& outEntities) const
 		{
 			ForAllWith<TComponents>( [&outEntities]( Entity e, TComponents&... ) { outEntities.push_back( e ); } );
 		}
@@ -185,14 +185,14 @@ namespace ddc
 		//
 		// Find all entities with the given type IDs and return them in the given vector.
 		//
-		void FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& outEntities ) const;
+		void FindAllWith(const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const;
 
 
 		//
 		// Find all entities with the given type and return them in the given vector.
 		//
 		template <typename... TComponents>
-		void ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const;
+		void ForAllWith(std::function<void( Entity, TComponents&... )> fn) const;
 
 		//
 		// Does the given entity have the given tag?

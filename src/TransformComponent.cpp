@@ -9,4 +9,4 @@
 #include "PCH.h"
 #include "TransformComponent.h"
 
-DD_COMPONENT_CPP( dd::TransformComponent );
+DD_COMPONENT_CPP(dd::TransformComponent);

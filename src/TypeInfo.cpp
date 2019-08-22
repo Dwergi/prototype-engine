@@ -141,10 +141,13 @@ namespace dd
 
 	void TypeInfo::RegisterComponent()
 	{
-		m_componentID = sm_maxComponentID;
-		sm_components->push_back( this );
+		if (m_componentID == INVALID_COMPONENT)
+		{
+			m_componentID = sm_maxComponentID;
+			sm_components->push_back(this);
 
-		++sm_maxComponentID;
+			++sm_maxComponentID;
+		}
 	}
 
 	const TypeInfo* TypeInfo::GetComponent( dd::ComponentID id )

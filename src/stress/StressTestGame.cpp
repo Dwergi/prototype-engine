@@ -219,14 +219,15 @@ namespace stress
 		camera->SetPosition(cam_pos);
 		camera->SetDirection(glm::vec3(0) - cam_pos);
 
-		dd::TestEntities::CreateAxes(*entity_layers[0]);
-
 		// dir light
 		{
+			dd::ComponentID light_id = DD_FIND_TYPE(dd::LightComponent)->ComponentID();
+
 			ddc::Entity entity = entity_layers[0]->CreateEntity<dd::LightComponent, dd::TransformComponent>();
 			entity.AddTag(ddc::Tag::Visible);
 
 			dd::LightComponent* light = entity.Access<dd::LightComponent>();
+
 			light->LightType = dd::LightType::Directional;
 			light->Colour = glm::vec3(1, 1, 1);
 			light->Intensity = 0.7;
@@ -235,6 +236,8 @@ namespace stress
 			transform->Rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(1, 1, 0));
 			transform->Update();
 		}
+
+		dd::TestEntities::CreateAxes(*entity_layers[0]);
 	}
 
 	void StressTestGame::DrawDebugInternal()

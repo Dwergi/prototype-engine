@@ -89,8 +89,6 @@ namespace ddr
 		void BeginRender( const ddc::EntityLayer& entities, const ddr::ICamera& camera );
 		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
 
-		void FillRenderData(ddr::IRenderer& renderer, ddc::EntityLayer& entities, const ddr::ICamera& camera, float delta_t);
-
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};
 }

@@ -201,14 +201,10 @@ namespace dd
 		ComponentRegistration(const char* type_name)
 		{
 			s_typeName = type_name;
-			s_registered = false;
 		}
 
 		static const dd::TypeInfo* Register()
 		{
-			if (s_registered)
-				return dd::TypeInfo::GetType<T>();
-
 			dd::TypeInfo* type = dd::TypeInfo::RegisterType<T>(s_typeName.c_str());
 			T::RegisterMembers(type);
 			DD_ASSERT(type->IsComponent(), "Don't register non-components through DD_COMPONENT_CPP!");
@@ -216,11 +212,10 @@ namespace dd
 			return type;
 		}
 
-		static bool s_registered;
+	private:
 		static std::string s_typeName;
 	};
 
-	template <typename T> bool ComponentRegistration<T>::s_registered = false;
 	template <typename T> std::string ComponentRegistration<T>::s_typeName;
 
 	template <typename T>

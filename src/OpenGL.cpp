@@ -54,9 +54,9 @@ namespace OpenGL
 
 namespace ddr
 {
-	dd::String128 GetArrayUniformName( const char* arrayName, size_t index, const char* uniform )
+	dd::String64 GetArrayUniformName( const char* arrayName, size_t index, const char* uniform )
 	{
-		dd::String256 result;
+		dd::String64 result;
 		result += arrayName;
 		result += "[";
 

@@ -61,7 +61,7 @@ namespace ddc
 		}
 
 		ddc::UpdateData& update_data = system.AccessUpdateData();
-		update_data.Fill(update.Layer, update.DeltaT);
+		update_data.Fill(*update.Layer, update.DeltaT);
 		system.Update(update_data);
 
 		update_data.Commit();

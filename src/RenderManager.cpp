@@ -129,39 +129,20 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void RenderManager::FillRenderData(ddr::IRenderer& renderer, ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
-	{
-		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
-		for (const ddc::DataRequest* req : renderer.GetRequirements())
-		{
-			if (!req->Optional())
-			{
-				required.Add(req->Component().ComponentID());
-			}
-		}
-
-		const std::bitset<ddc::MAX_TAGS>& tags = renderer.GetRequiredTags();
-
-		std::vector<ddc::Entity> entities;
-		layer.FindAllWith(required, tags, entities);
-
-		renderer.AccessRenderData().Fill(layer, camera, m_uniforms, std::move(entities), renderer.GetRequirements(), delta_t);
-	}
-
 	void RenderManager::Render(ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
 		// create render data
-		for (size_t i = 0; i < m_renderers.size(); ++i)
+		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			FillRenderData(*m_renderers[i], layer, camera, delta_t);
+			renderer->RenderData().Fill(layer, camera, m_uniforms, delta_t);
 		}
 
 		// update
-		for (size_t i = 0; i < m_renderers.size(); ++i)
+		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			m_renderers[i]->Update(*render_data[i]);
+			renderer->Update(renderer->RenderData());
 		}
 
 		ddr::IRenderer* debug_render = nullptr;
@@ -169,32 +150,29 @@ namespace ddr
 		BeginRender(layer, camera);
 
 		// render non-alpha
-		for (size_t i = 0; i < m_renderers.size(); ++i)
+		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			ddr::IRenderer& renderer = *m_renderers[i];
-			if (!renderer.UsesAlpha())
+			if (!renderer->UsesAlpha())
 			{
-				renderer.Render(renderer.AccessRenderData());
+				renderer->Render(renderer->RenderData());
 			}
 		}
 
 		// render debug
-		for (size_t i = 0; i < m_renderers.size(); ++i)
+		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			ddr::IRenderer& renderer = *m_renderers[i];
-			if (renderer.ShouldRenderDebug())
+			if (renderer->ShouldRenderDebug())
 			{
-				renderer.RenderDebug(renderer.AccessRenderData());
+				renderer->RenderDebug(renderer->RenderData());
 			}
 		}
 
 		// render alpha
-		for (size_t i = 0; i < m_renderers.size(); ++i)
+		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			ddr::IRenderer& renderer = *m_renderers[i];
-			if (renderer.UsesAlpha())
+			if (renderer->UsesAlpha())
 			{
-				renderer.Render(renderer.AccessRenderData());
+				renderer->Render(renderer->RenderData());
 			}
 		}
 
