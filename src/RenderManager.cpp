@@ -129,7 +129,7 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	RenderData RenderManager::CreateRenderData(ddr::IRenderer& renderer, ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
+	void RenderManager::FillRenderData(ddr::IRenderer& renderer, ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
 	{
 		dd::Array<dd::ComponentID, ddc::MAX_COMPONENTS> required;
 		for (const ddc::DataRequest* req : renderer.GetRequirements())
@@ -145,28 +145,23 @@ namespace ddr
 		std::vector<ddc::Entity> entities;
 		layer.FindAllWith(required, tags, entities);
 
-		return RenderData(layer, camera, m_uniforms, entities, renderer.GetRequirements(), delta_t);
+		renderer.AccessRenderData().Fill(layer, camera, m_uniforms, std::move(entities), renderer.GetRequirements(), delta_t);
 	}
 
 	void RenderManager::Render(ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
 	{
 		m_time += delta_t;
 
-		DD_TODO("RenderData could be stored in renderer, would avoid per-frame allocs.");
-		std::vector<RenderData> render_data;
-		render_data.reserve(m_renderers.size());
-		render_data.clear();
-
 		// create render data
 		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			render_data.emplace_back(CreateRenderData(*m_renderers[i], layer, camera, delta_t));
+			FillRenderData(*m_renderers[i], layer, camera, delta_t);
 		}
 
 		// update
 		for (size_t i = 0; i < m_renderers.size(); ++i)
 		{
-			m_renderers[i]->Update(render_data[i]);
+			m_renderers[i]->Update(*render_data[i]);
 		}
 
 		ddr::IRenderer* debug_render = nullptr;
@@ -179,7 +174,7 @@ namespace ddr
 			ddr::IRenderer& renderer = *m_renderers[i];
 			if (!renderer.UsesAlpha())
 			{
-				renderer.Render(render_data[i]);
+				renderer.Render(renderer.AccessRenderData());
 			}
 		}
 
@@ -189,7 +184,7 @@ namespace ddr
 			ddr::IRenderer& renderer = *m_renderers[i];
 			if (renderer.ShouldRenderDebug())
 			{
-				renderer.RenderDebug(render_data[i]);
+				renderer.RenderDebug(renderer.AccessRenderData());
 			}
 		}
 
@@ -199,7 +194,7 @@ namespace ddr
 			ddr::IRenderer& renderer = *m_renderers[i];
 			if (renderer.UsesAlpha())
 			{
-				renderer.Render(render_data[i]);
+				renderer.Render(renderer.AccessRenderData());
 			}
 		}
 

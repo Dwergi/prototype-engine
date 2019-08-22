@@ -11,15 +11,22 @@
 
 namespace ddc
 {
-	UpdateData::UpdateData(ddc::EntityLayer& layer, float delta_t) :
-		m_layer(layer),
-		m_delta(delta_t)
+	UpdateData::UpdateData()
 	{
 	}
 
-	void UpdateData::AddData(std::vector<Entity>&& entities, const dd::IArray<DataRequest*>& requests, const char* name)
+	UpdateDataBuffer& UpdateData::Create(const char* name)
 	{
-		m_dataBuffers.emplace_back(m_layer, std::move(entities), requests, name);
+		for (UpdateDataBuffer& buffer : m_dataBuffers)
+		{
+			if ((name == nullptr && buffer.Name().IsEmpty()) ||
+				buffer.Name() == name)
+			{
+				return buffer;
+			}
+		}
+
+		return m_dataBuffers.emplace_back(name);
 	}
 
 	const UpdateDataBuffer& UpdateData::Data(const char* name) const
@@ -38,6 +45,17 @@ namespace ddc
 			}
 		}
 		throw std::exception("No UpdateDataBuffer found for given name!");
+	}
+
+	void UpdateData::Fill(ddc::EntityLayer& layer, float delta_t)
+	{
+		m_layer = &layer;
+		m_delta = delta_t;
+
+		for (UpdateDataBuffer& buffer : m_dataBuffers)
+		{
+			buffer.Fill(layer);
+		}
 	}
 
 	void UpdateData::Commit()

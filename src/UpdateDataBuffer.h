@@ -8,7 +8,7 @@ namespace ddc
 
 	struct UpdateDataBuffer
 	{
-		UpdateDataBuffer(ddc::EntityLayer& layer, std::vector<Entity>&& entities, const dd::IArray<DataRequest*>& requests, const char* name);
+		explicit UpdateDataBuffer(const char* name);
 		UpdateDataBuffer(UpdateDataBuffer&& other);
 
 		const std::vector<Entity>& Entities() const { return m_entities; }
@@ -53,8 +53,17 @@ namespace ddc
 
 		static const int MAX_BUFFERS = 16;
 
+		friend struct System;
+
 		dd::String16 m_name;
 		std::vector<Entity> m_entities;
 		std::vector<ComponentBuffer> m_buffers;
+
+		dd::Array<DataRequest, 16> m_requests;
+		TagBits m_tags;
+
+		void RequireTag(ddc::Tag tag);
+		void AddRequest(DataRequest& request);
+		void Fill(ddc::EntityLayer& layer);
 	};
 }

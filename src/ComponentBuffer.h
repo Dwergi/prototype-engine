@@ -17,7 +17,6 @@ namespace ddc
 
 		const dd::TypeInfo& Component() const { return m_request.Component(); }
 		DataUsage Usage() const { return m_request.Usage(); }
-		const dd::String& Name() const { return m_request.Name(); }
 
 		size_t Size() const { return m_count; }
 		byte* Data() const { return m_storage; }

@@ -60,23 +60,20 @@ namespace ddr
 	struct RenderData
 	{
 	public:
-		RenderData(ddc::EntityLayer& entity_space, const ddr::ICamera& camera, ddr::UniformStorage& uniforms, 
-			const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requirements, float delta_t);
-
+		RenderData();
 		RenderData(RenderData&& data);
 
-		const ddc::EntityLayer& EntityLayer() const { return m_layer; }
-		ddc::EntityLayer& EntityLayer() { return m_layer; }
+		const ddc::EntityLayer& EntityLayer() const { return *m_layer; }
+		ddc::EntityLayer& EntityLayer() { return *m_layer; }
 
-		const ddr::ICamera& Camera() const { return m_camera; }
+		const ddr::ICamera& Camera() const { return *m_camera; }
 
-		ddr::UniformStorage& Uniforms() const { return m_uniforms; }
+		ddr::UniformStorage& Uniforms() const { return *m_uniforms; }
 
 		float Delta() const { return m_delta; }
 
 		const std::vector<ddc::Entity>& Entities() const { return m_entities; }
 		size_t Size() const { return m_entities.size(); }
-
 
 		template <typename T>
 		ddc::ReadView<T> Get() const
@@ -95,12 +92,17 @@ namespace ddr
 		}
 
 	private:
-		ddc::EntityLayer& m_layer;
-		const ddr::ICamera& m_camera;
-		ddr::UniformStorage& m_uniforms;
+		friend struct RenderManager;
+
+		ddc::EntityLayer* m_layer;
+		const ddr::ICamera* m_camera;
+		ddr::UniformStorage* m_uniforms;
 		float m_delta { 0 };
 
 		std::vector<ddc::Entity> m_entities;
 		std::vector<ddc::ComponentBuffer> m_buffers;
+
+		void Fill(ddc::EntityLayer& layer, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+			std::vector<ddc::Entity>&& entities, const dd::IArray<ddc::DataRequest*>& requirements, float delta_t);
 	};
 }

@@ -13,20 +13,8 @@
 
 namespace ddr
 {
-	RenderData::RenderData(ddc::EntityLayer& layer, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
-		const std::vector<ddc::Entity>& entities, const dd::IArray<ddc::DataRequest*>& requests, float delta_t) :
-		m_layer(layer),
-		m_camera(camera),
-		m_uniforms(uniforms),
-		m_entities(std::move(entities)),
-		m_delta(delta_t)
+	RenderData::RenderData()
 	{
-		m_buffers.reserve(requests.Size());
-
-		for (ddc::DataRequest* req : requests)
-		{
-			m_buffers.emplace_back(m_layer, entities, *req);
-		}
 	}
 
 	RenderData::RenderData(RenderData&& other) :
@@ -38,5 +26,22 @@ namespace ddr
 		m_delta(other.m_delta)
 	{
 
+	}
+
+	void RenderData::Fill(ddc::EntityLayer& layer, const ddr::ICamera& camera, ddr::UniformStorage& uniforms,
+		std::vector<ddc::Entity>&& entities, const dd::IArray<ddc::DataRequest*>& requests, float delta_t)
+	{
+		m_entities = std::move(entities);
+		m_layer = &layer;
+		m_camera = &camera;
+		m_uniforms = &uniforms;
+		m_delta = delta_t;
+
+		m_buffers.reserve(requests.Size());
+
+		for (ddc::DataRequest* req : requests)
+		{
+			m_buffers.emplace_back(m_layer, entities, *req);
+		}
 	}
 }

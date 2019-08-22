@@ -36,7 +36,7 @@ namespace ddr
 		{
 			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
 			CheckDuplicates(type, ddc::DataUsage::Read, ddc::DataCardinality::Required);
-			m_requests.Add( new ddc::ReadRequirement<T>( nullptr ) );
+			m_requests.Add( new ddc::ReadRequired<T>( nullptr ) );
 		}
 
 		template <typename T>
@@ -50,10 +50,15 @@ namespace ddr
 		void RequireTag( ddc::Tag tag ) { m_tags.set( (uint) tag ); }
 
 	private:
+		friend struct RenderManager;
+
+		ddr::RenderData m_data;
 		dd::Array<ddc::DataRequest*, ddc::MAX_COMPONENTS> m_requests;
 		std::bitset<ddc::MAX_TAGS> m_tags;
 
 		dd::String64 m_name;
+
+		ddr::RenderData& AccessRenderData() { return m_data; }
 
 		bool CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality);
 	};

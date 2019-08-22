@@ -36,10 +36,7 @@ namespace ddc
 
 		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
 
-		const dd::IArray<dd::String16>& GetRequestNames() const { return m_requestNames; }
-		const dd::IArray<DataRequest*>& GetRequests() const { return m_requests; }
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
-		std::bitset<MAX_TAGS> GetRequiredTags( const char* name = nullptr ) const;
 		const char* GetName() const { return m_name.c_str(); }
 
 		int MaxPartitions() const { return m_partitions; }
@@ -49,57 +46,37 @@ namespace ddc
 		template <typename T>
 		void RequireRead( const char* name = nullptr ) 
 		{ 
-			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, DataUsage::Read, DataCardinality::Required, name);
-			m_requests.Add(new ReadRequirement<T>(name));
-			
-			dd::String16 name_str(name);
-			if (!m_requestNames.Contains(name_str))
-			{
-				m_requestNames.Add(name_str);
-			}
+			dd::ComponentRegistration<T>::Register();
+
+			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
+			data_buffer.AddRequest(new ReadRequired<T>());
 		}
 
 		template <typename T>
 		void RequireWrite( const char* name = nullptr ) 
 		{
-			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, DataUsage::Write, DataCardinality::Required, name );
-			m_requests.Add( new WriteRequirement<T>( name ) );
+			dd::ComponentRegistration<T>::Register();
 
-			dd::String16 name_str(name);
-			if (!m_requestNames.Contains(name_str))
-			{
-				m_requestNames.Add(name_str);
-			}
+			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
+			data_buffer.AddRequest(new WriteRequired<T>());
 		}
 
 		template <typename T>
 		void OptionalRead( const char* name = nullptr )
 		{
-			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, DataUsage::Read, DataCardinality::Optional, name);
-			m_requests.Add( new ReadOptional<T>( name ) );
-			
-			dd::String16 name_str(name);
-			if (!m_requestNames.Contains(name_str))
-			{
-				m_requestNames.Add(name_str);
-			}
+			dd::ComponentRegistration<T>::Register();
+
+			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
+			data_buffer.AddRequest(new WriteOptional<T>());
 		}
 
 		template <typename T>
 		void OptionalWrite( const char* name = nullptr )
 		{
-			const dd::TypeInfo* type = dd::ComponentRegistration<T>::Register();
-			CheckDuplicates(type, DataUsage::Write, DataCardinality::Optional, name);
-			m_requests.Add( new WriteOptional<T>( name ) );
-			
-			dd::String16 name_str(name);
-			if (!m_requestNames.Contains(name_str))
-			{
-				m_requestNames.Add(name_str);
-			}
+			dd::ComponentRegistration<T>::Register();
+
+			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
+			data_buffer.AddRequest(new WriteOptional<T>());
 		}
 
 		bool CheckDuplicates( const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality, const char* name ) const;
@@ -113,16 +90,9 @@ namespace ddc
 		}
 
 	private:
-		struct TagRequest
-		{
-			dd::String32 Name;
-			std::bitset<MAX_TAGS> Tags;
-		};
+		friend struct SystemsManager;
 
-
-		dd::Array<dd::String16, 8> m_requestNames;
-		dd::Array<DataRequest*, 16> m_requests;
-		dd::Array<TagRequest, 16> m_tags;
+		ddc::UpdateData m_updateData;
 
 		dd::Array<const System*, 8> m_dependencies;
 		dd::String32 m_name;
@@ -132,5 +102,7 @@ namespace ddc
 
 		const static int MAX_PARTITIONS = 8;
 		int m_partitions { MAX_PARTITIONS };
+
+		ddc::UpdateData& AccessUpdateData() { return m_updateData; }
 	};
 }

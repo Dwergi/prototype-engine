@@ -13,22 +13,24 @@ namespace ddc
 {
 	struct UpdateData
 	{
-		UpdateData( ddc::EntityLayer& layer, float delta_t );
+		UpdateData();
 		UpdateData( const UpdateData& other ) = delete;
 
 		float Delta() const { return m_delta; }
-		ddc::EntityLayer& EntityLayer() const { return m_layer; }
+		ddc::EntityLayer& EntityLayer() const { return *m_layer; }
 		const UpdateDataBuffer& Data( const char* name = nullptr ) const;
 
 	private:
 
-		friend struct SystemsManager; // for AddData and Commit
+		friend struct System;
 
-		void AddData(std::vector<Entity>&& entities, const dd::IArray<DataRequest*>& requests, const char* name);
+		void Fill(ddc::EntityLayer& layer, float delta_t);
 		void Commit();
 
+		ddc::UpdateDataBuffer& Create(const char* name);
+
 		float m_delta { 0 };
-		ddc::EntityLayer& m_layer;
+		ddc::EntityLayer* m_layer;
 		std::vector<UpdateDataBuffer> m_dataBuffers;
 	};
 }

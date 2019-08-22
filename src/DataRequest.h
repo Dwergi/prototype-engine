@@ -31,7 +31,6 @@ namespace ddc
 		virtual ~DataRequest();
 
 		byte* GetBuffer(size_t count);
-		const dd::String& Name() const { return m_name; }
 		DataCardinality Cardinality() const { return m_cardinality; }
 		bool Optional() const { return m_cardinality == DataCardinality::Optional; }
 		DataUsage Usage() const { return m_usage; }
@@ -44,25 +43,23 @@ namespace ddc
 		const dd::TypeInfo* m_component { nullptr };
 		DataUsage m_usage { DataUsage::Invalid };
 		DataCardinality m_cardinality { DataCardinality::Invalid };
-
-		dd::String16 m_name;
 		dd::Buffer<byte> m_buffer;
 	};
 
 	template <typename TComponent>
-	struct ReadRequirement : DataRequest
+	struct ReadRequired : DataRequest
 	{
-		ReadRequirement( const char* name ) :
-			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Required, name )
+		ReadRequired() :
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Required )
 		{
 		}
 	};
 
 	template <typename TComponent>
-	struct WriteRequirement : DataRequest
+	struct WriteRequired : DataRequest
 	{
-		WriteRequirement( const char* name ) :
-			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Required, name )
+		WriteRequired() :
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Required )
 		{
 		}
 	};
@@ -70,8 +67,8 @@ namespace ddc
 	template <typename TComponent>
 	struct ReadOptional : DataRequest
 	{
-		ReadOptional( const char* name ) :
-			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Optional, name )
+		ReadOptional() :
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Read, DataCardinality::Optional )
 		{
 		}
 	};
@@ -79,8 +76,8 @@ namespace ddc
 	template <typename TComponent>
 	struct WriteOptional : DataRequest
 	{
-		WriteOptional( const char* name ) :
-			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Optional, name )
+		WriteOptional() :
+			DataRequest( DD_FIND_TYPE( TComponent ), DataUsage::Write, DataCardinality::Optional )
 		{
 		}
 	};

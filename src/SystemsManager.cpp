@@ -60,40 +60,8 @@ namespace ddc
 			return;
 		}
 
-		ddc::UpdateData update_data(*update.Layer, update.DeltaT);
-
-		// get names
-		dd::IArray<dd::String16> names = system.GetRequestNames();
-		dd::IArray<DataRequest*> all_requests = system.GetRequests();
-
-		// for each named data buffer, filter by requests
-		for (const dd::String& name : names)
-		{
-			dd::Array<dd::ComponentID, MAX_COMPONENTS> required;
-			dd::Array<DataRequest*, MAX_COMPONENTS> requests;
-			for (DataRequest* req : all_requests)
-			{
-				if (name == req->Name())
-				{
-					if (!req->Optional())
-					{
-						required.Add(req->Component().ComponentID());
-					}
-
-					requests.Add(req);
-				}
-			}
-
-			TagBits tags = system.GetRequiredTags(name.c_str());
-
-			// find entities with requirements
-			DD_TODO("Move UpdateData into System - we already know what DataRequests we have, so we can avoid allocations.");
-			std::vector<Entity> entities;
-			update.Layer->FindAllWith(required, tags, entities);
-
-			update_data.AddData(std::move(entities), requests, name.c_str());
-		}
-
+		ddc::UpdateData& update_data = system.AccessUpdateData();
+		update_data.Fill(update.Layer, update.DeltaT);
 		system.Update(update_data);
 
 		update_data.Commit();
