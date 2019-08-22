@@ -33,6 +33,8 @@ namespace dd
 		float SlidingDelta() const;
 		float DeltaWithoutDelay() const { return m_deltaWithoutDelay; }
 
+		int FrameCount() const;
+
 		virtual const char* GetDebugTitle() const override { return "FPS"; }
 
 		void DrawFPSCounter();
@@ -50,7 +52,6 @@ namespace dd
 		float m_timeScale { 1.0f };
 		bool m_drawCompact { true };
 		bool m_paused { false };
-		uint m_frame { 0 };
 
 		virtual void DrawDebugInternal() override;
 	};

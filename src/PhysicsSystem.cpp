@@ -276,9 +276,9 @@ namespace dd
 
 		float delta_t = update.Delta();
 		
-		auto static_planes = update.Data( "static_planes" );
-		auto static_spheres = update.Data( "static_spheres" );
-		auto dynamic_spheres = update.Data( "dynamic_spheres" );
+		const auto& static_planes = update.Data( "static_planes" );
+		const auto& static_spheres = update.Data( "static_spheres" );
+		const auto& dynamic_spheres = update.Data( "dynamic_spheres" );
 
 		auto dynamic_sphere_transforms = dynamic_spheres.Write<dd::TransformComponent>();
 		auto dynamic_sphere_physics = dynamic_spheres.Write<dd::PhysicsSphereComponent>();

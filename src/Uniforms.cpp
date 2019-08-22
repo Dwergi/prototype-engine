@@ -77,7 +77,7 @@ namespace ddr
 		return reinterpret_cast<IUniform*>(m_storage + index * UNIFORM_SIZE);
 	}
 
-	IUniform* UniformStorage::Create( std::string name, UniformType type )
+	IUniform* UniformStorage::Create( std::string_view name, UniformType type )
 	{
 		int index = (int) m_uniforms.size();
 
@@ -98,7 +98,7 @@ namespace ddr
 	}
 
 	template <typename T>
-	void UniformStorage::SetHelper( std::string name, const T& value )
+	void UniformStorage::SetHelper( std::string_view name, const T& value )
 	{
 		UniformType type = GetUniformType<T>();
 
@@ -117,47 +117,48 @@ namespace ddr
 		}
 	}
 
-	void UniformStorage::Set( std::string name, bool value )
+	void UniformStorage::Set( std::string_view name, bool value )
+	{
+		DD_TODO("I think these strings are copying...");
+		SetHelper( name, value );
+	}
+
+	void UniformStorage::Set( std::string_view name, int value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, int value )
+	void UniformStorage::Set( std::string_view name, float value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, float value )
+	void UniformStorage::Set( std::string_view name, glm::vec2 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, glm::vec2 value )
+	void UniformStorage::Set( std::string_view name, glm::vec3 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, glm::vec3 value )
+	void UniformStorage::Set( std::string_view name, glm::vec4 value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, glm::vec4 value )
+	void UniformStorage::Set( std::string_view name, const glm::mat3& value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, const glm::mat3& value )
+	void UniformStorage::Set( std::string_view name, const glm::mat4& value )
 	{
 		SetHelper( name, value );
 	}
 
-	void UniformStorage::Set( std::string name, const glm::mat4& value )
-	{
-		SetHelper( name, value );
-	}
-
-	void UniformStorage::Set( std::string name, const ddr::Texture& value )
+	void UniformStorage::Set( std::string_view name, const ddr::Texture& value )
 	{
 		IUniform* uniform = Find( name );
 		if( uniform == nullptr )
@@ -181,7 +182,7 @@ namespace ddr
 
 		for( auto pair : m_uniforms )
 		{
-			std::string name = pair.first;
+			std::string_view name = pair.first;
 			IUniform* uniform = Access( pair.second );
 
 			switch( uniform->Type )
@@ -334,10 +335,10 @@ namespace ddr
 		}
 	}
 
-	IUniform* UniformStorage::Find( std::string name ) 
+	IUniform* UniformStorage::Find( std::string_view name ) 
 	{
-		auto it = m_uniforms.find( name );
-		if( it == m_uniforms.end() )
+		auto it = m_uniforms.find( name.data() );
+		if (it == m_uniforms.end())
 		{
 			return nullptr;
 		}

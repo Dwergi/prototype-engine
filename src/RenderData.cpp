@@ -18,17 +18,14 @@ namespace ddr
 		m_layer(layer),
 		m_camera(camera),
 		m_uniforms(uniforms),
-		m_entities(entities),
+		m_entities(std::move(entities)),
 		m_delta(delta_t)
 	{
 		m_buffers.reserve(requests.Size());
 
 		for (ddc::DataRequest* req : requests)
 		{
-			byte* storage = req->GetBuffer(entities.size());
-
-			ddc::ComponentBuffer buffer(m_layer, entities, *req);
-			m_buffers.push_back(buffer);
+			m_buffers.emplace_back(m_layer, entities, *req);
 		}
 	}
 

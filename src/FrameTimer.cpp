@@ -26,8 +26,6 @@ namespace dd
 
 	void FrameTimer::Update()
 	{
-		++m_frame;
-
 		m_targetDelta = 1.0f / m_maxFPS;
 
 		m_lastFrameTime = m_currentFrameTime;
@@ -73,6 +71,11 @@ namespace dd
 
 			delta_t = (float) m_timer.TimeInSeconds() - m_currentFrameTime;
 		}
+	}
+
+	int FrameTimer::FrameCount() const
+	{
+		return dd::Profiler::FrameCount();
 	}
 
 	float FrameTimer::SlidingDelta() const

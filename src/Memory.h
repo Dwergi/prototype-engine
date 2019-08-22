@@ -23,4 +23,6 @@ void operator delete[](void* ptr) noexcept;
 namespace dd
 {
 	void InitializeMemoryTracking();
+
+	void BreakOnAlloc(bool enable);
 }

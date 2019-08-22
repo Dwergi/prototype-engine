@@ -62,7 +62,6 @@ namespace dd
 		friend struct Profiler;
 
 		std::string m_name;
-		int m_frameCount { 0 };
 		int m_index { -1 };
 		float m_sliding { 0 };
 		float m_values[FRAME_COUNT] = { 0 };
@@ -77,6 +76,8 @@ namespace dd
 
 	struct Profiler
 	{
+		static int FrameCount();
+
 		static void BeginFrame();
 		static void EndFrame();
 
@@ -90,5 +91,6 @@ namespace dd
 		static std::vector<ProfilerValue*> s_instances;
 		static bool s_draw;
 		static bool s_inFrame;
+		static int s_frameCount;
 	};
 }

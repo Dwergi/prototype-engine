@@ -15,12 +15,12 @@ namespace dd
 		//
 		// The name of this instance.
 		//
-		const std::string& Name() const { return m_name; }
+		std::string_view Name() const { return m_name; }
 
 		//
 		// Set the name of this instance.
 		//
-		void SetName(std::string name) { m_name = name; }
+		void SetName(std::string_view name) { m_name = name; }
 
 	protected:
 		std::string m_name;
@@ -39,12 +39,12 @@ namespace dd
 		//
 		// Find a handle to an object with the given name.
 		//
-		Handle<T> Find(std::string name) const;
+		Handle<T> Find(std::string_view name) const;
 
 		//
 		// Create (or retrieve) a handle to an object with the given name.
 		//
-		Handle<T> Create(std::string name);
+		Handle<T> Create(std::string_view name);
 
 		//
 		// Destroy the object associated with the given handle. 
@@ -109,7 +109,7 @@ namespace dd
 		std::vector<HandleEntry> m_entries;
 		std::mutex m_mutex;
 
-		Handle<T> FindInternal(std::string name) const;
+		Handle<T> FindInternal(std::string_view name) const;
 
 		virtual void OnCreate(T& instance) const {}
 		virtual void OnDestroy(T& instance) const {}

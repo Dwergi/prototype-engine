@@ -152,6 +152,7 @@ namespace ddr
 	{
 		m_time += delta_t;
 
+		DD_TODO("RenderData could be stored in renderer, would avoid per-frame allocs.");
 		std::vector<RenderData> render_data;
 		render_data.reserve(m_renderers.size());
 		render_data.clear();

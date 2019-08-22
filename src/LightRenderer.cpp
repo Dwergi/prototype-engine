@@ -75,7 +75,7 @@ namespace ddr
 	{
 		auto lights = data.Get<dd::LightComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
-		auto entities = data.Entities();
+		const auto& entities = data.Entities();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 
@@ -96,6 +96,7 @@ namespace ddr
 
 			m_debugLights.push_back( entities[ i ] );
 
+			DD_TODO("These strings are static, should pre-generate to avoid allocs.");
 			glm::vec4 position( transform.Position, 1 );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Type" ).c_str(), (int) light.LightType );
 			uniforms.Set( GetArrayUniformName( "Lights", i, "Position" ).c_str(), position );

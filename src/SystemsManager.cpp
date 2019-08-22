@@ -87,6 +87,7 @@ namespace ddc
 			TagBits tags = system.GetRequiredTags(name.c_str());
 
 			// find entities with requirements
+			DD_TODO("Move UpdateData into System - we already know what DataRequests we have, so we can avoid allocations.");
 			std::vector<Entity> entities;
 			update.Layer->FindAllWith(required, tags, entities);
 

@@ -9,13 +9,19 @@
 
 static dd::ProfilerValue* g_allocs;
 static dd::ProfilerValue* g_deletions;
+static bool g_breakOnAlloc = false;
 
 namespace dd
 {
 	void InitializeMemoryTracking()
 	{
-		g_allocs = &dd::Profiler::GetValue("Memory/Allocations");
+		g_allocs = &dd::Profiler::GetValue("Memory Allocations");
 		g_deletions = &dd::Profiler::GetValue("Memory/Deletions");
+	}
+
+	void BreakOnAlloc(bool enable)
+	{
+		g_breakOnAlloc = enable;
 	}
 }
 
@@ -25,6 +31,12 @@ void* operator new(size_t size)
 	{
 		g_allocs->Increment();
 	}
+
+	if (g_breakOnAlloc)
+	{
+		__debugbreak();
+	}
+
 	return std::malloc(size);
 }
 
@@ -34,6 +46,12 @@ void* operator new[](size_t size)
 	{
 		g_allocs->Increment();
 	}
+
+	if (g_breakOnAlloc)
+	{
+		__debugbreak();
+	}
+
 	return std::malloc(size);
 }
 

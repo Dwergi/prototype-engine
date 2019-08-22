@@ -160,14 +160,14 @@ namespace neut
 		
 		if(s_input->GotInput(dd::InputAction::SHOOT))
 		{
-			auto player = update.Data( "player" );
+			const auto& player = update.Data( "player" );
 			auto cameras = player.Read<dd::FPSCameraComponent>();
 
 			FireBullet( entities, cameras[0] );
 		}
 
-		auto dynamic_meshes = update.Data( "dynamic_meshes" );
-		auto bullet_data = update.Data( "bullets" );
+		const auto& dynamic_meshes = update.Data( "dynamic_meshes" );
+		const auto& bullet_data = update.Data( "bullets" );
 
 		auto bullets = bullet_data.Write<neut::BulletComponent>();
 		auto bullet_transforms = bullet_data.Write<dd::TransformComponent>();

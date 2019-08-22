@@ -16,6 +16,7 @@ namespace dd
 	std::vector<dd::ProfilerValue*> dd::Profiler::s_instances;
 	bool dd::Profiler::s_draw = false;
 	bool dd::Profiler::s_inFrame = false;
+	int dd::Profiler::s_frameCount = 0;
 
 	static dd::Service<dd::IWindow> s_window;
 
@@ -49,7 +50,6 @@ namespace dd
 
 	void ProfilerValue::BeginFrame()
 	{
-		++m_frameCount;
 		++m_index;
 
 		if (m_index >= FRAME_COUNT)
@@ -63,7 +63,7 @@ namespace dd
 	void ProfilerValue::EndFrame()
 	{
 		float total = 0;
-		int frames = ddm::min(m_frameCount, FRAME_COUNT);
+		int frames = ddm::min(dd::Profiler::FrameCount(), FRAME_COUNT);
 		for (int i = 0; i < frames; ++i)
 		{
 			total += m_values[i];
@@ -100,7 +100,7 @@ namespace dd
 
 		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_Framed, "%s: %.2f", m_name.substr(group_end).c_str(), GetValue()))
 		{
-			int frames = ddm::min(m_frameCount, FRAME_COUNT);
+			int frames = ddm::min(dd::Profiler::FrameCount(), FRAME_COUNT);
 
 			ImGui::PlotLines("", &ProfilerValueGetter, this, frames - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
 			ImGui::Value("Average Over 100", m_sliding);
@@ -132,6 +132,10 @@ namespace dd
 		return *value;
 	}
 
+	int Profiler::FrameCount()
+	{
+		return s_frameCount;
+	}
 
 	void Profiler::BeginFrame()
 	{
@@ -153,9 +157,9 @@ namespace dd
 		{
 			value->EndFrame();
 		}
-	}
 
-#pragma optimize("", off)
+		++s_frameCount;
+	}
 
 	static Array<std::string, 4> s_currentGroups;
 	static int s_openGroups = 0;

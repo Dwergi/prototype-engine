@@ -98,13 +98,13 @@ namespace d2d
 		float delta_t = update_data.Delta();
 		glm::vec2 accel_change = GRAVITY * delta_t;
 
-		auto circles = update_data.Data("circles");
-		auto circle_entities = circles.Entities();
+		const auto& circles = update_data.Data("circles");
+		const auto& circle_entities = circles.Entities();
 		auto circle_physics = circles.Write<d2d::CirclePhysicsComponent>();
 		auto circle_transforms = circles.Write<d2d::Transform2DComponent>();
 
-		auto boxes = update_data.Data("boxes");
-		auto box_entities = boxes.Entities();
+		const auto& boxes = update_data.Data("boxes");
+		const auto& box_entities = boxes.Entities();
 		auto box_physics = boxes.Write<d2d::BoxPhysicsComponent>();
 		auto box_transforms = boxes.Write<d2d::Transform2DComponent>();
 

@@ -153,6 +153,11 @@ static void EndFrame()
 	dd::Profiler::EndFrame();
 }
 
+#if 0
+#define DD_BREAK_ON_ALLOC(Frame) if (dd::Profiler::FrameCount() == (Frame)) { dd::BreakOnAlloc(true); }
+#else
+#define DD_BREAK_ON_ALLOC(Frame)
+#endif
 
 // Profiler values
 static dd::ProfilerValue& s_startFrameProfiler = dd::Profiler::GetValue("Start Frame");
@@ -240,6 +245,7 @@ static int GameMain()
 		while (!s_window->IsClosing())
 		{
 			DD_PROFILE_SCOPED(Frame);
+			DD_BREAK_ON_ALLOC(100);
 
 			{
 				s_profilerTimer.Restart();
@@ -307,6 +313,8 @@ static int GameMain()
 
 				s_endFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
+
+			dd::BreakOnAlloc(false);
 		}
 
 		for (ddc::EntityLayer* space : entity_layers)

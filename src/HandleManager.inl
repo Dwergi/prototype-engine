@@ -14,7 +14,7 @@ namespace dd
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::FindInternal( std::string name ) const
+	Handle<T> HandleManager<T>::FindInternal( std::string_view name ) const
 	{
 		DD_ASSERT( !name.empty() );
 
@@ -31,13 +31,13 @@ namespace dd
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::Find( std::string name ) const
+	Handle<T> HandleManager<T>::Find(std::string_view name) const
 	{
 		return FindInternal( name );
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::Create( std::string name )
+	Handle<T> HandleManager<T>::Create(std::string_view name)
 	{
 		std::scoped_lock<std::mutex> lock( m_mutex );
 		Handle<T> h = FindInternal( name );

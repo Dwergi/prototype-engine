@@ -22,10 +22,10 @@ namespace ddc
 		}
 	}
 
-	UpdateDataBuffer::UpdateDataBuffer(const UpdateDataBuffer& other) :
+	UpdateDataBuffer::UpdateDataBuffer(UpdateDataBuffer&& other) :
 		m_name(other.m_name),
-		m_entities(other.m_entities),
-		m_buffers(other.m_buffers)
+		m_entities(std::move(other.m_entities)),
+		m_buffers(std::move(other.m_buffers))
 	{
 	}
 }

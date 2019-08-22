@@ -63,14 +63,14 @@ namespace ddr
 
 		if( shaders.Size() == 0 )
 		{
-			DD_ASSERT_ERROR( shaders.Size() > 0, "ShaderProgram '%s': Failed to provide any shaders!", m_name.c_str() );
+			DD_ASSERT_ERROR( shaders.Size() > 0, "ShaderProgram '%s': Failed to provide any shaders!", m_name.data() );
 
 			m_valid = false;
 		}
 
 		for( const ShaderPart* shader : shaders )
 		{
-			DD_ASSERT_ERROR( shader != nullptr, "ShaderProgram '%s': Invalid shader given to program!", m_name.c_str() );
+			DD_ASSERT_ERROR( shader != nullptr, "ShaderProgram '%s': Invalid shader given to program!", m_name.data() );
 
 			glAttachShader( m_id, shader->m_id );
 			CheckOGLError();
@@ -79,7 +79,7 @@ namespace ddr
 		dd::String256 msg = Link();
 		if( !msg.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.c_str(), msg.c_str() );
+			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.data(), msg.data() );
 
 			m_valid = false;
 		}
@@ -135,7 +135,7 @@ namespace ddr
 		dd::String256 msg = Link();
 		if( !msg.IsEmpty() )
 		{
-			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.c_str(), msg.c_str() );
+			DD_ASSERT_ERROR( false, "ShaderProgram '%s': %s", m_name.data(), msg.data() );
 			return false;
 		}
 
@@ -149,7 +149,7 @@ namespace ddr
 
 	void Shader::Use( bool use )
 	{
-		DD_ASSERT( use != m_inUse, "ShaderProgram '%s': Trying to use shader that is already in use!", m_name.c_str() );
+		DD_ASSERT( use != m_inUse, "ShaderProgram '%s': Trying to use shader that is already in use!", m_name.data() );
 
 		g_shaderChanged.Increment();
 
@@ -159,11 +159,11 @@ namespace ddr
 
 		if( use )
 		{
-			DD_ASSERT( current == 0, "ShaderProgram '%s': Shader not deactivated before trying to activate another shader!", m_name.c_str() );
+			DD_ASSERT( current == 0, "ShaderProgram '%s': Shader not deactivated before trying to activate another shader!", m_name.data() );
 		}
 		else
 		{
-			DD_ASSERT( current == m_id, "ShaderProgram '%s': Trying to deactivate a different shader than currently bound!", m_name.c_str() );
+			DD_ASSERT( current == m_id, "ShaderProgram '%s': Trying to deactivate a different shader than currently bound!", m_name.data() );
 		}
 
 		m_inUse = use;
@@ -177,17 +177,17 @@ namespace ddr
 		return ScopedShader( *this );
 	}
 
-	ShaderLocation Shader::GetAttribute( std::string name ) const
+	ShaderLocation Shader::GetAttribute( std::string_view name ) const
 	{
 		AssertBeforeUse( name );
 
-		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name.c_str() );
+		GLint attrib = glGetAttribLocation( m_id, (const GLchar*) name.data() );
 		CheckOGLError();
 
 		return attrib;
 	}
 
-	bool Shader::EnableAttribute( std::string name )
+	bool Shader::EnableAttribute( std::string_view name )
 	{
 		GLint currentVAO = VAO::GetCurrentVAO();
 		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
@@ -201,11 +201,11 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.data() );
 		return false;
 	}
 
-	bool Shader::DisableAttribute( std::string name )
+	bool Shader::DisableAttribute( std::string_view name )
 	{
 		GLint currentVAO = VAO::GetCurrentVAO();
 		DD_ASSERT( currentVAO != OpenGL::InvalidID, "No VAO is bound!" );
@@ -219,7 +219,7 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.data() );
 		return false;
 	}
 
@@ -243,22 +243,22 @@ namespace ddr
 		return BindAttributeVec4( "VertexColour", false );
 	}
 
-	bool Shader::BindAttributeVec2( std::string name, bool normalized )
+	bool Shader::BindAttributeVec2( std::string_view name, bool normalized )
 	{
 		return BindAttributeFloat( name, 2, normalized );
 	}
 
-	bool Shader::BindAttributeVec3( std::string name, bool normalized )
+	bool Shader::BindAttributeVec3( std::string_view name, bool normalized )
 	{
 		return BindAttributeFloat( name, 3, normalized );
 	}
 
-	bool Shader::BindAttributeVec4( std::string name, bool normalized )
+	bool Shader::BindAttributeVec4( std::string_view name, bool normalized )
 	{
 		return BindAttributeFloat( name, 4, normalized );
 	}
 
-	bool Shader::BindAttributeFloat( std::string name, uint components, bool normalized )
+	bool Shader::BindAttributeFloat( std::string_view name, uint components, bool normalized )
 	{
 		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!" );
 		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!" );
@@ -279,7 +279,7 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::BindAttributeMat4(std::string name, bool instanced)
+	bool Shader::BindAttributeMat4(std::string_view name, bool instanced)
 	{
 		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
 		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
@@ -310,7 +310,7 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::SetAttributeInstanced( std::string name )
+	bool Shader::SetAttributeInstanced( std::string_view name )
 	{
 		DD_TODO("This is a bit wasteful, since it ends up looking the shader location twice.");
 
@@ -325,19 +325,19 @@ namespace ddr
 			return true;
 		}
 
-		DD_ASSERT( false, "Attribute '%s' not found!", name.c_str() );
+		DD_ASSERT( false, "Attribute '%s' not found!", name.data() );
 		return false;
 	}
 
-	ShaderLocation Shader::GetUniform( std::string name ) const
+	ShaderLocation Shader::GetUniform( std::string_view name ) const
 	{
 		AssertBeforeUse( name );
 
-		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name.c_str() );
+		GLint uniform = glGetUniformLocation( m_id, (const GLchar*) name.data() );
 		return uniform;
 	}
 
-	void Shader::SetUniform( std::string name, float f )
+	void Shader::SetUniform( std::string_view name, float f )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -347,7 +347,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, int i )
+	void Shader::SetUniform( std::string_view name, int i )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -357,7 +357,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, bool b )
+	void Shader::SetUniform( std::string_view name, bool b )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -367,7 +367,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const glm::vec2& vec )
+	void Shader::SetUniform( std::string_view name, const glm::vec2& vec )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -377,7 +377,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const glm::vec3& vec )
+	void Shader::SetUniform( std::string_view name, const glm::vec3& vec )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -387,7 +387,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const glm::vec4& vec )
+	void Shader::SetUniform( std::string_view name, const glm::vec4& vec )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -397,7 +397,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const glm::mat3& mat )
+	void Shader::SetUniform( std::string_view name, const glm::mat3& mat )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -407,7 +407,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const glm::mat4& mat )
+	void Shader::SetUniform( std::string_view name, const glm::mat4& mat )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -417,7 +417,7 @@ namespace ddr
 		}
 	}
 
-	void Shader::SetUniform( std::string name, const Texture& texture )
+	void Shader::SetUniform( std::string_view name, const Texture& texture )
 	{
 		ShaderLocation uniform = GetUniform( name );
 		if( uniform != InvalidLocation )
@@ -427,25 +427,30 @@ namespace ddr
 		}
 	}
 
-	void Shader::AssertBeforeUse( std::string name ) const
+	void Shader::AssertBeforeUse( std::string_view name ) const
 	{
-		DD_ASSERT( InUse(), "ShaderProgram '%s': Need to use shader before trying to access it!", m_name.c_str() );
-		DD_ASSERT( IsValid(), "ShaderProgram '%s': Program is invalid!", m_name.c_str() );
-		DD_ASSERT( name.size() > 0, "ShaderProgram '%s': Empty uniform name given!", m_name.c_str() );
+		DD_ASSERT( InUse(), "ShaderProgram '%s': Need to use shader before trying to access it!", m_name.data() );
+		DD_ASSERT( IsValid(), "ShaderProgram '%s': Program is invalid!", m_name.data() );
+		DD_ASSERT( name.size() > 0, "ShaderProgram '%s': Empty uniform name given!", m_name.data() );
 	}
 
-	ShaderHandle ShaderManager::Load( std::string name )
+	static std::string operator+(const std::string& a, std::string_view b)
+	{
+		return a + b.data();
+	}
+
+	ShaderHandle ShaderManager::Load( std::string_view name )
 	{
 		ShaderHandle shader_h = super::Find( name );
 		if( !shader_h.IsValid() )
 		{
-			const std::string folder( "shaders\\" );
+			std::string folder( "shaders\\" );
 
 			dd::Vector<ShaderPart*> shaders;
 			shaders.Reserve( 3 );
 
 			{
-				std::string vertex_path = folder + name + ".vert";
+				const std::string vertex_path = folder + name + ".vert";
 
 				ShaderPart* vertex = ShaderPart::Create( vertex_path, ShaderPart::Type::Vertex );
 				DD_ASSERT( vertex != nullptr );
@@ -453,7 +458,7 @@ namespace ddr
 			}
 
 			{
-				std::string geometry_path = folder + name + ".geom";
+				const std::string geometry_path = folder + name + ".geom";
 
 				ShaderPart* geom = ShaderPart::Create( geometry_path, ShaderPart::Type::Geometry );
 				if( geom != nullptr )
@@ -463,7 +468,7 @@ namespace ddr
 			}
 
 			{
-				std::string pixel_path = folder + name + ".frag";
+				const std::string pixel_path = folder + name + ".frag";
 
 				ShaderPart* pixel = ShaderPart::Create( pixel_path, ShaderPart::Type::Pixel );
 				DD_ASSERT( pixel != nullptr );
