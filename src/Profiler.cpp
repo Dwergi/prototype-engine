@@ -88,12 +88,24 @@ namespace dd
 
 	void ProfilerValue::Draw()
 	{
-		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_CollapsingHeader, "%s: %.2f", m_name.c_str(), GetValue()))
+		size_t group_end = m_name.rfind('/');
+		if (group_end == std::string::npos)
+		{
+			group_end = 0;
+		}
+		else
+		{
+			++group_end;
+		}
+
+		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_Framed, "%s: %.2f", m_name.substr(group_end).c_str(), GetValue()))
 		{
 			int frames = ddm::min(m_frameCount, FRAME_COUNT);
 
 			ImGui::PlotLines("", &ProfilerValueGetter, this, frames - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
 			ImGui::Value("Average Over 100", m_sliding);
+
+			ImGui::TreePop();
 		}
 	}
 
@@ -108,7 +120,15 @@ namespace dd
 		}
 
 		ProfilerValue* value = new ProfilerValue(name);
-		s_instances.push_back(value);
+
+		// insert alphabetically
+		size_t i = 0;
+		while (i < s_instances.size() && s_instances[i]->Name() < name)
+		{
+			++i;
+		}
+		s_instances.insert(s_instances.begin() + i, value);
+
 		return *value;
 	}
 
@@ -135,8 +155,67 @@ namespace dd
 		}
 	}
 
+#pragma optimize("", off)
+
+	static Array<std::string, 4> s_currentGroups;
+	static int s_openGroups = 0;
+
+	static bool CreateGroups(const std::string& name)
+	{
+		dd::Array<std::string, 4> groups;
+
+		// enumerate groups
+		size_t start = 0;
+		size_t end = name.find('/');
+		while (end != std::string::npos)
+		{
+			std::string group_name = name.substr(start, end - start);
+			groups.Add(group_name);
+
+			start = end + 1;
+			end = name.find('/', end + 1);
+		}
+
+		// count matches
+		int matches = 0;
+		for (int i = 0; i < groups.Size() && i < s_currentGroups.Size(); ++i)
+		{
+			if (groups[i] == s_currentGroups[i])
+			{
+				++matches;
+			}
+		}
+
+		s_currentGroups = groups;
+
+		// pop groups
+		int to_pop = s_openGroups - matches;
+		for (int i = 0; i < to_pop; ++i)
+		{
+			ImGui::TreePop();
+			--s_openGroups;
+		}
+
+		// push groups
+		for (int i = matches; i < s_currentGroups.Size() && i <= s_openGroups; ++i)
+		{
+			if (ImGui::TreeNodeEx(s_currentGroups[i].c_str(), ImGuiTreeNodeFlags_Framed))
+			{
+				++s_openGroups;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		return s_currentGroups.Size() == s_openGroups;
+	}
+
 	void Profiler::Draw()
 	{
+		DD_ASSERT(dd::IsMainThread());
+
 		if (!s_draw)
 		{
 			return;
@@ -149,8 +228,19 @@ namespace dd
 		{
 			for (dd::ProfilerValue* value : s_instances)
 			{
-				value->Draw();
+				if (CreateGroups(value->Name()))
+				{
+					value->Draw();
+				}
 			}
+
+			for (int i = 0; i < s_openGroups; ++i)
+			{
+				ImGui::TreePop();
+				--s_openGroups;
+			}
+
+			s_currentGroups.Clear();
 
 			ImGui::End();
 		}

@@ -1438,6 +1438,9 @@
     <ClCompile Include="src\EntityLayer.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Memory.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

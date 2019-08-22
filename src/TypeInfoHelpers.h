@@ -28,7 +28,7 @@ namespace dd
 	template <typename T>
 	inline void* New()
 	{
-		T* data = (T*) malloc( sizeof( T ) );
+		T* data = (T*) malloc(sizeof( T ));
 		new (data) T;
 		return data;
 	}

@@ -702,6 +702,7 @@
     <ClCompile Include="src\lux\LuxLightRenderer.cpp" />
     <ClCompile Include="src\lux\LuxportGame.cpp" />
     <ClCompile Include="src\lux\LuxportMap.cpp" />
+    <ClCompile Include="src\Memory.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
     <ClCompile Include="src\neutrino\BulletComponent.cpp" />
     <ClCompile Include="src\neutrino\BulletSystem.cpp" />

@@ -38,7 +38,7 @@ namespace ddm
 		const glm::vec2 offset, const glm::vec2 increment, const NoiseParameters& params )
 	{
 		data.clear();
-		data.resize( dimensions.x * dimensions.y );
+		data.resize( (size_t) dimensions.x * dimensions.y );
 		
 		float previous = -100.0f;
 

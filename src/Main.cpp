@@ -168,6 +168,7 @@ static int GameMain()
 	DD_PROFILE_INIT();
 	DD_PROFILE_THREAD_NAME("Main");
 
+	dd::InitializeMemoryTracking();
 	dd::SetAsMainThread();
 
 	dd::TypeInfo::RegisterQueuedTypes();

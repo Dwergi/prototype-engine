@@ -6,8 +6,21 @@
 
 #pragma once
 
-#define DD_ALIGNED_ALLOCATORS( Align ) \
-void* operator new( size_t sz ) { return _aligned_malloc( sz, Align ); } \
-void* operator new(size_t sz, void* ptr) { return ptr; } \
-void operator delete(void* p) {	_aligned_free( p ); } \
+#define DD_ALIGNED_ALLOCATORS(Align) \
+void* operator new(size_t size) { return _aligned_malloc(size, Align); } \
+void* operator new[](size_t size) { return _aligned_malloc(size, Align); } \
+void* operator new(size_t size, void* ptr) { return ptr; } \
+void operator delete(void* ptr) { _aligned_free(ptr); } \
+void operator delete[](void* ptr) { _aligned_free(ptr); } \
 void operator delete(void* ptr, void* place) {}
+
+void* operator new(size_t size);
+void operator delete(void* ptr) noexcept;
+
+void* operator new[](size_t size);
+void operator delete[](void* ptr) noexcept;
+
+namespace dd
+{
+	void InitializeMemoryTracking();
+}

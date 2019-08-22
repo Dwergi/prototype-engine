@@ -3,8 +3,8 @@
 
 namespace ddc
 {
-	UpdateDataBuffer::UpdateDataBuffer(ddc::EntityLayer& layer, const std::vector<Entity>& entities, const dd::IArray<DataRequest*>& requests, const char* name) :
-		m_entities(entities)
+	UpdateDataBuffer::UpdateDataBuffer(ddc::EntityLayer& layer, std::vector<Entity>&& entities, const dd::IArray<DataRequest*>& requests, const char* name) :
+		m_entities(std::move(entities))
 	{
 		m_buffers.reserve(MAX_BUFFERS);
 
@@ -17,7 +17,7 @@ namespace ddc
 		{
 			DD_ASSERT(req->Name() == m_name);
 
-			ComponentBuffer component_buffer(layer, entities, *req);
+			ComponentBuffer component_buffer(layer, m_entities, *req);
 			m_buffers.push_back(component_buffer);
 		}
 	}

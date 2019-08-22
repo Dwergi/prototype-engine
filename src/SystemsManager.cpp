@@ -90,7 +90,7 @@ namespace ddc
 			std::vector<Entity> entities;
 			update.Layer->FindAllWith(required, tags, entities);
 
-			update_data.AddData(entities, requests, name.c_str());
+			update_data.AddData(std::move(entities), requests, name.c_str());
 		}
 
 		system.Update(update_data);

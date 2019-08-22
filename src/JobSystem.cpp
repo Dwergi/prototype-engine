@@ -5,6 +5,8 @@
 
 namespace dd
 {
+	static constexpr bool USE_THREADS = false;
+
 	static constexpr int MAX_JOBS = 4096;
 	static constexpr uint MASK = MAX_JOBS - 1;
 	
@@ -51,10 +53,18 @@ namespace dd
 	{
 		DD_ASSERT(dd::IsMainThread());
 
+		if constexpr (!USE_THREADS)
+		{
+			threads = 1;
+		}
+		else
+		{
+			m_rng = Random32(0, threads - 1);
+		}
+
 		m_queues.resize(threads);
 		m_queues[0] = new JobQueue(*this, std::this_thread::get_id());
 		
-		m_rng = Random32(0, threads - 1);
 
 		for (uint i = 1; i < threads; ++i)
 		{
@@ -168,7 +178,14 @@ namespace dd
 
 	JobQueue* JobSystem::GetRandomQueue()
 	{
-		return m_queues[m_rng.Next()];
+		if constexpr (!USE_THREADS)
+		{
+			return m_queues[0];
+		}
+		else
+		{
+			return m_queues[m_rng.Next()];
+		}
 	}
 
 	JobQueue::JobQueue(JobSystem& system, std::thread::id tid)
