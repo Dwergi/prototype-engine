@@ -40,7 +40,50 @@ namespace ddc
 
 	void System::RequireTag( ddc::Tag tag, const char* name )
 	{
-		ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-		data_buffer.RequireTag(tag);
+		ddc::UpdateBuffer& update_buffer = CreateBuffer(name);
+		update_buffer.RequireTag(tag);
+	}
+
+	UpdateBuffer& System::CreateBuffer(const char* name)
+	{
+		dd::String16 str_name(name);
+
+		for (UpdateBuffer& buffer : m_updateBuffers)
+		{
+			if (buffer.Name() == str_name)
+			{
+				return buffer;
+			}
+		}
+
+		return m_updateBuffers.Add(UpdateBuffer(name));
+	}
+
+	ddc::UpdateData System::CreateUpdateData(ddc::EntityLayer& layer, float delta_t) const
+	{
+		ddc::UpdateData data(layer, delta_t);
+
+		for (UpdateBuffer& buffer : m_updateBuffers)
+		{
+			data.CreateView(buffer, 0, buffer.Size());
+		}
+
+		return std::move(data);
+	}
+
+	void System::FillBuffers(ddc::EntityLayer& layer)
+	{
+		for (UpdateBuffer& buffer : m_updateBuffers)
+		{
+			buffer.Fill(layer);
+		}
+	}
+
+	void System::CommitChanges()
+	{
+		for (UpdateBuffer& buffer : m_updateBuffers)
+		{
+			buffer.Commit();
+		}
 	}
 }

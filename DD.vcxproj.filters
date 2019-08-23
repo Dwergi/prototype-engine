@@ -633,9 +633,6 @@
     <ClInclude Include="src\Flags.h">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\UpdateDataBuffer.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\ScratchEntity.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -838,6 +835,15 @@
       <Filter>Jobs</Filter>
     </ClInclude>
     <ClInclude Include="src\EntityLayer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ProfilerValue.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComponentViews.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UpdateBuffer.h">
       <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1302,9 +1308,6 @@
     <ClCompile Include="src\Input.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\UpdateDataBuffer.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\InputEvent.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -1440,6 +1443,12 @@
     </ClCompile>
     <ClCompile Include="src\Memory.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProfilerValue.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UpdateBuffer.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

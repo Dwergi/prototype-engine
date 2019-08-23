@@ -9,8 +9,6 @@
 
 #include "IWindow.h"
 
-#include <fmt/format.h>
-
 namespace dd
 {
 	std::vector<dd::ProfilerValue*> dd::Profiler::s_instances;
@@ -19,95 +17,6 @@ namespace dd
 	int dd::Profiler::s_frameCount = 0;
 
 	static dd::Service<dd::IWindow> s_window;
-
-	ProfilerValue::ProfilerValue(const char* name) :
-		m_name(name)
-	{
-		m_sliding = 0;
-	}
-
-	void ProfilerValue::Increment()
-	{
-		++m_values[m_index];
-	}
-
-	void ProfilerValue::SetValue(float value)
-	{
-		m_values[m_index] = value;
-	}
-
-	float ProfilerValue::GetValue() const
-	{
-		return m_values[m_index];
-	}
-
-	float ProfilerValue::GetValueAtIndex(int index) const
-	{
-		DD_ASSERT(index >= 0 && index < FRAME_COUNT);
-
-		return m_values[index];
-	}
-
-	void ProfilerValue::BeginFrame()
-	{
-		++m_index;
-
-		if (m_index >= FRAME_COUNT)
-		{
-			m_index = 0;
-		}
-
-		m_values[m_index] = 0;
-	}
-
-	void ProfilerValue::EndFrame()
-	{
-		float total = 0;
-		int frames = ddm::min(dd::Profiler::FrameCount(), FRAME_COUNT);
-		for (int i = 0; i < frames; ++i)
-		{
-			total += m_values[i];
-		}
-
-		m_sliding = total / frames;
-	}
-
-	float ProfilerValueGetter(void* data, int index)
-	{
-		ProfilerValue* value = (ProfilerValue*) data;
-
-		int actual = value->Index() + index + 1;
-		if (actual >= ProfilerValue::FRAME_COUNT)
-		{
-			actual -= ProfilerValue::FRAME_COUNT;
-		}
-
-		float f = value->GetValueAtIndex(actual);
-		return f;
-	}
-
-	void ProfilerValue::Draw()
-	{
-		size_t group_end = m_name.rfind('/');
-		if (group_end == std::string::npos)
-		{
-			group_end = 0;
-		}
-		else
-		{
-			++group_end;
-		}
-
-		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_Framed, "%s: %.2f", m_name.substr(group_end).c_str(), GetValue()))
-		{
-			int frames = ddm::min(dd::Profiler::FrameCount(), FRAME_COUNT);
-
-			ImGui::PlotLines("", &ProfilerValueGetter, this, frames - 1, 0, nullptr, 0, 50, ImVec2(200, 50));
-			ImGui::Value("Average Over 100", m_sliding);
-
-			ImGui::TreePop();
-		}
-	}
 
 	ProfilerValue& Profiler::GetValue(const char* name)
 	{
@@ -164,22 +73,8 @@ namespace dd
 	static Array<std::string, 4> s_currentGroups;
 	static int s_openGroups = 0;
 
-	static bool CreateGroups(const std::string& name)
+	static bool CreateGroups(const dd::IArray<std::string>& groups)
 	{
-		dd::Array<std::string, 4> groups;
-
-		// enumerate groups
-		size_t start = 0;
-		size_t end = name.find('/');
-		while (end != std::string::npos)
-		{
-			std::string group_name = name.substr(start, end - start);
-			groups.Add(group_name);
-
-			start = end + 1;
-			end = name.find('/', end + 1);
-		}
-
 		// count matches
 		int matches = 0;
 		for (int i = 0; i < groups.Size() && i < s_currentGroups.Size(); ++i)
@@ -190,7 +85,8 @@ namespace dd
 			}
 		}
 
-		s_currentGroups = groups;
+		s_currentGroups.Clear();
+		s_currentGroups.PushAll(groups);
 
 		// pop groups
 		int to_pop = s_openGroups - matches;
@@ -232,7 +128,7 @@ namespace dd
 		{
 			for (dd::ProfilerValue* value : s_instances)
 			{
-				if (CreateGroups(value->Name()))
+				if (CreateGroups(value->Groups()))
 				{
 					value->Draw();
 				}

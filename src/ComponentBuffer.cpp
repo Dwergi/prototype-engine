@@ -38,8 +38,8 @@ namespace ddc
 			return;
 		}
 
-		const size_t component_size = m_request->Component().Size();
-		const dd::ComponentID component_id = m_request->Component().ComponentID();
+		const size_t component_size = m_request->Component()->Size();
+		const dd::ComponentID component_id = m_request->Component()->ComponentID();
 		
 		byte* dest = m_storage;
 
@@ -87,8 +87,8 @@ namespace ddc
 
 	void ComponentBuffer::Commit(const std::vector<ddc::Entity>& entities)
 	{
-		const size_t cmp_size = m_request->Component().Size();
-		const dd::ComponentID cmp_id = m_request->Component().ComponentID();
+		const size_t cmp_size = m_request->Component()->Size();
+		const dd::ComponentID cmp_id = m_request->Component()->ComponentID();
 
 		size_t copy_size = 0;
 		byte* dest_start = nullptr;

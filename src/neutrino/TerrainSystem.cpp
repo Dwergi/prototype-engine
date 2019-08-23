@@ -116,7 +116,7 @@ namespace neut
 
 		const auto& chunks_data = update_data.Data();
 
-		const auto& player = update_data.Data( "player" );
+		const auto& player = update_data.Data("player");
 		auto player_transforms = player.Read<dd::TransformComponent>();
 		
 		if (player_transforms.Size() == 0)
@@ -202,7 +202,7 @@ namespace neut
 		}
 	}
 
-	void TerrainSystem::GenerateChunks( ddc::EntityLayer& layer, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos )
+	void TerrainSystem::GenerateChunks( ddc::EntityLayer& layer, const ddc::UpdateBufferView& data, glm::vec2 camera_pos )
 	{
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto entities = data.Entities();
@@ -233,7 +233,7 @@ namespace neut
 		DD_ASSERT( required_chunks.size() == ChunksPerDimension * ChunksPerDimension );
 
 		std::unordered_map<glm::vec2, ddc::Entity> existing;
-		existing.reserve( entities.size() );
+		existing.reserve( entities.Size() );
 
 		for( size_t i = 0; i < chunks.Size(); ++i )
 		{

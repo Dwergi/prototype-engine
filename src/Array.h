@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Buffer.h"
+
 namespace dd
 {
 	template <typename T>
@@ -52,7 +54,7 @@ namespace dd
 
 	protected:
 
-		int m_size;
+		int m_size { 0 };
 		Buffer<T> m_data;
 
 		IArray(T* buffer, int capacity);
@@ -80,6 +82,6 @@ namespace dd
 
 		T m_inline[MaxCapacity];
 	};
-}
 
-#include "Array.inl"
+	#include "Array.inl"
+}

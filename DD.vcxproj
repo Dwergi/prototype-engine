@@ -370,6 +370,7 @@
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
     <ClInclude Include="src\CommandBuffer.h" />
+    <ClInclude Include="src\ComponentViews.h" />
     <ClInclude Include="src\d2d\Bounds2DRenderer.h" />
     <ClInclude Include="src\d2d\CirclePhysicsComponent.h" />
     <ClInclude Include="src\d2d\Physics2DBase.h" />
@@ -408,9 +409,10 @@
     <ClInclude Include="src\neutrino\WaterRenderer.h" />
     <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\Physics2DGame.h" />
+    <ClInclude Include="src\ProfilerValue.h" />
     <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
-    <ClInclude Include="src\UpdateDataBuffer.h" />
+    <ClInclude Include="src\UpdateBuffer.h" />
     <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\EnumFlags.h" />
@@ -734,6 +736,7 @@
     <ClCompile Include="src\PlaneComponent.cpp" />
     <ClCompile Include="src\PlaneRenderer.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\ProfilerValue.cpp" />
     <ClCompile Include="src\RenderCommand.cpp" />
     <ClCompile Include="src\RenderCommandTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -820,7 +823,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Triangulator.cpp" />
-    <ClCompile Include="src\UpdateDataBuffer.cpp" />
+    <ClCompile Include="src\UpdateBuffer.cpp" />
     <ClCompile Include="src\RenderManager.cpp" />
     <ClCompile Include="src\ShaderPart.cpp" />
     <ClCompile Include="src\Shader.cpp" />

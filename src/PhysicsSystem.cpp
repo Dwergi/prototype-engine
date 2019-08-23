@@ -129,7 +129,7 @@ namespace dd
 		transform.Update();
 	}
 
-	static bool IntersectStaticPlanes( const ddc::UpdateDataBuffer& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
+	static bool IntersectStaticPlanes( const ddc::UpdateBufferView& static_planes, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
 		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 
@@ -157,7 +157,7 @@ namespace dd
 		return false;
 	}
 
-	static bool IntersectStaticSpheres( const ddc::UpdateDataBuffer& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
+	static bool IntersectStaticSpheres( const ddc::UpdateBufferView& static_spheres, dd::PhysicsSphereComponent& moving_physics, dd::TransformComponent& moving_transform, float delta_t )
 	{
 		ddm::Sphere moving_sphere = moving_physics.Sphere.GetTransformed( moving_transform.Transform() );
 

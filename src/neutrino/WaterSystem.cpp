@@ -104,7 +104,7 @@ namespace neut
 		return it->second;
 	}
 
-	static void PopulateWaterCache( const ddc::UpdateDataBuffer& water_entities )
+	static void PopulateWaterCache( const ddc::UpdateBufferView& water_entities )
 	{
 		s_waterCache.clear();
 

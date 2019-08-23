@@ -48,7 +48,7 @@ namespace neut
 
 		void FireBullet( ddc::EntityLayer& entities, const ddr::ICamera& camera );
 		void KillBullet( ddc::EntityLayer& entities, ddc::Entity entity, neut::BulletComponent& bullet );
-		bool HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateDataBuffer& meshes, float delta_t, glm::vec3& out_pos );
+		bool HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateBufferView& meshes, float delta_t, glm::vec3& out_pos );
 
 		virtual void DrawDebugInternal() override;
 	};

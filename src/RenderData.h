@@ -8,7 +8,7 @@
 
 #include "ICamera.h"
 #include "Uniforms.h"
-#include "UpdateDataBuffer.h"
+#include "UpdateBuffer.h"
 
 namespace ddc
 {
@@ -19,7 +19,7 @@ namespace ddc
 
 namespace ddr
 {
-	struct RenderData : public ddc::UpdateDataBuffer
+	struct RenderData : ddc::UpdateBuffer
 	{
 	public:
 		RenderData();
@@ -33,7 +33,11 @@ namespace ddr
 		float Delta() const { return m_delta; }
 
 		template <typename T>
-		ddc::ReadView<T> Get() const { return Read<T>(); }
+		ddc::ReadView<T> Get() const
+		{
+			const ddc::ComponentBuffer& cmp_buffer = GetBuffer<T>(ddc::DataUsage::Read);
+			return ddc::ReadView<T>(cmp_buffer, 0, Size());
+		}
 
 	private:
 		friend struct RenderManager;

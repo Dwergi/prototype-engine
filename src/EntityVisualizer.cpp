@@ -139,7 +139,7 @@ namespace dd
 
 	void EntityVisualizer::Update(const ddc::UpdateData& update_data)
 	{
-		if (!update_data.Data().Entities().empty())
+		if (update_data.Data().Entities().Size() > 0)
 		{
 			m_selected = update_data.Data().Entities()[0];
 		}

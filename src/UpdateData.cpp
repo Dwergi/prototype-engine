@@ -7,59 +7,32 @@
 #include "PCH.h"
 #include "UpdateData.h"
 
-#include "Input.h"
-
 namespace ddc
 {
-	UpdateDataBuffer& UpdateData::Create(const char* name)
+	const UpdateBufferView& UpdateData::CreateView(UpdateBuffer& buffer, size_t start, size_t count)
 	{
-		dd::String16 str_name(name);
-
-		for (UpdateDataBuffer& buffer : m_dataBuffers)
+		for (const UpdateBufferView& v : m_views)
 		{
-			if (buffer.Name() == str_name)
+			if (v.Name() == buffer.Name())
 			{
-				return buffer;
+				return v;
 			}
 		}
 
-		return m_dataBuffers.Add(UpdateDataBuffer(name));
+		return m_views.Add(UpdateBufferView(buffer, start, count));
 	}
 
-	const UpdateDataBuffer& UpdateData::Data(const char* name) const
+	const UpdateBufferView& UpdateData::Data(const char* name) const
 	{
-		dd::String16 str;
-		if (name != nullptr)
-		{
-			str = name;
-		}
+		dd::String32 str_name(name);
 
-		for (const UpdateDataBuffer& data_buffer : m_dataBuffers)
+		for (const UpdateBufferView& v : m_views)
 		{
-			if (data_buffer.Name() == str)
+			if (v.Name() == str_name)
 			{
-				return data_buffer;
+				return v;
 			}
 		}
-		throw std::exception("No UpdateDataBuffer found for given name!");
-	}
-
-	void UpdateData::Fill(ddc::EntityLayer& layer, float delta_t)
-	{
-		m_layer = &layer;
-		m_delta = delta_t;
-
-		for (UpdateDataBuffer& buffer : m_dataBuffers)
-		{
-			buffer.Fill(layer);
-		}
-	}
-
-	void UpdateData::Commit()
-	{
-		for (UpdateDataBuffer& data_buffer : m_dataBuffers)
-		{
-			data_buffer.Commit();
-		}
+		throw new std::exception("No UpdateBufferView found of the given name!");
 	}
 }

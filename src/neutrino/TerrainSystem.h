@@ -91,7 +91,7 @@ namespace neut
 			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp, 
 			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos );
 
-		void GenerateChunks( ddc::EntityLayer& entities, const ddc::UpdateDataBuffer& data, glm::vec2 camera_pos );
+		void GenerateChunks( ddc::EntityLayer& entities, const ddc::UpdateBufferView& data, glm::vec2 camera_pos );
 
 		void DestroyChunks( ddc::EntityLayer& entities );
 

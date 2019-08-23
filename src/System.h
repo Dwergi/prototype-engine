@@ -48,8 +48,8 @@ namespace ddc
 		{ 
 			dd::ComponentRegistration<T>::Register();
 
-			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.RequestData(new ReadRequired<T>());
+			ddc::UpdateBuffer& buffer = CreateBuffer(name);
+			buffer.RequestData(new ReadRequired<T>());
 		}
 
 		template <typename T>
@@ -57,8 +57,8 @@ namespace ddc
 		{
 			dd::ComponentRegistration<T>::Register();
 
-			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.RequestData(new WriteRequired<T>());
+			ddc::UpdateBuffer& buffer = CreateBuffer(name);
+			buffer.RequestData(new WriteRequired<T>());
 		}
 
 		template <typename T>
@@ -66,8 +66,8 @@ namespace ddc
 		{
 			dd::ComponentRegistration<T>::Register();
 
-			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.RequestData(new WriteOptional<T>());
+			ddc::UpdateBuffer& buffer = CreateBuffer(name);
+			buffer.RequestData(new WriteOptional<T>());
 		}
 
 		template <typename T>
@@ -75,8 +75,8 @@ namespace ddc
 		{
 			dd::ComponentRegistration<T>::Register();
 
-			ddc::UpdateDataBuffer& data_buffer = m_updateData.Create(name);
-			data_buffer.RequestData(new WriteOptional<T>());
+			ddc::UpdateBuffer& buffer = CreateBuffer(name);
+			buffer.RequestData(new WriteOptional<T>());
 		}
 
 		void RequireTag( Tag tag, const char* name = nullptr );
@@ -90,8 +90,6 @@ namespace ddc
 	private:
 		friend struct SystemsManager;
 
-		ddc::UpdateData m_updateData;
-
 		dd::Array<const System*, 8> m_dependencies;
 		dd::String32 m_name;
 
@@ -101,6 +99,13 @@ namespace ddc
 		const static int MAX_PARTITIONS = 8;
 		int m_partitions { MAX_PARTITIONS };
 
-		ddc::UpdateData& AccessUpdateData() { return m_updateData; }
+		void FillBuffers(ddc::EntityLayer& layer);
+		void CommitChanges();
+
+		ddc::UpdateBuffer& CreateBuffer(const char* name);
+
+		ddc::UpdateData CreateUpdateData(ddc::EntityLayer& layer, float delta_t) const;
+
+		dd::Array<UpdateBuffer, 8> m_updateBuffers;
 	};
 }

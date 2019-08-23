@@ -6,34 +6,35 @@
 
 #pragma once
 
-#include "Input.h"
-#include "UpdateDataBuffer.h"
+#include "UpdateBuffer.h"
 
 namespace ddc
 {
+	struct EntityLayer;
 	struct System;
+	struct UpdateBufferView;
 
+	//
+	// UpdateData is just a conglomeration of things that a system update may want to know about.
+	// It also includes all the data views that the system has requested.
+	//
 	struct UpdateData
 	{
-		UpdateData() {}
-		UpdateData(const UpdateData& other) = delete;
+		UpdateData(ddc::EntityLayer& layer, float delta_t) : m_layer(&layer), m_delta(delta_t) {}
+		UpdateData(UpdateData&& other) : m_layer(other.m_layer), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
 
 		float Delta() const { return m_delta; }
 		ddc::EntityLayer& EntityLayer() const { return *m_layer; }
-		const UpdateDataBuffer& Data( const char* name = nullptr ) const;
+
+		const UpdateBufferView& Data(const char* name = nullptr) const;
 
 	private:
-
 		friend struct System;
-		friend struct SystemsManager;
 
-		void Fill(ddc::EntityLayer& layer, float delta_t);
-		void Commit();
-
-		ddc::UpdateDataBuffer& Create(const char* name);
-
-		float m_delta { 0 };
 		ddc::EntityLayer* m_layer { nullptr };
-		dd::Array<UpdateDataBuffer, 8> m_dataBuffers;
+		float m_delta { 0 };
+		dd::Array<UpdateBufferView, 8> m_views;
+
+		const UpdateBufferView& CreateView(UpdateBuffer& buffer, size_t start, size_t count);
 	};
 }

@@ -10,17 +10,22 @@
 
 namespace dd
 {
+	//
+	// A span represents a slice of a container.
+	//
 	template <typename T>
 	struct Span
 	{
-		Span( std::vector<T>& container, size_t count = ~0, size_t offset = 0 )
+		Span() {}
+
+		Span(std::vector<T>& container, size_t count = ~0, size_t offset = 0)
 		{
-			if( container.empty() )
+			if (container.empty())
 			{
 				return;
 			}
 
-			if( count != ~0 )
+			if (count != ~0)
 			{
 				m_size = count;
 			}
@@ -30,14 +35,12 @@ namespace dd
 			}
 
 			m_offset = offset;
-
 			m_begin = container.data() + m_offset;
-
 		}
 
-		Span( T* ptr, size_t count, size_t offset = 0 )
+		Span(T* ptr, size_t count, size_t offset = 0)
 		{
-			if( count == 0 )
+			if (count == 0)
 			{
 				return;
 			}
@@ -49,7 +52,7 @@ namespace dd
 		}
 
 		template <size_t Size>
-		Span( T( &arr )[ Size ], size_t count = Size, size_t offset = 0 )
+		Span(T(&arr)[Size], size_t count = Size, size_t offset = 0)
 		{
 			m_size = count;
 			m_offset = offset;
@@ -57,7 +60,7 @@ namespace dd
 			m_begin = arr + m_offset;
 		}
 
-		void operator=( const dd::Span<T>& other )
+		void operator=(const dd::Span<T>& other)
 		{
 			m_size = other.m_size;
 			m_offset = other.m_offset;
@@ -75,9 +78,9 @@ namespace dd
 			return m_size;
 		}
 
-		T& operator[]( size_t index ) const
+		T& operator[](size_t index) const
 		{
-			DD_ASSERT( index < m_size );
+			DD_ASSERT(index < m_size);
 
 			return *(m_begin + index);
 		}
@@ -92,6 +95,7 @@ namespace dd
 			return m_begin + m_offset + m_size;
 		}
 
+	private:
 		T* m_begin { nullptr };
 
 		size_t m_size { 0 };

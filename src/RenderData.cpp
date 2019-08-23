@@ -10,13 +10,12 @@
 namespace ddr
 {
 	RenderData::RenderData() :
-		ddc::UpdateDataBuffer(nullptr)
+		ddc::UpdateBuffer(nullptr)
 	{
-		DD_TODO("Should just replace Get<> with Read<>");
 	}
 
 	RenderData::RenderData(RenderData&& other) :
-		ddc::UpdateDataBuffer(std::move(other))
+		ddc::UpdateBuffer(std::move(other))
 	{
 	}
 
@@ -27,6 +26,6 @@ namespace ddr
 		m_uniforms = &uniforms;
 		m_delta = delta_t;
 
-		ddc::UpdateDataBuffer::Fill(layer);
+		ddc::UpdateBuffer::Fill(layer);
 	}
 }
