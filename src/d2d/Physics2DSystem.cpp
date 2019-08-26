@@ -109,7 +109,7 @@ namespace d2d
 		auto box_transforms = boxes.Write<d2d::Transform2DComponent>();
 
 		// update positions
-		for (int i = 0; i < circles.Size(); ++i)
+		for (uint i = 0; i < circles.Size(); ++i)
 		{
 			if (circle_entities[i].HasTag(ddc::Tag::Static))
 			{
@@ -124,7 +124,7 @@ namespace d2d
 			circle_transforms[i].Update();
 		}
 
-		for (int i = 0; i < boxes.Size(); ++i)
+		for (uint i = 0; i < boxes.Size(); ++i)
 		{
 			if (box_entities[i].HasTag(ddc::Tag::Static))
 			{
@@ -142,12 +142,12 @@ namespace d2d
 		// find collision manifolds
 		std::vector<CollisionManifold> collisions;
 
-		for (int a = 0; a < circles.Size(); ++a)
+		for (uint a = 0; a < circles.Size(); ++a)
 		{
 			d2d::CirclePhysicsComponent& a_physics = circle_physics[a];
 			d2d::Transform2DComponent& a_transform = circle_transforms[a];
 
-			for (int b = 0; b < circles.Size(); ++b)
+			for (uint b = 0; b < circles.Size(); ++b)
 			{
 				if (a == b)
 				{
@@ -172,7 +172,7 @@ namespace d2d
 				}
 			}
 
-			for (int b = 0; b < boxes.Size(); ++b)
+			for (uint b = 0; b < boxes.Size(); ++b)
 			{
 				d2d::BoxPhysicsComponent& b_physics = box_physics[b];
 				d2d::Transform2DComponent& b_transform = box_transforms[b];
@@ -231,14 +231,14 @@ namespace d2d
 			}
 		}
 
-		for (int a = 0; a < boxes.Size(); ++a)
+		for (uint a = 0; a < boxes.Size(); ++a)
 		{
 			d2d::BoxPhysicsComponent& a_physics = box_physics[a];
 			d2d::Transform2DComponent& a_transform = box_transforms[a];
 
 			glm::vec2 a_half_extents = a_physics.HitBox.HalfExtents();
 
-			for (int b = 0; b < boxes.Size(); ++b)
+			for (uint b = 0; b < boxes.Size(); ++b)
 			{
 				if (a == b)
 				{

@@ -27,14 +27,14 @@ namespace dd
 
 			if (count != ~0)
 			{
-				m_size = count;
+				m_size = (uint) count;
 			}
 			else
 			{
-				m_size = container.size();
+				m_size = (uint) container.size();
 			}
 
-			m_offset = offset;
+			m_offset = (uint) offset;
 			m_begin = container.data() + m_offset;
 		}
 
@@ -45,8 +45,8 @@ namespace dd
 				return;
 			}
 
-			m_size = count;
-			m_offset = offset;
+			m_size = (uint) count;
+			m_offset = (uint) offset;
 
 			m_begin = ptr + offset;
 		}
@@ -54,8 +54,8 @@ namespace dd
 		template <size_t Size>
 		Span(T(&arr)[Size], size_t count = Size, size_t offset = 0)
 		{
-			m_size = count;
-			m_offset = offset;
+			m_size = (uint) count;
+			m_offset = (uint) offset;
 
 			m_begin = arr + m_offset;
 		}
@@ -68,12 +68,12 @@ namespace dd
 			m_begin = other.m_begin;
 		}
 
-		size_t Offset() const
+		uint Offset() const
 		{
 			return m_offset;
 		}
 
-		size_t Size() const
+		uint Size() const
 		{
 			return m_size;
 		}
@@ -98,7 +98,7 @@ namespace dd
 	private:
 		T* m_begin { nullptr };
 
-		size_t m_size { 0 };
-		size_t m_offset { 0 };
+		uint m_size { 0 };
+		uint m_offset { 0 };
 	};
 }

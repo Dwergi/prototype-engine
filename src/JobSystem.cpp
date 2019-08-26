@@ -3,12 +3,14 @@
 
 #include "DDAssertHelpers.h"
 
+#include <processthreadsapi.h>
+
 namespace dd
 {
-	static constexpr bool USE_THREADS = false;
+	static constexpr bool USE_THREADS = true;
+	static constexpr uint MAX_THREADS = 0;
 
 	static constexpr int MAX_JOBS = 4096;
-	static constexpr uint MASK = MAX_JOBS - 1;
 	
 	thread_local Job g_jobs[MAX_JOBS];
 	thread_local int g_currentJob = 0;
@@ -23,23 +25,35 @@ namespace dd
 		// Get a new job to work on.
 		Job* GetJob();
 
+		// The owner thread of this queue.
 		std::thread::id Owner() const { return m_ownerThread; }
 
 		// Push is always called from the owning thread.
 		void Push(Job& job);
+
+		// Clear the queue in the worker thread.
+		void ScheduleClear() { m_shouldClear = true; }
+
+		// Should we clear the queue now?
+		bool ShouldClear() const { return m_shouldClear; }
 
 		// Clear the queue.
 		void Clear();
 
 	private:
 		std::thread::id m_ownerThread;
-		std::atomic<int> m_top;
-		std::atomic<int> m_bottom;
+		//std::atomic<int> m_top;
+		//std::atomic<int> m_bottom;
+
+		bool m_shouldClear { false };
+		int m_top { 0 };
+		int m_bottom { 0 };
+
+		std::mutex m_jobMutex;
 
 		JobSystem* m_system { nullptr };
 
 		static constexpr int MAX_PENDING = 1024;
-		static constexpr int PENDING_MASK = MAX_PENDING - 1;
 		Job* m_pending[MAX_PENDING];
 
 		// Pop is always called from the owning thread.
@@ -47,6 +61,7 @@ namespace dd
 
 		// Steal is always called from another thread.
 		Job* Steal();
+
 	};
 
 	JobSystem::JobSystem(uint threads)
@@ -59,12 +74,15 @@ namespace dd
 		}
 		else
 		{
+			if (MAX_THREADS != 0 && MAX_THREADS < threads)
+			{
+				threads = MAX_THREADS;
+			}
 			m_rng = Random32(0, threads - 1);
 		}
 
 		m_queues.resize(threads);
 		m_queues[0] = new JobQueue(*this, std::this_thread::get_id());
-		
 
 		for (uint i = 1; i < threads; ++i)
 		{
@@ -77,8 +95,19 @@ namespace dd
 		JobQueue* this_queue = new JobQueue(*this, std::this_thread::get_id());
 		m_queues[this_index] = this_queue;
 
+#ifdef WIN32
+		wchar_t name[64];
+		swprintf(name, 64, L"Job Worker %d", this_index);
+		SetThreadDescription(GetCurrentThread(), name);
+#endif
+
 		while (!m_stop)
 		{
+			if (this_queue->ShouldClear())
+			{
+				this_queue->Clear();
+			}
+
 			Job* job = this_queue->GetJob();
 			if (job != nullptr)
 			{
@@ -113,9 +142,7 @@ namespace dd
 			return nullptr;
 		}
 
-		job->m_parent = nullptr;
 		job->m_pendingJobs = 1;
-
 		return job;
 	}
 	
@@ -188,25 +215,42 @@ namespace dd
 		}
 	}
 
+	void JobSystem::Clear()
+	{
+		DD_ASSERT(dd::IsMainThread());
+
+		m_queues[0]->Clear();
+
+		for (JobQueue* queue : m_queues)
+		{
+			queue->ScheduleClear();
+		}
+	}
+
 	JobQueue::JobQueue(JobSystem& system, std::thread::id tid)
 	{
 		m_system = &system;
 		m_ownerThread = tid;
-		m_bottom = 0;
-		m_top = 0;
-		Clear();
+		m_shouldClear = true;
 	}
 
 	void JobQueue::Clear()
 	{
+		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+		std::lock_guard<std::mutex> lock(m_jobMutex);
+
 		std::memset(g_jobs, 0, sizeof(Job) * MAX_JOBS);
 		std::memset(m_pending, 0, sizeof(Job*) * MAX_PENDING);
 		g_currentJob = 0;
+		m_bottom = 0;
+		m_top = 0;
+		m_shouldClear = false;
 	}
 
 	Job* JobQueue::Allocate()
 	{
 		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+		DD_ASSERT(g_currentJob < MAX_JOBS);
 
 		Job* job = &g_jobs[g_currentJob];
 		std::memset(job, 0, sizeof(Job));
@@ -231,8 +275,13 @@ namespace dd
 
 	void JobQueue::Push(Job& job)
 	{
+		std::lock_guard<std::mutex> lock(m_jobMutex);
+
 		int bottom = m_bottom;
-		m_pending[bottom & PENDING_MASK] = &job;
+
+		DD_ASSERT(bottom < MAX_PENDING);
+
+		m_pending[bottom] = &job;
 		m_bottom = bottom + 1;
 	}
 
@@ -240,21 +289,25 @@ namespace dd
 	{
 		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
 		
-		int bottom = m_bottom - 1;
+		std::lock_guard<std::mutex> lock(m_jobMutex);
+
+		if (m_bottom <= m_top)
+		{
+			m_bottom = m_top;
+			return nullptr;
+		}
+
+		--m_bottom;
+		return m_pending[m_bottom];
+
+		/*int bottom = m_bottom - 1;
 		m_bottom.exchange(bottom);
 
 		int top = m_top;
 
-		if (bottom > top)
+		if (top <= bottom)
 		{
-			// empty queue
-			m_bottom = top;
-			return nullptr;
-		}
-		else
-		{
-			// more than one item
-			Job* job = m_pending[bottom & PENDING_MASK];
+			Job* job = m_pending[bottom];
 			if (top != bottom)
 			{
 				// more than one job left
@@ -269,21 +322,43 @@ namespace dd
 			m_bottom = top + 1;
 			return job;
 		}
+		else
+		{
+			// empty queue
+			m_bottom = top;
+			return nullptr;
+		}
 
-		return nullptr;
+		return nullptr;*/
 	}
 
 	Job* JobQueue::Steal()
 	{
 		DD_ASSERT(std::this_thread::get_id() != m_ownerThread);
 		DD_ASSERT(m_top < MAX_PENDING);
+
+		std::lock_guard<std::mutex> lock(m_jobMutex);
+
+		const int job_count = m_bottom - m_top;
+		if (job_count <= 0)
+		{
+			// no job there to steal
+			m_bottom = m_top;
+			return nullptr;
+		}
+
+		Job* job = m_pending[m_top];
+		++m_top;
+		return job;
+
+		/*
 		
 		int top = m_top;
 		int bottom = m_bottom;
 
 		if (top < bottom)
 		{
-			Job* job = m_pending[top & PENDING_MASK];
+			Job* job = m_pending[top];
 			if (!m_top.compare_exchange_strong(top, top + 1))
 			{
 				return nullptr;
@@ -292,7 +367,7 @@ namespace dd
 			return job;
 		}
 
-		return nullptr;
+		return nullptr;*/
 	}
 
 	void Job::Run()

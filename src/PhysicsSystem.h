@@ -28,5 +28,7 @@ namespace dd
 
 		int m_collisions { 0 };
 		BVHTree m_broadphase;
+
+		void PartialUpdate(const ddc::UpdateData* data, uint start, uint end);
 	};
 }

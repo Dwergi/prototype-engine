@@ -160,8 +160,6 @@ namespace dd
 
 	void Input::AddHandler(InputAction action, InputType type, InputHandler handler)
 	{
-		DD_TODO("Probably need a remove handler?");
-
 		InputReceived key { action, type };
 
 		auto it = m_handlers.find(key);

@@ -8,20 +8,24 @@
 
 namespace ddc
 {
-	enum class Tag : uint
+	enum class Tag : uint8
 	{
 		None = 0,
-		Visible = 1,
-		Focused = 2,
-		Selected = 3,
-		Static = 4,
-		Dynamic = 5
+		Disabled,
+		Visible,
+		Focused,
+		Selected,
+		Static,
+		Dynamic
 	};
 
 	struct EntityLayer;
 
 	struct Entity
 	{
+		Entity() = default;
+		Entity(const Entity&) = default;
+
 		bool operator==(Entity other) const { return Handle == other.Handle && m_layer == other.m_layer; }
 
 		bool IsValid() const;

@@ -95,7 +95,7 @@ namespace stress
 		dd::RandomFloat rng;
 
 		// destroy entities
-		for (uint i = s_entitiesStart; i < layer.Size(); ++i)
+		for (uint i = s_entitiesStart; i < layer.HighWaterMark(); ++i)
 		{
 			ddc::Entity entity = layer.GetEntity(i);
 			if (entity.IsAlive())

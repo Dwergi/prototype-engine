@@ -9,11 +9,11 @@
 
 namespace dd
 {
-	typedef uint8 ComponentID;
-	static const ComponentID INVALID_COMPONENT = 255;
+	enum class ComponentID : uint8 {};
+	static const ComponentID INVALID_COMPONENT = (ComponentID) 255;
 
-	typedef uint TypeID;
-	static const TypeID INVALID_TYPE = ~0u;
+	enum class TypeID : uint {};
+	static const TypeID INVALID_TYPE = (TypeID) ~0u;
 
 	struct Method
 	{
@@ -138,7 +138,7 @@ namespace dd
 		static void RegisterDefaultTypes();
 
 		static const TypeInfo* GetComponent(dd::ComponentID id);
-		static size_t ComponentCount() { return sm_maxComponentID; }
+		static uint8 ComponentCount() { return sm_maxComponentID; }
 
 		bool operator==(const TypeInfo& other) const;
 

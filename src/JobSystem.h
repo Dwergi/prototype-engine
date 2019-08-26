@@ -69,6 +69,10 @@ namespace dd
 		void Wait(const Job* job);
 		void WaitForAll(const std::vector<Job*>& jobs);
 
+		void Clear();
+
+		uint Threads() const { return (uint) m_workers.size() + 1; }
+
 	private:
 		friend struct JobQueue;
 

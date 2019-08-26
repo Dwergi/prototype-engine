@@ -71,7 +71,7 @@ namespace d2d
 		auto boxes = update_data.Data().Write<d2d::BoxPhysicsComponent>();
 		auto circles = update_data.Data().Write<d2d::CirclePhysicsComponent>();
 
-		for (int i = 0; i < update_data.Data().Size(); ++i)
+		for (uint i = 0; i < update_data.Data().Size(); ++i)
 		{
 			const d2d::Transform2DComponent& transform_cmp = transforms[i];
 			d2d::SpriteComponent& sprite_cmp = sprites[i];

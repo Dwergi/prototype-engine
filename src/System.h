@@ -34,7 +34,7 @@ namespace ddc
 		void SetEnabled(bool enabled) { m_enabled = enabled; }
 		bool IsEnabled() const { return m_enabled; }
 
-		void DependsOn( const System& system ) { DD_ASSERT( &system != this ); m_dependencies.Add( &system ); }
+		void DependsOn(const System& system) { DD_ASSERT(&system != this); m_dependencies.Add(&system); }
 
 		const dd::IArray<const System*>& GetDependencies() const { return m_dependencies; }
 		const char* GetName() const { return m_name.c_str(); }
@@ -44,8 +44,8 @@ namespace ddc
 	protected:
 
 		template <typename T>
-		void RequireRead( const char* name = nullptr ) 
-		{ 
+		void RequireRead(const char* name = nullptr)
+		{
 			dd::ComponentRegistration<T>::Register();
 
 			ddc::UpdateBuffer& buffer = CreateBuffer(name);
@@ -53,7 +53,7 @@ namespace ddc
 		}
 
 		template <typename T>
-		void RequireWrite( const char* name = nullptr ) 
+		void RequireWrite(const char* name = nullptr)
 		{
 			dd::ComponentRegistration<T>::Register();
 
@@ -62,7 +62,7 @@ namespace ddc
 		}
 
 		template <typename T>
-		void OptionalRead( const char* name = nullptr )
+		void OptionalRead(const char* name = nullptr)
 		{
 			dd::ComponentRegistration<T>::Register();
 
@@ -71,7 +71,7 @@ namespace ddc
 		}
 
 		template <typename T>
-		void OptionalWrite( const char* name = nullptr )
+		void OptionalWrite(const char* name = nullptr)
 		{
 			dd::ComponentRegistration<T>::Register();
 
@@ -79,11 +79,13 @@ namespace ddc
 			buffer.RequestData(new WriteOptional<T>());
 		}
 
-		void RequireTag( Tag tag, const char* name = nullptr );
+		void RequireTag(Tag tag, const char* name = nullptr);
+		template <size_t Size>
+		void RequireTags(Tag (&tags)[Size], const char* name = nullptr);
 
-		void SetPartitions( int count )
+		void SetPartitions(int count)
 		{
-			DD_ASSERT( count > 0 && count <= MAX_PARTITIONS );
+			DD_ASSERT(count > 0 && count <= MAX_PARTITIONS);
 			m_partitions = count;
 		}
 
@@ -108,4 +110,13 @@ namespace ddc
 
 		dd::Array<UpdateBuffer, 8> m_updateBuffers;
 	};
+
+	template <size_t Size>
+	void System::RequireTags(Tag(&tags)[Size], const char* name)
+	{
+		for (const Tag& tag : tags)
+		{
+			RequireTag(tag, name);
+		}
+	}
 }

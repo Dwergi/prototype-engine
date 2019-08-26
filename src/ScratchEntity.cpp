@@ -12,12 +12,12 @@ namespace ddc
 		EntityLayer* layer = entity.Layer();
 		size_t total_size = 0;
 
-		for (dd::ComponentID id = 0; id < dd::TypeInfo::ComponentCount(); ++id)
+		for (uint8 id = 0; id < dd::TypeInfo::ComponentCount(); ++id)
 		{
-			if (layer->HasComponent(entity, id))
+			if (layer->HasComponent(entity, (dd::ComponentID) id))
 			{
 				ComponentEntry entry;
-				entry.Type = dd::TypeInfo::GetComponent(id);
+				entry.Type = dd::TypeInfo::GetComponent((dd::ComponentID) id);
 				m_components.Add(entry);
 
 				total_size += entry.Type->Size();
