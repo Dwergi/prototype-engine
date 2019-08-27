@@ -68,8 +68,6 @@ namespace dd
 
 	private:
 
-		static const size_t MAX_ENTRIES = 8;
-
 		struct BVHEntry
 		{
 			dd::BVHHandle Handle { BVH::Invalid };
@@ -86,7 +84,8 @@ namespace dd
 
 		struct BVHBucket
 		{
-			static const size_t INVALID = -1;
+			static const int MAX_ENTRIES = 32;
+			static const int INVALID = -1;
 
 			BVHBucket() = default;
 			BVHBucket(const BVHBucket&) = delete;
@@ -98,21 +97,20 @@ namespace dd
 			// The actual bounds of the entries in the region.
 			ddm::AABB Bounds;
 
-			bool IsLeaf { true };
-
 			// If leaf, the start of the entries in this bucket.
 			// If not leaf, left bucket index.
-			size_t Left { INVALID };
+			int Left { INVALID };
 
 			// If leaf, the end of the entries in this bucket.
 			// If not leaf, right bucket index.
-			size_t Right { INVALID };
+			int Right { INVALID };
 
 			// The axis along which this node was split. (Diagnostic)
 			Axis SplitAxis { Axis::None };
 
-			size_t Count() const { return Right - Left; }
-			bool IsEmpty() const { return IsLeaf && Count() == 0; }
+			bool IsLeaf() const { return SplitAxis == Axis::None; }
+			int Count() const { return Right - Left; }
+			bool IsEmpty() const { return IsLeaf() && Count() == 0; }
 		};
 
 		std::vector<BVHEntry> m_entries;
@@ -124,7 +122,7 @@ namespace dd
 
 		void ClearBuckets();
 
-		void SplitBucket(size_t parent_idx, dd::Job* parent_job);
+		void SplitBucket(int parent_idx, dd::Job* root_job);
 		void CalculateBucketBounds(BVHBucket& bucket);
 		bool AllBucketsEmpty() const;
 	};

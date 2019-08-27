@@ -284,8 +284,6 @@ namespace dd
 		auto dynamic_sphere_transforms = dynamic_spheres.Write<dd::TransformComponent>();
 		auto dynamic_sphere_physics = dynamic_spheres.Write<dd::PhysicsSphereComponent>();
 
-
-
 		for (uint sphere_idx = start; sphere_idx < end; ++sphere_idx)
 		{
 			dd::PhysicsSphereComponent& ds_physics = dynamic_sphere_physics[sphere_idx];
@@ -304,6 +302,7 @@ namespace dd
 			collision |= DynamicSpheresCollisions(dynamic_sphere_transforms, dynamic_sphere_physics, m_broadphase, sphere_idx, delta_t);
 
 			glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
+			DD_ASSERT_SLOW(!ddm::IsNaN(velocity));
 
 			if (collision)
 			{

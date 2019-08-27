@@ -133,6 +133,8 @@ static dd::Timer s_profilerTimer;
 
 static void StartFrame()
 {
+	DD_DIAGNOSTIC("-------------------- START FRAME --------------------\n");
+
 	dd::Profiler::BeginFrame();
 
 	s_frameTimer->Update();

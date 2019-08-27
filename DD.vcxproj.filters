@@ -846,6 +846,12 @@
     <ClInclude Include="src\UpdateBuffer.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\JobQueue.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Job.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1449,6 +1455,12 @@
     </ClCompile>
     <ClCompile Include="src\UpdateBuffer.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JobQueue.cpp">
+      <Filter>Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Job.cpp">
+      <Filter>Jobs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

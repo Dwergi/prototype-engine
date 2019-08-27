@@ -22,6 +22,14 @@
 #define DD_ASSERT_FATAL PPK_ASSERT_FATAL
 #define DD_ASSERT_CUSTOM PPK_ASSERT_CUSTOM
 
+#define DD_ENABLE_SLOW_ASSERTS 1
+
+#if DD_ENABLE_SLOW_ASSERTS
+#define DD_ASSERT_SLOW(...) DD_ASSERT(__VA_ARGS__)
+#else
+#define DD_ASSERT_SLOW(...)
+#endif
+
 // assert that a return value from a function is used before it exits scope (eg. returning ownership of a pointer)
 #define DD_ASSERT_USED PPK_ASSERT_USED
 #define DD_ASSERT_USED_WARNING PPK_ASSERT_USED_WARNING
@@ -30,8 +38,10 @@
 #define DD_ASSERT_USED_FATAL PPK_ASSERT_USED_FATAL
 #define DD_ASSERT_USED_CUSTOM PPK_ASSERT_USED_CUSTOM
 
-#ifdef _DEBUG
-#define DD_DIAGNOSTIC( ... ) fprintf( stdout, __VA_ARGS__ );
+#define DD_ENABLE_DIAGNOSTIC 1
+
+#if DD_ENABLE_DIAGNOSTIC
+#define DD_DIAGNOSTIC( ... ) { char buffer[256]; snprintf(buffer, 128, __VA_ARGS__); OutputDebugStringA(buffer); }
 #else
 #define DD_DIAGNOSTIC( ... )
 #endif

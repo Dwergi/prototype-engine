@@ -18,7 +18,7 @@ namespace dd
 
 		const glm::mat4& Transform() const
 		{
-			//DD_ASSERT( m_transform == CalculateTransform() );
+			//DD_ASSERT_SLOW(m_transform == CalculateTransform());
 			return m_transform;
 		}
 
@@ -44,6 +44,8 @@ namespace dd
 
 		glm::mat4 CalculateTransform() const
 		{
+			DD_ASSERT_SLOW(!ddm::IsNaN(Position));
+
 			return glm::translate( Position ) * glm::toMat4( Rotation ) * glm::scale( Scale );
 		}
 	};

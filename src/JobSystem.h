@@ -1,55 +1,18 @@
+//
+// JobSystem.h
+// Copyright (C) Sebastian Nordgren 
+// August 24th 2019
 // Work-stealing jobsystem based on: https://blog.molecular-matters.com/2015/08/24/job-system-2-0-lock-free-work-stealing-part-1-basics/
+// Also influenced by https://manu343726.github.io/2017-03-13-lock-free-job-stealing-task-system-with-modern-c/
+//
 
 #pragma once
 
-#include <atomic>
-
 #include "Random.h"
+#include "Job.h"
 
 namespace dd
 {
-	struct JobSystem;
-
-	struct Job
-	{
-		void Run();
-		bool IsFinished() const;
-
-	private:
-		friend struct JobSystem;
-
-		void Finish();
-
-		void (*m_function)(Job*);
-		Job* m_parent { nullptr };
-		std::atomic<int> m_pendingJobs { 0 };
-
-		static constexpr size_t MaxSize = 128;
-		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs);
-		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
-
-		byte m_argument[PaddingBytes] { 0 };
-
-		template <typename T>
-		size_t SetArgument(size_t offset, T value)
-		{
-			std::memcpy(m_argument + offset, &value, sizeof(T));
-			return offset + sizeof(T);
-		}
-
-		template <typename T>
-		size_t GetArgument(size_t offset, T& value) const
-		{
-			value = *reinterpret_cast<const T*>(m_argument + offset);
-			return offset + sizeof(T);
-		}
-
-		template <typename TClass, typename... TArgs>
-		static void CallMethod(Job* job);
-		template <typename... TArgs>
-		static void CallFunction(Job* job);
-	};
-
 	struct JobSystem
 	{
 		JobSystem(uint threads);
@@ -64,6 +27,7 @@ namespace dd
 		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args);
 		template <typename... TArgs>
 		Job* CreateChild(Job* parent, void (*fn)(TArgs...), TArgs... args);
+		Job* CreateChild(Job* parent);
 
 		void Schedule(Job* job);
 		void Wait(const Job* job);
@@ -87,6 +51,7 @@ namespace dd
 		void WorkerThread(uint index);
 		
 		Job* Allocate();
+		bool IsOwnParent(Job* job) const;
 	};
 }
 
