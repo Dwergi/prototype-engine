@@ -48,8 +48,9 @@ namespace dd
 		DD_ASSERT(g_currentJob < MAX_JOBS);
 
 		Job* job = &g_jobs[g_currentJob];
-		job->Clear();
 		++g_currentJob;
+
+		job->Clear();
 		return job;
 	}
 

@@ -20,6 +20,13 @@ namespace dd
 		bool IsFinished() const;
 		void ContinueWith(Job* job);
 		void Clear();
+		void SetParent(Job* job);
+
+		template <typename TClass, typename... TArgs>
+		void SetMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args);
+
+		template <typename... TArgs>
+		void SetFunction(void (*fn)(TArgs...), TArgs... args);
 
 	private:
 		friend struct JobSystem;
@@ -29,16 +36,15 @@ namespace dd
 		void (*m_function)(Job*) { nullptr };
 		Job* m_parent { nullptr };
 		Job* m_continuations[8];
-		std::atomic<bool> m_running { false };
-		std::atomic<int16> m_pendingJobs { 0 };
-		std::atomic<int8> m_continuationCount { 0 };
+		std::atomic<int> m_pendingJobs { 0 };
+		std::atomic<int> m_continuationCount { 0 };
 
 		static constexpr size_t MaxSize = 192;
-		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs) + sizeof(m_running) + sizeof(m_continuationCount) + sizeof(m_continuations);
+		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_continuations) + sizeof(m_pendingJobs)  + sizeof(m_continuationCount);
 		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
 
 		byte m_argument[PaddingBytes] { 0 };
-
+		
 		template <typename T>
 		size_t SetArgument(size_t offset, T value)
 		{
@@ -95,5 +101,29 @@ namespace dd
 		offset = job->GetArgument(offset, args_tuple);
 
 		std::apply(fn, args_tuple);
+	}
+
+	template <typename TClass, typename... TArgs>
+	void Job::SetMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
+	{
+		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
+		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(args_tuple)) < Job::PaddingBytes);
+
+		m_function = &Job::CallMethod<TClass, TArgs...>;
+
+		size_t offset = 0;
+		offset = SetArgument(offset, this_ptr);
+		offset = SetArgument(offset, fn);
+		offset = SetArgument(offset, args_tuple);
+	}
+
+	template <typename... TArgs>
+	void Job::SetFunction(void (*fn)(TArgs...), TArgs... args)
+	{
+		m_function = &Job::CallFunction<TArgs...>;
+
+		size_t offset = 0;
+		offset = SetArgument(offset, fn);
+		offset = SetArgument(offset, arg);
 	}
 }

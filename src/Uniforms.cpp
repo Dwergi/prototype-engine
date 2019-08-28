@@ -180,7 +180,7 @@ namespace ddr
 		DD_ASSERT(m_shader == nullptr, "UniformStorage already bound!");
 		DD_ASSERT(shader.InUse(), "Shader not in use!");
 
-		for (const auto& pair : m_uniforms)
+		for (auto& pair : m_uniforms)
 		{
 			std::string_view name = pair.first;
 			IUniform* uniform = Access(pair.second);
@@ -324,7 +324,7 @@ namespace ddr
 
 	void UniformStorage::GetValuesFrom(UniformStorage& other)
 	{
-		for (const auto& pair : m_uniforms)
+		for (auto& pair : m_uniforms)
 		{
 			IUniform* other_uniform = other.Find(pair.first);
 			if (other_uniform != nullptr)
@@ -341,7 +341,7 @@ namespace ddr
 		static std::string name_str;
 		name_str = name;
 
-		const auto& it = m_uniforms.find(name_str);
+		auto& it = m_uniforms.find(name_str);
 		if (it == m_uniforms.end())
 		{
 			return nullptr;

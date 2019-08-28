@@ -167,7 +167,7 @@ namespace neut
 	{
 		const float delta_t = update_data.Delta();
 
-		const auto& data = update_data.Data();
+		auto& data = update_data.Data();
 		
 		auto trees = data.Write<neut::TreeComponent>();
 		auto bounds = data.Write<dd::BoundBoxComponent>();

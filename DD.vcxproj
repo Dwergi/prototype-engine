@@ -410,6 +410,7 @@
     <ClInclude Include="src\neutrino\WaterComponent.h" />
     <ClInclude Include="src\neutrino\WaterRenderer.h" />
     <ClInclude Include="src\neutrino\WaterSystem.h" />
+    <ClInclude Include="src\ParallelFor.h" />
     <ClInclude Include="src\Physics2DGame.h" />
     <ClInclude Include="src\ProfilerValue.h" />
     <ClInclude Include="src\ScratchEntity.h" />

@@ -173,7 +173,7 @@ namespace ddr
 	void SpriteRenderer::DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms)
 	{
 		// sort by texture to get instanceable groups
-		std::sort(start, end, [](const auto& a, const auto& b)
+		std::sort(start, end, [](auto& a, auto& b)
 		{
 			const ddr::Sprite* a_sprite = a.Sprite.Get();
 			const ddr::Sprite* b_sprite = b.Sprite.Get();
@@ -185,7 +185,7 @@ namespace ddr
 
 		while (tex_start < end)
 		{
-			SpriteIterator tex_end = std::find_if_not(tex_start, end, [current_tex](const auto& a)
+			SpriteIterator tex_end = std::find_if_not(tex_start, end, [current_tex](auto& a)
 			{
 				return a.Sprite.Get()->Texture == current_tex;
 			});
@@ -245,7 +245,7 @@ namespace ddr
 		m_vboColours.Unbind();
 
 		// sort by z index
-		std::sort(m_temp.begin(), m_temp.end(), [](const auto& a, const auto& b)
+		std::sort(m_temp.begin(), m_temp.end(), [](auto& a, auto& b)
 		{
 			return a.ZIndex < b.ZIndex;
 		});
@@ -255,7 +255,7 @@ namespace ddr
 		{
 			// find last index of the same layer
 			const int layer_z_index = layer_start->ZIndex;
-			SpriteIterator layer_end = std::find_if_not(layer_start, m_temp.end(), [layer_z_index](const auto& a)
+			SpriteIterator layer_end = std::find_if_not(layer_start, m_temp.end(), [layer_z_index](auto& a)
 			{
 				return a.ZIndex == layer_z_index;
 			});

@@ -96,7 +96,7 @@ namespace ddr
 	{
 		auto lights = data.Get<dd::LightComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
-		const auto& entities = data.Entities();
+		auto& entities = data.Entities();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 

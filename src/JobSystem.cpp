@@ -114,16 +114,17 @@ namespace dd
 	{
 		DD_ASSERT_SLOW(!IsOwnParent(parent));
 
-		if (parent != nullptr)
-		{
-			parent->m_pendingJobs++;
-		}
-
 		Job* job = Allocate();
 		DD_ASSERT(job != nullptr);
 
 		job->m_pendingJobs = 1;
-		job->m_parent = parent;
+		if (parent != nullptr)
+		{
+			DD_ASSERT(parent->m_pendingJobs > 0);
+
+			job->SetParent(parent);
+		}
+
 		return job;
 	}
 	
@@ -131,7 +132,6 @@ namespace dd
 	{
 		DD_ASSERT(job != nullptr, "Scheduling a null job!");
 		DD_ASSERT(job->m_pendingJobs >= 1);
-		DD_ASSERT(job->m_running == false);
 
 		JobQueue* queue = FindQueue(std::this_thread::get_id());
 		DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");

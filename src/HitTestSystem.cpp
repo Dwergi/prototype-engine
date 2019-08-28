@@ -100,7 +100,7 @@ namespace dd
 
 	void HitTestSystem::Update(const ddc::UpdateData& update)
 	{
-		const auto& data = update.Data();
+		auto& data = update.Data();
 
 		auto transforms = data.Read<dd::TransformComponent>();
 		auto bound_boxes = data.Read<dd::BoundBoxComponent>();

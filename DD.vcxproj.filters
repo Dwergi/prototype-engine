@@ -852,6 +852,9 @@
     <ClInclude Include="src\Job.h">
       <Filter>Jobs</Filter>
     </ClInclude>
+    <ClInclude Include="src\ParallelFor.h">
+      <Filter>Jobs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">

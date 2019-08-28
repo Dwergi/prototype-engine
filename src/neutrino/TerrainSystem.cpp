@@ -114,9 +114,9 @@ namespace neut
 			m_saveChunkImages = false;
 		}
 
-		const auto& chunks_data = update_data.Data();
+		auto& chunks_data = update_data.Data();
 
-		const auto& player = update_data.Data("player");
+		auto& player = update_data.Data("player");
 		auto player_transforms = player.Read<dd::TransformComponent>();
 		
 		if (player_transforms.Size() == 0)

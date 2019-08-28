@@ -122,7 +122,7 @@ namespace dd
 
 		void ClearBuckets();
 
-		void SplitBucket(int parent_idx, dd::Job* root_job);
+		void SplitBucket(int parent_idx, dd::Job* parent_job);
 		void CalculateBucketBounds(BVHBucket& bucket);
 		bool AllBucketsEmpty() const;
 	};

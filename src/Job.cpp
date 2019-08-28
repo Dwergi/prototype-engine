@@ -18,13 +18,7 @@ namespace dd
 	void Job::Run()
 	{
 		DD_ASSERT(m_pendingJobs > 0);
-
-		bool expected = false;
-		if (!m_running.compare_exchange_weak(expected, true))
-		{
-			DD_ASSERT(false, "Job already running!");
-		}
-
+		
 		if (m_function != nullptr)
 		{
 			m_function(this);
@@ -35,13 +29,10 @@ namespace dd
 
 	void Job::Clear()
 	{
-		m_running = false;
-		m_parent = nullptr;
-		m_continuationCount = 0;
-		m_pendingJobs = 0;
+		static_assert(sizeof(Job) == MaxSize);
+		DD_ASSERT(m_pendingJobs == 0);
 
-		std::memset(m_argument, 0, PaddingBytes);
-		std::memset(m_continuations, 0, 8 * sizeof(Job*));
+		std::memset(this, 0, sizeof(Job));
 	}
 
 	void Job::Finish()
@@ -72,8 +63,20 @@ namespace dd
 		DD_ASSERT(count < 8);
 		DD_ASSERT(job != nullptr);
 		DD_ASSERT(job != this);
+		DD_ASSERT(job->m_pendingJobs > 0);
+		DD_ASSERT(job->m_parent != this, "Can't add a child job as a continuation!");
 		DD_ASSERT(m_pendingJobs > 0);
 
 		m_continuations[count] = job;
+	}
+
+	void Job::SetParent(Job* parent)
+	{
+		DD_ASSERT(m_parent == nullptr);
+		DD_ASSERT(parent != nullptr);
+		DD_ASSERT(parent->m_pendingJobs > 0);
+
+		parent->m_pendingJobs++;
+		m_parent = parent;
 	}
 }
