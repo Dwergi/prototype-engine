@@ -15,6 +15,8 @@ namespace dd
 	struct Job;
 	struct JobSystem;
 
+#define DD_LOCK_FREE_JOBQUEUE 0
+
 	struct JobQueue
 	{
 		JobQueue(JobSystem& system, std::thread::id tid, uint index);
@@ -29,7 +31,7 @@ namespace dd
 		std::thread::id Owner() const { return m_ownerThread; }
 
 		// Push is always called from the owning thread.
-		void Push(Job& job);
+		void Push(Job* job);
 
 		// Clear the queue in the worker thread.
 		void ScheduleClear() { m_shouldClear = true; }
@@ -42,8 +44,15 @@ namespace dd
 
 	private:
 		std::thread::id m_ownerThread;
+
+#if DD_LOCK_FREE_JOBQUEUE
 		std::atomic<int> m_top;
 		std::atomic<int> m_bottom;
+#else
+		std::mutex m_mutex;
+		int m_top;
+		int m_bottom;
+#endif
 
 		bool m_shouldClear { false };
 		JobSystem* m_system { nullptr };

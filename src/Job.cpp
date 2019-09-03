@@ -40,34 +40,15 @@ namespace dd
 		int pending = --m_pendingJobs;
 		DD_ASSERT(pending >= 0);
 
-		if (pending == 0 && m_parent != nullptr)
+		if (m_parent != nullptr && pending == 0)
 		{
 			m_parent->Finish();
-		}
-
-		int continuation_count = m_continuationCount;
-		for (int i = 0; i < continuation_count; ++i)
-		{
-			s_jobsystem->Schedule(m_continuations[i]);
 		}
 	}
 
 	bool Job::IsFinished() const
 	{
 		return m_pendingJobs == 0;
-	}
-
-	void Job::ContinueWith(Job* job)
-	{
-		const int count = m_continuationCount++;
-		DD_ASSERT(count < 8);
-		DD_ASSERT(job != nullptr);
-		DD_ASSERT(job != this);
-		DD_ASSERT(job->m_pendingJobs > 0);
-		DD_ASSERT(job->m_parent != this, "Can't add a child job as a continuation!");
-		DD_ASSERT(m_pendingJobs > 0);
-
-		m_continuations[count] = job;
 	}
 
 	void Job::SetParent(Job* parent)

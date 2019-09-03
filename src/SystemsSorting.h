@@ -19,15 +19,15 @@ namespace ddc
 	{
 		struct Edge
 		{
-			size_t m_from { 0 };
-			size_t m_to { 0 };
+			size_t From { 0 };
+			size_t To { 0 };
 		};
 
-		System* m_system { nullptr };
-		dd::Job* m_job { nullptr };
+		System* System { nullptr };
+		dd::Job* UpdateJob { nullptr };
 
-		std::vector<Edge> m_in;
-		std::vector<Edge> m_out;
+		std::vector<Edge> In;
+		std::vector<Edge> Out;
 	};
 
 	void OrderSystemsByDependencies( dd::Span<System*> systems, std::vector<SystemNode>& out_ordered_systems );

@@ -23,7 +23,7 @@ namespace dd
 	template <typename TClass, typename... TArgs>
 	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
 	{
-		Job* job = CreateChild(parent);
+		Job* job = CreateChild(parent, nullptr);
 		job->SetMethod(this_ptr, fn, args...);
 
 		return job;
@@ -32,10 +32,7 @@ namespace dd
 	template <typename... TArgs>
 	Job* JobSystem::CreateChild(Job* parent, void (*fn)(TArgs...), TArgs... args)
 	{
-		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
-		static_assert(sizeof(fn) + sizeof(args_tuple) < Job::PaddingBytes);
-
-		Job* job = CreateChild(parent);
+		Job* job = CreateChild(parent, nullptr);
 		job->SetFunction(fn, args...);
 
 		return job;

@@ -21,17 +21,26 @@ namespace dd
 		Job* CreateMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... arg);
 		template <typename... TArgs>
 		Job* Create(void (*fn)(TArgs...), TArgs... arg);
-		Job* Create();
+		Job* Create(const char* id);
 
 		template <typename TClass, typename... TArgs>
 		Job* CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args);
 		template <typename... TArgs>
 		Job* CreateChild(Job* parent, void (*fn)(TArgs...), TArgs... args);
-		Job* CreateChild(Job* parent);
+		Job* CreateChild(Job* parent, const char* id);
 
 		void Schedule(Job* job);
+
+		// Do some work while waiting for the given job.
+		// Returns immediately if the job is finished.
 		void Wait(const Job* job);
+
+		// Do some work while waiting for the given jobs.
+		// Returns immediately if all jobs are finished.
 		void WaitForAll(const std::vector<Job*>& jobs);
+
+		// Unconditionally work on one job, then return.
+		void WorkOne();
 
 		void Clear();
 

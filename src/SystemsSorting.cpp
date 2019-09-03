@@ -15,7 +15,7 @@ namespace ddc
 	{
 		for( size_t i = 0; i < nodes.size(); ++i )
 		{
-			if( to_find == nodes[i].m_system )
+			if( to_find == nodes[i].System )
 			{
 				return i;
 			}
@@ -37,29 +37,29 @@ namespace ddc
 			{
 				SystemNode& node = scratch[n];
 
-				if( node.m_system != nullptr && node.m_in.size() == 0 )
+				if( node.System != nullptr && node.In.size() == 0 )
 				{
 					out_sorted.push_back( nodes[n] );
 
-					for( SystemNode::Edge& outEdge : node.m_out )
+					for( SystemNode::Edge& outEdge : node.Out )
 					{
-						SystemNode& dest_node = scratch[outEdge.m_to];
+						SystemNode& dest_node = scratch[outEdge.To];
 
 						size_t i = 0;
-						for( ; i < dest_node.m_in.size(); ++i )
+						for( ; i < dest_node.In.size(); ++i )
 						{
-							SystemNode::Edge& in_edge = dest_node.m_in[i];
-							if( in_edge.m_from == n )
+							SystemNode::Edge& in_edge = dest_node.In[i];
+							if( in_edge.From == n )
 							{
 								break;
 							}
 						}
 
-						dest_node.m_in.erase( dest_node.m_in.begin() + i );
+						dest_node.In.erase( dest_node.In.begin() + i );
 					}
 
-					node.m_out.clear();
-					node.m_system = nullptr;
+					node.Out.clear();
+					node.System = nullptr;
 				}
 			}
 		}
@@ -70,21 +70,21 @@ namespace ddc
 
 		for( const SystemNode& n : nodes )
 		{
-			new_indices.push_back( FindNodeIndex( n.m_system, out_sorted ) );
+			new_indices.push_back( FindNodeIndex( n.System, out_sorted ) );
 		}
 
 		for( SystemNode& node : out_sorted )
 		{
-			for( SystemNode::Edge& edge : node.m_in )
+			for( SystemNode::Edge& edge : node.In )
 			{
-				edge.m_from = new_indices[edge.m_from];
-				edge.m_to = new_indices[edge.m_to];
+				edge.From = new_indices[edge.From];
+				edge.To = new_indices[edge.To];
 			}
 
-			for( SystemNode::Edge& edge : node.m_out )
+			for( SystemNode::Edge& edge : node.Out )
 			{
-				edge.m_from = new_indices[edge.m_from];
-				edge.m_to = new_indices[edge.m_to];
+				edge.From = new_indices[edge.From];
+				edge.To = new_indices[edge.To];
 			}
 		}
 	}
@@ -97,7 +97,7 @@ namespace ddc
 		for( System* system : systems )
 		{
 			SystemNode node;
-			node.m_system = system;
+			node.System = system;
 			nodes.push_back( node );
 		}
 
@@ -111,13 +111,13 @@ namespace ddc
 				size_t dep_index = FindNodeIndex( dep, nodes );
 
 				SystemNode::Edge edge;
-				edge.m_from = dep_index;
-				edge.m_to = s;
+				edge.From = dep_index;
+				edge.To = s;
 
-				DD_ASSERT( edge.m_from != edge.m_to );
+				DD_ASSERT( edge.From != edge.To );
 
-				nodes[dep_index].m_out.push_back( edge );
-				nodes[s].m_in.push_back( edge );
+				nodes[dep_index].Out.push_back( edge );
+				nodes[s].In.push_back( edge );
 			}
 		}
 

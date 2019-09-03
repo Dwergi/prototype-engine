@@ -262,7 +262,7 @@ namespace dd
 		}
 	}
 
-	void BVHTree::SplitBucket(int parent_index, Job* parent_job)
+	void BVHTree::SplitBucket(int parent_index)
 	{
 		BVHBucket& parent = m_buckets[parent_index];
 		DD_ASSERT(parent.IsLeaf());
@@ -272,9 +272,10 @@ namespace dd
 		// recursion condition
 		if (parent.Count() <= BVHBucket::MAX_ENTRIES)
 		{
+			--m_pending;
 			return;
 		}
-
+		
 		int start = parent.Left;
 		int mid = start;
 		int end = parent.Right;
@@ -345,29 +346,29 @@ namespace dd
 		left.Right = mid;
 		right.Left = mid;
 
-		DD_TODO("This is wrong, children end up running/scheduling before parents.");
-		dd::Job* this_job = s_jobsystem->CreateChild(parent_job);
-		s_jobsystem->Schedule(this_job);
+		m_pending.fetch_add(2);
 
 		if (left.Count() > 256)
 		{
-			dd::Job* left_job = s_jobsystem->CreateMethodChild(this_job, this, &BVHTree::SplitBucket, right_index, this_job);
+			dd::Job* left_job = s_jobsystem->CreateMethod(this, &BVHTree::SplitBucket, left_index);
 			s_jobsystem->Schedule(left_job);
 		}
 		else
 		{
-			SplitBucket(left_index, nullptr);
+			SplitBucket(left_index);
 		}
 
 		if (right.Count() > 256)
 		{
-			dd::Job* right_job = s_jobsystem->CreateMethodChild(this_job, this, &BVHTree::SplitBucket, right_index, this_job);
+			dd::Job* right_job = s_jobsystem->CreateMethod(this, &BVHTree::SplitBucket, right_index);
 			s_jobsystem->Schedule(right_job);
 		}
 		else
 		{
-			SplitBucket(right_index, nullptr);
+			SplitBucket(right_index);
 		}
+
+		--m_pending;
 	}
 
 	void BVHTree::Build()
@@ -393,14 +394,14 @@ namespace dd
 
 		DD_ASSERT(AllBucketsEmpty());
 
-		dd::JobSystem& jobsystem = *s_jobsystem;
+		m_pending = 1;
 
-		dd::Job* job = jobsystem.Create();
+		SplitBucket(0);
 
-		SplitBucket(0, job);
-
-		jobsystem.Schedule(job);
-		jobsystem.Wait(job);
+		while (m_pending > 0)
+		{
+			s_jobsystem->WorkOne();
+		}
 		
 		int bucket_count = m_bucketCount;
 		m_buckets.resize(bucket_count);

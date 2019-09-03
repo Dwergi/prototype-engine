@@ -290,6 +290,8 @@ namespace dd
 			if (ds_physics.Resting)
 				continue;
 
+			DD_ASSERT(ds_physics.Mass > 0, "Invalid mass: %.2g", ds_physics.Mass);
+
 			// calculate universal parameters
 			dd::TransformComponent& ds_transform = dynamic_sphere_transforms[sphere_idx];
 			ds_physics.Momentum += m_gravity * ds_physics.Mass * delta_t;
@@ -301,8 +303,8 @@ namespace dd
 			collision |= IntersectStaticSpheres(static_spheres, ds_physics, ds_transform, delta_t);
 			collision |= DynamicSpheresCollisions(dynamic_sphere_transforms, dynamic_sphere_physics, m_broadphase, sphere_idx, delta_t);
 
-			glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
-			DD_ASSERT_SLOW(!ddm::IsNaN(velocity));
+			const glm::vec3 velocity = ds_physics.Momentum / ds_physics.Mass;
+			DD_ASSERT_SLOW(!ddm::IsNaN(velocity), "NaN velocity: (%.2g, %.2g, %.2g), momentum: (%.2g, %.2g, %.2g), mass: %.2g", velocity.x, velocity.y, velocity.z, ds_physics.Momentum.x, ds_physics.Momentum.y, ds_physics.Momentum.z, ds_physics.Mass);
 
 			if (collision)
 			{
@@ -341,6 +343,7 @@ namespace dd
 
 		for (size_t i = 0; i < dynamic_spheres.Size(); ++i)
 		{
+			DD_ASSERT(dynamic_sphere_physics[i].Mass > 0);
 			glm::vec3 displacement = (dynamic_sphere_physics[i].Momentum / dynamic_sphere_physics[i].Mass) * delta_t;
 			AddSphereToBVH(m_broadphase, dynamic_sphere_physics[i].Sphere, displacement, dynamic_sphere_transforms[i].Transform());
 		}
@@ -349,7 +352,7 @@ namespace dd
 
 		uint job_size = dynamic_spheres.Size() / s_jobsystem->Threads();
 
-		dd::Job* root = s_jobsystem->Create();
+		dd::Job* root = s_jobsystem->CreateChild(update.Job(), "Physics");
 
 		for (uint i = 0; i < s_jobsystem->Threads(); ++i)
 		{

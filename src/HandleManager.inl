@@ -14,14 +14,14 @@ namespace dd
 	}
 
 	template <typename T>
-	Handle<T> HandleManager<T>::FindInternal( std::string_view name ) const
+	Handle<T> HandleManager<T>::FindInternal(std::string_view name) const
 	{
-		DD_ASSERT( !name.empty() );
+		DD_ASSERT(!name.empty());
 
-		for( size_t i = 0; i < m_entries.size(); ++i )
+		for (size_t i = 0; i < m_entries.size(); ++i)
 		{
-			if( (m_entries[i].Alive || m_entries[i].Create) &&
-				m_entries[i].Instance->Name() == name )
+			if ((m_entries[i].Alive || m_entries[i].Create) &&
+				m_entries[i].Instance->Name() == name)
 			{
 				return m_entries[i].Handle;
 			}
@@ -33,76 +33,76 @@ namespace dd
 	template <typename T>
 	Handle<T> HandleManager<T>::Find(std::string_view name) const
 	{
-		return FindInternal( name );
+		return FindInternal(name);
 	}
 
 	template <typename T>
 	Handle<T> HandleManager<T>::Create(std::string_view name)
 	{
-		std::scoped_lock<std::mutex> lock( m_mutex );
-		Handle<T> h = FindInternal( name );
-		if( h.IsValid() )
+		std::scoped_lock<std::mutex> lock(m_mutex);
+		Handle<T> h = FindInternal(name);
+		if (h.IsValid())
 		{
 			return h;
 		}
 
-		if( m_free.empty() )
+		if (m_free.empty())
 		{
-			m_free.push_back( m_entries.size() );
+			m_free.push_back(m_entries.size());
 
 			HandleEntry& entry = m_entries.emplace_back();
 			entry.Handle.ID = m_entries.size() - 1;
 			entry.Handle.Version = -1;
 		}
 
-		size_t idx = dd::pop_front( m_free );
+		size_t idx = dd::pop_front(m_free);
 
 		HandleEntry& entry = m_entries[idx];
 		entry.Handle.Version++;
 		entry.Create = true;
 
-		DD_ASSERT( entry.Instance == nullptr );
+		DD_ASSERT(entry.Instance == nullptr);
 
 		entry.Instance = new T();
-		entry.Instance->SetName( name );
+		entry.Instance->SetName(name);
 
 		return entry.Handle;
 	}
 
 	template <typename T>
-	bool HandleManager<T>::IsAlive( Handle<T> h ) const
+	bool HandleManager<T>::IsAlive(Handle<T> handle) const
 	{
-		if( !h.IsValid() )
+		if (!handle.IsValid())
 		{
 			return false;
 		}
 
-		DD_ASSERT( h.ID >= 0 && h.ID < m_entries.size() );
+		DD_ASSERT_SLOW(handle.ID >= 0 && handle.ID < m_entries.size());
 
-		const HandleEntry& entry = m_entries[h.ID];
+		const HandleEntry& entry = m_entries[handle.ID];
 
-		return entry.Handle.Version == h.Version &&
+		return entry.Handle.Version == handle.Version &&
 			(entry.Alive || entry.Create);
 	}
 
 	template <typename T>
-	bool HandleManager<T>::Destroy( Handle<T> h )
+	bool HandleManager<T>::Destroy(Handle<T> handle)
 	{
-		if (!IsAlive(h))
+		if (!IsAlive(handle))
 		{
 			return false;
 		}
 
-		m_entries[h.ID].Destroy = true;
+		m_entries[handle.ID].Destroy = true;
 		return true;
 	}
 
 	template <typename T>
-	T* HandleManager<T>::Access( Handle<T> handle ) const
+	T* HandleManager<T>::Access(Handle<T> handle) const
 	{
-		DD_ASSERT( IsAlive( handle ) );
+		DD_ASSERT(IsAlive(handle));
 
-		if( handle.ID < m_entries.size() )
+		if (handle.ID < m_entries.size())
 		{
 			return m_entries[handle.ID].Instance;
 		}
@@ -111,7 +111,7 @@ namespace dd
 	}
 
 	template <typename T>
-	const T* HandleManager<T>::Get( Handle<T> handle ) const
+	const T* HandleManager<T>::Get(Handle<T> handle) const
 	{
 		return Access(handle);
 	}
@@ -121,9 +121,9 @@ namespace dd
 	{
 		size_t count = 0;
 
-		for( const HandleEntry& e : m_entries )
+		for (const HandleEntry& e : m_entries)
 		{
-			if( e.Alive )
+			if (e.Alive)
 			{
 				++count;
 			}
@@ -133,14 +133,14 @@ namespace dd
 	}
 
 	template <typename T>
-	T* HandleManager<T>::AccessNth( size_t i ) const
+	T* HandleManager<T>::AccessNth(size_t i) const
 	{
 		size_t current = 0;
-		for( const HandleEntry& e : m_entries )
+		for (const HandleEntry& e : m_entries)
 		{
-			if( e.Alive )
+			if (e.Alive)
 			{
-				if( current == i )
+				if (current == i)
 				{
 					return e.Instance;
 				}
@@ -155,13 +155,13 @@ namespace dd
 	template <typename T>
 	void HandleManager<T>::Update()
 	{
-		for( HandleEntry& entry : m_entries )
+		for (HandleEntry& entry : m_entries)
 		{
-			if( entry.Destroy )
+			if (entry.Destroy)
 			{
-				DD_ASSERT( entry.Instance != nullptr );
+				DD_ASSERT(entry.Instance != nullptr);
 
-				OnDestroy( *entry.Instance );
+				OnDestroy(*entry.Instance);
 
 				delete entry.Instance;
 				entry.Instance = nullptr;
@@ -171,11 +171,11 @@ namespace dd
 				entry.Destroy = false;
 			}
 
-			if( entry.Create )
+			if (entry.Create)
 			{
-				DD_ASSERT( entry.Instance != nullptr );
+				DD_ASSERT(entry.Instance != nullptr);
 
-				OnCreate( *entry.Instance );
+				OnCreate(*entry.Instance);
 
 				entry.Alive = true;
 				entry.Create = false;

@@ -18,7 +18,6 @@ namespace dd
 	{
 		void Run();
 		bool IsFinished() const;
-		void ContinueWith(Job* job);
 		void Clear();
 		void SetParent(Job* job);
 
@@ -35,12 +34,10 @@ namespace dd
 
 		void (*m_function)(Job*) { nullptr };
 		Job* m_parent { nullptr };
-		Job* m_continuations[8];
 		std::atomic<int> m_pendingJobs { 0 };
-		std::atomic<int> m_continuationCount { 0 };
 
-		static constexpr size_t MaxSize = 192;
-		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_continuations) + sizeof(m_pendingJobs)  + sizeof(m_continuationCount);
+		static constexpr size_t MaxSize = 64;
+		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs);
 		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
 
 		byte m_argument[PaddingBytes] { 0 };
@@ -74,6 +71,7 @@ namespace dd
 
 		TClass* this_ptr;
 		offset = job->GetArgument(offset, this_ptr);
+
 		TMethod method;
 		offset = job->GetArgument(offset, method);
 
@@ -94,8 +92,6 @@ namespace dd
 
 		void (*fn)(TArgs...);
 		offset = job->GetArgument(offset, fn);
-		TArg arg;
-		offset = job->GetArgument(offset, arg);
 
 		std::tuple<TArgs...> args_tuple;
 		offset = job->GetArgument(offset, args_tuple);
@@ -107,7 +103,7 @@ namespace dd
 	void Job::SetMethod(TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
 	{
 		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
-		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(args_tuple)) < Job::PaddingBytes);
+		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(args_tuple)) <= Job::PaddingBytes);
 
 		m_function = &Job::CallMethod<TClass, TArgs...>;
 
@@ -120,10 +116,13 @@ namespace dd
 	template <typename... TArgs>
 	void Job::SetFunction(void (*fn)(TArgs...), TArgs... args)
 	{
+		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
+		static_assert(sizeof(fn) + sizeof(args_tuple) <= Job::PaddingBytes);
+
 		m_function = &Job::CallFunction<TArgs...>;
 
 		size_t offset = 0;
 		offset = SetArgument(offset, fn);
-		offset = SetArgument(offset, arg);
+		offset = SetArgument(offset, args_tuple);
 	}
 }

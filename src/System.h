@@ -9,6 +9,11 @@
 #include "DataRequest.h"
 #include "UpdateData.h"
 
+namespace dd
+{
+	struct Job;
+}
+
 namespace ddc
 {
 	struct EntityLayer;
@@ -106,7 +111,7 @@ namespace ddc
 
 		ddc::UpdateBuffer& CreateBuffer(const char* name);
 
-		ddc::UpdateData CreateUpdateData(ddc::EntityLayer& layer, float delta_t) const;
+		ddc::UpdateData CreateUpdateData(ddc::EntityLayer& layer, dd::Job* job, float delta_t) const;
 
 		dd::Array<UpdateBuffer, 8> m_updateBuffers;
 	};

@@ -80,9 +80,9 @@ namespace dd
 		return job;
 	}
 
-	Job* JobSystem::Create()
+	Job* JobSystem::Create(const char* id)
 	{
-		return CreateChild(nullptr);
+		return CreateChild(nullptr, id);
 	}
 
 	bool JobSystem::IsOwnParent(Job* job) const
@@ -110,7 +110,7 @@ namespace dd
 		return false;
 	}
 
-	Job* JobSystem::CreateChild(Job* parent)
+	Job* JobSystem::CreateChild(Job* parent, const char* id)
 	{
 		DD_ASSERT_SLOW(!IsOwnParent(parent));
 
@@ -125,6 +125,12 @@ namespace dd
 			job->SetParent(parent);
 		}
 
+		if (id != nullptr)
+		{
+			size_t length = ddm::min(std::strlen(id), Job::PaddingBytes);
+			std::memcpy(job->m_argument, id, length);
+		}
+
 		return job;
 	}
 	
@@ -136,7 +142,7 @@ namespace dd
 		JobQueue* queue = FindQueue(std::this_thread::get_id());
 		DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");
 
-		queue->Push(*job);
+		queue->Push(job);
 	}
 
 	void JobSystem::Wait(const Job* job)
@@ -162,6 +168,17 @@ namespace dd
 		for (Job* job : jobs)
 		{
 			Wait(job);
+		}
+	}
+
+	void JobSystem::WorkOne()
+	{
+		JobQueue* queue = FindQueue(std::this_thread::get_id());
+		
+		Job* work = queue->GetJob();
+		if (work != nullptr)
+		{
+			work->Run();
 		}
 	}
 	

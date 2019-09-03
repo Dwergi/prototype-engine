@@ -38,7 +38,7 @@
 #define DD_ASSERT_USED_FATAL PPK_ASSERT_USED_FATAL
 #define DD_ASSERT_USED_CUSTOM PPK_ASSERT_USED_CUSTOM
 
-#define DD_ENABLE_DIAGNOSTIC 1
+#define DD_ENABLE_DIAGNOSTIC 0
 
 #if DD_ENABLE_DIAGNOSTIC
 #define DD_DIAGNOSTIC( ... ) { char buffer[256]; snprintf(buffer, 128, __VA_ARGS__); OutputDebugStringA(buffer); }

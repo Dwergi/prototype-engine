@@ -59,9 +59,9 @@ namespace ddc
 		return m_updateBuffers.Add(UpdateBuffer(name));
 	}
 
-	ddc::UpdateData System::CreateUpdateData(ddc::EntityLayer& layer, float delta_t) const
+	ddc::UpdateData System::CreateUpdateData(ddc::EntityLayer& layer, dd::Job* job, float delta_t) const
 	{
-		ddc::UpdateData data(layer, delta_t);
+		ddc::UpdateData data(layer, job, delta_t);
 
 		for (UpdateBuffer& buffer : m_updateBuffers)
 		{

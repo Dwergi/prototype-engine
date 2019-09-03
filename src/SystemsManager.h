@@ -44,7 +44,7 @@ namespace ddc
 
 		struct SystemUpdate
 		{
-			SystemNode* SystemNode { nullptr };
+			SystemNode* Node { nullptr };
 			EntityLayer* Layer { nullptr };
 			float DeltaT { 0 };
 		};

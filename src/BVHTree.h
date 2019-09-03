@@ -116,13 +116,13 @@ namespace dd
 		std::vector<BVHEntry> m_entries;
 		std::vector<BVHBucket> m_buckets;
 
-		bool m_built { false };
 		std::atomic<int> m_bucketCount { 0 };
-		std::atomic<int> m_futureCount { 0 };
+		std::atomic<int> m_pending { 0 };
+		bool m_built { false };
 
 		void ClearBuckets();
 
-		void SplitBucket(int parent_idx, dd::Job* parent_job);
+		void SplitBucket(int parent_idx);
 		void CalculateBucketBounds(BVHBucket& bucket);
 		bool AllBucketsEmpty() const;
 	};

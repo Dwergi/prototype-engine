@@ -45,18 +45,25 @@ namespace dd
 
 		m_actions.clear();
 
+		const bool is_focused = s_window->IsFocused();
+
 		dd::Array<InputEvent, 64> input_events;
 		for (IInputSource* source : m_sources)
 		{
 			input_events.Clear();
 
-			bool should_capture = s_window->IsFocused() && m_currentMode->ShouldCaptureMouse();
+			bool should_capture = is_focused && m_currentMode->ShouldCaptureMouse();
 			source->SetCaptureMouse(should_capture);
 
-			bool should_centre = s_window->IsFocused() && m_currentMode->ShouldCentreMouse();
+			bool should_centre = is_focused && m_currentMode->ShouldCentreMouse();
 			source->SetCentreMouse(should_centre);
 
 			source->UpdateInput();
+
+			if (!is_focused)
+			{
+				continue;
+			}
 
 			if (source->GotMouseInput())
 			{
