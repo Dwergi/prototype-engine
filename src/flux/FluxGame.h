@@ -4,7 +4,7 @@
 
 namespace flux
 {
-	class FluxGame : public IGame
+	class FluxGame : public dd::IGame
 	{
 		// Initialization occurs in this order.
 		virtual void Initialize() override;

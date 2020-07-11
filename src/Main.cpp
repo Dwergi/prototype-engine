@@ -43,13 +43,13 @@
 #include <nlohmann/json.hpp>
 
 //---------------------------------------------------------------------------
-// GAME TO USE
 #include "stress/StressTestGame.h"
-using TGame = stress::StressTestGame;
-//#include "lux/LuxportGame.h"
-//using TGame = lux::LuxportGame;
-//#include "neutrino/NeutrinoGame.h"
-//using TGame = neut::NeutrinoGame;
+#include "lux/LuxportGame.h"
+#include "neutrino/NeutrinoGame.h"
+#include "flux/FluxGame.h"
+
+// GAME TO USE
+using TGame = flux::FluxGame;
 //---------------------------------------------------------------------------
 
 static dd::Service<dd::IGame> s_game;

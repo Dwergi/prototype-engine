@@ -12,7 +12,6 @@
 #include "SpriteSheet.h"
 #include "SystemsManager.h"
 #include "Texture.h"
-#include "RendererManager.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
@@ -35,4 +34,36 @@ namespace flux
 	static dd::InputKeyBindings* s_keybindings;
 
 	static ddc::Entity s_player;
+
+	void FluxGame::Initialize()
+	{
+
+	}
+
+	void FluxGame::RegisterSystems(ddc::SystemsManager& system_manager)
+	{
+
+	}
+
+	void FluxGame::RegisterRenderers(ddr::RenderManager& renderer)
+	{
+
+	}
+
+	void FluxGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& layers)
+	{
+
+	}
+
+	void FluxGame::Update(const dd::GameUpdateData& update_data)
+	{
+
+	}
+
+	void FluxGame::Shutdown()
+	{
+
+	}
+
+	ddr::ICamera& FluxGame::GetCamera() const { return *s_camera; }
 }
