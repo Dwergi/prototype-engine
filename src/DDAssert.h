@@ -12,7 +12,7 @@
 #define PPK_ASSERT_ENABLED 1
 #endif
 
-#include "PP_Assert.h"
+#include "ppk/ppk_assert.h"
 
 // assert with a warning level
 #define DD_ASSERT PPK_ASSERT
@@ -40,20 +40,20 @@ namespace dd
 {
 	enum class AssertAction
 	{
-		None = pempek::assert::implementation::AssertAction::None,
-		Abort = pempek::assert::implementation::AssertAction::Abort,
-		Break = pempek::assert::implementation::AssertAction::Break,
-		Ignore = pempek::assert::implementation::AssertAction::Ignore,
-		IgnoreLine = pempek::assert::implementation::AssertAction::IgnoreLine,
-		IgnoreAll = pempek::assert::implementation::AssertAction::IgnoreAll,
-		Throw = pempek::assert::implementation::AssertAction::Throw
+		None = ppk::assert::implementation::AssertAction::None,
+		Abort = ppk::assert::implementation::AssertAction::Abort,
+		Break = ppk::assert::implementation::AssertAction::Break,
+		Ignore = ppk::assert::implementation::AssertAction::Ignore,
+		IgnoreLine = ppk::assert::implementation::AssertAction::IgnoreLine,
+		IgnoreAll = ppk::assert::implementation::AssertAction::IgnoreAll,
+		Throw = ppk::assert::implementation::AssertAction::Throw
 	};
 
 	enum class AssertLevel
 	{
-		Warning = pempek::assert::implementation::AssertLevel::Warning,
-		Debug = pempek::assert::implementation::AssertLevel::Debug,
-		Error = pempek::assert::implementation::AssertLevel::Error,
-		Fatal = pempek::assert::implementation::AssertLevel::Fatal
+		Warning = ppk::assert::implementation::AssertLevel::Warning,
+		Debug = ppk::assert::implementation::AssertLevel::Debug,
+		Error = ppk::assert::implementation::AssertLevel::Error,
+		Fatal = ppk::assert::implementation::AssertLevel::Fatal
 	};
 }

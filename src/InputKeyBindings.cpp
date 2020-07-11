@@ -43,7 +43,7 @@ namespace dd
 		BindKey(key, dd::ModifierFlags(), action, modes);
 	}
 
-	void InputKeyBindings::BindKey(dd::Key key, dd::InputAction action, std::string mode_name)
+	void InputKeyBindings::BindKey(dd::Key key, dd::InputAction action, std::string_view mode_name)
 	{
 		BindKey(key, dd::ModifierFlags(), action, mode_name);
 	}
@@ -60,10 +60,10 @@ namespace dd
 		BindKey(key, modifiers, action, modes);
 	}
 
-	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action, std::string mode_name)
+	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action, std::string_view mode_name)
 	{
 		dd::InputModeConfig* mode = dd::InputModeConfig::Find(mode_name);
-		DD_ASSERT(mode != nullptr, "Mode '%s' not registered!", mode_name.c_str());
+		DD_ASSERT(mode != nullptr, "Mode '%s' not registered!", ((std::string) mode_name).c_str());
 
 		BindKey(key, modifiers, action, mode->ID());
 	}

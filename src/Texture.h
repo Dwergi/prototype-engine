@@ -55,7 +55,7 @@ namespace ddr
 
 	struct TextureManager : dd::HandleManager<ddr::Texture>
 	{
-		ddr::TextureHandle Load(std::string texture_name);
+		ddr::TextureHandle Load(std::string_view texture_name);
 
 	private:
 

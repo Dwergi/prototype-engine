@@ -362,6 +362,7 @@
     <ClInclude Include="include\pcg\pcg_extras.hpp" />
     <ClInclude Include="include\pcg\pcg_random.hpp" />
     <ClInclude Include="include\pcg\pcg_uint128.hpp" />
+    <ClInclude Include="include\ppk\ppk_assert.h" />
     <ClInclude Include="include\Remotery\lib\Remotery.h" />
     <ClInclude Include="include\stb\stb_image.h" />
     <ClInclude Include="include\stb\stb_image_write.h" />
@@ -517,7 +518,6 @@
     <ClInclude Include="src\OctreeComponent.h" />
     <ClInclude Include="src\Plane.h" />
     <ClInclude Include="src\PlayerComponent.h" />
-    <ClInclude Include="src\PP_Assert.h" />
     <ClInclude Include="src\PCH.h" />
     <ClInclude Include="src\Profiler.h" />
     <ClInclude Include="src\Property.h" />
@@ -630,6 +630,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="include\ppk\ppk_assert.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="include\Remotery\lib\Remotery.c">
@@ -907,14 +910,6 @@
     <ClCompile Include="src\MessageQueue.cpp" />
     <ClCompile Include="src\AABBOctree.cpp" />
     <ClCompile Include="src\Plane.cpp" />
-    <ClCompile Include="src\PP_Assert.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="src\PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

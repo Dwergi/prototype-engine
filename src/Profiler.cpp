@@ -123,8 +123,10 @@ namespace dd
 
 		glm::ivec2 window_size = s_window->GetSize();
 		ImGui::SetNextWindowPos(ImVec2(window_size.x - 200.f, 30), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(170, 170), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowBgAlpha(0.4f);
 
-		if (ImGui::Begin("Profiler", &s_draw, ImVec2(170, 170), 0.4f))
+		if (ImGui::Begin("Profiler", &s_draw))
 		{
 			for (dd::ProfilerValue* value : s_instances)
 			{

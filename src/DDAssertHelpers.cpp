@@ -113,7 +113,7 @@ namespace dd
 	static dd::Service<dd::DebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
 
-	static pempek::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
+	static ppk::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
 		int level, const char* message)
 	{
 		s_assert.Open = true;
@@ -139,7 +139,7 @@ namespace dd
 			}
 		} while (s_assert.Action == AssertAction::None);
 
-		return (pempek::assert::implementation::AssertAction::AssertAction) s_assert.Action;
+		return (ppk::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 	}
 
 	void InitializeAssert()
@@ -149,7 +149,7 @@ namespace dd
 			.CentreMouse(false)
 			.ShowCursor(true);
 
-		pempek::assert::implementation::setAssertHandler(OnAssert);
+		ppk::assert::implementation::setAssertHandler(OnAssert);
 	}
 
 	static void StartFrame()

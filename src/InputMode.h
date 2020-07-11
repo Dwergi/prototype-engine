@@ -15,8 +15,8 @@ namespace dd
 	
 	struct InputModeConfig
 	{
-		static InputModeConfig& Create(std::string name);
-		static InputModeConfig* Find(std::string name);
+		static InputModeConfig& Create(std::string_view name);
+		static InputModeConfig* Find(std::string_view name);
 		static InputModeConfig* Access(InputModeID id);
 
 		InputModeID ID() const { return (1 << m_index); }

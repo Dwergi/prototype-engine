@@ -37,9 +37,6 @@
     <Filter Include="Includes\PCG">
       <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\PP Assert">
-      <UniqueIdentifier>{16d20338-1fa4-4afd-8d42-1e4b198a3d3f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\gl3w">
       <UniqueIdentifier>{e87999f1-1019-463f-9d68-497df60b60de}</UniqueIdentifier>
     </Filter>
@@ -129,6 +126,9 @@
     </Filter>
     <Filter Include="Games\Flux">
       <UniqueIdentifier>{e99ca982-3474-45da-8ea0-6b1f0b616939}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\ppk">
+      <UniqueIdentifier>{54fbc484-083d-4e8a-bca6-952b46c51c6a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -245,9 +245,6 @@
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_uint128.hpp">
       <Filter>Includes\PCG</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PP_Assert.h">
-      <Filter>Includes\PP Assert</Filter>
     </ClInclude>
     <ClInclude Include="include\gl3w\include\GL\gl3w.h">
       <Filter>Includes\gl3w</Filter>
@@ -861,6 +858,9 @@
     <ClInclude Include="src\flux\FluxGame.h">
       <Filter>Games\Flux</Filter>
     </ClInclude>
+    <ClInclude Include="include\ppk\ppk_assert.h">
+      <Filter>Includes\ppk</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -956,9 +956,6 @@
     </ClCompile>
     <ClCompile Include="src\DebugConsole.cpp">
       <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PP_Assert.cpp">
-      <Filter>Includes\PP Assert</Filter>
     </ClCompile>
     <ClCompile Include="include\gl3w\src\gl3w.c">
       <Filter>Includes\gl3w</Filter>
@@ -1469,6 +1466,9 @@
     </ClCompile>
     <ClCompile Include="src\flux\FluxGame.cpp">
       <Filter>Games\Flux</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ppk\ppk_assert.cpp">
+      <Filter>Includes\ppk</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

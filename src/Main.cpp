@@ -365,7 +365,7 @@ int main(int argc, char* argv[])
 	dd::CommandLine cmdLine(argv, argc);
 	if (cmdLine.Exists("noassert"))
 	{
-		pempek::assert::implementation::ignoreAllAsserts(true);
+		ppk::assert::implementation::ignoreAllAsserts(true);
 	}
 
 	if (cmdLine.Exists("dataroot"))

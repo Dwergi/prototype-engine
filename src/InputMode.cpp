@@ -17,7 +17,7 @@ namespace dd
 	InputModeConfig InputModeConfig::s_modes[MAX_MODES];
 	uint8 InputModeConfig::s_used = 0;
 
-	InputModeConfig& InputModeConfig::InputModeConfig::Create(std::string name)
+	InputModeConfig& InputModeConfig::InputModeConfig::Create(std::string_view name)
 	{
 		InputModeConfig* existing = Find(name);
 		if (existing != nullptr)
@@ -36,7 +36,7 @@ namespace dd
 		return new_mode;
 	}
 
-	InputModeConfig* InputModeConfig::Find(std::string name)
+	InputModeConfig* InputModeConfig::Find(std::string_view name)
 	{
 		for (int i = 0; i < s_used; ++i)
 		{

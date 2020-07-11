@@ -19,10 +19,10 @@ namespace dd
 		bool FindBinding(InputModeID mode, const InputEvent& evt, InputAction& out_action) const;
 
 		void BindKey(dd::Key key, InputAction action);
-		void BindKey(dd::Key key, InputAction action, std::string mode_name);
+		void BindKey(dd::Key key, InputAction action, std::string_view mode_name);
 		void BindKey(dd::Key key, InputAction action, InputModeFlags modes);
 		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action);
-		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action, std::string mode_name);
+		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action, std::string_view mode_name);
 		void BindKey(dd::Key key, ModifierFlags modifiers, InputAction action, InputModeFlags modes);
 
 	private:

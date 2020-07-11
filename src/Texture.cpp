@@ -130,7 +130,7 @@ namespace ddr
 		m_textureUnit = -1;
 	}
 
-	TextureHandle TextureManager::Load(std::string name)
+	TextureHandle TextureManager::Load(std::string_view name)
 	{
 		TextureHandle texture_h = super::Find(name); 
 		if (!texture_h.IsValid())

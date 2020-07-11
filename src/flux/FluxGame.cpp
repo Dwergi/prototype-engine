@@ -35,9 +35,25 @@ namespace flux
 
 	static ddc::Entity s_player;
 
+	static const char* PLAYER_SPRITESHEET = "player_spritesheet.png";
+	static const char* MAP_BACKGROUND = "map_background.png";
+	static const char* MAP_FOREGROUND = "map_foreground.png";
+
 	void FluxGame::Initialize()
 	{
+		s_camera = new ddr::OrthoCamera();
 
+		dd::Services::Register(new ddr::SpriteManager());
+		dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
+
+		ddr::TextureHandle spritesheet_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
+		s_spriteSheetManager->Load(PLAYER_SPRITESHEET, spritesheet_tex_h, glm::ivec2(32));
+
+		ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
+		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));
+
+		ddr::TextureHandle foreground_tex_h = s_textureManager->Load(MAP_FOREGROUND);
+		s_spriteSheetManager->Load(MAP_FOREGROUND, foreground_tex_h, glm::ivec2(16));
 	}
 
 	void FluxGame::RegisterSystems(ddc::SystemsManager& system_manager)
