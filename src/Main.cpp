@@ -133,8 +133,6 @@ static dd::Timer s_profilerTimer;
 
 static void StartFrame()
 {
-	DD_DIAGNOSTIC("-------------------- START FRAME --------------------\n");
-
 	dd::Profiler::BeginFrame();
 
 	s_frameTimer->Update();
@@ -147,8 +145,6 @@ static void StartFrame()
 
 static void EndFrame()
 {
-	s_jobSystem->Clear();
-
 	s_debugUI->EndFrame();
 	s_window->Swap();
 
@@ -182,7 +178,7 @@ static int GameMain()
 
 	dd::TypeInfo::RegisterQueuedTypes();
 
-	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency()));
+	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
 
 	dd::Services::RegisterInterface<dd::IGame>(new TGame());
 

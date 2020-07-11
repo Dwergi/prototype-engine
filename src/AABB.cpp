@@ -31,7 +31,7 @@ namespace ddm
 		: Min( min ),
 		Max( max )
 	{
-		DD_ASSERT_SLOW(IsValid(), "Invalid AABB: (%.2g, %.2g, %.2g)-(%.2g, %.2g, %.2g)", Min.x, Min.y, Min.z, Max.x, Max.y, Max.z);
+		DD_ASSERT( IsValid() );
 	}
 
 	AABB::AABB( const Sphere& sphere )
@@ -61,7 +61,7 @@ namespace ddm
 		Min = glm::min( Min, pt );
 		Max = glm::max( Max, pt );
 
-		DD_ASSERT_SLOW(IsValid(), "Invalid AABB: (%.2g, %.2g, %.2g)-(%.2g, %.2g, %.2g)", Min.x, Min.y, Min.z, Max.x, Max.y, Max.z);
+		DD_ASSERT( IsValid() );
 	}
 
 	void AABB::Expand( const AABB& bounds )
@@ -69,7 +69,7 @@ namespace ddm
 		Min = glm::min( Min, bounds.Min );
 		Max = glm::max( Max, bounds.Max );
 
-		DD_ASSERT_SLOW(IsValid(), "Invalid AABB: (%.2g, %.2g, %.2g)-(%.2g, %.2g, %.2g)", Min.x, Min.y, Min.z, Max.x, Max.y, Max.z);
+		DD_ASSERT( IsValid() );
 	}
 
 	float AABB::Volume() const

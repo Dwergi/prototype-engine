@@ -78,7 +78,7 @@ namespace ddr
 		auto transforms = data.Get<dd::TransformComponent>();
 		auto colours = data.Get<dd::ColourComponent>();
 
-		auto& entities = data.Entities();
+		const auto& entities = data.Entities();
 
 		for( size_t i = 0; i < data.Size(); ++i )
 		{

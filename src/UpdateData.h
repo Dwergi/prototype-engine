@@ -8,11 +8,6 @@
 
 #include "UpdateBuffer.h"
 
-namespace dd
-{
-	struct Job;
-}
-
 namespace ddc
 {
 	struct EntityLayer;
@@ -25,19 +20,17 @@ namespace ddc
 	//
 	struct UpdateData
 	{
-		UpdateData(ddc::EntityLayer& layer, dd::Job* job, float delta_t) : m_layer(&layer), m_job(job), m_delta(delta_t) {}
-		UpdateData(UpdateData&& other) : m_layer(other.m_layer), m_job(other.m_job), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
+		UpdateData(ddc::EntityLayer& layer, float delta_t) : m_layer(&layer), m_delta(delta_t) {}
+		UpdateData(UpdateData&& other) : m_layer(other.m_layer), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
 
 		float Delta() const { return m_delta; }
 		ddc::EntityLayer& EntityLayer() const { return *m_layer; }
-		dd::Job* Job() const { return m_job; }
 
 		const UpdateBufferView& Data(const char* name = nullptr) const;
 
 	private:
 		friend struct System;
 
-		dd::Job* m_job { nullptr };
 		ddc::EntityLayer* m_layer { nullptr };
 		float m_delta { 0 };
 		dd::Array<UpdateBufferView, 8> m_views;

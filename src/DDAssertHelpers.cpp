@@ -35,19 +35,19 @@ namespace dd
 		String256 out;
 		switch (level)
 		{
-		case (int) AssertLevel::Debug:
+		case ( int) AssertLevel::Debug:
 			out += "DEBUG";
 			break;
 
-		case (int) AssertLevel::Warning:
+		case ( int) AssertLevel::Warning:
 			out += "WARNING";
 			break;
 
-		case (int) AssertLevel::Error:
+		case ( int) AssertLevel::Error:
 			out += "ERROR";
 			break;
 
-		case (int) AssertLevel::Fatal:
+		case ( int) AssertLevel::Fatal:
 			out += "FATAL";
 			break;
 		}
@@ -116,25 +116,15 @@ namespace dd
 	static pempek::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
 		int level, const char* message)
 	{
-		__debugbreak();
-
 		s_assert.Open = true;
 		s_assert.Info = FormatAssert(level, file, line, function, expression);
 		s_assert.Message = String256();
 		s_assert.Action = AssertAction::None;
 		if (message != nullptr)
 		{
-			s_assert.Message += " Message: ";
+			s_assert.Message += "Message: ";
 			s_assert.Message += message;
 		}
-
-		static dd::String256 s_message;
-		s_message = s_assert.Info;
-		s_message += s_assert.Message;
-		s_message += '\n';
-
-		printf(s_message.c_str());
-		OutputDebugStringA(s_message.c_str());
 
 		do
 		{
@@ -145,6 +135,7 @@ namespace dd
 			else
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				__debugbreak();
 			}
 		} while (s_assert.Action == AssertAction::None);
 
@@ -190,6 +181,13 @@ namespace dd
 	{
 		if (s_assert.Open)
 		{
+			static dd::String256 s_message;
+			s_message = s_assert.Info;
+			s_message += s_assert.Message;
+
+			printf(s_message.c_str());
+			OutputDebugStringA(s_message.c_str());
+
 			std::string input_mode = s_input->GetCurrentMode();
 			s_input->SetCurrentMode("assert");
 

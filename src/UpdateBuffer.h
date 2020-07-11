@@ -81,7 +81,7 @@ namespace ddc
 		UpdateBufferView(const UpdateBufferView& other);
 
 		const dd::Span<Entity>& Entities() const { return m_entities; }
-		uint Size() const { return m_entities.Size(); }
+		size_t Size() const { return m_entities.Size(); }
 		const dd::String& Name() const { return m_buffer->Name(); }
 
 		template <typename T>

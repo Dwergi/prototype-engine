@@ -47,7 +47,7 @@
 
 #define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
 
-#define DD_FUNCTION( Func ) dd::BuildFunction<decltype( &Func ), &Func>( &Func )
+#define DD_FUNCTION( FN ) dd::BuildFunction<decltype( &FN ), &FN>( &FN )
 
 #define DD_CONCAT_IMPL( A, B ) A##B
 

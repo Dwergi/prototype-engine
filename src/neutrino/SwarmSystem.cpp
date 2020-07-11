@@ -115,12 +115,12 @@ namespace neut
 		const float max_turn = TurnSpeed * dt;
 		const float max_accel = AccelerationRate * dt;
 
-		auto& data = update.Data();
+		const auto& data = update.Data();
 		auto transforms = data.Write<dd::TransformComponent>();
 		auto swarm_agents = data.Write<neut::SwarmAgentComponent>();
 		auto rays = data.Write<dd::RayComponent>();
 
-		auto& player_data = update.Data( "player" );
+		const auto& player_data = update.Data( "player" );
 		auto player_transforms = player_data.Read<dd::TransformComponent>();
 
 		glm::vec3 player_pos = player_transforms[0].Position;

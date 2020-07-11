@@ -2,14 +2,52 @@
 #include "JobSystem.h"
 
 #include "DDAssertHelpers.h"
-#include "JobQueue.h"
-
-#include <processthreadsapi.h>
 
 namespace dd
 {
-	static constexpr bool USE_THREADS = true;
-	static constexpr uint MAX_THREADS = 0;
+	static constexpr bool USE_THREADS = false;
+
+	static constexpr int MAX_JOBS = 4096;
+	static constexpr uint MASK = MAX_JOBS - 1;
+	
+	thread_local Job g_jobs[MAX_JOBS];
+	thread_local int g_currentJob = 0;
+
+	struct JobQueue
+	{
+		JobQueue(JobSystem& system, std::thread::id tid);
+
+		// Create a new job.
+		Job* Allocate();
+
+		// Get a new job to work on.
+		Job* GetJob();
+
+		std::thread::id Owner() const { return m_ownerThread; }
+
+		// Push is always called from the owning thread.
+		void Push(Job& job);
+
+		// Clear the queue.
+		void Clear();
+
+	private:
+		std::thread::id m_ownerThread;
+		std::atomic<int> m_top;
+		std::atomic<int> m_bottom;
+
+		JobSystem* m_system { nullptr };
+
+		static constexpr int MAX_PENDING = 1024;
+		static constexpr int PENDING_MASK = MAX_PENDING - 1;
+		Job* m_pending[MAX_PENDING];
+
+		// Pop is always called from the owning thread.
+		Job* Pop();
+
+		// Steal is always called from another thread.
+		Job* Steal();
+	};
 
 	JobSystem::JobSystem(uint threads)
 	{
@@ -21,15 +59,12 @@ namespace dd
 		}
 		else
 		{
-			if (MAX_THREADS != 0 && MAX_THREADS < threads)
-			{
-				threads = MAX_THREADS;
-			}
 			m_rng = Random32(0, threads - 1);
 		}
 
 		m_queues.resize(threads);
-		m_queues[0] = new JobQueue(*this, std::this_thread::get_id(), 0);
+		m_queues[0] = new JobQueue(*this, std::this_thread::get_id());
+		
 
 		for (uint i = 1; i < threads; ++i)
 		{
@@ -39,22 +74,11 @@ namespace dd
 
 	void JobSystem::WorkerThread(uint this_index)
 	{
-		JobQueue* this_queue = new JobQueue(*this, std::this_thread::get_id(), this_index);
+		JobQueue* this_queue = new JobQueue(*this, std::this_thread::get_id());
 		m_queues[this_index] = this_queue;
-
-#ifdef WIN32
-		wchar_t name[64];
-		swprintf(name, 64, L"Job Worker %d", this_index);
-		SetThreadDescription(GetCurrentThread(), name);
-#endif
 
 		while (!m_stop)
 		{
-			if (this_queue->ShouldClear())
-			{
-				this_queue->Clear();
-			}
-
 			Job* job = this_queue->GetJob();
 			if (job != nullptr)
 			{
@@ -80,69 +104,37 @@ namespace dd
 		return job;
 	}
 
-	Job* JobSystem::Create(const char* id)
+	Job* JobSystem::Create()
 	{
-		return CreateChild(nullptr, id);
-	}
-
-	bool JobSystem::IsOwnParent(Job* job) const
-	{
+		Job* job = Allocate();
 		if (job == nullptr)
 		{
-			return false;
+			DD_ASSERT(job != nullptr);
+			return nullptr;
 		}
 
-		dd::Array<Job*, 8> jobs;
-		jobs.Add(job);
-
-		Job* parent = job->m_parent;
-		while (parent != nullptr)
-		{
-			if (jobs.Contains(parent))
-			{
-				return true;
-			}
-
-			jobs.Add(parent);
-			parent = parent->m_parent;
-		}
-
-		return false;
-	}
-
-	Job* JobSystem::CreateChild(Job* parent, const char* id)
-	{
-		DD_ASSERT_SLOW(!IsOwnParent(parent));
-
-		Job* job = Allocate();
-		DD_ASSERT(job != nullptr);
-
+		job->m_parent = nullptr;
 		job->m_pendingJobs = 1;
-		if (parent != nullptr)
-		{
-			DD_ASSERT(parent->m_pendingJobs > 0);
-
-			job->SetParent(parent);
-		}
-
-		if (id != nullptr)
-		{
-			size_t length = ddm::min(std::strlen(id), Job::PaddingBytes);
-			std::memcpy(job->m_argument, id, length);
-		}
 
 		return job;
 	}
 	
 	void JobSystem::Schedule(Job* job)
 	{
-		DD_ASSERT(job != nullptr, "Scheduling a null job!");
-		DD_ASSERT(job->m_pendingJobs >= 1);
+		if (job == nullptr)
+		{
+			DD_ASSERT(job != nullptr, "Scheduling a null job!");
+			return;
+		}
 
 		JobQueue* queue = FindQueue(std::this_thread::get_id());
-		DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");
+		if (queue == nullptr)
+		{
+			DD_ASSERT(queue != nullptr, "Scheduling jobs on thread without queue!");
+			return;
+		}
 
-		queue->Push(job);
+		queue->Push(*job);
 	}
 
 	void JobSystem::Wait(const Job* job)
@@ -168,17 +160,6 @@ namespace dd
 		for (Job* job : jobs)
 		{
 			Wait(job);
-		}
-	}
-
-	void JobSystem::WorkOne()
-	{
-		JobQueue* queue = FindQueue(std::this_thread::get_id());
-		
-		Job* work = queue->GetJob();
-		if (work != nullptr)
-		{
-			work->Run();
 		}
 	}
 	
@@ -207,15 +188,134 @@ namespace dd
 		}
 	}
 
-	void JobSystem::Clear()
+	JobQueue::JobQueue(JobSystem& system, std::thread::id tid)
 	{
-		DD_ASSERT(dd::IsMainThread());
+		m_system = &system;
+		m_ownerThread = tid;
+		m_bottom = 0;
+		m_top = 0;
+		Clear();
+	}
 
-		m_queues[0]->Clear();
+	void JobQueue::Clear()
+	{
+		std::memset(g_jobs, 0, sizeof(Job) * MAX_JOBS);
+		std::memset(m_pending, 0, sizeof(Job*) * MAX_PENDING);
+		g_currentJob = 0;
+	}
 
-		for (JobQueue* queue : m_queues)
+	Job* JobQueue::Allocate()
+	{
+		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+
+		Job* job = &g_jobs[g_currentJob];
+		std::memset(job, 0, sizeof(Job));
+		++g_currentJob;
+		return job;
+	}
+
+	Job* JobQueue::GetJob()
+	{
+		Job* job = Pop();
+		if (job == nullptr)
 		{
-			queue->ScheduleClear();
+			JobQueue* queue = m_system->GetRandomQueue();
+			if (queue != nullptr && queue != this)
+			{
+				job = queue->Steal();
+			}
 		}
+
+		return job;
+	}
+
+	void JobQueue::Push(Job& job)
+	{
+		int bottom = m_bottom;
+		m_pending[bottom & PENDING_MASK] = &job;
+		m_bottom = bottom + 1;
+	}
+
+	Job* JobQueue::Pop()
+	{
+		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
+		
+		int bottom = m_bottom - 1;
+		m_bottom.exchange(bottom);
+
+		int top = m_top;
+
+		if (bottom > top)
+		{
+			// empty queue
+			m_bottom = top;
+			return nullptr;
+		}
+		else
+		{
+			// more than one item
+			Job* job = m_pending[bottom & PENDING_MASK];
+			if (top != bottom)
+			{
+				// more than one job left
+				return job;
+			}
+
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				job = nullptr;
+			}
+
+			m_bottom = top + 1;
+			return job;
+		}
+
+		return nullptr;
+	}
+
+	Job* JobQueue::Steal()
+	{
+		DD_ASSERT(std::this_thread::get_id() != m_ownerThread);
+		DD_ASSERT(m_top < MAX_PENDING);
+		
+		int top = m_top;
+		int bottom = m_bottom;
+
+		if (top < bottom)
+		{
+			Job* job = m_pending[top & PENDING_MASK];
+			if (!m_top.compare_exchange_strong(top, top + 1))
+			{
+				return nullptr;
+			}
+
+			return job;
+		}
+
+		return nullptr;
+	}
+
+	void Job::Run()
+	{
+		if (m_function != nullptr)
+		{
+			m_function(this);
+		}
+
+		Finish();
+	}
+
+	void Job::Finish()
+	{
+		int pending = --m_pendingJobs;
+		if (pending == 0 && m_parent != nullptr)
+		{
+			m_parent->Finish();
+		}
+	}
+
+	bool Job::IsFinished() const
+	{
+		return m_pendingJobs == 0;
 	}
 }

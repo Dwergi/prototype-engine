@@ -49,37 +49,36 @@ namespace ddc
 	void SystemsManager::UpdateSystem(SystemUpdate update)
 	{
 		// wait for all dependencies
-		for (ddc::SystemNode::Edge& dep : update.Node->In)
+		for (ddc::SystemNode::Edge& dep : update.SystemNode->m_in)
 		{
-			s_jobsystem->Wait(m_orderedSystems[dep.From].UpdateJob);
+			s_jobsystem->Wait(m_orderedSystems[dep.m_from].m_job);
 		}
 
-		System& system = *update.Node->System;
+		System& system = *update.SystemNode->m_system;
 		if (!system.IsEnabledForLayer(*update.Layer))
 		{
 			return;
 		}
 
 		system.FillBuffers(*update.Layer);
-
-		ddc::UpdateData update_data = system.CreateUpdateData(*update.Layer, update.Node->UpdateJob, update.DeltaT);
+		ddc::UpdateData update_data = system.CreateUpdateData(*update.Layer, update.DeltaT);
 		system.Update(update_data);
 		system.CommitChanges();
 	}
 
 	void SystemsManager::UpdateSystemsWithTreeScheduling(EntityLayer& layer, float delta_t)
 	{
-		dd::Job* root_job = s_jobsystem->Create("Systems");
+		dd::Job* root_job = s_jobsystem->Create();
 
 		for (SystemNode& node : m_orderedSystems)
 		{
 			SystemUpdate update;
-			update.Node = &node;
+			update.SystemNode = &node;
 			update.Layer = &layer;
 			update.DeltaT = delta_t;
 
-			node.UpdateJob = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
-			s_jobsystem->Schedule(node.UpdateJob);
+			node.m_job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
+			s_jobsystem->Schedule(node.m_job);
 		}
 
 		s_jobsystem->Schedule(root_job);
@@ -145,7 +144,7 @@ namespace ddc
 			NodeEntry entry;
 			entry.Node = &node;
 
-			if (node.In.empty())
+			if (node.m_in.empty())
 			{
 				entry.Column = 0;
 				entry.Row = row;
@@ -168,9 +167,9 @@ namespace ddc
 					continue;
 
 				int column = -1;
-				for (const SystemNode::Edge& edge : entry.Node->In)
+				for (const SystemNode::Edge& edge : entry.Node->m_in)
 				{
-					const NodeEntry* entry = FindNodeEntry(entries, m_orderedSystems[edge.From]);
+					const NodeEntry* entry = FindNodeEntry(entries, m_orderedSystems[edge.m_from]);
 					if (entry->Column == -1)
 					{
 						column = -1;
@@ -216,12 +215,12 @@ namespace ddc
 			ImVec2 b(a.x + NODE_WIDTH, a.y + NODE_HEIGHT);
 			draw_list->AddRectFilled(a, b, ImColor(0, 0, 0, 128), 3.0f);
 			draw_list->AddText(ImGui::GetFont(), ImGui::GetFontSize(), ImVec2(a.x + 5, a.y + 5), ImColor(255, 255, 255, 255),
-				entry.Node->System->GetName());
+				entry.Node->m_system->GetName());
 
 			// draw connections
-			for (const SystemNode::Edge& edge : entry.Node->In)
+			for (const SystemNode::Edge& edge : entry.Node->m_in)
 			{
-				const NodeEntry* dep = FindNodeEntry(entries, m_orderedSystems[edge.From]);
+				const NodeEntry* dep = FindNodeEntry(entries, m_orderedSystems[edge.m_from]);
 
 				ImVec2 out_pos = GetNodePosition(dep->Column, dep->Row);
 				out_pos.x += NODE_WIDTH;

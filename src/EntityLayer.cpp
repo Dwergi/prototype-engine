@@ -9,14 +9,14 @@
 
 namespace ddc
 {
-	static_assert(sizeof(ddc::Entity) == sizeof(uint64), "Entity should only be 64 bits.");
+	static_assert( sizeof( ddc::Entity ) == sizeof( uint64 ), "Entity should only be 64 bits." );
 
 	static const uint8 MAX_SPACES = 8;
 
 	static EntityLayer* s_spaceInstances[MAX_SPACES];
 	static uint8 s_maxLayer = 0;
 
-	EntityLayer::EntityLayer(const std::string& name) :
+	EntityLayer::EntityLayer(std::string name) :
 		m_name(name)
 	{
 		DD_ASSERT(s_maxLayer < MAX_SPACES);
@@ -42,7 +42,7 @@ namespace ddc
 		{
 			return;
 		}
-
+		
 		uint old_max_entities = m_maxEntities;
 		if (m_entities.size() > m_maxEntities)
 		{
@@ -51,9 +51,9 @@ namespace ddc
 
 		m_components.resize(dd::TypeInfo::ComponentCount());
 
-		for (uint8 i = 0; i < dd::TypeInfo::ComponentCount(); ++i)
+		for (dd::ComponentID i = 0; i < dd::TypeInfo::ComponentCount(); ++i)
 		{
-			const dd::TypeInfo* type = dd::TypeInfo::GetComponent((dd::ComponentID) i);
+			const dd::TypeInfo* type = dd::TypeInfo::GetComponent(i);
 			DD_ASSERT(type != nullptr);
 
 			size_t buffer_size = type->Size() * m_maxEntities;
@@ -73,14 +73,14 @@ namespace ddc
 		}
 	}
 
-	void EntityLayer::Update(float delta_t)
+	void EntityLayer::Update( float delta_t )
 	{
 		UpdateStorage();
 
-		for (int id = 0; id < m_entities.size(); ++id)
+		for( int id = 0; id < m_entities.size(); ++id )
 		{
 			EntityEntry& entry = m_entities[id];
-			if (entry.Destroy)
+			if( entry.Destroy )
 			{
 				entry.Alive = false;
 				entry.Destroy = false;
@@ -92,7 +92,7 @@ namespace ddc
 				m_free.push_back(id);
 			}
 
-			if (entry.Create)
+			if( entry.Create )
 			{
 				entry.Create = false;
 				entry.Alive = true;
@@ -102,59 +102,52 @@ namespace ddc
 
 	Entity EntityLayer::CreateEntity()
 	{
-		if (m_free.empty())
+		if( m_free.empty() )
 		{
-			m_free.push_back((uint) m_entities.size());
+			m_free.push_back( (uint) m_entities.size() );
 
 			EntityEntry new_entry;
 			new_entry.Entity.ID = m_entities.size();
 			new_entry.Entity.Version = -1;
 			new_entry.Entity.m_layer = m_instanceIndex;
 
-			m_entities.push_back(new_entry);
+			m_entities.push_back( new_entry );
 			UpdateStorage();
 		}
 
-		uint idx = dd::pop_front(m_free);
+		uint idx = dd::pop_front( m_free );
 		DD_ASSERT(idx < m_maxEntities, "Went over the max entity count!");
 
-		EntityEntry& entry = m_entities[idx];
+		EntityEntry& entry = m_entities[ idx ];
 		entry.Entity.Version++;
 		entry.Create = true;
 		return entry.Entity;
 	}
 
-	Entity EntityLayer::CreateEntityType(const EntityType& type)
+	void EntityLayer::DestroyEntity( Entity entity )
 	{
-		Entity e = CreateEntity();
-		AddType(e, type);
-		return e;
+		DD_ASSERT( IsAlive( entity ), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version );
+
+		m_entities[ entity.ID ].Destroy = true;
 	}
 
-	void EntityLayer::DestroyEntity(Entity entity)
+	Entity EntityLayer::GetEntity( uint id ) const
 	{
-		DD_ASSERT(IsAlive(entity), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version);
-
-		m_entities[entity.ID].Destroy = true;
-	}
-
-	Entity EntityLayer::GetEntity(uint id) const
-	{
-		if (id < m_entities.size())
+		if( id < m_entities.size() )
 		{
-			return m_entities[id].Entity;
+			return m_entities[ id ].Entity;
 		}
 
 		return Entity();
 	}
 
-	bool EntityLayer::IsAlive(Entity entity) const
+	bool EntityLayer::IsAlive( Entity entity ) const
 	{
-		DD_ASSERT(entity.ID >= 0 && entity.ID < m_entities.size());
+		DD_ASSERT( entity.ID >= 0 && entity.ID < m_entities.size() );
 
-		const EntityEntry& entry = m_entities[entity.ID];
+		const EntityEntry& entry = m_entities[ entity.ID ];
 
-		return entry.Entity.Version == entity.Version && (entry.Alive || entry.Create) && !entry.Tags.test((size_t) Tag::Disabled);
+		return entry.Entity.Version == entity.Version && (entry.Alive || entry.Create);
 	}
 
 	int EntityLayer::ComponentCount(Entity entity) const
@@ -183,174 +176,152 @@ namespace ddc
 		return (dd::ComponentID) i;
 	}
 
-	bool EntityLayer::HasComponent(Entity entity, dd::ComponentID id) const
+	bool EntityLayer::HasComponent( Entity entity, dd::ComponentID id ) const
 	{
 		DD_ASSERT(entity.IsValid());
 
-		if (!IsAlive(entity))
+		if( !IsAlive( entity ) )
 		{
 			return false;
 		}
 
-		return m_entities[entity.ID].Ownership.test((size_t) id);
+		return m_entities[entity.ID].Ownership.test( id );
 	}
 
-	bool EntityLayer::IsType(Entity entity, const EntityType& type) const
+	void* EntityLayer::AddComponent( Entity entity, dd::ComponentID id )
 	{
-		ComponentBits mask = type.Mask;
-		if (IsAlive(m_entities[entity.ID].Entity))
+		if( HasComponent( entity, id ) )
 		{
-			mask &= m_entities[entity.ID].Ownership;
-
-			if (mask.count() == type.Mask.count())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	void* EntityLayer::AddComponent(Entity entity, dd::ComponentID id)
-	{
-		if (HasComponent(entity, id))
-		{
-			return AccessComponent(entity, id);
+			return AccessComponent( entity, id );
 		}
 
-		m_entities[entity.ID].Ownership.set((size_t) id, true);
+		m_entities[entity.ID].Ownership.set( id, true );
 
-		void* ptr = AccessComponent(entity, id);
-		DD_ASSERT(ptr != nullptr);
+		void* ptr = AccessComponent( entity, id );
+		DD_ASSERT( ptr != nullptr );
 
-		const dd::TypeInfo* type = dd::TypeInfo::GetComponent(id);
-		type->PlacementNew(ptr);
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id ); 
+		type->PlacementNew( ptr );
 		return ptr;
 	}
 
-	void EntityLayer::AddType(Entity entity, const EntityType& type)
+	void* EntityLayer::AccessComponent( Entity entity, dd::ComponentID id ) const
 	{
-		for (size_t i = 0; i < type.Mask.size(); ++i)
-		{
-			if (type.Mask.test(i))
-			{
-				dd::ComponentID id = (dd::ComponentID) i;
-				AddComponent(entity, id);
-			}
-		}
-	}
-
-	void* EntityLayer::AccessComponent(Entity entity, dd::ComponentID id) const
-	{
-		if (!HasComponent(entity, id))
+		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
 		}
 
-		const dd::TypeInfo* type = dd::TypeInfo::GetComponent(id);
-		return m_components[(size_t) id] + (entity.ID * type->Size());
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id );
+		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	const void* EntityLayer::GetComponent(Entity entity, dd::ComponentID id) const
+	const void* EntityLayer::GetComponent( Entity entity, dd::ComponentID id ) const
 	{
-		if (!HasComponent(entity, id))
+		if( !HasComponent( entity, id ) )
 		{
 			return nullptr;
 		}
-
-		const dd::TypeInfo* type = dd::TypeInfo::GetComponent(id);
-		return m_components[(size_t) id] + (entity.ID * type->Size());
+		
+		const dd::TypeInfo* type = dd::TypeInfo::GetComponent( id );
+		return m_components[id] + (entity.ID * type->Size());
 	}
 
-	void EntityLayer::RemoveComponent(Entity entity, dd::ComponentID id)
+	void EntityLayer::RemoveComponent( Entity entity, dd::ComponentID id )
 	{
-		m_entities[entity.ID].Ownership.set((size_t) id, false);
-	}
-
-	void EntityLayer::RemoveType(Entity entity, const EntityType& type)
-	{
-		for (size_t i = 0; i < type.Mask.size(); ++i)
+		if( HasComponent( entity, id ) )
 		{
-			if (type.Mask.test(i))
+			m_entities[entity.ID].Ownership.set( id, false );
+		}
+		else
+		{
+			DD_ASSERT( false, "Entity does not have have component being removed!" );
+		}
+	}
+
+	void EntityLayer::GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const
+	{
+		DD_ASSERT( IsAlive( entity ) );
+
+		for( dd::ComponentID i = 0; i < MAX_COMPONENTS; ++i )
+		{
+			if( m_entities[ entity.ID ].Ownership.test( i ) )
 			{
-				dd::ComponentID id = (dd::ComponentID) i;
-				RemoveComponent(entity, id);
+				components.Add( i );
 			}
 		}
 	}
 
-	void EntityLayer::GetAllComponents(Entity entity, dd::IArray<dd::ComponentID>& components) const
-	{
-		DD_ASSERT(IsAlive(entity));
+#pragma optimize("", off)
 
-		for (uint8 i = 0; i < dd::TypeInfo::ComponentCount(); ++i)
+	void EntityLayer::FindAllWith( const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const
+	{
+		ComponentBits required;
+		for( dd::ComponentID type : components )
 		{
-			if (m_entities[entity.ID].Ownership.test(i))
-			{
-				components.Add((dd::ComponentID) i);
-			}
+			required.set( type, true );
 		}
-	}
 
-	void EntityLayer::FindAllWith(const EntityType& type, const TagBits& tags, std::vector<Entity>& out_entities) const
-	{
-		for (const EntityEntry& entry : m_entities)
+		for( const EntityEntry& entry : m_entities )
 		{
-			if (IsAlive(entry.Entity))
+			if( IsAlive( entry.Entity ) )
 			{
 				TagBits entity_tags = tags & entry.Tags;
-				ComponentBits entity_components = type.Mask & entry.Ownership;
+				ComponentBits entity_components = required & entry.Ownership;
 
-				if (entity_components.count() == type.Mask.count() &&
-					entity_tags.count() == tags.count())
+				if( entity_components.count() == required.count() && 
+					entity_tags.count() == tags.count() )
 				{
-					out_entities.push_back(entry.Entity);
+					out_entities.push_back( entry.Entity );
 				}
 			}
 		}
 	}
 
-	bool EntityLayer::HasTag(Entity e, Tag tag) const
-	{
-		DD_ASSERT(IsAlive(e));
-		DD_ASSERT(tag != Tag::None);
+#pragma optimize("", on)
 
-		return m_entities[e.ID].Tags.test((uint) tag);
+	bool EntityLayer::HasTag( Entity e, Tag tag ) const
+	{
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
+
+		return m_entities[ e.ID ].Tags.test( (uint) tag );
 	}
 
-	void EntityLayer::AddTag(Entity e, Tag tag)
+	void EntityLayer::AddTag( Entity e, Tag tag )
 	{
-		DD_ASSERT(IsAlive(e));
-		DD_ASSERT(tag != Tag::None);
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
 
-		m_entities[e.ID].Tags.set((uint) tag);
+		m_entities[ e.ID ].Tags.set( (uint) tag );
 	}
 
-	void EntityLayer::RemoveTag(Entity e, Tag tag)
+	void EntityLayer::RemoveTag( Entity e, Tag tag )
 	{
-		DD_ASSERT(IsAlive(e));
-		DD_ASSERT(tag != Tag::None);
+		DD_ASSERT( IsAlive( e ) );
+		DD_ASSERT( tag != Tag::None );
 
-		m_entities[e.ID].Tags.reset((uint) tag);
+		m_entities[ e.ID ].Tags.reset( (uint) tag );
 	}
 
-	void EntityLayer::SetAllTags(Entity e, TagBits tags)
+	void EntityLayer::SetAllTags( Entity e, TagBits tags )
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT( IsAlive( e ) );
 
-		m_entities[e.ID].Tags = tags;
+		m_entities[ e.ID ].Tags = tags;
 	}
 
-	TagBits EntityLayer::GetAllTags(Entity e) const
+	TagBits EntityLayer::GetAllTags( Entity e ) const
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT( IsAlive( e ) );
 
-		return m_entities[e.ID].Tags;
+		return m_entities[ e.ID ].Tags;
 	}
 
 	EntityLayer* Entity::Layer() const
 	{
 		DD_ASSERT(m_layer < s_maxLayer);
-
+		
 		return s_spaceInstances[m_layer];
 	}
 
@@ -402,13 +373,5 @@ namespace ddc
 	bool Entity::HasComponent(dd::ComponentID id) const
 	{
 		return Layer()->HasComponent(*this, id);
-	}
-
-	EntityType::EntityType(const dd::IArray<dd::ComponentID>& components)
-	{
-		for (dd::ComponentID id : components)
-		{
-			Mask.set((size_t) id);
-		}
 	}
 }

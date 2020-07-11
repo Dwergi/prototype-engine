@@ -120,13 +120,13 @@ namespace neut
 
 	void WaterSystem::Update( const ddc::UpdateData& update_data )
 	{
-		auto& terrain = update_data.Data( "terrain" );
+		const auto& terrain = update_data.Data( "terrain" );
 		auto terrain_chunks = terrain.Read<neut::TerrainChunkComponent>();
 		auto terrain_transforms = terrain.Read<dd::TransformComponent>();
 		auto terrain_bboxes = terrain.Read<dd::BoundBoxComponent>();
 		auto terrain_bspheres = terrain.Read<dd::BoundSphereComponent>();
 
-		auto& water = update_data.Data( "water" );
+		const auto& water = update_data.Data( "water" );
 		PopulateWaterCache( water );
 
 		ddc::EntityLayer& entities = update_data.EntityLayer();

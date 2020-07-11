@@ -55,7 +55,7 @@ namespace dd
 	{
 		DD_ASSERT(m_built);
 
-		dd::Array<int, 64> stack;
+		dd::Array<size_t, 64> stack;
 		stack.Add(0);
 
 		BVHIntersection nearest;
@@ -75,9 +75,9 @@ namespace dd
 				bucket_distance < nearest.Distance &&
 				bucket_distance < ray.Length)
 			{
-				if (bucket.IsLeaf())
+				if (bucket.IsLeaf)
 				{
-					for (int e = bucket.Left; e < bucket.Right; ++e)
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
 						float distance;
 						const BVHEntry& entry = m_entries[e];
@@ -106,7 +106,7 @@ namespace dd
 	{
 		DD_ASSERT(m_built);
 
-		dd::Array<int, 64> stack;
+		dd::Array<size_t, 64> stack;
 		stack.Add(0);
 
 		BVHIntersection nearest;
@@ -126,9 +126,9 @@ namespace dd
 				bucket_distance < nearest.Distance &&
 				bucket_distance < ray.Length)
 			{
-				if (bucket.IsLeaf())
+				if (bucket.IsLeaf)
 				{
-					for (int e = bucket.Left; e < bucket.Right; ++e)
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
 						const BVHEntry& entry = m_entries[e];
 						float entry_distance;
@@ -163,7 +163,7 @@ namespace dd
 
 		int buckets_tested = 0;
 
-		dd::Array<int, 64> stack;
+		dd::Array<size_t, 64> stack;
 		stack.Add(0);
 
 		bool hit = false;
@@ -176,9 +176,9 @@ namespace dd
 
 			if (bucket.Bounds.Intersects(bounds))
 			{
-				if (bucket.IsLeaf())
+				if (bucket.IsLeaf)
 				{
-					for (int e = bucket.Left; e < bucket.Right; ++e)
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
 						const BVHEntry& entry = m_entries[e];
 						if (entry.Bounds.Intersects(bounds))
@@ -207,7 +207,7 @@ namespace dd
 
 		int buckets_tested = 0;
 
-		dd::Array<int, 64> stack;
+		dd::Array<size_t, 64> stack;
 		stack.Add(0);
 
 		bool hit = false;
@@ -219,9 +219,9 @@ namespace dd
 			const BVHBucket& bucket = m_buckets[stack.Pop()];
 			if (bucket.Bounds.Intersects(sphere))
 			{
-				if (bucket.IsLeaf())
+				if (bucket.IsLeaf)
 				{
-					for (int e = bucket.Left; e < bucket.Right; ++e)
+					for (size_t e = bucket.Left; e < bucket.Right; ++e)
 					{
 						const BVHEntry& entry = m_entries[e];
 						if (entry.Bounds.Intersects(sphere))
@@ -248,9 +248,9 @@ namespace dd
 	{
 		bucket.Bounds.Clear();
 
-		if (bucket.IsLeaf())
+		if (bucket.IsLeaf)
 		{
-			for (int e = bucket.Left; e < bucket.Right; ++e)
+			for (size_t e = bucket.Left; e < bucket.Right; ++e)
 			{
 				bucket.Bounds.Expand(m_entries[e].Bounds);
 			}
@@ -262,25 +262,18 @@ namespace dd
 		}
 	}
 
-	void BVHTree::SplitBucket(int parent_index)
+	void BVHTree::SplitBucket(size_t parent_index, Job* parent_job)
 	{
 		BVHBucket& parent = m_buckets[parent_index];
-		DD_ASSERT(parent.IsLeaf());
+		DD_ASSERT(parent.IsLeaf);
 		DD_ASSERT(parent.Region.IsValid());
 		DD_TODO("Might be better to make this stack-based?");
 
 		// recursion condition
-		if (parent.Count() <= BVHBucket::MAX_ENTRIES)
+		if (parent.Count() <= MAX_ENTRIES)
 		{
-			--m_pending;
 			return;
 		}
-		
-		int start = parent.Left;
-		int mid = start;
-		int end = parent.Right;
-
-		DD_DIAGNOSTIC("BVH SPLIT: Start: %d, End: %d\n", start, end);
 
 		// figure out the split axis
 		glm::vec3 half_extents = parent.Region.Extents() / 2.0f;
@@ -298,34 +291,39 @@ namespace dd
 		float split_coord = parent.Region.Min[split_axis] + half_extents[split_axis];
 		parent.SplitAxis = (Axis) split_axis;
 
+		size_t start = parent.Left;
+		size_t mid = start;
+		size_t end = parent.Right;
+
 		// create sub-buckets
-		int left_index = m_bucketCount++;
-		
+		size_t left_index = m_bucketCount++;
+
 		BVHBucket& left = m_buckets[left_index];
 		left.Region.Min = parent.Region.Min;
 		left.Region.Max = parent.Region.Max;
 		left.Region.Max[split_axis] = split_coord;
 
-		left.SplitAxis = Axis::None;
+		left.IsLeaf = true;
 		left.Left = start;
 		left.Right = start;
 
-		int right_index = m_bucketCount++;
+		size_t right_index = m_bucketCount++;
 
 		BVHBucket& right = m_buckets[right_index];
 		right.Region.Min = parent.Region.Min;
 		right.Region.Min[split_axis] = split_coord;
 		right.Region.Max = parent.Region.Max;
 
-		right.SplitAxis = Axis::None;
+		right.IsLeaf = true;
 		right.Left = end;
 		right.Right = end;
 
+		parent.IsLeaf = false;
 		parent.Left = left_index;
 		parent.Right = right_index;
 
 		// split the current entries between the two buckets
-		for (int i = start; i < end; ++i)
+		for (size_t i = start; i < end; ++i)
 		{
 			glm::vec3 center = m_entries[i].Bounds.Center();
 			if (center[split_axis] < split_coord)
@@ -341,34 +339,30 @@ namespace dd
 			mid = start + (end - start) / 2;
 		}
 
-		DD_ASSERT_SLOW(mid != start && mid != end);
+		DD_ASSERT(mid != start && mid != end);
 
 		left.Right = mid;
 		right.Left = mid;
 
-		m_pending.fetch_add(2);
-
-		if (left.Count() > 256)
+		if (left.Count() > 512)
 		{
-			dd::Job* left_job = s_jobsystem->CreateMethod(this, &BVHTree::SplitBucket, left_index);
+			dd::Job* left_job = s_jobsystem->CreateMethodChild(parent_job, this, &BVHTree::SplitBucket, left_index, parent_job);
 			s_jobsystem->Schedule(left_job);
 		}
 		else
 		{
-			SplitBucket(left_index);
+			SplitBucket(left_index, parent_job);
 		}
 
-		if (right.Count() > 256)
+		if (right.Count() > 512)
 		{
-			dd::Job* right_job = s_jobsystem->CreateMethod(this, &BVHTree::SplitBucket, right_index);
+			dd::Job* right_job = s_jobsystem->CreateMethodChild(parent_job, this, &BVHTree::SplitBucket, right_index, parent_job);
 			s_jobsystem->Schedule(right_job);
 		}
 		else
 		{
-			SplitBucket(right_index);
+			SplitBucket(right_index, parent_job);
 		}
-
-		--m_pending;
 	}
 
 	void BVHTree::Build()
@@ -388,27 +382,22 @@ namespace dd
 
 		BVHBucket& root = m_buckets[0];
 		root.Bounds = root.Region;
-		root.SplitAxis = Axis::None;
+		root.IsLeaf = true;
 		root.Left = 0;
-		root.Right = (int) m_entries.size();
+		root.Right = m_entries.size();
 
 		DD_ASSERT(AllBucketsEmpty());
 
-		m_pending = 1;
+		dd::Job* job = s_jobsystem->Create();
+		SplitBucket(0, job);
+		s_jobsystem->Schedule(job);
+		s_jobsystem->Wait(job);
 
-		SplitBucket(0);
+		m_buckets.resize(m_bucketCount);
 
-		while (m_pending > 0)
+		for (size_t b = m_buckets.size(); b > 0; --b)
 		{
-			s_jobsystem->WorkOne();
-		}
-		
-		int bucket_count = m_bucketCount;
-		m_buckets.resize(bucket_count);
-
-		for (int b = bucket_count - 1; b >= 0; --b)
-		{
-			CalculateBucketBounds(m_buckets[b]);
+			CalculateBucketBounds(m_buckets[b - 1]);
 		}
 
 		m_built = true;
@@ -440,7 +429,7 @@ namespace dd
 		for (size_t i = 1; i < m_buckets.size(); ++i)
 		{
 			const BVHBucket& bucket = m_buckets[i];
-			if (!bucket.IsLeaf() || bucket.Left != bucket.Right)
+			if (!bucket.IsLeaf || bucket.Left != bucket.Right)
 			{
 				return false;
 			}

@@ -127,6 +127,9 @@
     <Filter Include="Games\Physics2D">
       <UniqueIdentifier>{65206d0c-22b2-4941-98ff-f2324986ae7b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Games\Flux">
+      <UniqueIdentifier>{e99ca982-3474-45da-8ea0-6b1f0b616939}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TransformComponent.h">
@@ -452,33 +455,6 @@
     </ClInclude>
     <ClInclude Include="include\nlohmann\json.hpp">
       <Filter>Includes\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\color.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\core.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\format.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\format-inl.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\ostream.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\posix.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\printf.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\ranges.h">
-      <Filter>Includes\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fmt\include\fmt\time.h">
-      <Filter>Includes\fmt</Filter>
     </ClInclude>
     <ClInclude Include="src\PhysicsRigidBodyComponent.h">
       <Filter>Components</Filter>
@@ -846,14 +822,44 @@
     <ClInclude Include="src\UpdateBuffer.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\JobQueue.h">
-      <Filter>Jobs</Filter>
+    <ClInclude Include="include\fmt\include\fmt\chrono.h">
+      <Filter>Includes\fmt</Filter>
     </ClInclude>
-    <ClInclude Include="src\Job.h">
-      <Filter>Jobs</Filter>
+    <ClInclude Include="include\fmt\include\fmt\color.h">
+      <Filter>Includes\fmt</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParallelFor.h">
-      <Filter>Jobs</Filter>
+    <ClInclude Include="include\fmt\include\fmt\compile.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\core.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\format.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\format-inl.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\locale.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\os.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\ostream.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\posix.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\printf.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fmt\include\fmt\ranges.h">
+      <Filter>Includes\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="src\flux\FluxGame.h">
+      <Filter>Games\Flux</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1182,12 +1188,6 @@
     <ClCompile Include="src\EntityVisualizer.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
-    <ClCompile Include="include\fmt\src\format.cc">
-      <Filter>Includes\fmt</Filter>
-    </ClCompile>
-    <ClCompile Include="include\fmt\src\posix.cc">
-      <Filter>Includes\fmt</Filter>
-    </ClCompile>
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -1437,7 +1437,6 @@
     <ClCompile Include="src\SystemsManager.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics2DGame.cpp" />
     <ClCompile Include="src\stress\IRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1459,11 +1458,17 @@
     <ClCompile Include="src\UpdateBuffer.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\JobQueue.cpp">
-      <Filter>Jobs</Filter>
+    <ClCompile Include="include\fmt\src\format.cc">
+      <Filter>Includes\fmt</Filter>
     </ClCompile>
-    <ClCompile Include="src\Job.cpp">
-      <Filter>Jobs</Filter>
+    <ClCompile Include="include\fmt\src\os.cc">
+      <Filter>Includes\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics2DGame.cpp">
+      <Filter>Games\Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flux\FluxGame.cpp">
+      <Filter>Games\Flux</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

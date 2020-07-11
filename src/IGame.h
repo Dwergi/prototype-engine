@@ -50,9 +50,9 @@ namespace dd
 		// Last initialization step - it is valid to populate the entity layer here if desired.
 		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& layers) = 0;
 
-		virtual void Shutdown() = 0;
-
 		virtual void Update(const dd::GameUpdateData& update_data) = 0;
+
+		virtual void Shutdown() = 0;
 
 		virtual ddr::ICamera& GetCamera() const = 0;
 		virtual const char* GetTitle() const { return "DD"; }
