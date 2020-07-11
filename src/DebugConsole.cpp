@@ -198,57 +198,16 @@ namespace dd
 
 		// reset output buffer
 		std::string errors;
-
-		// pass to AngelScript to evaluate 
-		/*if( m_scriptEngine.Evaluate( completeString, errors ) )
-			AddLog( fmt::format( "\t{}\n", errors ) );
-		else
-			AddLog( fmt::format( "\tScript error: {}!", errors.c_str() ) );*/
 	}
 
 	void DebugConsole::ListFunctions()
 	{
 		AddLog("Functions:\n");
-
-		/*asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
-		for( uint i = 0; i < engine->GetGlobalFunctionCount(); ++i )
-		{
-			asIScriptFunction* func = engine->GetGlobalFunctionByIndex( i );
-
-			// Skip the functions that start with _ as these are not meant to be called explicitly by the user
-			if( func->GetName()[0] != '_' )
-				AddLog( fmt::format( "\t- {}\n", func->GetDeclaration() ) );
-		}*/
 	}
 
 	void DebugConsole::ListVariables()
 	{
 		AddLog("Variables:\n");
-
-		/*asIScriptEngine* engine = m_scriptEngine.GetInternalEngine();
-		for( uint i = 0; i < engine->GetGlobalPropertyCount(); ++i )
-		{
-			const char* name;
-			const char* scope;
-			int typeId;
-			bool isConst;
-			void* ptr;
-
-			int res = engine->GetGlobalPropertyByIndex( i, &name, &scope, &typeId, &isConst, nullptr, &ptr );
-			if( res >= 0 )
-			{
-				const char* type_declaration = engine->GetTypeDeclaration( typeId );
-
-				if( strlen( scope ) > 0 )
-				{
-					AddLog( fmt::format( "\t- {} {}::{}\n", type_declaration, scope, name ) );
-				}
-				else
-				{
-					AddLog( fmt::format( "\t- {} {}\n", type_declaration, name ) );
-				}
-			}
-		}*/
 	}
 
 	int DebugConsole::TextEditCallback(ImGuiTextEditCallbackData* data)
@@ -339,7 +298,9 @@ namespace dd
 					// List matches
 					AddLog("Possible matches:\n");
 					for (int i = 0; i < candidates.size(); ++i)
+					{
 						AddLog(fmt::format("- {}\n", candidates[i].c_str()));
+					}
 				}
 
 				break;
@@ -351,9 +312,13 @@ namespace dd
 				if (data->EventKey == ImGuiKey_UpArrow)
 				{
 					if (m_historyPos == -1)
+					{
 						m_historyPos = (int) (m_history.size() - 1);
+					}
 					else if (m_historyPos > 0)
+					{
 						m_historyPos--;
+					}
 				}
 				else if (data->EventKey == ImGuiKey_DownArrow)
 				{

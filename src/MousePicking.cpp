@@ -354,7 +354,7 @@ namespace dd
 		}
 
 
-		if (ImGui::TreeNodeEx("Async", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Async", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::Value("Ray Origin", m_hitResult.Ray().Origin());
 			ImGui::Value("Ray Dir", m_hitResult.Ray().Direction());
@@ -370,11 +370,9 @@ namespace dd
 				ImGui::Text("Distance: <none>");
 
 			}
-
-			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("Ray", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Ray", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::Checkbox("Visualize Ray", &m_visualizeRay);
 
@@ -382,11 +380,9 @@ namespace dd
 
 			ImGui::Value("Ray Origin", ray_cmp->Ray.Origin());
 			ImGui::Value("Ray Dir", ray_cmp->Ray.Direction());
-
-			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("Focused", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Focused", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (m_focused.IsValid())
 			{
@@ -413,7 +409,7 @@ namespace dd
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("Selected", ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Selected", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (m_selected.IsValid())
 			{

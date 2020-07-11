@@ -72,6 +72,8 @@ namespace ddr
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) = delete;
 
+		static const char* TypeName() { return "Shader"; }
+
 	private:
 
 		friend struct ddr::UniformStorage;

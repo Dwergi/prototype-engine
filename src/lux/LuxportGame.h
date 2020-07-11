@@ -23,6 +23,5 @@ namespace lux
 		virtual void Update(const dd::GameUpdateData& update_data) override;
 
 		virtual const char* GetTitle() const override { return "Luxport"; }
-		ddr::ICamera& GetCamera() const;
 	};
 }

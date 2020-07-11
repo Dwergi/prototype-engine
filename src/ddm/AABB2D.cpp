@@ -7,6 +7,8 @@
 #include "PCH.h"
 #include "AABB2D.h"
 
+#include "Circle.h"
+
 DD_POD_CPP(ddm::AABB2D);
 
 namespace ddm
@@ -23,6 +25,24 @@ namespace ddm
 	{
 		return glm::all(glm::lessThanEqual(Min, other.Max)) && 
 			glm::all(glm::greaterThanEqual(Max, other.Min));
+	}
+
+	bool AABB2D::Intersects(const Circle& other) const
+	{
+		if (Contains(other.Centre))
+		{
+			return true;
+		}
+		
+		glm::vec2 nearest = NearestPoint(other.Centre);
+
+		return glm::distance2(nearest, other.Centre) < other.Radius;
+	}
+
+	bool AABB2D::Contains(glm::vec2 pt) const
+	{
+		return glm::all(glm::lessThanEqual(Min, pt)) &&
+			glm::all(glm::greaterThanEqual(Max, pt));
 	}
 
 	glm::vec2 ddm::AABB2D::NearestPoint(glm::vec2 pt) const

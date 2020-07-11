@@ -14,6 +14,8 @@ namespace ddr
 		ddr::SpriteHandle Get(int idx) const { return m_sprites[idx]; }
 		ddr::SpriteHandle Get(int x, int y) const;
 
+		static const char* TypeName() { return "Sprite Sheet"; }
+
 		DD_BASIC_TYPE(ddr::SpriteSheet)
 
 	private:

@@ -42,5 +42,9 @@ namespace dd
 	{
 		return std::this_thread::get_id() == s_mainThread;
 	}
+}
 
+std::string operator+(std::string_view a, std::string_view b)
+{
+	return std::string(a) + std::string(b);
 }

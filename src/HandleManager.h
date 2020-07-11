@@ -15,7 +15,7 @@ namespace dd
 		//
 		// The name of this instance.
 		//
-		std::string_view Name() const { return m_name; }
+		const std::string& Name() const { return m_name; }
 
 		//
 		// Set the name of this instance.
@@ -26,11 +26,34 @@ namespace dd
 		std::string m_name;
 	};
 
+	struct HandleManagerBase
+	{
+		//
+		// Update this handle manager.
+		//
+		virtual void Update() = 0;
+
+		//
+		// Get the type name of the type this manager is handling.
+		//
+		virtual const char* TypeName() const = 0;
+
+		//
+		// Get the number of valid handles.
+		//
+		virtual size_t LiveCount() const = 0;
+
+		//
+		// Get the names of all live instances of the type.
+		//
+		virtual void GetLiveNames(std::vector<std::string>& names) const = 0;
+	};
+
 	//
 	// Handle container that cares rather little about the internals of your type, as long as it derives from this.
 	//
 	template <typename T>
-	struct HandleManager
+	struct HandleManager : HandleManagerBase
 	{
 		static_assert(std::is_base_of<HandleTarget, T>::value);
 
@@ -72,7 +95,17 @@ namespace dd
 		//
 		// Get the number of valid handles.
 		//
-		size_t LiveCount() const;
+		virtual size_t LiveCount() const override;
+
+		//
+		// Get the names of all live instances of the handle.
+		//
+		virtual void GetLiveNames(std::vector<std::string>& names) const override;
+
+		//
+		// Get the name of the type.
+		//
+		virtual const char* TypeName() const override { return T::TypeName(); }
 
 		//
 		// Access the handle at index i.
@@ -82,7 +115,7 @@ namespace dd
 		//
 		// Update the handle manager, creating/destroying things that were created last frame.
 		//
-		virtual void Update();
+		virtual void Update() override;
 
 	protected:
 

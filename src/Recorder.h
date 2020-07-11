@@ -10,14 +10,14 @@
 
 namespace dd
 {
-	class RecorderBase
+	struct RecorderBase
 	{
 	};
 	//---------------------------------------------------------------------------
 
 	template <typename T>
-	class Recorder
-		: public RecorderBase
+	struct Recorder
+		: RecorderBase
 	{
 	protected:
 
@@ -48,8 +48,8 @@ namespace dd
 	//---------------------------------------------------------------------------
 
 	template <typename T>
-	class FullRecorder
-		: public Recorder<T> 
+	struct FullRecorder
+		: Recorder<T> 
 	{
 	protected:
 

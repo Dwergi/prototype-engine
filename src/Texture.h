@@ -37,6 +37,8 @@ namespace ddr
 
 		int GetTextureUnit() const { return m_textureUnit; }
 
+		static const char* TypeName() { return "Texture"; }
+
 	private:
 
 		friend struct TextureManager;

@@ -33,7 +33,5 @@ namespace stress
 		virtual void RegisterSystems(ddc::SystemsManager& system_manager) override;
 
 		virtual const char* GetTitle() const override { return "Stress Test"; }
-
-		virtual ddr::ICamera& GetCamera() const override;
 	};
 }

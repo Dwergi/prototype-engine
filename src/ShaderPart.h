@@ -26,7 +26,7 @@ namespace ddr
 		// Create a shader with the given name and type.
 		// Load the contents from the given path.
 		//
-		static ShaderPart* Create( const std::string& path, Type type );
+		static ShaderPart* Create(std::string_view path, Type type);
 
 		//
 		// Reload the shader from file.
@@ -35,11 +35,11 @@ namespace ddr
 
 		~ShaderPart();
 
-		ShaderPart( const ShaderPart& other ) = delete;
-		ShaderPart( ShaderPart&& other ) = delete;
-		ShaderPart& operator=( const ShaderPart& other ) = delete;
-		ShaderPart& operator=( ShaderPart&& other ) = delete;
-		
+		ShaderPart(const ShaderPart& other) = delete;
+		ShaderPart(ShaderPart&& other) = delete;
+		ShaderPart& operator=(const ShaderPart& other) = delete;
+		ShaderPart& operator=(ShaderPart&& other) = delete;
+
 	private:
 
 		friend struct Shader;
@@ -51,15 +51,15 @@ namespace ddr
 
 		std::string m_path;
 		std::string m_source;
-		
+
 		static std::unordered_map<std::string, ShaderPart*> sm_shaderCache;
 
-		static bool LoadFile( const std::string& path, std::string& outSource );
-		static std::string ProcessIncludes( std::string path, std::string source );
-		static void GatherUniforms( const std::string& src, UniformStorage& outUniforms );
+		static bool LoadFile(std::string_view path, std::string& outSource);
+		static std::string ProcessIncludes(std::string_view path, std::string_view source);
+		static void GatherUniforms(std::string_view src, UniformStorage& outUniforms);
 
-		ShaderPart( const std::string& path, Type type );
+		ShaderPart(std::string_view path, Type type);
 
-		std::string Compile( const std::string& source );
+		std::string Compile(const std::string& source);
 	};
 }

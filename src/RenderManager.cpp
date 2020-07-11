@@ -73,6 +73,11 @@ namespace ddr
 		}
 	}
 
+	void RenderManager::SetCamera(const ddr::ICamera& camera)
+	{
+		m_camera = &camera;
+	}
+
 	void RenderManager::Shutdown()
 	{
 		for (ddr::IRenderer* current : m_renderers)
@@ -105,13 +110,11 @@ namespace ddr
 		ImGui::Checkbox("Draw Depth", &m_debugDrawDepth);
 		ImGui::Checkbox("Draw Normals", &m_debugDrawNormals);
 
-		if (ImGui::TreeNodeEx("Fog", ImGuiTreeNodeFlags_CollapsingHeader))
+		if (ImGui::CollapsingHeader("Fog"))
 		{
 			ImGui::Checkbox("Enabled", &s_fog.Enabled);
 			ImGui::SliderFloat("Distance", &s_fog.Distance, 0, 10000, "%.1f");
 			ImGui::ColorEdit3("Colour", glm::value_ptr(s_fog.Colour));
-
-			ImGui::TreePop();
 		}
 
 		if (ImGui::Button("Reload Shaders"))
@@ -129,14 +132,16 @@ namespace ddr
 		m_framebuffer.UnbindDraw();
 	}
 
-	void RenderManager::Render(ddc::EntityLayer& layer, const ddr::ICamera& camera, float delta_t)
+	void RenderManager::Render(ddc::EntityLayer& layer, float delta_t)
 	{
+		DD_ASSERT(m_camera != nullptr, "No camera has been set through RenderManager::SetCamera!");
+
 		m_time += delta_t;
 
 		// create render data
 		for (ddr::IRenderer* renderer : m_renderers)
 		{
-			renderer->RenderData().Fill(layer, camera, m_uniforms, delta_t);
+			renderer->RenderData().Fill(layer, *m_camera, m_uniforms, delta_t);
 		}
 
 		// update
@@ -147,7 +152,7 @@ namespace ddr
 
 		ddr::IRenderer* debug_render = nullptr;
 
-		BeginRender(layer, camera);
+		BeginRender(layer, *m_camera);
 
 		// render non-alpha
 		for (ddr::IRenderer* renderer : m_renderers)
@@ -176,7 +181,7 @@ namespace ddr
 			}
 		}
 
-		EndRender(m_uniforms, camera);
+		EndRender(m_uniforms, *m_camera);
 	}
 
 	void RenderManager::BeginRender(const ddc::EntityLayer& layer, const ddr::ICamera& camera)

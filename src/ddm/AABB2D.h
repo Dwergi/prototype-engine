@@ -19,6 +19,8 @@ namespace ddm
 		bool Intersects(const ddm::AABB2D& other) const;
 		bool Intersects(const ddm::Circle& circle) const;
 
+		bool Contains(glm::vec2 pt) const;
+
 		glm::vec2 NearestPoint(glm::vec2 pt) const;
 
 		glm::vec2 Min { 0, 0 };

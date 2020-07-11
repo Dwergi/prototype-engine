@@ -46,6 +46,7 @@ namespace dd
 		bool m_draw { false };
 		bool m_midWindow { false };
 		bool m_midFrame { false };
+		bool m_needsSort { false };
 
 		ImGuiContext* m_imguiContext { nullptr };
 	};

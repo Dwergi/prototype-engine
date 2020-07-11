@@ -155,6 +155,8 @@ namespace ddr
 		Mesh( const Mesh& ) = delete;
 		Mesh( Mesh&& ) = delete;
 
+		static const char* TypeName() { return "Mesh"; }
+
 	private:
 
 		static const size_t DirtyBitCount = (size_t) MeshPart::Count;

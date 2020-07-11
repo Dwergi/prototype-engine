@@ -37,7 +37,7 @@ namespace dd
 
 	void Input::Update(float delta_t)
 	{
-		DD_ASSERT_FATAL(m_bindings != nullptr, "Key bindings not set!");
+		DD_ASSERT_FATAL(m_bindings.Count() > 0, "Key bindings not set!");
 
 		// switch mode
 		UpdateMode();
@@ -73,7 +73,7 @@ namespace dd
 				if ((evt.IsMouse() && m_mouseEnabled) ||
 					(evt.IsKeyboard() && m_keyboardEnabled))
 				{
-					bound = m_bindings->FindBinding(m_currentMode->ID(), evt, action);
+					bound = m_bindings.FindBinding(m_currentMode->ID(), evt, action);
 				}
 
 				if (bound)
@@ -145,7 +145,7 @@ namespace dd
 		return false;
 	}
 
-	void Input::SetCurrentMode(std::string mode_name)
+	void Input::SetCurrentMode(std::string_view mode_name)
 	{
 		InputModeConfig* mode = InputModeConfig::Find(mode_name);
 		DD_ASSERT(mode != nullptr);

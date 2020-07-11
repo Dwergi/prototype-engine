@@ -19,37 +19,37 @@ namespace ddr
 {
 	std::unordered_map<std::string, ShaderPart*> ShaderPart::sm_shaderCache;
 
-	GLenum GetOpenGLShaderType( ShaderPart::Type type )
+	GLenum GetOpenGLShaderType(ShaderPart::Type type)
 	{
-		switch( type )
+		switch (type)
 		{
-		case ShaderPart::Type::Vertex:
-			return GL_VERTEX_SHADER;
+			case ShaderPart::Type::Vertex:
+				return GL_VERTEX_SHADER;
 
-		case ShaderPart::Type::Pixel:
-			return GL_FRAGMENT_SHADER;
+			case ShaderPart::Type::Pixel:
+				return GL_FRAGMENT_SHADER;
 
-		case ShaderPart::Type::Geometry:
-			return GL_GEOMETRY_SHADER;
+			case ShaderPart::Type::Geometry:
+				return GL_GEOMETRY_SHADER;
 		}
 
 		return GL_INVALID_INDEX;
 	}
 
-	ShaderPart::ShaderPart( const std::string& path, Type type ) :
-		m_path( path ),
-		m_type( type )
+	ShaderPart::ShaderPart(std::string_view path, Type type) :
+		m_path(path),
+		m_type(type)
 	{
-		m_id = glCreateShader( GetOpenGLShaderType( type ) );
+		m_id = glCreateShader(GetOpenGLShaderType(type));
 
-		DD_ASSERT_ERROR( m_id != OpenGL::InvalidID, "Failed to create shader!" );
+		DD_ASSERT_ERROR(m_id != OpenGL::InvalidID, "Failed to create shader!");
 	}
 
 	ShaderPart::~ShaderPart()
 	{
-		if( m_id != OpenGL::InvalidID )
+		if (m_id != OpenGL::InvalidID)
 		{
-			glDeleteShader( m_id );
+			glDeleteShader(m_id);
 		}
 	}
 
@@ -60,51 +60,51 @@ namespace ddr
 		std::string oldSource = m_source;
 
 		std::string source;
-		if( !LoadFile( m_path, source ) )
+		if (!LoadFile(m_path, source))
 		{
-			DD_ASSERT_ERROR( false, "'%s': Failed to load.", m_path.c_str() );
+			DD_ASSERT_ERROR(false, "'%s': Failed to load.", m_path.c_str());
 			return false;
 		}
 
-		std::string message = Compile( source );
-		if( !message.empty() )
+		std::string message = Compile(source);
+		if (!message.empty())
 		{
-			DD_ASSERT_ERROR( false, "'%s': Compiling failed, message:\n %s", m_path.c_str(), message.c_str() );
+			DD_ASSERT_ERROR(false, "'%s': Compiling failed, message:\n %s", m_path.c_str(), message.c_str());
 
 			m_source = oldSource;
-			Compile( m_source );
+			Compile(m_source);
 
-			GatherUniforms( m_source, m_uniforms );
+			GatherUniforms(m_source, m_uniforms);
 			return false;
 		}
 
 		m_source = source;
 
-		GatherUniforms( m_source, m_uniforms );
+		GatherUniforms(m_source, m_uniforms);
 		return true;
 	}
 
-	std::string ShaderPart::Compile( const std::string& source )
+	std::string ShaderPart::Compile(const std::string& source)
 	{
-		DD_PROFILE_SCOPED( Shader_Compile );
+		DD_PROFILE_SCOPED(Shader_Compile);
 
 		std::string msg;
 
 		const char* src = source.c_str();
-		glShaderSource( m_id, 1, (const GLchar**) &src, NULL );
+		glShaderSource(m_id, 1, (const GLchar**) &src, NULL);
 
-		glCompileShader( m_id );
+		glCompileShader(m_id);
 
 		GLint status;
-		glGetShaderiv( m_id, GL_COMPILE_STATUS, &status );
+		glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
 
-		if( status == GL_FALSE )
+		if (status == GL_FALSE)
 		{
 			GLint infoLogLength;
-			glGetShaderiv( m_id, GL_INFO_LOG_LENGTH, &infoLogLength );
+			glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-			char* strInfoLog = new char[ infoLogLength + 1 ];
-			glGetShaderInfoLog( m_id, infoLogLength, NULL, strInfoLog );
+			char* strInfoLog = new char[(size_t) infoLogLength + 1];
+			glGetShaderInfoLog(m_id, infoLogLength, NULL, strInfoLog);
 
 			msg += strInfoLog;
 			delete[] strInfoLog;
@@ -113,73 +113,75 @@ namespace ddr
 		return msg;
 	}
 
-	size_t SkipWhitespace( const std::string& str, size_t start )
+	size_t SkipWhitespace(std::string_view str, size_t start)
 	{
-		return str.find_first_not_of( "\r\n\t ", start );
+		return str.find_first_not_of("\r\n\t ", start);
 	}
 
-	size_t EndOfWord( const std::string& str, size_t start )
+	size_t EndOfWord(std::string_view str, size_t start)
 	{
-		return str.find_first_of( "\r\n\t .,;[]()", start );
+		return str.find_first_of("\r\n\t .,;[]()", start);
 	}
 
-	std::string BlockContents( const std::string& str, size_t& offset )
+	std::string_view BlockContents(std::string_view str, size_t& offset)
 	{
-		size_t block_start = str.find( '{', offset );
-		offset = str.find( '}', block_start );
-		
-		std::string contents = str.substr( block_start + 1, offset - block_start - 1 );
+		size_t block_start = str.find('{', offset);
+		offset = str.find('}', block_start);
+
+		std::string_view contents = str.substr(block_start + 1, offset - block_start - 1);
 		++offset;
 		return contents;
 	}
 
-	std::string NextWord( const std::string& str, size_t& offset )
+	std::string_view NextWord(std::string_view str, size_t& offset)
 	{
-		size_t start = SkipWhitespace( str, offset );
-		offset = EndOfWord( str, start );
+		size_t start = SkipWhitespace(str, offset);
+		offset = EndOfWord(str, start);
 
-		return str.substr( start, offset - start );
+		return str.substr(start, offset - start);
 	}
 
-	size_t NextLine( const std::string& str, size_t start )
+	size_t NextLine(std::string_view str, size_t start)
 	{
-		size_t offset = str.find( "\n", start );
-		return SkipWhitespace( str, offset );
+		size_t offset = str.find("\n", start);
+		return SkipWhitespace(str, offset);
 	}
 
-	std::string ShaderPart::ProcessIncludes( std::string path, std::string src )
+	std::string ShaderPart::ProcessIncludes(std::string_view path, std::string_view src)
 	{
 		const char* const INCLUDE = "#include \"";
 
-		std::string base_path = path.substr( 0, path.rfind( "\\" ) );
+		std::string_view base_path = path.substr(0, path.rfind("\\"));
 
-		std::string final_source = src;
+		std::string final_source(src);
 
 		size_t include_start = 0;
-		while( (include_start = final_source.find( INCLUDE, include_start )) != std::string::npos )
+		while ((include_start = final_source.find(INCLUDE, include_start)) != std::string::npos)
 		{
-			size_t file_start = include_start + strlen( INCLUDE );
-			size_t file_end = final_source.find( "\"", file_start );
+			size_t file_start = include_start + strlen(INCLUDE);
+			size_t file_end = final_source.find("\"", file_start);
 
-			DD_ASSERT( file_end != std::string::npos, "'%s': Failed to find include name." );
+			DD_ASSERT(file_end != std::string::npos, "'%s': Failed to find include name.");
 
-			std::string include_name = final_source.substr( file_start, file_end - file_start );
+			std::string include_name = final_source.substr(file_start, file_end - file_start);
 			std::string include_path = base_path + "\\" + include_name;
 
-			dd::File file( include_path );
+			dd::File file(include_path);
 			std::string include_source;
-			if( !file.Read( include_source ) )
+			if (!file.Read(include_source))
 			{
-				DD_ASSERT_ERROR( false, "'%s': Failed to load include path '%s'.", path.c_str(), include_path.c_str() );
+				DD_ASSERT_ERROR(false, "'%s': Failed to load include path '%s'.", file.Path().c_str(), include_path.c_str());
 			}
 
-			include_source = ProcessIncludes( path, include_source );
+			include_source = ProcessIncludes(path, include_source);
 
-			std::string source_start = final_source.substr( 0, include_start );
-			std::string source_rest = final_source.substr( file_end + 1 );
+			std::string_view source_start = std::string_view(final_source).substr(0, include_start);
+			std::string_view source_rest = std::string_view(final_source).substr(file_end + 1);
 
-			final_source.reserve( final_source.size() + include_source.size() );
-			final_source = source_start + include_source + source_rest;
+			final_source.reserve(final_source.size() + include_source.size());
+			final_source = std::string(source_start);
+			final_source += include_source;
+			final_source += source_rest;
 
 			include_start += include_source.size();
 		}
@@ -187,91 +189,91 @@ namespace ddr
 		return final_source;
 	}
 
-	void ParseStruct( const std::string& src, size_t head, UniformStorage& outUniforms )
+	void ParseStruct(std::string_view src, size_t head, UniformStorage& outUniforms)
 	{
-		std::string struct_contents = BlockContents( src, head );
-		
-		std::string struct_name = NextWord( src, head );
+		std::string_view struct_contents = BlockContents(src, head);
 
-		size_t index_start = src.find( '[', head );
-		size_t line_end = src.find( ';', head );
+		std::string_view struct_name = NextWord(src, head);
+
+		size_t index_start = src.find('[', head);
+		size_t line_end = src.find(';', head);
 
 		int array_count = -1;
 
-		if( index_start < line_end )
+		if (index_start < line_end)
 		{
 			size_t index_end = index_start + 1;
-			std::string index = NextWord( src, index_end );
+			std::string_view index = NextWord(src, index_end);
 
 			int parsed = -1;
-			std::from_chars( index.c_str(), index.c_str() + index.size(), parsed );
+			std::from_chars(index.data(), index.data() + index.size(), parsed);
 
-			if( parsed > 0 )
+			if (parsed > 0)
 			{
 				array_count = parsed;
 			}
 		}
 
 		size_t struct_head = 0;
-		struct_head = SkipWhitespace( struct_contents, struct_head );
-		while( struct_head != std::string::npos )
+		struct_head = SkipWhitespace(struct_contents, struct_head);
+		while (struct_head != std::string::npos)
 		{
-			std::string var_type = NextWord( struct_contents, struct_head );
+			std::string_view var_type = NextWord(struct_contents, struct_head);
 
-			UniformType type = GetUniformTypeFromName( var_type );
-			DD_ASSERT( type != UniformType::Invalid );
+			UniformType type = GetUniformTypeFromName(var_type);
+			DD_ASSERT(type != UniformType::Invalid);
 
-			std::string var_name = NextWord( struct_contents, struct_head );
+			std::string_view var_name = NextWord(struct_contents, struct_head);
 
-			if( array_count == -1 )
+			if (array_count == -1)
 			{
-				std::string full_name = var_name;
-				if( !struct_name.empty() )
+				std::string full_name(var_name);
+				if (!struct_name.empty())
 				{
-					full_name = struct_name + "." + var_name;
+					full_name = std::string(struct_name) + "." + var_name;
 				}
 
-				outUniforms.Create( full_name.c_str(), type );
+				outUniforms.Create(full_name.c_str(), type);
 			}
 			else
 			{
-				for( int i = 0; i < array_count; ++i )
+				for (int i = 0; i < array_count; ++i)
 				{
-					std::string full_name = fmt::format( "{0}[{1}].{2}", struct_name, i, var_name );
-					outUniforms.Create( full_name.c_str(), type );
+					std::string full_name = fmt::format("{0}[{1}].{2}", struct_name, i, var_name);
+					outUniforms.Create(full_name.c_str(), type);
 				}
 			}
 
-			struct_head = NextLine( struct_contents, struct_head );
+			struct_head = NextLine(struct_contents, struct_head);
 		}
 	}
 
-	void ShaderPart::GatherUniforms( const std::string& src, UniformStorage& outUniforms )
+	void ShaderPart::GatherUniforms(std::string_view src, UniformStorage& outUniforms)
 	{
 		const char* const UNIFORM = "uniform ";
 
 		size_t uniform_start = 0;
-		while( (uniform_start = src.find( UNIFORM, uniform_start )) != std::string::npos )
+		while ((uniform_start = src.find(UNIFORM, uniform_start)) != std::string::npos)
 		{
-			size_t head = uniform_start + strlen( UNIFORM );
-			std::string type_name = NextWord( src, head );
-			if( type_name == "struct" )
+			size_t head = uniform_start + strlen(UNIFORM);
+			std::string_view type_name = NextWord(src, head);
+			if (type_name == "struct")
 			{
-				ParseStruct( src, head, outUniforms );
+				ParseStruct(src, head, outUniforms);
 			}
 			else
 			{
-				UniformType type = GetUniformTypeFromName( type_name );
-				if( type != UniformType::Invalid )
+				UniformType type = GetUniformTypeFromName(type_name);
+				if (type != UniformType::Invalid)
 				{
-					std::string var_name = NextWord( src, head );
+					std::string_view var_name = NextWord(src, head);
 
-					outUniforms.Create( var_name.c_str(), type );
+					outUniforms.Create(var_name, type);
 				}
 				else
 				{
 					// uniform block
-					ParseStruct( src, head, outUniforms );
+					ParseStruct(src, head, outUniforms);
 				}
 			}
 
@@ -279,44 +281,46 @@ namespace ddr
 		}
 	}
 
-	bool ShaderPart::LoadFile( const std::string& path, std::string& outSource )
+	bool ShaderPart::LoadFile(std::string_view path, std::string& outSource)
 	{
-		dd::File file( path );
+		dd::File file(path);
 		std::string read;
-		if( !file.Read( read ) )
+		if (!file.Read(read))
 		{
 			return false;
 		}
 
-		outSource = ProcessIncludes( path, read );
+		outSource = ProcessIncludes(path, read);
 		return true;
 	}
 
-	ShaderPart* ShaderPart::Create( const std::string& path, ShaderPart::Type type )
+	ShaderPart* ShaderPart::Create(std::string_view path_view, ShaderPart::Type type)
 	{
-		DD_PROFILE_SCOPED( Shader_Create );
+		DD_PROFILE_SCOPED(Shader_Create);
 
-		auto it = sm_shaderCache.find( path );
-		if( it != sm_shaderCache.end() )
+		std::string path(path_view);
+
+		auto it = sm_shaderCache.find(path);
+		if (it != sm_shaderCache.end())
 		{
 			return it->second;
 		}
 
-		if( !dd::File::Exists( path ) )
+		if (!dd::File::Exists(path))
 		{
 			return nullptr;
 		}
 
-		ShaderPart* shader = new ShaderPart( path, type );
-		if( shader->m_id == OpenGL::InvalidID ||
-			!shader->Reload() )
+		ShaderPart* shader = new ShaderPart(path, type);
+		if (shader->m_id == OpenGL::InvalidID ||
+			!shader->Reload())
 		{
-			DD_ASSERT( false, "Failed to load shader from '%s'!", path.c_str() );
+			DD_ASSERT(false, "Failed to load shader from '%s'!", path.c_str());
 			delete shader;
 			return nullptr;
 		}
 
-		sm_shaderCache.insert( std::make_pair( path, shader ) );
+		sm_shaderCache.insert(std::make_pair(path, shader));
 		return shader;
 	}
 }

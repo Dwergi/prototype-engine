@@ -16,7 +16,7 @@ namespace ddc
 	static EntityLayer* s_spaceInstances[MAX_SPACES];
 	static uint8 s_maxLayer = 0;
 
-	EntityLayer::EntityLayer(std::string name) :
+	EntityLayer::EntityLayer(std::string_view name) :
 		m_name(name)
 	{
 		DD_ASSERT(s_maxLayer < MAX_SPACES);

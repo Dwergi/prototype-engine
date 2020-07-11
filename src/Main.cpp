@@ -14,10 +14,10 @@
 
 #endif
 
+#include "AssetManager.h"
 #include "DDAssertHelpers.h"
 #include "DebugConsole.h"
 #include "DebugUI.h"
-#include "EntityPrototype.h"
 #include "EntityVisualizer.h"
 #include "File.h"
 #include "FrameTimer.h"
@@ -26,11 +26,8 @@
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "JobSystem.h"
-#include "Material.h"
-#include "Mesh.h"
 #include "OpenGL.h"
 #include "Services.h"
-#include "Texture.h"
 #include "Timer.h"
 #include "Uniforms.h"
 #include "IWindow.h"
@@ -39,8 +36,9 @@
 #include "SystemsManager.h"
 #include "RenderManager.h"
 
+#include "nlohmann/json.hpp"
+
 #include <filesystem>
-#include <nlohmann/json.hpp>
 
 //---------------------------------------------------------------------------
 #include "stress/StressTestGame.h"
@@ -49,7 +47,7 @@
 #include "flux/FluxGame.h"
 
 // GAME TO USE
-using TGame = flux::FluxGame;
+using TGame = lux::LuxportGame;
 //---------------------------------------------------------------------------
 
 static dd::Service<dd::IGame> s_game;
@@ -61,8 +59,7 @@ static dd::Service<ddr::RenderManager> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
 static dd::Service<ddc::SystemsManager> s_systemsManager;
-
-static ddc::EntityLayer* g_tempSpace;
+static dd::Service<dd::AssetManager> s_assetManager;
 
 std::thread::id g_mainThread;
 
@@ -101,32 +98,6 @@ static void IncreaseTimeScale()
 {
 	float time_scale = s_frameTimer->GetTimeScale();
 	s_frameTimer->SetTimeScale(time_scale * 1.1f);
-}
-
-static dd::Service<ddr::TextureManager> s_textureManager;
-static dd::Service<ddr::ShaderManager> s_shaderManager;
-static dd::Service<ddr::MaterialManager> s_materialManager;
-static dd::Service<ddr::MeshManager> s_meshManager;
-static dd::Service<ddc::EntityPrototypeManager> s_entityProtoManager;
-
-static void CreateAssetManagers()
-{
-	DD_TODO("Assets probably shouldn't live in main...");
-
-	dd::Services::Register(new ddr::TextureManager());
-	dd::Services::Register(new ddr::ShaderManager());
-	dd::Services::Register(new ddr::MaterialManager());
-	dd::Services::Register(new ddr::MeshManager());
-	dd::Services::Register(new ddc::EntityPrototypeManager());
-}
-
-static void UpdateAssetManagers()
-{
-	s_textureManager->Update();
-	s_shaderManager->Update();
-	s_materialManager->Update();
-	s_meshManager->Update();
-	s_entityProtoManager->Update();
 }
 
 static dd::Timer s_profilerTimer;
@@ -213,14 +184,9 @@ static int GameMain()
 		dd::Services::Register(new dd::FrameTimer());
 		s_frameTimer->SetMaxFPS(60);
 
-		dd::EntityVisualizer& entity_visualizer = dd::Services::Register(new dd::EntityVisualizer());
+		dd::Services::Register(new dd::EntityVisualizer());
 
-		s_debugUI->RegisterDebugPanel(*s_frameTimer);
-		s_debugUI->RegisterDebugPanel(*s_renderer);
-		s_debugUI->RegisterDebugPanel(*s_systemsManager);
-		s_debugUI->RegisterDebugPanel(entity_visualizer);
-
-		CreateAssetManagers();
+		dd::Services::Register(new dd::AssetManager());
 
 		std::vector<ddc::EntityLayer*> entity_layers;
 
@@ -255,7 +221,7 @@ static int GameMain()
 				s_startFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
 
-			UpdateAssetManagers();
+			s_assetManager->Update();
 
 			{
 				{
@@ -290,7 +256,7 @@ static int GameMain()
 					s_profilerTimer.Restart();
 					for (ddc::EntityLayer* space : entity_layers)
 					{
-						s_renderer->Render(*space, s_game->GetCamera(), s_frameTimer->GameDelta());
+						s_renderer->Render(*space, s_frameTimer->GameDelta());
 					}
 					s_renderProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
@@ -317,15 +283,16 @@ static int GameMain()
 			dd::BreakOnAlloc(false);
 		}
 
-		for (ddc::EntityLayer* space : entity_layers)
+		for (ddc::EntityLayer* layer : entity_layers)
 		{
-			s_systemsManager->Shutdown(*space);
+			s_systemsManager->Shutdown(*layer);
 
-			delete space;
+			delete layer;
 		}
 
 		entity_layers.clear();
 
+		s_assetManager->Shutdown();
 		s_renderer->Shutdown();
 		s_game->Shutdown();
 	}

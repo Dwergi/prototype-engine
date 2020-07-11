@@ -19,11 +19,11 @@ namespace dd
 {
 	struct IDebugPanel
 	{
-		IDebugPanel() :
-			m_debugOpen( false )
-		{
-		}
+		IDebugPanel();
 
+		//
+		// Draw this debug panel.
+		//
 		void DrawDebugPanel();
 
 		//
@@ -44,7 +44,7 @@ namespace dd
 
 	private:
 
-		bool m_debugOpen;
+		bool m_debugOpen { false };
 
 		//
 		// Override this to draw your debug UI. You may assume that IsDebugOpen() is true, and that a window already exists. Do NOT call ImGui::End().

@@ -42,6 +42,8 @@ namespace ddc
 
 		TagBits Tags;
 		std::vector<ComponentPrototype> Components;
+
+		static const char* TypeName() { return "Prototype"; }
 	};
 
 	template <typename TComponent>

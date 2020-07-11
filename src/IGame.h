@@ -54,7 +54,6 @@ namespace dd
 
 		virtual void Shutdown() = 0;
 
-		virtual ddr::ICamera& GetCamera() const = 0;
 		virtual const char* GetTitle() const { return "DD"; }
 	};
 }

@@ -21,13 +21,13 @@
 
 namespace dd
 {
-	static const glm::vec3 s_gravity( 0, -9.81, 0 );
+	static const glm::vec3 s_gravity(0, -9.81, 0);
 
 	// TODO: There's a bit too many of these spraffed around now.
 	static dd::Service<dd::Input> s_input;
 
 	ParticleSystem::ParticleSystem() :
-		ddc::System( "Particles" )
+		ddc::System("Particles")
 	{
 		RequireWrite<dd::ParticleSystemComponent>();
 		RequireRead<dd::TransformComponent>();
@@ -38,15 +38,15 @@ namespace dd
 
 	}
 
-	void ParticleSystem::Initialize( ddc::EntityLayer& entities )
+	void ParticleSystem::Initialize(ddc::EntityLayer& entities)
 	{
 		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
 		//entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
 
-		s_input->AddHandler(dd::InputAction::START_PARTICLE, [this](){ m_startEmitting = true; });
+		s_input->AddHandler(dd::InputAction::START_PARTICLE, [this]() { m_startEmitting = true; });
 	}
-	
-	void ParticleSystem::OnBulletHitMessage( ddc::Message msg )
+
+	void ParticleSystem::OnBulletHitMessage(ddc::Message msg)
 	{
 		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
 
@@ -57,8 +57,8 @@ namespace dd
 
 		m_pendingSpawns.push_back( req );*/
 	}
-	
-	void ParticleSystem::Update( const ddc::UpdateData& update )
+
+	void ParticleSystem::Update(const ddc::UpdateData& update)
 	{
 		const auto& data = update.Data();
 		ddc::EntityLayer& entities = update.EntityLayer();
@@ -66,17 +66,17 @@ namespace dd
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();
 
-		for( size_t i = 0; i < particles.Size(); ++i )
+		for (size_t i = 0; i < particles.Size(); ++i)
 		{
-			dd::ParticleSystemComponent& system = particles[ i ];
-				
-			if( m_killAllParticles )
+			dd::ParticleSystemComponent& system = particles[i];
+
+			if (m_killAllParticles)
 			{
-				for( size_t i = 0; i < dd::MAX_PARTICLES; ++i )
+				for (size_t i = 0; i < dd::MAX_PARTICLES; ++i)
 				{
 					dd::Particle& particle = system.Particles[i];
 
-					if( particle.Alive() )
+					if (particle.Alive())
 					{
 						particle.Age = particle.Lifetime;
 					}
@@ -85,57 +85,57 @@ namespace dd
 				system.Age = system.Lifetime;
 			}
 
-			UpdateLiveParticles( system, update.Delta() );
+			UpdateLiveParticles(system, update.Delta());
 
 			system.Age += update.Delta();
 
-			if( system.Age < system.Lifetime )
+			if (system.Age < system.Lifetime)
 			{
-				EmitNewParticles( system, transforms[ i ], update.Delta() );
+				EmitNewParticles(system, transforms[i], update.Delta());
 			}
 		}
 
-		for( const SpawnRequest& req : m_pendingSpawns )
+		for (const SpawnRequest& req : m_pendingSpawns)
 		{
 			ddc::Entity entity = entities.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
-			entities.AddTag( entity, ddc::Tag::Visible );
+			entities.AddTag(entity, ddc::Tag::Visible);
 
-			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>( entity );
-			transform->Rotation = glm::rotation( req.Normal, glm::vec3( 0, 0, 1 ) );
+			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
+			transform->Rotation = glm::rotation(req.Normal, glm::vec3(0, 0, 1));
 			transform->Position = req.Position;
 			transform->Update();
 
-			dd::BoundBoxComponent* bounds = entities.Access<dd::BoundBoxComponent>( entity );
-			bounds->BoundBox = ddm::AABB( glm::vec3( -0.5 ), glm::vec3( 0.5 ) );
+			dd::BoundBoxComponent* bounds = entities.Access<dd::BoundBoxComponent>(entity);
+			bounds->BoundBox = ddm::AABB(glm::vec3(-0.5), glm::vec3(0.5));
 
-			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>( entity );
+			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>(entity);
 			particle->Age = 0;
 			particle->MinLifetime = 0.1;
 			particle->MaxLifetime = 0.2;
-			particle->MinColour = glm::vec3( 0.7, 0, 0 );
-			particle->MaxColour = glm::vec3( 1.0, 1.0, 0 );
+			particle->MinColour = glm::vec3(0.7, 0, 0);
+			particle->MaxColour = glm::vec3(1.0, 1.0, 0);
 			particle->EmissionRate = 2000;
-			particle->MinSize = glm::vec2( 0.1, 0.1 );
-			particle->MaxSize = glm::vec2( 0.2, 0.2 );
-			particle->MinVelocity = glm::vec3( 0, 0, 5 );
-			particle->MaxVelocity = glm::vec3( 5, 5, 7 );
+			particle->MinSize = glm::vec2(0.1, 0.1);
+			particle->MaxSize = glm::vec2(0.2, 0.2);
+			particle->MinVelocity = glm::vec3(0, 0, 5);
+			particle->MaxVelocity = glm::vec3(5, 5, 7);
 			particle->Lifetime = 0.1;
 		}
 
 		m_pendingSpawns.clear();
 	}
 
-	void ParticleSystem::UpdateLiveParticles( dd::ParticleSystemComponent& system, float delta_t )
+	void ParticleSystem::UpdateLiveParticles(dd::ParticleSystemComponent& system, float delta_t)
 	{
-		for( size_t particle_index = 0; particle_index < system.LiveCount; ++particle_index )
+		for (size_t particle_index = 0; particle_index < system.LiveCount; ++particle_index)
 		{
 			dd::Particle& particle = system.Particles[particle_index];
 
-			if( particle.Alive() )
+			if (particle.Alive())
 			{
-				particle.Age += float( delta_t );
+				particle.Age += float(delta_t);
 
-				if( !particle.Alive() )
+				if (!particle.Alive())
 				{
 					--system.LiveCount;
 					continue;
@@ -150,7 +150,7 @@ namespace dd
 		}
 	}
 
-	void ParticleSystem::EmitNewParticles( dd::ParticleSystemComponent& system, const dd::TransformComponent& transform, float delta_t )
+	void ParticleSystem::EmitNewParticles(dd::ParticleSystemComponent& system, const dd::TransformComponent& transform, float delta_t)
 	{
 		system.EmissionAccumulator += system.EmissionRate * delta_t;
 		int toEmit = (int) system.EmissionAccumulator;
@@ -159,28 +159,28 @@ namespace dd
 
 		int emitted = 0;
 
-		for( int i = 0; i < dd::MAX_PARTICLES; ++i )
+		for (int i = 0; i < dd::MAX_PARTICLES; ++i)
 		{
-			if( emitted >= toEmit || system.LiveCount > CurrentMaxParticles )
+			if (emitted >= toEmit || system.LiveCount > CurrentMaxParticles)
 			{
 				break;
 			}
 
-			dd::Particle& particle = system.Particles[ i ];
+			dd::Particle& particle = system.Particles[i];
 
-			if( !particle.Alive() )
+			if (!particle.Alive())
 			{
 				particle.Position = transform.Position;
-				
-				glm::vec3 velocity = GetRandomVector3( system.RNG, system.MinVelocity, system.MaxVelocity );
+
+				glm::vec3 velocity = GetRandomVector3(system.RNG, system.MinVelocity, system.MaxVelocity);
 				particle.Velocity = velocity * transform.Rotation;
 
-				DD_ASSERT( !ddm::IsNaN( particle.Velocity ) );
+				DD_ASSERT(!ddm::IsNaN(particle.Velocity));
 
-				particle.Size = GetRandomVector2( system.RNG, system.MinSize, system.MaxSize );
-				particle.Lifetime = glm::mix( system.MinLifetime, system.MaxLifetime, system.RNG.Next() );
+				particle.Size = GetRandomVector2(system.RNG, system.MinSize, system.MaxSize);
+				particle.Lifetime = glm::mix(system.MinLifetime, system.MaxLifetime, system.RNG.Next());
 				particle.Age = 0;
-				particle.Colour = glm::vec4( GetRandomVector3( system.RNG, system.MinColour, system.MaxColour ), 1 );
+				particle.Colour = glm::vec4(GetRandomVector3(system.RNG, system.MinColour, system.MaxColour), 1);
 
 				++system.LiveCount;
 				++emitted;
@@ -190,57 +190,57 @@ namespace dd
 
 	void ParticleSystem::DrawDebugInternal()
 	{
-		ImGui::SliderInt( "Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES );
+		ImGui::SliderInt("Max Particles", &CurrentMaxParticles, 0, dd::MAX_PARTICLES);
 
-		if( m_selected == nullptr )
+		if (m_selected == nullptr)
 		{
-			ImGui::Text( "<no selection>" );
+			ImGui::Text("<no selection>");
 			return;
 		}
 
-		if( ImGui::Button( "Start" ) )
+		if (ImGui::Button("Start"))
 		{
 			m_selected->Age = 0;
 		}
 
-		ImGui::SliderFloat( "Emitter Lifetime", &m_selected->Lifetime, 0, 300 );
-		
+		ImGui::SliderFloat("Emitter Lifetime", &m_selected->Lifetime, 0, 300);
+
 		{
 			float max_emission_rate = CurrentMaxParticles / m_selected->MaxLifetime; // any higher and we can end up saturating the buffer
 
-			ImGui::SliderFloat( "Emission Rate", &m_selected->EmissionRate, 0.f, max_emission_rate );
+			ImGui::SliderFloat("Emission Rate", &m_selected->EmissionRate, 0.f, max_emission_rate);
 		}
 
-		if( ImGui::TreeNodeEx( "Lifetime", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		if (ImGui::CollapsingHeader("Lifetime"))
 		{
-			ImGui::SliderFloat( "Min", &m_selected->MinLifetime, 0, m_selected->MaxLifetime );
-			ImGui::SliderFloat( "Max", &m_selected->MaxLifetime, m_selected->MinLifetime, 10 );
+			ImGui::SliderFloat("Min", &m_selected->MinLifetime, 0, m_selected->MaxLifetime);
+			ImGui::SliderFloat("Max", &m_selected->MaxLifetime, m_selected->MinLifetime, 10);
 
 			ImGui::TreePop();
 		}
 
-		if( ImGui::TreeNodeEx( "Colour", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		if (ImGui::CollapsingHeader("Colour"))
 		{
-			ImGui::DragFloatRange2( "R", &m_selected->MinColour.r, &m_selected->MaxColour.r, 0.001f, 0, 1 );
-			ImGui::DragFloatRange2( "G", &m_selected->MinColour.g, &m_selected->MaxColour.g, 0.001f, 0, 1 );
-			ImGui::DragFloatRange2( "B", &m_selected->MinColour.b, &m_selected->MaxColour.b, 0.001f, 0, 1 );
-
-			ImGui::TreePop();
-		}
-		
-		if( ImGui::TreeNodeEx( "Velocity", ImGuiTreeNodeFlags_CollapsingHeader ) )
-		{
-			ImGui::DragFloatRange2( "X", &m_selected->MinVelocity.x, &m_selected->MaxVelocity.x, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Y", &m_selected->MinVelocity.y, &m_selected->MaxVelocity.y, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Z", &m_selected->MinVelocity.z, &m_selected->MaxVelocity.z, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2("R", &m_selected->MinColour.r, &m_selected->MaxColour.r, 0.001f, 0, 1);
+			ImGui::DragFloatRange2("G", &m_selected->MinColour.g, &m_selected->MaxColour.g, 0.001f, 0, 1);
+			ImGui::DragFloatRange2("B", &m_selected->MinColour.b, &m_selected->MaxColour.b, 0.001f, 0, 1);
 
 			ImGui::TreePop();
 		}
 
-		if( ImGui::TreeNodeEx( "Size", ImGuiTreeNodeFlags_CollapsingHeader ) )
+		if (ImGui::CollapsingHeader("Velocity"))
 		{
-			ImGui::DragFloatRange2( "X", &m_selected->MinSize.x, &m_selected->MaxSize.x, 0.1f, -50, 50, "%.1f" );
-			ImGui::DragFloatRange2( "Y", &m_selected->MinSize.y, &m_selected->MaxSize.y, 0.1f, -50, 50, "%.1f" );
+			ImGui::DragFloatRange2("X", &m_selected->MinVelocity.x, &m_selected->MaxVelocity.x, 0.1f, -50, 50, "%.1f");
+			ImGui::DragFloatRange2("Y", &m_selected->MinVelocity.y, &m_selected->MaxVelocity.y, 0.1f, -50, 50, "%.1f");
+			ImGui::DragFloatRange2("Z", &m_selected->MinVelocity.z, &m_selected->MaxVelocity.z, 0.1f, -50, 50, "%.1f");
+
+			ImGui::TreePop();
+		}
+
+		if (ImGui::CollapsingHeader("Size"))
+		{
+			ImGui::DragFloatRange2("X", &m_selected->MinSize.x, &m_selected->MaxSize.x, 0.1f, -50, 50, "%.1f");
+			ImGui::DragFloatRange2("Y", &m_selected->MinSize.y, &m_selected->MaxSize.y, 0.1f, -50, 50, "%.1f");
 
 			ImGui::TreePop();
 		}

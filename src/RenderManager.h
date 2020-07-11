@@ -31,6 +31,8 @@ namespace ddr
 		RenderManager();
 		~RenderManager();
 
+		RenderManager(const RenderManager&) = delete;
+
 		//
 		// Initialize all registered renderers.
 		//
@@ -44,12 +46,17 @@ namespace ddr
 		//
 		// Render all the registered renderers.
 		//
-		void Render( ddc::EntityLayer& entities, const ddr::ICamera& camera, float delta_t );
+		void Render(ddc::EntityLayer& entities, float delta_t);
+		
+		//
+		// Set the camera to use when rendering.
+		//
+		void SetCamera(const ddr::ICamera& camera);
 
 		//
 		// Register a renderer.
 		//
-		void Register( ddr::IRenderer& renderer );
+		void Register(ddr::IRenderer& renderer);
 
 	protected:
 
@@ -59,14 +66,16 @@ namespace ddr
 		virtual void DrawDebugInternal() override;
 
 	private:
-		
+
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;
 		Texture m_depthTexture;
 
 		RenderState m_defaultState;
 		RenderState m_depthState;
-		
+
+		const ICamera* m_camera { nullptr };
+
 		std::vector<ddr::IRenderer*> m_renderers;
 
 		glm::ivec2 m_previousSize { -1, -1 };
@@ -79,15 +88,15 @@ namespace ddr
 		bool m_debugDrawDepth { false };
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_reloadShaders { false };
-		
+
 		ddr::UniformStorage m_uniforms;
 
-		void CreateFrameBuffer( glm::ivec2 size );
+		void CreateFrameBuffer(glm::ivec2 size);
 
-		void RenderDebug( const ddr::RenderData& data, ddr::IRenderer& debug_render );
+		void RenderDebug(const ddr::RenderData& data, ddr::IRenderer& debug_render);
 
-		void BeginRender( const ddc::EntityLayer& entities, const ddr::ICamera& camera );
-		void EndRender( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
+		void BeginRender(const ddc::EntityLayer& entities, const ddr::ICamera& camera);
+		void EndRender(ddr::UniformStorage& uniforms, const ddr::ICamera& camera);
 
 		virtual const char* GetDebugTitle() const override { return "Renderer"; }
 	};

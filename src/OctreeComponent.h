@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	class OctreeComponent
+	struct OctreeComponent
 	{
 	public:
 		OctreeEntry Entry { -1 };

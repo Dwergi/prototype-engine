@@ -2,9 +2,12 @@
 #include "Physics2DGame.h"
 
 #include "FPSCameraComponent.h"
+#include "RenderManager.h"
 
 namespace phys2d
 {
+	static dd::FPSCameraComponent s_camera;
+
 	void Physics2DGame::Initialize()
 	{
 	}
@@ -16,6 +19,7 @@ namespace phys2d
 
 	void Physics2DGame::RegisterRenderers(ddr::RenderManager& renderer)
 	{
+		renderer.SetCamera(s_camera);
 	}
 
 	void Physics2DGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& spaces)
@@ -30,9 +34,4 @@ namespace phys2d
 	{
 	}
 
-	static dd::FPSCameraComponent s_camera;
-	ddr::ICamera& Physics2DGame::GetCamera() const
-	{
-		return s_camera;
-	}
 }

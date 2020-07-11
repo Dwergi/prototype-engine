@@ -10,9 +10,8 @@
 
 namespace dd
 {
-	InputKeyBindings::InputKeyBindings(std::string name)
+	InputKeyBindings::InputKeyBindings()
 	{
-		m_name = name;
 	}
 
 	InputKeyBindings::~InputKeyBindings()
@@ -63,7 +62,7 @@ namespace dd
 	void InputKeyBindings::BindKey(dd::Key key, dd::ModifierFlags modifiers, dd::InputAction action, std::string_view mode_name)
 	{
 		dd::InputModeConfig* mode = dd::InputModeConfig::Find(mode_name);
-		DD_ASSERT(mode != nullptr, "Mode '%s' not registered!", ((std::string) mode_name).c_str());
+		DD_ASSERT(mode != nullptr, "Mode '%s' not registered!", std::string(mode_name).c_str());
 
 		BindKey(key, modifiers, action, mode->ID());
 	}

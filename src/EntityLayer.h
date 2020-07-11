@@ -23,7 +23,7 @@ namespace ddc
 	//
 	struct EntityLayer
 	{
-		EntityLayer(std::string name);
+		EntityLayer(std::string_view name);
 		~EntityLayer();
 
 		//

@@ -29,6 +29,6 @@ namespace lux
 		ddc::Entity m_end;
 
 		void LoadLayer(ddc::EntityLayer& entities, int layer);
-		void HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string tileset, int tile_index);
+		void HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string_view tileset, int tile_index);
 	};
 }

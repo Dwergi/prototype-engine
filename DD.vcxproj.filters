@@ -861,6 +861,9 @@
     <ClInclude Include="include\ppk\ppk_assert.h">
       <Filter>Includes\ppk</Filter>
     </ClInclude>
+    <ClInclude Include="src\AssetManager.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1469,6 +1472,9 @@
     </ClCompile>
     <ClCompile Include="include\ppk\ppk_assert.cpp">
       <Filter>Includes\ppk</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetManager.cpp">
+      <Filter>Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

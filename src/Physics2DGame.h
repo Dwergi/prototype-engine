@@ -13,6 +13,5 @@ namespace phys2d
 		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& spaces) override;
 		virtual void Shutdown() override;
 		virtual void Update(const dd::GameUpdateData& update_data) override;
-		virtual ddr::ICamera& GetCamera() const override;
 	};
 }

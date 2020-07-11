@@ -12,12 +12,12 @@
 namespace dd
 {
 	template <typename T>
-	class Recorder;
+	struct Recorder;
 
 	template <typename T>
-	class FullRecorder;
+	struct FullRecorder;
 
-	class Property
+	struct Property
 	{
 	public:
 
@@ -43,10 +43,10 @@ namespace dd
 		void* GetPtr() const { return m_ptr; }
 
 		template <typename T>
-		friend class Recorder;
+		friend struct Recorder;
 
 		template <typename T>
-		friend class FullRecorder;
+		friend struct FullRecorder;
 	};
 
 	template <typename T>

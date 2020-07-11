@@ -9,7 +9,7 @@
 namespace dd
 {
 	template <typename T>
-	class RingBuffer
+	struct RingBuffer
 	{
 	public:
 

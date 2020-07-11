@@ -7,8 +7,17 @@
 #include "PCH.h"
 #include "IDebugPanel.h"
 
+#include "DebugUI.h"
+
 namespace dd
 {
+	static dd::Service<dd::DebugUI> s_debugUI;
+
+	IDebugPanel::IDebugPanel()
+	{
+		s_debugUI->RegisterDebugPanel(*this);
+	}
+
 	void IDebugPanel::DrawDebugPanel()
 	{
 		ImGui::SetNextWindowPos(ImVec2(30, 30), ImGuiCond_FirstUseEver);

@@ -18,11 +18,10 @@ namespace neut
 
 		virtual void Update(const dd::GameUpdateData& update_data) override;
 
-		virtual const char* GetTitle() const override { return "Neutrino"; }
-		virtual ddr::ICamera& GetCamera() const override;
-
 		virtual void CreateEntityLayers(std::vector<ddc::EntityLayer*>& layers) override;
 		virtual void RegisterRenderers(ddr::RenderManager& renderer) override;
 		virtual void RegisterSystems(ddc::SystemsManager& system_manager) override;
+
+		virtual const char* GetTitle() const override { return "Neutrino"; }
 	};
 }

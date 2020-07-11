@@ -108,7 +108,7 @@ namespace dd
 				break;
 			}
 		}
-		
+
 		return s_currentGroups.Size() == s_openGroups;
 	}
 
@@ -153,4 +153,3 @@ namespace dd
 		s_draw = draw;
 	}
 }
-

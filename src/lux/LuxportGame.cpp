@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "LuxportGame.h"
 
-#include "EntityPrototype.h"
+#include "AssetManager.h"
 #include "DebugUI.h"
 #include "File.h"
 #include "HitTest.h"
@@ -54,17 +54,15 @@ extern "C" FILE* __cdecl __iob_func(void)
 
 namespace lux
 {
+	static dd::Service<dd::AssetManager> s_assetManager;
 	static dd::Service<ddr::SpriteManager> s_spriteManager;
 	static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 	static dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
-	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::DebugUI> s_debugUI;
 
 	static ddr::OrthoCamera* s_camera;
-
-	static dd::InputKeyBindings* s_keybindings;
 
 	static ddc::Entity s_player;
 	static ddc::Entity s_teleporter;
@@ -188,6 +186,9 @@ namespace lux
 
 	void LuxportGame::RegisterRenderers(ddr::RenderManager& renderer)
 	{
+		s_camera = new ddr::OrthoCamera();
+		renderer.SetCamera(*s_camera);
+
 		lux::LuxLightRenderer& lights_renderer = dd::Services::Register(new lux::LuxLightRenderer());
 		renderer.Register(lights_renderer);
 
@@ -205,18 +206,25 @@ namespace lux
 
 	void LuxportGame::Initialize()
 	{
-		s_camera = new ddr::OrthoCamera();
+		ddr::ShaderManager& shader_manager = dd::Services::Register(new ddr::ShaderManager());
+		s_assetManager->Register(shader_manager);
 
-		dd::Services::Register(new ddr::SpriteManager());
-		dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
+		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
+		s_assetManager->Register(texture_manager);
 
-		ddr::TextureHandle spritesheet_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
+		ddr::SpriteManager& sprite_manager = dd::Services::Register(new ddr::SpriteManager());
+		s_assetManager->Register(sprite_manager);
+
+		ddr::SpriteSheetManager& spritesheet_manager = dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
+		s_assetManager->Register(spritesheet_manager);
+
+		ddr::TextureHandle spritesheet_tex_h = texture_manager.Load(PLAYER_SPRITESHEET);
 		s_spriteSheetManager->Load(PLAYER_SPRITESHEET, spritesheet_tex_h, glm::ivec2(32));
 
-		ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
+		ddr::TextureHandle background_tex_h = texture_manager.Load(MAP_BACKGROUND);
 		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));
 
-		ddr::TextureHandle foreground_tex_h = s_textureManager->Load(MAP_FOREGROUND);
+		ddr::TextureHandle foreground_tex_h = texture_manager.Load(MAP_FOREGROUND);
 		s_spriteSheetManager->Load(MAP_FOREGROUND, foreground_tex_h, glm::ivec2(16));
 
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
@@ -226,16 +234,13 @@ namespace lux
 
 		s_input->SetCurrentMode("game");
 
-		DD_TODO("Should provide key bindings by default?");
-		s_keybindings = new dd::InputKeyBindings("luxport");
-		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
-		s_keybindings->BindKey(dd::Key::MOUSE_RIGHT, dd::InputAction::RETURN_TELEPORTER, "game");
-		s_keybindings->BindKey(dd::Key::R, dd::InputAction::RESET, "game");
-		s_keybindings->BindKey(dd::Key::ENTER, dd::InputAction::NEXT_MAP);
-		s_keybindings->BindKey(dd::Key::ENTER, dd::ModifierFlags(dd::Modifier::Shift), dd::InputAction::PREVIOUS_MAP);
-
-		s_input->SetKeyBindings(*s_keybindings);
+		dd::InputKeyBindings& bindings = s_input->AccessKeyBindings();
+		bindings.BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		bindings.BindKey(dd::Key::MOUSE_RIGHT, dd::InputAction::RETURN_TELEPORTER, "game");
+		bindings.BindKey(dd::Key::R, dd::InputAction::RESET, "game");
+		bindings.BindKey(dd::Key::ENTER, dd::InputAction::NEXT_MAP);
+		bindings.BindKey(dd::Key::ENTER, dd::ModifierFlags(dd::Modifier::Shift), dd::InputAction::PREVIOUS_MAP);
 
 		s_music = new sf::Music();
 		std::filesystem::path sound_path = dd::File::GetDataRoot();
@@ -279,7 +284,6 @@ namespace lux
 		delete s_exitSoundBuffer; 
 		delete s_throwSoundBuffer;
 		delete s_teleReturnSoundBuffer;
-		delete s_keybindings;
 	}
 
 	static void ReturnTeleporterToPlayer()
@@ -483,9 +487,6 @@ namespace lux
 
 	void LuxportGame::Update(const dd::GameUpdateData& update)
 	{
-		s_spriteManager->Update();
-		s_spriteSheetManager->Update();
-
 		if (s_input->GotInput(dd::InputAction::NEXT_MAP))
 		{
 			s_desiredMapIndex = ddm::wrap(s_desiredMapIndex + 1, 1, MAX_MAP);
@@ -555,10 +556,5 @@ namespace lux
 		}
 
 		s_listener->setPosition(sf::Vector3(player_transform->Position.x, player_transform->Position.y, 0.0f));
-	}
-
-	ddr::ICamera& LuxportGame::GetCamera() const
-	{
-		return *s_camera;
 	}
 }

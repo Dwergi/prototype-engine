@@ -41,6 +41,8 @@ namespace ddr
 		Material( const Material& ) = delete;
 		Material( Material&& ) = delete;
 
+		static const char* TypeName() { return "Material"; }
+
 	private:
 		bool m_inUse { false };
 	};

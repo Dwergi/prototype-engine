@@ -85,7 +85,7 @@ namespace lux
 		return new_entity;
 	}
 
-	void LuxportMap::HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string tileset, int tile_index)
+	void LuxportMap::HandleSpecialTiles(ddc::EntityLayer& entities, ddc::Entity entity, std::string_view tileset, int tile_index)
 	{
 		const bool solid_tileset = tileset == SpecialTiles::SolidTileSet;
 

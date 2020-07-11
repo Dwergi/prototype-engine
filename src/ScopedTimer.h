@@ -10,7 +10,7 @@
 
 namespace dd
 {
-	class ScopedTimer
+	struct ScopedTimer
 	{
 	public:
 		ScopedTimer( float& elapsed_ms );

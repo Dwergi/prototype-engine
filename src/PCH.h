@@ -104,6 +104,8 @@ namespace dd
 	bool IsMainThread();
 }
 
+std::string operator+(std::string_view a, std::string_view b);
+
 #define DD_TOSTRING2( X ) #X
 #define DD_TOSTRING( X ) DD_TOSTRING2( X )
 #define DD_TODO( Message ) __pragma( message( __FILE__ ":" DD_TOSTRING( __LINE__ ) " - TODO: " Message ) )

@@ -73,9 +73,9 @@ namespace dd
 	template <typename T>
 	struct Service
 	{
-		static void Register( T& instance ) 
+		static void Register(T& instance)
 		{
-			DD_ASSERT( s_instance == nullptr, "Instance already registered!" );
+			DD_ASSERT(s_instance == nullptr, "Instance already registered!");
 			s_instance = &instance;
 		}
 
@@ -88,12 +88,12 @@ namespace dd
 
 		static T& Get()
 		{
-			DD_ASSERT( s_instance != nullptr, "Instance not registered yet!" );
+			DD_ASSERT(s_instance != nullptr, "Instance not registered yet!");
 			return *s_instance;
 		}
 
-		operator T&() { return Get(); }
-		operator T*() { return &Get(); }
+		operator T& () { return Get(); }
+		operator T* () { return &Get(); }
 		T& operator*() { return Get(); }
 		T* operator->() { return &Get(); }
 

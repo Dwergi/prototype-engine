@@ -59,7 +59,7 @@ namespace dd
 			FPSCameraComponent* camera = m_cameras[i];
 
 			std::string label = fmt::format("Camera {}", i);
-			if (ImGui::TreeNodeEx(label.c_str(), ImGuiTreeNodeFlags_CollapsingHeader))
+			if (ImGui::CollapsingHeader(label.c_str()))
 			{
 
 				ImGui::Value("Yaw", glm::degrees(camera->GetYaw()), "%.2f");
@@ -90,8 +90,6 @@ namespace dd
 				}
 
 				ImGui::Checkbox("Invert", &m_invert);
-
-				ImGui::TreePop();
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 
 namespace dd
 {
-	class TrenchComponent
+	struct TrenchComponent
 	{
 	public:
 

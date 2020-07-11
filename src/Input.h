@@ -8,6 +8,7 @@
 
 #include "InputAction.h"
 #include "InputEvent.h"
+#include "InputKeyBindings.h"
 #include "InputKeys.h"
 #include "InputMode.h"
 
@@ -52,14 +53,15 @@ namespace dd
 		// Just mark the given action as being handled by IsHeld(). Requires manual checking of IsHeld().
 		void AddHeldHandler(dd::InputAction action);
 
-		void SetCurrentMode(std::string mode_name);
+		void SetCurrentMode(std::string_view mode_name);
 		std::string GetCurrentMode() const { return m_currentMode != nullptr ? m_currentMode->GetName() : std::string(); }
 
 		void EnableMouse(bool enabled) { m_mouseEnabled = enabled; }
 		void EnableKeyboard(bool enabled) { m_keyboardEnabled = enabled; }
 
-		void SetKeyBindings(InputKeyBindings& bindings) { m_bindings = &bindings; }
-		InputKeyBindings* GetKeyBindings() const { return m_bindings; }
+		void SetKeyBindings(InputKeyBindings& bindings) { m_bindings = bindings; }
+		const InputKeyBindings& GetKeyBindings() const { return m_bindings; }
+		InputKeyBindings& AccessKeyBindings() { return m_bindings; }
 
 		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> GetText() const { return m_text; }
 
@@ -74,7 +76,7 @@ namespace dd
 		std::unordered_map<InputReceived, std::vector<InputHandler>, InputRecvHash> m_handlers;
 		std::unordered_map<InputAction, bool> m_held;
 
-		InputKeyBindings* m_bindings { nullptr };
+		InputKeyBindings m_bindings;
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
 

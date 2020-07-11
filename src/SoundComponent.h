@@ -9,9 +9,10 @@ namespace ddc
 {
 	struct SoundComponent
 	{
-		sfml::SoundSource* SoundSource;
+		sf::SoundSource* SoundSource;
 
 		DD_BEGIN_CLASS(dd::SoundComponent)
 			DD_MEMBER()
+		DD_END_CLASS()
 	};
 }

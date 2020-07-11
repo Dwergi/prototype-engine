@@ -13,37 +13,37 @@ namespace dd
 {
 	std::string File::s_dataRoot;
 
-	void File::SetDataRoot( std::string root )
+	void File::SetDataRoot(std::string_view root)
 	{
 		std::filesystem::path canonical_path(root);
 		canonical_path = std::filesystem::canonical(canonical_path);
 
 		if (!std::filesystem::is_directory(canonical_path))
 		{
-			DD_ASSERT(false, "Invalid data root given, not a directory: %s!", root.c_str());
+			DD_ASSERT(false, "Invalid data root given, not a directory: %s!", std::string(root).c_str());
 			return;
 		}
 
 		if (!std::filesystem::exists(canonical_path))
 		{
-			DD_ASSERT(false, "Invalid data root given, doesn't exist: %s!", root.c_str());
+			DD_ASSERT(false, "Invalid data root given, doesn't exist: %s!", std::string(root).c_str());
 			return;
 		}
 
 		s_dataRoot = canonical_path.string();
 	}
 
-	bool File::Exists( std::string file_path )
+	bool File::Exists(std::string_view file_path)
 	{
-		std::filesystem::path path( s_dataRoot );
+		std::filesystem::path path(s_dataRoot);
 		path /= file_path;
 
-		return !std::filesystem::is_directory( path ) && std::filesystem::exists( path );
+		return !std::filesystem::is_directory(path) && std::filesystem::exists(path);
 	}
 
-	File::File( std::string_view relative_file )
+	File::File(std::string_view relative_file)
 	{
-		std::filesystem::path path( s_dataRoot );
+		std::filesystem::path path(s_dataRoot);
 		path /= relative_file;
 
 		DD_ASSERT(!std::filesystem::is_directory(path));
@@ -63,9 +63,9 @@ namespace dd
 		return file;
 	}
 
-	size_t File::Read( Buffer<byte>& buffer ) const
+	size_t File::Read(Buffer<byte>& buffer) const
 	{
-		if(buffer.SizeBytes() < Size())
+		if (buffer.SizeBytes() < Size())
 		{
 			return 0;
 		}
@@ -76,7 +76,7 @@ namespace dd
 			return 0;
 		}
 
-		size_t read = std::fread(buffer.Access(), 1, ( size_t) buffer.SizeBytes(), file);
+		size_t read = std::fread(buffer.Access(), 1, (size_t) buffer.SizeBytes(), file);
 		std::fclose(file);
 		return read;
 	}
@@ -91,11 +91,11 @@ namespace dd
 		{
 			buffer.Delete();
 		}
-		
+
 		return buffer;
 	}
 
-	size_t File::Read( std::string& dst ) const
+	size_t File::Read(std::string& dst) const
 	{
 		FILE* file = Open("rb");
 		if (file == nullptr)
@@ -108,23 +108,23 @@ namespace dd
 		size_t read = std::fread(dst.data(), 1, Size(), file);
 		std::fclose(file);
 
-		size_t i = dst.find( '\0' );
-		if( i != std::string::npos )
+		size_t i = dst.find('\0');
+		if (i != std::string::npos)
 		{
 			DD_ASSERT(false, "Resized");
-			dst.resize( i );
+			dst.resize(i);
 		}
 
 		return dst.length();
 	}
 
-	bool File::Write( const std::string& src ) const
+	bool File::Write(std::string_view src) const
 	{
-		dd::ConstBuffer<char> buffer(src.c_str(), src.size());
+		dd::ConstBuffer<char> buffer(src.data(), src.size());
 		return Write(buffer);
 	}
 
-	bool File::Write( const IBuffer& buffer ) const
+	bool File::Write(const IBuffer& buffer) const
 	{
 		FILE* file = Open("wb");
 		if (file == nullptr)

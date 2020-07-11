@@ -19,7 +19,7 @@ namespace ddr
 
 namespace dd
 {
-	class TrenchSystem : public ddc::System
+	struct TrenchSystem : public ddc::System
 	{
 	public: 
 

@@ -13,7 +13,7 @@ namespace dd
 {
 	struct TypeInfo;
 
-	class String
+	struct String
 	{
 	protected:
 

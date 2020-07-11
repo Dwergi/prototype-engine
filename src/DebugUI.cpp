@@ -80,18 +80,27 @@ namespace dd
 	{
 		m_debugPanels.push_back(&debug_panel);
 
-		std::sort(m_debugPanels.begin(), m_debugPanels.end(),
-			[](const IDebugPanel* a, const IDebugPanel* b)
-		{
-			return strcmp(a->GetDebugTitle(), b->GetDebugTitle()) < 0;
-		}
-		);
+		m_needsSort = true;
 	}
 
 	void DebugUI::RenderDebugPanels()
 	{
 		if (!m_draw)
+		{
 			return;
+		}
+
+		if (m_needsSort)
+		{
+			std::sort(m_debugPanels.begin(), m_debugPanels.end(),
+				[](const IDebugPanel* a, const IDebugPanel* b)
+				{
+					return strcmp(a->GetDebugTitle(), b->GetDebugTitle()) < 0;
+				}
+			);
+
+			m_needsSort = false;
+		}
 
 		if (ImGui::BeginMainMenuBar())
 		{

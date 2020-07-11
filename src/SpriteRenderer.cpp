@@ -22,12 +22,12 @@ namespace ddr
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	static const glm::vec2 s_quad[] = {
-			glm::vec2(0,	0),
-			glm::vec2(1,	0),
-			glm::vec2(0,	1),
-			glm::vec2(0,	1),
-			glm::vec2(1,	0),
-			glm::vec2(1,	1)
+			glm::vec2(0, 0),
+			glm::vec2(1, 0),
+			glm::vec2(0, 1),
+			glm::vec2(0, 1),
+			glm::vec2(1, 0),
+			glm::vec2(1, 1)
 	};
 
 	static VBO s_vboQuad;

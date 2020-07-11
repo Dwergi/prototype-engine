@@ -68,5 +68,5 @@ namespace dd
 		{
 			new (&dest[i]) T(std::move(temp[i]));
 		}
-	}
+	} 
 }

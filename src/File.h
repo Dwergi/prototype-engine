@@ -12,22 +12,22 @@ namespace dd
 {
 	struct File
 	{
-		File( std::string_view relative_file);
+		File(std::string_view relative_file);
 
-		std::string Path() const { return m_path; }
+		const std::string& Path() const { return m_path; }
 
 		size_t Read(std::string& dst) const;
 		size_t Read(Buffer<byte>& buffer) const;
 		Buffer<byte> ReadIntoBuffer() const;
 
-		bool Write(const std::string& src) const;
+		bool Write(std::string_view src) const;
 		bool Write(const IBuffer& buffer) const;
 
-		size_t Size() const { return std::filesystem::file_size( m_path ); }
+		size_t Size() const { return std::filesystem::file_size(m_path); }
 
-		static bool Exists( std::string relative_file);
+		static bool Exists(std::string_view relative_file);
 
-		static void SetDataRoot( std::string root );
+		static void SetDataRoot(std::string_view root);
 		static std::string GetDataRoot() { return s_dataRoot; }
 
 	private:

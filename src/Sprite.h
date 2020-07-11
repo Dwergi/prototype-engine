@@ -21,6 +21,8 @@ namespace ddr
 		// size as percentage of texture size
 		glm::vec2 SizeNormalized { 0, 0 };
 
+		static const char* TypeName() { return "Sprite"; }
+
 		DD_BEGIN_CLASS(ddr::Sprite)
 			DD_MEMBER(Offset);
 			DD_MEMBER(OffsetNormalized);
