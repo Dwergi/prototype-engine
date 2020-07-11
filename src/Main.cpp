@@ -47,7 +47,7 @@
 #include "flux/FluxGame.h"
 
 // GAME TO USE
-using TGame = lux::LuxportGame;
+using TGame = flux::FluxGame;
 //---------------------------------------------------------------------------
 
 static dd::Service<dd::IGame> s_game;
@@ -146,6 +146,9 @@ static int GameMain()
 
 	dd::InitializeMemoryTracking();
 	dd::SetAsMainThread();
+
+	dd::File::SetBasePath("../../../data");
+	dd::File::AddOverridePath("./base");
 
 	dd::TypeInfo::RegisterQueuedTypes();
 
@@ -333,15 +336,6 @@ int main(int argc, char* argv[])
 	if (cmdLine.Exists("noassert"))
 	{
 		ppk::assert::implementation::ignoreAllAsserts(true);
-	}
-
-	if (cmdLine.Exists("dataroot"))
-	{
-		dd::File::SetDataRoot(cmdLine.GetValue("dataroot").c_str());
-	}
-	else
-	{
-		dd::File::SetDataRoot("../../../data");
 	}
 
 #ifdef _TEST

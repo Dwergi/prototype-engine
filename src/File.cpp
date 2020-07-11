@@ -11,50 +11,112 @@
 
 namespace dd
 {
-	std::string File::s_dataRoot;
-
-	void File::SetDataRoot(std::string_view root)
+	std::filesystem::path File::s_basePath;
+	std::vector<std::filesystem::path> File::s_overridePaths;
+	
+	void File::SetBasePath(std::string_view path)
 	{
-		std::filesystem::path canonical_path(root);
+		std::filesystem::path canonical_path(path);
 		canonical_path = std::filesystem::canonical(canonical_path);
 
 		if (!std::filesystem::is_directory(canonical_path))
 		{
-			DD_ASSERT(false, "Invalid data root given, not a directory: %s!", std::string(root).c_str());
+			DD_ASSERT(false, "Invalid base path given, not a directory: %s!", canonical_path.string().c_str());
 			return;
 		}
 
 		if (!std::filesystem::exists(canonical_path))
 		{
-			DD_ASSERT(false, "Invalid data root given, doesn't exist: %s!", std::string(root).c_str());
+			DD_ASSERT(false, "Invalid base path given, doesn't exist: %s!", canonical_path.string().c_str());
 			return;
 		}
 
-		s_dataRoot = canonical_path.string();
+		s_basePath = canonical_path;
+	}
+
+	void File::AddOverridePath(std::string_view path)
+	{
+		std::filesystem::path canonical_path(s_basePath);
+		canonical_path /= path;
+		canonical_path = std::filesystem::canonical(canonical_path);
+
+		if (!std::filesystem::is_directory(canonical_path))
+		{
+			DD_ASSERT(false, "Invalid base path given, not a directory: %s!", canonical_path.string().c_str());
+			return;
+		}
+
+		if (!std::filesystem::exists(canonical_path))
+		{
+			DD_ASSERT(false, "Invalid base path given, doesn't exist: %s!", canonical_path.string().c_str());
+			return;
+		}
+
+		// insert at front so that later added roots override earlier ones, which allows games to override any base file with their own version
+		dd::push_front(s_overridePaths, canonical_path);
+	}
+
+	std::filesystem::path File::GetWritePath()
+	{
+		if (s_overridePaths.size() > 0)
+		{
+			return dd::last(s_overridePaths);
+		}
+
+		return s_basePath;
 	}
 
 	bool File::Exists(std::string_view file_path)
 	{
-		std::filesystem::path path(s_dataRoot);
+		for (const std::filesystem::path& base : s_overridePaths)
+		{
+			std::filesystem::path path(base);
+			path /= file_path;
+
+			if (std::filesystem::exists(path) && !std::filesystem::is_directory(path))
+			{
+				return true;
+			}
+		}
+
+		std::filesystem::path path(s_basePath);
 		path /= file_path;
 
-		return !std::filesystem::is_directory(path) && std::filesystem::exists(path);
+		return std::filesystem::exists(path) && !std::filesystem::is_directory(path);
 	}
 
 	File::File(std::string_view relative_file)
 	{
-		std::filesystem::path path(s_dataRoot);
-		path /= relative_file;
+		std::filesystem::path base_to_use;
+
+		for (const std::filesystem::path& base : s_overridePaths)
+		{
+			std::filesystem::path path(base);
+			path /= relative_file;
+
+			if (std::filesystem::exists(path) && !std::filesystem::is_directory(path))
+			{
+				base_to_use = base;
+				break;
+			}
+		}
+
+		if (base_to_use.empty())
+		{
+			base_to_use = s_basePath;
+		}
+
+		std::filesystem::path path = base_to_use / relative_file;
 
 		DD_ASSERT(!std::filesystem::is_directory(path));
 
-		m_path = path.string();
+		m_path = path;
 	}
 
 	FILE* File::Open(const char* mode) const
 	{
 		FILE* file;
-		errno_t err = fopen_s(&file, m_path.c_str(), mode);
+		errno_t err = fopen_s(&file, m_path.string().c_str(), mode);
 		if (err != 0)
 		{
 			return nullptr;

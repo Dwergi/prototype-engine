@@ -135,13 +135,11 @@ namespace ddr
 		TextureHandle texture_h = super::Find(name); 
 		if (!texture_h.IsValid())
 		{
-			const std::string folder("textures\\");
-			const std::filesystem::path root = dd::File::GetDataRoot();
-			
-			const std::filesystem::path abs_path = root / folder / name;
+			const std::string folder("textures/");
+			dd::File file(folder + name);
 
 			sf::Image img;
-			if (!img.loadFromFile(abs_path.string()))
+			if (!img.loadFromFile(file.Path()))
 			{
 				return TextureHandle();
 			}

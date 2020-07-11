@@ -10,12 +10,14 @@
 #include "BoundsRenderer.h"
 #include "BulletSystem.h"
 #include "DebugUI.h"
+#include "File.h"
 #include "FPSCameraComponent.h"
 #include "FrameTimer.h"
 #include "FreeCameraController.h"
 #include "HitTestSystem.h"
 #include "Input.h"
 #include "InputKeyBindings.h"
+#include "IWindow.h"
 #include "LightComponent.h"
 #include "LightRenderer.h"
 #include "LinesRenderer.h"
@@ -26,6 +28,7 @@
 #include "PlayerComponent.h"
 #include "PhysicsSystem.h"
 #include "RayRenderer.h"
+#include "RenderManager.h"
 #include "ShakyCamera.h"
 #include "ShipSystem.h"
 #include "SystemsManager.h"
@@ -40,8 +43,6 @@
 #include "Services.h"
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
-#include "IWindow.h"
-#include "RenderManager.h"
 
 namespace neut
 {
@@ -195,6 +196,8 @@ namespace neut
 
 	void NeutrinoGame::Initialize()
 	{
+		dd::File::AddOverridePath("./neutrino");
+
 		dd::InputModeFlags all_modes;
 		all_modes.Fill();
 

@@ -244,7 +244,6 @@ namespace ddr
 		else
 		{
 			m_framebuffer.Blit();
-
 			m_defaultState.Use(false);
 		}
 

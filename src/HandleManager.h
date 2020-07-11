@@ -175,6 +175,9 @@ namespace dd
 		bool operator<(const Handle<T>& other) const { return m_handle < other.m_handle; }
 		bool operator>(const Handle<T>& other) const { return m_handle > other.m_handle; }
 
+		const T* operator->() const { return Get(); }
+		T* operator->() { return Access(); }
+
 	private:
 		friend struct HandleManager<T>;
 		static HandleManager<T>* m_manager;

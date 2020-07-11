@@ -38,7 +38,7 @@ namespace ddr
 		glm::vec3(1, 1, 1)
 	};
 
-	static dd::ConstBuffer<glm::vec3> s_cornersBuffer(s_corners, dd::ArrayLength(s_corners));
+	static dd::ConstBuffer<glm::vec3> s_cornersBuffer(s_corners, std::size(s_corners));
 
 	static const uint s_indices[] =
 	{
@@ -50,7 +50,7 @@ namespace ddr
 		0,4,	1,5,	2,6,	3,7
 	};
 
-	static dd::ConstBuffer<uint> s_indicesBuffer(s_indices, dd::ArrayLength(s_indices));
+	static dd::ConstBuffer<uint> s_indicesBuffer(s_indices, std::size(s_indices));
 
 	BoundsRenderer::BoundsRenderer() :
 		IRenderer("Bounds")

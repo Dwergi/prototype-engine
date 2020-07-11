@@ -206,6 +206,8 @@ namespace lux
 
 	void LuxportGame::Initialize()
 	{
+		dd::File::AddOverridePath("./lux");
+
 		ddr::ShaderManager& shader_manager = dd::Services::Register(new ddr::ShaderManager());
 		s_assetManager->Register(shader_manager);
 
@@ -243,7 +245,7 @@ namespace lux
 		bindings.BindKey(dd::Key::ENTER, dd::ModifierFlags(dd::Modifier::Shift), dd::InputAction::PREVIOUS_MAP);
 
 		s_music = new sf::Music();
-		std::filesystem::path sound_path = dd::File::GetDataRoot();
+		std::filesystem::path sound_path = dd::File::GetWritePath();
 		sound_path /= "sounds";
 
 		std::filesystem::path music_path = sound_path / "bgmusic.ogg";

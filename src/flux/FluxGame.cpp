@@ -4,6 +4,7 @@
 #include "AssetManager.h"
 #include "DebugUI.h"
 #include "EntityPrototype.h"
+#include "File.h"
 #include "HitTest.h"
 #include "InputKeyBindings.h"
 #include "Input.h"
@@ -56,10 +57,8 @@ namespace flux
 		transform_cmp->Position = MAP_SIZE / 2;
 		transform_cmp->Update();
 
-		const ddr::SpriteSheet* spritesheet = s_playerSpriteSheet.Get();
-
 		d2d::SpriteComponent* sprite_cmp = player.Access<d2d::SpriteComponent>();
-		sprite_cmp->Sprite = spritesheet->Get(0, 0);
+		sprite_cmp->Sprite = s_playerSpriteSheet->Get(0, 0);
 		sprite_cmp->ZIndex = 9;
 
 		d2d::BoxPhysicsComponent* physics = player.Access<d2d::BoxPhysicsComponent>();
@@ -70,6 +69,8 @@ namespace flux
 
 	void FluxGame::Initialize()
 	{
+		dd::File::AddOverridePath("./flux");
+
 		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
 		s_assetManager->Register(texture_manager);
 
@@ -84,6 +85,21 @@ namespace flux
 
 		ddr::TextureHandle player_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
 		s_playerSpriteSheet = s_spriteSheetManager->Load(PLAYER_SPRITESHEET, player_tex_h, glm::ivec2(32));
+
+		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
+		game_input.ShowCursor(true)
+			.CaptureMouse(true)
+			.CentreMouse(false);
+
+		s_input->SetCurrentMode("game");
+
+		dd::InputKeyBindings& bindings = s_input->AccessKeyBindings();
+		bindings.BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		bindings.BindKey(dd::Key::W, dd::InputAction::UP, "game");
+		bindings.BindKey(dd::Key::S, dd::InputAction::DOWN, "game");
+		bindings.BindKey(dd::Key::A, dd::InputAction::LEFT, "game");
+		bindings.BindKey(dd::Key::D, dd::InputAction::RIGHT, "game");
+		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT);
 
 		/*ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
 		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));

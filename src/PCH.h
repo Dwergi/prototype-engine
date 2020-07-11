@@ -80,22 +80,42 @@ namespace dd
 	const double M_PI_2 = 1.57079632679489661923;
 	const double M_1_PI = 0.318309886183790671538;
 
-	void* PointerAdd( void* base, uint64 offset );
-	const void* PointerAdd( const void* base, uint64 offset );
+	void* PointerAdd(void* base, uint64 offset);
+	const void* PointerAdd(const void* base, uint64 offset);
 
 	template <typename T, size_t Size>
-	size_t ArrayLength( const T( &arr )[Size] )
+	size_t ArrayLength(const T(&arr)[Size])
 	{
 		return Size;
 	}
 
 	template <typename T>
-	T pop_front( std::vector<T>& vec )
+	T pop_front(std::vector<T>& vec)
 	{
 		T value = vec.front();
-		vec.erase( vec.begin() );
+		vec.erase(vec.begin());
 
 		return std::move(value);
+	}
+
+	template <typename T, typename Arg>
+	void push_front(std::vector<T>& vec, Arg&& value)
+	{
+		vec.insert(vec.begin(), std::forward<Arg>(value));
+	}
+
+	template <typename T>
+	const T& last(const std::vector<T>& vec)
+	{
+		DD_ASSERT(vec.size() > 0);
+		return vec[vec.size() - 1];
+	}
+
+	template <typename T>
+	T& last(std::vector<T>& vec)
+	{
+		DD_ASSERT(vec.size() > 0);
+		return vec[vec.size() - 1];
 	}
 
 	bool DebuggerAttached();

@@ -68,7 +68,6 @@ namespace ddr
 			s_vboQuad.Unbind();
 		}
 
-
 		m_vboPositions.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		{
 			m_vboPositions.Bind();
@@ -126,10 +125,15 @@ namespace ddr
 		size_t count = std::distance(start, end);
 
 		m_positions.clear();
+		m_positions.reserve(count);
 		m_sizes.clear();
+		m_sizes.reserve(count);
 		m_uvOffsets.clear();
+		m_uvOffsets.reserve(count);
 		m_uvScales.clear();
+		m_uvScales.reserve(count);
 		m_colours.clear();
+		m_colours.reserve(count);
 
 		for (SpriteIterator it = start; it != end; ++it)
 		{

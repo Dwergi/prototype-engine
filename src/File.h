@@ -14,7 +14,7 @@ namespace dd
 	{
 		File(std::string_view relative_file);
 
-		const std::string& Path() const { return m_path; }
+		std::string Path() const { return m_path.string(); }
 
 		size_t Read(std::string& dst) const;
 		size_t Read(Buffer<byte>& buffer) const;
@@ -27,12 +27,15 @@ namespace dd
 
 		static bool Exists(std::string_view relative_file);
 
-		static void SetDataRoot(std::string_view root);
-		static std::string GetDataRoot() { return s_dataRoot; }
+		static void SetBasePath(std::string_view base);
+		static void AddOverridePath(std::string_view root);
+		static std::filesystem::path GetWritePath();
 
 	private:
-		std::string m_path;
-		static std::string s_dataRoot;
+		std::filesystem::path m_path;
+
+		static std::filesystem::path s_basePath;
+		static std::vector<std::filesystem::path> s_overridePaths;
 
 		FILE* Open(const char* mode) const;
 	};

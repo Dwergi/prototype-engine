@@ -51,16 +51,10 @@ void main()
 			intensity = (1.5 + sin(Time * 2) / 15) * 300;
 			colour = vec3(0.7, 0.6, 0.5);
 		}
-		else if (Lights[i].Type == 4)
+		else if (Lights[i].Type == 4 || Lights[i].Type == 5)
 		{
-			// red
-			intensity = (0.1 + cos((Time+i%3) * 8) / 8) * 900;
-			colour = vec3(0, 0, 0);
-		}
-		else if (Lights[i].Type == 5)
-		{
-			// yellow
-			intensity = (0.1 + cos((Time+i%3) * 8) / 8) * 900;
+			// red & yellow
+			intensity = (0.1 + cos((Time + i % 3) * 8) / 8) * 900;
 			colour = vec3(0, 0, 0);
 		}
 
