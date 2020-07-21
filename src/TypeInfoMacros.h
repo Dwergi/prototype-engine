@@ -17,13 +17,13 @@
 
 #define DD_REGISTER_POD( TypeName ) dd::TypeInfo::RegisterPOD<TypeName>( #TypeName )
 
-#define DD_REGISTER_CONTAINER( Container, Containing ) dd::TypeInfo::RegisterContainer<dd::RemoveQualifiers<Container<Containing>>::type, Containing>( #Container )
+#define DD_REGISTER_CONTAINER( Container, Containing ) dd::TypeInfo::RegisterContainer<std::remove_cv_t<Container<Containing>>, Containing>( #Container )
 
 #define DD_FIND_TYPE( TypeName ) dd::TypeInfo::GetType<TypeName>()
 
 #define DD_TYPE_OF( Object ) dd::TypeInfo::GetType<dd::RemoveQualifiers<decltype(Object)>::type>()
 
-#define DD_TYPE_OF_MEMBER( TypeName, MemberName ) dd::TypeInfo::GetType<dd::RemoveQualifiers<dd::StripMemberness<decltype(&TypeName::MemberName)>::type>::type>()
+#define DD_TYPE_OF_MEMBER( TypeName, MemberName ) dd::TypeInfo::GetType<std::remove_cv_t<dd::StripMemberness<decltype(&TypeName::MemberName)>::type>>()
 
 #define DD_OFFSET_OF( TypeName, MemberName ) ((unsigned int) (&((((TypeName*) nullptr))->MemberName)))
 
@@ -37,7 +37,7 @@
 
 #define DD_TAG_COMPONENT( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) { typeInfo->RegisterComponent(); }
 
-#define DD_REGISTER_PARENT( TypeName, ParentType ) dd::TypeInfo::AccessType<dd::RemoveQualifiers<TypeName>::type>()->RegisterParentType<ParentType>()
+#define DD_REGISTER_PARENT( TypeName, ParentType ) dd::TypeInfo::AccessType<TypeName>()->RegisterParentType<ParentType>()
 
 #define DD_PARENT( ParentType ) typeInfo->RegisterParentType<ParentType>()
 

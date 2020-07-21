@@ -44,6 +44,12 @@ namespace ddm
 	}
 
 	template <typename T>
+	T clamp1(T value)
+	{
+		return clamp(value, T(0), T(1)); 
+	}
+
+	template <typename T>
 	std::enable_if_t<std::is_floating_point_v<T>, T> wrap(T value, T min, T max)
 	{
 		value = min + std::fmod(value - min, max - min);
@@ -65,9 +71,13 @@ namespace ddm
 		return value;
 	}
 
+	bool IsNaN(glm::vec2 v);
 	bool IsNaN(glm::vec3 v);
 	bool IsNaN(glm::vec4 v);
+
+	bool IsInf(glm::vec2 v);
 	bool IsInf(glm::vec3 v);
+	bool IsInf(glm::vec4 v);
 
 	glm::mat4 TransformFromOriginDir(const glm::vec3& origin, const glm::vec3& direction);
 	glm::mat4 TransformFromRay(const ddm::Ray& ray);

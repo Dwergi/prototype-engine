@@ -23,6 +23,9 @@
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
 
+#include "flux/FluxPlayerComponent.h"
+#include "flux/FluxPlayerController.h"
+
 namespace flux
 {
 	static dd::Service<dd::AssetManager> s_assetManager;
@@ -46,25 +49,39 @@ namespace flux
 	static const char* MAP_BACKGROUND = "map_background.png";
 	static const char* MAP_FOREGROUND = "map_foreground.png";
 
+	flux::PlayerStats s_playerStats;
+	std::vector<flux::Weapon> s_weapons;
+
 	static ddc::Entity CreatePlayer(ddc::EntityLayer& layer)
 	{
-		ddc::Entity player = layer.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::BoxPhysicsComponent>();
+		ddc::Entity player = layer.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::CirclePhysicsComponent, flux::FluxPlayerComponent>();
 		layer.AddTag(player, ddc::Tag::Visible);
 		layer.AddTag(player, ddc::Tag::Static);
 
 		d2d::Transform2DComponent* transform_cmp = player.Access<d2d::Transform2DComponent>();
-		transform_cmp->Scale = glm::vec2(2);
+		transform_cmp->Scale = { 1, 1 };
 		transform_cmp->Position = MAP_SIZE / 2;
 		transform_cmp->Update();
 
 		d2d::SpriteComponent* sprite_cmp = player.Access<d2d::SpriteComponent>();
 		sprite_cmp->Sprite = s_playerSpriteSheet->Get(0, 0);
 		sprite_cmp->ZIndex = 9;
+		sprite_cmp->Pivot = { 0.5, 0.5 };
 
-		d2d::BoxPhysicsComponent* physics = player.Access<d2d::BoxPhysicsComponent>();
-		physics->Elasticity = 0;
+		d2d::CirclePhysicsComponent* physics_cmp = player.Access<d2d::CirclePhysicsComponent>();
+		physics_cmp->Elasticity = 0;
+
+		flux::FluxPlayerComponent* player_cmp = player.Access<flux::FluxPlayerComponent>();
+		player_cmp->Stats = &s_playerStats;
 
 		return player;
+	}
+
+	static void ResetPlayer()
+	{
+		d2d::Transform2DComponent* transform_cmp = s_player.Access<d2d::Transform2DComponent>();
+		transform_cmp->Position = MAP_SIZE / 2;
+		transform_cmp->Update();
 	}
 
 	void FluxGame::Initialize()
@@ -99,7 +116,16 @@ namespace flux
 		bindings.BindKey(dd::Key::S, dd::InputAction::DOWN, "game");
 		bindings.BindKey(dd::Key::A, dd::InputAction::LEFT, "game");
 		bindings.BindKey(dd::Key::D, dd::InputAction::RIGHT, "game");
-		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT);
+		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		bindings.BindKey(dd::Key::R, dd::InputAction::RESET, "game");
+
+		s_input->AddHandler(dd::InputAction::RESET, &ResetPlayer);
+
+		s_playerStats.MaxHealth = 100;
+
+		s_playerStats.MaxSpeed = 15; // tiles/s
+		s_playerStats.Acceleration = 50; // tiles/s/s
+		s_playerStats.Deceleration = 100; // tiles/s/s
 
 		/*ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
 		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));
@@ -111,6 +137,11 @@ namespace flux
 	void FluxGame::RegisterSystems(ddc::SystemsManager& system_manager)
 	{
 		d2d::SpriteTileSystem& sprite_tile_system = dd::Services::Register(new d2d::SpriteTileSystem(MAP_SIZE, 16));
+
+		flux::FluxPlayerController& flux_player_system = dd::Services::Register(new flux::FluxPlayerController(sprite_tile_system));
+		system_manager.Register(flux_player_system);
+
+		sprite_tile_system.DependsOn(flux_player_system);
 		system_manager.Register(sprite_tile_system);
 	}
 
@@ -125,10 +156,10 @@ namespace flux
 
 	void FluxGame::CreateEntityLayers(std::vector<ddc::EntityLayer*>& entity_layers)
 	{
-		entity_layers.push_back(new ddc::EntityLayer("game"));
 		entity_layers.push_back(new ddc::EntityLayer("background"));
+		entity_layers.push_back(new ddc::EntityLayer("game"));
 
-		s_player = CreatePlayer(*entity_layers[0]);
+		s_player = CreatePlayer(*entity_layers[1]);
 	}
 
 	void FluxGame::Update(const dd::GameUpdateData& update_data)
@@ -140,5 +171,13 @@ namespace flux
 	void FluxGame::Shutdown()
 	{
 		delete s_camera;
+	}
+
+	void FluxGame::DrawDebugInternal()
+	{
+		ImGui::SliderInt("Max Health", &s_playerStats.MaxHealth, 0, 1000);
+		ImGui::SliderFloat("Acceleration", &s_playerStats.Acceleration, 0, 100, "%.1f");
+		ImGui::SliderFloat("Deceleration", &s_playerStats.Deceleration, 0, 100, "%.1f");
+		ImGui::SliderFloat("Max Speed", &s_playerStats.MaxSpeed, 0, 50, "%.1f");
 	}
 }

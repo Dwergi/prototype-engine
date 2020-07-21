@@ -31,55 +31,55 @@ namespace dd
 		New = SetFunc<std::is_default_constructible<T>::value, void* (*)(), &dd::New<DefaultCtorType>>::Get();
 		Copy = SetFunc<std::is_copy_assignable<T>::value, void (*)(void*, const void*), &dd::Copy<CopyAssignType>>::Get();
 		Delete = dd::Delete<T>;
-		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void( *)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
+		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void(*)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
 		PlacementCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void*, const void*), &dd::PlacementCopy<CopyCtorType>>::Get();
 		PlacementDelete = dd::PlacementDelete<T>;
 		NewCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void**, const void*), &dd::NewCopy<CopyCtorType>>::Get();
 	}
 
 	template <typename T>
-	TypeInfo* TypeInfo::RegisterType( const char* name )
+	TypeInfo* TypeInfo::RegisterType(const char* name)
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
-		if( typeInfo->IsRegistered() )
+		if (typeInfo->IsRegistered())
 			return typeInfo;
 
 		typeInfo->m_typeKind = TypeKind::Class;
 
-		typeInfo->Init( name, sizeof( T ) );
+		typeInfo->Init(name, sizeof(T));
 
 		typeInfo->RegisterFunctions<T>();
 
-		sm_typeMap->insert( std::make_pair( String64( name ), typeInfo ) );
+		sm_typeMap->insert(std::make_pair(String64(name), typeInfo));
 
 		// register pointer and references as well
 		{
-			String64 ptrName( name );
+			String64 ptrName(name);
 			ptrName += "*";
 			TypeInfo* ptrInfo = AccessType<T*>();
-			ptrInfo->Init( ptrName.c_str(), sizeof( T* ) );
-			sm_typeMap->insert( std::make_pair( String32( ptrName ), ptrInfo ) );
+			ptrInfo->Init(ptrName.c_str(), sizeof(T*));
+			sm_typeMap->insert(std::make_pair(String32(ptrName), ptrInfo));
 
-			String64 refName( name );
+			String64 refName(name);
 			refName += "&";
 			TypeInfo* refInfo = AccessType<T&>();
-			refInfo->Init( refName.c_str(), sizeof( T& ) );
-			sm_typeMap->insert( std::make_pair( String32( refName ), refInfo ) );
+			refInfo->Init(refName.c_str(), sizeof(T&));
+			sm_typeMap->insert(std::make_pair(String32(refName), refInfo));
 		}
 
 		return typeInfo;
 	}
 
 	template <typename T>
-	TypeInfo* TypeInfo::RegisterPOD( const char* name )
+	TypeInfo* TypeInfo::RegisterPOD(const char* name)
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<T>());
-		if( typeInfo->IsRegistered() )
+		if (typeInfo->IsRegistered())
 			return typeInfo;
 
 		typeInfo->m_typeKind = TypeKind::POD;
 
-		typeInfo->Init( name, sizeof( T ) );
+		typeInfo->Init(name, sizeof(T));
 
 		typeInfo->New = PODNew<T>;
 		typeInfo->Copy = PODCopy<T>;
@@ -89,33 +89,33 @@ namespace dd
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
 		typeInfo->PlacementCopy = PODPlacementCopy<T>;
 
-		sm_typeMap->insert( std::make_pair( String32( name ), typeInfo ) );
-		
-		RegisterContainer<Vector<T>, T>( "dd::Vector" );
+		sm_typeMap->insert(std::make_pair(String32(name), typeInfo));
+
+		RegisterContainer<Vector<T>, T>("dd::Vector");
 
 		return typeInfo;
 	}
 
 	template <typename TContainer, typename TItem>
-	TypeInfo* TypeInfo::RegisterContainer( const char* container )
+	TypeInfo* TypeInfo::RegisterContainer(const char* container)
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<TContainer>());
-		if( typeInfo->IsRegistered() )
+		if (typeInfo->IsRegistered())
 		{
 			return typeInfo;
 		}
 
 		const TypeInfo* itemType = GetType<TItem>();
-		DD_ASSERT( itemType->IsRegistered() );
+		DD_ASSERT(itemType->IsRegistered());
 
 		typeInfo->m_typeKind = TypeKind::Container;
 
-		String64 finalName( container );
+		String64 finalName(container);
 		finalName += "<";
 		finalName += itemType->Name().c_str();
 		finalName += ">";
 
-		typeInfo->Init( finalName.c_str(), sizeof( TContainer ) );
+		typeInfo->Init(finalName.c_str(), sizeof(TContainer));
 		typeInfo->m_containedType = itemType;
 
 		typeInfo->RegisterFunctions<TContainer>();
@@ -124,23 +124,23 @@ namespace dd
 		typeInfo->ElementAt = dd::ElementAt<TContainer>;
 		typeInfo->InsertElement = dd::InsertElement<TContainer, TItem>;
 
-		sm_typeMap->insert( std::make_pair( String32( finalName ), typeInfo ) );
+		sm_typeMap->insert(std::make_pair(String32(finalName), typeInfo));
 
 		return typeInfo;
 	}
 
 	template <typename TEnum>
-	TypeInfo* TypeInfo::RegisterEnum( const char* name )
+	TypeInfo* TypeInfo::RegisterEnum(const char* name)
 	{
 		TypeInfo* typeInfo = const_cast<TypeInfo*>(GetType<TEnum>());
-		if( typeInfo->IsRegistered() )
+		if (typeInfo->IsRegistered())
 		{
 			return typeInfo;
 		}
 
 		typeInfo->m_typeKind = TypeKind::Enum;
 
-		typeInfo->Init( name, sizeof( TEnum ) );
+		typeInfo->Init(name, sizeof(TEnum));
 
 		typeInfo->New = PODNew<TEnum>;
 		typeInfo->Copy = PODCopy<TEnum>;
@@ -150,7 +150,7 @@ namespace dd
 		typeInfo->PlacementDelete = PODPlacementDelete<TEnum>;
 		typeInfo->PlacementCopy = PODPlacementCopy<TEnum>;
 
-		sm_typeMap->insert( std::make_pair( String32( name ), typeInfo ) );
+		sm_typeMap->insert(std::make_pair(String32(name), typeInfo));
 
 		return typeInfo;
 	}
@@ -158,46 +158,46 @@ namespace dd
 	template <typename T>
 	void TypeInfo::RegisterParentType()
 	{
-		const TypeInfo* parent = DD_FIND_TYPE( T );
-		DD_ASSERT( parent->IsRegistered() );
+		const TypeInfo* parent = DD_FIND_TYPE(T);
+		DD_ASSERT(parent->IsRegistered());
 
 		m_parentType = parent;
 
-		T::RegisterMembers( this );
+		T::RegisterMembers(this);
 	}
 
 	template <typename FnType, FnType Fn>
-	void TypeInfo::RegisterMethod( const char* name )
+	void TypeInfo::RegisterMethod(const char* name)
 	{
-		DD_ASSERT( IsRegistered() );
+		DD_ASSERT(IsRegistered());
 
 		Method& m = m_methods.Allocate();
 		m.Name = name;
-		m.Function = dd::BuildFunction<FnType, Fn>( Fn );
+		m.Function = dd::BuildFunction<FnType, Fn>(Fn);
 	}
-	
+
 	template <typename TClass, typename TProp, TProp TClass::* MemberPtr>
-	void TypeInfo::RegisterMember( const char* name )
+	void TypeInfo::RegisterMember(const char* name)
 	{
-		DD_ASSERT( IsRegistered() );
+		DD_ASSERT(IsRegistered());
 
 		const TypeInfo* memberType = TypeInfo::GetType<TProp>();
-		DD_ASSERT( memberType->IsRegistered() );
+		DD_ASSERT(memberType->IsRegistered());
 
 		uintptr_t offset = (uintptr_t) (&(((TClass*) nullptr)->*MemberPtr));
-		RegisterMemberInternal( name, memberType, offset );
+		RegisterMemberInternal(name, memberType, offset);
 	}
 
 	template <typename T>
-	void RegisterEnumOptions( dd::TypeInfo* typeInfo )
+	void RegisterEnumOptions(dd::TypeInfo* typeInfo)
 	{
-		DD_ASSERT( false, "Enum options being registered for non-existent enum!" );
+		DD_ASSERT(false, "Enum options being registered for non-existent enum!");
 	}
 
 	template <typename T>
-	void TypeInfo::RegisterEnumOption( T value, const char* name )
+	void TypeInfo::RegisterEnumOption(T value, const char* name)
 	{
-		DD_ASSERT( IsRegistered() );
+		DD_ASSERT(IsRegistered());
 
 		EnumOption& option = m_enumOptions.Allocate();
 		option.Value = (int) value;

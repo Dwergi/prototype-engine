@@ -20,32 +20,32 @@ namespace ddr
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	static const glm::vec2 s_screenFacingQuadVertices[] = {
-			glm::vec2( -0.5f,	-0.5f ),
-			glm::vec2( 0.5f,	-0.5f ),
-			glm::vec2( -0.5f,	0.5f ),
-			glm::vec2( -0.5f,	0.5f ),
-			glm::vec2( 0.5f,	-0.5f ),
-			glm::vec2( 0.5f,	0.5f )
+			glm::vec2(-0.5f,	-0.5f),
+			glm::vec2(0.5f,	-0.5f),
+			glm::vec2(-0.5f,	0.5f),
+			glm::vec2(-0.5f,	0.5f),
+			glm::vec2(0.5f,	-0.5f),
+			glm::vec2(0.5f,	0.5f)
 	};
 
 	static const glm::vec2 s_screenFacingQuadUVs[] = {
-		glm::vec2( 0,	0 ),
-		glm::vec2( 1,	0 ),
-		glm::vec2( 0,	1 ),
-		glm::vec2( 0,	1 ),
-		glm::vec2( 1,	0 ),
-		glm::vec2( 1,	1 )
+		glm::vec2(0,	0),
+		glm::vec2(1,	0),
+		glm::vec2(0,	1),
+		glm::vec2(0,	1),
+		glm::vec2(1,	0),
+		glm::vec2(1,	1)
 	};
 
 	static VBO s_vboQuad;
-	
+
 	static ShaderHandle s_shaderParticle;
 
 	ParticleSystemRenderer::ParticleSystemRenderer() :
-		ddr::IRenderer( "Particle Systems" )
+		ddr::IRenderer("Particle Systems")
 	{
 		Require<dd::ParticleSystemComponent>();
-		RequireTag( ddc::Tag::Visible );
+		RequireTag(ddc::Tag::Visible);
 
 		m_renderState.BackfaceCulling = false;
 		m_renderState.Blending = true;
@@ -54,10 +54,10 @@ namespace ddr
 
 	void ParticleSystemRenderer::Initialize()
 	{
-		s_shaderParticle = s_shaderManager->Load( "particle" );
+		s_shaderParticle = s_shaderManager->Load("particle");
 
 		Shader* shader = s_shaderParticle.Access();
-		DD_ASSERT( shader != nullptr );
+		DD_ASSERT(shader != nullptr);
 
 		ScopedShader scoped_state = shader->UseScoped();
 
@@ -73,40 +73,37 @@ namespace ddr
 			s_vboQuad.CommitData();
 		}
 
-		shader->BindAttributeVec2( "Position", false );
+		shader->BindAttributeVec2("Position", Normalized::No, Instanced::Yes);
 		s_vboQuad.Unbind();
 
-		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboPosition.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboPosition.Bind();
-		m_vboPosition.SetData( dd::ConstBuffer<glm::vec3>( m_positions, dd::MAX_PARTICLES ) );
+		m_vboPosition.SetData(dd::ConstBuffer<glm::vec3>(m_positions, dd::MAX_PARTICLES));
 		m_vboPosition.CommitData();
 
-		shader->BindAttributeVec3( "PositionInstanced", false );
-		shader->SetAttributeInstanced( "PositionInstanced" );
+		shader->BindAttributeVec3("PositionInstanced", Normalized::No, Instanced::Yes);
 		m_vboPosition.Unbind();
 
-		m_vboSizes.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboSizes.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboSizes.Bind();
-		m_vboSizes.SetData( dd::ConstBuffer<glm::vec2>( m_sizes, dd::MAX_PARTICLES ) );
+		m_vboSizes.SetData(dd::ConstBuffer<glm::vec2>(m_sizes, dd::MAX_PARTICLES));
 		m_vboSizes.CommitData();
 
-		shader->BindAttributeVec2( "ScaleInstanced", false );
-		shader->SetAttributeInstanced( "ScaleInstanced" );
+		shader->BindAttributeVec2("ScaleInstanced", Normalized::No, Instanced::Yes);
 		m_vboSizes.Unbind();
 
-		m_vboColours.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboColours.Bind();
-		m_vboColours.SetData( dd::ConstBuffer<glm::vec4>( m_colours, dd::MAX_PARTICLES ) );
+		m_vboColours.SetData(dd::ConstBuffer<glm::vec4>(m_colours, dd::MAX_PARTICLES));
 		m_vboColours.CommitData();
 
-		shader->BindAttributeVec4( "ColourInstanced", false );
-		shader->SetAttributeInstanced( "ColourInstanced" );
+		shader->BindAttributeVec4("ColourInstanced");
 		m_vboColours.Unbind();
 
 		m_vaoParticle.Unbind();
 	}
 
-	void ParticleSystemRenderer::Render( const ddr::RenderData& data )
+	void ParticleSystemRenderer::Render(const ddr::RenderData& data)
 	{
 		Shader* shader = s_shaderParticle.Access();
 		ScopedShader scoped_shader = shader->UseScoped();
@@ -115,7 +112,7 @@ namespace ddr
 		const ddr::ICamera& camera = data.Camera();
 		const ddc::EntityLayer& entities = data.EntityLayer();
 
-		uniforms.Bind( *shader );
+		uniforms.Bind(*shader);
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
 		m_vaoParticle.Bind();
@@ -124,27 +121,27 @@ namespace ddr
 
 		glm::vec3 cam_pos = camera.GetPosition();
 
-		for( const dd::ParticleSystemComponent& system : particle_systems )
+		for (const dd::ParticleSystemComponent& system : particle_systems)
 		{
-			memcpy( m_tempBuffer, system.Particles, sizeof( dd::Particle ) * system.LiveCount );
+			memcpy(m_tempBuffer, system.Particles, sizeof(dd::Particle) * system.LiveCount);
 
-			for( dd::Particle& p : m_tempBuffer )
+			for (dd::Particle& p : m_tempBuffer)
 			{
-				DD_ASSERT( !ddm::IsNaN( p.Position ) );
-				
-				p.Distance = p.Alive() ? glm::distance2( p.Position, cam_pos ) : -1;
+				DD_ASSERT(!ddm::IsNaN(p.Position));
+
+				p.Distance = p.Alive() ? glm::distance2(p.Position, cam_pos) : -1;
 			}
 
-			std::sort( &m_tempBuffer[0], &m_tempBuffer[dd::MAX_PARTICLES],
-				[]( const dd::Particle& a, const dd::Particle& b )
-			{
-				return a.Distance > b.Distance;
-			} );
+			std::sort(&m_tempBuffer[0], &m_tempBuffer[dd::MAX_PARTICLES],
+				[](const dd::Particle& a, const dd::Particle& b)
+				{
+					return a.Distance > b.Distance;
+				});
 
 			int count = 0;
-			for( const dd::Particle& particle : m_tempBuffer )
+			for (const dd::Particle& particle : m_tempBuffer)
 			{
-				if( !particle.Alive() )
+				if (!particle.Alive())
 				{
 					break;
 				}

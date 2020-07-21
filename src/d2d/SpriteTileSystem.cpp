@@ -47,6 +47,8 @@ namespace d2d
 
 	glm::vec2 SpriteTileSystem::CoordToPixels(glm::vec2 coord) const
 	{
+		DD_ASSERT(!ddm::IsNaN(coord));
+
 		return glm::vec2(
 			m_edgeOffset.x + coord.x * m_scaledTileSize + m_scaledTileSize / 2,
 			m_edgeOffset.y + coord.y * m_scaledTileSize + m_scaledTileSize / 2);
@@ -54,6 +56,8 @@ namespace d2d
 
 	glm::vec2 SpriteTileSystem::PixelsToCoord(glm::vec2 pixels) const
 	{
+		DD_ASSERT(!ddm::IsNaN(pixels));
+
 		glm::vec2 half_tile( m_scaledTileSize / 2.0f );
 		 
 		return (pixels - m_edgeOffset - half_tile) / glm::vec2(m_scaledTileSize); 
@@ -65,13 +69,15 @@ namespace d2d
 
 		DD_ASSERT(m_scaledTileSize != 0);
 
-		auto entities = update_data.Data().Entities();
-		auto sprites = update_data.Data().Write<d2d::SpriteComponent>();
-		auto transforms = update_data.Data().Read<d2d::Transform2DComponent>();
-		auto boxes = update_data.Data().Write<d2d::BoxPhysicsComponent>();
-		auto circles = update_data.Data().Write<d2d::CirclePhysicsComponent>();
+		const ddc::UpdateBufferView& update_buffer = update_data.Data();
 
-		for (int i = 0; i < update_data.Data().Size(); ++i)
+		auto entities = update_buffer.Entities();
+		auto sprites = update_buffer.Write<d2d::SpriteComponent>();
+		auto transforms = update_buffer.Read<d2d::Transform2DComponent>();
+		auto boxes = update_buffer.Write<d2d::BoxPhysicsComponent>();
+		auto circles = update_buffer.Write<d2d::CirclePhysicsComponent>();
+
+		for (int i = 0; i < update_buffer.Size(); ++i)
 		{
 			const d2d::Transform2DComponent& transform_cmp = transforms[i];
 			d2d::SpriteComponent& sprite_cmp = sprites[i];
@@ -81,6 +87,8 @@ namespace d2d
 
 			glm::vec2 sprite_size_px = transform_cmp.Scale * m_scaledTileSize;
 			sprite_cmp.Size = sprite_size_px;
+
+			sprite_cmp.Rotation = transform_cmp.Rotation;
 
 			if (boxes.Has(i))
 			{

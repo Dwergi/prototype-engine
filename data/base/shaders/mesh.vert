@@ -17,7 +17,7 @@ uniform mat4 Projection;
 
 void main()
 {
-	vec4 posTransformed = TransformInstanced * vec4( Position, 1 );
+	vec4 posTransformed = TransformInstanced * vec4(Position, 1);
 
 	Fragment.Position = posTransformed.xyz;
 	Fragment.Colour = ColourInstanced;

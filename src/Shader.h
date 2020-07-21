@@ -9,6 +9,8 @@
 #include "HandleManager.h"
 #include "OpenGL.h"
 
+#include <string_view>
+
 namespace ddr
 {
 	struct ShaderPart;
@@ -25,6 +27,18 @@ namespace ddr
 
 	private:
 		Shader* m_shader { nullptr };
+	};
+
+	enum class Normalized
+	{
+		Yes,
+		No
+	};
+
+	enum class Instanced
+	{
+		Yes,
+		No
 	};
 
 	struct Shader : dd::HandleTarget
@@ -53,13 +67,15 @@ namespace ddr
 		bool BindUVs();
 		bool BindVertexColours();
 
-		bool BindAttributeFloat(std::string_view name, uint components, bool normalized);
-		bool BindAttributeVec2(std::string_view name, bool normalized);
-		bool BindAttributeVec3(std::string_view name, bool normalized);
-		bool BindAttributeVec4(std::string_view name, bool normalized);
-		bool BindAttributeMat4(std::string_view name, bool instanced);
+		bool BindAttributeFloat(std::string_view name, uint components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec2(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec3(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec4(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
 
-		bool SetAttributeInstanced(std::string_view name);
+		bool BindAttributeMatrix(std::string_view name, uint size, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat2(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat3(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat4(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
 
 		bool EnableAttribute(std::string_view name);
 		bool DisableAttribute(std::string_view name);

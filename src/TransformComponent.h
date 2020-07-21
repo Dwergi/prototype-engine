@@ -24,18 +24,18 @@ namespace dd
 
 		void Update()
 		{
-			Rotation = glm::normalize( Rotation );
+			Rotation = glm::normalize(Rotation);
 			m_transform = CalculateTransform();
 		}
 
-		DD_ALIGNED_ALLOCATORS( 16 );
+		DD_ALIGNED_ALLOCATORS(16);
 
-		DD_BEGIN_CLASS( dd::TransformComponent )
+		DD_BEGIN_CLASS(dd::TransformComponent)
 			DD_COMPONENT();
 
-			DD_MEMBER( Position );
-			DD_MEMBER( Rotation );
-			DD_MEMBER( Scale );
+			DD_MEMBER(Position);
+			DD_MEMBER(Rotation);
+			DD_MEMBER(Scale);
 		DD_END_CLASS()
 
 	private:
@@ -44,7 +44,7 @@ namespace dd
 
 		glm::mat4 CalculateTransform() const
 		{
-			return glm::translate( Position ) * glm::toMat4( Rotation ) * glm::scale( Scale );
+			return glm::translate(Position) * glm::toMat4(Rotation) * glm::scale(Scale);
 		}
 	};
 }

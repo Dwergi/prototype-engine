@@ -18,21 +18,15 @@ namespace dd
 	struct FreeCameraController : IDebugPanel, ddc::System
 	{
 		FreeCameraController();
-		FreeCameraController( FreeCameraController&& other );
+		FreeCameraController(FreeCameraController&& other);
 		~FreeCameraController();
-		
-		FreeCameraController( const FreeCameraController& ) = delete;
-		FreeCameraController& operator=( const FreeCameraController& ) = delete;
+
+		FreeCameraController(const FreeCameraController&) = delete;
+		FreeCameraController& operator=(const FreeCameraController&) = delete;
 
 		virtual void Initialize(ddc::EntityLayer& layer) override;
-		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void Update(const ddc::UpdateData& data) override;
 
-		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
-
-	protected:
-
-		virtual void DrawDebugInternal() override;
-	
 	private:
 
 		std::vector<FPSCameraComponent*> m_cameras;
@@ -40,5 +34,8 @@ namespace dd
 
 		bool m_enabled { true };
 		bool m_invert { false };
+
+		virtual const char* GetDebugTitle() const override { return "Free Camera"; }
+		virtual void DrawDebugInternal() override;
 	};
 }

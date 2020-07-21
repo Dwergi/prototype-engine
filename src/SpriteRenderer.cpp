@@ -16,6 +16,7 @@
 #include "Uniforms.h"
 
 #include "d2d/SpriteComponent.h"
+#include "d2d/Transform2DComponent.h"
 
 namespace ddr
 {
@@ -43,6 +44,7 @@ namespace ddr
 		m_renderState.BackfaceCulling = false;
 		m_renderState.Blending = true;
 		m_renderState.Depth = false;
+		m_renderState.DepthWrite = false;
 	}
 
 	void SpriteRenderer::Initialize()
@@ -63,48 +65,36 @@ namespace ddr
 			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_quad, 6));
 			s_vboQuad.CommitData();
 
-			shader->BindAttributeVec2("Position", false);
-			shader->BindAttributeVec2("UV", false);
+			shader->BindAttributeVec2("Position");
+			shader->BindAttributeVec2("UV");
 			s_vboQuad.Unbind();
 		}
 
-		m_vboPositions.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+		m_vboTransforms.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		{
-			m_vboPositions.Bind();
-			shader->BindAttributeVec2("PositionInstanced", false);
-			shader->SetAttributeInstanced("PositionInstanced");
-			m_vboPositions.Unbind();
-		}
-
-		m_vboSizes.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			m_vboSizes.Bind();
-			shader->BindAttributeVec2("SizeInstanced", false);
-			shader->SetAttributeInstanced("SizeInstanced");
-			m_vboSizes.Unbind();
+			m_vboTransforms.Bind();
+			shader->BindAttributeMat3("TransformInstanced", Normalized::No, Instanced::Yes);
+			m_vboTransforms.Unbind();
 		}
 
 		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		{
 			m_vboColours.Bind();
-			shader->BindAttributeVec4("ColourInstanced", false);
-			shader->SetAttributeInstanced("ColourInstanced");
+			shader->BindAttributeVec4("ColourInstanced", Normalized::No, Instanced::Yes);
 			m_vboColours.Unbind();
 		}
 
 		m_vboUVOffsets.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		{
 			m_vboUVOffsets.Bind();
-			shader->BindAttributeVec2("UVOffsetInstanced", false);
-			shader->SetAttributeInstanced("UVOffsetInstanced");
+			shader->BindAttributeVec2("UVOffsetInstanced", Normalized::No, Instanced::Yes);
 			m_vboUVOffsets.Unbind();
 		}
 
 		m_vboUVScales.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		{
 			m_vboUVScales.Bind();
-			shader->BindAttributeVec2("UVScaleInstanced", false);
-			shader->SetAttributeInstanced("UVScaleInstanced");
+			shader->BindAttributeVec2("UVScaleInstanced", Normalized::No, Instanced::Yes);
 			m_vboUVScales.Unbind();
 		}
 
@@ -124,37 +114,26 @@ namespace ddr
 
 		size_t count = std::distance(start, end);
 
-		m_positions.clear();
-		m_positions.reserve(count);
-		m_sizes.clear();
-		m_sizes.reserve(count);
+		m_transforms.clear();
 		m_uvOffsets.clear();
-		m_uvOffsets.reserve(count);
 		m_uvScales.clear();
-		m_uvScales.reserve(count);
 		m_colours.clear();
-		m_colours.reserve(count);
 
 		for (SpriteIterator it = start; it != end; ++it)
 		{
 			const ddr::Sprite* sprite = it->Sprite.Get();
 			DD_ASSERT(sprite->Texture == texture_h);
 
-			m_positions.push_back(it->Position);
-			m_sizes.push_back(it->Size);
+			m_transforms.push_back(d2d::Calculate2DTransform(it->Position, it->Size, it->Rotation, it->Pivot));
 			m_colours.push_back(it->Colour);
 
 			m_uvOffsets.push_back(sprite->OffsetNormalized);
 			m_uvScales.push_back(sprite->SizeNormalized);
 		}
 
-		m_vboPositions.Bind();
-		m_vboPositions.CommitData();
-		m_vboPositions.Unbind();
-
-		m_vboSizes.Bind();
-		m_vboSizes.CommitData();
-		m_vboSizes.Unbind();
+		m_vboTransforms.Bind();
+		m_vboTransforms.CommitData();
+		m_vboTransforms.Unbind();
 
 		m_vboUVOffsets.Bind();
 		m_vboUVOffsets.CommitData();
@@ -222,19 +201,14 @@ namespace ddr
 		std::copy(sprite_cmps.begin(), sprite_cmps.end(), std::back_inserter(m_temp));
 
 		// reserve memory
-		m_positions.reserve(m_temp.size());
-		m_sizes.reserve(m_temp.size());
+		m_transforms.reserve(m_temp.size());
 		m_uvOffsets.reserve(m_temp.size());
 		m_uvScales.reserve(m_temp.size());
 		m_colours.reserve(m_temp.size());
 
-		m_vboPositions.Bind();
-		m_vboPositions.SetData(m_positions.data(), m_positions.capacity());
-		m_vboPositions.Unbind();
-
-		m_vboSizes.Bind();
-		m_vboSizes.SetData(m_sizes.data(), m_sizes.capacity());
-		m_vboSizes.Unbind();
+		m_vboTransforms.Bind();
+		m_vboTransforms.SetData(m_transforms.data(), m_transforms.capacity());
+		m_vboTransforms.Unbind();
 
 		m_vboUVOffsets.Bind();
 		m_vboUVOffsets.SetData(m_uvOffsets.data(), m_uvOffsets.capacity());

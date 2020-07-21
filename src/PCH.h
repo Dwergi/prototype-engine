@@ -128,4 +128,7 @@ std::string operator+(std::string_view a, std::string_view b);
 
 #define DD_TOSTRING2( X ) #X
 #define DD_TOSTRING( X ) DD_TOSTRING2( X )
-#define DD_TODO( Message ) __pragma( message( __FILE__ ":" DD_TOSTRING( __LINE__ ) " - TODO: " Message ) )
+#define DD_TODO( Message ) __pragma(message( __FILE__ ":" DD_TOSTRING( __LINE__ ) " - TODO: " Message))
+
+#define DD_OPTIMIZE_OFF() __pragma(optimize("",off))
+#define DD_OPTIMIZE_ON() __pragma(optimize("",on))

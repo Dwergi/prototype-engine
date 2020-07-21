@@ -223,6 +223,8 @@
     <ClInclude Include="src\ddm\Circle.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\flux\FluxGame.h" />
+    <ClInclude Include="src\flux\FluxPlayerComponent.h" />
+    <ClInclude Include="src\flux\FluxPlayerController.h" />
     <ClInclude Include="src\JobSystem.h" />
     <ClInclude Include="src\lux\LuxLightComponent.h" />
     <ClInclude Include="src\lux\LuxLightRenderer.h" />
@@ -464,6 +466,8 @@
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\flux\FluxGame.cpp" />
+    <ClCompile Include="src\flux\FluxPlayerComponent.cpp" />
+    <ClCompile Include="src\flux\FluxPlayerController.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
     <ClCompile Include="src\ImGuiBinding.cpp" />
     <ClCompile Include="src\InputEvent.cpp" />

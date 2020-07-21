@@ -31,9 +31,9 @@ static dd::ProfilerValue& s_meshesRendered = dd::Profiler::GetValue("Meshes Rend
 namespace ddr
 {
 	MeshRenderer::MeshRenderer() :
-		ddr::IRenderer( "Meshes" )
+		ddr::IRenderer("Meshes")
 	{
-		RequireTag( ddc::Tag::Visible );
+		RequireTag(ddc::Tag::Visible);
 		Require<dd::MeshComponent>();
 		Require<dd::TransformComponent>();
 		Optional<dd::ColourComponent>();
@@ -55,22 +55,22 @@ namespace ddr
 	void MeshRenderer::Update(ddr::RenderData& data)
 	{
 		size_t count = s_meshManager->LiveCount();
-		
-		for( size_t i = 0; i < count; ++i )
+
+		for (size_t i = 0; i < count; ++i)
 		{
-			Mesh* mesh = s_meshManager->AccessNth( i );
-			mesh->Update( *s_jobsystem );
+			Mesh* mesh = s_meshManager->AccessNth(i);
+			mesh->Update(*s_jobsystem);
 		}
 	}
 
-	void MeshRenderer::Render( const ddr::RenderData& data )
+	void MeshRenderer::Render(const ddr::RenderData& data)
 	{
 		m_commands.Clear();
 		m_meshCount = 0;
 		m_unculledMeshCount = 0;
-		
+
 		ddr::UniformStorage& uniforms = data.Uniforms();
-		uniforms.Set( "DrawNormals", m_drawNormals );
+		uniforms.Set("DrawNormals", m_drawNormals);
 
 		auto meshes = data.Get<dd::MeshComponent>();
 		auto bound_boxes = data.Get<dd::BoundBoxComponent>();
@@ -80,19 +80,19 @@ namespace ddr
 
 		const auto& entities = data.Entities();
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		for (size_t i = 0; i < data.Size(); ++i)
 		{
-			RenderMesh( entities[i], meshes[i], transforms[i], bound_boxes.Get( i ), bound_spheres.Get( i ), colours.Get( i ), data );
+			RenderMesh(entities[i], meshes[i], transforms[i], bound_boxes.Get(i), bound_spheres.Get(i), colours.Get(i), data);
 		}
 
 		ProcessCommands(data.Uniforms());
 	}
 
-	void MeshRenderer::RenderMesh( ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp, 
-		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp, 
-		const ddr::RenderData& render_data )
+	void MeshRenderer::RenderMesh(ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
+		const dd::BoundBoxComponent* bbox_cmp, const dd::BoundSphereComponent* bsphere_cmp, const dd::ColourComponent* colour_cmp,
+		const ddr::RenderData& render_data)
 	{
-		if( !mesh_cmp.Mesh.IsValid() )
+		if (!mesh_cmp.Mesh.IsValid())
 			return;
 
 		const ddr::ICamera& camera = render_data.Camera();
@@ -122,32 +122,32 @@ namespace ddr
 
 		++m_unculledMeshCount;
 
-		glm::vec4 debug_multiplier( 1, 1, 1, 1 );
+		glm::vec4 debug_multiplier(1, 1, 1, 1);
 
-		if( entities.HasTag( entity, ddc::Tag::Focused ) )
+		if (entities.HasTag(entity, ddc::Tag::Focused))
 		{
 			debug_multiplier.z = 1.5f;
 		}
 
-		if( entities.HasTag( entity, ddc::Tag::Selected ) )
+		if (entities.HasTag(entity, ddc::Tag::Selected))
 		{
 			debug_multiplier.y = 1.5f;
 		}
 
-		if( m_debugHighlightFrustumMeshes )
+		if (m_debugHighlightFrustumMeshes)
 		{
 			debug_multiplier.x = 1.5f;
 		}
 
-		glm::vec4 colour( 1 );
-		
-		if( colour_cmp != nullptr )
+		glm::vec4 colour(1);
+
+		if (colour_cmp != nullptr)
 		{
 			colour = colour_cmp->Colour;
 		}
 
 		const Mesh* mesh = mesh_cmp.Mesh.Get();
-		
+
 		MeshRenderCommand& cmd = m_commands.Allocate();
 		cmd.Material = mesh->GetMaterial();
 		cmd.Mesh = mesh_cmp.Mesh;
@@ -168,13 +168,12 @@ namespace ddr
 
 		m_vboTransforms.Bind();
 		m_vboTransforms.CommitData();
-		shader->BindAttributeMat4("TransformInstanced", true);
+		shader->BindAttributeMat4("TransformInstanced", Normalized::No, Instanced::Yes);
 		m_vboTransforms.Unbind();
 
 		m_vboColours.Bind();
 		m_vboColours.CommitData();
-		shader->BindAttributeVec4("ColourInstanced", false);
-		shader->SetAttributeInstanced("ColourInstanced");
+		shader->BindAttributeVec4("ColourInstanced", Normalized::No, Instanced::Yes);
 		m_vboColours.Unbind();
 
 		if (mesh->GetIndices().IsValid())
@@ -202,7 +201,7 @@ namespace ddr
 		m_vboTransforms.Bind();
 		m_vboTransforms.SetData(transforms.data(), transforms.capacity());
 		m_vboTransforms.Unbind();
-		
+
 		static std::vector<glm::vec4> colours;
 		colours.reserve(m_commands.Size());
 		colours.clear();
@@ -265,27 +264,27 @@ namespace ddr
 
 	void MeshRenderer::DrawDebugInternal()
 	{
-		ImGui::Value( "Meshes", m_meshCount );
-		ImGui::Value( "Unculled Meshes", m_unculledMeshCount );
+		ImGui::Value("Meshes", m_meshCount);
+		ImGui::Value("Unculled Meshes", m_unculledMeshCount);
 
-		ImGui::Checkbox( "Frustum Culling", &m_frustumCull );
-		ImGui::Checkbox( "Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes );
+		ImGui::Checkbox("Frustum Culling", &m_frustumCull);
+		ImGui::Checkbox("Highlight Frustum Meshes", &m_debugHighlightFrustumMeshes);
 
-		MaterialHandle material_h( "mesh" );
+		MaterialHandle material_h("mesh");
 		Material* material = material_h.Access();
 
 		bool culling = material->State.BackfaceCulling;
-		if( ImGui::Checkbox( "Backface Culling", &culling ) )
+		if (ImGui::Checkbox("Backface Culling", &culling))
 		{
 			material->State.BackfaceCulling = culling;
 		}
 
 		bool depth = material->State.Depth;
-		if( ImGui::Checkbox( "Depth Test", &depth ) )
+		if (ImGui::Checkbox("Depth Test", &depth))
 		{
 			material->State.Depth = depth;
 		}
 
-		ImGui::Checkbox( "Draw Normals", &m_drawNormals );
+		ImGui::Checkbox("Draw Normals", &m_drawNormals);
 	}
 }

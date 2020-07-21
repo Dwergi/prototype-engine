@@ -113,7 +113,7 @@ namespace dd
 
 		float dt = update_data.Delta();
 
-		const auto& data = update_data.Data();
+		const ddc::UpdateBufferView& data = update_data.Data();
 		auto cameras = data.Write<FPSCameraComponent>();
 		auto transforms = data.Write<TransformComponent>();
 

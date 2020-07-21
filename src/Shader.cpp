@@ -223,40 +223,40 @@ namespace ddr
 
 	bool Shader::BindPositions()
 	{
-		return BindAttributeVec3("Position", false);
+		return BindAttributeVec3("Position");
 	}
 
 	bool Shader::BindNormals()
 	{
-		return BindAttributeVec3("Normal", true);
+		return BindAttributeVec3("Normal", Normalized::Yes);
 	}
 
 	bool Shader::BindUVs()
 	{
-		return BindAttributeVec2("UV", false);
+		return BindAttributeVec2("UV");
 	}
 
 	bool Shader::BindVertexColours()
 	{
-		return BindAttributeVec4("VertexColour", false);
+		return BindAttributeVec4("VertexColour");
 	}
 
-	bool Shader::BindAttributeVec2(std::string_view name, bool normalized)
+	bool Shader::BindAttributeVec2(std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 2, normalized);
+		return BindAttributeFloat(name, 2, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec3(std::string_view name, bool normalized)
+	bool Shader::BindAttributeVec3(std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 3, normalized);
+		return BindAttributeFloat(name, 3, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec4(std::string_view name, bool normalized)
+	bool Shader::BindAttributeVec4(std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 4, normalized);
+		return BindAttributeFloat(name, 4, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeFloat(std::string_view name, uint components, bool normalized)
+	bool Shader::BindAttributeFloat(std::string_view name, uint components, Normalized normalized, Instanced instanced)
 	{
 		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
 		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
@@ -268,8 +268,13 @@ namespace ddr
 			glEnableVertexAttribArray(loc);
 			CheckOGLError();
 
-			glVertexAttribPointer(loc, components, GL_FLOAT, normalized ? GL_TRUE : GL_FALSE, 0, nullptr);
+			glVertexAttribPointer(loc, components, GL_FLOAT, normalized == Normalized::Yes ? GL_TRUE : GL_FALSE, 0, nullptr);
 			CheckOGLError();
+
+			if (instanced == Instanced::Yes)
+			{
+				glVertexAttribDivisor(loc, 1);
+			}
 
 			return true;
 		}
@@ -277,7 +282,7 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::BindAttributeMat4(std::string_view name, bool instanced)
+	bool Shader::BindAttributeMatrix(std::string_view name, uint size, Normalized normalized, Instanced instanced)
 	{
 		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
 		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
@@ -285,18 +290,18 @@ namespace ddr
 		ShaderLocation loc = GetAttribute(name);
 		if (loc != InvalidLocation)
 		{
-			size_t offset = sizeof(float) * 4;
-			GLsizei stride = (GLsizei) (offset * 4);
+			size_t offset = sizeof(float) * size;
+			GLsizei stride = (GLsizei) (offset * size);
 
-			for (int i = 0; i < 4; ++i)
+			for (uint i = 0; i < size; ++i)
 			{
 				glEnableVertexAttribArray(loc + i);
 				CheckOGLError();
 
-				glVertexAttribPointer(loc + i, 4, GL_FLOAT, GL_FALSE, stride, (void*) (i * offset));
+				glVertexAttribPointer(loc + i, size, GL_FLOAT, GL_FALSE, stride, (const void*) (i * offset));
 				CheckOGLError();
 
-				if (instanced)
+				if (instanced == Instanced::Yes)
 				{
 					glVertexAttribDivisor(loc + i, 1);
 				}
@@ -308,21 +313,19 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::SetAttributeInstanced(std::string_view name)
+	bool Shader::BindAttributeMat2(std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
+		return BindAttributeMatrix(name, 2, normalized, instanced);
+	}
+	
+	bool Shader::BindAttributeMat3(std::string_view name, Normalized normalized, Instanced instanced)
+	{
+		return BindAttributeMatrix(name, 3, normalized, instanced);
+	}
 
-		ShaderLocation loc = GetAttribute(name);
-		if (loc != InvalidLocation)
-		{
-			glVertexAttribDivisor(loc, 1);
-			CheckOGLError();
-
-			return true;
-		}
-
-		DD_ASSERT(false, "Attribute '%s' not found!", name.data());
-		return false;
+	bool Shader::BindAttributeMat4(std::string_view name, Normalized normalized, Instanced instanced)
+	{
+		return BindAttributeMatrix(name, 4, normalized, instanced);
 	}
 
 	ShaderLocation Shader::GetUniform(std::string_view name) const

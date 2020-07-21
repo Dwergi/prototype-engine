@@ -154,12 +154,9 @@ static int GameMain()
 
 	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
 
-	dd::Services::RegisterInterface<dd::IGame>(new TGame());
-
 	{
 		dd::IWindow& window = *new dd::SFMLWindow();
-		window.SetTitle(s_game->GetTitle())
-			.SetSize(glm::ivec2(1024, 768))
+		window.SetSize(glm::ivec2(1024, 768))
 			.Initialize();
 
 		OpenGL::Initialize();
@@ -194,6 +191,7 @@ static int GameMain()
 		std::vector<ddc::EntityLayer*> entity_layers;
 
 		{
+			dd::Services::RegisterInterface<dd::IGame>(new TGame());
 			s_game->Initialize();
 			s_game->RegisterSystems(*s_systemsManager);
 			s_game->RegisterRenderers(*s_renderer);
@@ -216,6 +214,8 @@ static int GameMain()
 			DD_PROFILE_SCOPED(Frame);
 			DD_BREAK_ON_ALLOC(100);
 
+			s_window->SetTitle(s_game->GetTitle());
+
 			{
 				s_profilerTimer.Restart();
 
@@ -229,27 +229,27 @@ static int GameMain()
 			{
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* space : entity_layers)
+					for (ddc::EntityLayer* layer : entity_layers)
 					{
-						space->Update(s_frameTimer->GameDelta());
+						layer->Update(s_frameTimer->GameDelta());
 					}
 					s_entityUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* space : entity_layers)
+					for (ddc::EntityLayer* layer : entity_layers)
 					{
-						s_systemsManager->Update(*space, s_frameTimer->GameDelta());
+						s_systemsManager->Update(*layer, s_frameTimer->GameDelta());
 					}
 					s_systemsUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* space : entity_layers)
+					for (ddc::EntityLayer* layer : entity_layers)
 					{
-						dd::GameUpdateData update_data(*space, *s_input, s_frameTimer->GameDelta());
+						dd::GameUpdateData update_data(*layer, *s_input, s_frameTimer->GameDelta());
 						s_game->Update(update_data);
 					}
 					s_gameUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
@@ -257,9 +257,9 @@ static int GameMain()
 
 				{
 					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* space : entity_layers)
+					for (ddc::EntityLayer* layer : entity_layers)
 					{
-						s_renderer->Render(*space, s_frameTimer->GameDelta());
+						s_renderer->Render(*layer, s_frameTimer->GameDelta());
 					}
 					s_renderProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}

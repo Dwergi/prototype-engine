@@ -864,6 +864,12 @@
     <ClInclude Include="src\AssetManager.h">
       <Filter>Assets</Filter>
     </ClInclude>
+    <ClInclude Include="src\flux\FluxPlayerController.h">
+      <Filter>Games\Flux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\flux\FluxPlayerComponent.h">
+      <Filter>Games\Flux</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1475,6 +1481,12 @@
     </ClCompile>
     <ClCompile Include="src\AssetManager.cpp">
       <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flux\FluxPlayerController.cpp">
+      <Filter>Games\Flux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flux\FluxPlayerComponent.cpp">
+      <Filter>Games\Flux</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

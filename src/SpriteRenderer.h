@@ -31,11 +31,8 @@ namespace ddr
 
 		VAO m_vao;
 
-		std::vector<glm::vec2> m_positions;
-		VBO m_vboPositions;
-
-		std::vector<glm::vec2> m_sizes;
-		VBO m_vboSizes;
+		std::vector<glm::mat3> m_transforms;
+		VBO m_vboTransforms;
 
 		std::vector<glm::vec2> m_uvOffsets;
 		VBO m_vboUVOffsets;

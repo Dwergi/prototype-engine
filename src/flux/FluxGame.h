@@ -1,10 +1,11 @@
 #pragma once
 
 #include "IGame.h"
+#include "IDebugPanel.h"
 
 namespace flux
 {
-	struct FluxGame : dd::IGame
+	struct FluxGame : dd::IGame, dd::IDebugPanel
 	{
 		// Initialization occurs in this order.
 		virtual void Initialize() override;
@@ -17,5 +18,9 @@ namespace flux
 		virtual void Shutdown() override;
 
 		virtual const char* GetTitle() const { return "Flux"; }
+
+	private:
+		virtual const char* GetDebugTitle() const { return GetTitle(); }
+		virtual void DrawDebugInternal() override;
 	};
 }

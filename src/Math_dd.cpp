@@ -5,71 +5,86 @@
 
 namespace ddm
 {
-	bool IsNaN( glm::vec3 v )
+	bool IsNaN(glm::vec2 v)
 	{
-		return glm::isnan( v.x ) || glm::isnan( v.y ) || glm::isnan( v.z );
+		return glm::isnan(v.x) || glm::isnan(v.y);
 	}
 
-	bool IsNaN( glm::vec4 v )
+	bool IsNaN(glm::vec3 v)
 	{
-		return glm::isnan( v.x ) || glm::isnan( v.y ) || glm::isnan( v.z ) || glm::isnan( v.w );;
+		return glm::isnan(v.x) || glm::isnan(v.y) || glm::isnan(v.z);
 	}
 
-	bool IsInf( glm::vec3 v )
+	bool IsNaN(glm::vec4 v)
 	{
-		return glm::isinf( v.x ) || glm::isinf( v.y ) || glm::isinf( v.z );
+		return glm::isnan(v.x) || glm::isnan(v.y) || glm::isnan(v.z) || glm::isnan(v.w);;
 	}
 
-	glm::mat4 TransformFromOriginDir( const glm::vec3& origin, const glm::vec3& dir )
+	bool IsInf(glm::vec2 v)
 	{
-		glm::vec3 right = glm::normalize( glm::cross( dir, glm::vec3( 0, 1, 0 ) ) );
+		return glm::isinf(v.x) || glm::isinf(v.y);
+	}
+
+	bool IsInf(glm::vec3 v)
+	{
+		return glm::isinf(v.x) || glm::isinf(v.y) || glm::isinf(v.z);
+	}
+
+	bool IsInf(glm::vec4 v)
+	{
+		return glm::isinf(v.x) || glm::isinf(v.y) || glm::isinf(v.z) || glm::isinf(v.w);
+	}
+
+	glm::mat4 TransformFromOriginDir(const glm::vec3& origin, const glm::vec3& dir)
+	{
+		glm::vec3 right = glm::normalize(glm::cross(dir, glm::vec3(0, 1, 0)));
 
 		// degenerate case of vector pointing up
-		if( ddm::IsNaN( right ) )
+		if (ddm::IsNaN(right))
 		{
-			right = glm::vec3( 0, 0, 1 );
+			right = glm::vec3(0, 0, 1);
 		}
 
-		glm::vec3 up = glm::cross( dir, right );
+		glm::vec3 up = glm::cross(dir, right);
 
 		return glm::mat4(
-			glm::vec4( right, 0 ),
-			glm::vec4( up, 0 ),
-			glm::vec4( dir, 0 ),
-			glm::vec4( origin, 1 ) );
+			glm::vec4(right, 0),
+			glm::vec4(up, 0),
+			glm::vec4(dir, 0),
+			glm::vec4(origin, 1));
 	}
 
-	glm::mat4 TransformFromRay( const ddm::Ray& ray )
+	glm::mat4 TransformFromRay(const ddm::Ray& ray)
 	{
-		return TransformFromOriginDir( ray.Origin(), ray.Direction() );
+		return TransformFromOriginDir(ray.Origin(), ray.Direction());
 	}
 
-	glm::vec3 DirectionFromPitchYaw( float pitch, float yaw )
+	glm::vec3 DirectionFromPitchYaw(float pitch, float yaw)
 	{
-		return glm::vec3( glm::cos( pitch ) * glm::sin( yaw ),
-			glm::sin( pitch ),
-			glm::cos( pitch ) * glm::cos( yaw ) );
+		return glm::vec3(glm::cos(pitch) * glm::sin(yaw),
+			glm::sin(pitch),
+			glm::cos(pitch) * glm::cos(yaw));
 	}
 
-	void PitchYawFromDirection( const glm::vec3& dir, float& pitch, float& yaw )
+	void PitchYawFromDirection(const glm::vec3& dir, float& pitch, float& yaw)
 	{
-		glm::vec3 d = glm::normalize( dir );
+		glm::vec3 d = glm::normalize(dir);
 
-		pitch = asin( d.y );
-		yaw = atan2( d.x, d.z );
+		pitch = asin(d.y);
+		yaw = atan2(d.x, d.z);
 	}
 
-	glm::quat QuatFromPitchYaw( float pitch, float yaw )
+	glm::quat QuatFromPitchYaw(float pitch, float yaw)
 	{
-		return glm::angleAxis( pitch, glm::vec3( 1, 0, 0 ) ) * glm::angleAxis( yaw, glm::vec3( 0, 1, 0 ) );
+		return glm::angleAxis(pitch, glm::vec3(1, 0, 0)) * glm::angleAxis(yaw, glm::vec3(0, 1, 0));
 	}
 
-	glm::vec3 NormalFromTriangle( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 )
+	glm::vec3 NormalFromTriangle(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2)
 	{
 		glm::vec3 a = p1 - p0;
 		glm::vec3 b = p2 - p0;
 
-		glm::vec3 normal = glm::normalize( glm::cross( a, b ) );
+		glm::vec3 normal = glm::normalize(glm::cross(a, b));
 		return normal;
 	}
 }

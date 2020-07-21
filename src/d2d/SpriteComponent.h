@@ -8,8 +8,6 @@ namespace d2d
 	struct SpriteComponent
 	{
 		SpriteComponent();
-		SpriteComponent(const SpriteComponent& other);
-		SpriteComponent& operator=(const SpriteComponent& other);
 
 		// handle to a sprite
 		ddr::SpriteHandle Sprite;
@@ -23,6 +21,12 @@ namespace d2d
 		// size in pixels
 		glm::vec2 Size { 0, 0 };
 
+		// the point in the sprite to pivot around
+		glm::vec2 Pivot { 0, 0 };
+
+		// rotation in radians
+		float Rotation { 0 };
+
 		// colour to modulate sprite with
 		glm::vec4 Colour { 1, 1, 1, 1 };
 
@@ -35,8 +39,10 @@ namespace d2d
 			DD_MEMBER(Sprite);
 			DD_MEMBER(Position);
 			DD_MEMBER(Size);
+			DD_MEMBER(Rotation);
 			DD_MEMBER(Colour);
 			DD_MEMBER(ZIndex);
+			DD_MEMBER(HitBox);
 		DD_END_CLASS()
 	};
 }

@@ -59,7 +59,7 @@ namespace dd
 		virtual void OnSetCursor(Cursor cursor) = 0;
 
 		glm::ivec2 m_size { 0, 0 };
-		std::string m_title;
+		std::string m_title { "DD" };
 		bool m_focused { false };
 		bool m_closing { false };
 		dd::Cursor m_cursor { Cursor::Hidden };
