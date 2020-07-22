@@ -71,7 +71,7 @@ namespace dd
 
 		Array();
 		Array(const Array<T, MaxCapacity>& other);
-		Array(Array<T, MaxCapacity>&& other);
+		Array(Array<T, MaxCapacity>&& other) noexcept;
 
 		Array<T, MaxCapacity>& operator=(const Array<T, MaxCapacity>& other);
 		Array<T, MaxCapacity>& operator=(Array<T, MaxCapacity>&& other);

@@ -501,7 +501,7 @@ namespace lux
 
 		if (s_currentMap == nullptr || s_desiredMapIndex != s_currentMap->GetIndex())
 		{
-			SwitchMap(update.EntityLayer(), s_desiredMapIndex);
+			SwitchMap(update.Layer(), s_desiredMapIndex);
 		}
 
 		DD_TODO("Try using ScratchEntity here.");

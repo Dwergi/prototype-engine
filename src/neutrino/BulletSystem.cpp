@@ -156,7 +156,7 @@ namespace neut
 
 	void BulletSystem::Update(const ddc::UpdateData& update)
 	{
-		ddc::EntityLayer& entities = update.EntityLayer();
+		ddc::EntityLayer& entities = update.Layer();
 
 		if (s_input->GotInput(dd::InputAction::SHOOT))
 		{

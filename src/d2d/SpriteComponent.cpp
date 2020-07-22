@@ -1,3 +1,9 @@
+//
+// SpriteComponent.cpp
+// Copyright (C) Sebastian Nordgren 
+// July 22nd 2020
+//
+
 #include "PCH.h"
 #include "d2d/SpriteComponent.h"
 

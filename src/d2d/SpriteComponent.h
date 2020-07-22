@@ -1,3 +1,9 @@
+//
+// SpriteComponent.h
+// Copyright (C) Sebastian Nordgren 
+// July 22nd 2020
+//
+
 #pragma once
 
 #include "ddm/AABB2D.h"

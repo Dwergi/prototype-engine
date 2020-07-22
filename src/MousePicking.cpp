@@ -122,7 +122,7 @@ namespace dd
 	{
 		if (!m_previousRay.IsValid())
 		{
-			m_previousRay = data.EntityLayer().CreateEntity<dd::RayComponent>();
+			m_previousRay = data.Layer().CreateEntity<dd::RayComponent>();
 		}
 
 		// set focused
@@ -235,13 +235,13 @@ namespace dd
 		int id = GetEntityIDAt(m_position);
 		m_depth = (1.0f / GetDepthAt(m_position)) / 100.f;
 
-		ddc::Entity entity = data.EntityLayer().GetEntity(id);
+		ddc::Entity entity = data.Layer().GetEntity(id);
 		return entity;
 	}
 
 	ddc::Entity MousePicking::HitTestRay(const ddr::RenderData& data, bool select)
 	{
-		const ddc::EntityLayer& layer = data.EntityLayer();
+		const ddc::EntityLayer& layer = data.Layer();
 
 		if (m_pendingHit.Valid)
 		{

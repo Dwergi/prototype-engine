@@ -12,9 +12,6 @@
 namespace ddc
 {
 	static const int MAX_COMPONENTS = 64;
-	static const int MAX_TAGS = 32;
-
-	typedef std::bitset<MAX_TAGS> TagBits;
 	typedef std::bitset<MAX_COMPONENTS> ComponentBits;
 
 	//
@@ -47,22 +44,22 @@ namespace ddc
 		// Destroy an entity.
 		// This entity may still participate in the current frame's updates, but will be destroyed in the next Update().
 		//
-		void DestroyEntity( Entity entity );
+		void DestroyEntity(Entity entity);
 
 		//
 		// Get an entity by its handle.
 		//
-		Entity GetEntity( uint id ) const;
+		Entity GetEntity(uint id) const;
 
 		//
 		// Is this entity alive?
 		// This will remain true for the remainder of the current frame after Destroy() is called on this entity.
 		//
-		bool IsAlive( Entity entity ) const;
+		bool IsAlive(Entity entity) const;
 
 		uint LiveCount() const { return (uint) (m_entities.size() - m_free.size()); }
 		uint Size() const { return (uint) m_entities.size(); }
-		 
+
 		//
 		// Get the number of components the entity has.
 		//
@@ -76,7 +73,7 @@ namespace ddc
 		//
 		// Access a component from the given entity by type ID.
 		//
-		void* AccessComponent( Entity entity, dd::ComponentID id ) const;
+		void* AccessComponent(Entity entity, dd::ComponentID id) const;
 
 		//
 		// Access the message queue of this entity layer.
@@ -88,89 +85,89 @@ namespace ddc
 		// Access a component from the given entity.
 		//
 		template <typename T>
-		T* Access( Entity entity ) const
+		T* Access(Entity entity) const
 		{
-			const dd::TypeInfo* type = DD_FIND_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE(T);
 
-			return reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
+			return reinterpret_cast<T*>(AccessComponent(entity, type->ComponentID()));
 		}
 
 		//
 		// Access a component from the given entity.
 		//
 		template <typename T>
-		bool Access( Entity entity, T*& cmp ) const
+		bool Access(Entity entity, T*& cmp) const
 		{
-			const dd::TypeInfo* type = DD_FIND_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE(T);
 
-			cmp = reinterpret_cast<T*>(AccessComponent( entity, type->ComponentID() ));
+			cmp = reinterpret_cast<T*>(AccessComponent(entity, type->ComponentID()));
 			return cmp != nullptr;
 		}
 
 		//
 		// Get a component from the given entity.
 		//
-		const void* GetComponent( Entity entity, dd::ComponentID id ) const;
+		const void* GetComponent(Entity entity, dd::ComponentID id) const;
 
 		//
 		// Get a component from the given entity.
 		//
 		template <typename T>
-		const T* Get( Entity entity ) const
+		const T* Get(Entity entity) const
 		{
-			const dd::TypeInfo* type = DD_FIND_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE(T);
 
-			return reinterpret_cast<const T*>(GetComponent( entity, type->ComponentID() ));
+			return reinterpret_cast<const T*>(GetComponent(entity, type->ComponentID()));
 		}
 
-		void GetAllComponents( Entity entity, dd::IArray<dd::ComponentID>& components ) const;
+		void GetAllComponents(Entity entity, dd::IArray<dd::ComponentID>& components) const;
 
 		//
 		// Does the given entity have a component of the given type ID?
 		//
-		bool HasComponent( Entity entity, dd::ComponentID id ) const;
+		bool HasComponent(Entity entity, dd::ComponentID id) const;
 
 		template <typename T>
-		bool Has( Entity entity ) const
+		bool Has(Entity entity) const
 		{
-			return HasComponent( entity, DD_FIND_TYPE( T )->ComponentID() );
+			return HasComponent(entity, DD_FIND_TYPE(T)->ComponentID());
 		}
 
 		//
 		// Does the given entity have a component of the given type?
 		//
 		template <typename... TComponents>
-		bool HasAll( Entity entity ) const;
+		bool HasAll(Entity entity) const;
 
 		//
 		// Add a component to the given entity of the given type ID.
 		//
-		void* AddComponent( Entity entity, dd::ComponentID id );
+		void* AddComponent(Entity entity, dd::ComponentID id);
 
 		//
 		// Add a component to the given entity of the given type.
 		//
 		template <typename T>
-		T& Add( Entity entity )
+		T& Add(Entity entity)
 		{
-			const dd::TypeInfo* type = DD_FIND_TYPE( T );
+			const dd::TypeInfo* type = DD_FIND_TYPE(T);
 
-			return *reinterpret_cast<T*>(AddComponent( entity, type->ComponentID() ));
+			return *reinterpret_cast<T*>(AddComponent(entity, type->ComponentID()));
 		}
 
 		//
 		// Remove a component from the given entity of the given type ID.
 		//
-		void RemoveComponent( Entity entity, dd::ComponentID id );
+		void RemoveComponent(Entity entity, dd::ComponentID id);
 
 		//
 		// Remove a component from the given entity of the given type.
 		//
 		template <typename T>
-		void Remove( Entity entity )
+		void Remove(Entity entity)
 		{
-			const dd::TypeInfo* type = DD_FIND_TYPE( T );
-			RemoveComponent( entity, type->ComponentID() );
+			const dd::TypeInfo* type = DD_FIND_TYPE(T);
+			RemoveComponent(entity, type->ComponentID());
 		}
 
 		//
@@ -179,7 +176,7 @@ namespace ddc
 		template <typename... TComponents>
 		void FindAllWith(std::vector<Entity>& outEntities) const
 		{
-			ForAllWith<TComponents>( [&outEntities]( Entity e, TComponents&... ) { outEntities.push_back( e ); } );
+			ForAllWith<TComponents>([&outEntities](Entity e, TComponents&...) { outEntities.push_back(e); });
 		}
 
 		//
@@ -192,37 +189,37 @@ namespace ddc
 		// Find all entities with the given type and return them in the given vector.
 		//
 		template <typename... TComponents>
-		void ForAllWith(std::function<void( Entity, TComponents&... )> fn) const;
+		void ForAllWith(std::function<void(Entity, TComponents&...)> fn) const;
 
 		//
 		// Does the given entity have the given tag?
 		//
-		bool HasTag( Entity e, Tag tag ) const;
+		bool HasTag(Entity e, Tag tag) const;
 
 		//
 		// Add the given tag to the given entity.
 		//
-		void AddTag( Entity e, Tag tag );
+		void AddTag(Entity e, Tag tag);
 
 		//
 		// Remove the given tag from the given entity.
 		//
-		void RemoveTag( Entity e, Tag tag );
+		void RemoveTag(Entity e, Tag tag);
 
 		//
 		// Set all of an entity's tags at once.
 		//
-		void SetAllTags( Entity e, TagBits tags );
+		void SetAllTags(Entity e, TagBits tags);
 
 		//
 		// Get a copy of all the tags the entity has.
 		//
-		TagBits GetAllTags( Entity e ) const;
+		TagBits GetAllTags(Entity e) const;
 
 		// 
 		// Get the name of this entity layer.
 		//
-		std::string Name() const { return m_name; }
+		const std::string& Name() const { return m_name; }
 
 	private:
 
@@ -246,7 +243,7 @@ namespace ddc
 			TagBits Tags;
 		};
 
-		uint m_maxEntities { 0 };
+		size_t m_maxEntities { 0 };
 
 		std::vector<EntityEntry> m_entities;
 		std::vector<uint> m_free;
@@ -267,36 +264,36 @@ namespace ddc
 	Entity EntityLayer::CreateEntity()
 	{
 		Entity entity = CreateEntity();
-		
+
 		ExpandType
 		{
-			0, (Add<TComponents>( entity ), 0)...
+			0, (Add<TComponents>(entity), 0)...
 		};
 
 		return entity;
 	}
 
 	template <typename T>
-	void SetBitmask( ComponentBits& mask )
+	void SetBitmask(ComponentBits& mask)
 	{
-		mask.set( DD_FIND_TYPE( T )->ComponentID(), true );
+		mask.set(DD_FIND_TYPE(T)->ComponentID(), true);
 	}
 
 	template <typename... TComponents>
-	bool EntityLayer::HasAll( Entity entity ) const
+	bool EntityLayer::HasAll(Entity entity) const
 	{
 		ComponentBits mask;
 
 		ExpandType
 		{
-			0, (SetBitmask<TComponents>( mask ), 0)...
+			0, (SetBitmask<TComponents>(mask), 0)...
 		};
 
-		if( IsAlive( m_entities[entity.ID] ) )
+		if (IsAlive(m_entities[entity.ID]))
 		{
 			mask &= m_entities[entity.ID].Ownership;
 
-			if( mask.count() == sizeof...(TComponents) )
+			if (mask.count() == sizeof...(TComponents))
 			{
 				return true;
 			}
@@ -306,32 +303,32 @@ namespace ddc
 	}
 
 	template <typename... TComponents>
-	void EntityLayer::ForAllWith( std::function<void( Entity, TComponents&... )> fn ) const
+	void EntityLayer::ForAllWith(std::function<void(Entity, TComponents&...)> fn) const
 	{
 		ComponentBits mask;
 
 		ExpandType
 		{
-			0, (SetBitmask<TComponents>( mask ), 0)...
+			0, (SetBitmask<TComponents>(mask), 0)...
 		};
 
-		DD_ASSERT( mask.any() );
+		DD_ASSERT(mask.any());
 
-		for( const EntityEntry& entry : m_entities )
+		for (const EntityEntry& entry : m_entities)
 		{
-			if( IsAlive( entry.Entity ) )
+			if (IsAlive(entry.Entity))
 			{
 				ComponentBits entity_mask = mask;
 				entity_mask &= entry.Ownership;
 
-				if( entity_mask.count() == sizeof...( TComponents ) )
+				if (entity_mask.count() == sizeof...(TComponents))
 				{
-					fn( entry.Entity, *Access<TComponents>( entry.Entity )... );
+					fn(entry.Entity, *Access<TComponents>(entry.Entity)...);
 				}
 			}
 		}
 	}
-	
+
 	template <typename TComponent>
 	TComponent* Entity::Access() const
 	{

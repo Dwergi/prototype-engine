@@ -20,7 +20,7 @@ Array<T, MaxCapacity>::Array(const Array<T, MaxCapacity>& other)
 }
 
 template <typename T, int MaxCapacity>
-Array<T, MaxCapacity>::Array(Array<T, MaxCapacity>&& other)
+Array<T, MaxCapacity>::Array(Array<T, MaxCapacity>&& other) noexcept
 	: IArray(m_inline, MaxCapacity)
 {
 	m_size = other.m_size;

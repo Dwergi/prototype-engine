@@ -16,7 +16,7 @@ namespace ddc
 
 	void System::EnableForLayer(const ddc::EntityLayer& layer)
 	{
-		if (!IsEnabledForLayer(layer))
+		if (m_layers.empty() || !IsEnabledForLayer(layer))
 		{
 			m_layers.push_back(&layer);
 		}

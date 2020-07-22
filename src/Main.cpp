@@ -197,9 +197,9 @@ static int GameMain()
 			s_game->RegisterRenderers(*s_renderer);
 			s_game->CreateEntityLayers(entity_layers);
 
-			for (ddc::EntityLayer* space : entity_layers)
+			for (ddc::EntityLayer* layer : entity_layers)
 			{
-				s_systemsManager->Initialize(*space);
+				s_systemsManager->Initialize(*layer);
 			}
 
 			s_renderer->Initialize();

@@ -59,7 +59,7 @@ namespace neut
 
 	void TerrainRenderer::Update(ddr::RenderData& data)
 	{
-		data.EntityLayer().ForAllWith<neut::TerrainChunkComponent>( []( ddc::Entity, neut::TerrainChunkComponent& chunk )
+		data.Layer().ForAllWith<neut::TerrainChunkComponent>( []( ddc::Entity, neut::TerrainChunkComponent& chunk )
 		{
 			chunk.Chunk->Update();
 		} );

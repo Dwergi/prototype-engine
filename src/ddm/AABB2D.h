@@ -12,6 +12,10 @@ namespace ddm
 
 	struct AABB2D
 	{
+		AABB2D();
+		AABB2D(glm::vec2 min, glm::vec2 max);
+		AABB2D(const AABB2D& other);
+
 		AABB2D GetTransformed(const glm::mat3& transform) const;
 
 		glm::vec2 HalfExtents() const;

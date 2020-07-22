@@ -44,7 +44,7 @@ namespace neut
 
 	void WaterRenderer::Update(ddr::RenderData& render_data)
 	{
-		ddc::EntityLayer& layer = render_data.EntityLayer();
+		ddc::EntityLayer& layer = render_data.Layer();
 
 		layer.ForAllWith<neut::WaterComponent>( []( ddc::Entity entity, neut::WaterComponent& water )
 		{

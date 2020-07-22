@@ -222,6 +222,8 @@
     <ClInclude Include="src\ddm\AABB2D.h" />
     <ClInclude Include="src\ddm\Circle.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\flux\FluxBulletComponent.h" />
+    <ClInclude Include="src\flux\FluxBulletSystem.h" />
     <ClInclude Include="src\flux\FluxGame.h" />
     <ClInclude Include="src\flux\FluxPlayerComponent.h" />
     <ClInclude Include="src\flux\FluxPlayerController.h" />
@@ -465,6 +467,8 @@
     <ClCompile Include="src\ddm\Circle.cpp" />
     <ClCompile Include="src\EntityPrototype.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
+    <ClCompile Include="src\flux\FluxBulletComponent.cpp" />
+    <ClCompile Include="src\flux\FluxBulletSystem.cpp" />
     <ClCompile Include="src\flux\FluxGame.cpp" />
     <ClCompile Include="src\flux\FluxPlayerComponent.cpp" />
     <ClCompile Include="src\flux\FluxPlayerController.cpp" />

@@ -61,7 +61,7 @@ namespace dd
 	void ParticleSystem::Update(const ddc::UpdateData& update)
 	{
 		const auto& data = update.Data();
-		ddc::EntityLayer& entities = update.EntityLayer();
+		ddc::EntityLayer& entities = update.Layer();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();

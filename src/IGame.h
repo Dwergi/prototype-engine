@@ -26,8 +26,8 @@ namespace dd
 	{
 		GameUpdateData(ddc::EntityLayer& layer, dd::Input& input, float delta_t) : m_layer(layer), m_input(input), m_delta(delta_t) {}
 
-		// Get the entity space.
-		ddc::EntityLayer& EntityLayer() const { return m_layer; }
+		// Get the entity layer.
+		ddc::EntityLayer& Layer() const { return m_layer; }
 
 		// Get the input system.
 		dd::Input& Input() const { return m_input; }

@@ -29,6 +29,7 @@ namespace dd
 
 	enum class TypeKind
 	{
+		Invalid,
 		Class,
 		POD,
 		Container,
@@ -151,7 +152,7 @@ namespace dd
 
 		uint m_size { 0 };
 
-		TypeKind m_typeKind;
+		TypeKind m_typeKind { TypeKind::Invalid };
 
 		dd::ComponentID m_componentID { INVALID_COMPONENT };
 

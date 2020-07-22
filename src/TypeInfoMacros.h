@@ -55,16 +55,18 @@
 
 #define DD_CONCAT_NAMESPACE( A, B ) DD_CONCAT_IMPL( DD_CONCAT_IMPL( A, :: ), B )
 
-#define DD_ENUM( TypeName ) template <> void RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
+#define DD_ENUM( TypeName ) namespace dd { template <> void RegisterEnumOptions<TypeName>(dd::TypeInfo* typeInfo); }
 
-#define DD_ENUM_OPTION( TypeName, OptionName ) typeInfo->RegisterEnumOption( DD_CONCAT_NAMESPACE( TypeName, OptionName ), #OptionName )
+#define DD_ENUM_OPTION( OptionName ) typeInfo->RegisterEnumOption( DD_CONCAT_NAMESPACE(TEnum, OptionName), #OptionName )
 
 #define DD_POD_CPP( TypeName ) static dd::PODRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 
 #define DD_CLASS_CPP( TypeName ) static dd::ClassRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 
-#define DD_ENUM_CPP( TypeName ) static dd::EnumRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName ); \
-	template <> void dd::RegisterEnumOptions<TypeName>( dd::TypeInfo* typeInfo )
+#define DD_BEGIN_ENUM( TypeName ) static dd::EnumRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName ); \
+	template <> void dd::RegisterEnumOptions<TypeName>(dd::TypeInfo* typeInfo) { using TEnum = TypeName;
+
+#define DD_END_ENUM() }
 
 #define DD_COMPONENT_CPP( TypeName ) static dd::ComponentRegistration<TypeName> DD_CONCAT( s_typeRegistration, __LINE__ )( #TypeName )
 

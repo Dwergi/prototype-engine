@@ -96,7 +96,7 @@ namespace ddr
 			return;
 
 		const ddr::ICamera& camera = render_data.Camera();
-		const ddc::EntityLayer& entities = render_data.EntityLayer();
+		const ddc::EntityLayer& entities = render_data.Layer();
 		ddr::UniformStorage& uniforms = render_data.Uniforms();
 
 		++m_meshCount;

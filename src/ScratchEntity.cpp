@@ -3,6 +3,11 @@
 
 namespace ddc
 {
+	ScratchEntity::ScratchEntity()
+	{
+
+	}
+
 	ScratchEntity::ScratchEntity(ddc::Entity entity)
 	{
 		DD_ASSERT(entity.IsValid() && entity.IsAlive());
@@ -24,8 +29,8 @@ namespace ddc
 			}
 		}
 
-		m_storage = new byte[total_size];
-		memset(m_storage, 0xCC, total_size);
+		m_storage = dd::Buffer<byte>(new byte[total_size], total_size);
+		memset(m_storage.Access(), 0xCC, total_size);
 
 		size_t current_offset = 0;
 		for (ComponentEntry& entry : m_components)
@@ -34,7 +39,7 @@ namespace ddc
 			size_t size = entry.Type->Size();
 
 			const byte* data = (const byte*) layer->GetComponent(entity, id);
-			memcpy(m_storage + current_offset, data, size);
+			memcpy(&m_storage[current_offset], data, size);
 			
 			entry.Hash = dd::HashBytes(data, size);
 
@@ -59,13 +64,21 @@ namespace ddc
 		return m_tags.test((size_t) tag);
 	}
 
+	TagBits ScratchEntity::GetAllTags() const
+	{
+		return m_tags;
+	}
+
 	ScratchEntity::~ScratchEntity()
 	{
-		delete[] m_storage;
+		byte* storage = m_storage.Release();
+		delete[] storage;
 	}
 
 	bool ScratchEntity::Commit()
 	{
+		DD_ASSERT(m_entity.IsValid() && m_entity.IsAlive(), "Committing to an an invalid or dead entity!");
+
 		EntityLayer* layer = m_entity.Layer();
 
 		bool changed = false;
@@ -73,14 +86,29 @@ namespace ddc
 		size_t current_offset = 0;
 		for (const ComponentEntry& entry : m_components)
 		{
-			const byte* data = m_storage + current_offset;
+			const byte* data = &m_storage[current_offset];
 			size_t size = entry.Type->Size();
 
 			uint64 new_hash = dd::HashBytes(data, size);
-			if (new_hash != entry.Hash)
+
+			if (!layer->HasComponent(m_entity, entry.Type->ID()))
+			{
+				// component added
+				void* cmp_data = layer->AddComponent(m_entity, entry.Type->ID());
+				memcpy(cmp_data, data, size);
+
+				changed = true;
+			}
+			else if (entry.Deleted)
+			{
+				layer->RemoveComponent(m_entity, entry.Type->ComponentID());
+
+				changed = true;
+			}
+			else if (new_hash != entry.Hash)
 			{
 				void* cmp_data = layer->AccessComponent(m_entity, entry.Type->ComponentID());
-				std::memcpy(cmp_data, data, size);
+				memcpy(cmp_data, data, size);
 
 				changed = true;
 			}
@@ -97,18 +125,41 @@ namespace ddc
 		return changed;
 	}
 
-	void* ScratchEntity::FindComponent(dd::ComponentID id) const
+	void* ScratchEntity::AccessComponent(dd::ComponentID id) const
 	{
+		DD_ASSERT(id != dd::INVALID_COMPONENT);
+
 		size_t current_offset = 0;
 		for (const ComponentEntry& entry : m_components)
 		{
 			if (entry.Type->ComponentID() == id)
 			{
-				return m_storage + current_offset;
+				return &m_storage[current_offset];
 			}
 
 			current_offset += entry.Type->Size();
 		}
 		return nullptr;
+	}
+
+	const void* ScratchEntity::GetComponent(dd::ComponentID id) const
+	{
+		return AccessComponent(id);
+	}
+
+	bool ScratchEntity::HasComponent(dd::ComponentID id) const
+	{
+		return GetComponent(id) != nullptr;
+	}
+
+	void ScratchEntity::GetAllComponents(dd::IArray<dd::ComponentID>& components) const
+	{
+		for (const ComponentEntry& entry : m_components)
+		{
+			if (!entry.Deleted)
+			{
+				components.Add(entry.Type->ComponentID());
+			}
+		}
 	}
 }

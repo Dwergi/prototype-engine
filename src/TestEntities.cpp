@@ -127,7 +127,7 @@ namespace dd
 			physics_plane.Plane = ddm::Plane(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 			physics_plane.Elasticity = 0.95f;
 
-			phys_plane_proto->PopulateFromEntity(plane, entities);
+			phys_plane_proto->PopulateFromEntity(plane);
 		}
 
 		{

@@ -25,9 +25,7 @@ namespace ddr
 		RenderData();
 		RenderData(RenderData&& data);
 
-		const ddc::EntityLayer& EntityLayer() const { return *m_layer; }
-		ddc::EntityLayer& EntityLayer() { return *m_layer; }
-
+		ddc::EntityLayer& Layer() const { return *m_layer; }
 		const ddr::ICamera& Camera() const { return *m_camera; }
 		ddr::UniformStorage& Uniforms() const { return *m_uniforms; }
 		float Delta() const { return m_delta; }

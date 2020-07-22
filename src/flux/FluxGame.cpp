@@ -23,6 +23,7 @@
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
 
+#include "flux/FluxBulletSystem.h"
 #include "flux/FluxPlayerComponent.h"
 #include "flux/FluxPlayerController.h"
 
@@ -36,16 +37,20 @@ namespace flux
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<flux::FluxPlayerController> s_playerController;
 
 	static ddr::OrthoCamera* s_camera;
 	static dd::InputKeyBindings* s_keybindings;
 	static ddr::SpriteSheetHandle s_playerSpriteSheet;
+	static ddr::SpriteSheetHandle s_playerBulletSpriteSheet;
 
 	static ddc::Entity s_player;
 
-	static const glm::ivec2 MAP_SIZE(32, 24);
+	static const glm::ivec2 MAP_SIZE = { 32, 24 };
+	static const int TILE_SIZE = 16;
 
-	static const char* PLAYER_SPRITESHEET = "flux_player.png";
+	static const char* PLAYER_SPRITESHEET = "player.png";
+	static const char* PLAYER_BULLET_SPRITESHEET = "player_bullet.png";
 	static const char* MAP_BACKGROUND = "map_background.png";
 	static const char* MAP_FOREGROUND = "map_foreground.png";
 
@@ -73,6 +78,7 @@ namespace flux
 
 		flux::FluxPlayerComponent* player_cmp = player.Access<flux::FluxPlayerComponent>();
 		player_cmp->Stats = &s_playerStats;
+		player_cmp->EquippedWeapon = &s_weapons[0];
 
 		return player;
 	}
@@ -88,6 +94,8 @@ namespace flux
 	{
 		dd::File::AddOverridePath("./flux");
 
+		dd::Services::Register(new ddc::EntityPrototypeManager());
+
 		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
 		s_assetManager->Register(texture_manager);
 
@@ -102,6 +110,9 @@ namespace flux
 
 		ddr::TextureHandle player_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
 		s_playerSpriteSheet = s_spriteSheetManager->Load(PLAYER_SPRITESHEET, player_tex_h, glm::ivec2(32));
+
+		ddr::TextureHandle player_bullet_tex_h = s_textureManager->Load(PLAYER_BULLET_SPRITESHEET);
+		s_playerBulletSpriteSheet = s_spriteSheetManager->Load(PLAYER_BULLET_SPRITESHEET, player_bullet_tex_h, glm::ivec2(32));
 
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");
 		game_input.ShowCursor(true)
@@ -127,6 +138,13 @@ namespace flux
 		s_playerStats.Acceleration = 50; // tiles/s/s
 		s_playerStats.Deceleration = 100; // tiles/s/s
 
+		flux::Weapon weapon;
+		weapon.BulletDamage = 10; // tiles/s
+		weapon.BulletSpeed = 30; // tiles/s
+		weapon.ShotDelay = 0.5f; // seconds
+
+		s_weapons.push_back(weapon);
+
 		/*ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
 		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));
 
@@ -136,7 +154,10 @@ namespace flux
 
 	void FluxGame::RegisterSystems(ddc::SystemsManager& system_manager)
 	{
-		d2d::SpriteTileSystem& sprite_tile_system = dd::Services::Register(new d2d::SpriteTileSystem(MAP_SIZE, 16));
+		d2d::SpriteTileSystem& sprite_tile_system = dd::Services::Register(new d2d::SpriteTileSystem(MAP_SIZE, TILE_SIZE));
+
+		flux::FluxBulletSystem& flux_bullet_system = dd::Services::Register(new flux::FluxBulletSystem(MAP_SIZE));
+		system_manager.Register(flux_bullet_system);
 
 		flux::FluxPlayerController& flux_player_system = dd::Services::Register(new flux::FluxPlayerController(sprite_tile_system));
 		system_manager.Register(flux_player_system);
@@ -158,6 +179,8 @@ namespace flux
 	{
 		entity_layers.push_back(new ddc::EntityLayer("background"));
 		entity_layers.push_back(new ddc::EntityLayer("game"));
+
+		s_playerController->EnableForLayer(*entity_layers[1]);
 
 		s_player = CreatePlayer(*entity_layers[1]);
 	}

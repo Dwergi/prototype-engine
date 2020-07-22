@@ -186,7 +186,7 @@ namespace ddr
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
-		const ddc::EntityLayer& entities = data.EntityLayer();
+		const ddc::EntityLayer& entities = data.Layer();
 
 		uniforms.Bind(*shader);
 

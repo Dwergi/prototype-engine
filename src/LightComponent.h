@@ -15,8 +15,6 @@ namespace dd
 		Spot
 	};
 
-	DD_ENUM( dd::LightType );
-
 	class LightComponent
 	{
 	public:
@@ -32,17 +30,19 @@ namespace dd
 
 		LightType LightType { LightType::Directional };
 
-		DD_BEGIN_CLASS( dd::LightComponent )
+		DD_BEGIN_CLASS(dd::LightComponent)
 			DD_COMPONENT();
 
-			DD_MEMBER( Colour );
-			DD_MEMBER( Intensity );
-			DD_MEMBER( Ambient );
-			DD_MEMBER( Specular );
-			DD_MEMBER( Attenuation );
-			DD_MEMBER( InnerAngle );
-			DD_MEMBER( OuterAngle );
-			DD_MEMBER( LightType );
+			DD_MEMBER(Colour);
+			DD_MEMBER(Intensity);
+			DD_MEMBER(Ambient);
+			DD_MEMBER(Specular);
+			DD_MEMBER(Attenuation);
+			DD_MEMBER(InnerAngle);
+			DD_MEMBER(OuterAngle);
+			DD_MEMBER(LightType);
 		DD_END_CLASS()
 	};
 }
+
+DD_ENUM(dd::LightType)

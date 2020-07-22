@@ -21,10 +21,10 @@ namespace ddc
 	struct UpdateData
 	{
 		UpdateData(ddc::EntityLayer& layer, float delta_t) : m_layer(&layer), m_delta(delta_t) {}
-		UpdateData(UpdateData&& other) : m_layer(other.m_layer), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
+		UpdateData(UpdateData&& other) noexcept : m_layer(other.m_layer), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
 
 		float Delta() const { return m_delta; }
-		ddc::EntityLayer& EntityLayer() const { return *m_layer; }
+		ddc::EntityLayer& Layer() const { return *m_layer; }
 
 		const UpdateBufferView& Data(const char* name = nullptr) const;
 

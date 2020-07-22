@@ -150,7 +150,7 @@ namespace stress
 
 	void StressTestGame::Update(const dd::GameUpdateData& update_data)
 	{
-		ddc::EntityLayer& layer = update_data.EntityLayer();
+		ddc::EntityLayer& layer = update_data.Layer();
 
 		s_freeCam->SetEnabled(s_input->GetCurrentMode() == "game");
 
@@ -177,7 +177,7 @@ namespace stress
 			CreateEntities(layer, to_create);
 		}
 
-		ddc::EntityLayer& entities = update_data.EntityLayer();
+		ddc::EntityLayer& entities = update_data.Layer();
 		entities.ForAllWith<dd::TransformComponent, dd::PhysicsSphereComponent>(
 			[this](ddc::Entity e, auto& transform, auto& physics)
 			{

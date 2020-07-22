@@ -129,7 +129,7 @@ namespace neut
 		const auto& water = update_data.Data("water");
 		PopulateWaterCache(water);
 
-		ddc::EntityLayer& entities = update_data.EntityLayer();
+		ddc::EntityLayer& entities = update_data.Layer();
 
 		const ddm::Plane water_plane(glm::vec3(0, m_waterHeight, 0), glm::vec3(0, -1, 0));
 
@@ -155,7 +155,7 @@ namespace neut
 			ddc::Entity water_entity = FindWater(terrain_chunk->GetPosition());
 			if (!water_entity.IsValid())
 			{
-				water_entity = CreateWaterEntity(update_data.EntityLayer(), terrain_chunk->GetPosition());
+				water_entity = CreateWaterEntity(update_data.Layer(), terrain_chunk->GetPosition());
 
 				++m_waterChunks;
 			}

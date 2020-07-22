@@ -13,7 +13,26 @@ DD_POD_CPP(ddm::AABB2D);
 
 namespace ddm
 {
-	ddm::AABB2D AABB2D::GetTransformed(const glm::mat3& transform) const
+	AABB2D::AABB2D()
+	{
+
+	}
+
+	AABB2D::AABB2D(glm::vec2 min, glm::vec2 max) :
+		Min(min),
+		Max(max)
+	{
+
+	}
+
+	AABB2D::AABB2D(const AABB2D& other) :
+		Min(other.Min),
+		Max(other.Max)
+	{
+
+	}
+
+	AABB2D AABB2D::GetTransformed(const glm::mat3& transform) const
 	{
 		AABB2D transformed;
 		transformed.Min = (transform * glm::vec3(Min, 1)).xy; 
@@ -45,17 +64,17 @@ namespace ddm
 			glm::all(glm::greaterThanEqual(Max, pt));
 	}
 
-	glm::vec2 ddm::AABB2D::NearestPoint(glm::vec2 pt) const
+	glm::vec2 AABB2D::NearestPoint(glm::vec2 pt) const
 	{
 		return glm::clamp(pt, Min, Max);
 	}
 
-	glm::vec2 ddm::AABB2D::HalfExtents() const
+	glm::vec2 AABB2D::HalfExtents() const
 	{
 		return (Max - Min) / 2.0f;
 	}
 
-	glm::vec2 ddm::AABB2D::NearestNormal(glm::vec2 dir)
+	glm::vec2 AABB2D::NearestNormal(glm::vec2 dir)
 	{
 		if (std::abs(dir.x) > std::abs(dir.y))
 		{

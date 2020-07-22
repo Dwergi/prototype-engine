@@ -23,7 +23,7 @@ namespace ddc
 
 		//
 		// Allow the system to be updated for the given layer. May be called multiple times. 
-		// If never called, then system will allow all layers.
+		// If never called, then the system will allow all layers.
 		//
 		void EnableForLayer(const ddc::EntityLayer& layer);
 		bool IsEnabledForLayer(const ddc::EntityLayer& layer) const;

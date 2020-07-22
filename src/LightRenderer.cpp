@@ -89,7 +89,7 @@ namespace ddr
 
 	void LightRenderer::Update(ddr::RenderData& data)
 	{
-		UpdateDebugPointLights(data.EntityLayer());
+		UpdateDebugPointLights(data.Layer());
 	}
 
 	void LightRenderer::Render(const ddr::RenderData& data)

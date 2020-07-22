@@ -6,11 +6,17 @@
 
 #pragma once
 
-#include "System.h"
+#include "EntityPrototype.h"
+#include "System.h" 
 
 namespace d2d
 {
 	struct SpriteTileSystem;
+}
+
+namespace ddc
+{
+	struct EntityPrototype;
 }
 
 namespace flux
@@ -29,5 +35,6 @@ namespace flux
 	private:
 
 		const d2d::SpriteTileSystem& m_tileSystem;
+		ddc::EntityPrototypeHandle m_bulletPrototype;
 	};
 }

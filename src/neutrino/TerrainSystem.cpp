@@ -98,7 +98,7 @@ namespace neut
 
 	void TerrainSystem::Update( const ddc::UpdateData& update_data )
 	{
-		ddc::EntityLayer& layer = update_data.EntityLayer();
+		ddc::EntityLayer& layer = update_data.Layer();
 
 		if( m_requiresRegeneration )
 		{

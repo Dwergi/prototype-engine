@@ -18,6 +18,9 @@ namespace ddc
 		Dynamic = 5
 	};
 
+	static const int MAX_TAGS = 32;
+	typedef std::bitset<MAX_TAGS> TagBits;
+
 	struct EntityLayer;
 
 	struct Entity
@@ -31,6 +34,7 @@ namespace ddc
 		void AddTag(ddc::Tag tag) const;
 		void RemoveTag(ddc::Tag tag) const;
 		bool HasTag(ddc::Tag tag) const;
+		TagBits GetAllTags() const;
 
 		void Destroy() const;
 
@@ -39,6 +43,7 @@ namespace ddc
 		void* AccessComponent(dd::ComponentID id) const;
 		const void* GetComponent(dd::ComponentID id) const;
 		bool HasComponent(dd::ComponentID id) const;
+		void GetAllComponents(dd::IArray<dd::ComponentID>& components) const;
 
 		template <typename TComponent> TComponent* Access() const;
 		template <typename TComponent> const TComponent* Get() const;

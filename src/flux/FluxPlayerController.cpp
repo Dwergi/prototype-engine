@@ -6,10 +6,15 @@
 
 #include "PCH.h"
 #include "FluxPlayerController.h"
+
+#include "EntityPrototype.h"
+#include "FluxBulletComponent.h"
 #include "FluxPlayerComponent.h"
-
 #include "Input.h"
+#include "ScratchEntity.h"
+#include "SpriteSheet.h"
 
+#include "d2d/SpriteComponent.h"
 #include "d2d/SpriteTileSystem.h"
 #include "d2d/Transform2DComponent.h"
 
@@ -18,6 +23,8 @@
 namespace flux
 {
 	dd::Service<dd::Input> s_input;
+	dd::Service<ddc::EntityPrototypeManager> s_prototypes;
+	dd::Service<ddr::SpriteSheetManager> s_spriteManager;
 
 	FluxPlayerController::FluxPlayerController(const d2d::SpriteTileSystem& tile_system) :
 		ddc::System("Flux Player"),
@@ -34,11 +41,34 @@ namespace flux
 
 	void FluxPlayerController::Initialize(ddc::EntityLayer& layer)
 	{
+		DD_ASSERT(!m_bulletPrototype.IsValid());
+
 		s_input->AddHeldHandler(dd::InputAction::DOWN);
 		s_input->AddHeldHandler(dd::InputAction::UP);
 		s_input->AddHeldHandler(dd::InputAction::LEFT);
 		s_input->AddHeldHandler(dd::InputAction::RIGHT);
 		s_input->AddHeldHandler(dd::InputAction::SHOOT);
+
+		m_bulletPrototype = s_prototypes->Create("player_bullet");
+
+		ddc::ScratchEntity scratch;
+		scratch.AddTag(ddc::Tag::Visible);
+		scratch.AddTag(ddc::Tag::Dynamic);
+
+		d2d::Transform2DComponent& transform_cmp = scratch.Add<d2d::Transform2DComponent>();
+		transform_cmp.Scale = { 1, 1 };
+
+		d2d::SpriteComponent& sprite_cmp = scratch.Add<d2d::SpriteComponent>();
+		sprite_cmp.Pivot = { 0.5f, 0.5f };
+
+		ddr::SpriteSheetHandle spritesheet_h = s_spriteManager->Find("player_bullet.png"); 
+		sprite_cmp.Sprite = spritesheet_h->Get(0);
+		sprite_cmp.ZIndex = 8;
+
+		flux::FluxBulletComponent& bullet_cmp = scratch.Add<flux::FluxBulletComponent>();
+
+		ddc::EntityPrototype* prototype = m_bulletPrototype.Access();
+		prototype->PopulateFromScratchEntity(scratch);
 	}
 
 	DD_OPTIMIZE_OFF()
@@ -64,7 +94,8 @@ namespace flux
 			glm::vec2 dir_to_mouse = glm::normalize(mouse_pos.Absolute - player_pos_px);
 
 			float angle = atan2(dir_to_mouse.y, dir_to_mouse.x) + glm::radians(90.0f);
-			transform_cmp.Rotation = ddm::wrap(angle, glm::radians(0.0f), glm::radians(360.0f));
+			angle = ddm::wrap(angle, glm::radians(0.0f), glm::radians(360.0f));
+			transform_cmp.Rotation = angle;
 
 			glm::vec2 move_dir = { 0, 0 };
 		
@@ -123,7 +154,21 @@ namespace flux
 			{
 				if (player_cmp.ShotCooldown == 0)
 				{
-					DD_TODO("Spawn bullet.");
+					ddc::Entity bullet = m_bulletPrototype->Instantiate(update_data.Layer());
+					
+					d2d::Transform2DComponent* bullet_transform = bullet.Access<d2d::Transform2DComponent>();
+					bullet_transform->Rotation = angle;
+					bullet_transform->Position = transform_cmp.Position + dir_to_mouse * transform_cmp.Scale * 0.5f;
+					bullet_transform->Scale = { 1, 1 };
+
+					flux::FluxBulletComponent* bullet_cmp = bullet.Access<flux::FluxBulletComponent>();
+					bullet_cmp->Velocity = dir_to_mouse * player_cmp.EquippedWeapon->BulletSpeed;
+					bullet_cmp->Damage = player_cmp.EquippedWeapon->BulletDamage;
+					bullet_cmp->Type = flux::BulletType::Friendly;
+
+					d2d::SpriteComponent* sprite_cmp = bullet.Access<d2d::SpriteComponent>();
+
+					player_cmp.ShotCooldown = player_cmp.EquippedWeapon->ShotDelay;
 				}
 			}
 		}

@@ -45,6 +45,6 @@ namespace d2d
 	private:
 
 		// final transform, created by calling Update()
-		glm::mat3 m_transform;
+		glm::mat3 m_transform { 1.0f };
 	};
 }
