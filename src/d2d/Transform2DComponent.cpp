@@ -5,8 +5,6 @@ DD_COMPONENT_CPP(d2d::Transform2DComponent);
 
 namespace d2d
 {
-	DD_OPTIMIZE_OFF()
-
 	glm::mat3 Translation2DToMatrix(glm::vec2 translation)
 	{
 		glm::mat3 result;

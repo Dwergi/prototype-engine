@@ -12,7 +12,7 @@ namespace dd
 	static dd::ProfilerValue& s_frameTimes = dd::Profiler::GetValue("Frame Time");
 
 	FrameTimer::FrameTimer() : 
-		m_maxFPS(120),
+		m_maxFPS(144),
 		m_targetDelta(1.0f / m_maxFPS)
 	{
 		m_lastFrameTime = 0.0f;

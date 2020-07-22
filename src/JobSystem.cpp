@@ -64,7 +64,6 @@ namespace dd
 
 		m_queues.resize(threads);
 		m_queues[0] = new JobQueue(*this, std::this_thread::get_id());
-		
 
 		for (uint i = 1; i < threads; ++i)
 		{

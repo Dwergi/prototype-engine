@@ -101,6 +101,8 @@ namespace ddr
 		m_vao.Unbind();
 	}
 
+	DD_OPTIMIZE_OFF()
+
 	void SpriteRenderer::DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms)
 	{
 		const ddr::Sprite* sprite = start->Sprite.Get();
@@ -112,12 +114,12 @@ namespace ddr
 		texture->Bind(0);
 		uniforms.Set("Texture", *texture);
 
-		size_t count = std::distance(start, end);
-
 		m_transforms.clear();
 		m_uvOffsets.clear();
 		m_uvScales.clear();
 		m_colours.clear();
+
+		int count = 0;
 
 		for (SpriteIterator it = start; it != end; ++it)
 		{
@@ -129,6 +131,8 @@ namespace ddr
 
 			m_uvOffsets.push_back(sprite->OffsetNormalized);
 			m_uvScales.push_back(sprite->SizeNormalized);
+
+			++count;
 		}
 
 		m_vboTransforms.Bind();
@@ -147,7 +151,7 @@ namespace ddr
 		m_vboColours.CommitData();
 		m_vboColours.Unbind();
 
-		OpenGL::DrawArraysInstanced(6, (int) count);
+		OpenGL::DrawArraysInstanced(6, count);
 		CheckOGLError();
 
 		texture->Unbind();
@@ -158,20 +162,19 @@ namespace ddr
 		// sort by texture to get instanceable groups
 		std::sort(start, end, [](const auto& a, const auto& b)
 		{
-			const ddr::Sprite* a_sprite = a.Sprite.Get();
-			const ddr::Sprite* b_sprite = b.Sprite.Get();
-			return a_sprite->Texture < b_sprite->Texture;
+			return a.Sprite->Texture < b.Sprite->Texture;
 		});
 
 		SpriteIterator tex_start = start;
-		ddr::TextureHandle current_tex = tex_start->Sprite.Get()->Texture;
-
 		while (tex_start < end)
 		{
-			SpriteIterator tex_end = std::find_if_not(tex_start, end, [current_tex](const auto& a)
-			{
-				return a.Sprite.Get()->Texture == current_tex;
-			});
+			ddr::TextureHandle current_tex = tex_start->Sprite->Texture;
+
+			SpriteIterator tex_end = std::find_if_not(tex_start, end, 
+				[current_tex](const auto& x)
+				{
+					return x.Sprite->Texture == current_tex;
+				});
 
 			DrawInstancedSprites(tex_start, tex_end, uniforms);
 
@@ -233,10 +236,11 @@ namespace ddr
 		{
 			// find last index of the same layer
 			const int layer_z_index = layer_start->ZIndex;
-			SpriteIterator layer_end = std::find_if_not(layer_start, m_temp.end(), [layer_z_index](const auto& a)
-			{
-				return a.ZIndex == layer_z_index;
-			});
+			SpriteIterator layer_end = std::find_if_not(layer_start, m_temp.end(), 
+				[layer_z_index](const auto& x)
+				{
+					return x.ZIndex == layer_z_index;
+				});
 
 			DrawLayer(layer_start, layer_end, uniforms);
 

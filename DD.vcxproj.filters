@@ -876,6 +876,12 @@
     <ClInclude Include="src\flux\FluxBulletSystem.h">
       <Filter>Games\Flux</Filter>
     </ClInclude>
+    <ClInclude Include="src\flux\FluxEnemyComponent.h">
+      <Filter>Games\Flux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\flux\FluxEnemySystem.h">
+      <Filter>Games\Flux</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1498,6 +1504,9 @@
       <Filter>Games\Flux</Filter>
     </ClCompile>
     <ClCompile Include="src\flux\FluxBulletSystem.cpp">
+      <Filter>Games\Flux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flux\FluxEnemySystem.cpp">
       <Filter>Games\Flux</Filter>
     </ClCompile>
   </ItemGroup>

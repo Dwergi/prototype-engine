@@ -39,15 +39,21 @@ namespace dd
 
 	IWindow& IWindow::SetSize(glm::ivec2 size)
 	{
-		m_size = size;
-		OnSetSize(size);
+		if (m_size != size)
+		{
+			m_size = size;
+			OnSetSize(size);
+		}
 		return *this;
 	}
 
-	IWindow& IWindow::SetTitle(std::string title)
+	IWindow& IWindow::SetTitle(std::string_view title)
 	{
-		m_title = title;
-		OnSetTitle(title);
+		if (m_title != title)
+		{
+			m_title = title;
+			OnSetTitle(m_title);
+		}
 		return *this;
 	}
 
@@ -58,8 +64,11 @@ namespace dd
 
 	IWindow& IWindow::SetCursor(dd::Cursor cursor)
 	{
-		m_cursor = cursor;
-		OnSetCursor(cursor);
+		if (m_cursor != cursor)
+		{
+			m_cursor = cursor;
+			OnSetCursor(cursor);
+		}
 		return *this;
 	}
 }

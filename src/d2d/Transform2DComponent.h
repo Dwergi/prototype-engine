@@ -33,6 +33,7 @@ namespace d2d
 		}
 
 		DD_ALIGNED_ALLOCATORS(16);
+
 		DD_BEGIN_CLASS(d2d::Transform2DComponent)
 			DD_COMPONENT();
 

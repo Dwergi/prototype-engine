@@ -100,6 +100,8 @@ namespace ddc
 		}
 	}
 
+	DD_OPTIMIZE_OFF()
+
 	Entity EntityLayer::CreateEntity()
 	{
 		if (m_free.empty())
@@ -108,7 +110,7 @@ namespace ddc
 
 			EntityEntry new_entry;
 			new_entry.Entity.ID = m_entities.size();
-			new_entry.Entity.Version = -1;
+			new_entry.Entity.Version = 0;
 			new_entry.Entity.m_layer = m_instanceIndex;
 
 			m_entities.push_back(new_entry);

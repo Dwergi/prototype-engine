@@ -10,7 +10,7 @@
 
 namespace flux
 {
-	struct FluxBulletSystem : ddc::System
+	struct FluxBulletSystem : ddc::System, dd::IDebugPanel
 	{
 		FluxBulletSystem(glm::vec2 map_size);
 
@@ -19,7 +19,11 @@ namespace flux
 		virtual void Shutdown(ddc::EntityLayer& layer) override;
 
 	private:
-
 		glm::vec2 m_mapSize;
+
+		int m_liveBullets { 0 };
+
+		virtual const char* GetDebugTitle() const override { return "Bullets";  }
+		virtual void DrawDebugInternal() override;
 	};
 }

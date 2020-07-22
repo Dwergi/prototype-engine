@@ -38,7 +38,7 @@ namespace dd
 		IWindow& SetSize(glm::ivec2 size);
 		glm::ivec2 GetSize() const { return m_size; }
 
-		IWindow& SetTitle(std::string title);
+		IWindow& SetTitle(std::string_view title);
 		std::string GetTitle() const { return m_title; }
 
 		float GetAspectRatio() const { return float(m_size.x) / float(m_size.y); }

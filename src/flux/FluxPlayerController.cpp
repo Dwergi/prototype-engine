@@ -22,9 +22,9 @@
 
 namespace flux
 {
-	dd::Service<dd::Input> s_input;
-	dd::Service<ddc::EntityPrototypeManager> s_prototypes;
-	dd::Service<ddr::SpriteSheetManager> s_spriteManager;
+	static dd::Service<dd::Input> s_input;
+	static dd::Service<ddc::EntityPrototypeManager> s_prototypes;
+	static dd::Service<ddr::SpriteSheetManager> s_spriteManager;
 
 	FluxPlayerController::FluxPlayerController(const d2d::SpriteTileSystem& tile_system) :
 		ddc::System("Flux Player"),
@@ -66,12 +66,11 @@ namespace flux
 		sprite_cmp.ZIndex = 8;
 
 		flux::FluxBulletComponent& bullet_cmp = scratch.Add<flux::FluxBulletComponent>();
+		bullet_cmp.HitCircle = ddm::Circle(glm::vec2(0.5f, 0.5f), 0.25f);
 
 		ddc::EntityPrototype* prototype = m_bulletPrototype.Access();
 		prototype->PopulateFromScratchEntity(scratch);
 	}
-
-	DD_OPTIMIZE_OFF()
 
 	void FluxPlayerController::Update(const ddc::UpdateData& update_data)
 	{

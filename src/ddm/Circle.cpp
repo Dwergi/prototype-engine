@@ -11,6 +11,18 @@ DD_POD_CPP(ddm::Circle);
 
 namespace ddm
 {
+	Circle::Circle()
+	{
+
+	}
+
+	Circle::Circle(glm::vec2 centre, float radius) :
+		Centre(centre),
+		Radius(radius)
+	{
+
+	}
+
 	Circle Circle::GetTransformed(glm::vec2 translate, glm::vec2 scale) const
 	{
 		Circle result;
@@ -22,8 +34,8 @@ namespace ddm
 	bool Circle::Intersects(const Circle& other) const
 	{
 		float r = Radius + other.Radius;
-		r *= r;
+		float distance = glm::distance(Centre, other.Centre);
 
-		return r < glm::distance2(Centre, other.Centre);
+		return distance < r;
 	}
 }
