@@ -53,7 +53,7 @@ namespace neut
 	{
 	}
 
-	void ShipSystem::Update(const ddc::UpdateData& data)
+	void ShipSystem::Update(ddc::UpdateData& data)
 	{
 		if (!m_enabled)
 			return;

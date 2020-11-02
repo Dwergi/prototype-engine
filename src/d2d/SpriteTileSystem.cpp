@@ -63,7 +63,7 @@ namespace d2d
 		return (pixels - m_edgeOffset - half_tile) / glm::vec2(m_scaledTileSize); 
 	}
 
-	void SpriteTileSystem::Update(const ddc::UpdateData& update_data)
+	void SpriteTileSystem::Update(ddc::UpdateData& update_data)
 	{
 		UpdateConstants();
 

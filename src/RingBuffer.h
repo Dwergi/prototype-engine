@@ -14,11 +14,11 @@ namespace dd
 	public:
 
 		RingBuffer();
-		explicit RingBuffer( uint size );
+		explicit RingBuffer(uint size);
 		~RingBuffer();
 
-		void Push( const T& item );
-		void Push( T&& item );
+		void Push(const T& item);
+		void Push(T&& item);
 
 		T Pop();
 
@@ -34,7 +34,7 @@ namespace dd
 		uint m_size { 0 };
 
 		void Grow();
-		void Allocate( uint size );
+		void Allocate(uint size);
 	};
 }
 

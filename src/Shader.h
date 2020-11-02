@@ -100,14 +100,16 @@ namespace ddr
 		uint m_id { OpenGL::InvalidID };
 
 		dd::Vector<ShaderPart*> m_shaders;
+		std::unordered_map<std::string, ShaderLocation> m_uniforms;
+		std::unordered_map<std::string, ShaderLocation> m_attributes;
 
 		void SetShaders(const dd::Vector<ShaderPart*>& shaders);
 		dd::String256 Link();
 
-		ShaderLocation GetAttribute(std::string_view name) const;
-		ShaderLocation GetUniform(std::string_view name) const;
+		ShaderLocation GetAttribute(std::string_view name);
+		ShaderLocation GetUniform(std::string_view name);
 
-		void AssertBeforeUse(std::string_view name) const;
+		void AssertBeforeUse(const std::string& name) const;
 	};
 
 	using ShaderHandle = dd::Handle<Shader>;

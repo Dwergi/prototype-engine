@@ -17,7 +17,7 @@ namespace dd
 		HitTestSystem();
 
 		virtual void Initialize( ddc::EntityLayer& entities ) override;
-		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void Update( ddc::UpdateData& data ) override;
 
 		virtual HitHandle ScheduleHitTest( const ddm::Ray& ray ) override;
 		virtual bool FetchResult( HitHandle handle, HitResult& result ) override;

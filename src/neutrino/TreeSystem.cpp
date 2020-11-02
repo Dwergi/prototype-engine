@@ -163,7 +163,7 @@ namespace neut
 		}
 	}
 
-	void TreeSystem::Update( const ddc::UpdateData& update_data )
+	void TreeSystem::Update( ddc::UpdateData& update_data )
 	{
 		const float delta_t = update_data.Delta();
 

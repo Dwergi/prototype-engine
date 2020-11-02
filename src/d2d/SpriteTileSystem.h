@@ -8,7 +8,7 @@ namespace d2d
 	{
 		SpriteTileSystem(glm::ivec2 map_dimensions, int tile_size);
 
-		virtual void Update(const ddc::UpdateData& update_data) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
 
 		glm::vec2 CoordToPixels(glm::vec2 coord) const;
 		glm::vec2 PixelsToCoord(glm::vec2 coord) const;

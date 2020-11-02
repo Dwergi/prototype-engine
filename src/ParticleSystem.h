@@ -16,30 +16,34 @@ namespace dd
 	struct ParticleSystemComponent;
 	struct TransformComponent;
 
+	struct SpawnParticleMessage
+	{
+		glm::vec3 Position;
+		glm::vec3 Normal;
+
+		DD_BEGIN_CLASS(dd::SpawnParticleMessage)
+			DD_MEMBER(Position);
+		DD_MEMBER(Normal);
+		DD_END_CLASS()
+	};
+
 	struct ParticleSystem : ddc::System, dd::IDebugPanel
 	{
 		ParticleSystem();
 		~ParticleSystem();
 
-		virtual void Initialize( ddc::EntityLayer& ) override;
-		virtual void Update( const ddc::UpdateData& data ) override;
-		virtual void Shutdown( ddc::EntityLayer& ) override {}
+		virtual void Initialize(ddc::EntityLayer&) override;
+		virtual void Update(ddc::UpdateData& data) override;
+		virtual void Shutdown(ddc::EntityLayer&) override {}
 
-		ParticleSystem( const ParticleSystem& ) = delete;
-		ParticleSystem( ParticleSystem&& ) = delete;
-		ParticleSystem& operator=( const ParticleSystem& ) = delete;
-		ParticleSystem& operator=( ParticleSystem&& ) = delete;
+		ParticleSystem(const ParticleSystem&) = delete;
+		ParticleSystem(ParticleSystem&&) = delete;
+		ParticleSystem& operator=(const ParticleSystem&) = delete;
+		ParticleSystem& operator=(ParticleSystem&&) = delete;
 
 	private:
 
 		typedef uint ParticleID;
-
-		struct SpawnRequest
-		{
-			ParticleID Particle { 0 };
-			glm::vec3 Position;
-			glm::vec3 Normal;
-		};
 
 		int CurrentMaxParticles { 1000 };
 
@@ -48,14 +52,16 @@ namespace dd
 
 		dd::ParticleSystemComponent* m_selected { nullptr };
 
-		std::vector<SpawnRequest> m_pendingSpawns;
+		std::vector<dd::SpawnParticleMessage> m_pendingSpawns;
+
+		ddc::MessageType m_spawnParticleMessage;
 
 		virtual void DrawDebugInternal() override;
-		virtual const char* GetDebugTitle() const {	return "Particles"; }
+		virtual const char* GetDebugTitle() const { return "Particles"; }
 
-		void UpdateLiveParticles( dd::ParticleSystemComponent& cmp, float delta_t );
-		void EmitNewParticles( dd::ParticleSystemComponent& cmp, const dd::TransformComponent& transform, float delta_t );
+		void UpdateLiveParticles(dd::ParticleSystemComponent& cmp, float delta_t);
+		void EmitNewParticles(dd::ParticleSystemComponent& cmp, const dd::TransformComponent& transform, float delta_t);
 
-		void OnBulletHitMessage( ddc::Message msg );
+		void OnSpawnParticleMessage(ddc::Message msg);
 	};
 }

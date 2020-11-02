@@ -15,7 +15,7 @@ namespace flux
 		FluxBulletSystem(glm::vec2 map_size);
 
 		virtual void Initialize(ddc::EntityLayer& layer) override;
-		virtual void Update(const ddc::UpdateData& update_data) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
 		virtual void Shutdown(ddc::EntityLayer& layer) override;
 
 	private:

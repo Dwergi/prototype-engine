@@ -11,6 +11,7 @@
 namespace ddc
 {
 	struct EntityLayer;
+	struct ScratchEntity;
 	struct System;
 	struct UpdateBufferView;
 
@@ -24,17 +25,22 @@ namespace ddc
 		UpdateData(UpdateData&& other) noexcept : m_layer(other.m_layer), m_delta(other.m_delta), m_views(std::move(other.m_views)) {}
 
 		float Delta() const { return m_delta; }
-		ddc::EntityLayer& Layer() const { return *m_layer; }
-
 		const UpdateBufferView& Data(const char* name = nullptr) const;
+
+		void CreateEntity(ddc::ScratchEntity&& new_entity);
+		void DestroyEntity(ddc::Entity entity);
 
 	private:
 		friend struct System;
-
+		
 		ddc::EntityLayer* m_layer { nullptr };
 		float m_delta { 0 };
 		dd::Array<UpdateBufferView, 8> m_views;
 
+		std::vector<ddc::ScratchEntity*> m_createdEntities;
+		std::vector<ddc::Entity> m_destroyedEntities;
+
 		const UpdateBufferView& CreateView(UpdateBuffer& buffer, size_t start, size_t count);
+		void CommitChanges();
 	};
 }

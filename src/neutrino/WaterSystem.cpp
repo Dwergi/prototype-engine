@@ -12,6 +12,7 @@
 #include "BoundsHelpers.h"
 #include "ColourComponent.h"
 #include "Plane.h"
+#include "ScratchEntity.h"
 #include "Services.h"
 #include "TransformComponent.h"
 #include "Triangulator.h"
@@ -42,16 +43,16 @@ namespace neut
 		m_noiseParams.Wavelength = 32;
 	}
 
-	ddc::Entity WaterSystem::CreateWaterEntity(ddc::EntityLayer& entities, glm::vec2 chunk_pos) const
+	ddc::ScratchEntity WaterSystem::CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const
 	{
-		ddc::Entity entity = entities.CreateEntity<dd::TransformComponent, neut::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
-		entities.AddTag(entity, ddc::Tag::Visible);
+		ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<dd::TransformComponent, neut::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
+		scratch.AddTag(ddc::Tag::Visible);
 
-		dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
+		dd::TransformComponent* transform = scratch.Access<dd::TransformComponent>();
 		transform->Position = glm::vec3(chunk_pos.x, m_waterHeight, chunk_pos.y);
 		transform->Update();
 
-		neut::WaterComponent* water = entities.Access<neut::WaterComponent>(entity);
+		neut::WaterComponent* water = scratch.Access<neut::WaterComponent>();
 		water->TerrainChunkPosition = chunk_pos;
 
 		std::string mesh_name = fmt::format("water_{}x{}", chunk_pos.x, chunk_pos.y);
@@ -61,12 +62,12 @@ namespace neut
 		mesh->SetMaterial(ddr::MaterialHandle("water"));
 		mesh->UseBVH(false);
 
-		dd::ColourComponent* colour = entities.Access<dd::ColourComponent>(entity);
+		dd::ColourComponent* colour = scratch.Access<dd::ColourComponent>();
 		colour->Colour = glm::vec4(0, 0, 1, 0.5);
 
 		const float vertex_distance = m_terrainParams.ChunkSize / neut::WaterComponent::VertexCount;
 
-		dd::BoundBoxComponent* bound_box = entities.Access<dd::BoundBoxComponent>(entity);
+		dd::BoundBoxComponent* bound_box = scratch.Access<dd::BoundBoxComponent>();
 		bound_box->BoundBox.Min = glm::vec3(0);
 		bound_box->BoundBox.Max = glm::vec3(vertex_distance * neut::WaterComponent::VertexCount, 0, vertex_distance * neut::WaterComponent::VertexCount);
 
@@ -84,7 +85,7 @@ namespace neut
 
 		water->Dirty = true;
 
-		return entity;
+		return scratch;
 	}
 
 	void WaterSystem::Initialize(ddc::EntityLayer& entities)
@@ -118,7 +119,7 @@ namespace neut
 		}
 	}
 
-	void WaterSystem::Update(const ddc::UpdateData& update_data)
+	void WaterSystem::Update(ddc::UpdateData& update_data)
 	{
 		const auto& terrain = update_data.Data("terrain");
 		auto terrain_chunks = terrain.Read<neut::TerrainChunkComponent>();
@@ -128,8 +129,6 @@ namespace neut
 
 		const auto& water = update_data.Data("water");
 		PopulateWaterCache(water);
-
-		ddc::EntityLayer& entities = update_data.Layer();
 
 		const ddm::Plane water_plane(glm::vec3(0, m_waterHeight, 0), glm::vec3(0, -1, 0));
 
@@ -155,7 +154,7 @@ namespace neut
 			ddc::Entity water_entity = FindWater(terrain_chunk->GetPosition());
 			if (!water_entity.IsValid())
 			{
-				water_entity = CreateWaterEntity(update_data.Layer(), terrain_chunk->GetPosition());
+				CreateWaterEntity(update_data, terrain_chunk->GetPosition());
 
 				++m_waterChunks;
 			}

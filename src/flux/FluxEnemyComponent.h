@@ -17,6 +17,8 @@ namespace flux
 
 		DD_BEGIN_CLASS(flux::FluxEnemyComponent)
 			DD_COMPONENT();
+
+			DD_MEMBER(Health);
 		DD_END_CLASS()
 	};
 }

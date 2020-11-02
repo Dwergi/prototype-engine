@@ -105,7 +105,7 @@ namespace dd
 		s_input->AddHeldHandler(InputAction::BOOST);
 	}
 
-	void FreeCameraController::Update(const ddc::UpdateData& update_data)
+	void FreeCameraController::Update(ddc::UpdateData& update_data)
 	{
 		DD_PROFILE_SCOPED(FreeCameraController_Update);
 

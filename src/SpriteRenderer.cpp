@@ -18,6 +18,8 @@
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
 
+#include <iterator>
+
 namespace ddr
 {
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
@@ -201,6 +203,7 @@ namespace ddr
 		
 		// copy components to temp
 		m_temp.clear();
+		m_temp.reserve(sprite_cmps.Size());
 		std::copy(sprite_cmps.begin(), sprite_cmps.end(), std::back_inserter(m_temp));
 
 		// reserve memory
@@ -250,5 +253,10 @@ namespace ddr
 		m_vao.Unbind();
 		
 		uniforms.Unbind();
+	}
+
+	void SpriteRenderer::DrawDebugInternal()
+	{
+		ImGui::Value("Sprites", m_temp.size());
 	}
 }

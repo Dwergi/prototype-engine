@@ -268,7 +268,7 @@ namespace dd
 		return false;
 	}
 
-	void PhysicsSystem::Update( const ddc::UpdateData& update )
+	void PhysicsSystem::Update( ddc::UpdateData& update )
 	{
 		DD_PROFILE_SCOPED( PhysicsSystem_Update );
 

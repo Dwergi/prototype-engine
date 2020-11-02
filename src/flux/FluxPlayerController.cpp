@@ -69,10 +69,10 @@ namespace flux
 		bullet_cmp.HitCircle = ddm::Circle(glm::vec2(0.5f, 0.5f), 0.25f);
 
 		ddc::EntityPrototype* prototype = m_bulletPrototype.Access();
-		prototype->PopulateFromScratchEntity(scratch);
+		prototype->PopulateFromScratch(scratch);
 	}
 
-	void FluxPlayerController::Update(const ddc::UpdateData& update_data)
+	void FluxPlayerController::Update(ddc::UpdateData& update_data)
 	{
 		DD_PROFILE_SCOPED(FluxPlayerController_Update);
 
@@ -153,7 +153,7 @@ namespace flux
 			{
 				if (player_cmp.ShotCooldown == 0)
 				{
-					ddc::Entity bullet = m_bulletPrototype->Instantiate(update_data.Layer());
+					ddc::ScratchEntity bullet = m_bulletPrototype->InstantiateScratch();
 					
 					d2d::Transform2DComponent* bullet_transform = bullet.Access<d2d::Transform2DComponent>();
 					bullet_transform->Rotation = angle;
@@ -166,6 +166,8 @@ namespace flux
 					bullet_cmp->Type = flux::BulletType::Friendly;
 
 					d2d::SpriteComponent* sprite_cmp = bullet.Access<d2d::SpriteComponent>();
+
+					update_data.CreateEntity(std::move(bullet));
 
 					player_cmp.ShotCooldown = player_cmp.EquippedWeapon->ShotDelay;
 				}

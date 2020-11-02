@@ -44,7 +44,7 @@ namespace neut
 
 		// System implementation
 		virtual void Initialize(ddc::EntityLayer& entities) override {}
-		virtual void Update(const ddc::UpdateData& data) override;
+		virtual void Update(ddc::UpdateData& data) override;
 		virtual void Shutdown(ddc::EntityLayer& entities) override;
 	};
 }

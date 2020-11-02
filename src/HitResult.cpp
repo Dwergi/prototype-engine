@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "HitResult.h"
 
-DD_CLASS_CPP( dd::HitHandle );
+DD_CLASS_CPP(dd::HitHandle);
 
 namespace dd
 {
@@ -15,20 +15,20 @@ namespace dd
 	{
 	}
 
-	HitResult::HitResult( ddm::Ray ray ) :
-		m_ray( ray )
+	HitResult::HitResult(ddm::Ray ray) :
+		m_ray(ray)
 	{
 	}
 
-	HitResult::HitResult( const HitResult& other ) :
-		m_entity( other.m_entity ),
-		m_ray( other.m_ray ),
-		m_distance( other.m_distance ),
-		m_normal( other.m_normal )
+	HitResult::HitResult(const HitResult& other) :
+		m_entity(other.m_entity),
+		m_ray(other.m_ray),
+		m_distance(other.m_distance),
+		m_normal(other.m_normal)
 	{
 	}
 
-	void HitResult::operator=( const HitResult& other )
+	void HitResult::operator=(const HitResult& other)
 	{
 		m_entity = other.m_entity;
 		m_ray = other.m_ray;
@@ -36,9 +36,9 @@ namespace dd
 		m_normal = other.m_normal;
 	}
 
-	void HitResult::RegisterHit( float distance, glm::vec3 normal, ddc::Entity entity )
+	void HitResult::RegisterHit(float distance, glm::vec3 normal, ddc::Entity entity)
 	{
-		if( distance < m_ray.Length && distance < m_distance )
+		if (distance < m_ray.Length && distance < m_distance)
 		{
 			m_distance = distance;
 			m_normal = normal;

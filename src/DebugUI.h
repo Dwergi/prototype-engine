@@ -9,35 +9,46 @@
 struct ImDrawData;
 struct ImGuiContext;
 
-namespace ddc
-{
-	struct EntityLayer;
-}
-
 namespace dd
 {
 	struct IDebugPanel;
-	struct IInputSource;
-	struct Window;
 
-	struct DebugUI
+	struct IDebugUI
 	{
-		DebugUI();
-		~DebugUI();
+		virtual void RenderDebugPanels() = 0;
 
-		void StartFrame( float delta_t );
+		virtual void SetDraw(bool draw) = 0;
+
+		virtual void StartFrame(float delta_t) = 0;
+		virtual void EndFrame() = 0;
+
+		virtual bool IsMidFrame() const = 0;
+		virtual bool IsMidWindow() const = 0;
+		virtual void EndWindow() = 0;
+
+	private:
+		friend struct IDebugPanel;
+
+		virtual void RegisterDebugPanel(IDebugPanel& debug_panel) = 0;
+	};
+
+	struct ImGuiDebugUI : IDebugUI
+	{
+		ImGuiDebugUI();
+		~ImGuiDebugUI();
+
+		void StartFrame(float delta_t);
 		void EndFrame();
 
 		bool ShouldDraw() const { return m_draw; }
-		DebugUI& SetDraw(bool draw) { m_draw = draw; return *this; }
+		void SetDraw(bool draw) override { m_draw = draw; }
 
-		bool IsMidFrame() const { return m_midFrame; }
-		
-		bool IsMidWindow() const { return m_midWindow; }
-		void EndWindow();
+		bool IsMidFrame() const override { return m_midFrame; }
 
-		void RegisterDebugPanel( IDebugPanel& debug_panel );
-		void RenderDebugPanels();
+		bool IsMidWindow() const override { return m_midWindow; }
+		void EndWindow() override;
+
+		void RenderDebugPanels() override;
 
 	private:
 		std::vector<IDebugPanel*> m_debugPanels;
@@ -49,5 +60,7 @@ namespace dd
 		bool m_needsSort { false };
 
 		ImGuiContext* m_imguiContext { nullptr };
+
+		void RegisterDebugPanel(IDebugPanel& debug_panel) override;
 	};
 }

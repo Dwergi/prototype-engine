@@ -60,10 +60,10 @@ namespace flux
 		sprite_cmp.Sprite = spritesheet_h->Get(0);
 		sprite_cmp.ZIndex = 7;
 
-		m_enemyPrototype->PopulateFromScratchEntity(scratch);
+		m_enemyPrototype->PopulateFromScratch(scratch);
 	}
 
-	void FluxEnemySystem::Update(const ddc::UpdateData& update_data)
+	void FluxEnemySystem::Update(ddc::UpdateData& update_data)
 	{
 		float dt = update_data.Delta();
 
@@ -78,8 +78,7 @@ namespace flux
 			if (enemy_cmp.Health <= 0)
 			{
 				ddc::Entity enemy_entity = update_buffer.Entities()[i];
-				enemy_entity.RemoveTag(ddc::Tag::Visible);
-				enemy_entity.Destroy();
+				update_data.DestroyEntity(enemy_entity);
 			}
 		}
 
@@ -87,9 +86,11 @@ namespace flux
 
 		if (m_lastSpawn <= 0 && update_buffer.Size() < m_maxEnemies)
 		{
-			ddc::Entity new_enemy = m_enemyPrototype->Instantiate(update_data.Layer());
+			ddc::ScratchEntity new_enemy = m_enemyPrototype->InstantiateScratch();
 
 			DD_ASSERT(new_enemy.HasTag(ddc::Tag::Visible));
+
+			flux::FluxEnemyComponent* new_enemy_cmp = new_enemy.Access<flux::FluxEnemyComponent>();
 
 			d2d::Transform2DComponent* new_transform_cmp = new_enemy.Access<d2d::Transform2DComponent>();
 
@@ -127,6 +128,8 @@ namespace flux
 			new_transform_cmp->Position = new_pos;
 			new_transform_cmp->Rotation = glm::radians(m_rngAngle.Next());
 			new_transform_cmp->Update();
+
+			update_data.CreateEntity(std::move(new_enemy));
 
 			m_lastSpawn = m_spawnDelay;
 		}

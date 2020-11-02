@@ -23,7 +23,7 @@ namespace ddc
 	{
 		UpdateBuffer() {}
 		explicit UpdateBuffer(const char* name);
-		UpdateBuffer(UpdateBuffer&& other);
+		UpdateBuffer(UpdateBuffer&& other) noexcept;
 
 		const dd::String& Name() const { return m_name; }
 
@@ -80,7 +80,7 @@ namespace ddc
 		UpdateBufferView(UpdateBuffer& buffer, size_t start, size_t count);
 		UpdateBufferView(const UpdateBufferView& other);
 
-		const dd::Span<Entity>& Entities() const { return m_entities; }
+		const dd::Span<ddc::Entity>& Entities() const;
 		size_t Size() const { return m_entities.Size(); }
 		const dd::String& Name() const { return m_buffer->Name(); }
 

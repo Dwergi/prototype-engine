@@ -14,7 +14,7 @@
 
 #include "Remotery/lib/Remotery.h"
 
-#define DD_PROFILE_INIT() Remotery* profiler; rmt_CreateGlobalInstance( &profiler )
+#define DD_PROFILE_INIT( Remotery ) rmt_CreateGlobalInstance( &Remotery )
 
 #define DD_PROFILE_THREAD_NAME( Name ) rmt_SetCurrentThreadName( Name )
 
@@ -24,7 +24,7 @@
 
 #define DD_PROFILE_SCOPED( Name ) rmt_ScopedCPUSample( Name, 0 )
 
-#define DD_PROFILE_DEINIT() rmt_DestroyGlobalInstance( profiler )
+#define DD_PROFILE_DEINIT( Remotery ) rmt_DestroyGlobalInstance( Remotery )
 
 #define DD_PROFILE_LOG( LogText ) rmt_LogText( LogText )
 
@@ -42,6 +42,9 @@ namespace dd
 {
 	struct Profiler
 	{
+		static void Initialize();
+		static void Shutdown();
+
 		static int FrameCount();
 
 		static void BeginFrame();
@@ -54,6 +57,8 @@ namespace dd
 		static ProfilerValue& GetValue(const char* name);
 		
 	private:
+		static Remotery* s_remotery;
+
 		static std::vector<ProfilerValue*> s_instances;
 		static bool s_draw;
 		static bool s_inFrame;

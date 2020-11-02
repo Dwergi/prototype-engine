@@ -18,7 +18,7 @@ namespace ddc
 		System(const char* name);
 
 		virtual void Initialize(ddc::EntityLayer& layer) {}
-		virtual void Update(const ddc::UpdateData& update_data) = 0;
+		virtual void Update(ddc::UpdateData& update_data) = 0;
 		virtual void Shutdown(ddc::EntityLayer& layer) {}
 
 		//
@@ -99,8 +99,7 @@ namespace ddc
 		const static int MAX_PARTITIONS = 8;
 		int m_partitions { MAX_PARTITIONS };
 
-		void FillBuffers(ddc::EntityLayer& layer);
-		void CommitChanges();
+		void CommitChanges(ddc::UpdateData& data);
 
 		ddc::UpdateBuffer& CreateBuffer(const char* name);
 

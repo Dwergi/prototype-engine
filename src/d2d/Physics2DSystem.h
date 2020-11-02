@@ -15,7 +15,7 @@ namespace d2d
 	{
 		PhysicsSystem();
 
-		void Update(const ddc::UpdateData& update_data);
+		void Update(ddc::UpdateData& update_data);
 
 	private:
 		int m_collisionCount { 0 };

@@ -8,6 +8,6 @@ namespace d2d
 	{
 		SpriteAnimationSystem();
 
-		virtual void Update(const ddc::UpdateData& update_data) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
 	};
 }

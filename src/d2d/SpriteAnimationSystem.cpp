@@ -14,7 +14,7 @@ namespace d2d
 		RequireWrite<d2d::SpriteComponent>();
 	}
 
-	void SpriteAnimationSystem::Update(const ddc::UpdateData& update_data)
+	void SpriteAnimationSystem::Update(ddc::UpdateData& update_data)
 	{
 		auto anims = update_data.Data().Write<d2d::SpriteAnimationComponent>();
 		auto sprites = update_data.Data().Write<d2d::SpriteComponent>();

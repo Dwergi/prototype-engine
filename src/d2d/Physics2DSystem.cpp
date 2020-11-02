@@ -93,7 +93,7 @@ namespace d2d
 		PositionalCorrection(manifold);
 	}
 	
-	void PhysicsSystem::Update(const ddc::UpdateData& update_data)
+	void PhysicsSystem::Update(ddc::UpdateData& update_data)
 	{
 		float delta_t = update_data.Delta();
 		glm::vec2 accel_change = GRAVITY * delta_t;
@@ -276,7 +276,7 @@ namespace d2d
 	}
 
 
-	/*void OldPhysics(ddc::UpdateDataBuffer& circles, ddc::WriteView<d2d::SpriteTileComponent>& circle_tiles, ddc::WriteView<d2d::CirclePhysicsComponent>& circle_physics, float delta_t, ddc::UpdateDataBuffer& static_boxes, ddc::ReadView<d2d::SpriteTileComponent>& static_box_tiles, ddc::ReadView<d2d::BoxPhysicsComponent>& static_box_physics, const ddc::UpdateData& update_data)
+	/*void OldPhysics(ddc::UpdateDataBuffer& circles, ddc::WriteView<d2d::SpriteTileComponent>& circle_tiles, ddc::WriteView<d2d::CirclePhysicsComponent>& circle_physics, float delta_t, ddc::UpdateDataBuffer& static_boxes, ddc::ReadView<d2d::SpriteTileComponent>& static_box_tiles, ddc::ReadView<d2d::BoxPhysicsComponent>& static_box_physics, ddc::UpdateData& update_data)
 	{
 		for (int c = 0; c < circles.Size(); ++c)
 		{

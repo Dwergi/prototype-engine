@@ -16,7 +16,7 @@ namespace neut
 		TreeSystem();
 
 		virtual void Initialize( ddc::EntityLayer& entities );
-		virtual void Update( const ddc::UpdateData& update_data );
+		virtual void Update( ddc::UpdateData& update_data );
 
 		virtual const char* GetDebugTitle() const override { return "Trees"; }
 

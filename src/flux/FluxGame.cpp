@@ -37,7 +37,7 @@ namespace flux
 	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<flux::FluxPlayerController> s_playerController;
 	static dd::Service<flux::FluxEnemySystem> s_enemySystem;
 
@@ -64,9 +64,9 @@ namespace flux
 
 	static ddc::Entity CreatePlayer(ddc::EntityLayer& layer)
 	{
-		ddc::Entity player = layer.CreateEntity<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::CirclePhysicsComponent, flux::FluxPlayerComponent>();
-		layer.AddTag(player, ddc::Tag::Visible);
-		layer.AddTag(player, ddc::Tag::Static);
+		ddc::ScratchEntity player = ddc::ScratchEntity::Create<d2d::SpriteComponent, d2d::Transform2DComponent, d2d::CirclePhysicsComponent, flux::FluxPlayerComponent>();
+		player.AddTag(ddc::Tag::Visible);
+		player.AddTag(ddc::Tag::Static);
 
 		d2d::Transform2DComponent* transform_cmp = player.Access<d2d::Transform2DComponent>();
 		transform_cmp->Scale = { 1, 1 };
@@ -85,7 +85,7 @@ namespace flux
 		player_cmp->Stats = &s_playerStats;
 		player_cmp->EquippedWeapon = &s_weapons[0];
 
-		return player;
+		return player.Instantiate(layer);
 	}
 
 	static void ResetPlayer()

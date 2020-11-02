@@ -110,7 +110,7 @@ namespace dd
 
 	static dd::Service<dd::FrameTimer> s_frameTimer;
 	static dd::Service<dd::Input> s_input;
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
 
 	static ppk::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,

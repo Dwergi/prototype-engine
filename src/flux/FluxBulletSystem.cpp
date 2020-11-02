@@ -39,12 +39,12 @@ namespace flux
 
 	void FluxBulletSystem::DrawDebugInternal()
 	{
-		ImGui::Value("Live", &m_liveBullets);
+		ImGui::Value("Live", m_liveBullets);
 	}
 
 	DD_OPTIMIZE_OFF();
 
-	void FluxBulletSystem::Update(const ddc::UpdateData& update_data)
+	void FluxBulletSystem::Update(ddc::UpdateData& update_data)
 	{
 		float dt = update_data.Delta(); 
 
@@ -67,13 +67,13 @@ namespace flux
 			bullet_cmp.Lifetime += dt;
 
 			ddm::Circle bullet_circle = bullet_cmp.HitCircle.GetTransformed(bullet_transform.Position, bullet_transform.Scale);
+			static const ddm::AABB2D MAP_BOUNDS(glm::vec2(0, 0), m_mapSize);
 
-			if (bullet_cmp.Lifetime > 3.0f)
+			if (!MAP_BOUNDS.Intersects(bullet_circle))
 			{
 				ddc::Entity bullet_entity = bullets_buffer.Entities()[b];
-				DD_ASSERT(bullet_entity.Has<flux::FluxBulletComponent>() && !bullet_entity.Has<flux::FluxEnemyComponent>());
-				
-				bullet_entity.Destroy();
+				update_data.DestroyEntity(bullet_entity);
+				continue;
 			}
 
 			if (bullet_cmp.Type == flux::BulletType::Friendly)
@@ -90,9 +90,8 @@ namespace flux
 						enemy_cmp.Health -= bullet_cmp.Damage;
 
 						ddc::Entity bullet_entity = bullets_buffer.Entities()[b];
-						DD_ASSERT(bullet_entity.Has<flux::FluxBulletComponent>() && !bullet_entity.Has<flux::FluxEnemyComponent>());
-
-						bullet_entity.Destroy();
+						update_data.DestroyEntity(bullet_entity);
+						break;
 					}
 				}
 			}

@@ -15,7 +15,7 @@ namespace dd
 {
 	void InitializeMemoryTracking()
 	{
-		g_allocs = &dd::Profiler::GetValue("Memory Allocations");
+		g_allocs = &dd::Profiler::GetValue("Memory/Allocations");
 		g_deletions = &dd::Profiler::GetValue("Memory/Deletions");
 	}
 

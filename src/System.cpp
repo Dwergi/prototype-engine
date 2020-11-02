@@ -65,25 +65,23 @@ namespace ddc
 
 		for (UpdateBuffer& buffer : m_updateBuffers)
 		{
+			buffer.Fill(layer);
+
+			DD_TODO("This isn't segmented for multithreaded updates...");
+
 			data.CreateView(buffer, 0, buffer.Size());
 		}
 
 		return std::move(data);
 	}
 
-	void System::FillBuffers(ddc::EntityLayer& layer)
-	{
-		for (UpdateBuffer& buffer : m_updateBuffers)
-		{
-			buffer.Fill(layer);
-		}
-	}
-
-	void System::CommitChanges()
+	void System::CommitChanges(ddc::UpdateData& data)
 	{
 		for (UpdateBuffer& buffer : m_updateBuffers)
 		{
 			buffer.Commit();
 		}
+
+		data.CommitChanges();
 	}
 }

@@ -60,10 +60,9 @@ namespace ddc
 			return;
 		}
 
-		system.FillBuffers(*update.Layer);
 		ddc::UpdateData update_data = system.CreateUpdateData(*update.Layer, update.DeltaT);
 		system.Update(update_data);
-		system.CommitChanges();
+		system.CommitChanges(update_data);
 	}
 
 	void SystemsManager::UpdateSystemsWithTreeScheduling(EntityLayer& layer, float delta_t)

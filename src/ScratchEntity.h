@@ -6,21 +6,23 @@ namespace ddc
 	{
 		ScratchEntity();
 		ScratchEntity(ddc::Entity entity);
+		ScratchEntity(ScratchEntity&& other) noexcept;
 		~ScratchEntity();
-
-		// could support move, but not sure it's necessary...
-		ScratchEntity(const ScratchEntity&) = delete;
 
 		// Commit changes to the entity.
 		// If this goes out of scope without Commit() being called, all changes are discarded.
 		bool Commit();
+
+		// Create a new instance of this entity in the given layer.
+		ddc::Entity Instantiate(ddc::EntityLayer& layer);
 
 		int Components() const { return m_components.Size(); }
 
 		void AddTag(ddc::Tag tag);
 		void RemoveTag(ddc::Tag tag);
 		bool HasTag(ddc::Tag tag) const;
-		TagBits GetAllTags() const;
+		ddc::TagBits GetAllTags() const;
+		void SetAllTags(ddc::TagBits tags);
 
 		template <typename TComponent> TComponent& Add();
 		template <typename TComponent> void Remove();
@@ -29,10 +31,16 @@ namespace ddc
 		template <typename TComponent> const TComponent* Get() const;
 		template <typename TComponent> bool Has() const;
 
+		void* AddComponent(dd::ComponentID id);
+		void RemoveComponent(dd::ComponentID id);
+
 		void* AccessComponent(dd::ComponentID id) const;
 		const void* GetComponent(dd::ComponentID id) const;
 		bool HasComponent(dd::ComponentID id) const;
 		void GetAllComponents(dd::IArray<dd::ComponentID>& components) const;
+
+		template <typename... TComponents>
+		static ScratchEntity Create();
 
 	private:
 
@@ -47,6 +55,9 @@ namespace ddc
 		dd::Array<ComponentEntry, MAX_COMPONENTS> m_components;
 		TagBits m_tags;
 		dd::Buffer<byte> m_storage;
+
+		void* AddComponentType(const dd::TypeInfo* type);
+		void RemoveComponentType(const dd::TypeInfo* type);
 	};
 
 	template <typename TComponent>
@@ -75,36 +86,26 @@ namespace ddc
 	TComponent& ScratchEntity::Add()
 	{
 		const dd::TypeInfo* type = DD_FIND_TYPE(TComponent);
-		DD_ASSERT(!HasComponent(type->ComponentID()));
-
-		ComponentEntry new_entry;
-		new_entry.Type = type;
-		m_components.Add(new_entry);
-
-		size_t old_size = m_storage.SizeBytes();
-		size_t new_size = old_size + type->Size();
-
-		byte* old_ptr = m_storage.Release();
-		m_storage.Set(new byte[new_size], new_size);
-
-		memcpy(m_storage.Access(), old_ptr, old_size);
-		delete[] old_ptr;
-
-		TComponent* new_cmp = new (&m_storage[old_size]) TComponent();
-		return *new_cmp;
+		return *static_cast<TComponent*>(AddComponentType(type));
 	}
 
 	template <typename TComponent> 
 	void ScratchEntity::Remove()
 	{
 		const dd::TypeInfo* type = DD_FIND_TYPE(TComponent);
-		for (ComponentEntry& entry : m_components)
+		RemoveComponentType(type);
+	}
+
+	template <typename... TComponents>
+	ScratchEntity ScratchEntity::Create()
+	{
+		ScratchEntity scratch;
+
+		ExpandType
 		{
-			if (entry.Type == type)
-			{
-				entry.Deleted = true;
-				break;
-			}
-		}
+			0, (scratch.Add<TComponents>(), 0)...
+		};
+
+		return std::move(scratch);
 	}
 }

@@ -29,6 +29,7 @@ namespace ddc
 
 		bool IsValid() const;
 		bool IsAlive() const;
+		bool IsAliveOrCreated() const;
 		int Components() const;
 
 		void AddTag(ddc::Tag tag) const;
@@ -64,6 +65,10 @@ namespace ddc
 
 			uint64 Handle { INVALID_HANDLE };
 		};
+
+		DD_BEGIN_CLASS(ddc::Entity)
+			DD_MEMBER(Handle);
+		DD_END_CLASS()
 
 	private:
 		friend struct EntityLayer;

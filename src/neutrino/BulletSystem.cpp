@@ -9,7 +9,6 @@
 
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
-#include "neutrino/BulletComponent.h"
 #include "ColourComponent.h"
 #include "FPSCameraComponent.h"
 #include "HitTest.h"
@@ -21,8 +20,11 @@
 #include "MeshComponent.h"
 #include "MessageQueue.h"
 #include "PlayerComponent.h"
+#include "ScratchEntity.h"
 #include "Services.h"
 #include "TransformComponent.h"
+
+#include "neutrino/BulletComponent.h"
 
 static dd::Service<dd::IAsyncHitTest> s_hitTest;
 static dd::Service<ddc::MessageQueue> s_messageQueue;
@@ -50,6 +52,8 @@ namespace neut
 
 		RequireRead<dd::PlayerComponent>("player");
 		RequireRead<dd::FPSCameraComponent>("player");
+
+		m_bulletHitMessage = ddc::MessageType::Register<neut::BulletHitMessage>("BulletHit");
 	}
 
 	void BulletSystem::Initialize(ddc::EntityLayer& entities)
@@ -57,72 +61,66 @@ namespace neut
 
 	}
 
-	void BulletSystem::FireBullet(ddc::EntityLayer& entities, const ddr::ICamera& camera)
+	void BulletSystem::FireBullet(ddc::UpdateData& update_data, const ddr::ICamera& camera)
 	{
-		ddc::Entity entity = entities.CreateEntity<neut::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
-		entities.AddTag(entity, ddc::Tag::Visible);
+		ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<neut::BulletComponent, dd::TransformComponent, dd::MeshComponent, dd::BoundSphereComponent, dd::BoundBoxComponent, dd::LightComponent, dd::ColourComponent>();
+		scratch.AddTag(ddc::Tag::Visible);
 
-		dd::TransformComponent* transform;
-		entities.Access(entity, transform);
-
+		dd::TransformComponent* transform = scratch.Access<dd::TransformComponent>();
 		transform->Scale = glm::vec3(m_scale);
 		transform->Position = camera.GetPosition();
 		transform->Update();
 
-		neut::BulletComponent* bullet;
-		entities.Access(entity, bullet);
+		neut::BulletComponent* bullet = scratch.Access<neut::BulletComponent>();
 		bullet->Velocity = camera.GetDirection() * m_speed;
 
-		dd::MeshComponent* mesh;
-		entities.Access(entity, mesh);
+		dd::MeshComponent* mesh = scratch.Access<dd::MeshComponent>();
 
 		mesh->Mesh = ddr::MeshHandle("sphere");
 
-		dd::ColourComponent* colour;
-		entities.Access(entity, colour);
+		dd::ColourComponent* colour = scratch.Access<dd::ColourComponent>();
 		colour->Colour = glm::vec4(m_colour, 1);
 
-		dd::BoundSphereComponent* bsphere;
-		entities.Access(entity, bsphere);
+		dd::BoundSphereComponent* bsphere = scratch.Access<dd::BoundSphereComponent>();
 		bsphere->Sphere.Radius = 1.0f;
 
-		dd::BoundBoxComponent* bbox;
-		entities.Access(entity, bbox);
+		dd::BoundBoxComponent* bbox = scratch.Access<dd::BoundBoxComponent>();
 		bbox->BoundBox = mesh->Mesh.Get()->GetBoundBox();
 
-		dd::LightComponent* light;
-		entities.Access(entity, light);
+		dd::LightComponent* light = scratch.Access<dd::LightComponent>();
 		light->LightType = dd::LightType::Point;
 		light->Ambient = 0;
 		light->Intensity = m_intensity;
 		light->Colour = m_colour;
 		light->Attenuation = m_attenuation;
 
+		update_data.CreateEntity(std::move(scratch));
+
 		m_fireBullet = false;
 	}
 
-	void BulletSystem::KillBullet(ddc::EntityLayer& layer, ddc::Entity entity, neut::BulletComponent& bullet)
+	void BulletSystem::KillBullet(ddc::UpdateData& update, ddc::Entity entity, neut::BulletComponent& bullet)
 	{
 		if (bullet.PendingHit.Valid)
 		{
 			s_hitTest->ReleaseResult(bullet.PendingHit);
 		}
 
-		if (glm::length2(bullet.HitPosition) > 0)
+		if (bullet.HitResult.IsValid())
 		{
 			neut::BulletHitMessage payload;
-			payload.Position = bullet.HitPosition;
-			payload.SurfaceNormal = bullet.HitNormal;
+			payload.Position = bullet.HitResult.Position();
+			payload.Normal = bullet.HitResult.Normal();
 			payload.Velocity = bullet.Velocity;
+			payload.HitEntity = bullet.HitResult.Entity();
 
-			ddc::Message msg;
-			msg.Type = ddc::MessageType::BulletHit;
+			ddc::Message msg(m_bulletHitMessage);
 			msg.SetPayload(payload);
 
 			s_messageQueue->Send(msg);
 		}
 
-		layer.DestroyEntity(entity);
+		update.DestroyEntity(entity);
 	}
 
 	bool BulletSystem::HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& bullet_transform, const ddc::UpdateBufferView& meshes, float delta_t, glm::vec3& out_pos)
@@ -142,9 +140,8 @@ namespace neut
 
 			if (ddm::HitTestMesh(ray, mesh_cmps[i], mesh_transforms[i], mesh_bspheres.Get(i), mesh_bboxes.Get(i), hit_distance, hit_normal))
 			{
-				bullet.HitPosition = initial_pos + glm::normalize(bullet.Velocity) * hit_distance;
-				bullet.HitNormal = hit_normal;
-				DD_ASSERT(glm::length2(bullet.HitNormal) > 0.01f);
+				bullet.HitResult = dd::HitResult(ray);
+				bullet.HitResult.RegisterHit(hit_distance, hit_normal, meshes.Entities()[i]);
 
 				bullet.Lifetime = bullet.Age;
 				return true;
@@ -154,16 +151,14 @@ namespace neut
 		return false;
 	}
 
-	void BulletSystem::Update(const ddc::UpdateData& update)
+	void BulletSystem::Update(ddc::UpdateData& update)
 	{
-		ddc::EntityLayer& entities = update.Layer();
-
 		if (s_input->GotInput(dd::InputAction::SHOOT))
 		{
 			const auto& player = update.Data("player");
 			auto cameras = player.Read<dd::FPSCameraComponent>();
 
-			FireBullet(entities, cameras[0]);
+			FireBullet(update, cameras[0]);
 		}
 
 		const auto& dynamic_meshes = update.Data("dynamic_meshes");
@@ -183,7 +178,7 @@ namespace neut
 
 			if (bullet.Age >= bullet.Lifetime)
 			{
-				KillBullet(entities, bullet_data.Entities()[i], bullet);
+				KillBullet(update, bullet_data.Entities()[i], bullet);
 				continue;
 			}
 
@@ -218,9 +213,7 @@ namespace neut
 				{
 					if (result.Distance() < FLT_MAX)
 					{
-						bullet.HitPosition = result.Position();
-						bullet.HitNormal = result.Normal();
-						DD_ASSERT(glm::length2(bullet.HitNormal) > 0.01f);
+						bullet.HitResult = result;
 
 						float hit_lifetime = result.Distance() / glm::length(bullet.Velocity);
 						bullet.Lifetime = ddm::min(bullet.Lifetime, hit_lifetime);

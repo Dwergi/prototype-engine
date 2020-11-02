@@ -54,12 +54,13 @@ static dd::Service<dd::IGame> s_game;
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IInputSource> s_inputSource;
-static dd::Service<dd::DebugUI> s_debugUI;
+static dd::Service<dd::IDebugUI> s_debugUI;
 static dd::Service<ddr::RenderManager> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
 static dd::Service<dd::JobSystem> s_jobSystem;
 static dd::Service<ddc::SystemsManager> s_systemsManager;
 static dd::Service<dd::AssetManager> s_assetManager;
+static dd::Service<dd::CommandLine> s_commandLine;
 
 std::thread::id g_mainThread;
 
@@ -141,27 +142,17 @@ static dd::ProfilerValue& s_endFrameProfiler = dd::Profiler::GetValue("End Frame
 
 static int GameMain()
 {
-	DD_PROFILE_INIT();
-	DD_PROFILE_THREAD_NAME("Main");
-
-	dd::InitializeMemoryTracking();
-	dd::SetAsMainThread();
-
-	dd::File::SetBasePath("../../../data");
-	dd::File::AddOverridePath("./base");
-
-	dd::TypeInfo::RegisterQueuedTypes();
-
-	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
+	if (s_commandLine->Exists("noassert"))
+	{
+		ppk::assert::implementation::ignoreAllAsserts(true);
+	}
 
 	{
-		dd::IWindow& window = *new dd::SFMLWindow();
-		window.SetSize(glm::ivec2(1024, 768))
+		dd::Services::RegisterInterface<dd::IWindow>(new dd::SFMLWindow())
+			.SetSize(glm::ivec2(1024, 768))
 			.Initialize();
 
 		OpenGL::Initialize();
-		
-		dd::Services::RegisterInterface<dd::IWindow>(window);
 
 		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
 
@@ -175,7 +166,7 @@ static int GameMain()
 		s_input->AddHandler(dd::InputAction::TIME_SCALE_DOWN, &DecreaseTimeScale);
 		s_input->AddHandler(dd::InputAction::TIME_SCALE_UP, &IncreaseTimeScale);
 
-		dd::Services::Register(new dd::DebugUI());
+		dd::Services::RegisterInterface<dd::IDebugUI>(new dd::ImGuiDebugUI());
 
 		dd::Services::Register(new ddc::SystemsManager());
 
@@ -231,7 +222,7 @@ static int GameMain()
 					s_profilerTimer.Restart();
 					for (ddc::EntityLayer* layer : entity_layers)
 					{
-						layer->Update(s_frameTimer->GameDelta());
+						layer->Update();
 					}
 					s_entityUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 				}
@@ -300,18 +291,29 @@ static int GameMain()
 		s_game->Shutdown();
 	}
 
-	dd::Services::UnregisterAll();
-
-	DD_PROFILE_DEINIT();
-
 	return 0;
 }
 
 #ifdef _TEST
 
+struct TestDebugUI : dd::IDebugUI
+{
+	void RegisterDebugPanel(dd::IDebugPanel& debug_panel) override {}
+	void RenderDebugPanels() override {}
+
+	void SetDraw(bool draw) override {}
+
+	void StartFrame(float delta_t) override {}
+	void EndFrame() override {}
+
+	bool IsMidFrame() const override { return false; }
+	bool IsMidWindow() const override { return false; }
+	void EndWindow() override {}
+};
+
 int TestMain(int argc, char* argv[])
 {
-	dd::TypeInfo::RegisterQueuedTypes();
+	dd::Services::RegisterInterface<dd::IDebugUI>(new TestDebugUI());
 
 	int iError = tests::RunTests(argc, argv);
 
@@ -325,22 +327,45 @@ int TestMain(int argc, char* argv[])
 
 #endif
 
+void Initialize()
+{
+	dd::InitializeMemoryTracking();
+	dd::SetAsMainThread();
+
+	dd::Profiler::Initialize();
+
+	dd::File::SetBasePath("../../../data");
+	dd::File::AddOverridePath("./base");
+
+	dd::TypeInfo::RegisterQueuedTypes();
+
+	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
+}
+
+void Shutdown()
+{
+	dd::Profiler::Shutdown();
+
+	dd::Services::UnregisterAll();
+}
+
 //
 // ENTRY POINT
 //
 int main(int argc, char* argv[])
 {
 	std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
+	dd::Services::Register(new dd::CommandLine(argv, argc));
 
-	dd::CommandLine cmdLine(argv, argc);
-	if (cmdLine.Exists("noassert"))
-	{
-		ppk::assert::implementation::ignoreAllAsserts(true);
-	}
+	Initialize();
 
 #ifdef _TEST
-	return TestMain(argc, argv);
+	int32 ret = TestMain(argc, argv);
 #else
-	return GameMain();
+	int32 ret = GameMain();
 #endif
+
+	Shutdown();
+
+	return ret;
 }

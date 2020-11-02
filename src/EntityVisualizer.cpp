@@ -134,7 +134,7 @@ namespace dd
 		RequireTag(ddc::Tag::Selected);
 	}
 
-	void EntityVisualizer::Update(const ddc::UpdateData& update_data)
+	void EntityVisualizer::Update(ddc::UpdateData& update_data)
 	{
 		if (update_data.Data().Entities().Size() > 0)
 		{

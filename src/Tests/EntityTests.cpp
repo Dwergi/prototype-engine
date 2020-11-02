@@ -47,9 +47,9 @@ struct TestSystem : ddc::System
 		RequireWrite<SecondComponent>();
 	}
 
-	virtual void Update(const ddc::UpdateData& data) override
+	virtual void Update(ddc::UpdateData& data) override
 	{
-		auto buffer = data.Data();
+		const auto& buffer = data.Data();
 
 		auto read = buffer.Read<FirstComponent>();
 		auto write = buffer.Write<SecondComponent>();
@@ -73,9 +73,9 @@ struct DependentSystem : ddc::System
 		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update(const ddc::UpdateData& data) override
+	virtual void Update(ddc::UpdateData& data) override
 	{
-		auto buffer = data.Data();
+		const auto& buffer = data.Data();
 
 		auto read = buffer.Read<SecondComponent>();
 		auto write = buffer.Write<ThirdComponent>();
@@ -98,9 +98,9 @@ struct ReaderSystem : ddc::System
 		RequireRead<ThirdComponent>();
 	}
 
-	virtual void Update(const ddc::UpdateData& data) override
+	virtual void Update(ddc::UpdateData& data) override
 	{
-		auto buffer = data.Data();
+		const auto& buffer = data.Data();
 
 		auto read = buffer.Read<ThirdComponent>();
 
@@ -121,9 +121,9 @@ struct OnlyReaderSystem : ddc::System
 		RequireRead<SecondComponent>();
 	}
 
-	virtual void Update(const ddc::UpdateData& data) override
+	virtual void Update(ddc::UpdateData& data) override
 	{
-		auto buffer = data.Data();
+		const auto& buffer = data.Data();
 
 		auto read1 = buffer.Read<FirstComponent>();
 		auto read2 = buffer.Read<SecondComponent>();
@@ -146,123 +146,143 @@ struct OnlyWriterSystem : ddc::System
 		RequireWrite<ThirdComponent>();
 	}
 
-	virtual void Update(const ddc::UpdateData& data) override {}
+	virtual void Update(ddc::UpdateData& data) override {}
 };
 
-TEST_CASE("EntityManager")
+TEST_CASE("EntityLayer")
 {
-	ddc::EntityLayer space("test");
+	ddc::EntityLayer::DestroyAllLayers();
 
-	ddc::Entity a = space.CreateEntity();
+	ddc::EntityLayer layer("test");
+
+	ddc::Entity a = layer.CreateEntity();
 	REQUIRE(a.ID == 0);
 
-	ddc::Entity b = space.CreateEntity();
+	ddc::Entity b = layer.CreateEntity();
 	REQUIRE(b.ID == 1);
 
-	ddc::Entity c = space.CreateEntity();
+	ddc::Entity c = layer.CreateEntity();
 	REQUIRE(c.ID == 2);
 
-	space.DestroyEntity(a);
+	layer.DestroyEntity(a);
+	layer.Update();
 
-	ddc::Entity a2 = space.CreateEntity();
+	ddc::Entity a2 = layer.CreateEntity();
 	REQUIRE(a2.ID == a.ID);
-	REQUIRE(a2.Version == 1);
+	REQUIRE(a2.Version == 2);
 
-	space.DestroyEntity(b);
+	layer.DestroyEntity(b);
+	layer.Update();
 
-	ddc::Entity b2 = space.CreateEntity();
+	ddc::Entity b2 = layer.CreateEntity();
 	REQUIRE(b2.ID == b.ID);
-	REQUIRE(b2.Version == 1);
+	REQUIRE(b2.Version == 2);
 }
 
 TEST_CASE("Component")
 {
-	ddc::EntityLayer space("test");
-	ddc::Entity a = space.CreateEntity();
+	ddc::EntityLayer::DestroyAllLayers();
+
+	ddc::EntityLayer layer("test");
+	ddc::Entity a = layer.CreateEntity();
 
 	const dd::TypeInfo* type = DD_FIND_TYPE(FirstComponent);
+
+	// component shouldn't be registered yet until a system that uses it is created
+	REQUIRE(type->ComponentID() == dd::INVALID_COMPONENT);
+
+	TestSystem system;
+
 	REQUIRE(type->ComponentID() != dd::INVALID_COMPONENT);
 
-	bool found = space.Has<FirstComponent>(a);
+	layer.Update();
+
+	bool found = layer.Has<FirstComponent>(a);
 	REQUIRE(found == false);
 
-	FirstComponent& cmp = space.Add<FirstComponent>(a);
+	FirstComponent& cmp = layer.Add<FirstComponent>(a);
 	REQUIRE(cmp.FirstValue == -100);
 
 	cmp.FirstValue = 5;
 
-	const FirstComponent& cmp2 = *space.Access<FirstComponent>(a);
+	const FirstComponent& cmp2 = *layer.Access<FirstComponent>(a);
 	REQUIRE(cmp2.FirstValue == 5);
 	REQUIRE(cmp.FirstValue == cmp2.FirstValue);
 
-	REQUIRE(space.Has<FirstComponent>(a));
+	REQUIRE(layer.Has<FirstComponent>(a));
 
-	space.Remove<FirstComponent>(a);
-	REQUIRE_FALSE(space.Has<FirstComponent>(a));
+	layer.Remove<FirstComponent>(a);
+	REQUIRE_FALSE(layer.Has<FirstComponent>(a));
 }
 
 TEST_CASE("Update System")
 {
-	ddc::EntityLayer space("test");
-
-	for (int i = 0; i < 8; ++i)
-	{
-		ddc::Entity e = space.CreateEntity();
-
-		FirstComponent& simple = space.Add<FirstComponent>(e);
-		simple.FirstValue = i;
-
-		SecondComponent& other = space.Add<SecondComponent>(e);
-		other.SecondValue = -1;
-	}
+	ddc::EntityLayer::DestroyAllLayers();
 
 	TestSystem system;
 
+	ddc::EntityLayer layer("test");
+
 	ddc::SystemsManager system_mgr;
 	system_mgr.Register(system);
-	system_mgr.Initialize(space);
-	system_mgr.Update(space, 0);
+	system_mgr.Initialize(layer);
+
+	for (int i = 0; i < 8; ++i)
+	{
+		ddc::Entity e = layer.CreateEntity();
+
+		FirstComponent& simple = layer.Add<FirstComponent>(e);
+		simple.FirstValue = i;
+
+		SecondComponent& other = layer.Add<SecondComponent>(e);
+		other.SecondValue = -1;
+	}
+
+	layer.Update();
+	system_mgr.Update(layer, 0);
 
 	for (int i = 0; i < 8; ++i)
 	{
 		ddc::Entity e;
 		e.ID = i;
-		e.Version = 0;
+		e.Version = 1;
 
-		FirstComponent& simple = *space.Access<FirstComponent>(e);
+		FirstComponent& simple = *layer.Access<FirstComponent>(e);
 		REQUIRE(simple.FirstValue == e.ID);
 
-		SecondComponent& other = *space.Access<SecondComponent>(e);
+		SecondComponent& other = *layer.Access<SecondComponent>(e);
 		REQUIRE(other.SecondValue == e.ID);
 	}
 }
 
 TEST_CASE("Update With Discontinuity")
 {
-	dd::TypeInfo::RegisterQueuedTypes();
+	ddc::EntityLayer::DestroyAllLayers();
 
-	ddc::EntityLayer space("test");
+	TestSystem system;
+
+	ddc::EntityLayer layer("test");
+
+	ddc::SystemsManager system_mgr;
+	system_mgr.Register(system);
+	system_mgr.Initialize(layer);
 
 	for (int i = 0; i < 5; ++i)
 	{
-		ddc::Entity e = space.CreateEntity();
+		ddc::Entity e = layer.CreateEntity();
 
 		if (i == 2)
 			continue;
 
-		FirstComponent& simple = space.Add<FirstComponent>(e);
+		FirstComponent& simple = layer.Add<FirstComponent>(e);
 		simple.FirstValue = i;
 
-		SecondComponent& other = space.Add<SecondComponent>(e);
+		SecondComponent& other = layer.Add<SecondComponent>(e);
 		other.SecondValue = -1;
 	}
 
-	TestSystem system;
-
-	ddc::SystemsManager system_mgr;
-	system_mgr.Register(system);
-	system_mgr.Initialize(space);
-	system_mgr.Update(space, 0);
+	layer.Update();
+	system_mgr.Update(layer, 0);
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -271,172 +291,74 @@ TEST_CASE("Update With Discontinuity")
 
 		ddc::Entity e;
 		e.ID = i;
-		e.Version = 0;
+		e.Version = 1;
 
-		FirstComponent& simple = *space.Access<FirstComponent>(e);
+		FirstComponent& simple = *layer.Access<FirstComponent>(e);
 		REQUIRE(simple.FirstValue == e.ID);
 
-		SecondComponent& other = *space.Access<SecondComponent>(e);
+		SecondComponent& other = *layer.Access<SecondComponent>(e);
 		REQUIRE(other.SecondValue == e.ID);
 	}
 }
 
 TEST_CASE("Update Multiple Systems")
 {
+	ddc::EntityLayer::DestroyAllLayers();
+
 	TestSystem a;
 	DependentSystem b;
 
-	ddc::EntityLayer space("test");
+	ddc::EntityLayer layer("test");
 
 	ddc::SystemsManager system_mgr;
 	system_mgr.Register(a);
 	system_mgr.Register(b);
-	system_mgr.Initialize(space);
+	system_mgr.Initialize(layer);
 
 	for (int i = 0; i < 4; ++i)
 	{
-		ddc::Entity e = space.CreateEntity();
+		ddc::Entity e = layer.CreateEntity();
 
-		FirstComponent& first = space.Add<FirstComponent>(e);
+		FirstComponent& first = layer.Add<FirstComponent>(e);
 		first.FirstValue = i;
 
-		SecondComponent& second = space.Add<SecondComponent>(e);
+		SecondComponent& second = layer.Add<SecondComponent>(e);
 		second.SecondValue = -1;
 
-		ThirdComponent& third = space.Add<ThirdComponent>(e);
+		ThirdComponent& third = layer.Add<ThirdComponent>(e);
 		third.ThirdValue = -1;
 	}
 
-	system_mgr.Update(space, 0);
+	layer.Update();
+	system_mgr.Update(layer, 0);
 
 	for (int i = 0; i < 4; ++i)
 	{
 		ddc::Entity e;
 		e.ID = i;
-		e.Version = 0;
+		e.Version = 1;
 
-		SecondComponent& second = *space.Access<SecondComponent>(e);
+		SecondComponent& second = *layer.Access<SecondComponent>(e);
 		REQUIRE(second.SecondValue == e.ID);
 	}
 
-	system_mgr.Update(space, 0);
+	system_mgr.Update(layer, 0);
 
 	for (int i = 0; i < 4; ++i)
 	{
 		ddc::Entity e;
 		e.ID = i;
-		e.Version = 0;
+		e.Version = 1;
 
-		ThirdComponent& third = *space.Access<ThirdComponent>(e);
+		ThirdComponent& third = *layer.Access<ThirdComponent>(e);
 		REQUIRE(third.ThirdValue == e.ID);
-	}
-}
-
-TEST_CASE("Schedule Systems By Component")
-{
-	SECTION("Simple")
-	{
-		TestSystem test_system;
-		DependentSystem dependent_system;
-
-		ddc::System* systems[] = { &dependent_system, &test_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &test_system);
-		REQUIRE(ordered[1].m_system == &dependent_system);
-	}
-
-	SECTION("Independent")
-	{
-		TestSystem test_system;
-		ReaderSystem reader_system;
-
-		ddc::System* systems[] = { &test_system, &reader_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &test_system);
-		REQUIRE(ordered[1].m_system == &reader_system);
-	}
-
-	SECTION("Dependency Chain")
-	{
-		TestSystem test_system;
-		DependentSystem dependent_system;
-		ReaderSystem reader_system;
-
-		ddc::System* systems[] = { &dependent_system, &test_system, &reader_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &test_system);
-		REQUIRE(ordered[1].m_system == &dependent_system);
-		REQUIRE(ordered[2].m_system == &reader_system);
-	}
-
-	SECTION("Duplicate Requirements")
-	{
-		TestSystem test_system;
-		DependentSystem dependent_system;
-		DependentSystem duplicate_system;
-
-		ddc::System* systems[] = { &dependent_system, &test_system, &duplicate_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &test_system);
-	}
-
-	SECTION("Only Writer")
-	{
-		OnlyWriterSystem only_writer_system;
-		DependentSystem dependent_system;
-		ReaderSystem reader_system;
-
-		ddc::System* systems[] = { &only_writer_system, &dependent_system, &reader_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &only_writer_system);
-		REQUIRE(ordered[1].m_system == &dependent_system);
-		REQUIRE(ordered[2].m_system == &reader_system);
-	}
-
-	SECTION("Only Reader")
-	{
-		TestSystem test_system;
-		OnlyReaderSystem only_reader_system;
-
-		ddc::System* systems[] = { &test_system, &only_reader_system };
-
-		dd::Span<ddc::System*> span_systems(systems);
-
-		std::vector<ddc::SystemNode> ordered;
-		ddc::OrderSystemsByComponent(span_systems, ordered);
-
-		REQUIRE(ordered[0].m_system == &test_system);
-		REQUIRE(ordered[1].m_system == &only_reader_system);
 	}
 }
 
 TEST_CASE("Schedule Systems By Dependency")
 {
+	ddc::EntityLayer::DestroyAllLayers();
+
 	SECTION("Simple")
 	{
 		TestSystem a;
@@ -444,7 +366,7 @@ TEST_CASE("Schedule Systems By Dependency")
 		TestSystem b;
 		b.DependsOn(a);
 
-		ddc::System* systems[] = { &a, &b };
+		ddc::System* systems[] = { &b, &a };
 
 		dd::Span<ddc::System*> span_systems(systems);
 
@@ -465,7 +387,7 @@ TEST_CASE("Schedule Systems By Dependency")
 		TestSystem c;
 		c.DependsOn(b);
 
-		ddc::System* systems[] = { &a, &b, &c };
+		ddc::System* systems[] = { &c, &b, &a };
 
 		dd::Span<ddc::System*> span_systems(systems);
 
@@ -491,7 +413,7 @@ TEST_CASE("Schedule Systems By Dependency")
 		d.DependsOn(b);
 		d.DependsOn(c);
 
-		ddc::System* systems[] = { &a, &b, &c, &d };
+		ddc::System* systems[] = { &d, &c, &a, &b };
 
 		dd::Span<ddc::System*> span_systems(systems, 4);
 
@@ -507,6 +429,8 @@ TEST_CASE("Schedule Systems By Dependency")
 
 TEST_CASE("Update With Tree Scheduling")
 {
+	ddc::EntityLayer::DestroyAllLayers();
+
 	SECTION("Simple")
 	{
 		TestSystem a;
@@ -514,7 +438,7 @@ TEST_CASE("Update With Tree Scheduling")
 		TestSystem b;
 		b.DependsOn(a);
 
-		ddc::System* systems[] = { &a, &b };
+		ddc::System* systems[] = { &b, &a };
 
 		dd::Span<ddc::System*> span_systems(systems);
 
@@ -524,14 +448,14 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[0].m_system == &a);
 		REQUIRE(ordered[1].m_system == &b);
 
-		ddc::EntityLayer space("test");
+		ddc::EntityLayer layer("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
-		system_mgr.Initialize(space);
+		system_mgr.Initialize(layer);
 
-		system_mgr.Update(space, 0);
+		system_mgr.Update(layer, 0);
 	}
 
 	SECTION("Multiple Roots")
@@ -543,7 +467,7 @@ TEST_CASE("Update With Tree Scheduling")
 		c.DependsOn(a);
 		c.DependsOn(b);
 
-		ddc::System* systems[] = { &a, &b, &c };
+		ddc::System* systems[] = { &c, &a, &b };
 
 		dd::Span<ddc::System*> span_systems(systems);
 
@@ -554,14 +478,14 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[1].m_system == &b);
 		REQUIRE(ordered[2].m_system == &c);
 
-		ddc::EntityLayer space("test");
+		ddc::EntityLayer layer("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
-		system_mgr.Initialize(space);
+		system_mgr.Initialize(layer);
 
-		system_mgr.Update(space, 0);
+		system_mgr.Update(layer, 0);
 	}
 
 	SECTION("Diamond")
@@ -576,7 +500,7 @@ TEST_CASE("Update With Tree Scheduling")
 		TestSystem d;
 		d.DependsOn(c);
 
-		ddc::System* systems[] = { &a, &b, &c, &d };
+		ddc::System* systems[] = { &d, &c, &a, &b };
 
 		dd::Span<ddc::System*> span_systems(systems);
 
@@ -588,55 +512,56 @@ TEST_CASE("Update With Tree Scheduling")
 		REQUIRE(ordered[2].m_system == &c);
 		REQUIRE(ordered[3].m_system == &d);
 
-		ddc::EntityLayer space("test");
+		ddc::EntityLayer layer("test");
 
 		ddc::SystemsManager system_mgr;
 		system_mgr.Register(a);
 		system_mgr.Register(b);
 		system_mgr.Register(c);
-		system_mgr.Initialize(space);
+		system_mgr.Initialize(layer);
 
-		system_mgr.Update(space, 0);
+		system_mgr.Update(layer, 0);
 	}
 }
 
 TEST_CASE("Full Update Loop")
 {
+	ddc::EntityLayer::DestroyAllLayers();
+
 	TestSystem a;
 	DependentSystem b;
 	ReaderSystem c;
 
-	ddc::System* systems[] = { &a, &b, &c };
-
-	ddc::EntityLayer space("test");
+	ddc::EntityLayer layer("test");
 
 	ddc::SystemsManager system_mgr;
-	system_mgr.Register(a);
-	system_mgr.Register(b);
 	system_mgr.Register(c);
-	system_mgr.Initialize(space);
+	system_mgr.Register(b);
+	system_mgr.Register(a);
+	system_mgr.Initialize(layer);
 
-	BENCHMARK("Create space")
+	BENCHMARK("Create layer")
 	{
 		for (int i = 0; i < 1000; ++i)
 		{
-			ddc::Entity e = space.CreateEntity();
-			FirstComponent& first = space.Add<FirstComponent>(e);
+			ddc::Entity e = layer.CreateEntity();
+			FirstComponent& first = layer.Add<FirstComponent>(e);
 			first.FirstValue = i;
 
-			SecondComponent& second = space.Add<SecondComponent>(e);
+			SecondComponent& second = layer.Add<SecondComponent>(e);
 			second.SecondValue = 0;
 
-			ThirdComponent& third = space.Add<ThirdComponent>(e);
+			ThirdComponent& third = layer.Add<ThirdComponent>(e);
 			third.ThirdValue = 0;
 		}
 	}
 
 	BENCHMARK("Update")
 	{
-		for (int i = 0; i < 1000; ++i)
+		for (int i = 0; i < 100; ++i)
 		{
-			space.Update(0.0f);
+			layer.Update();
+			system_mgr.Update(layer, 0.0f);
 		}
 	}
 
@@ -644,12 +569,12 @@ TEST_CASE("Full Update Loop")
 	{
 		ddc::Entity e;
 		e.ID = i;
-		e.Version = 0;
+		e.Version = 1;
 
-		const SecondComponent* second = space.Get<SecondComponent>(e);
+		const SecondComponent* second = layer.Get<SecondComponent>(e);
 		REQUIRE(second->SecondValue == i);
 
-		const ThirdComponent* third = space.Get<ThirdComponent>(e);
+		const ThirdComponent* third = layer.Get<ThirdComponent>(e);
 		REQUIRE(third->ThirdValue == i);
 	}
 }

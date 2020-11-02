@@ -19,10 +19,10 @@ namespace neut
 
 	struct WaterSystem : ddc::System, dd::IDebugPanel
 	{
-		WaterSystem( const TerrainParameters& params );
+		WaterSystem(const TerrainParameters& params);
 
-		virtual void Update( const ddc::UpdateData& update_data ) override;
-		virtual void Initialize( ddc::EntityLayer& entities ) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
+		virtual void Initialize(ddc::EntityLayer& entities) override;
 
 	private:
 
@@ -43,6 +43,6 @@ namespace neut
 		virtual const char* GetDebugTitle() const override { return "Water"; }
 		virtual void DrawDebugInternal() override;
 
-		ddc::Entity CreateWaterEntity( ddc::EntityLayer& entities, glm::vec2 chunk_pos ) const;
+		ddc::ScratchEntity CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const;
 	};
 }

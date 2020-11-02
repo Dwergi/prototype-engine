@@ -475,6 +475,7 @@
     <ClCompile Include="src\flux\FluxGame.cpp" />
     <ClCompile Include="src\flux\FluxPlayerComponent.cpp" />
     <ClCompile Include="src\flux\FluxPlayerController.cpp" />
+    <ClCompile Include="src\flux\FluxEnemyComponent.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
     <ClCompile Include="src\ImGuiBinding.cpp" />
     <ClCompile Include="src\InputEvent.cpp" />
@@ -491,6 +492,7 @@
     <ClCompile Include="src\lux\LuxportMap.cpp" />
     <ClCompile Include="src\Memory.cpp" />
     <ClCompile Include="src\MeshRenderCommand.cpp" />
+    <ClCompile Include="src\MessageType.cpp" />
     <ClCompile Include="src\neutrino\BulletComponent.cpp" />
     <ClCompile Include="src\neutrino\BulletSystem.cpp" />
     <ClCompile Include="src\neutrino\NeutrinoGame.cpp" />

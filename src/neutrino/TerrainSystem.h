@@ -45,26 +45,21 @@ namespace neut
 		// Get the terrain parameters.
 		//
 		const TerrainParameters& GetTerrainParameters() const { return m_params; }
-		
+
 		//
 		// Initialize the terrain system.
 		//
-		virtual void Initialize( ddc::EntityLayer& entities ) override;
+		virtual void Initialize(ddc::EntityLayer& entities) override;
 
 		//
 		// Update the terrain system.
 		//
-		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void Update(ddc::UpdateData& data) override;
 
 		//
 		// Shut down the terrain system and destroy terrain chunk meshes.
 		//
-		virtual void Shutdown( ddc::EntityLayer& entities ) override;
-
-		//
-		// Save the heightmaps of the terrain chunks generated.
-		//
-		void SaveChunkImages( const ddc::EntityLayer& entities ) const;
+		virtual void Shutdown(ddc::EntityLayer& entities) override;
 
 		//
 		// The name to display in the debug view list.
@@ -72,7 +67,7 @@ namespace neut
 		const char* GetDebugTitle() const override { return "Terrain"; }
 
 	private:
-		
+
 		bool m_enabled { true };
 		bool m_requiresRegeneration { false };
 		bool m_saveChunkImages { false };
@@ -85,16 +80,21 @@ namespace neut
 
 		virtual void DrawDebugInternal() override;
 
-		ddc::Entity CreateChunk( ddc::EntityLayer& entities, glm::vec2 pos, int lod );
+		void CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod);
 
-		void UpdateChunk( ddc::EntityLayer& entities, ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
-			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp, 
-			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos );
+		void UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp,
+			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
+			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos);
 
-		void GenerateChunks( ddc::EntityLayer& entities, const ddc::UpdateBufferView& data, glm::vec2 camera_pos );
+		void GenerateChunks(ddc::UpdateData& update_data, const ddc::UpdateBufferView& data, glm::vec2 camera_pos);
 
-		void DestroyChunks( ddc::EntityLayer& entities );
+		//
+		// Save the heightmaps of the terrain chunks generated.
+		//
+		void SaveChunkImages(ddc::UpdateData& update_data) const;
 
-		int CalculateLOD( glm::vec2 chunk_middle, glm::vec2 camera_pos ) const;
+		void DestroyChunks(ddc::UpdateData& update_data);
+
+		int CalculateLOD(glm::vec2 chunk_middle, glm::vec2 camera_pos) const;
 	};
 }

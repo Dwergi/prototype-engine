@@ -16,7 +16,7 @@ namespace dd
 		EntityVisualizer();
 
 		// Inherited via System
-		virtual void Update(const ddc::UpdateData& update_data) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
 
 		virtual const char* GetDebugTitle() const override { return "Entity Data"; }
 

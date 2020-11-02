@@ -20,25 +20,26 @@ namespace ddc
 
 	struct Message
 	{
-		MessageType Type { MessageType::Unknown };
-
 		Message();
-		Message( const Message& other );
+		Message(MessageType type);
+		Message(const Message& other);
+
+		MessageType GetType() const { return m_type; }
 
 		template <typename T>
-		void SetPayload( const T& payload );
+		Message& SetPayload(const T& payload);
 
 		template <typename T>
 		const T& GetPayload() const;
 
-		DD_BASIC_TYPE( Message )
+		DD_BASIC_TYPE(Message)
 
 	private:
-		
+
 		static const size_t PAYLOAD_SIZE = 64;
 
+		MessageType m_type { MessageType::Unknown };
 		byte m_payload[PAYLOAD_SIZE];
-		const dd::TypeInfo* m_payloadType { nullptr };
 	};
 
 	struct MessageQueue
@@ -50,17 +51,17 @@ namespace ddc
 		// Subscribe to a given message with the given handler.
 		// If you ever want to unsubscribe, you must keep the returned token.
 		//
-		MessageSubscription Subscribe( MessageType type, std::function<void(Message)> handler );
+		MessageSubscription Subscribe(MessageType type, std::function<void(Message)> handler);
 
 		//
 		// Unsubscribe the given token. 
 		//
-		void Unsubscribe( MessageSubscription token );
-	
+		void Unsubscribe(MessageSubscription token);
+
 		//
-		// Send a message. The message must be derived from the Message struct.
+		// Send a message.
 		//
-		void Send( Message message );
+		void Send(Message message);
 
 		//
 		// Actually send messages in order of arrival.
@@ -70,7 +71,7 @@ namespace ddc
 		//
 		// Get the number of subscribers to the given message type.
 		//
-		int GetSubscriberCount( MessageType type ) const;
+		int GetSubscriberCount(MessageType type) const;
 
 		//
 		// Get the total number of subscribers.
@@ -92,7 +93,7 @@ namespace ddc
 
 		MessageHandlerID m_nextHandlerID;
 
-		void Dispatch( const Message& message ) const;
+		void Dispatch(const Message& message) const;
 	};
 
 	struct MessageSubscription
@@ -105,17 +106,21 @@ namespace ddc
 	};
 
 	template <typename T>
-	void Message::SetPayload( const T& payload )
+	Message& Message::SetPayload(const T& payload)
 	{
-		static_assert(sizeof( T ) <= PAYLOAD_SIZE);
-		m_payloadType = DD_FIND_TYPE( T );
-		memcpy( m_payload, &payload, sizeof( T ) );
+		static_assert(sizeof(T) <= PAYLOAD_SIZE);
+
+		DD_ASSERT(m_type.GetPayloadType() == DD_FIND_TYPE(T));
+
+		memcpy(m_payload, &payload, sizeof(T));
+
+		return *this;
 	}
 
 	template <typename T>
 	const T& Message::GetPayload() const
 	{
-		DD_ASSERT( m_payloadType == DD_FIND_TYPE( T ) );
+		DD_ASSERT(m_type.GetPayloadType() == DD_FIND_TYPE(T));
 
 		return *reinterpret_cast<const T*>(m_payload);
 	}

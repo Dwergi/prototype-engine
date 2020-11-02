@@ -17,10 +17,16 @@ namespace ddc
 		memset(m_payload, 0, PAYLOAD_SIZE);
 	}
 
+	Message::Message(MessageType type)
+	{
+		m_type = type;
+
+		memset(m_payload, 0, PAYLOAD_SIZE);
+	}
+
 	Message::Message(const Message& other)
 	{
-		Type = other.Type;
-		m_payloadType = other.m_payloadType;
+		m_type = other.m_type;
 
 		memcpy(m_payload, other.m_payload, PAYLOAD_SIZE);
 	}
@@ -91,7 +97,7 @@ namespace ddc
 
 	void MessageQueue::Dispatch(const Message& message) const
 	{
-		auto it = m_subscribers.find(message.Type);
+		auto it = m_subscribers.find(message.GetType());
 		if (it == m_subscribers.end())
 			return;
 

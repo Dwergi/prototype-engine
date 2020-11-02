@@ -60,7 +60,7 @@ namespace lux
 	static dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 
 	static ddr::OrthoCamera* s_camera;
 
@@ -173,7 +173,6 @@ namespace lux
 	{
 		d2d::PhysicsSystem& physics_system = dd::Services::Register(new d2d::PhysicsSystem());
 		system_manager.Register(physics_system);
-		s_debugUI->RegisterDebugPanel(physics_system);
 
 		d2d::SpriteAnimationSystem& sprite_anim_system = dd::Services::Register(new d2d::SpriteAnimationSystem());
 		system_manager.Register(sprite_anim_system);

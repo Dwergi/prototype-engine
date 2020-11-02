@@ -17,7 +17,7 @@
 
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IWindow> s_window;
-static dd::Service<dd::DebugUI> s_debugUI;
+static dd::Service<dd::IDebugUI> s_debugUI;
 
 namespace dd
 {
@@ -33,7 +33,7 @@ namespace dd
 		s_debugUI->SetDraw(false);
 	}
 
-	DebugUI::DebugUI()
+	ImGuiDebugUI::ImGuiDebugUI()
 	{
 		ImGuiBinding::Initialize();
 
@@ -45,12 +45,12 @@ namespace dd
 			.OnExit(&OnExitDebugMode);
 	}
 
-	DebugUI::~DebugUI()
+	ImGuiDebugUI::~ImGuiDebugUI()
 	{
 		ImGuiBinding::Shutdown();
 	}
 
-	void DebugUI::StartFrame(float delta_t)
+	void ImGuiDebugUI::StartFrame(float delta_t)
 	{
 		DD_PROFILE_SCOPED(DebugUI_Update);
 
@@ -59,14 +59,14 @@ namespace dd
 		ImGuiBinding::StartFrame(delta_t);
 	}
 
-	void DebugUI::EndFrame()
+	void ImGuiDebugUI::EndFrame()
 	{
 		ImGuiBinding::EndFrame();
 
 		m_midFrame = false;
 	}
 
-	void DebugUI::EndWindow()
+	void ImGuiDebugUI::EndWindow()
 	{
 		if (m_midWindow)
 		{
@@ -76,14 +76,14 @@ namespace dd
 		}
 	}
 
-	void DebugUI::RegisterDebugPanel(IDebugPanel& debug_panel)
+	void ImGuiDebugUI::RegisterDebugPanel(IDebugPanel& debug_panel)
 	{
 		m_debugPanels.push_back(&debug_panel);
 
 		m_needsSort = true;
 	}
 
-	void DebugUI::RenderDebugPanels()
+	void ImGuiDebugUI::RenderDebugPanels()
 	{
 		if (!m_draw)
 		{

@@ -11,12 +11,28 @@
 
 namespace dd
 {
+	Remotery* dd::Profiler::s_remotery = nullptr;
 	std::vector<dd::ProfilerValue*> dd::Profiler::s_instances;
 	bool dd::Profiler::s_draw = false;
 	bool dd::Profiler::s_inFrame = false;
 	int dd::Profiler::s_frameCount = 0;
 
 	static dd::Service<dd::IWindow> s_window;
+
+	void Profiler::Initialize()
+	{
+		DD_ASSERT(s_remotery == nullptr);
+
+		DD_PROFILE_INIT(s_remotery);
+		DD_PROFILE_THREAD_NAME("Main");
+	}
+
+	void Profiler::Shutdown()
+	{
+		DD_ASSERT(s_remotery != nullptr);
+
+		DD_PROFILE_DEINIT(s_remotery);
+	}
 
 	ProfilerValue& Profiler::GetValue(const char* name)
 	{

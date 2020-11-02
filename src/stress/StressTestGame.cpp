@@ -34,7 +34,7 @@
 namespace stress
 {
 	static dd::Service<dd::Input> s_input;
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::FreeCameraController> s_freeCam;
 
@@ -70,8 +70,6 @@ namespace stress
 		bindings.BindKey(dd::Key::SPACE, dd::InputAction::UP);
 		bindings.BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
 		bindings.BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
-
-		s_debugUI->RegisterDebugPanel(*this);
 	}
 
 	void StressTestGame::Shutdown()
@@ -252,15 +250,12 @@ namespace stress
 		render_manager.SetCamera(*s_camera.Get<dd::FPSCameraComponent>());
 
 		ddr::LightRenderer* light_renderer = new ddr::LightRenderer();
-		s_debugUI->RegisterDebugPanel(*light_renderer);
-
-		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer();
-		s_debugUI->RegisterDebugPanel(*mesh_renderer);
-
-		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
-
 		render_manager.Register(*light_renderer);
+		
+		ddr::MeshRenderer* mesh_renderer = new ddr::MeshRenderer();
 		render_manager.Register(*mesh_renderer);
+		
+		ddr::RayRenderer* ray_renderer = new ddr::RayRenderer();
 		render_manager.Register(*ray_renderer);
 	}
 
@@ -268,10 +263,8 @@ namespace stress
 	{
 		dd::FreeCameraController& free_cam = dd::Services::Register(new dd::FreeCameraController());
 		systems_manager.Register(free_cam);
-		s_debugUI->RegisterDebugPanel(free_cam);
 
 		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
 		systems_manager.Register(physics_system);
-		s_debugUI->RegisterDebugPanel(physics_system);
 	}
 }

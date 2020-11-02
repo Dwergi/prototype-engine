@@ -64,7 +64,7 @@ namespace ddc
 		}
 	}
 
-	void EntityPrototype::PopulateFromScratchEntity(const ddc::ScratchEntity& entity)
+	void EntityPrototype::PopulateFromScratch(const ddc::ScratchEntity& entity)
 	{
 		DD_ASSERT(Components.empty(), "Already initialized EntityPrototype!");
 
@@ -80,7 +80,7 @@ namespace ddc
 		}
 	}
 
-	ddc::Entity EntityPrototype::Instantiate(ddc::EntityLayer& layer)
+	ddc::Entity EntityPrototype::Instantiate(ddc::EntityLayer& layer) const
 	{
 		ddc::Entity entity = layer.CreateEntity();
 
@@ -93,6 +93,21 @@ namespace ddc
 		layer.SetAllTags(entity, Tags);
 
 		return entity;
+	}
+
+	ddc::ScratchEntity EntityPrototype::InstantiateScratch() const
+	{
+		ddc::ScratchEntity scratch;
+
+		for (const ComponentPrototype& cmp : Components)
+		{
+			void* data = scratch.AddComponent(cmp.ID);
+			cmp.CopyTo(data);
+		}
+
+		scratch.SetAllTags(Tags);
+
+		return scratch;
 	}
 
 	void EntityPrototype::AddTag(ddc::Tag tag)

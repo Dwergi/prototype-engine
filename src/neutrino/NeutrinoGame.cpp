@@ -53,7 +53,7 @@ namespace neut
 	static dd::Service<dd::ShakyCamera> s_shakyCamera;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::IInputSource> s_inputSource;
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::JobSystem> s_jobSystem;
 	static dd::Service<dd::FrameTimer> s_frameTimer;
 	static dd::Service<neut::TerrainSystem> s_terrain;

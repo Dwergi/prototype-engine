@@ -90,7 +90,8 @@ namespace dd
 	{
 		Clear();
 
-		delete[](byte*) m_data.Release();
+		delete[] (byte*) m_data.Release();
+		delete[] (byte*) m_overflow.Release();
 	}
 
 	template <typename TKey, typename TValue>

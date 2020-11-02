@@ -20,7 +20,7 @@ namespace neut
 
 		virtual void Initialize( ddc::EntityLayer& entities ) override;
 
-		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void Update( ddc::UpdateData& data ) override;
 
 		virtual const char* GetDebugTitle() const override { return "Swarm"; }
 

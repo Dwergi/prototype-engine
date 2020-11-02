@@ -6,17 +6,19 @@
 
 #pragma once
 
+#include "IDebugPanel.h"
 #include "IRenderer.h"
 #include "RenderState.h"
-#include "d2d/SpriteComponent.h"
 #include "VAO.h"
 #include "VBO.h"
+
+#include "d2d/SpriteComponent.h"
 
 namespace ddr
 {
 	const int MAX_SPRITES = 1024;
 
-	struct SpriteRenderer : ddr::IRenderer
+	struct SpriteRenderer : ddr::IRenderer, dd::IDebugPanel
 	{
 	public:
 
@@ -48,5 +50,8 @@ namespace ddr
 		using SpriteIterator = std::vector<d2d::SpriteComponent>::iterator;
 		void DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
 		void DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
+
+		virtual const char* GetDebugTitle() const override { return "Sprites"; }
+		virtual void DrawDebugInternal() override;
 	};
 }

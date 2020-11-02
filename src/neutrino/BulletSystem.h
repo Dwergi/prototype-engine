@@ -30,8 +30,8 @@ namespace neut
 	{
 		BulletSystem();
 
-		virtual void Initialize( ddc::EntityLayer& entities ) override;
-		virtual void Update( const ddc::UpdateData& data ) override;
+		virtual void Initialize(ddc::EntityLayer& layer) override;
+		virtual void Update(ddc::UpdateData& update) override;
 
 		virtual const char* GetDebugTitle() const override { return "Bullets"; }
 
@@ -46,9 +46,11 @@ namespace neut
 		float m_intensity { 0 };
 		float m_attenuation { 0 };
 
-		void FireBullet( ddc::EntityLayer& entities, const ddr::ICamera& camera );
-		void KillBullet( ddc::EntityLayer& entities, ddc::Entity entity, neut::BulletComponent& bullet );
-		bool HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateBufferView& meshes, float delta_t, glm::vec3& out_pos );
+		ddc::MessageType m_bulletHitMessage;
+
+		void FireBullet(ddc::UpdateData& update, const ddr::ICamera& camera);
+		void KillBullet(ddc::UpdateData& update, ddc::Entity entity, neut::BulletComponent& bullet);
+		bool HitTestDynamicMeshes(neut::BulletComponent& bullet, dd::TransformComponent& transform, const ddc::UpdateBufferView& meshes, float delta_t, glm::vec3& out_pos);
 
 		virtual void DrawDebugInternal() override;
 	};

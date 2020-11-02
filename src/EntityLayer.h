@@ -23,10 +23,12 @@ namespace ddc
 		EntityLayer(std::string_view name);
 		~EntityLayer();
 
+		static void DestroyAllLayers();
+
 		//
 		// Update the entity layer - entities are created and deleted at this point.
 		//
-		void Update(float delta_t);
+		void Update();
 
 		//
 		// Create an entity. 
@@ -56,6 +58,11 @@ namespace ddc
 		// This will remain true for the remainder of the current frame after Destroy() is called on this entity.
 		//
 		bool IsAlive(Entity entity) const;
+
+		// 
+		// Is this entity alive or has it been created this frame?
+		//
+		bool IsAliveOrCreated(Entity entity) const;
 
 		uint LiveCount() const { return (uint) (m_entities.size() - m_free.size()); }
 		uint Size() const { return (uint) m_entities.size(); }
@@ -255,6 +262,9 @@ namespace ddc
 		std::string m_name;
 		uint8 m_instanceIndex { 0 };
 
+		ddc::MessageType m_entityCreatedMessage;
+		ddc::MessageType m_entityDestroyedMessage;
+
 		void UpdateStorage();
 	};
 
@@ -289,7 +299,7 @@ namespace ddc
 			0, (SetBitmask<TComponents>(mask), 0)...
 		};
 
-		if (IsAlive(m_entities[entity.ID]))
+		if (IsAliveOrCreated(m_entities[entity.ID]))
 		{
 			mask &= m_entities[entity.ID].Ownership;
 
@@ -316,7 +326,7 @@ namespace ddc
 
 		for (const EntityEntry& entry : m_entities)
 		{
-			if (IsAlive(entry.Entity))
+			if (IsAliveOrCreated(entry.Entity))
 			{
 				ComponentBits entity_mask = mask;
 				entity_mask &= entry.Ownership;

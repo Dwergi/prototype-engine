@@ -11,7 +11,7 @@ namespace ddc
 		}
 	}
 
-	UpdateBuffer::UpdateBuffer(UpdateBuffer&& other) :
+	UpdateBuffer::UpdateBuffer(UpdateBuffer&& other) noexcept :
 		m_name(other.m_name),
 		m_entities(std::move(other.m_entities)),
 		m_buffers(std::move(other.m_buffers)),
@@ -39,7 +39,7 @@ namespace ddc
 		}
 	}
 
-	bool UpdateBuffer::CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality) const
+	bool UpdateBuffer::CheckDuplicates(const dd::TypeInfo* component, DataUsage usage, DataCardinality cardinality) const
 	{
 		for (const DataRequest* req : m_requests)
 		{
@@ -53,7 +53,7 @@ namespace ddc
 		return true;
 	}
 
-	void UpdateBuffer::Fill(ddc::EntityLayer& layer)
+	void UpdateBuffer::Fill(EntityLayer& layer)
 	{
 		m_entities.clear();
 		layer.FindAllWith(m_requiredComponents, m_tags, m_entities);
@@ -93,5 +93,11 @@ namespace ddc
 		m_count(other.m_count),
 		m_entities(other.m_entities)
 	{
+	}
+
+	const dd::Span<Entity>& UpdateBufferView::Entities() const
+	{
+		DD_TODO("This is too dangerous to expose, should probably be ScratchEntity.");
+		return m_entities;
 	}
 }

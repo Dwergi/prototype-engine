@@ -39,9 +39,10 @@ namespace ddc
 		void AddTag(ddc::Tag tag);
 
 		void PopulateFromEntity(ddc::Entity entity);
-		void PopulateFromScratchEntity(const ddc::ScratchEntity& entity);
+		void PopulateFromScratch(const ddc::ScratchEntity& scratch);
 
-		ddc::Entity Instantiate(ddc::EntityLayer& entities);
+		ddc::Entity Instantiate(ddc::EntityLayer& entities) const;
+		ddc::ScratchEntity InstantiateScratch() const;
 
 		static const char* TypeName() { return "Prototype"; }
 

@@ -12,6 +12,7 @@
 #include "DataRequest.h"
 #include "Input.h"
 #include "ParticleSystemComponent.h"
+#include "ScratchEntity.h"
 #include "TransformComponent.h"
 #include "UpdateData.h"
 
@@ -31,6 +32,8 @@ namespace dd
 	{
 		RequireWrite<dd::ParticleSystemComponent>();
 		RequireRead<dd::TransformComponent>();
+
+		m_spawnParticleMessage = ddc::MessageType::Register<dd::SpawnParticleMessage>("SpawnParticle");
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -40,28 +43,20 @@ namespace dd
 
 	void ParticleSystem::Initialize(ddc::EntityLayer& entities)
 	{
-		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
-		//entities.Messages().Subscribe( ddc::MessageType::BulletHit, [this]( ddc::Message msg ) { OnBulletHitMessage( msg ); } );
+		entities.Messages().Subscribe(m_spawnParticleMessage, [this](ddc::Message msg) { OnSpawnParticleMessage(msg); });
 
 		s_input->AddHandler(dd::InputAction::START_PARTICLE, [this]() { m_startEmitting = true; });
 	}
 
-	void ParticleSystem::OnBulletHitMessage(ddc::Message msg)
+	void ParticleSystem::OnSpawnParticleMessage(ddc::Message msg)
 	{
-		DD_TODO("Bullet hits shouldn't really be handled in ParticleSystem?");
-
-		/*dd::BulletHitMessage payload = msg.GetPayload<dd::BulletHitMessage>();
-		SpawnRequest req;
-		req.Position = payload.Position;
-		req.Normal = payload.SurfaceNormal;
-
-		m_pendingSpawns.push_back( req );*/
+		dd::SpawnParticleMessage payload = msg.GetPayload<dd::SpawnParticleMessage>();
+		m_pendingSpawns.push_back(payload);
 	}
 
-	void ParticleSystem::Update(const ddc::UpdateData& update)
+	void ParticleSystem::Update(ddc::UpdateData& update)
 	{
 		const auto& data = update.Data();
-		ddc::EntityLayer& entities = update.Layer();
 
 		auto particles = data.Write<dd::ParticleSystemComponent>();
 		auto transforms = data.Read<dd::TransformComponent>();
@@ -95,20 +90,20 @@ namespace dd
 			}
 		}
 
-		for (const SpawnRequest& req : m_pendingSpawns)
+		for (const SpawnParticleMessage& msg : m_pendingSpawns)
 		{
-			ddc::Entity entity = entities.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
-			entities.AddTag(entity, ddc::Tag::Visible);
+			ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
+			scratch.AddTag(ddc::Tag::Visible);
 
-			dd::TransformComponent* transform = entities.Access<dd::TransformComponent>(entity);
-			transform->Rotation = glm::rotation(req.Normal, glm::vec3(0, 0, 1));
-			transform->Position = req.Position;
+			dd::TransformComponent* transform = scratch.Access<dd::TransformComponent>();
+			transform->Rotation = glm::rotation(msg.Normal, glm::vec3(0, 0, 1));
+			transform->Position = msg.Position;
 			transform->Update();
 
-			dd::BoundBoxComponent* bounds = entities.Access<dd::BoundBoxComponent>(entity);
+			dd::BoundBoxComponent* bounds = scratch.Access<dd::BoundBoxComponent>();
 			bounds->BoundBox = ddm::AABB(glm::vec3(-0.5), glm::vec3(0.5));
 
-			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>(entity);
+			dd::ParticleSystemComponent* particle = scratch.Access<dd::ParticleSystemComponent>();
 			particle->Age = 0;
 			particle->MinLifetime = 0.1;
 			particle->MaxLifetime = 0.2;
@@ -120,6 +115,8 @@ namespace dd
 			particle->MinVelocity = glm::vec3(0, 0, 5);
 			particle->MaxVelocity = glm::vec3(5, 5, 7);
 			particle->Lifetime = 0.1;
+
+			update.CreateEntity(std::move(scratch));
 		}
 
 		m_pendingSpawns.clear();

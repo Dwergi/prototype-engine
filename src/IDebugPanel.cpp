@@ -11,7 +11,7 @@
 
 namespace dd
 {
-	static dd::Service<dd::DebugUI> s_debugUI;
+	static dd::Service<dd::IDebugUI> s_debugUI;
 
 	IDebugPanel::IDebugPanel()
 	{

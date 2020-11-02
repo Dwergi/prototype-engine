@@ -17,7 +17,7 @@ namespace flux
 		FluxEnemySystem(glm::ivec2 map_size);
 
 		virtual void Initialize(ddc::EntityLayer& layer) override;
-		virtual void Update(const ddc::UpdateData& update_data) override;
+		virtual void Update(ddc::UpdateData& update_data) override;
 
 	private:
 

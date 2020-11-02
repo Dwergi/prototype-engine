@@ -109,7 +109,7 @@ namespace neut
 		}
 	}
 
-	void SwarmSystem::Update( const ddc::UpdateData& update )
+	void SwarmSystem::Update( ddc::UpdateData& update )
 	{
 		const float dt = update.Delta();
 		const float max_turn = TurnSpeed * dt;

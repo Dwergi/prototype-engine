@@ -14,7 +14,7 @@ namespace ddc
 	{
 		ComponentBuffer();
 		explicit ComponentBuffer(DataRequest* request);
-		ComponentBuffer(ComponentBuffer&& other);
+		ComponentBuffer(ComponentBuffer&& other) noexcept;
 
 		const dd::TypeInfo* Component() const { return m_request->Component(); }
 		DataUsage Usage() const { return m_request->Usage(); }

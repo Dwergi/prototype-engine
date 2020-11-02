@@ -30,7 +30,7 @@ namespace flux
 		FluxPlayerController& operator=(const FluxPlayerController&) = delete; 
 
 		virtual void Initialize(ddc::EntityLayer& layer) override;
-		virtual void Update(const ddc::UpdateData& data) override;
+		virtual void Update(ddc::UpdateData& data) override;
 
 	private:
 

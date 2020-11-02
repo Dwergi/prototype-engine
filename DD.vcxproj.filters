@@ -1509,6 +1509,12 @@
     <ClCompile Include="src\flux\FluxEnemySystem.cpp">
       <Filter>Games\Flux</Filter>
     </ClCompile>
+    <ClCompile Include="src\flux\FluxEnemyComponent.cpp">
+      <Filter>Games\Flux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageType.cpp">
+      <Filter>Messaging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">

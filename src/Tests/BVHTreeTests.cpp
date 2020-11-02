@@ -118,22 +118,23 @@ TEST_CASE( "[BVHTree] Huge Tree" )
 
 	tree.Build();
 
-	DD_DIAGNOSTIC("Entries: %zu, Buckets: %zu\n", tree.GetEntryCount(), tree.GetBucketCount());
-
-	int x, y, z;
-	tree.CountBucketSplits( x, y, z );
-
-	int most = ddm::max( x, ddm::max( y, z ) );
-	int least = ddm::min( x, ddm::min( y, z ) );
-
-	REQUIRE( (size_t) (most - least) < (tree.GetBucketCount() / 10) );
-
 	for( int i = 0; i < 256; ++i )
 	{
 		ddm::Ray ray( glm::vec3( rng.Next(), rng.Next(), rng.Next() ), glm::vec3( rng.Next(), rng.Next(), rng.Next() ) );
 
 		tree.IntersectsRay( ray );
 	}
+
+	DD_DIAGNOSTIC("Entries: %zu, Buckets: %zu\n", tree.GetEntryCount(), tree.GetBucketCount());
+
+	int x, y, z;
+	tree.CountBucketSplits(x, y, z);
+
+	int most = ddm::max(x, ddm::max(y, z));
+	int least = ddm::min(x, ddm::min(y, z));
+
+	REQUIRE((size_t) (most - least) < (tree.GetBucketCount() / 10));
+
 }
 
 TEST_CASE( "[BVHTree] Within Bounds" )

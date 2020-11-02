@@ -7,25 +7,30 @@
 #include "PCH.h"
 #include "EntityLayer.h"
 
+DD_CLASS_CPP(ddc::Entity);
+
 namespace ddc
 {
 	static_assert(sizeof(ddc::Entity) == sizeof(uint64), "Entity should only be 64 bits.");
 
-	static const uint8 MAX_SPACES = 8;
+	static const uint8 MAX_LAYERS = 8;
 
-	static EntityLayer* s_layerInstances[MAX_SPACES];
+	static EntityLayer* s_layerInstances[MAX_LAYERS];
 	static uint8 s_maxLayer = 0;
 
 	EntityLayer::EntityLayer(std::string_view name) :
 		m_name(name)
 	{
-		DD_ASSERT(s_maxLayer < MAX_SPACES);
+		DD_ASSERT(s_maxLayer < MAX_LAYERS);
 		s_layerInstances[s_maxLayer] = this;
 		m_instanceIndex = s_maxLayer;
 		++s_maxLayer;
 
 		m_maxEntities = 1024;
 		UpdateStorage();
+
+		m_entityCreatedMessage = ddc::MessageType::Register<ddc::Entity>("EntityCreated");
+		m_entityDestroyedMessage = ddc::MessageType::Register<ddc::Entity>("EntityDestroyed");
 	}
 
 	EntityLayer::~EntityLayer()
@@ -34,6 +39,19 @@ namespace ddc
 		{
 			free(buffer);
 		}
+
+		s_layerInstances[m_instanceIndex] = nullptr;
+	}
+
+	void EntityLayer::DestroyAllLayers()
+	{
+		for (uint8 layer = 0; layer < s_maxLayer; ++layer)
+		{
+			delete s_layerInstances[layer];
+			s_layerInstances[layer] = nullptr;
+		}
+
+		s_maxLayer = 0;
 	}
 
 	void EntityLayer::UpdateStorage()
@@ -73,7 +91,7 @@ namespace ddc
 		}
 	}
 
-	void EntityLayer::Update(float delta_t)
+	void EntityLayer::Update()
 	{
 		UpdateStorage();
 
@@ -82,6 +100,12 @@ namespace ddc
 			EntityEntry& entry = m_entities[id];
 			if (entry.Destroy)
 			{
+				DD_ASSERT(entry.Create || entry.Alive);
+
+				m_messages.Send(
+					ddc::Message(m_entityDestroyedMessage)
+					.SetPayload(entry.Entity));
+
 				entry.Alive = false;
 				entry.Destroy = false;
 				entry.Create = false;
@@ -94,13 +118,17 @@ namespace ddc
 
 			if (entry.Create)
 			{
+				DD_ASSERT(!entry.Alive);
+
+				m_messages.Send(
+					ddc::Message(m_entityDestroyedMessage)
+					.SetPayload(entry.Entity));
+
 				entry.Create = false;
 				entry.Alive = true;
 			}
 		}
 	}
-
-	DD_OPTIMIZE_OFF()
 
 	Entity EntityLayer::CreateEntity()
 	{
@@ -112,6 +140,7 @@ namespace ddc
 			new_entry.Entity.ID = m_entities.size();
 			new_entry.Entity.Version = 0;
 			new_entry.Entity.m_layer = m_instanceIndex;
+			new_entry.Flags = 0;
 
 			m_entities.push_back(new_entry);
 			UpdateStorage();
@@ -128,9 +157,12 @@ namespace ddc
 
 	void EntityLayer::DestroyEntity(Entity entity)
 	{
-		DD_ASSERT(IsAlive(entity), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version);
-
-		m_entities[entity.ID].Destroy = true;
+		DD_ASSERT(IsAliveOrCreated(entity), "Entity being destroyed is not alive, ID: %d, Version: %d", entity.ID, entity.Version);
+		
+		if (m_entities[entity.ID].Entity.Version == entity.Version)
+		{
+			m_entities[entity.ID].Destroy = true;
+		}
 	}
 
 	Entity EntityLayer::GetEntity(uint id) const
@@ -145,16 +177,35 @@ namespace ddc
 
 	bool EntityLayer::IsAlive(Entity entity) const
 	{
+		if (!entity.IsValid())
+		{
+			return false;
+		}
+
 		DD_ASSERT(entity.ID >= 0 && entity.ID < m_entities.size());
 
 		const EntityEntry& entry = m_entities[entity.ID];
 
-		return entry.Entity.Version == entity.Version && (entry.Alive || entry.Create);
+		return entry.Entity.Version == entity.Version && entry.Alive;
+	}
+
+	bool EntityLayer::IsAliveOrCreated(Entity entity) const
+	{
+		if (!entity.IsValid())
+		{
+			return false;
+		}
+
+		DD_ASSERT(entity.ID >= 0 && entity.ID < m_entities.size());
+
+		const EntityEntry& entry = m_entities[entity.ID];
+
+		return entry.Entity.Version == entity.Version && (entry.Create || entry.Alive);
 	}
 
 	int EntityLayer::ComponentCount(Entity entity) const
 	{
-		DD_ASSERT(IsAlive(entity));
+		DD_ASSERT(IsAliveOrCreated(entity));
 
 		const EntityEntry& entry = m_entities[entity.ID];
 		return (int) entry.Ownership.count();
@@ -162,7 +213,7 @@ namespace ddc
 
 	dd::ComponentID EntityLayer::GetNthComponentID(Entity entity, int index) const
 	{
-		DD_ASSERT(IsAlive(entity));
+		DD_ASSERT(IsAliveOrCreated(entity));
 
 		const EntityEntry& entry = m_entities[entity.ID];
 
@@ -180,9 +231,9 @@ namespace ddc
 
 	bool EntityLayer::HasComponent(Entity entity, dd::ComponentID id) const
 	{
-		DD_ASSERT(entity.IsValid());
+		DD_ASSERT(id != dd::INVALID_COMPONENT);
 
-		if (!IsAlive(entity))
+		if (!IsAliveOrCreated(entity))
 		{
 			return false;
 		}
@@ -243,7 +294,7 @@ namespace ddc
 
 	void EntityLayer::GetAllComponents(Entity entity, dd::IArray<dd::ComponentID>& components) const
 	{
-		DD_ASSERT(IsAlive(entity));
+		DD_ASSERT(IsAliveOrCreated(entity));
 
 		for (dd::ComponentID i = 0; i < MAX_COMPONENTS; ++i)
 		{
@@ -253,8 +304,6 @@ namespace ddc
 			}
 		}
 	}
-
-#pragma optimize("", off)
 
 	void EntityLayer::FindAllWith(const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const
 	{
@@ -280,11 +329,9 @@ namespace ddc
 		}
 	}
 
-#pragma optimize("", on)
-
 	bool EntityLayer::HasTag(Entity e, Tag tag) const
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
 		return m_entities[e.ID].Tags.test((uint) tag);
@@ -292,7 +339,7 @@ namespace ddc
 
 	void EntityLayer::AddTag(Entity e, Tag tag)
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
 		m_entities[e.ID].Tags.set((uint) tag);
@@ -300,7 +347,7 @@ namespace ddc
 
 	void EntityLayer::RemoveTag(Entity e, Tag tag)
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
 		m_entities[e.ID].Tags.reset((uint) tag);
@@ -308,14 +355,14 @@ namespace ddc
 
 	void EntityLayer::SetAllTags(Entity e, TagBits tags)
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT(IsAliveOrCreated(e));
 
 		m_entities[e.ID].Tags = tags;
 	}
 
 	TagBits EntityLayer::GetAllTags(Entity e) const
 	{
-		DD_ASSERT(IsAlive(e));
+		DD_ASSERT(IsAliveOrCreated(e));
 
 		return m_entities[e.ID].Tags;
 	}
@@ -334,7 +381,12 @@ namespace ddc
 
 	bool Entity::IsAlive() const
 	{
-		return IsValid() && Layer()->IsAlive(*this);
+		return Layer()->IsAlive(*this);
+	}
+
+	bool Entity::IsAliveOrCreated() const
+	{
+		return Layer()->IsAliveOrCreated(*this);
 	}
 
 	void Entity::AddTag(ddc::Tag tag) const
