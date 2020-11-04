@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "OpenGL.h"
-#include "RenderState.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
+#include "ddr/OpenGL.h"
+#include "ddr/RenderState.h"
+#include "ddr/Shader.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 namespace ddr
 {

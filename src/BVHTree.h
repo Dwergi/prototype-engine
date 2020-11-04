@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "AABB.h"
-#include "Ray.h"
+#include "ddm/AABB.h"
+#include "ddm/Ray.h"
 
 namespace dd
 {

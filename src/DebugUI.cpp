@@ -8,12 +8,13 @@
 #include "DebugUI.h"
 
 #include "File.h"
-#include "GLError.h"
 #include "IDebugPanel.h"
 #include "InputMode.h"
 #include "Input.h"
 #include "ImGuiBinding.h"
 #include "IWindow.h"
+
+#include "ddr/GLError.h"
 
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IWindow> s_window;

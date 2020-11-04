@@ -6,15 +6,18 @@
 
 #pragma once
 
-#include "FrameBuffer.h"
 #include "IAsyncHitTest.h"
 #include "IDebugPanel.h"
 #include "InputAction.h"
-#include "Material.h"
-#include "Ray.h"
 #include "IRenderer.h"
-#include "System.h"
-#include "Texture.h"
+
+#include "ddc/System.h"
+
+#include "ddm/Ray.h"
+
+#include "ddr/FrameBuffer.h"
+#include "ddr/Material.h"
+#include "ddr/Texture.h"
 
 struct GLFWwindow;
 

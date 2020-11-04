@@ -3,18 +3,14 @@
 
 #include "AssetManager.h"
 #include "DebugUI.h"
-#include "EntityPrototype.h"
 #include "File.h"
-#include "HitTest.h"
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "IWindow.h"
 #include "OrthoCamera.h"
-#include "RenderManager.h"
 #include "SpriteRenderer.h"
 #include "SpriteSheet.h"
 #include "SystemsManager.h"
-#include "Texture.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
@@ -22,6 +18,13 @@
 #include "d2d/SpriteTileSystem.h"
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
+
+#include "ddc/EntityPrototype.h"
+
+#include "ddm/HitTest.h"
+
+#include "ddr/RenderManager.h"
+#include "ddr/Texture.h"
 
 #include "flux/FluxBulletSystem.h"
 #include "flux/FluxEnemySystem.h"

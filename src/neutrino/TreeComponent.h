@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "Mesh.h"
 #include "Random.h"
+
+#include "ddr/Mesh.h"
 
 namespace neut
 {

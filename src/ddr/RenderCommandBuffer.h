@@ -1,5 +1,5 @@
 //
-// CommandBuffer.h - A buffer of pending commands. 
+// RenderCommandBuffer.h - A buffer of pending render commands. 
 // Copyright (C) Sebastian Nordgren 
 // December 17th 2018
 //
@@ -13,12 +13,12 @@ namespace ddr
 	struct UniformStorage;
 
 	template <typename T>
-	struct CommandBuffer
+	struct RenderCommandBuffer
 	{
 		static_assert(std::is_base_of_v<RenderCommand, T>);
 
-		CommandBuffer() {}
-		CommandBuffer( const CommandBuffer& other ) = delete;
+		RenderCommandBuffer() {}
+		RenderCommandBuffer( const RenderCommandBuffer& other ) = delete;
 
 		void Clear();
 
@@ -40,14 +40,14 @@ namespace ddr
 	};
 
 	template <typename T>
-	void CommandBuffer<T>::Clear()
+	void RenderCommandBuffer<T>::Clear()
 	{
 		m_storage.clear();
 		m_offsets.clear();
 	}
 
 	template <typename T>
-	void CommandBuffer<T>::Sort()
+	void RenderCommandBuffer<T>::Sort()
 	{
 		std::sort(m_offsets.begin(), m_offsets.end(),
 			[this](size_t a, size_t b)
@@ -60,7 +60,7 @@ namespace ddr
 	}
 
 	template <typename T>
-	T& CommandBuffer<T>::Allocate()
+	T& RenderCommandBuffer<T>::Allocate()
 	{
 		size_t offset = m_storage.size();
 		m_storage.resize( offset + sizeof( T ) );
@@ -72,7 +72,7 @@ namespace ddr
 	}
 
 	template <typename T>
-	const T& CommandBuffer<T>::Get(int index) const
+	const T& RenderCommandBuffer<T>::Get(int index) const
 	{
 		DD_ASSERT(index >= 0 && index < m_offsets.size());
 		const void* ptr = &m_storage[m_offsets[index]];
@@ -80,7 +80,7 @@ namespace ddr
 	}
 
 	template <typename T>
-	T& CommandBuffer<T>::Access(int index)
+	T& RenderCommandBuffer<T>::Access(int index)
 	{
 		DD_ASSERT(index >= 0 && index < m_offsets.size());
 		void* ptr = &m_storage[m_offsets[index]];

@@ -12,11 +12,12 @@
 #include "BoundsHelpers.h"
 #include "Input.h"
 #include "MeshUtils.h"
-#include "OpenGL.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
 #include "TransformComponent.h"
+
+#include "ddr/OpenGL.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Shader.h"
 
 namespace ddr
 {

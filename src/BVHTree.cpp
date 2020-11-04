@@ -7,8 +7,9 @@
 #include "PCH.h"
 #include "BVHTree.h"
 
-#include "AABB.h"
 #include "JobSystem.h"
+
+#include "ddm/AABB.h"
 
 static dd::Service<dd::JobSystem> s_jobsystem;
 

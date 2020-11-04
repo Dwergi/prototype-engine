@@ -252,12 +252,6 @@
     <ClInclude Include="src\Profiler.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\AABB.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Plane.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\AABBOctree.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -288,15 +282,6 @@
     <ClInclude Include="src\Frustum.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\VAO.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GLError.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VBO.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="include\stb\stb_image_write.h">
       <Filter>Includes\stb</Filter>
     </ClInclude>
@@ -312,9 +297,6 @@
     <ClInclude Include="src\MousePicking.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\Ray.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\FrameTimer.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -325,12 +307,6 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\ICamera.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FrameBuffer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\FSM.h">
@@ -348,9 +324,6 @@
     <ClInclude Include="src\BVHTree.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Uniforms.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\IDebugPanel.h">
       <Filter>DebugUI</Filter>
     </ClInclude>
@@ -360,23 +333,8 @@
     <ClInclude Include="src\ParticleSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="src\Units.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderData.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentBuffer.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\SystemsSorting.h">
       <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UpdateData.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HitTest.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="src\BoundsRenderer.h">
       <Filter>Renderers</Filter>
@@ -395,9 +353,6 @@
     </ClInclude>
     <ClInclude Include="src\RayComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DataRequest.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\HitTestSystem.h">
       <Filter>Systems</Filter>
@@ -420,17 +375,11 @@
     <ClInclude Include="src\BoundsHelpers.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sphere.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\PhysicsSphereComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="src\PhysicsPlaneComponent.h">
       <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\System.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\ColourComponent.h">
       <Filter>Components</Filter>
@@ -443,9 +392,6 @@
     </ClInclude>
     <ClInclude Include="src\MessageType.h">
       <Filter>Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EntityPrototype.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\EntityVisualizer.h">
       <Filter>DebugUI</Filter>
@@ -465,12 +411,6 @@
     <ClInclude Include="src\HandleManager.h">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderState.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShaderPart.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\LinesComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -485,18 +425,6 @@
     </ClInclude>
     <ClInclude Include="src\Triangulator.h">
       <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MeshRenderCommand.h">
-      <Filter>Rendering\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderCommand.h">
-      <Filter>Rendering\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandBuffer.h">
-      <Filter>Rendering\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShadowMap.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\Services.h">
       <Filter>Core</Filter>
@@ -555,9 +483,6 @@
     <ClInclude Include="src\PlaneRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math_dd.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="src\SpriteRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
@@ -566,18 +491,6 @@
     </ClInclude>
     <ClInclude Include="src\Sprite.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Material.h">
-      <Filter>Assets</Filter>
     </ClInclude>
     <ClInclude Include="src\OrthoCamera.h">
       <Filter>Rendering</Filter>
@@ -605,12 +518,6 @@
     </ClInclude>
     <ClInclude Include="src\Flags.h">
       <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScratchEntity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entity.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\FPSCameraComponent.h">
       <Filter>Components</Filter>
@@ -720,9 +627,6 @@
     <ClInclude Include="src\d2d\SpriteTileSystem.h">
       <Filter>Systems\d2d</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderManager.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="src\SystemsManager.h">
       <Filter>Systems</Filter>
     </ClInclude>
@@ -807,17 +711,8 @@
     <ClInclude Include="src\JobSystem.h">
       <Filter>Jobs</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntityLayer.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="src\ProfilerValue.h">
       <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ComponentViews.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UpdateBuffer.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\fmt\include\fmt\chrono.h">
       <Filter>Includes\fmt</Filter>
@@ -881,6 +776,111 @@
     </ClInclude>
     <ClInclude Include="src\flux\FluxEnemySystem.h">
       <Filter>Games\Flux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\HitTest.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Math_dd.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Ray.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Sphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\AABB.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\Shader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\ShaderPart.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\VAO.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\VBO.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\GLError.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\OpenGL.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\Texture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\Material.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\RenderData.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\RenderManager.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\RenderState.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\Uniforms.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddm\Units.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\ComponentBuffer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\ComponentViews.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\DataRequest.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\UpdateBuffer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\UpdateData.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\EntityLayer.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\EntityPrototype.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\MeshRenderCommand.h">
+      <Filter>Rendering\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\RenderCommandBuffer.h">
+      <Filter>Rendering\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\RenderCommand.h">
+      <Filter>Rendering\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\ShadowMap.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddr\FrameBuffer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\ScratchEntity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\System.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -981,12 +981,6 @@
     <ClCompile Include="include\gl3w\src\gl3w.c">
       <Filter>Includes\gl3w</Filter>
     </ClCompile>
-    <ClCompile Include="src\AABB.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Plane.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\AABBOctreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -997,9 +991,6 @@
       <Filter>Containers</Filter>
     </ClCompile>
     <ClCompile Include="src\Tests\MessageQueueTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RingBufferTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\MessageQueue.cpp">
@@ -1023,18 +1014,6 @@
     <ClCompile Include="src\Frustum.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\FrustumTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VAO.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GLError.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VBO.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="include\stb\stb_image_write.cpp">
       <Filter>Includes\stb</Filter>
     </ClCompile>
@@ -1049,9 +1028,6 @@
     </ClCompile>
     <ClCompile Include="src\TransformComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Ray.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\MousePicking.cpp">
       <Filter>Input</Filter>
@@ -1074,12 +1050,6 @@
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpenGL.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FrameBuffer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\FSM.cpp">
       <Filter>FSM</Filter>
     </ClCompile>
@@ -1095,9 +1065,6 @@
     <ClCompile Include="src\Tests\BVHTreeTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Uniforms.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\IDebugPanel.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
@@ -1107,26 +1074,11 @@
     <ClCompile Include="src\ParticleSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="src\Units.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderData.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ComponentBuffer.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\PlayerComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\SystemsSorting.cpp">
       <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UpdateData.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HitTest.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\BoundsRenderer.cpp">
       <Filter>Renderers</Filter>
@@ -1145,12 +1097,6 @@
     </ClCompile>
     <ClCompile Include="src\RayComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Math_dd.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DataRequest.cpp">
-      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\HitTestSystem.cpp">
       <Filter>Systems</Filter>
@@ -1179,12 +1125,6 @@
     <ClCompile Include="src\BoundsHelpers.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sphere.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\System.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\ColourComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -1200,9 +1140,6 @@
     <ClCompile Include="src\OctreeComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityPrototype.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntityVisualizer.cpp">
       <Filter>DebugUI</Filter>
     </ClCompile>
@@ -1215,17 +1152,11 @@
     <ClCompile Include="src\JSON.cpp">
       <Filter>JSON</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderState.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\LinesComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\LinesRenderer.cpp">
       <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShaderPart.cpp">
-      <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\Noise.cpp">
       <Filter>Math</Filter>
@@ -1235,15 +1166,6 @@
     </ClCompile>
     <ClCompile Include="src\Triangulator.cpp">
       <Filter>Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandBuffer.cpp">
-      <Filter>Rendering\Commands</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshRenderCommand.cpp">
-      <Filter>Rendering\Commands</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderCommand.cpp">
-      <Filter>Rendering\Commands</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderCommandTests.cpp">
       <Filter>Tests</Filter>
@@ -1308,18 +1230,6 @@
     <ClCompile Include="src\ParticleSystemRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Material.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="src\InputMode.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -1337,9 +1247,6 @@
     </ClCompile>
     <ClCompile Include="src\InputEvent.cpp">
       <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScratchEntity.cpp">
-      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\OrthoCamera.cpp">
       <Filter>Rendering</Filter>
@@ -1449,9 +1356,6 @@
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
       <Filter>Systems\d2d</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderManager.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="src\SystemsManager.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
@@ -1464,17 +1368,11 @@
     <ClCompile Include="src\JobSystem.cpp">
       <Filter>Jobs</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityLayer.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\Memory.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\ProfilerValue.cpp">
       <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UpdateBuffer.cpp">
-      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="include\fmt\src\format.cc">
       <Filter>Includes\fmt</Filter>
@@ -1514,6 +1412,108 @@
     </ClCompile>
     <ClCompile Include="src\MessageType.cpp">
       <Filter>Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\HitTest.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Math_dd.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Plane.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Sphere.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\AABB.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\Shader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\ShaderPart.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\VAO.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\VBO.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\GLError.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\OpenGL.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\Texture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\Material.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\Mesh.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\RenderData.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\RenderManager.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\RenderState.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\Uniforms.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddm\Units.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\FrustumTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tests\RingBufferTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\ComponentBuffer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\DataRequest.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\UpdateBuffer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\UpdateData.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\EntityLayer.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\EntityPrototype.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\MeshRenderCommand.cpp">
+      <Filter>Rendering\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\RenderCommandBuffer.cpp">
+      <Filter>Rendering\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\RenderCommand.cpp">
+      <Filter>Rendering\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddr\FrameBuffer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\ScratchEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\System.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

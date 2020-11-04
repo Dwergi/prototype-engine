@@ -7,8 +7,8 @@
 #include "PCH.h"
 #include "AABB.h"
 
-#include "Sphere.h"
-#include "Ray.h"
+#include "ddm/Sphere.h"
+#include "ddm/Ray.h"
 
 DD_CLASS_CPP(ddm::AABB);
 

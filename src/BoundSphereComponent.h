@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Sphere.h"
+#include "ddm/Sphere.h"
 
 namespace dd
 {

@@ -202,13 +202,10 @@
     <ClInclude Include="include\stb\stb_image.h" />
     <ClInclude Include="include\stb\stb_image_write.h" />
     <ClInclude Include="include\tinygltf\tinygltf.h" />
-    <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\BoundBoxComponent.h" />
     <ClInclude Include="src\BoundsHelpers.h" />
     <ClInclude Include="src\ColourComponent.h" />
-    <ClInclude Include="src\CommandBuffer.h" />
-    <ClInclude Include="src\ComponentViews.h" />
     <ClInclude Include="src\d2d\Bounds2DRenderer.h" />
     <ClInclude Include="src\d2d\CirclePhysicsComponent.h" />
     <ClInclude Include="src\d2d\Physics2DBase.h" />
@@ -219,9 +216,43 @@
     <ClInclude Include="src\d2d\SpriteComponent.h" />
     <ClInclude Include="src\d2d\SpriteTileSystem.h" />
     <ClInclude Include="src\d2d\Transform2DComponent.h" />
+    <ClInclude Include="src\ddc\ComponentBuffer.h" />
+    <ClInclude Include="src\ddc\ComponentViews.h" />
+    <ClInclude Include="src\ddc\DataRequest.h" />
+    <ClInclude Include="src\ddc\Entity.h" />
+    <ClInclude Include="src\ddc\EntityLayer.h" />
+    <ClInclude Include="src\ddc\EntityPrototype.h" />
+    <ClInclude Include="src\ddc\ScratchEntity.h" />
+    <ClInclude Include="src\ddc\System.h" />
+    <ClInclude Include="src\ddc\UpdateBuffer.h" />
+    <ClInclude Include="src\ddc\UpdateData.h" />
+    <ClInclude Include="src\ddm\AABB.h" />
     <ClInclude Include="src\ddm\AABB2D.h" />
     <ClInclude Include="src\ddm\Circle.h" />
-    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\ddm\HitTest.h" />
+    <ClInclude Include="src\ddm\Math_dd.h" />
+    <ClInclude Include="src\ddm\Plane.h" />
+    <ClInclude Include="src\ddm\Ray.h" />
+    <ClInclude Include="src\ddm\Sphere.h" />
+    <ClInclude Include="src\ddm\Units.h" />
+    <ClInclude Include="src\ddr\FrameBuffer.h" />
+    <ClInclude Include="src\ddr\GLError.h" />
+    <ClInclude Include="src\ddr\Material.h" />
+    <ClInclude Include="src\ddr\Mesh.h" />
+    <ClInclude Include="src\ddr\MeshRenderCommand.h" />
+    <ClInclude Include="src\ddr\OpenGL.h" />
+    <ClInclude Include="src\ddr\RenderCommand.h" />
+    <ClInclude Include="src\ddr\RenderCommandBuffer.h" />
+    <ClInclude Include="src\ddr\RenderData.h" />
+    <ClInclude Include="src\ddr\RenderManager.h" />
+    <ClInclude Include="src\ddr\RenderState.h" />
+    <ClInclude Include="src\ddr\Shader.h" />
+    <ClInclude Include="src\ddr\ShaderPart.h" />
+    <ClInclude Include="src\ddr\ShadowMap.h" />
+    <ClInclude Include="src\ddr\Texture.h" />
+    <ClInclude Include="src\ddr\Uniforms.h" />
+    <ClInclude Include="src\ddr\VAO.h" />
+    <ClInclude Include="src\ddr\VBO.h" />
     <ClInclude Include="src\flux\FluxBulletComponent.h" />
     <ClInclude Include="src\flux\FluxBulletSystem.h" />
     <ClInclude Include="src\flux\FluxEnemyComponent.h" />
@@ -255,10 +286,7 @@
     <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\Physics2DGame.h" />
     <ClInclude Include="src\ProfilerValue.h" />
-    <ClInclude Include="src\ScratchEntity.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
-    <ClInclude Include="src\UpdateBuffer.h" />
-    <ClInclude Include="src\EntityPrototype.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\EnumFlags.h" />
     <ClInclude Include="src\Flags.h" />
@@ -274,7 +302,6 @@
     <ClInclude Include="src\JSON.h" />
     <ClInclude Include="src\LinesComponent.h" />
     <ClInclude Include="src\LinesRenderer.h" />
-    <ClInclude Include="src\MeshRenderCommand.h" />
     <ClInclude Include="src\Noise.h" />
     <ClInclude Include="src\OrthoCamera.h" />
     <ClInclude Include="src\ParticleSystemRenderer.h" />
@@ -283,19 +310,13 @@
     <ClInclude Include="src\PhysicsRigidBodyComponent.h" />
     <ClInclude Include="src\PlaneComponent.h" />
     <ClInclude Include="src\PlaneRenderer.h" />
-    <ClInclude Include="src\RenderCommand.h" />
-    <ClInclude Include="src\RenderState.h" />
     <ClInclude Include="src\Services.h" />
     <ClInclude Include="src\SFMLInputSource.h" />
     <ClInclude Include="src\SFMLWindow.h" />
-    <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\SoundComponent.h" />
-    <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BVHTree.h" />
-    <ClInclude Include="src\ComponentBuffer.h" />
-    <ClInclude Include="src\DataRequest.h" />
     <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\FPSCameraComponent.h" />
     <ClInclude Include="src\CommandLine.h" />
@@ -305,7 +326,6 @@
     <ClInclude Include="src\FSM.h" />
     <ClInclude Include="src\FunctionView.h" />
     <ClInclude Include="src\HitResult.h" />
-    <ClInclude Include="src\HitTest.h" />
     <ClInclude Include="src\HitTestSystem.h" />
     <ClInclude Include="src\IAsyncHitTest.h" />
     <ClInclude Include="src\MeshUtils.h" />
@@ -317,9 +337,7 @@
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\SpriteSheet.h" />
-    <ClInclude Include="src\System.h" />
     <ClInclude Include="src\IRenderer.h" />
-    <ClInclude Include="src\FrameBuffer.h" />
     <ClInclude Include="src\ContainerHelpers.h" />
     <ClInclude Include="src\DebugConsole.h" />
     <ClInclude Include="src\DebugUI.h" />
@@ -332,48 +350,37 @@
     <ClInclude Include="src\Frustum.h" />
     <ClInclude Include="src\Function.h" />
     <ClInclude Include="src\FunctionSignature.h" />
-    <ClInclude Include="src\GLError.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\DenseMap.h" />
     <ClInclude Include="src\Hash.h" />
     <ClInclude Include="src\ICamera.h" />
     <ClInclude Include="src\IDebugPanel.h" />
     <ClInclude Include="src\LightComponent.h" />
-    <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\Math_dd.h" />
     <ClInclude Include="src\MeshRenderer.h" />
-    <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\ParticleSystemComponent.h" />
-    <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\InputAction.h" />
     <ClInclude Include="src\Iteration.h" />
     <ClInclude Include="src\InputKeyBindings.h" />
     <ClInclude Include="src\MousePicking.h" />
     <ClInclude Include="src\Member.h" />
     <ClInclude Include="src\Memory.h" />
-    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshComponent.h" />
     <ClInclude Include="src\MessageQueue.h" />
     <ClInclude Include="src\MessageType.h" />
     <ClInclude Include="src\AABBOctree.h" />
     <ClInclude Include="src\OctreeComponent.h" />
-    <ClInclude Include="src\Plane.h" />
     <ClInclude Include="src\PlayerComponent.h" />
     <ClInclude Include="src\PCH.h" />
     <ClInclude Include="src\Profiler.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
-    <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\SystemsManager.h" />
     <ClInclude Include="src\TestEntities.h" />
     <ClInclude Include="src\Triangulator.h" />
-    <ClInclude Include="src\RenderManager.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\ScopedTimer.h" />
-    <ClInclude Include="src\ShaderPart.h" />
-    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShakyCamera.h" />
     <ClInclude Include="src\SharedString.h" />
     <ClInclude Include="src\Socket.h" />
@@ -387,7 +394,6 @@
     <ClInclude Include="src\Tests\TestTypes.h">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Typedefs.h" />
     <ClInclude Include="src\TypeInfo.h" />
@@ -396,14 +402,8 @@
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Recorder.h" />
-    <ClInclude Include="src\Uniforms.h" />
-    <ClInclude Include="src\Units.h" />
-    <ClInclude Include="src\UpdateData.h" />
-    <ClInclude Include="src\VAO.h" />
     <ClInclude Include="src\Variable.h" />
-    <ClInclude Include="src\VBO.h" />
     <ClInclude Include="src\Vector.h" />
-    <ClInclude Include="src\EntityLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\fmt\src\format.cc">
@@ -448,13 +448,11 @@
     <ClCompile Include="include\tinygltf\tinygltf.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Array.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\BoundBoxComponent.cpp" />
     <ClCompile Include="src\BoundsHelpers.cpp" />
     <ClCompile Include="src\ColourComponent.cpp" />
-    <ClCompile Include="src\CommandBuffer.cpp" />
     <ClCompile Include="src\d2d\Bounds2DRenderer.cpp" />
     <ClCompile Include="src\d2d\BoxPhysicsComponent.cpp" />
     <ClCompile Include="src\d2d\CirclePhysicsComponent.cpp" />
@@ -465,9 +463,40 @@
     <ClCompile Include="src\d2d\SpriteComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp" />
     <ClCompile Include="src\d2d\Transform2DComponent.cpp" />
+    <ClCompile Include="src\ddc\ComponentBuffer.cpp" />
+    <ClCompile Include="src\ddc\DataRequest.cpp" />
+    <ClCompile Include="src\ddc\EntityLayer.cpp" />
+    <ClCompile Include="src\ddc\EntityPrototype.cpp" />
+    <ClCompile Include="src\ddc\ScratchEntity.cpp" />
+    <ClCompile Include="src\ddc\System.cpp" />
+    <ClCompile Include="src\ddc\UpdateBuffer.cpp" />
+    <ClCompile Include="src\ddc\UpdateData.cpp" />
+    <ClCompile Include="src\ddm\AABB.cpp" />
     <ClCompile Include="src\ddm\AABB2D.cpp" />
     <ClCompile Include="src\ddm\Circle.cpp" />
-    <ClCompile Include="src\EntityPrototype.cpp" />
+    <ClCompile Include="src\ddm\HitTest.cpp" />
+    <ClCompile Include="src\ddm\Math_dd.cpp" />
+    <ClCompile Include="src\ddm\Plane.cpp" />
+    <ClCompile Include="src\ddm\Ray.cpp" />
+    <ClCompile Include="src\ddm\Sphere.cpp" />
+    <ClCompile Include="src\ddm\Units.cpp" />
+    <ClCompile Include="src\ddr\FrameBuffer.cpp" />
+    <ClCompile Include="src\ddr\GLError.cpp" />
+    <ClCompile Include="src\ddr\Material.cpp" />
+    <ClCompile Include="src\ddr\Mesh.cpp" />
+    <ClCompile Include="src\ddr\MeshRenderCommand.cpp" />
+    <ClCompile Include="src\ddr\OpenGL.cpp" />
+    <ClCompile Include="src\ddr\RenderCommand.cpp" />
+    <ClCompile Include="src\ddr\RenderCommandBuffer.cpp" />
+    <ClCompile Include="src\ddr\RenderData.cpp" />
+    <ClCompile Include="src\ddr\RenderManager.cpp" />
+    <ClCompile Include="src\ddr\RenderState.cpp" />
+    <ClCompile Include="src\ddr\Shader.cpp" />
+    <ClCompile Include="src\ddr\ShaderPart.cpp" />
+    <ClCompile Include="src\ddr\Texture.cpp" />
+    <ClCompile Include="src\ddr\Uniforms.cpp" />
+    <ClCompile Include="src\ddr\VAO.cpp" />
+    <ClCompile Include="src\ddr\VBO.cpp" />
     <ClCompile Include="src\EntityVisualizer.cpp" />
     <ClCompile Include="src\flux\FluxBulletComponent.cpp" />
     <ClCompile Include="src\flux\FluxBulletSystem.cpp" />
@@ -491,7 +520,6 @@
     <ClCompile Include="src\lux\LuxportGame.cpp" />
     <ClCompile Include="src\lux\LuxportMap.cpp" />
     <ClCompile Include="src\Memory.cpp" />
-    <ClCompile Include="src\MeshRenderCommand.cpp" />
     <ClCompile Include="src\MessageType.cpp" />
     <ClCompile Include="src\neutrino\BulletComponent.cpp" />
     <ClCompile Include="src\neutrino\BulletSystem.cpp" />
@@ -524,67 +552,52 @@
     <ClCompile Include="src\PlaneRenderer.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\ProfilerValue.cpp" />
-    <ClCompile Include="src\RenderCommand.cpp" />
     <ClCompile Include="src\RenderCommandTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\RenderState.cpp" />
-    <ClCompile Include="src\ScratchEntity.cpp" />
     <ClCompile Include="src\Services.cpp" />
     <ClCompile Include="src\SFMLInputSource.cpp" />
     <ClCompile Include="src\SFMLWindow.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\BoundSphereComponent.cpp" />
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
-    <ClCompile Include="src\ComponentBuffer.cpp" />
-    <ClCompile Include="src\DataRequest.cpp" />
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCameraComponent.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\HitResult.cpp" />
-    <ClCompile Include="src\HitTest.cpp" />
     <ClCompile Include="src\HitTestSystem.cpp" />
     <ClCompile Include="src\LightRenderer.cpp" />
     <ClCompile Include="src\MeshUtils.cpp" />
-    <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\Math_dd.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
-    <ClCompile Include="src\OpenGL.cpp" />
-    <ClCompile Include="src\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameTimer.cpp" />
     <ClCompile Include="src\FreeCameraController.cpp" />
     <ClCompile Include="src\Frustum.cpp" />
-    <ClCompile Include="src\FrustumTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\GLError.cpp" />
     <ClCompile Include="src\IDebugPanel.cpp" />
     <ClCompile Include="src\InputKeyBindings.cpp" />
     <ClCompile Include="src\LightComponent.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MousePicking.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\ParticleSystemComponent.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\PlayerComponent.cpp" />
-    <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\RayComponent.cpp" />
     <ClCompile Include="src\RayRenderer.cpp" />
-    <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\SpriteSheet.cpp" />
     <ClCompile Include="src\stress\IRenderer.cpp" />
     <ClCompile Include="src\stress\StressTestGame.cpp" />
-    <ClCompile Include="src\System.cpp" />
     <ClCompile Include="src\SystemsManager.cpp" />
     <ClCompile Include="src\TestEntities.cpp" />
     <ClCompile Include="src\Tests\FPSCameraTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Tests\FrustumTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Tests\HitTestSystemTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
@@ -592,11 +605,11 @@
     <ClCompile Include="src\Tests\MeshUtilsTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Tests\RingBufferTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Triangulator.cpp" />
-    <ClCompile Include="src\UpdateBuffer.cpp" />
-    <ClCompile Include="src\RenderManager.cpp" />
-    <ClCompile Include="src\ShaderPart.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShakyCamera.cpp" />
     <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\SystemsSorting.cpp" />
@@ -621,14 +634,7 @@
     <ClCompile Include="src\Tests\TypeInfoTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TransformComponent.cpp" />
-    <ClCompile Include="src\Uniforms.cpp" />
-    <ClCompile Include="src\Units.cpp" />
-    <ClCompile Include="src\UpdateData.cpp" />
-    <ClCompile Include="src\VAO.cpp" />
-    <ClCompile Include="src\VBO.cpp" />
-    <ClCompile Include="src\EntityLayer.cpp" />
     <None Include="cpp.hint" />
     <None Include="src\Array.inl" />
     <None Include="src\Buffer.inl">
@@ -646,16 +652,12 @@
     <ClCompile Include="src\Member.cpp" />
     <ClCompile Include="src\MessageQueue.cpp" />
     <ClCompile Include="src\AABBOctree.cpp" />
-    <ClCompile Include="src\Plane.cpp" />
     <ClCompile Include="src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
     <ClCompile Include="src\Recorder.cpp" />
-    <ClCompile Include="src\RingBufferTests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\SharedString.cpp" />
     <ClCompile Include="src\String_dd.cpp" />

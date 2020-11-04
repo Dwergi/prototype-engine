@@ -7,8 +7,10 @@
 #pragma once
 
 #include "ICamera.h"
-#include "Uniforms.h"
-#include "UpdateBuffer.h"
+
+#include "ddc/UpdateBuffer.h"
+
+#include "ddr/Uniforms.h"
 
 namespace ddc
 {

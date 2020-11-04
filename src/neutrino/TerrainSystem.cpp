@@ -12,15 +12,17 @@
 #include "ICamera.h"
 #include "JobSystem.h"
 #include "MeshComponent.h"
-#include "Mesh.h"
-#include "OpenGL.h"
 #include "PlayerComponent.h"
 #include "Random.h"
-#include "RenderData.h"
-#include "ScratchEntity.h"
 #include "Services.h"
 #include "TransformComponent.h"
-#include "Uniforms.h"
+
+#include "ddc/ScratchEntity.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/OpenGL.h"
+#include "ddr/RenderData.h"
+#include "ddr/Uniforms.h"
 
 #include "neutrino/TerrainChunk.h"
 #include "neutrino/TerrainChunkComponent.h"

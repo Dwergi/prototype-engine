@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "DataRequest.h"
-#include "UpdateData.h"
+#include "ddc/DataRequest.h"
+#include "ddc/UpdateData.h"
 
 namespace ddc
 {

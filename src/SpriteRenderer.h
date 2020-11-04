@@ -8,9 +8,10 @@
 
 #include "IDebugPanel.h"
 #include "IRenderer.h"
-#include "RenderState.h"
-#include "VAO.h"
-#include "VBO.h"
+
+#include "ddr/RenderState.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 #include "d2d/SpriteComponent.h"
 

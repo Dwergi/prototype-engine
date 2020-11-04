@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include "Plane.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
+#include "ddr/Shader.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
+
+#include "ddm/Plane.h"
 
 namespace ddm
 {

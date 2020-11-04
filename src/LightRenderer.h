@@ -7,9 +7,10 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "Mesh.h"
 #include "IRenderer.h"
-#include "Shader.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/Shader.h"
 
 namespace ddr
 {

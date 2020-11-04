@@ -7,10 +7,11 @@
 #include "PCH.h"
 #include "BoundsHelpers.h"
 
-#include "AABB.h"
+#include "ddm/AABB.h"
+#include "ddm/Sphere.h"
+
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
-#include "Sphere.h"
 #include "TransformComponent.h"
 
 namespace dd

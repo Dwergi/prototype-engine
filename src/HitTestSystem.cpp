@@ -10,11 +10,12 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
-#include "HitTest.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "Random.h"
 #include "TransformComponent.h"
+
+#include "ddm/HitTest.h"
+#include "ddr/Mesh.h"
 
 namespace dd
 {

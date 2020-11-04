@@ -6,14 +6,13 @@
 
 #pragma once
 
-#include "CommandBuffer.h"
-#include "FrameBuffer.h"
 #include "IDebugPanel.h"
-#include "Mesh.h"
-#include "RenderState.h"
-#include "System.h"
-#include "Texture.h"
-#include "Uniforms.h"
+
+#include "ddr/FrameBuffer.h"
+#include "ddr/Mesh.h"
+#include "ddr/RenderState.h"
+#include "ddr/Texture.h"
+#include "ddr/Uniforms.h"
 
 namespace dd
 {

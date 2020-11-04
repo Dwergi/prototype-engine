@@ -7,11 +7,12 @@
 #pragma once
 
 #include "IRenderer.h"
-#include "RenderState.h"
-#include "Material.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
+
+#include "ddr/RenderState.h"
+#include "ddr/Material.h"
+#include "ddr/Shader.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 namespace dd
 {

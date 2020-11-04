@@ -2,7 +2,8 @@
 #include "Physics2DGame.h"
 
 #include "FPSCameraComponent.h"
-#include "RenderManager.h"
+
+#include "ddr/RenderManager.h"
 
 namespace phys2d
 {

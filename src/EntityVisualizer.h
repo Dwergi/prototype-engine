@@ -7,11 +7,12 @@
 #pragma once
 
 #include "IDebugPanel.h"
-#include "System.h"
+
+#include "ddc/System.h"
 
 namespace dd
 {
-	struct EntityVisualizer : IDebugPanel, ddc::System
+	struct EntityVisualizer : dd::IDebugPanel, ddc::System
 	{
 		EntityVisualizer();
 

@@ -8,7 +8,8 @@
 
 #include "IDebugPanel.h"
 #include "MessageQueue.h"
-#include "System.h"
+
+#include "ddc/System.h"
 
 namespace dd
 {

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Ray.h"
+#include "ddm/Ray.h"
 
 namespace dd
 {

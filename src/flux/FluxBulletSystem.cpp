@@ -10,6 +10,7 @@
 #include "d2d/Transform2DComponent.h"
 
 #include "ddm/AABB2D.h"
+#include "ddm/HitTest.h"
 
 #include "flux/FluxBulletComponent.h"
 #include "flux/FluxEnemyComponent.h"
@@ -51,6 +52,7 @@ namespace flux
 		const ddc::UpdateBufferView& bullets_buffer = update_data.Data("bullets");
 		ddc::WriteView<d2d::Transform2DComponent> bullet_transforms = bullets_buffer.Write<d2d::Transform2DComponent>();
 		ddc::WriteView<flux::FluxBulletComponent> bullet_cmps = bullets_buffer.Write<flux::FluxBulletComponent>();
+		const dd::Span<ddc::Entity>& bullet_entities = bullets_buffer.Entities();
 
 		const ddc::UpdateBufferView& enemies_buffer = update_data.Data("enemies");
 		ddc::ReadView<d2d::Transform2DComponent> enemy_transforms = enemies_buffer.Read<d2d::Transform2DComponent>();
@@ -61,6 +63,8 @@ namespace flux
 			d2d::Transform2DComponent& bullet_transform = bullet_transforms[b];
 			flux::FluxBulletComponent& bullet_cmp = bullet_cmps[b];
 
+			glm::vec2 prev_position = bullet_transform.Position;
+
 			bullet_transform.Position += bullet_cmp.Velocity * dt;
 			bullet_transform.Update();
 
@@ -68,13 +72,6 @@ namespace flux
 
 			ddm::Circle bullet_circle = bullet_cmp.HitCircle.GetTransformed(bullet_transform.Position, bullet_transform.Scale);
 			static const ddm::AABB2D MAP_BOUNDS(glm::vec2(0, 0), m_mapSize);
-
-			if (!MAP_BOUNDS.Intersects(bullet_circle))
-			{
-				ddc::Entity bullet_entity = bullets_buffer.Entities()[b];
-				update_data.DestroyEntity(bullet_entity);
-				continue;
-			}
 
 			if (bullet_cmp.Type == flux::BulletType::Friendly)
 			{
@@ -84,16 +81,23 @@ namespace flux
 					flux::FluxEnemyComponent& enemy_cmp = enemy_cmps[e];
 
 					ddm::Circle enemy_circle = enemy_cmp.HitCircle.GetTransformed(enemy_transform.Position, enemy_transform.Scale);
-					if (enemy_circle.Intersects(bullet_circle))
+
+					// bullet is moving, so we get the distance to the swept circle formed by previous -> current position
+					float distance = ddm::DistanceToSegment(enemy_circle.Centre, prev_position, bullet_transform.Position);
+					if (distance <= (bullet_circle.Radius + enemy_circle.Radius))
 					{
 						// collision!
 						enemy_cmp.Health -= bullet_cmp.Damage;
 
-						ddc::Entity bullet_entity = bullets_buffer.Entities()[b];
-						update_data.DestroyEntity(bullet_entity);
+						update_data.DestroyEntity(bullet_entities[b]);
 						break;
 					}
 				}
+			}
+
+			if (!MAP_BOUNDS.Intersects(bullet_circle))
+			{
+				update_data.DestroyEntity(bullet_entities[b]);
 			}
 		}
 	}

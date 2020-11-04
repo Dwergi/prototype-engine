@@ -9,13 +9,14 @@
 
 #include "BoundBoxComponent.h"
 #include "ColourComponent.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
 #include "Random.h"
 #include "RayComponent.h"
 #include "Services.h"
 #include "TransformComponent.h"
+
+#include "ddr/Mesh.h"
 
 #include "glm/gtx/vector_angle.hpp"
 

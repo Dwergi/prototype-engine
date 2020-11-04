@@ -6,9 +6,10 @@
 
 #pragma once
 
-#include "EntityPrototype.h"
 #include "Random.h"
-#include "System.h"
+
+#include "ddc/EntityPrototype.h"
+#include "ddc/System.h"
 
 namespace flux
 {
@@ -32,5 +33,7 @@ namespace flux
 
 		virtual const char* GetDebugTitle() const override { return "Enemies"; }
 		virtual void DrawDebugInternal() override;
+
+		glm::vec2 GenerateSpawnPosition();
 	};
 }

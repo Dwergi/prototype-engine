@@ -7,8 +7,9 @@
 #include "PCH.h"
 #include "FPSCameraComponent.h"
 
-#include "Math_dd.h"
 #include "IWindow.h"
+
+#include "ddm/Math_dd.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

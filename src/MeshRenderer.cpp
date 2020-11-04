@@ -13,16 +13,17 @@
 #include "ColourComponent.h"
 #include "Frustum.h"
 #include "ICamera.h"
-#include "Material.h"
 #include "MeshComponent.h"
-#include "MeshRenderCommand.h"
 #include "MeshUtils.h"
-#include "OpenGL.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
 #include "TransformComponent.h"
-#include "Uniforms.h"
+
+#include "ddr/Material.h"
+#include "ddr/MeshRenderCommand.h"
+#include "ddr/OpenGL.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Shader.h"
+#include "ddr/Uniforms.h"
 
 static dd::Service<dd::JobSystem> s_jobsystem;
 static dd::Service<ddr::MeshManager> s_meshManager;

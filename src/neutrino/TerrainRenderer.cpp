@@ -7,8 +7,9 @@
 #include "PCH.h"
 #include "neutrino/TerrainRenderer.h"
 
-#include "Mesh.h"
 #include "MeshComponent.h"
+
+#include "ddr/Mesh.h"
 
 #include "neutrino/TerrainChunk.h"
 #include "neutrino/TerrainChunkComponent.h"

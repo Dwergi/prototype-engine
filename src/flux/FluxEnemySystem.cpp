@@ -7,11 +7,12 @@
 #include "PCH.h"
 #include "FluxEnemySystem.h"
 
-#include "ScratchEntity.h"
 #include "SpriteSheet.h"
 
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
+
+#include "ddc/ScratchEntity.h"
 
 #include "flux/FluxEnemyComponent.h"
 
@@ -19,6 +20,8 @@ namespace flux
 {
 	static dd::Service<ddc::EntityPrototypeManager> s_prototypes;
 	static dd::Service<ddr::SpriteSheetManager> s_spriteManager;
+
+	const float EDGE_OFFSET = 2.0f;
 
 	FluxEnemySystem::FluxEnemySystem(glm::ivec2 map_size) : 
 		ddc::System("Enemies"),
@@ -28,10 +31,8 @@ namespace flux
 		RequireWrite<flux::FluxEnemyComponent>();
 		RequireTag(ddc::Tag::Visible);
 
-		float circumference = m_mapSize.x * 2.0f + m_mapSize.y * 2.0f;
-
 		m_rngPosition.SetMin(0);
-		m_rngPosition.SetMax(circumference);
+		m_rngPosition.SetMax(4);
 
 		m_rngAngle.SetMin(0);
 		m_rngAngle.SetMax(359);
@@ -61,6 +62,64 @@ namespace flux
 		sprite_cmp.ZIndex = 7;
 
 		m_enemyPrototype->PopulateFromScratch(scratch);
+	}
+
+	glm::vec2 FluxEnemySystem::GenerateSpawnPosition()
+	{
+		// we treat this value as a position around the circumference of the map going clockwise: top -> right -> bottom -> left
+		float circumference = m_rngPosition.Next();
+
+		glm::vec2 new_pos { 0, 0 };
+		if (circumference < 1)
+		{
+			new_pos.x = EDGE_OFFSET + (m_mapSize.x - EDGE_OFFSET) * circumference;
+			new_pos.y = EDGE_OFFSET;
+		}
+
+		circumference -= 1;
+
+		if (circumference >= 0 && circumference < 1)
+		{
+			new_pos.x = m_mapSize.x - EDGE_OFFSET;
+			new_pos.y = EDGE_OFFSET + (m_mapSize.y - EDGE_OFFSET) * circumference;
+		}
+
+		circumference -= 1;
+
+		if (circumference >= 0 && circumference < 1)
+		{
+			new_pos.x = EDGE_OFFSET + (m_mapSize.x - EDGE_OFFSET) * circumference;
+			new_pos.y = m_mapSize.y - EDGE_OFFSET;
+		}
+
+		circumference -= 1;
+
+		if (circumference >= 0)
+		{
+			new_pos.x = EDGE_OFFSET;
+			new_pos.y = EDGE_OFFSET + (m_mapSize.y - EDGE_OFFSET) * circumference;
+		}
+
+		return new_pos;
+	}
+
+	static bool CollidesWithExistingEnemy(const ddm::Circle& new_hit_circle, const ddc::WriteView<d2d::Transform2DComponent>& transforms, const ddc::WriteView<flux::FluxEnemyComponent>& enemies)
+	{
+		DD_ASSERT(transforms.Size() == enemies.Size());
+
+		for (int i = 0; i < transforms.Size(); ++i)
+		{
+			const flux::FluxEnemyComponent& existing_enemy = enemies[i];
+			const d2d::Transform2DComponent& existing_transform = transforms[i];
+
+			ddm::Circle existing_circle = existing_enemy.HitCircle.GetTransformed(existing_transform.Position, existing_transform.Scale);
+			if (new_hit_circle.Intersects(existing_circle))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	void FluxEnemySystem::Update(ddc::UpdateData& update_data)
@@ -94,36 +153,16 @@ namespace flux
 
 			d2d::Transform2DComponent* new_transform_cmp = new_enemy.Access<d2d::Transform2DComponent>();
 
-			// we treat this value as a position around the circumference of the map going clockwise: top -> right -> bottom -> left
-			float circumference = m_rngPosition.Next();
-
-			glm::vec2 new_pos { 0, 0 };
-			if (circumference < m_mapSize.x)
-			{
-				new_pos.x = circumference;
-				new_pos.y = 1;
-			}
-			circumference -= m_mapSize.x;
-
-			if (circumference >= 0 && circumference < m_mapSize.y)
-			{
-				new_pos.x = m_mapSize.x - 1.0f;
-				new_pos.y = circumference;
-			}
-			circumference -= m_mapSize.y;
-
-			if (circumference >= 0 && circumference < m_mapSize.x)
-			{
-				new_pos.x = circumference;
-				new_pos.y = m_mapSize.y - 1.0f;
-			}
-			circumference -= m_mapSize.x;
+			glm::vec2 new_pos;
+			ddm::Circle new_hit_circle;
 			
-			if (circumference >= 0)
+			do
 			{
-				new_pos.x = 1;
-				new_pos.y = circumference;
-			}
+				new_pos = GenerateSpawnPosition();
+
+				new_hit_circle = new_enemy_cmp->HitCircle.GetTransformed(new_pos, glm::vec2(1, 1));
+			} 
+			while (CollidesWithExistingEnemy(new_hit_circle, transforms, enemies));
 
 			new_transform_cmp->Position = new_pos;
 			new_transform_cmp->Rotation = glm::radians(m_rngAngle.Next());

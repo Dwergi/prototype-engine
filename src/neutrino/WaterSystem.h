@@ -8,9 +8,11 @@
 
 #include "IDebugPanel.h"
 #include "JobSystem.h"
-#include "Material.h"
 #include "Noise.h"
-#include "System.h"
+
+#include "ddc/System.h"
+
+#include "ddr/Material.h"
 
 namespace neut
 {

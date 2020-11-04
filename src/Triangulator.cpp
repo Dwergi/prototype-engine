@@ -7,7 +7,7 @@
 #include "PCH.h"
 #include "Triangulator.h"
 
-#include "Mesh.h"
+#include "ddr/Mesh.h"
 
 namespace dd
 {

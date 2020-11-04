@@ -8,7 +8,9 @@
 
 #include "BVHTree.h"
 #include "IDebugPanel.h"
-#include "System.h"
+
+#include "ddc/System.h"
+
 #include "neutrino/SwarmAgentComponent.h"
 
 namespace neut

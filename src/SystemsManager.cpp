@@ -2,9 +2,10 @@
 #include "SystemsManager.h"
 
 #include "JobSystem.h"
-#include "System.h"
 #include "SystemsSorting.h"
-#include "UpdateData.h"
+
+#include "ddc/System.h"
+#include "ddc/UpdateData.h"
 
 namespace ddc
 {

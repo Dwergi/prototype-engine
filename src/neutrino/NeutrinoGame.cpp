@@ -28,7 +28,6 @@
 #include "PlayerComponent.h"
 #include "PhysicsSystem.h"
 #include "RayRenderer.h"
-#include "RenderManager.h"
 #include "ShakyCamera.h"
 #include "ShipSystem.h"
 #include "SystemsManager.h"
@@ -43,6 +42,8 @@
 #include "Services.h"
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
+
+#include "ddr/RenderManager.h"
 
 namespace neut
 {

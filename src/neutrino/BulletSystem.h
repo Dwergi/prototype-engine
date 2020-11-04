@@ -8,7 +8,8 @@
 
 #include "IDebugPanel.h"
 #include "InputAction.h"
-#include "System.h"
+
+#include "ddc/System.h"
 
 namespace ddr
 {

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "IRenderer.h"
-#include "Shader.h"
+
+#include "ddr/Shader.h"
 
 namespace lux
 {

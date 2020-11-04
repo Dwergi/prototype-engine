@@ -15,21 +15,22 @@
 #include "InputKeyBindings.h"
 #include "IWindow.h"
 #include "MeshComponent.h"
-#include "Mesh.h"
-#include "MeshRenderCommand.h"
-#include "OpenGL.h"
 #include "ParticleSystemComponent.h"
 #include "RayComponent.h"
-#include "RenderData.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
 #include "TransformComponent.h"
-#include "Uniforms.h"
-#include "UpdateData.h"
 
+#include "ddc/UpdateData.h"
 
-#include "HitTest.h"
+#include "ddm/HitTest.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/MeshRenderCommand.h"
+#include "ddr/OpenGL.h"
+#include "ddr/RenderData.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Shader.h"
+#include "ddr/Uniforms.h"
 
 #include "glm/gtx/rotate_vector.hpp"
 

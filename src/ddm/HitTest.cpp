@@ -7,17 +7,19 @@
 #include "PCH.h"
 #include "HitTest.h"
 
-#include "AABB.h"
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
 #include "BVHTree.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
-#include "Ray.h"
-#include "Sphere.h"
 #include "TransformComponent.h"
 #include "Triangulator.h"
+
+#include "ddm/AABB.h"
+#include "ddm/Ray.h"
+#include "ddm/Sphere.h"
+
+#include "ddr/Mesh.h"
 
 #include <glm/gtx/intersect.hpp>
 
@@ -112,5 +114,19 @@ namespace ddm
 	bool BoxBoxIntersect(glm::vec2 a_min, glm::vec2 a_max, glm::vec2 b_min, glm::vec2 b_max)
 	{
 		return glm::all(glm::lessThanEqual(a_min, b_max)) && glm::all(glm::greaterThanEqual(a_max, b_min));
+	}
+
+	float DistanceToSegment(glm::vec2 point, glm::vec2 line_a, glm::vec2 line_b)
+	{
+		float length2 = glm::distance2(line_a, line_b);
+		if (length2 == 0)
+		{
+			return glm::distance2(point, line_a);
+		}
+
+		float t = ddm::clamp(glm::dot(point - line_a, line_b - line_a) / length2, 0.0f, 1.0f);
+		glm::vec2 projection = line_a + t * (line_b - line_a);
+
+		return glm::distance(point, projection);
 	}
 }

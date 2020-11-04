@@ -8,12 +8,14 @@
 #include "PhysicsSystem.h"
 
 #include "BVHTree.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "PhysicsPlaneComponent.h"
 #include "PhysicsSphereComponent.h"
-#include "Plane.h"
 #include "TransformComponent.h"
+
+#include "ddm/Plane.h"
+
+#include "ddr/Mesh.h"
 
 namespace dd
 {

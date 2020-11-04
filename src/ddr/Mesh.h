@@ -6,11 +6,13 @@
 
 #pragma once
 
-#include "AABB.h"
 #include "HandleManager.h"
-#include "Material.h"
-#include "VAO.h"
-#include "VBO.h"
+
+#include "ddm/AABB.h"
+
+#include "ddr/Material.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 namespace dd
 {

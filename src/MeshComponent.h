@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "AABB.h"
-#include "Mesh.h"
+#include "ddr/Mesh.h"
 
 namespace dd
 {

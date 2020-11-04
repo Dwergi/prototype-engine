@@ -7,12 +7,13 @@
 #include "PCH.h"
 #include "FluxPlayerController.h"
 
-#include "EntityPrototype.h"
 #include "FluxBulletComponent.h"
 #include "FluxPlayerComponent.h"
 #include "Input.h"
-#include "ScratchEntity.h"
 #include "SpriteSheet.h"
+
+#include "ddc/EntityPrototype.h"
+#include "ddc/ScratchEntity.h"
 
 #include "d2d/SpriteComponent.h"
 #include "d2d/SpriteTileSystem.h"

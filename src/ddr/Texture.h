@@ -7,7 +7,8 @@
 #pragma once
 
 #include "HandleManager.h"
-#include "OpenGL.h"
+
+#include "ddr/OpenGL.h"
 
 namespace ddr
 {

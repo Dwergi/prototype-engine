@@ -7,8 +7,8 @@
 #include "PCH.h"
 #include "neutrino/TerrainParameters.h"
 
-#include "OpenGL.h"
-#include "Uniforms.h"
+#include "ddr/OpenGL.h"
+#include "ddr/Uniforms.h"
 
 namespace neut
 {

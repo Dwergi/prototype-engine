@@ -12,9 +12,10 @@
 #include "IInputSource.h"
 #include "ImGuiBinding.h"
 #include "Input.h"
-#include "OpenGL.h"
 #include "Services.h"
 #include "IWindow.h"
+
+#include "ddr/OpenGL.h"
 
 #include "imgui/imgui.h"
 

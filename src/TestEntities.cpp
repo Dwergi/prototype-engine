@@ -4,7 +4,6 @@
 #include "BoundBoxComponent.h"
 #include "BoundSphereComponent.h"
 #include "ColourComponent.h"
-#include "EntityPrototype.h"
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "LightComponent.h"
@@ -16,6 +15,8 @@
 #include "RayComponent.h"
 #include "neutrino/ShipComponent.h"
 #include "TransformComponent.h"
+
+#include "ddc/EntityPrototype.h"
 
 namespace dd
 {

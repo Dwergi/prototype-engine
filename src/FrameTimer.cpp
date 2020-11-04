@@ -88,7 +88,7 @@ namespace dd
 		ImGui::SetWindowPos( ImVec2( 2.0f, 30.0f ), ImGuiCond_FirstUseEver );
 
 		ImGui::Checkbox( "Compact Counter", &m_drawCompact );
-		ImGui::SliderFloat( "Time Scale", &m_timeScale, 0.0f, 4.0f, "%.3f", 2.0f );
+		ImGui::SliderFloat( "Scale", &m_timeScale, 0.0f, 10.0f, "%.3f", 2.0f );
 
 		ImGui::Value( "FPS: ", 1000.f / s_frameTimes.SlidingAverage(), "%.1f" );
 	}

@@ -7,15 +7,17 @@
 #include "PCH.h"
 #include "Frustum.h"
 
-#include "AABB.h"
 #include "ICamera.h"
-#include "OpenGL.h"
-#include "RenderData.h"
 #include "Services.h"
-#include "Shader.h"
-#include "Sphere.h"
-#include "Uniforms.h"
-#include "VAO.h"
+
+#include "ddm/AABB.h"
+#include "ddm/Sphere.h"
+
+#include "ddr/OpenGL.h"
+#include "ddr/RenderData.h"
+#include "ddr/Shader.h"
+#include "ddr/Uniforms.h"
+#include "ddr/VAO.h"
 
 namespace ddr
 {

@@ -7,11 +7,12 @@
 #include "PCH.h"
 #include "MeshUtils.h"
 
-#include "Material.h"
-#include "Mesh.h"
-#include "Shader.h"
 #include "Triangulator.h"
-#include "VBO.h"
+
+#include "ddr/Material.h"
+#include "ddr/Mesh.h"
+#include "ddr/Shader.h"
+#include "ddr/VBO.h"
 
 namespace dd
 {

@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "d2d/SpriteTileSystem.h"
 
-#include "Math_dd.h"
 #include "IWindow.h"
 
 #include "d2d/BoxPhysicsComponent.h"

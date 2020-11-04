@@ -6,11 +6,13 @@
 
 #pragma once
 
-#include "Mesh.h"
-#include "Shader.h"
-#include "System.h"
 #include "TransformComponent.h"
 #include "TrenchComponent.h"
+
+#include "ddc/System.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/Shader.h"
 
 namespace ddr
 {

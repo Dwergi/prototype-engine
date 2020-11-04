@@ -11,11 +11,13 @@
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
 #include "ColourComponent.h"
-#include "Plane.h"
-#include "ScratchEntity.h"
 #include "Services.h"
 #include "TransformComponent.h"
 #include "Triangulator.h"
+
+#include "ddc/ScratchEntity.h"
+
+#include "ddm/Plane.h"
 
 #include "neutrino/TerrainChunk.h"
 #include "neutrino/TerrainChunkComponent.h"

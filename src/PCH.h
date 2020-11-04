@@ -41,7 +41,6 @@
 #include "Typedefs.h"
 #include "TypeInfoMacros.h"
 
-#include "Math_dd.h"
 #include "Buffer.h"
 #include "String_dd.h"
 #include "Array.h"
@@ -63,7 +62,9 @@
 
 #include "Globals.h"
 
-#include "EntityLayer.h"
+#include "ddc/EntityLayer.h"
+
+#include "ddm/Math_dd.h"
 
 //#include "Serialization.h"
 

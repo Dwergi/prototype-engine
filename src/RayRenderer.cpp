@@ -10,7 +10,8 @@
 #include "ColourComponent.h"
 #include "RayComponent.h"
 #include "Services.h"
-#include "Shader.h"
+
+#include "ddr/Shader.h"
 
 namespace ddr
 {

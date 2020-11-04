@@ -10,12 +10,13 @@
 #include "BoundBoxComponent.h"
 #include "MeshUtils.h"
 #include "LightComponent.h"
-#include "Mesh.h"
 #include "Services.h"
-#include "Shader.h"
 #include "TransformComponent.h"
-#include "Uniforms.h"
-#include "OpenGL.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/OpenGL.h"
+#include "ddr/Uniforms.h"
+#include "ddr/Shader.h"
 
 namespace ddr
 {

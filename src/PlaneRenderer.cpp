@@ -8,11 +8,12 @@
 #include "PlaneRenderer.h"
 
 #include "ColourComponent.h"
-#include "Mesh.h"
-#include "MeshRenderCommand.h"
 #include "PlaneComponent.h"
-#include "Shader.h"
 #include "TransformComponent.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/MeshRenderCommand.h"
+#include "ddr/Shader.h"
 
 dd::Service<ddr::ShaderManager> s_shaderManager;
 dd::Service<ddr::MaterialManager> s_materialManager;

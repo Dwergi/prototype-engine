@@ -11,18 +11,21 @@
 #include "BoundSphereComponent.h"
 #include "ColourComponent.h"
 #include "FPSCameraComponent.h"
-#include "HitTest.h"
 #include "IAsyncHitTest.h"
 #include "ICamera.h"
 #include "Input.h"
 #include "LightComponent.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "MessageQueue.h"
 #include "PlayerComponent.h"
-#include "ScratchEntity.h"
 #include "Services.h"
 #include "TransformComponent.h"
+
+#include "ddc/ScratchEntity.h"
+
+#include "ddm/HitTest.h"
+
+#include "ddr/Mesh.h"
 
 #include "neutrino/BulletComponent.h"
 

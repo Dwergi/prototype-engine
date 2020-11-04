@@ -34,4 +34,6 @@ namespace ddm
 		const ddr::Mesh& mesh, float& out_distance, glm::vec3& out_normal );
 
 	bool BoxBoxIntersect(glm::vec2 a_min, glm::vec2 a_max, glm::vec2 b_min, glm::vec2 b_max);
+
+	float DistanceToSegment(glm::vec2 point, glm::vec2 line_a, glm::vec2 line_b);
 }

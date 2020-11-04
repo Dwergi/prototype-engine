@@ -9,13 +9,15 @@
 
 #include "ColourComponent.h"
 #include "ICamera.h"
-#include "Material.h"
-#include "Mesh.h"
+
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
+
+#include "ddr/Material.h"
+#include "ddr/Mesh.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Shader.h"
 
 namespace dd
 {

@@ -20,7 +20,6 @@
 #include "PhysicsSystem.h"
 #include "Random.h"
 #include "RayRenderer.h"
-#include "RenderManager.h"
 #include "TestEntities.h"
 #include "IWindow.h"
 #include "SystemsManager.h"
@@ -30,6 +29,8 @@
 #include "MeshComponent.h"
 #include "RayComponent.h"
 #include "TransformComponent.h"
+
+#include "ddr/RenderManager.h"
 
 namespace stress
 {

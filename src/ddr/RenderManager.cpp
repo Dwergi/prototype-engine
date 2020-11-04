@@ -7,22 +7,23 @@
 #include "PCH.h"
 #include "RenderManager.h"
 
-#include "AABB.h"
-#include "GLError.h"
 #include "Frustum.h"
 #include "ICamera.h"
-#include "Material.h"
-#include "Mesh.h"
 #include "MeshComponent.h"
 #include "MousePicking.h"
 #include "LightComponent.h"
-#include "OpenGL.h"
 #include "ParticleSystem.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
 #include "TransformComponent.h"
 #include "IWindow.h"
+
+#include "ddm/AABB.h"
+
+#include "ddr/GLError.h"
+#include "ddr/Mesh.h"
+#include "ddr/Material.h"
+#include "ddr/OpenGL.h"
+#include "ddr/Shader.h"
 
 namespace ddr
 {

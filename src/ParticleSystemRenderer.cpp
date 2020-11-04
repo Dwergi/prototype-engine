@@ -8,12 +8,13 @@
 #include "ParticleSystemRenderer.h"
 
 #include "ICamera.h"
-#include "OpenGL.h"
-#include "RenderData.h"
 #include "Services.h"
-#include "ShaderPart.h"
-#include "Shader.h"
-#include "Uniforms.h"
+
+#include "ddr/OpenGL.h"
+#include "ddr/RenderData.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Shader.h"
+#include "ddr/Uniforms.h"
 
 namespace ddr
 {

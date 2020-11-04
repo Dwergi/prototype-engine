@@ -7,9 +7,10 @@
 #pragma once
 
 #include "IRenderer.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
+
+#include "ddr/Shader.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 namespace ddr
 {

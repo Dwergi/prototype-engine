@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "AABB.h"
 #include "FSM.h"
 #include "JobSystem.h"
-#include "Mesh.h"
+
+#include "ddm/AABB.h"
+
+#include "ddr/Mesh.h"
 
 #include "neutrino/TerrainParameters.h"
 

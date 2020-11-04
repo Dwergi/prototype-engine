@@ -7,13 +7,14 @@
 #include "PCH.h"
 #include "Shader.h"
 
-#include "GLError.h"
 #include "ICamera.h"
-#include "OpenGL.h"
-#include "ShaderPart.h"
-#include "Texture.h"
-#include "VAO.h"
-#include "VBO.h"
+
+#include "ddr/GLError.h"
+#include "ddr/OpenGL.h"
+#include "ddr/ShaderPart.h"
+#include "ddr/Texture.h"
+#include "ddr/VAO.h"
+#include "ddr/VBO.h"
 
 DD_POD_CPP(ddr::ShaderHandle);
 

@@ -6,7 +6,8 @@
 
 #include "IAsyncHitTest.h"
 #include "IDebugPanel.h"
-#include "System.h"
+
+#include "ddc/System.h"
 
 namespace dd
 {

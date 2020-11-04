@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "EntityPrototype.h"
-#include "System.h" 
+#include "ddc/EntityPrototype.h"
+#include "ddc/System.h" 
 
 namespace d2d
 {

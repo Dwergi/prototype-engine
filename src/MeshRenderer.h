@@ -6,11 +6,12 @@
 
 #pragma once
 
-#include "CommandBuffer.h"
 #include "IDebugPanel.h"
 #include "IRenderer.h"
-#include "Mesh.h"
-#include "MeshRenderCommand.h"
+
+#include "ddr/Mesh.h"
+#include "ddr/MeshRenderCommand.h"
+#include "ddr/RenderCommandBuffer.h"
 
 namespace dd
 {
@@ -47,7 +48,7 @@ namespace ddr
 
 		MeshHandle m_cube;
 
-		ddr::CommandBuffer<ddr::MeshRenderCommand> m_commands;
+		ddr::RenderCommandBuffer<ddr::MeshRenderCommand> m_commands;
 
 		void RenderMesh(ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,

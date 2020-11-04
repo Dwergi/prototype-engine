@@ -10,17 +10,13 @@
 #include "AssetManager.h"
 #include "DebugUI.h"
 #include "File.h"
-#include "HitTest.h"
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "IWindow.h"
 #include "OrthoCamera.h"
-#include "ScratchEntity.h"
 #include "SpriteRenderer.h"
 #include "SpriteSheet.h"
 #include "SystemsManager.h"
-#include "Texture.h"
-#include "RenderManager.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
@@ -30,6 +26,13 @@
 #include "d2d/SpriteAnimationSystem.h"
 #include "d2d/SpriteComponent.h"
 #include "d2d/Transform2DComponent.h"
+
+#include "ddc/ScratchEntity.h"
+
+#include "ddm/HitTest.h"
+
+#include "ddr/RenderManager.h"
+#include "ddr/Texture.h"
 
 #include "lux/LuxLightComponent.h"
 #include "lux/LuxLightRenderer.h"

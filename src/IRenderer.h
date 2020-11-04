@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "DataRequest.h"
-#include "RenderData.h"
+#include "ddc/DataRequest.h"
+
+#include "ddr/RenderData.h"
 
 namespace ddr
 {

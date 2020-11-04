@@ -8,8 +8,10 @@
 
 #include "IDebugPanel.h"
 #include "InputAction.h"
-#include "Mesh.h"
-#include "System.h"
+
+#include "ddc/System.h"
+
+#include "ddr/Mesh.h"
 
 namespace dd
 {

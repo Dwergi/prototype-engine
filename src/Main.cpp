@@ -26,15 +26,16 @@
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "JobSystem.h"
-#include "OpenGL.h"
 #include "Services.h"
 #include "Timer.h"
-#include "Uniforms.h"
 #include "IWindow.h"
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
 #include "SystemsManager.h"
-#include "RenderManager.h"
+
+#include "ddr/OpenGL.h"
+#include "ddr/RenderManager.h"
+#include "ddr/Uniforms.h"
 
 #include "nlohmann/json.hpp"
 

@@ -9,12 +9,13 @@
 
 #include "BoundBoxComponent.h"
 #include "ParticleSystemComponent.h"
-#include "DataRequest.h"
 #include "Input.h"
 #include "ParticleSystemComponent.h"
-#include "ScratchEntity.h"
 #include "TransformComponent.h"
-#include "UpdateData.h"
+
+#include "ddc/DataRequest.h"
+#include "ddc/ScratchEntity.h"
+#include "ddc/UpdateData.h"
 
 #include "glm/gtx/norm.hpp"
 

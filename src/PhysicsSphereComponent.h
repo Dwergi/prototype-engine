@@ -7,7 +7,8 @@
 #pragma once
 
 #include "PhysicsBase.h"
-#include "Sphere.h"
+
+#include "ddm/Sphere.h"
 
 namespace dd
 {
