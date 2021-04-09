@@ -17,7 +17,11 @@ namespace dd
 	{
 		virtual void RenderDebugPanels() = 0;
 
+		virtual bool ShouldDraw() const = 0;
 		virtual void SetDraw(bool draw) = 0;
+
+		virtual bool HasMouseCapture() const = 0;
+		virtual void SetMouseCapture(bool capture) = 0;
 
 		virtual void StartFrame(float delta_t) = 0;
 		virtual void EndFrame() = 0;
@@ -40,8 +44,11 @@ namespace dd
 		void StartFrame(float delta_t);
 		void EndFrame();
 
-		bool ShouldDraw() const { return m_draw; }
+		bool ShouldDraw() const override { return m_draw; }
 		void SetDraw(bool draw) override { m_draw = draw; }
+
+		bool HasMouseCapture() const override;
+		void SetMouseCapture(bool capture) override;
 
 		bool IsMidFrame() const override { return m_midFrame; }
 

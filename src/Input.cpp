@@ -15,6 +15,7 @@
 #include <imgui/imgui.h>
 
 static dd::Service<dd::IWindow> s_window;
+static dd::Service<dd::InputKeyBindings> s_keybindings;
 
 namespace dd
 {
@@ -37,7 +38,7 @@ namespace dd
 
 	void Input::Update(float delta_t)
 	{
-		DD_ASSERT_FATAL(m_bindings.Count() > 0, "Key bindings not set!");
+		DD_ASSERT_FATAL(s_keybindings->Count() > 0, "Key bindings not set!");
 
 		// switch mode
 		UpdateMode();
@@ -73,7 +74,7 @@ namespace dd
 				if ((evt.IsMouse() && m_mouseEnabled) ||
 					(evt.IsKeyboard() && m_keyboardEnabled))
 				{
-					bound = m_bindings.FindBinding(m_currentMode->ID(), evt, action);
+					bound = s_keybindings->FindBinding(m_currentMode->ID(), evt, action);
 				}
 
 				if (bound)

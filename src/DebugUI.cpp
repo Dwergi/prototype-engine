@@ -22,16 +22,14 @@ static dd::Service<dd::IDebugUI> s_debugUI;
 
 namespace dd
 {
-	void OnEnterDebugMode()
+	static void OnEnterDebugMode()
 	{
-		ImGuiBinding::SetMouseHandling(true);
-		s_debugUI->SetDraw(true);
+		s_debugUI->SetMouseCapture(true);
 	}
 
-	void OnExitDebugMode()
+	static void OnExitDebugMode()
 	{
-		ImGuiBinding::SetMouseHandling(false);
-		s_debugUI->SetDraw(false);
+		s_debugUI->SetMouseCapture(false);
 	}
 
 	ImGuiDebugUI::ImGuiDebugUI()
@@ -82,6 +80,16 @@ namespace dd
 		m_debugPanels.push_back(&debug_panel);
 
 		m_needsSort = true;
+	}
+
+	bool ImGuiDebugUI::HasMouseCapture() const
+	{
+		return ImGuiBinding::IsMouseHandled();
+	}
+
+	void ImGuiDebugUI::SetMouseCapture(bool capture)
+	{
+		ImGuiBinding::SetMouseHandling(capture);
 	}
 
 	void ImGuiDebugUI::RenderDebugPanels()

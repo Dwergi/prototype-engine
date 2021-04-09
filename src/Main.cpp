@@ -55,6 +55,7 @@ static dd::Service<dd::IGame> s_game;
 static dd::Service<dd::IWindow> s_window;
 static dd::Service<dd::Input> s_input;
 static dd::Service<dd::IInputSource> s_inputSource;
+static dd::Service<dd::InputKeyBindings> s_keybindings;
 static dd::Service<dd::IDebugUI> s_debugUI;
 static dd::Service<ddr::RenderManager> s_renderer;
 static dd::Service<dd::FrameTimer> s_frameTimer;
@@ -70,14 +71,21 @@ static void ShowSystemConsole(bool show)
 	::ShowWindow(GetConsoleWindow(), show ? SW_SHOW : SW_HIDE);
 }
 
-static void ToggleConsole()
-{
-	s_debugUI->SetDraw(true);
-}
-
 static void ToggleDebugUI()
 {
+	bool is_toggled = s_input->GetCurrentMode() == "debug";
+	s_debugUI->SetDraw(!is_toggled);
+	s_input->SetCurrentMode(is_toggled ? "game" : "debug");
+}
+
+static void ToggleDebugUIMouseCapture()
+{
 	s_input->SetCurrentMode(s_input->GetCurrentMode() == "game" ? "debug" : "game");
+}
+
+static void ToggleProfiler()
+{
+	dd::Profiler::EnableDraw(!dd::Profiler::ShouldDraw());
 }
 
 static void PauseGame()
@@ -162,10 +170,20 @@ static int GameMain()
 		s_input->Initialize();
 
 		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
+		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE, &ToggleDebugUIMouseCapture);
 		s_input->AddHandler(dd::InputAction::EXIT, &Exit);
 		s_input->AddHandler(dd::InputAction::PAUSE, &PauseGame);
 		s_input->AddHandler(dd::InputAction::TIME_SCALE_DOWN, &DecreaseTimeScale);
 		s_input->AddHandler(dd::InputAction::TIME_SCALE_UP, &IncreaseTimeScale);
+		s_input->AddHandler(dd::InputAction::TOGGLE_PROFILER, &ToggleProfiler);
+
+		dd::Services::Register(new dd::InputKeyBindings());
+
+		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+		s_keybindings->BindKey(dd::Key::ESCAPE, dd::Modifier::Shift, dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE);
+		s_keybindings->BindKey(dd::Key::P, dd::InputAction::PAUSE);
+		s_keybindings->BindKey(dd::Key::O, dd::InputAction::TOGGLE_PROFILER);
+
 
 		dd::Services::RegisterInterface<dd::IDebugUI>(new dd::ImGuiDebugUI());
 

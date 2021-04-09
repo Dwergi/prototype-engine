@@ -23,7 +23,7 @@ namespace dd
 
 	void ImGuiBinding::SetMouseHandling(bool handle)
 	{
-		s_handleMouse = true;
+		s_handleMouse = handle;
 	}
 
 	bool ImGuiBinding::IsMouseHandled()

@@ -22,12 +22,34 @@ namespace dd
 	{
 		DD_ASSERT(evt.Type != InputType::None);
 
+		// ctrl, shift, alt, alt + shift, alt + ctrl, ctrl + shift, alt + ctrl + shift
+		dd::Array<const KeyBinding*, 7> matches;
+
 		for (const KeyBinding& binding : m_bindings)
 		{
-			if (binding.Modes.Has(mode) && binding.Key == evt.Key && 
-				(binding.Modifiers == ModifierFlags(Modifier::None) || binding.Modifiers == evt.Modifiers))
+			if (binding.Modes.Has(mode) &&
+				binding.Key == evt.Key)
 			{
-				out_action = binding.Action;
+				matches.Add(&binding);
+			}
+		}
+
+		// check for exact modifier match, ie. Shift+A
+		for (const KeyBinding* match : matches)
+		{
+			if (match->Modifiers == evt.Modifiers)
+			{
+				out_action = match->Action;
+				return true;
+			}
+		}
+
+		// check for inexact match, ie. A
+		for (const KeyBinding* match : matches)
+		{
+			if (match->Modifiers == Modifier::None)
+			{
+				out_action = match->Action;
 				return true;
 			}
 		}

@@ -36,6 +36,7 @@
 namespace stress
 {
 	static dd::Service<dd::Input> s_input;
+	static dd::Service<dd::InputKeyBindings> s_keybindings;
 	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::FreeCameraController> s_freeCam;
@@ -43,11 +44,6 @@ namespace stress
 	static ddr::MeshHandle s_unitCube;
 
 	static ddc::Entity s_camera;
-
-	static void ToggleProfiler()
-	{
-		dd::Profiler::EnableDraw(!dd::Profiler::ShouldDraw());
-	}
 
 	void StressTestGame::Initialize()
 	{
@@ -60,18 +56,13 @@ namespace stress
 
 		s_input->SetCurrentMode("game");
 
-		s_input->AddHandler(dd::InputAction::TOGGLE_PROFILER, &ToggleProfiler);
-
-		dd::InputKeyBindings& bindings = s_input->AccessKeyBindings();
-		bindings.BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		bindings.BindKey(dd::Key::P, dd::InputAction::TOGGLE_PROFILER);
-		bindings.BindKey(dd::Key::W, dd::InputAction::FORWARD);
-		bindings.BindKey(dd::Key::S, dd::InputAction::BACKWARD);
-		bindings.BindKey(dd::Key::A, dd::InputAction::LEFT);
-		bindings.BindKey(dd::Key::D, dd::InputAction::RIGHT);
-		bindings.BindKey(dd::Key::SPACE, dd::InputAction::UP);
-		bindings.BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
-		bindings.BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
+		s_keybindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
+		s_keybindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
+		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
+		s_keybindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
+		s_keybindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
+		s_keybindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
+		s_keybindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
 	}
 
 	void StressTestGame::Shutdown()

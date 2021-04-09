@@ -64,6 +64,7 @@ namespace lux
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::IDebugUI> s_debugUI;
+	static dd::Service<dd::InputKeyBindings> s_keybindings;
 
 	static ddr::OrthoCamera* s_camera;
 
@@ -238,13 +239,11 @@ namespace lux
 
 		s_input->SetCurrentMode("game");
 
-		dd::InputKeyBindings& bindings = s_input->AccessKeyBindings();
-		bindings.BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
-		bindings.BindKey(dd::Key::MOUSE_RIGHT, dd::InputAction::RETURN_TELEPORTER, "game");
-		bindings.BindKey(dd::Key::R, dd::InputAction::RESET, "game");
-		bindings.BindKey(dd::Key::ENTER, dd::InputAction::NEXT_MAP);
-		bindings.BindKey(dd::Key::ENTER, dd::ModifierFlags(dd::Modifier::Shift), dd::InputAction::PREVIOUS_MAP);
+		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		s_keybindings->BindKey(dd::Key::MOUSE_RIGHT, dd::InputAction::RETURN_TELEPORTER, "game");
+		s_keybindings->BindKey(dd::Key::R, dd::InputAction::RESET, "game");
+		s_keybindings->BindKey(dd::Key::ENTER, dd::InputAction::NEXT_MAP);
+		s_keybindings->BindKey(dd::Key::ENTER, dd::Modifier::Shift, dd::InputAction::PREVIOUS_MAP);
 
 		s_music = new sf::Music();
 		std::filesystem::path sound_path = dd::File::GetWritePath();

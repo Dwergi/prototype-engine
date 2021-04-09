@@ -48,8 +48,8 @@
 
 namespace neut
 {
-	static dd::Service<dd::InputKeyBindings> s_inputBindings;
 	static dd::Service<dd::Input> s_input;
+	static dd::Service<dd::InputKeyBindings> s_keybindings;
 	//static dd::Service<dd::ShipSystem> s_shipSystem;
 	static dd::Service<dd::FreeCameraController> s_freeCamera;
 	static dd::Service<dd::ShakyCamera> s_shakyCamera;
@@ -203,42 +203,40 @@ namespace neut
 		dd::InputModeFlags all_modes;
 		all_modes.Fill();
 
-		s_inputBindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		s_inputBindings->BindKey(dd::Key::F1, dd::InputAction::TOGGLE_FREECAM);
-		s_inputBindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_BOUNDS);
-		s_inputBindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
-		s_inputBindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
-		s_inputBindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
-		s_inputBindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
-		s_inputBindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
-		s_inputBindings->BindKey(dd::Key::R, dd::InputAction::ADD_MINOR_TRAUMA);
-		s_inputBindings->BindKey(dd::Key::T, dd::InputAction::ADD_MAJOR_TRAUMA);
-		s_inputBindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
-		s_inputBindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
-		s_inputBindings->BindKey(dd::Key::KEY_1, dd::InputAction::CAMERA_POS_1);
-		s_inputBindings->BindKey(dd::Key::KEY_2, dd::InputAction::CAMERA_POS_2);
-		s_inputBindings->BindKey(dd::Key::KEY_3, dd::InputAction::CAMERA_POS_3);
-		s_inputBindings->BindKey(dd::Key::KEY_4, dd::InputAction::CAMERA_POS_4);
-		s_inputBindings->BindKey(dd::Key::HOME, dd::InputAction::DECREASE_DEPTH);
-		s_inputBindings->BindKey(dd::Key::END, dd::InputAction::INCREASE_DEPTH);
-		s_inputBindings->BindKey(dd::Key::PAUSE, dd::InputAction::PAUSE);
-		s_inputBindings->BindKey(dd::Key::PAGE_DOWN, dd::InputAction::TIME_SCALE_DOWN);
-		s_inputBindings->BindKey(dd::Key::PAGE_UP, dd::InputAction::TIME_SCALE_UP);
-		s_inputBindings->BindKey(dd::Key::E, dd::InputAction::TOGGLE_ENTITY_DATA, "debug");
-		s_inputBindings->BindKey(dd::Key::F3, dd::InputAction::TOGGLE_PICKING, "debug");
-		s_inputBindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SELECT_MESH, "debug");
-		s_inputBindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
-		s_inputBindings->BindKey(dd::Key::P, dd::InputAction::RESET_PHYSICS, "game");
-		s_inputBindings->BindKey(dd::Key::ESCAPE, dd::InputAction::EXIT);
-		s_inputBindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_CONSOLE, "debug");
+		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_FREECAM);
+		s_keybindings->BindKey(dd::Key::F3, dd::InputAction::TOGGLE_BOUNDS);
+		s_keybindings->BindKey(dd::Key::F4, dd::InputAction::TOGGLE_PICKING, "debug");
+		s_keybindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
+		s_keybindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
+		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
+		s_keybindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
+		s_keybindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
+		s_keybindings->BindKey(dd::Key::R, dd::InputAction::ADD_MINOR_TRAUMA);
+		s_keybindings->BindKey(dd::Key::T, dd::InputAction::ADD_MAJOR_TRAUMA);
+		s_keybindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
+		s_keybindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
+		s_keybindings->BindKey(dd::Key::KEY_1, dd::InputAction::CAMERA_POS_1);
+		s_keybindings->BindKey(dd::Key::KEY_2, dd::InputAction::CAMERA_POS_2);
+		s_keybindings->BindKey(dd::Key::KEY_3, dd::InputAction::CAMERA_POS_3);
+		s_keybindings->BindKey(dd::Key::KEY_4, dd::InputAction::CAMERA_POS_4);
+		s_keybindings->BindKey(dd::Key::HOME, dd::InputAction::DECREASE_DEPTH);
+		s_keybindings->BindKey(dd::Key::END, dd::InputAction::INCREASE_DEPTH);
+		s_keybindings->BindKey(dd::Key::PAGE_DOWN, dd::InputAction::TIME_SCALE_DOWN);
+		s_keybindings->BindKey(dd::Key::PAGE_UP, dd::InputAction::TIME_SCALE_UP);
+		s_keybindings->BindKey(dd::Key::E, dd::InputAction::TOGGLE_ENTITY_DATA, "debug");
+		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SELECT_MESH, "debug");
+		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		s_keybindings->BindKey(dd::Key::P, dd::InputAction::RESET_PHYSICS, "game");
+		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::EXIT);
+		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_CONSOLE, "debug");
 
-		s_input->AddHandler(dd::InputAction::TOGGLE_FREECAM, dd::InputType::Release, &ToggleFreeCam);
-		s_input->AddHandler(dd::InputAction::CAMERA_POS_1, dd::InputType::Release, []() { SetCameraPos(CameraPos::One); });
-		s_input->AddHandler(dd::InputAction::CAMERA_POS_2, dd::InputType::Release, []() { SetCameraPos(CameraPos::Two); });
-		s_input->AddHandler(dd::InputAction::CAMERA_POS_3, dd::InputType::Release, []() { SetCameraPos(CameraPos::Three); });
-		s_input->AddHandler(dd::InputAction::CAMERA_POS_4, dd::InputType::Release, []() { SetCameraPos(CameraPos::Four); });
-		s_input->AddHandler(dd::InputAction::INCREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::IncreaseDepth); });
-		s_input->AddHandler(dd::InputAction::DECREASE_DEPTH, dd::InputType::Release, []() { SetCameraPos(CameraPos::DecreaseDepth); });
+		s_input->AddHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_1, []() { SetCameraPos(CameraPos::One); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_2, []() { SetCameraPos(CameraPos::Two); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_3, []() { SetCameraPos(CameraPos::Three); });
+		s_input->AddHandler(dd::InputAction::CAMERA_POS_4, []() { SetCameraPos(CameraPos::Four); });
+		s_input->AddHandler(dd::InputAction::INCREASE_DEPTH, []() { SetCameraPos(CameraPos::IncreaseDepth); });
+		s_input->AddHandler(dd::InputAction::DECREASE_DEPTH, []() { SetCameraPos(CameraPos::DecreaseDepth); });
 	}
 
 	void NeutrinoGame::Update(const dd::GameUpdateData& update_data)
@@ -277,6 +275,7 @@ namespace neut
 		ddr::BoundsRenderer& bounds_renderer = dd::Services::Register(new ddr::BoundsRenderer());
 
 		ddr::RayRenderer& ray_renderer = dd::Services::Register(new ddr::RayRenderer());
+
 		ddr::LinesRenderer& lines_renderer = dd::Services::Register(new ddr::LinesRenderer());
 
 		neut::WaterRenderer& water_renderer = dd::Services::Register(new neut::WaterRenderer());

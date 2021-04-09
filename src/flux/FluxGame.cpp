@@ -40,12 +40,12 @@ namespace flux
 	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::Input> s_input;
+	static dd::Service<dd::InputKeyBindings> s_keybindings;
 	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<flux::FluxPlayerController> s_playerController;
 	static dd::Service<flux::FluxEnemySystem> s_enemySystem;
 
 	static ddr::OrthoCamera* s_camera;
-	static dd::InputKeyBindings* s_keybindings;
 	static ddr::SpriteSheetHandle s_playerSpriteSheet;
 	static ddr::SpriteSheetHandle s_playerBulletSpriteSheet;
 
@@ -141,14 +141,12 @@ namespace flux
 
 		s_input->SetCurrentMode("game");
 
-		dd::InputKeyBindings& bindings = s_input->AccessKeyBindings();
-		bindings.BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		bindings.BindKey(dd::Key::W, dd::InputAction::UP, "game");
-		bindings.BindKey(dd::Key::S, dd::InputAction::DOWN, "game");
-		bindings.BindKey(dd::Key::A, dd::InputAction::LEFT, "game");
-		bindings.BindKey(dd::Key::D, dd::InputAction::RIGHT, "game");
-		bindings.BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
-		bindings.BindKey(dd::Key::R, dd::InputAction::RESET, "game");
+		s_keybindings->BindKey(dd::Key::W, dd::InputAction::UP, "game");
+		s_keybindings->BindKey(dd::Key::S, dd::InputAction::DOWN, "game");
+		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT, "game");
+		s_keybindings->BindKey(dd::Key::D, dd::InputAction::RIGHT, "game");
+		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
+		s_keybindings->BindKey(dd::Key::R, dd::InputAction::RESET, "game");
 
 		s_input->AddHandler(dd::InputAction::RESET, &ResetPlayer);
 

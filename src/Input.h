@@ -59,10 +59,6 @@ namespace dd
 		void EnableMouse(bool enabled) { m_mouseEnabled = enabled; }
 		void EnableKeyboard(bool enabled) { m_keyboardEnabled = enabled; }
 
-		void SetKeyBindings(InputKeyBindings& bindings) { m_bindings = bindings; }
-		const InputKeyBindings& GetKeyBindings() const { return m_bindings; }
-		InputKeyBindings& AccessKeyBindings() { return m_bindings; }
-
 		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> GetText() const { return m_text; }
 
 	private:
@@ -76,7 +72,6 @@ namespace dd
 		std::unordered_map<InputReceived, std::vector<InputHandler>, InputRecvHash> m_handlers;
 		std::unordered_map<InputAction, bool> m_held;
 
-		InputKeyBindings m_bindings;
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
 
