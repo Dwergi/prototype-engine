@@ -5,9 +5,9 @@
 //
 
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
-#include "Plane.h"
+#include "ddm/Plane.h"
 
 using ddm::Plane;
 

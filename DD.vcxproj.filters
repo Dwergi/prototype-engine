@@ -34,9 +34,6 @@
     <Filter Include="Includes">
       <UniqueIdentifier>{6f7b570c-e8a9-463e-a549-5bb17d2ab414}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\PCG">
-      <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Includes\gl3w">
       <UniqueIdentifier>{e87999f1-1019-463f-9d68-497df60b60de}</UniqueIdentifier>
     </Filter>
@@ -129,6 +126,15 @@
     </Filter>
     <Filter Include="Includes\ppk">
       <UniqueIdentifier>{54fbc484-083d-4e8a-bca6-952b46c51c6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\catch2">
+      <UniqueIdentifier>{6ba44154-b774-44c8-abf3-d5c15b3080cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\pcg">
+      <UniqueIdentifier>{c8412055-6a87-4a0b-8e46-c078be2d1ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\catch2\benchmark">
+      <UniqueIdentifier>{9b4a360d-311f-4a40-968e-828e43abf899}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -238,13 +244,13 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_extras.hpp">
-      <Filter>Includes\PCG</Filter>
+      <Filter>Includes\pcg</Filter>
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_random.hpp">
-      <Filter>Includes\PCG</Filter>
+      <Filter>Includes\pcg</Filter>
     </ClInclude>
     <ClInclude Include="include\pcg\pcg_uint128.hpp">
-      <Filter>Includes\PCG</Filter>
+      <Filter>Includes\pcg</Filter>
     </ClInclude>
     <ClInclude Include="include\gl3w\include\GL\gl3w.h">
       <Filter>Includes\gl3w</Filter>
@@ -332,9 +338,6 @@
     </ClInclude>
     <ClInclude Include="src\ParticleSystem.h">
       <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SystemsSorting.h">
-      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\BoundsRenderer.h">
       <Filter>Renderers</Filter>
@@ -627,9 +630,6 @@
     <ClInclude Include="src\d2d\SpriteTileSystem.h">
       <Filter>Systems\d2d</Filter>
     </ClInclude>
-    <ClInclude Include="src\SystemsManager.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics2DGame.h">
       <Filter>Games\Physics2D</Filter>
     </ClInclude>
@@ -882,6 +882,447 @@
     <ClInclude Include="src\ddc\System.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="include\catch2\catch_all.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_approx.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_assertion_info.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_assertion_result.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_config.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_message.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_reporter_registrars.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_section_info.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_session.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_tag_alias.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_tag_alias_autoregistrar.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_template_test_macros.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_test_case_info.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_test_macros.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_test_spec.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_timer.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_tostring.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_totals.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_translate_exception.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_version.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\catch_version_macros.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_constructor.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_optimizer.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generator_exception.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generators.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generators_adapters.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generators_all.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generators_random.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\generators\catch_generators_range.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_all.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_capture.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_config.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_enum_values_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_exception.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_generatortracker.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_registry_hub.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_reporter.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_reporter_factory.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_reporter_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_runner.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_tag_alias_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\interfaces\catch_interfaces_testcase.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_assertion_handler.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_case_sensitive.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_clara.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_commandline.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_compiler_capabilities.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_config_android_logwrite.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_config_counter.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_config_uncaught_exceptions.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_config_wchar.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_console_colour.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_console_width.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_container_nonmembers.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_context.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_debug_console.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_debugger.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_decomposer.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_enforce.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_enum_values_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_errno_guard.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_exception_translator_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_fatal_condition_handler.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_lazy_expr.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_leak_detector.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_list.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_message_info.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_meta.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_noncopyable.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_option.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_output_redirect.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_platform.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_polyfills.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_preprocessor.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_random_number_generator.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_reporter_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_result_type.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_run_context.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_section.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_singletons.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_source_line_info.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_startup_exception_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_stream.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_stream_end_stop.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_string_manip.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_stringref.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_tag_alias_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_template_test_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_case_registry_impl.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_case_tracker.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_failure_exception.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_macro_impl.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_registry.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_test_spec_parser.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_textflow.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_to_string.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_uncaught_exceptions.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_unique_ptr.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_wildcard_pattern.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_windows_h_proxy.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\internal\catch_xmlwriter.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_all.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_container_properties.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_contains.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_exception.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_floating_point.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_predicate.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_quantifiers.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_string.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_templated.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\catch_matchers_vector.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\matchers\internal\catch_matchers_impl.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_automake.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_compact.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_console.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_cumulative_base.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_event_listener.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_helpers.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_junit.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_listening.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_sonarqube.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_streaming_base.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_tap.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_teamcity.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporter_xml.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\reporters\catch_reporters_all.hpp">
+      <Filter>Includes\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\SystemsManager.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\SystemsSorting.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_benchmark.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_benchmark_all.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_benchmark_function.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_chronometer.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_clock.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_environment.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_estimate.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_execution_plan.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_outlier_classification.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\catch_sample_analysis.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_analyse.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_complete_invoke.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_estimate_clock.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_run_for_at_least.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_repeat.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_measure.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_stats.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\catch2\benchmark\detail\catch_timing.hpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1076,9 +1517,6 @@
     </ClCompile>
     <ClCompile Include="src\PlayerComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SystemsSorting.cpp">
-      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\BoundsRenderer.cpp">
       <Filter>Renderers</Filter>
@@ -1356,9 +1794,6 @@
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp">
       <Filter>Systems\d2d</Filter>
     </ClCompile>
-    <ClCompile Include="src\SystemsManager.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\stress\IRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1514,6 +1949,210 @@
     </ClCompile>
     <ClCompile Include="src\ddc\System.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_approx.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_assertion_result.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_config.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_message.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_registry_hub.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_session.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_test_case_info.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_test_spec.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_timer.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_tostring.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_totals.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\catch_version.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\generators\internal\catch_generators_combined_tu.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\interfaces\catch_interfaces_combined_tu.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\interfaces\catch_interfaces_reporter.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_assertion_handler.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_clara.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_combined_tu.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_commandline.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_console_colour.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_context.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_debug_console.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_debugger.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_enforce.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_enum_values_registry.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_exception_translator_registry.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_fatal_condition_handler.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_list.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_main.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_output_redirect.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_random_number_generator.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_reporter_registry.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_result_type.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_run_context.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_section.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_singletons.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_source_line_info.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_stream.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_string_manip.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_stringref.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_tag_alias_registry.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_test_case_registry_impl.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_test_case_tracker.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_test_registry.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_test_spec_parser.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_textflow.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_wildcard_pattern.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\internal\catch_xmlwriter.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\matchers\catch_matchers_floating_point.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\matchers\catch_matchers_string.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\matchers\catch_matchers_templated.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\matchers\internal\catch_matchers_combined_tu.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_automake.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_combined_tu.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_compact.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_console.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_cumulative_base.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_junit.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_listening.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_sonarqube.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_streaming_base.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_tap.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_teamcity.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\reporters\catch_reporter_xml.cpp">
+      <Filter>Includes\catch2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\SystemsManager.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddc\SystemsSorting.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\benchmark\internal\catch_benchmark_combined_tu.cpp">
+      <Filter>Includes\catch2\benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="include\catch2\benchmark\detail\catch_stats.cpp">
+      <Filter>Includes\catch2\benchmark</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

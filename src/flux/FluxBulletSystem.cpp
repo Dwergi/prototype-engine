@@ -43,8 +43,6 @@ namespace flux
 		ImGui::Value("Live", m_liveBullets);
 	}
 
-	DD_OPTIMIZE_OFF();
-
 	void FluxBulletSystem::Update(ddc::UpdateData& update_data)
 	{
 		float dt = update_data.Delta(); 
@@ -71,7 +69,7 @@ namespace flux
 			bullet_cmp.Lifetime += dt;
 
 			ddm::Circle bullet_circle = bullet_cmp.HitCircle.GetTransformed(bullet_transform.Position, bullet_transform.Scale);
-			static const ddm::AABB2D MAP_BOUNDS(glm::vec2(0, 0), m_mapSize);
+			const ddm::AABB2D MAP_BOUNDS(glm::vec2(0, 0), m_mapSize);
 
 			if (bullet_cmp.Type == flux::BulletType::Friendly)
 			{

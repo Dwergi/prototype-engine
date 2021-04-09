@@ -1,6 +1,9 @@
 #pragma once
 
-namespace tests
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/benchmark/catch_benchmark_all.hpp"
+
+struct TestInitializer
 {
-	int RunTests( int argc, char* argv[] );
-}
+	TestInitializer();
+};

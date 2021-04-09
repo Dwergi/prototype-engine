@@ -45,7 +45,7 @@
 
 #define DD_METHOD( MethodName ) typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
 
-#define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* typeInfo ) {}
+#define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* ) {}
 
 #define DD_FUNCTION( FN ) dd::BuildFunction<decltype( &FN ), &FN>( &FN )
 

@@ -18,7 +18,7 @@
 
 DD_POD_CPP(ddr::ShaderHandle);
 
-static dd::ProfilerValue& g_shaderChanged = dd::Profiler::GetValue("Shader Changed");
+static dd::ProfilerValueRef g_shaderChanged("Shader Changed");
 
 namespace ddr
 {

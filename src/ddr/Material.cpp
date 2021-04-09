@@ -13,7 +13,7 @@ DD_POD_CPP(ddr::MaterialHandle);
 
 namespace ddr
 {
-	static dd::ProfilerValue& g_materialChanged = dd::Profiler::GetValue("Material Changed");
+	static dd::ProfilerValueRef g_materialChanged("Material Changed");
 
 	Material::Material()
 	{

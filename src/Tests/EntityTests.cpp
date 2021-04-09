@@ -1,11 +1,11 @@
 #include "PCH.h"
-#include "ComponentBuffer.h"
-#include "UpdateData.h"
-#include "System.h"
-#include "SystemsManager.h"
-#include "SystemsSorting.h"
+#include "Tests.h"
 
-#include "catch2/catch.hpp"
+#include "ddc/ComponentBuffer.h"
+#include "ddc/UpdateData.h"
+#include "ddc/System.h"
+#include "ddc/SystemsManager.h"
+#include "ddc/SystemsSorting.h"
 
 struct FirstComponent
 {
@@ -540,7 +540,7 @@ TEST_CASE("Full Update Loop")
 	system_mgr.Register(a);
 	system_mgr.Initialize(layer);
 
-	BENCHMARK("Create layer")
+	//BENCHMARK("Create layer")
 	{
 		for (int i = 0; i < 1000; ++i)
 		{
@@ -554,16 +554,13 @@ TEST_CASE("Full Update Loop")
 			ThirdComponent& third = layer.Add<ThirdComponent>(e);
 			third.ThirdValue = 0;
 		}
-	}
+	};
 
-	BENCHMARK("Update")
+	//BENCHMARK("Update")
 	{
-		for (int i = 0; i < 100; ++i)
-		{
-			layer.Update();
-			system_mgr.Update(layer, 0.0f);
-		}
-	}
+		layer.Update();
+		system_mgr.Update(layer, 0.0f);
+	};
 
 	for (int i = 0; i < 1000; ++i)
 	{

@@ -17,21 +17,21 @@ namespace dd
 	{
 		if (var.Type() == DD_FIND_TYPE(float))
 		{
-			ImGui::DragFloat(name.c_str(), &var.GetValue<float>(), 0.001f);
+			ImGui::DragFloat(name.c_str(), &var.AccessValue<float>(), 0.001f);
 		}
 		else if (var.Type() == DD_FIND_TYPE(int))
 		{
-			ImGui::DragInt(name.c_str(), &var.GetValue<int>());
+			ImGui::DragInt(name.c_str(), &var.AccessValue<int>());
 		}
 		else if (var.Type() == DD_FIND_TYPE(bool))
 		{
-			ImGui::Checkbox(name.c_str(), &var.GetValue<bool>());
+			ImGui::Checkbox(name.c_str(), &var.AccessValue<bool>());
 		}
 	}
 
 	static void AddEnum(const String& name, Variable& var)
 	{
-		int& current = var.GetValue<int>();
+		int& current = var.AccessValue<int>();
 
 		const Vector<EnumOption>& options = var.Type()->GetEnumOptions();
 

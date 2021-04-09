@@ -48,7 +48,7 @@ namespace dd
 		bool IsValid() const;
 
 		template <typename T>
-		T& GetValue();
+		T& AccessValue();
 		template <typename T>
 		const T& GetValue() const;
 
@@ -87,7 +87,7 @@ namespace dd
 	template <typename T>
 	struct CastHelper
 	{
-		static T& Cast( void*& data )
+		static T& Cast(void* const& data)
 		{
 			return *(T*&) (data);
 		}
@@ -96,7 +96,7 @@ namespace dd
 	template <typename T>
 	struct CastHelper<T*>
 	{
-		static T*& Cast( void*& data )
+		static T*& Cast(void* const& data)
 		{
 			return (T*&) data;
 		}
@@ -105,7 +105,7 @@ namespace dd
 	template <typename T>
 	struct CastHelper<const T*>
 	{
-		static const T*& Cast( void*& data )
+		static const T*& Cast(void* const& data)
 		{
 			return (const T*&) data;
 		}
@@ -114,14 +114,14 @@ namespace dd
 	template <typename T>
 	struct CastHelper<const T&>
 	{
-		static const T& Cast( void*& data )
+		static const T& Cast(void* const& data)
 		{
 			return *(const T*&) data;
 		}
 	};
 
 	template <typename T>
-	T& Variable::GetValue()
+	T& Variable::AccessValue()
 	{
 		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
 		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_FIND_TYPE( T ) ) );

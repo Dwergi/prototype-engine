@@ -16,7 +16,6 @@
 #include "OrthoCamera.h"
 #include "SpriteRenderer.h"
 #include "SpriteSheet.h"
-#include "SystemsManager.h"
 
 #include "d2d/BoxPhysicsComponent.h"
 #include "d2d/CirclePhysicsComponent.h"
@@ -28,6 +27,7 @@
 #include "d2d/Transform2DComponent.h"
 
 #include "ddc/ScratchEntity.h"
+#include "ddc/SystemsManager.h"
 
 #include "ddm/HitTest.h"
 

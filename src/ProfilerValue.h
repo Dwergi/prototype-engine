@@ -12,24 +12,41 @@ namespace dd
 {
 	struct Profiler;
 
-	struct ProfilerValue
+	struct IProfilerValue
+	{
+		virtual void Increment() = 0;
+		virtual void Decrement() = 0;
+
+		virtual void SetValue(float value) = 0;
+		virtual float GetValue() const = 0;
+		virtual float GetValueAtIndex(int index) const = 0;
+
+		virtual int Index() const = 0;
+		virtual float SlidingAverage() const = 0;
+
+		virtual const std::string& Name() const = 0;
+		virtual const dd::IArray<std::string>& Groups() const = 0;
+	};
+
+	struct ProfilerValue final : IProfilerValue
 	{
 		static const int FRAME_COUNT = 100;
 
 		ProfilerValue(const ProfilerValue&) = delete;
 		ProfilerValue(ProfilerValue&&) = delete;
 
-		void Increment();
+		void Increment() override;
+		void Decrement() override;
 
-		void SetValue(float value);
-		float GetValue() const;
-		float GetValueAtIndex(int index) const;
+		void SetValue(float value) override;
+		float GetValue() const override;
+		float GetValueAtIndex(int index) const override;
 
-		int Index() const { return m_index; }
-		float SlidingAverage() const { return m_sliding; }
+		int Index() const override { return m_index; }
+		float SlidingAverage() const override { return m_sliding; }
 
-		const std::string& Name() const { return m_name; }
-		const dd::IArray<std::string>& Groups() const { return m_groups; }
+		const std::string& Name() const override { return m_name; }
+		const dd::IArray<std::string>& Groups() const override  { return m_groups; }
 
 	private:
 		friend struct Profiler;
@@ -40,10 +57,34 @@ namespace dd
 		float m_sliding { 0 };
 		float m_values[FRAME_COUNT] = { 0 };
 
-		ProfilerValue(const char* name);
+		ProfilerValue(std::string_view name);
 
 		void BeginFrame();
 		void EndFrame();
 		void Draw();
+	};
+
+	struct ProfilerValueRef final : IProfilerValue
+	{
+		ProfilerValueRef(std::string_view name);
+
+		void Increment() override;
+		void Decrement() override;
+
+		void SetValue(float value) override;
+		float GetValue() const override;
+		float GetValueAtIndex(int index) const override;
+
+		int Index() const override;
+		float SlidingAverage() const override;
+
+		const std::string& Name() const override { return m_name; }
+		const dd::IArray<std::string>& Groups() const override;
+
+	private:
+		std::string m_name;
+		ProfilerValue* m_ptr { 0 };
+
+		void Initialize();
 	};
 }

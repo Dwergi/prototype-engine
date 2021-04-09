@@ -22,13 +22,14 @@
 #include "RayRenderer.h"
 #include "TestEntities.h"
 #include "IWindow.h"
-#include "SystemsManager.h"
 
 #include "ColourComponent.h"
 #include "FPSCameraComponent.h"
 #include "MeshComponent.h"
 #include "RayComponent.h"
 #include "TransformComponent.h"
+
+#include "ddc/SystemsManager.h"
 
 #include "ddr/RenderManager.h"
 

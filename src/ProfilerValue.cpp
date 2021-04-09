@@ -11,9 +11,9 @@
 
 namespace dd
 {
-	ProfilerValue::ProfilerValue(const char* name)
+	ProfilerValue::ProfilerValue(std::string_view name)
 	{
-		std::string str_name = name;
+		std::string str_name(name);
 
 		// enumerate groups
 		size_t start = 0;
@@ -44,6 +44,11 @@ namespace dd
 	void ProfilerValue::Increment()
 	{
 		++m_values[m_index];
+	}
+
+	void ProfilerValue::Decrement()
+	{
+		--m_values[m_index];
 	}
 
 	void ProfilerValue::SetValue(float value)
@@ -115,5 +120,66 @@ namespace dd
 
 			ImGui::TreePop();
 		}
+	}
+
+	ProfilerValueRef::ProfilerValueRef(std::string_view name) :
+		m_name(name)
+	{
+	}
+
+	void ProfilerValueRef::Initialize()
+	{
+		if (m_ptr == nullptr)
+		{
+			m_ptr = &dd::Profiler::GetValue(m_name);
+		}
+	}
+
+	void ProfilerValueRef::Increment()
+	{
+		Initialize();
+		m_ptr->Increment();
+	}
+
+	void ProfilerValueRef::Decrement()
+	{
+		Initialize();
+		m_ptr->Decrement();
+	}
+
+	void ProfilerValueRef::SetValue(float value)
+	{
+		Initialize();
+		m_ptr->SetValue(value);
+	}
+
+	float ProfilerValueRef::GetValue() const
+	{
+		DD_ASSERT(m_ptr != nullptr);
+		return m_ptr->GetValue();
+	}
+
+	float ProfilerValueRef::GetValueAtIndex(int index) const
+	{
+		DD_ASSERT(m_ptr != nullptr);
+		return m_ptr->GetValueAtIndex(index);
+	}
+
+	int ProfilerValueRef::Index() const
+	{
+		DD_ASSERT(m_ptr != nullptr);
+		return m_ptr->Index();
+	}
+
+	float ProfilerValueRef::SlidingAverage() const
+	{
+		DD_ASSERT(m_ptr != nullptr);
+		return m_ptr->SlidingAverage();
+	}
+
+	const dd::IArray<std::string>& ProfilerValueRef::Groups() const
+	{
+		DD_ASSERT(m_ptr != nullptr);
+		return m_ptr->Groups();
 	}
 }

@@ -7,7 +7,6 @@
 #include "PCH.h"
 #include "TestTypes.h"
 
-
 void Test::SimpleStruct::Double() const
 {
 

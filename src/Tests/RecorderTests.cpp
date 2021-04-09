@@ -5,7 +5,7 @@
 //
 
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
 #include "Recorder.h"
 

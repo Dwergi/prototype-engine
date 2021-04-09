@@ -1,7 +1,7 @@
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
-#include "Math_dd.h"
+#include "ddm/Math_dd.h"
 
 #include <glm/gtc/constants.hpp>
 
@@ -15,6 +15,7 @@ bool almostEqualRads( float a, float b )
 
 TEST_CASE( "[FPSCamera] Direction to Pitch/Yaw" )
 {
+
 	float pitch[] = { -85, -60, -30, 0, 30, 60, 85 };
 	float yaw[] = { 0, 30, 60, 90, 120, 180, 210, 240, 270, 300, 330 };
 

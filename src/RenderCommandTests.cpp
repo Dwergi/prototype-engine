@@ -5,9 +5,9 @@
 //
 
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
-#include "RenderCommand.h"
+#include "ddr/RenderCommand.h"
 
 constexpr uint MASK = 0x00FFFFFF;
 

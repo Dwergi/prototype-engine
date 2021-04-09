@@ -21,10 +21,11 @@ namespace dd
 
 	void Profiler::Initialize()
 	{
-		DD_ASSERT(s_remotery == nullptr);
-
-		DD_PROFILE_INIT(s_remotery);
-		DD_PROFILE_THREAD_NAME("Main");
+		if (s_remotery == nullptr)
+		{
+			DD_PROFILE_INIT(s_remotery);
+			DD_PROFILE_THREAD_NAME("Main");
+		}
 	}
 
 	void Profiler::Shutdown()
@@ -34,8 +35,10 @@ namespace dd
 		DD_PROFILE_DEINIT(s_remotery);
 	}
 
-	ProfilerValue& Profiler::GetValue(const char* name)
+	ProfilerValue& Profiler::GetValue(std::string_view name)
 	{
+		Initialize();
+
 		for (dd::ProfilerValue* value : s_instances)
 		{
 			if (value->Name() == name)

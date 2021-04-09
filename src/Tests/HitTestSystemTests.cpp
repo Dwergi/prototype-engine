@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
 #include "HitTestSystem.h"
 #include "JobSystem.h"

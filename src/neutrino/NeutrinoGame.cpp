@@ -30,7 +30,6 @@
 #include "RayRenderer.h"
 #include "ShakyCamera.h"
 #include "ShipSystem.h"
-#include "SystemsManager.h"
 #include "SwarmAgentComponent.h"
 #include "SwarmSystem.h"
 #include "TerrainRenderer.h"
@@ -42,6 +41,8 @@
 #include "Services.h"
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
+
+#include "ddc/SystemsManager.h"
 
 #include "ddr/RenderManager.h"
 

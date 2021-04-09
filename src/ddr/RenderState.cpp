@@ -7,7 +7,7 @@ namespace ddr
 {
 	const RenderState* RenderState::m_current = nullptr;
 
-	static dd::ProfilerValue& s_renderStateChanged = dd::Profiler::GetValue("Render State Changed");
+	static dd::ProfilerValueRef s_renderStateChanged("Render State Changed");
 
 	ScopedRenderState::ScopedRenderState(RenderState& state) :
 		m_state(&state)

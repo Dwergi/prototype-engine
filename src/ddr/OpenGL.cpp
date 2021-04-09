@@ -10,7 +10,7 @@
 #include "GLError.h"
 #include "Profiler.h"
 
-static dd::ProfilerValue& s_drawCallProfiler = dd::Profiler::GetValue("Draw Calls");
+static dd::ProfilerValueRef s_drawCallProfiler("Draw Calls");
 
 namespace OpenGL
 {

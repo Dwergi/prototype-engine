@@ -6,8 +6,6 @@
 
 #include "PCH.h"
 
-#include "CommandLine.h"
-
 #ifdef _TEST
 
 #include "Tests.h"
@@ -15,6 +13,7 @@
 #endif
 
 #include "AssetManager.h"
+#include "CommandLine.h"
 #include "DDAssertHelpers.h"
 #include "DebugConsole.h"
 #include "DebugUI.h"
@@ -31,7 +30,8 @@
 #include "IWindow.h"
 #include "SFMLInputSource.h"
 #include "SFMLWindow.h"
-#include "SystemsManager.h"
+
+#include "ddc/SystemsManager.h"
 
 #include "ddr/OpenGL.h"
 #include "ddr/RenderManager.h"
@@ -133,13 +133,13 @@ static void EndFrame()
 #endif
 
 // Profiler values
-static dd::ProfilerValue& s_startFrameProfiler = dd::Profiler::GetValue("Start Frame");
-static dd::ProfilerValue& s_entityUpdateProfiler = dd::Profiler::GetValue("Entity Update");
-static dd::ProfilerValue& s_systemsUpdateProfiler = dd::Profiler::GetValue("Systems Update");
-static dd::ProfilerValue& s_gameUpdateProfiler = dd::Profiler::GetValue("Game Update");
-static dd::ProfilerValue& s_renderProfiler = dd::Profiler::GetValue("Render");
-static dd::ProfilerValue& s_debugUIProfiler = dd::Profiler::GetValue("Debug UI");
-static dd::ProfilerValue& s_endFrameProfiler = dd::Profiler::GetValue("End Frame");
+static dd::ProfilerValueRef s_startFrameProfiler("Start Frame");
+static dd::ProfilerValueRef s_entityUpdateProfiler("Entity Update");
+static dd::ProfilerValueRef s_systemsUpdateProfiler("Systems Update");
+static dd::ProfilerValueRef s_gameUpdateProfiler("Game Update");
+static dd::ProfilerValueRef s_renderProfiler("Render");
+static dd::ProfilerValueRef s_debugUIProfiler("Debug UI");
+static dd::ProfilerValueRef s_endFrameProfiler("End Frame");
 
 static int GameMain()
 {
@@ -295,45 +295,10 @@ static int GameMain()
 	return 0;
 }
 
-#ifdef _TEST
-
-struct TestDebugUI : dd::IDebugUI
-{
-	void RegisterDebugPanel(dd::IDebugPanel& debug_panel) override {}
-	void RenderDebugPanels() override {}
-
-	void SetDraw(bool draw) override {}
-
-	void StartFrame(float delta_t) override {}
-	void EndFrame() override {}
-
-	bool IsMidFrame() const override { return false; }
-	bool IsMidWindow() const override { return false; }
-	void EndWindow() override {}
-};
-
-int TestMain(int argc, char* argv[])
-{
-	dd::Services::RegisterInterface<dd::IDebugUI>(new TestDebugUI());
-
-	int iError = tests::RunTests(argc, argv);
-
-	if (iError != 0)
-		DD_ASSERT(false, "Tests failed!");
-	else
-		printf("Tests passed!");
-
-	return iError;
-}
-
-#endif
-
 void Initialize()
 {
 	dd::InitializeMemoryTracking();
 	dd::SetAsMainThread();
-
-	dd::Profiler::Initialize();
 
 	dd::File::SetBasePath("../../../data");
 	dd::File::AddOverridePath("./base");
@@ -353,6 +318,8 @@ void Shutdown()
 //
 // ENTRY POINT
 //
+#ifndef _TEST
+
 int main(int argc, char* argv[])
 {
 	std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
@@ -360,13 +327,10 @@ int main(int argc, char* argv[])
 
 	Initialize();
 
-#ifdef _TEST
-	int32 ret = TestMain(argc, argv);
-#else
 	int32 ret = GameMain();
-#endif
 
 	Shutdown();
 
 	return ret;
 }
+#endif // !_TEST

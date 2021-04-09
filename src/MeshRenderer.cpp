@@ -27,7 +27,7 @@
 
 static dd::Service<dd::JobSystem> s_jobsystem;
 static dd::Service<ddr::MeshManager> s_meshManager;
-static dd::ProfilerValue& s_meshesRendered = dd::Profiler::GetValue("Meshes Rendered");
+static dd::ProfilerValueRef s_meshesRendered("Meshes Rendered");
 
 namespace ddr
 {

@@ -20,13 +20,6 @@ namespace dd
 	uint TypeInfo::sm_maxID = 0;
 	uint8 TypeInfo::sm_maxComponentID = 0;
 
-	struct DefaultTypeRegistration
-	{
-		DefaultTypeRegistration() { dd::TypeInfo::RegisterDefaultTypes(); }
-	};
-
-	static DefaultTypeRegistration sm_defaults;
-
 	void FindNamespace(const char* name, String& nameSpace, String& typeName)
 	{
 		String128 input(name);
@@ -269,6 +262,8 @@ namespace dd
 
 	void TypeInfo::RegisterQueuedTypes()
 	{
+		dd::TypeInfo::RegisterDefaultTypes();
+
 		for (auto fn : *sm_registrations)
 		{
 			fn();

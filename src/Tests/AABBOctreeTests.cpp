@@ -5,11 +5,10 @@
 //
 
 #include "PCH.h"
+#include "Tests.h"
+
 #include "AABBOctree.h"
-
 #include "Random.h"
-
-#include "catch2/catch.hpp"
 
 using namespace dd;
 

@@ -31,13 +31,13 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R>
 	void Call( Variable* ret, void* context, Variable* args )
 	{
-		ret->GetValue<R>() = (*FunctionPtr)();
+		ret->AccessValue<R>() = (*FunctionPtr)();
 	}
 
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename... Args, std::size_t... Index>
 	void InternalCallHelper( Variable* ret, Variable* args, std::index_sequence<Index...> )
 	{
-		ret->GetValue<R>() = (*FunctionPtr)(GetArg<Index, Args...>::get( args )...);
+		ret->AccessValue<R>() = (*FunctionPtr)(GetArg<Index, Args...>::get( args )...);
 	}
 
 	// General case of 1-N arguments.
@@ -77,13 +77,13 @@ namespace dd
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C>
 	void CallMethod( Variable* ret, void* context, Variable* args )
 	{
-		ret->GetValue<R>() = (((C*) context)->*FunctionPtr)();
+		ret->AccessValue<R>() = (((C*) context)->*FunctionPtr)();
 	}
 
 	template <typename FunctionType, FunctionType FunctionPtr, typename R, typename C, typename... Args, std::size_t... Index>
 	void InternalCallMethodHelper( Variable* ret, C* context, Variable* args, std::index_sequence<Index...> )
 	{
-		ret->GetValue<R>() = (context->*FunctionPtr)( GetArg<Index, Args...>::get( args )... );
+		ret->AccessValue<R>() = (context->*FunctionPtr)( GetArg<Index, Args...>::get( args )... );
 	}
 
 	// General case of 1-N arguments.

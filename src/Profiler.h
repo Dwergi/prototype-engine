@@ -54,7 +54,7 @@ namespace dd
 		static void EnableDraw( bool draw );
 		static bool ShouldDraw() { return s_draw; }
 
-		static ProfilerValue& GetValue(const char* name);
+		static ProfilerValue& GetValue(std::string_view name);
 		
 	private:
 		static Remotery* s_remotery;

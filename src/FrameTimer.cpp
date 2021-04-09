@@ -9,7 +9,7 @@
 
 namespace dd
 {
-	static dd::ProfilerValue& s_frameTimes = dd::Profiler::GetValue("Frame Time");
+	static dd::ProfilerValueRef s_frameTimes("Frame Time");
 
 	FrameTimer::FrameTimer() : 
 		m_maxFPS(144),

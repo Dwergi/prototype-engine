@@ -6,13 +6,36 @@
 
 #include "PCH.h"
 #include "Tests.h"
-#define CATCH_CONFIG_RUNNER
-#include "catch2/catch.hpp"
 
-int tests::RunTests( int argc, char* argv[] )
+#include "DebugUI.h"
+#include "File.h"
+#include "JobSystem.h"
+#include "Services.h"
+
+struct TestDebugUI : dd::IDebugUI
 {
-	Catch::Session session;
-	Catch::ConfigData& config = session.configData();
-	config.showDurations = Catch::ShowDurations::Always;
-	return session.run( argc, argv );
+	void RegisterDebugPanel(dd::IDebugPanel& debug_panel) override {}
+	void RenderDebugPanels() override {}
+
+	void SetDraw(bool draw) override {}
+
+	void StartFrame(float delta_t) override {}
+	void EndFrame() override {}
+
+	bool IsMidFrame() const override { return false; }
+	bool IsMidWindow() const override { return false; }
+	void EndWindow() override {}
+};
+
+static TestInitializer s_instance;
+
+TestInitializer::TestInitializer()
+{
+	dd::InitializeMemoryTracking();
+	dd::SetAsMainThread();
+
+	dd::TypeInfo::RegisterQueuedTypes();
+
+	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
+	dd::Services::RegisterInterface<dd::IDebugUI>(new TestDebugUI());
 }

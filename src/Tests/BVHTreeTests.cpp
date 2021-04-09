@@ -5,12 +5,12 @@
 //
 
 #include "PCH.h"
+#include "Tests.h"
+
 #include "BVHTree.h"
 
 #include "Random.h"
-#include "Ray.h"
-
-#include "catch2/catch.hpp"
+#include "ddm/Ray.h"
 
 TEST_CASE("[BVHTree] Controlled Build")
 {

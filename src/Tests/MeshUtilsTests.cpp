@@ -1,8 +1,8 @@
 #include "PCH.h"
-#include "catch2/catch.hpp"
+#include "Tests.h"
 
 #include "MeshUtils.h"
-#include "Mesh.h"
+#include "ddr/Mesh.h"
 
 TEST_CASE( "[Icosphere] 1 Iteration" )
 {
