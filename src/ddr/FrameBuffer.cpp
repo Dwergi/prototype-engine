@@ -268,7 +268,7 @@ namespace ddr
 	void FrameBuffer::UnbindRead()
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_previousRead);
-		m_previousRead = -1;
+		m_previousRead = 0;
 
 		CheckOGLError();
 	}
@@ -276,7 +276,7 @@ namespace ddr
 	void FrameBuffer::UnbindDraw()
 	{
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_previousDraw);
-		m_previousDraw = -1;
+		m_previousDraw = 0;
 
 		glViewport(0, 0, m_previousSize.x, m_previousSize.y);
 		m_previousSize = { 0, 0 };

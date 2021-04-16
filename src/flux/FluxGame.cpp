@@ -104,11 +104,11 @@ namespace flux
 
 		dd::Services::Register(new ddc::EntityPrototypeManager());
 
-		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
-		s_assetManager->Register(texture_manager);
-
 		ddr::ShaderManager& shader_manager = dd::Services::Register(new ddr::ShaderManager());
 		s_assetManager->Register(shader_manager);
+
+		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
+		s_assetManager->Register(texture_manager);
 
 		ddr::SpriteManager& sprite_manager = dd::Services::Register(new ddr::SpriteManager());
 		s_assetManager->Register(sprite_manager);

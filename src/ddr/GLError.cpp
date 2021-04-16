@@ -22,24 +22,24 @@ namespace dd
 				switch( err )
 				{
 				case GL_INVALID_OPERATION:
-					error = "INVALID_OPERATION";
+					error = "GL_INVALID_OPERATION";
 					break;
 				case GL_INVALID_ENUM:
-					error = "INVALID_ENUM";
+					error = "GL_INVALID_ENUM";
 					break;
 				case GL_INVALID_VALUE:
-					error = "INVALID_VALUE";
+					error = "GL_INVALID_VALUE";
 					break;
 				case GL_OUT_OF_MEMORY:
-					error = "OUT_OF_MEMORY";
+					error = "GL_OUT_OF_MEMORY";
 					break;
 				case GL_INVALID_FRAMEBUFFER_OPERATION:
-					error = "INVALID_FRAMEBUFFER_OPERATION";
+					error = "GL_INVALID_FRAMEBUFFER_OPERATION";
 					break;
 				}
 
 				char message[256];
-				snprintf( message, 256, "GL_%s - %s:%d\n", error, file, line );
+				snprintf( message, 256, "%s - %s:%d\n", error, file, line );
 
 				__debugbreak();
 				DD_ASSERT( false, message );

@@ -92,6 +92,11 @@ namespace dd
 			return *s_instance;
 		}
 
+		bool IsRegistered() const
+		{
+			return s_instance != nullptr;
+		}
+
 		operator T& () { return Get(); }
 		operator T* () { return &Get(); }
 		T& operator*() { return Get(); }

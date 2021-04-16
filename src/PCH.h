@@ -12,6 +12,7 @@
 #endif
 
 #define GLM_FORCE_SWIZZLE 1
+#define GLM_FORCE_CTOR_INIT
 
 #pragma warning( disable : 4723 )
 
@@ -30,13 +31,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "glm/fwd.hpp"
-#include "glm/glm.hpp"
+#include <glm/fwd.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/norm.hpp>
 
 #include "Memory.h"
-
 #include "Profiler.h"
-
 #include "DDAssert.h"
 #include "Typedefs.h"
 #include "TypeInfoMacros.h"
@@ -67,11 +70,6 @@
 #include "ddm/Math_dd.h"
 
 //#include "Serialization.h"
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/norm.hpp>
 
 #include "Services.h"
 

@@ -46,9 +46,11 @@
 #include "lux/LuxportGame.h"
 #include "neutrino/NeutrinoGame.h"
 #include "flux/FluxGame.h"
+#include "phys2d/Physics2DGame.h"
 
 // GAME TO USE
 using TGame = flux::FluxGame;
+//using TGame = phys2d::Physics2DGame;
 //---------------------------------------------------------------------------
 
 static dd::Service<dd::IGame> s_game;
@@ -65,6 +67,8 @@ static dd::Service<dd::AssetManager> s_assetManager;
 static dd::Service<dd::CommandLine> s_commandLine;
 
 std::thread::id g_mainThread;
+
+std::vector<ddc::EntityLayer*> g_entityLayers;
 
 static void ShowSystemConsole(bool show)
 {
@@ -149,171 +153,175 @@ static dd::ProfilerValueRef s_renderProfiler("Render");
 static dd::ProfilerValueRef s_debugUIProfiler("Debug UI");
 static dd::ProfilerValueRef s_endFrameProfiler("End Frame");
 
-static int GameMain()
+static void InitializeGame()
 {
 	if (s_commandLine->Exists("noassert"))
 	{
 		ppk::assert::implementation::ignoreAllAsserts(true);
 	}
 
+	dd::Services::RegisterInterface<dd::IWindow>(new dd::SFMLWindow())
+		.SetSize(glm::ivec2(1024, 768))
+		.Initialize();
+
+	OpenGL::Initialize();
+
+	dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
+
+	dd::Services::Register(new dd::Input());
+	s_input->AddInputSource(*s_inputSource);
+	s_input->Initialize();
+
+	s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
+	s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE, &ToggleDebugUIMouseCapture);
+	s_input->AddHandler(dd::InputAction::EXIT, &Exit);
+	s_input->AddHandler(dd::InputAction::PAUSE, &PauseGame);
+	s_input->AddHandler(dd::InputAction::TIME_SCALE_DOWN, &DecreaseTimeScale);
+	s_input->AddHandler(dd::InputAction::TIME_SCALE_UP, &IncreaseTimeScale);
+	s_input->AddHandler(dd::InputAction::TOGGLE_PROFILER, &ToggleProfiler);
+
+	dd::Services::Register(new dd::InputKeyBindings());
+
+	s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
+	s_keybindings->BindKey(dd::Key::ESCAPE, dd::Modifier::Shift, dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE);
+	s_keybindings->BindKey(dd::Key::P, dd::InputAction::PAUSE);
+	s_keybindings->BindKey(dd::Key::O, dd::InputAction::TOGGLE_PROFILER);
+
+	dd::Services::RegisterInterface<dd::IDebugUI>(new dd::ImGuiDebugUI());
+
+	dd::Services::Register(new ddc::SystemsManager());
+
+	dd::Services::Register(new ddr::RenderManager());
+
+	dd::Services::Register(new dd::FrameTimer());
+	s_frameTimer->SetMaxFPS(60);
+
+	dd::Services::Register(new dd::EntityVisualizer());
+
+	dd::Services::Register(new dd::AssetManager());
+
 	{
-		dd::Services::RegisterInterface<dd::IWindow>(new dd::SFMLWindow())
-			.SetSize(glm::ivec2(1024, 768))
-			.Initialize();
+		dd::Services::RegisterInterface<dd::IGame>(new TGame());
+		s_game->Initialize();
+		s_game->RegisterSystems(*s_systemsManager);
+		s_game->RegisterRenderers(*s_renderer);
+		s_game->CreateEntityLayers(g_entityLayers);
 
-		OpenGL::Initialize();
-
-		dd::Services::RegisterInterface<dd::IInputSource>(new dd::SFMLInputSource());
-
-		dd::Services::Register(new dd::Input());
-		s_input->AddInputSource(*s_inputSource);
-		s_input->Initialize();
-
-		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI, &ToggleDebugUI);
-		s_input->AddHandler(dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE, &ToggleDebugUIMouseCapture);
-		s_input->AddHandler(dd::InputAction::EXIT, &Exit);
-		s_input->AddHandler(dd::InputAction::PAUSE, &PauseGame);
-		s_input->AddHandler(dd::InputAction::TIME_SCALE_DOWN, &DecreaseTimeScale);
-		s_input->AddHandler(dd::InputAction::TIME_SCALE_UP, &IncreaseTimeScale);
-		s_input->AddHandler(dd::InputAction::TOGGLE_PROFILER, &ToggleProfiler);
-
-		dd::Services::Register(new dd::InputKeyBindings());
-
-		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::TOGGLE_DEBUG_UI);
-		s_keybindings->BindKey(dd::Key::ESCAPE, dd::Modifier::Shift, dd::InputAction::TOGGLE_DEBUG_UI_CAPTURE);
-		s_keybindings->BindKey(dd::Key::P, dd::InputAction::PAUSE);
-		s_keybindings->BindKey(dd::Key::O, dd::InputAction::TOGGLE_PROFILER);
-
-
-		dd::Services::RegisterInterface<dd::IDebugUI>(new dd::ImGuiDebugUI());
-
-		dd::Services::Register(new ddc::SystemsManager());
-
-		dd::Services::Register(new ddr::RenderManager());
-
-		dd::Services::Register(new dd::FrameTimer());
-		s_frameTimer->SetMaxFPS(60);
-
-		dd::Services::Register(new dd::EntityVisualizer());
-
-		dd::Services::Register(new dd::AssetManager());
-
-		std::vector<ddc::EntityLayer*> entity_layers;
-
+		for (ddc::EntityLayer* layer : g_entityLayers)
 		{
-			dd::Services::RegisterInterface<dd::IGame>(new TGame());
-			s_game->Initialize();
-			s_game->RegisterSystems(*s_systemsManager);
-			s_game->RegisterRenderers(*s_renderer);
-			s_game->CreateEntityLayers(entity_layers);
-
-			for (ddc::EntityLayer* layer : entity_layers)
-			{
-				s_systemsManager->Initialize(*layer);
-			}
-
-			s_renderer->Initialize();
+			s_systemsManager->Initialize(*layer);
 		}
 
-		// everything is set up, so we can start using ImGui - asserts before this will be handled by the default console
-		dd::InitializeAssert();
-		ShowSystemConsole(false);
-
-		while (!s_window->IsClosing())
-		{
-			DD_PROFILE_SCOPED(Frame);
-			DD_BREAK_ON_ALLOC(100);
-
-			s_window->SetTitle(s_game->GetTitle());
-
-			{
-				s_profilerTimer.Restart();
-
-				StartFrame();
-
-				s_startFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-			}
-
-			s_assetManager->Update();
-
-			{
-				{
-					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* layer : entity_layers)
-					{
-						layer->Update();
-					}
-					s_entityUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-				}
-
-				{
-					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* layer : entity_layers)
-					{
-						s_systemsManager->Update(*layer, s_frameTimer->GameDelta());
-					}
-					s_systemsUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-				}
-
-				{
-					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* layer : entity_layers)
-					{
-						dd::GameUpdateData update_data(*layer, *s_input, s_frameTimer->GameDelta());
-						s_game->Update(update_data);
-					}
-					s_gameUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-				}
-
-				{
-					s_profilerTimer.Restart();
-					for (ddc::EntityLayer* layer : entity_layers)
-					{
-						s_renderer->Render(*layer, s_frameTimer->GameDelta());
-					}
-					s_renderProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-				}
-			}
-
-			{
-				s_profilerTimer.Restart();
-
-				s_frameTimer->DrawFPSCounter();
-				s_debugUI->RenderDebugPanels();
-				dd::Profiler::Draw();
-
-				s_debugUIProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-			}
-
-			{
-				s_profilerTimer.Restart();
-
-				EndFrame();
-
-				s_endFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
-			}
-
-			dd::BreakOnAlloc(false);
-		}
-
-		for (ddc::EntityLayer* layer : entity_layers)
-		{
-			s_systemsManager->Shutdown(*layer);
-
-			delete layer;
-		}
-
-		entity_layers.clear();
-
-		s_assetManager->Shutdown();
-		s_renderer->Shutdown();
-		s_game->Shutdown();
+		s_renderer->Initialize();
 	}
+
+	// everything is set up, so we can start using ImGui - asserts before this will be handled by the default console
+	dd::Assert::Initialize();
+	ShowSystemConsole(false);
+}
+
+static void GameShutdown()
+{
+	for (ddc::EntityLayer* layer : g_entityLayers)
+	{
+		s_systemsManager->Shutdown(*layer);
+
+		delete layer;
+	}
+
+	g_entityLayers.clear();
+
+	s_renderer->Shutdown();
+	s_game->Shutdown();
+}
+
+static int GameMain()
+{
+	InitializeGame();
+
+	while (!s_window->IsClosing())
+	{
+		DD_PROFILE_SCOPED(Frame);
+		DD_BREAK_ON_ALLOC(100);
+
+		s_window->SetTitle(s_game->GetTitle());
+
+		{
+			s_profilerTimer.Restart();
+
+			StartFrame();
+
+			s_startFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+		}
+
+		s_assetManager->Update();
+
+		{
+			{
+				s_profilerTimer.Restart();
+				for (ddc::EntityLayer* layer : g_entityLayers)
+				{
+					layer->Update();
+				}
+				s_entityUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+			}
+
+			{
+				s_profilerTimer.Restart();
+				for (ddc::EntityLayer* layer : g_entityLayers)
+				{
+					s_systemsManager->Update(*layer, s_frameTimer->GameDelta());
+				}
+				s_systemsUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+			}
+
+			{
+				s_profilerTimer.Restart();
+				for (ddc::EntityLayer* layer : g_entityLayers)
+				{
+					dd::GameUpdateData update_data(*layer, *s_input, s_frameTimer->GameDelta());
+					s_game->Update(update_data);
+				}
+				s_gameUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+			}
+
+			{
+				s_profilerTimer.Restart();
+				for (ddc::EntityLayer* layer : g_entityLayers)
+				{
+					s_renderer->Render(*layer, s_frameTimer->GameDelta());
+				}
+				s_renderProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+			}
+		}
+
+		{
+			s_profilerTimer.Restart();
+
+			s_frameTimer->DrawFPSCounter();
+			s_debugUI->RenderDebugPanels();
+			dd::Profiler::Draw();
+
+			s_debugUIProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+		}
+
+		{
+			s_profilerTimer.Restart();
+
+			EndFrame();
+
+			s_endFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
+		}
+
+		dd::BreakOnAlloc(false);
+	}
+
+	GameShutdown();
 
 	return 0;
 }
 
-void Initialize()
+static void Initialize()
 {
 	dd::InitializeMemoryTracking();
 	dd::SetAsMainThread();
@@ -326,10 +334,10 @@ void Initialize()
 	dd::Services::Register(new dd::JobSystem(std::thread::hardware_concurrency() - 1));
 }
 
-void Shutdown()
+static void Shutdown()
 {
+	dd::Assert::Shutdown();
 	dd::Profiler::Shutdown();
-
 	dd::Services::UnregisterAll();
 }
 

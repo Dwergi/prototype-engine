@@ -6,8 +6,9 @@
 
 #pragma once
 
-namespace dd
+namespace dd::Assert
 {
-	void InitializeAssert();
-	void CheckAssert();
+	void Initialize();
+	void Shutdown();
+	void Check();
 }

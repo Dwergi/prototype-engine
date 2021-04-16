@@ -19,7 +19,7 @@
 
 #include "imgui/imgui.h"
 
-namespace dd
+namespace dd::Assert
 {
 	struct Assert
 	{
@@ -114,6 +114,8 @@ namespace dd
 	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::IWindow> s_window;
 
+	static bool g_initialized = false;
+
 	static ppk::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
 		int level, const char* message)
 	{
@@ -121,17 +123,29 @@ namespace dd
 		s_assert.Info = FormatAssert(level, file, line, function, expression);
 		s_assert.Message = String256();
 		s_assert.Action = AssertAction::None;
+
 		if (message != nullptr)
 		{
 			s_assert.Message += "Message: ";
 			s_assert.Message += message;
 		}
 
+		dd::String256 s_message = s_assert.Info;
+		s_message += s_assert.Message;
+
+		printf(s_message.c_str());
+		OutputDebugStringA(s_message.c_str());
+
+		if (!g_initialized)
+		{
+			return ppk::assert::implementation::AssertAction::Ignore;
+		}
+
 		do
 		{
 			if (dd::IsMainThread())
 			{
-				CheckAssert();
+				Check();
 			}
 			else
 			{
@@ -143,14 +157,33 @@ namespace dd
 		return (ppk::assert::implementation::AssertAction::AssertAction) s_assert.Action;
 	}
 
-	void InitializeAssert()
+	static void OnEnterInputMode()
+	{
+		ImGuiBinding::SetMouseHandling(true);
+	}
+
+	static void OnExitInputMode()
+	{
+		ImGuiBinding::SetMouseHandling(false);
+	}
+
+	void Initialize()
 	{
 		dd::InputModeConfig::Create("assert")
 			.CaptureMouse(false)
 			.CentreMouse(false)
-			.ShowCursor(true);
+			.ShowCursor(true)
+			.OnEnter(&OnEnterInputMode)
+			.OnExit(&OnExitInputMode);
 
 		ppk::assert::implementation::setAssertHandler(OnAssert);
+
+		g_initialized = true;
+	}
+
+	void Shutdown()
+	{
+		g_initialized = false;
 	}
 
 	static void StartFrame()
@@ -178,21 +211,13 @@ namespace dd
 		dd::Profiler::EndFrame();
 	}
 
-	void CheckAssert()
+	void Check()
 	{
 		if (s_assert.Open)
 		{
-			static dd::String256 s_message;
-			s_message = s_assert.Info;
-			s_message += s_assert.Message;
-
-			printf(s_message.c_str());
-			OutputDebugStringA(s_message.c_str());
-
-			std::string input_mode = s_input->GetCurrentMode();
+			std::string previous_input_mode;
+			previous_input_mode = s_input->GetCurrentMode();
 			s_input->SetCurrentMode("assert");
-
-			ImGuiBinding::SetMouseHandling(true);
 
 			bool was_mid_window = s_debugUI->IsMidWindow();
 			if (was_mid_window)
@@ -231,9 +256,7 @@ namespace dd
 				ImGui::Begin("post_assert");
 			}
 
-			ImGuiBinding::SetMouseHandling(false);
-
-			s_input->SetCurrentMode(input_mode);
+			s_input->SetCurrentMode(previous_input_mode);
 		}
 	}
 }

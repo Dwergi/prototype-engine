@@ -199,6 +199,10 @@ Buffer<T>::Buffer(Buffer<T>&& other)
 template <typename T>
 Buffer<T>::~Buffer()
 {
+	if (m_ptr != nullptr)
+	{
+		__debugbreak();
+	}
 	DD_ASSERT(m_ptr == nullptr, "Buffer went out of scope without being released!");
 }
 

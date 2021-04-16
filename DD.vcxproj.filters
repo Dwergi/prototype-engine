@@ -630,9 +630,6 @@
     <ClInclude Include="src\d2d\SpriteTileSystem.h">
       <Filter>Systems\d2d</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics2DGame.h">
-      <Filter>Games\Physics2D</Filter>
-    </ClInclude>
     <ClInclude Include="src\IRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -1323,6 +1320,9 @@
     <ClInclude Include="include\catch2\benchmark\detail\catch_timing.hpp">
       <Filter>Includes\catch2\benchmark</Filter>
     </ClInclude>
+    <ClInclude Include="src\phys2d\Physics2DGame.h">
+      <Filter>Games\Physics2D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1815,9 +1815,6 @@
     <ClCompile Include="include\fmt\src\os.cc">
       <Filter>Includes\fmt</Filter>
     </ClCompile>
-    <ClCompile Include="src\Physics2DGame.cpp">
-      <Filter>Games\Physics2D</Filter>
-    </ClCompile>
     <ClCompile Include="src\flux\FluxGame.cpp">
       <Filter>Games\Flux</Filter>
     </ClCompile>
@@ -2153,6 +2150,9 @@
     </ClCompile>
     <ClCompile Include="include\catch2\benchmark\detail\catch_stats.cpp">
       <Filter>Includes\catch2\benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\phys2d\Physics2DGame.cpp">
+      <Filter>Games\Physics2D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

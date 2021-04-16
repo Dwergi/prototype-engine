@@ -32,11 +32,6 @@ namespace dd
 		}
 	}
 
-	void AssetManager::Shutdown()
-	{
-
-	}
-
 	void AssetManager::DrawDebugInternal()
 	{
 		std::vector<std::string> instances;

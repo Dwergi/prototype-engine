@@ -431,7 +431,7 @@
     <ClInclude Include="src\neutrino\WaterComponent.h" />
     <ClInclude Include="src\neutrino\WaterRenderer.h" />
     <ClInclude Include="src\neutrino\WaterSystem.h" />
-    <ClInclude Include="src\Physics2DGame.h" />
+    <ClInclude Include="src\phys2d\Physics2DGame.h" />
     <ClInclude Include="src\ProfilerValue.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
@@ -1218,7 +1218,7 @@
     <ClCompile Include="src\OctreeComponent.cpp" />
     <ClCompile Include="src\OrthoCamera.cpp" />
     <ClCompile Include="src\ParticleSystemRenderer.cpp" />
-    <ClCompile Include="src\Physics2DGame.cpp" />
+    <ClCompile Include="src\phys2d\Physics2DGame.cpp" />
     <ClCompile Include="src\PhysicsBase.cpp" />
     <ClCompile Include="src\PhysicsPlaneComponent.cpp" />
     <ClCompile Include="src\PhysicsRigidBodyComponent.cpp" />

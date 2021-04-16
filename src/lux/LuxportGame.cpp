@@ -58,13 +58,14 @@ extern "C" FILE* __cdecl __iob_func(void)
 namespace lux
 {
 	static dd::Service<dd::AssetManager> s_assetManager;
+	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<ddr::SpriteManager> s_spriteManager;
 	static dd::Service<ddr::SpriteSheetManager> s_spriteSheetManager;
 	static dd::Service<d2d::SpriteTileSystem> s_spriteTileSystem;
-	static dd::Service<dd::IWindow> s_window;
-	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::IDebugUI> s_debugUI;
+	static dd::Service<dd::Input> s_input;
 	static dd::Service<dd::InputKeyBindings> s_keybindings;
+	static dd::Service<dd::IWindow> s_window;
 
 	static ddr::OrthoCamera* s_camera;
 
@@ -211,25 +212,19 @@ namespace lux
 	{
 		dd::File::AddOverridePath("./lux");
 
-		ddr::ShaderManager& shader_manager = dd::Services::Register(new ddr::ShaderManager());
-		s_assetManager->Register(shader_manager);
-
-		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
-		s_assetManager->Register(texture_manager);
-
 		ddr::SpriteManager& sprite_manager = dd::Services::Register(new ddr::SpriteManager());
 		s_assetManager->Register(sprite_manager);
 
 		ddr::SpriteSheetManager& spritesheet_manager = dd::Services::Register(new ddr::SpriteSheetManager(*s_spriteManager));
 		s_assetManager->Register(spritesheet_manager);
 
-		ddr::TextureHandle spritesheet_tex_h = texture_manager.Load(PLAYER_SPRITESHEET);
+		ddr::TextureHandle spritesheet_tex_h = s_textureManager->Load(PLAYER_SPRITESHEET);
 		s_spriteSheetManager->Load(PLAYER_SPRITESHEET, spritesheet_tex_h, glm::ivec2(32));
 
-		ddr::TextureHandle background_tex_h = texture_manager.Load(MAP_BACKGROUND);
+		ddr::TextureHandle background_tex_h = s_textureManager->Load(MAP_BACKGROUND);
 		s_spriteSheetManager->Load(MAP_BACKGROUND, background_tex_h, glm::ivec2(16));
 
-		ddr::TextureHandle foreground_tex_h = texture_manager.Load(MAP_FOREGROUND);
+		ddr::TextureHandle foreground_tex_h = s_textureManager->Load(MAP_FOREGROUND);
 		s_spriteSheetManager->Load(MAP_FOREGROUND, foreground_tex_h, glm::ivec2(16));
 
 		dd::InputModeConfig& game_input = dd::InputModeConfig::Create("game");

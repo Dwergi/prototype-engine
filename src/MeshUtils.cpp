@@ -151,7 +151,7 @@ namespace dd
 		glm::vec3( 1.0f, 0.0f, 0.0f )
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_cube_hNormalsBuffer( s_unitCubeNormals, ArrayLength( s_unitCubeNormals ) );
+	static const dd::ConstBuffer<glm::vec3> s_unitCubeNormalsBuffer( s_unitCubeNormals, ArrayLength( s_unitCubeNormals ) );
 
 	static const glm::vec2 s_unitCubeUVs[] =
 	{
@@ -480,7 +480,7 @@ namespace dd
 	void MeshUtils::MakeUnitCube( ddr::Mesh& mesh )
 	{
 		mesh.SetPositions( s_unitCubePositionsBuffer );
-		mesh.SetNormals( s_cube_hNormalsBuffer );
+		mesh.SetNormals(s_unitCubeNormalsBuffer);
 		mesh.SetUVs( s_unitCubeUVsBuffer );
 
 		ddm::AABB bounds;

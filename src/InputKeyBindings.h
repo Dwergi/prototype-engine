@@ -29,14 +29,16 @@ namespace dd
 
 	private:
 
+		// none, ctrl, shift, alt, alt + shift, alt + ctrl, ctrl + shift, alt + ctrl + shift
+		const int NumModifiers = 8;
+
 		struct KeyBinding
 		{
-			dd::InputModeFlags Modes;
-			dd::Key Key;
-			dd::ModifierFlags Modifiers;
-			dd::InputAction Action;
+			InputModeFlags Modes;
+			Key Key;
+			InputAction Actions[8] = { InputAction::NONE };
 		};
-		
+
 		std::vector<KeyBinding> m_bindings;
 	};
 }

@@ -72,7 +72,7 @@ namespace ddr
 		NEAR_BR, FAR_BR, FAR_TR
 	};
 
-	static dd::Buffer<GLushort> s_indexBuffer( const_cast<GLushort*>( s_indices ), dd::ArrayLength( s_indices ) );
+	static dd::ConstBuffer<GLushort> s_indexBuffer( const_cast<GLushort*>( s_indices ), dd::ArrayLength( s_indices ) );
 
 	const glm::vec3 s_colours[] =
 	{

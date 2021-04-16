@@ -22,35 +22,24 @@ namespace dd
 	{
 		DD_ASSERT(evt.Type != InputType::None);
 
-		// ctrl, shift, alt, alt + shift, alt + ctrl, ctrl + shift, alt + ctrl + shift
-		dd::Array<const KeyBinding*, 7> matches;
-
 		for (const KeyBinding& binding : m_bindings)
 		{
-			if (binding.Modes.Has(mode) &&
-				binding.Key == evt.Key)
+			if (binding.Key == evt.Key &&
+				binding.Modes.Has(mode))
 			{
-				matches.Add(&binding);
-			}
-		}
+				// check for exact modifier match, ie. Shift+A
+				if (binding.Actions[evt.Modifiers.Flags()] != InputAction::NONE)
+				{
+					out_action = binding.Actions[evt.Modifiers.Flags()];
+					return true;
+				}
 
-		// check for exact modifier match, ie. Shift+A
-		for (const KeyBinding* match : matches)
-		{
-			if (match->Modifiers == evt.Modifiers)
-			{
-				out_action = match->Action;
-				return true;
-			}
-		}
-
-		// check for inexact match, ie. A
-		for (const KeyBinding* match : matches)
-		{
-			if (match->Modifiers == Modifier::None)
-			{
-				out_action = match->Action;
-				return true;
+				// check for no-modifier match, ie. A
+				if (binding.Actions[evt.Modifiers.Flags()] != InputAction::NONE)
+				{
+					out_action = binding.Actions[0];
+					return true;
+				}
 			}
 		}
 
@@ -93,9 +82,10 @@ namespace dd
 	{
 		for (KeyBinding& binding : m_bindings)
 		{
-			if (binding.Modes.HasAny(modes) && binding.Key == key && binding.Modifiers == modifiers)
+			// if we're binding the same key to the same action in a new mode, merge the entries
+			if (binding.Modes.HasAny(modes) && binding.Key == key)
 			{
-				DD_ASSERT(binding.Action == action);
+				DD_ASSERT(binding.Actions[modifiers.Flags()] == InputAction::NONE || binding.Actions[modifiers.Flags()] == action);
 				binding.Modes.SetAll(modes);
 				return;
 			}
@@ -104,8 +94,8 @@ namespace dd
 		KeyBinding new_binding;
 		new_binding.Modes = modes;
 		new_binding.Key = key;
-		new_binding.Modifiers = modifiers;
-		new_binding.Action = action;
+		new_binding.Actions[modifiers.Flags()] = action;
+
 		m_bindings.push_back(new_binding);
 
 		std::sort(m_bindings.begin(), m_bindings.end(), [](const KeyBinding& a, const KeyBinding& b)

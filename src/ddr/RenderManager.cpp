@@ -7,15 +7,16 @@
 #include "PCH.h"
 #include "RenderManager.h"
 
+#include "AssetManager.h"
 #include "Frustum.h"
 #include "ICamera.h"
+#include "IWindow.h"
+#include "LightComponent.h"
 #include "MeshComponent.h"
 #include "MousePicking.h"
-#include "LightComponent.h"
 #include "ParticleSystem.h"
 #include "Services.h"
 #include "TransformComponent.h"
-#include "IWindow.h"
 
 #include "ddm/AABB.h"
 
@@ -28,7 +29,6 @@
 namespace ddr
 {
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
-	static dd::Service<ddr::TextureManager> s_textureManager;
 	static dd::Service<dd::IWindow> s_window;
 
 	struct Fog
@@ -85,6 +85,8 @@ namespace ddr
 		{
 			current->Shutdown();
 		}
+
+		m_framebuffer.Destroy();
 	}
 
 	void RenderManager::Register(ddr::IRenderer& renderer)
@@ -111,6 +113,7 @@ namespace ddr
 		ImGui::Checkbox("Draw Depth", &m_debugDrawDepth);
 		ImGui::Checkbox("Draw Normals", &m_debugDrawNormals);
 
+		DD_TODO("Fog isn't really relevant to all renderers...");
 		if (ImGui::CollapsingHeader("Fog"))
 		{
 			ImGui::Checkbox("Enabled", &s_fog.Enabled);
@@ -118,6 +121,7 @@ namespace ddr
 			ImGui::ColorEdit3("Colour", glm::value_ptr(s_fog.Colour));
 		}
 
+		DD_TODO("Shaders should probably live in their own debug view.");
 		if (ImGui::Button("Reload Shaders"))
 		{
 			m_reloadShaders = true;

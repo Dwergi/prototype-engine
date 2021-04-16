@@ -262,8 +262,6 @@ namespace neut
 	{
 		renderer.SetCamera(s_shakyCamera.Get());
 
-		dd::Service<dd::MousePicking> mouse_picking;
-
 		ddr::LightRenderer& light_renderer = dd::Services::Register(new ddr::LightRenderer());
 
 		neut::TerrainRenderer& terrain_renderer = dd::Services::Register(new neut::TerrainRenderer(s_terrain->GetTerrainParameters()));
@@ -280,6 +278,7 @@ namespace neut
 
 		neut::WaterRenderer& water_renderer = dd::Services::Register(new neut::WaterRenderer());
 
+		dd::Service<dd::MousePicking> mouse_picking;
 		renderer.Register(*mouse_picking);
 		renderer.Register(light_renderer);
 		renderer.Register(terrain_renderer);
@@ -299,7 +298,7 @@ namespace neut
 
 		neut::SwarmSystem& swarm_system = dd::Services::Register(new neut::SwarmSystem());
 
-		//neut::TrenchSystem trench_system( *s_shakyCam  );
+		//neut::TrenchSystem trench_system( *s_shakyCamera  );
 		//trench_system.CreateRenderResources();
 
 		dd::HitTestSystem* hit_testing_system = new dd::HitTestSystem();
@@ -308,7 +307,7 @@ namespace neut
 
 		dd::PhysicsSystem& physics_system = dd::Services::Register(new dd::PhysicsSystem());
 
-		//Services::Register(new ShipSystem( *s_shakyCam  ));
+		//Services::Register(new ShipSystem( *s_shakyCamera  ));
 		//s_shipSystem->BindActions( bindings );
 		//s_shipSystem->CreateShip( *s_world );
 
