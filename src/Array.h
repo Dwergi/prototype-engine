@@ -82,6 +82,6 @@ namespace dd
 
 		T m_inline[MaxCapacity];
 	};
-
-	#include "Array.inl"
 }
+
+#include "Array.inl"
