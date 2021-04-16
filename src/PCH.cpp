@@ -31,6 +31,23 @@ namespace dd
 	}
 #endif
 
+	int SplitString(const std::string& to_split, dd::IArray<std::string>& out_parts, char split_on)
+	{
+		size_t start = 0;
+		size_t end = to_split.find(split_on);
+		while (end != std::string::npos)
+		{
+			std::string part = to_split.substr(start, end - start);
+			out_parts.Add(part);
+
+			start = end + 1;
+			end = to_split.find(split_on, start);
+		}
+
+		out_parts.Add(to_split.substr(start));
+		return out_parts.Size();
+	}
+
 	static std::thread::id s_mainThread;
 
 	void SetAsMainThread()

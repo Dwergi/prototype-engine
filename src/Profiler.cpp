@@ -35,24 +35,30 @@ namespace dd
 		DD_PROFILE_DEINIT(s_remotery);
 	}
 
-	ProfilerValue& Profiler::GetValue(std::string_view name)
+	ProfilerValue& Profiler::GetValue(std::string_view full_name)
 	{
 		Initialize();
 
 		for (dd::ProfilerValue* value : s_instances)
 		{
-			if (value->Name() == name)
+			if (value->FullName() == full_name)
 			{
 				return *value;
 			}
 		}
 
-		ProfilerValue* value = new ProfilerValue(name);
+		ProfilerValue* value = new ProfilerValue(full_name);
 
 		// insert alphabetically
 		size_t i = 0;
-		while (i < s_instances.size() && s_instances[i]->Name() < name)
+		for (const dd::ProfilerValue* value : s_instances)
 		{
+			const int cmp = full_name.compare(value->FullName());
+			if (cmp < 0)
+			{
+				break;
+			}
+
 			++i;
 		}
 		s_instances.insert(s_instances.begin() + i, value);

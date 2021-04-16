@@ -13,31 +13,13 @@ namespace dd
 {
 	ProfilerValue::ProfilerValue(std::string_view name)
 	{
-		std::string str_name(name);
+		m_fullName = name;
 
 		// enumerate groups
-		size_t start = 0;
-		size_t end = str_name.find('/');
-		while (end != std::string::npos)
-		{
-			std::string group_name = str_name.substr(start, end - start);
-			m_groups.Add(group_name);
+		int parts = SplitString(m_fullName, m_groups, '/');
 
-			start = end + 1;
-			end = str_name.find('/', end + 1);
-		}
-
-		size_t group_end = str_name.rfind('/');
-		if (group_end == std::string::npos)
-		{
-			group_end = 0;
-		}
-		else
-		{
-			group_end += 1;
-		}
-
-		m_name = str_name.substr(group_end);
+		m_name = m_groups.Last();
+		m_groups.Pop();
 		m_sliding = 0;
 	}
 
@@ -108,10 +90,7 @@ namespace dd
 
 	void ProfilerValue::Draw()
 	{
-		char buffer[64];
-		std::snprintf(buffer, 64, "%s: %.2f", m_name.c_str(), GetValue());
-
-		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_Framed, buffer))
+		if (ImGui::TreeNodeEx(this, ImGuiTreeNodeFlags_Framed, "%s: %.2f", m_name.c_str(), GetValue()))
 		{
 			int frames = ddm::min(dd::Profiler::FrameCount(), FRAME_COUNT);
 
@@ -122,8 +101,8 @@ namespace dd
 		}
 	}
 
-	ProfilerValueRef::ProfilerValueRef(std::string_view name) :
-		m_name(name)
+	ProfilerValueRef::ProfilerValueRef(std::string_view full_name) :
+		m_fullName(full_name)
 	{
 	}
 
@@ -131,7 +110,7 @@ namespace dd
 	{
 		if (m_ptr == nullptr)
 		{
-			m_ptr = &dd::Profiler::GetValue(m_name);
+			m_ptr = &dd::Profiler::GetValue(m_fullName);
 		}
 	}
 
@@ -175,6 +154,12 @@ namespace dd
 	{
 		DD_ASSERT(m_ptr != nullptr);
 		return m_ptr->SlidingAverage();
+	}
+
+	std::string_view ProfilerValueRef::Name() const
+	{
+		DD_ASSERT(m_ptr != nullptr); 
+		return m_ptr->Name();
 	}
 
 	const dd::IArray<std::string>& ProfilerValueRef::Groups() const

@@ -145,13 +145,13 @@ static void EndFrame()
 #endif
 
 // Profiler values
-static dd::ProfilerValueRef s_startFrameProfiler("Start Frame");
-static dd::ProfilerValueRef s_entityUpdateProfiler("Entity Update");
-static dd::ProfilerValueRef s_systemsUpdateProfiler("Systems Update");
-static dd::ProfilerValueRef s_gameUpdateProfiler("Game Update");
-static dd::ProfilerValueRef s_renderProfiler("Render");
-static dd::ProfilerValueRef s_debugUIProfiler("Debug UI");
-static dd::ProfilerValueRef s_endFrameProfiler("End Frame");
+static dd::ProfilerValueRef s_entityUpdateProfiler("Update/Entity");
+static dd::ProfilerValueRef s_systemsUpdateProfiler("Update/Systems");
+static dd::ProfilerValueRef s_gameUpdateProfiler("Update/Game");
+static dd::ProfilerValueRef s_startFrameProfiler("Render/Start Frame");
+static dd::ProfilerValueRef s_renderProfiler("Render/Render");
+static dd::ProfilerValueRef s_debugUIProfiler("Render/Debug UI");
+static dd::ProfilerValueRef s_endFrameProfiler("Render/End Frame");
 
 static void InitializeGame()
 {

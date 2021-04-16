@@ -117,6 +117,8 @@ namespace dd
 		return vec[vec.size() - 1];
 	}
 
+	int SplitString(const std::string& to_split, dd::IArray<std::string>& out_parts, char split_on);
+
 	bool DebuggerAttached();
 
 	void SetAsMainThread();

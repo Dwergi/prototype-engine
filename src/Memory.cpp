@@ -9,7 +9,7 @@
 
 static dd::ProfilerValue* g_allocs;
 static dd::ProfilerValue* g_deletions;
-static bool g_breakOnAlloc = false;
+static std::atomic<bool> g_breakOnAlloc = false;
 
 namespace dd
 {
