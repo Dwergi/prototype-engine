@@ -15,7 +15,6 @@
 #include "MeshComponent.h"
 #include "MousePicking.h"
 #include "ParticleSystem.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 #include "ddm/AABB.h"
@@ -28,6 +27,7 @@
 
 namespace ddr
 {
+	static dd::Service<dd::AssetManager> s_assetManager;
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 	static dd::Service<dd::IWindow> s_window;
 
@@ -57,6 +57,17 @@ namespace ddr
 		m_depthState.Blending = true;
 		m_depthState.BackfaceCulling = false;
 		m_depthState.Depth = false;
+
+		dd::Services::Register(new ddr::ShaderManager());
+		s_assetManager->Register(s_shaderManager.Get());
+
+		ddr::MaterialManager* material_manager = new ddr::MaterialManager();
+		dd::Services::Register(material_manager);
+		s_assetManager->Register(*material_manager);
+
+		ddr::MeshManager* mesh_manager = new ddr::MeshManager();
+		dd::Services::Register(mesh_manager);
+		s_assetManager->Register(*mesh_manager);
 	}
 
 	RenderManager::~RenderManager()

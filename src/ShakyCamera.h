@@ -92,7 +92,7 @@ namespace dd
 
 	private:
 
-		const FPSCameraComponent& m_sourceCamera;
+		const FPSCameraComponent* m_sourceCamera { nullptr };
 
 		float Seed { 0 };
 		float m_trauma { 0 };

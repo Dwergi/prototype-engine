@@ -61,25 +61,25 @@ namespace ddc
 
 	void ScratchEntity::AddTag(ddc::Tag tag)
 	{
-		m_tags.set((size_t) tag);
+		m_tags.Set(tag);
 	}
 
 	void ScratchEntity::RemoveTag(ddc::Tag tag)
 	{
-		m_tags.reset((size_t) tag);
+		m_tags.Unset(tag);
 	}
 
 	bool ScratchEntity::HasTag(ddc::Tag tag) const
 	{
-		return m_tags.test((size_t) tag);
+		return m_tags.Has(tag);
 	}
 
-	TagBits ScratchEntity::GetAllTags() const
+	dd::EnumFlags<ddc::Tag> ScratchEntity::GetAllTags() const
 	{
 		return m_tags;
 	}
 
-	void ScratchEntity::SetAllTags(ddc::TagBits tags)
+	void ScratchEntity::SetAllTags(dd::EnumFlags<ddc::Tag> tags)
 	{
 		m_tags = tags;
 	}

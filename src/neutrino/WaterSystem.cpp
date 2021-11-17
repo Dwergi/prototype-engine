@@ -11,7 +11,6 @@
 #include "BoundSphereComponent.h"
 #include "BoundsHelpers.h"
 #include "ColourComponent.h"
-#include "Services.h"
 #include "TransformComponent.h"
 #include "Triangulator.h"
 

@@ -68,7 +68,8 @@ namespace ddc
 
 	void SystemsManager::UpdateSystemsWithTreeScheduling(EntityLayer& layer, float delta_t)
 	{
-		dd::Job* root_job = s_jobsystem->Create();
+		dd::JobSystem* jobsystem = s_jobsystem;
+		dd::Job* root_job = jobsystem->Create();
 
 		for (SystemNode& node : m_orderedSystems)
 		{
@@ -78,11 +79,11 @@ namespace ddc
 			update.DeltaT = delta_t;
 
 			node.m_job = s_jobsystem->CreateMethodChild(root_job, this, &SystemsManager::UpdateSystem, update);
-			s_jobsystem->Schedule(node.m_job);
+			jobsystem->Schedule(node.m_job);
 		}
 
-		s_jobsystem->Schedule(root_job);
-		s_jobsystem->Wait(root_job);
+		jobsystem->Schedule(root_job);
+		jobsystem->Wait(root_job);
 	}
 
 	namespace

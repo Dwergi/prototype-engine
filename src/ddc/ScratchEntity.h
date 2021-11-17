@@ -21,8 +21,8 @@ namespace ddc
 		void AddTag(ddc::Tag tag);
 		void RemoveTag(ddc::Tag tag);
 		bool HasTag(ddc::Tag tag) const;
-		ddc::TagBits GetAllTags() const;
-		void SetAllTags(ddc::TagBits tags);
+		dd::EnumFlags<ddc::Tag> GetAllTags() const;
+		void SetAllTags(dd::EnumFlags<ddc::Tag> tags);
 
 		template <typename TComponent> TComponent& Add();
 		template <typename TComponent> void Remove();
@@ -53,7 +53,7 @@ namespace ddc
 
 		ddc::Entity m_entity;
 		dd::Array<ComponentEntry, MAX_COMPONENTS> m_components;
-		TagBits m_tags;
+		dd::EnumFlags<ddc::Tag> m_tags;
 		dd::Buffer<byte> m_storage;
 
 		void* AddComponentType(const dd::TypeInfo* type);

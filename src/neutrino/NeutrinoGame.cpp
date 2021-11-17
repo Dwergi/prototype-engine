@@ -38,7 +38,6 @@
 #include "TransformComponent.h"
 #include "TreeSystem.h"
 #include "TrenchSystem.h"
-#include "Services.h"
 #include "WaterRenderer.h"
 #include "WaterSystem.h"
 
@@ -52,13 +51,14 @@ namespace neut
 	static dd::Service<dd::InputKeyBindings> s_keybindings;
 	//static dd::Service<dd::ShipSystem> s_shipSystem;
 	static dd::Service<dd::FreeCameraController> s_freeCamera;
-	static dd::Service<dd::ShakyCamera> s_shakyCamera;
+	//static dd::Service<dd::ShakyCamera> s_shakyCamera;
 	static dd::Service<dd::IWindow> s_window;
 	static dd::Service<dd::IInputSource> s_inputSource;
 	static dd::Service<dd::IDebugUI> s_debugUI;
 	static dd::Service<dd::JobSystem> s_jobSystem;
 	static dd::Service<dd::FrameTimer> s_frameTimer;
 	static dd::Service<neut::TerrainSystem> s_terrain;
+	static dd::Service<ddr::RenderManager> s_renderer;
 
 	static ddc::Entity s_player;
 
@@ -111,7 +111,7 @@ namespace neut
 		}
 	}
 
-	static void UpdateFreeCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::Input& input, float delta_t)
+	static void UpdateShakyCam(dd::FreeCameraController& free_cam, dd::ShakyCamera& shaky_cam, dd::Input& input, float delta_t)
 	{
 		shaky_cam.Update(delta_t);
 	}
@@ -129,11 +129,10 @@ namespace neut
 			s_player = entities.CreateEntity<dd::TransformComponent, dd::PlayerComponent, dd::FPSCameraComponent>();
 
 			dd::FPSCameraComponent* camera = s_player.Access<dd::FPSCameraComponent>();
-			camera->SetWindowSize(s_window->GetSize());
+			camera->SetAspectRatio(s_window->GetAspectRatio());
 			camera->SetVerticalFOV(glm::radians(45.0f));
 
-			DD_TODO("Shaky camera should be a component/system pair.");
-			dd::Services::Register(new dd::ShakyCamera(*camera, s_input));
+			s_renderer->SetCamera(*camera);
 		}
 
 		// dir light
@@ -157,7 +156,7 @@ namespace neut
 			entities.AddTag(entity, ddc::Tag::Visible);
 
 			dd::LightComponent* light = entities.Access<dd::LightComponent>(entity);
-			light->LightType = dd::LightType::Point;
+			light->LightType = dd::LightType::Spot;
 			light->Colour = glm::vec3(1, 1, 1);
 			light->Intensity = 3;
 			light->Ambient = 0.01;
@@ -200,10 +199,13 @@ namespace neut
 	{
 		dd::File::AddOverridePath("./neutrino");
 
-		dd::InputModeFlags all_modes;
-		all_modes.Fill();
+		dd::InputModeConfig::Create("game")
+			.ShowCursor(false)
+			.CaptureMouse(true)
+			.CentreMouse(true);
 
-		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_FREECAM);
+		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_FREECAM, "game");
+		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_CONSOLE, "debug");
 		s_keybindings->BindKey(dd::Key::F3, dd::InputAction::TOGGLE_BOUNDS);
 		s_keybindings->BindKey(dd::Key::F4, dd::InputAction::TOGGLE_PICKING, "debug");
 		s_keybindings->BindKey(dd::Key::W, dd::InputAction::FORWARD);
@@ -226,9 +228,7 @@ namespace neut
 		s_keybindings->BindKey(dd::Key::E, dd::InputAction::TOGGLE_ENTITY_DATA, "debug");
 		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SELECT_MESH, "debug");
 		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
-		s_keybindings->BindKey(dd::Key::P, dd::InputAction::RESET_PHYSICS, "game");
-		s_keybindings->BindKey(dd::Key::ESCAPE, dd::InputAction::EXIT);
-		s_keybindings->BindKey(dd::Key::F2, dd::InputAction::TOGGLE_CONSOLE, "debug");
+		s_keybindings->BindKey(dd::Key::H, dd::InputAction::RESET_PHYSICS, "game");
 
 		s_input->AddHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
 		s_input->AddHandler(dd::InputAction::CAMERA_POS_1, []() { SetCameraPos(CameraPos::One); });
@@ -237,13 +237,17 @@ namespace neut
 		s_input->AddHandler(dd::InputAction::CAMERA_POS_4, []() { SetCameraPos(CameraPos::Four); });
 		s_input->AddHandler(dd::InputAction::INCREASE_DEPTH, []() { SetCameraPos(CameraPos::IncreaseDepth); });
 		s_input->AddHandler(dd::InputAction::DECREASE_DEPTH, []() { SetCameraPos(CameraPos::DecreaseDepth); });
+
+		s_input->SetCurrentMode("game");
 	}
 
 	void NeutrinoGame::Update(const dd::GameUpdateData& update_data)
 	{
-		s_player.Access<dd::FPSCameraComponent>()->SetWindowSize(s_window->GetSize());
+		dd::FPSCameraComponent* camera = s_player.Access<dd::FPSCameraComponent>();
+		camera->SetAspectRatio(s_window->GetAspectRatio());
 
-		UpdateFreeCam(s_freeCamera, s_shakyCamera, s_input, s_frameTimer->AppDelta());
+		s_renderer->SetCamera(*camera);
+		//UpdateShakyCam(s_freeCamera, camera, s_input, s_frameTimer->AppDelta());
 	}
 
 	void NeutrinoGame::Shutdown()
@@ -260,8 +264,6 @@ namespace neut
 
 	void NeutrinoGame::RegisterRenderers(ddr::RenderManager& renderer)
 	{
-		renderer.SetCamera(s_shakyCamera.Get());
-
 		ddr::LightRenderer& light_renderer = dd::Services::Register(new ddr::LightRenderer());
 
 		neut::TerrainRenderer& terrain_renderer = dd::Services::Register(new neut::TerrainRenderer(s_terrain->GetTerrainParameters()));
@@ -331,7 +333,7 @@ namespace neut
 		system_manager.Register(bullet_system);
 		system_manager.Register(physics_system);
 		system_manager.Register(swarm_system);
-		system_manager.Register(tree_system);
+		//system_manager.Register(tree_system);
 		system_manager.Register(water_system);
 	}
 }

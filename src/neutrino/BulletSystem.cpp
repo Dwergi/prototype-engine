@@ -18,7 +18,6 @@
 #include "MeshComponent.h"
 #include "MessageQueue.h"
 #include "PlayerComponent.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 #include "ddc/ScratchEntity.h"

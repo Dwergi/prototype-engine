@@ -5,9 +5,11 @@
 //
 
 #include "PCH.h"
-#include "FluxBulletSystem.h"
+#include "flux/FluxBulletSystem.h"
 
 #include "d2d/Transform2DComponent.h"
+
+#include "ddc/EntityType.h"
 
 #include "ddm/AABB2D.h"
 #include "ddm/HitTest.h"
@@ -17,15 +19,15 @@
 
 namespace flux
 {
+	using BulletsType = ddc::EntityType<d2d::Transform2DComponent, flux::FluxBulletComponent>;
+	using EnemiesType = ddc::EntityType<const d2d::Transform2DComponent, flux::FluxBulletComponent>;
+
 	FluxBulletSystem::FluxBulletSystem(glm::vec2 map_size) :
 		ddc::System("Bullets"),
 		m_mapSize(map_size)
 	{
-		RequireWrite<d2d::Transform2DComponent>("bullets");
-		RequireWrite<flux::FluxBulletComponent>("bullets");
-
-		RequireRead<d2d::Transform2DComponent>("enemies");
-		RequireWrite<flux::FluxEnemyComponent>("enemies");
+		RequireType<BulletsType>("bullets");
+		RequireType<EnemiesType>("enemies");
 	}
 
 	void FluxBulletSystem::Initialize(ddc::EntityLayer& layer)

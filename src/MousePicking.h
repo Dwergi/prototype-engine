@@ -48,6 +48,7 @@ namespace dd
 		static const int DownScalingFactor = 2;
 
 		MousePicking();
+		~MousePicking();
 
 		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
 		float GetDepthAt( glm::vec2 mouse_pos ) const;

@@ -22,6 +22,7 @@ namespace dd
 	struct BoundBoxComponent;
 	struct ColourComponent;
 	struct MeshComponent;
+	struct Job;
 	struct TransformComponent;
 	struct Wireframe;
 }
@@ -81,13 +82,13 @@ namespace neut
 
 		virtual void DrawDebugInternal() override;
 
-		void CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod);
+		void CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod, dd::Job* root_job);
 
 		void UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp,
 			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
-			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos);
+			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos, dd::Job* root_job);
 
-		void GenerateChunks(ddc::UpdateData& update_data, const ddc::UpdateBufferView& data, glm::vec2 camera_pos);
+		void GenerateChunks(ddc::UpdateData& update_data, const ddc::UpdateBufferView& data, glm::vec2 camera_pos, dd::Job* root_job);
 
 		//
 		// Save the heightmaps of the terrain chunks generated.

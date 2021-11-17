@@ -13,10 +13,10 @@ namespace dd
 	}
 
 	template <typename TClass, typename... TArgs>
-	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* fn)(TArgs...), TArgs... args)
+	Job* JobSystem::CreateMethodChild(Job* parent, TClass* this_ptr, void (TClass::* method)(TArgs...), TArgs... args)
 	{
 		std::tuple<TArgs...> args_tuple = std::make_tuple(args...);
-		static_assert((sizeof(TClass*) + sizeof(fn) + sizeof(args_tuple)) < Job::PaddingBytes);
+		static_assert((sizeof(TClass*) + sizeof(method) + sizeof(args_tuple)) < Job::PaddingBytes);
 		
 		Job* job = Allocate();
 		if (job == nullptr)
@@ -35,10 +35,14 @@ namespace dd
 		job->m_function = &Job::CallMethod<TClass, TArgs...>;
 
 		size_t offset = 0;
+#ifdef DD_USE_JOB_THIS_PTR
+		job->m_this = this_ptr;
+#else
 		offset = job->SetArgument(offset, this_ptr);
-		offset = job->SetArgument(offset, fn);
+#endif
 
-		job->SetArgument(offset, args_tuple);
+		offset = job->SetArgument(offset, method);
+		offset = job->SetArgument(offset, args_tuple);
 		return job;
 	}
 
@@ -77,9 +81,13 @@ namespace dd
 
 		size_t offset = 0;
 
-		TClass* this_ptr;
+		TClass* this_ptr = nullptr;
+#ifdef DD_USE_JOB_THIS_PTR
+		this_ptr = static_cast<TClass*>(job->m_this);
+#else
 		offset = job->GetArgument(offset, this_ptr);
-		TMethod method;
+#endif
+		TMethod method = nullptr;
 		offset = job->GetArgument(offset, method);
 
 		std::tuple<TArgs...> args_tuple;
@@ -97,7 +105,7 @@ namespace dd
 	{
 		size_t offset = 0;
 
-		void (*fn)(TArgs...);
+		void (*fn)(TArgs...) = nullptr;
 		offset = job->GetArgument(offset, fn);
 		TArg arg;
 		offset = job->GetArgument(offset, arg);

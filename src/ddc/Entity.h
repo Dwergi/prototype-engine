@@ -6,21 +6,11 @@
 
 #pragma once
 
+#include "ddc/EntityType.h"
+#include "ddc/Tags.h"
+
 namespace ddc
 {
-	enum class Tag : uint
-	{
-		None = 0,
-		Visible = 1,
-		Focused = 2,
-		Selected = 3,
-		Static = 4,
-		Dynamic = 5
-	};
-
-	static const int MAX_TAGS = 32;
-	typedef std::bitset<MAX_TAGS> TagBits;
-
 	struct EntityLayer;
 
 	struct Entity
@@ -35,7 +25,7 @@ namespace ddc
 		void AddTag(ddc::Tag tag) const;
 		void RemoveTag(ddc::Tag tag) const;
 		bool HasTag(ddc::Tag tag) const;
-		TagBits GetAllTags() const;
+		dd::EnumFlags<Tag> GetAllTags() const;
 
 		void Destroy() const;
 

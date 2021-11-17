@@ -8,10 +8,11 @@ namespace dd
 	static constexpr bool USE_THREADS = false;
 
 	static constexpr int MAX_JOBS = 4096;
-	static constexpr uint MASK = MAX_JOBS - 1;
+	static constexpr int JOBS_MASK = MAX_JOBS - 1;
 	
-	thread_local Job g_jobs[MAX_JOBS];
-	thread_local int g_currentJob = 0;
+	thread_local Job t_jobs[MAX_JOBS];
+	thread_local int t_currentJob = 0;
+	thread_local bool t_isWaiting = false;
 
 	struct JobQueue
 	{
@@ -32,15 +33,15 @@ namespace dd
 		void Clear();
 
 	private:
-		std::thread::id m_ownerThread;
 		std::atomic<int> m_top;
 		std::atomic<int> m_bottom;
 
-		JobSystem* m_system { nullptr };
-
-		static constexpr int MAX_PENDING = 1024;
+		static constexpr int MAX_PENDING = 2048;
 		static constexpr int PENDING_MASK = MAX_PENDING - 1;
 		Job* m_pending[MAX_PENDING];
+
+		std::thread::id m_ownerThread;
+		JobSystem* m_system { nullptr };
 
 		// Pop is always called from the owning thread.
 		Job* Pop();
@@ -138,6 +139,14 @@ namespace dd
 
 	void JobSystem::Wait(const Job* job)
 	{
+		// if we're already waiting on this thread, then we can end up in a situation where we do work that this thread is already waiting for, but never complete
+		if (t_isWaiting)
+		{
+			return;
+		}
+
+		t_isWaiting = true;
+
 		JobQueue* queue = FindQueue(std::this_thread::get_id());
 
 		while (!job->IsFinished())
@@ -152,6 +161,8 @@ namespace dd
 				std::this_thread::yield();
 			}
 		}
+
+		t_isWaiting = false;
 	}
 
 	void JobSystem::WaitForAll(const std::vector<Job*>& jobs)
@@ -198,18 +209,18 @@ namespace dd
 
 	void JobQueue::Clear()
 	{
-		std::memset(g_jobs, 0, sizeof(Job) * MAX_JOBS);
+		std::memset(t_jobs, 0, sizeof(Job) * MAX_JOBS);
 		std::memset(m_pending, 0, sizeof(Job*) * MAX_PENDING);
-		g_currentJob = 0;
+		t_currentJob = 0;
 	}
 
 	Job* JobQueue::Allocate()
 	{
 		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
 
-		Job* job = &g_jobs[g_currentJob];
+		Job* job = &t_jobs[t_currentJob];
 		std::memset(job, 0, sizeof(Job));
-		++g_currentJob;
+		t_currentJob = (t_currentJob + 1) & JOBS_MASK;
 		return job;
 	}
 
@@ -230,68 +241,86 @@ namespace dd
 
 	void JobQueue::Push(Job& job)
 	{
-		int bottom = m_bottom;
+		int bottom = m_bottom.load(std::memory_order_relaxed);
+		int top = m_top.load(std::memory_order_acquire);
+
+		const int size = bottom - top;
+		if (size >= MAX_PENDING)
+		{
+			DD_ASSERT(size >= MAX_PENDING, "Job queue is full!");
+			return;
+		}
+
 		m_pending[bottom & PENDING_MASK] = &job;
-		m_bottom = bottom + 1;
+
+		std::atomic_thread_fence(std::memory_order_release);
+
+		m_bottom.store(bottom + 1, std::memory_order_relaxed);
 	}
 
 	Job* JobQueue::Pop()
 	{
 		DD_ASSERT(std::this_thread::get_id() == m_ownerThread);
 		
-		int bottom = m_bottom - 1;
-		m_bottom.exchange(bottom);
+		int bottom = m_bottom.load(std::memory_order_relaxed) - 1;
+		m_bottom.store(bottom, std::memory_order_relaxed);
 
-		int top = m_top;
+		std::atomic_thread_fence(std::memory_order_seq_cst);
 
-		if (bottom > top)
+		int top = m_top.load(std::memory_order_relaxed);
+
+		Job* job = nullptr;
+		if (top <= bottom)
 		{
-			// empty queue
-			m_bottom = top;
-			return nullptr;
+			// more than one item
+			job = m_pending[bottom & PENDING_MASK];
+
+			if (top == bottom)
+			{
+				// last item just got stolen
+				if (!m_top.compare_exchange_strong(top, top + 1,
+						std::memory_order_seq_cst,
+						std::memory_order_relaxed))
+				{
+					// failed race against steal operation
+					job = nullptr;
+				}
+
+				m_bottom.store(bottom + 1, std::memory_order_relaxed);
+			}
 		}
 		else
 		{
-			// more than one item
-			Job* job = m_pending[bottom & PENDING_MASK];
-			if (top != bottom)
-			{
-				// more than one job left
-				return job;
-			}
-
-			if (!m_top.compare_exchange_strong(top, top + 1))
-			{
-				job = nullptr;
-			}
-
-			m_bottom = top + 1;
-			return job;
+			// empty queue
+			m_bottom.store(bottom + 1, std::memory_order_relaxed);
 		}
 
-		return nullptr;
+		return job;
 	}
 
 	Job* JobQueue::Steal()
 	{
 		DD_ASSERT(std::this_thread::get_id() != m_ownerThread);
-		DD_ASSERT(m_top < MAX_PENDING);
 		
-		int top = m_top;
-		int bottom = m_bottom;
+		int top = m_top.load(std::memory_order_acquire);
+		std::atomic_thread_fence(std::memory_order_seq_cst); 
+		int bottom = m_bottom.load(std::memory_order_acquire);
+
+		Job* job = nullptr;
 
 		if (top < bottom)
 		{
-			Job* job = m_pending[top & PENDING_MASK];
-			if (!m_top.compare_exchange_strong(top, top + 1))
+			job = m_pending[top & PENDING_MASK];
+
+			if (!m_top.compare_exchange_strong(top, top + 1,
+				std::memory_order_seq_cst,
+				std::memory_order_relaxed))
 			{
 				return nullptr;
 			}
-
-			return job;
 		}
 
-		return nullptr;
+		return job;
 	}
 
 	void Job::Run()
@@ -306,7 +335,7 @@ namespace dd
 
 	void Job::Finish()
 	{
-		int pending = --m_pendingJobs;
+		const int pending = --m_pendingJobs;
 		if (pending == 0 && m_parent != nullptr)
 		{
 			m_parent->Finish();

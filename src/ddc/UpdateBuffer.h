@@ -60,10 +60,10 @@ namespace ddc
 		dd::Array<ComponentBuffer, MAX_BUFFERS> m_buffers;
 		dd::Array<DataRequest*, MAX_BUFFERS> m_requests;
 		dd::Array<dd::ComponentID, MAX_BUFFERS> m_requiredComponents;
-		TagBits m_tags;
+		dd::EnumFlags<ddc::Tag> m_tags;
 
 		void RequestData(DataRequest* request);
-		void RequireTag(ddc::Tag tag) { m_tags.set((uint) tag); }
+		void RequireTag(ddc::Tag tag) { m_tags.Set(tag); }
 		void Fill(ddc::EntityLayer& layer);
 		bool CheckDuplicates(const dd::TypeInfo* component, ddc::DataUsage usage, ddc::DataCardinality cardinality) const;
 		void Commit();
@@ -80,7 +80,7 @@ namespace ddc
 		UpdateBufferView(UpdateBuffer& buffer, size_t start, size_t count);
 		UpdateBufferView(const UpdateBufferView& other);
 
-		const dd::Span<ddc::Entity>& Entities() const;
+		dd::Span<ddc::Entity> Entities() const;
 		size_t Size() const { return m_entities.Size(); }
 		const dd::String& Name() const { return m_buffer->Name(); }
 

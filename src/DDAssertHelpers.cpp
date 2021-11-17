@@ -12,7 +12,6 @@
 #include "IInputSource.h"
 #include "ImGuiBinding.h"
 #include "Input.h"
-#include "Services.h"
 #include "IWindow.h"
 
 #include "ddr/OpenGL.h"
@@ -36,19 +35,19 @@ namespace dd::Assert
 		String256 out;
 		switch (level)
 		{
-		case ( int) AssertLevel::Debug:
+		case (int) AssertLevel::Debug:
 			out += "DEBUG";
 			break;
 
-		case ( int) AssertLevel::Warning:
+		case (int) AssertLevel::Warning:
 			out += "WARNING";
 			break;
 
-		case ( int) AssertLevel::Error:
+		case (int) AssertLevel::Error:
 			out += "ERROR";
 			break;
 
-		case ( int) AssertLevel::Fatal:
+		case (int) AssertLevel::Fatal:
 			out += "FATAL";
 			break;
 		}

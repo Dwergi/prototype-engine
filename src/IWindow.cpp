@@ -64,11 +64,8 @@ namespace dd
 
 	IWindow& IWindow::SetCursor(dd::Cursor cursor)
 	{
-		if (m_cursor != cursor)
-		{
-			m_cursor = cursor;
-			OnSetCursor(cursor);
-		}
+		m_cursor = cursor;
+		OnSetCursor(cursor);
 		return *this;
 	}
 }

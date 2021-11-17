@@ -17,7 +17,6 @@
 #include "MeshComponent.h"
 #include "ParticleSystemComponent.h"
 #include "RayComponent.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 #include "ddc/UpdateData.h"
@@ -54,6 +53,17 @@ namespace dd
 
 		RequireTag(ddc::Tag::Visible);
 		RequireTag(ddc::Tag::Dynamic);
+	}
+
+	MousePicking::~MousePicking()
+	{
+		m_framebuffer.Destroy();
+
+		m_lastIDBuffer.Delete();
+		m_idTexture.Destroy();
+
+		m_lastDepthBuffer.Delete();
+		m_depthTexture.Destroy();
 	}
 
 	static int GetPixelIndex(glm::vec2 mouse_pos)
@@ -199,8 +209,8 @@ namespace dd
 			m_lastIDBuffer.Delete();
 			m_idTexture.Destroy();
 
-			m_depthTexture.Destroy();
 			m_lastDepthBuffer.Delete();
+			m_depthTexture.Destroy();
 
 			CreateFrameBuffer(s_window->GetSize());
 		}
@@ -369,7 +379,6 @@ namespace dd
 			{
 				ImGui::Text("Handle: <none>");
 				ImGui::Text("Distance: <none>");
-
 			}
 		}
 
@@ -406,8 +415,6 @@ namespace dd
 				ImGui::TextUnformatted("Mesh: <none>");
 				ImGui::TextUnformatted("Position: <none>");
 			}
-
-			ImGui::TreePop();
 		}
 
 		if (ImGui::CollapsingHeader("Selected", ImGuiTreeNodeFlags_DefaultOpen))
@@ -433,8 +440,6 @@ namespace dd
 				ImGui::TextUnformatted("Mesh: <none>");
 				ImGui::TextUnformatted("Position: <none>");
 			}
-
-			ImGui::TreePop();
 		}
 	}
 

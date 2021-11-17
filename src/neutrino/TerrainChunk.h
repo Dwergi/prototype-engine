@@ -23,6 +23,17 @@ namespace ddr
 
 namespace neut
 {
+	enum class TerrainChunkStates
+	{
+		InitializePending,
+		InitializeDone,
+		UpdatePending,
+		UpdateDone,
+		RenderUpdatePending,
+		RenderUpdateDone,
+		Ready
+	};
+
 	struct TerrainChunk
 	{
 		//
@@ -41,7 +52,7 @@ namespace neut
 		void SwitchLOD(int lod);
 		void SetNoiseOffset(glm::vec2 origin);
 
-		void Update();
+		void Update(dd::Job* parent_job);
 		void RenderUpdate();
 
 		void WriteHeightImage(const char* filename) const;
@@ -52,6 +63,8 @@ namespace neut
 
 		ddr::MeshHandle GetMesh() const { return m_mesh; }
 
+		bool IsReady() const { return m_state == TerrainChunkStates::Ready; }
+
 	private:
 
 		static const int MeshVertexCount = (MaxVertices + 1) * (MaxVertices + 1);
@@ -60,19 +73,8 @@ namespace neut
 
 		const TerrainParameters& m_terrainParams;
 
-		enum ChunkStates
-		{
-			INITIALIZE_PENDING,
-			INITIALIZE_DONE,
-			UPDATE_PENDING,
-			UPDATE_DONE,
-			RENDER_UPDATE_PENDING,
-			RENDER_UPDATE_DONE,
-			READY
-		};
-
 		std::atomic<bool> m_updating { false };
-		dd::FSM m_state;
+		dd::FSM<TerrainChunkStates> m_state;
 
 		ddr::MeshHandle m_mesh;
 

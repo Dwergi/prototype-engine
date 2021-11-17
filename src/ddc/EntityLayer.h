@@ -6,7 +6,9 @@
 
 #pragma once
 
-#include "Entity.h"
+#include "ddc/Entity.h"
+
+#include "EnumFlags.h"
 #include "MessageQueue.h"
 
 namespace ddc
@@ -189,7 +191,7 @@ namespace ddc
 		//
 		// Find all entities with the given type IDs and return them in the given vector.
 		//
-		void FindAllWith(const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const;
+		void FindAllWith(const dd::IArray<dd::ComponentID>& components, const dd::EnumFlags<ddc::Tag>& tags, std::vector<Entity>& out_entities) const;
 
 
 		//
@@ -216,12 +218,12 @@ namespace ddc
 		//
 		// Set all of an entity's tags at once.
 		//
-		void SetAllTags(Entity e, TagBits tags);
+		void SetAllTags(Entity e, dd::EnumFlags<ddc::Tag> tags);
 
 		//
 		// Get a copy of all the tags the entity has.
 		//
-		TagBits GetAllTags(Entity e) const;
+		dd::EnumFlags<ddc::Tag> GetAllTags(Entity e) const;
 
 		// 
 		// Get the name of this entity layer.
@@ -247,7 +249,7 @@ namespace ddc
 			};
 
 			ComponentBits Ownership;
-			TagBits Tags;
+			dd::EnumFlags<ddc::Tag> Tags;
 		};
 
 		size_t m_maxEntities { 0 };

@@ -104,9 +104,6 @@ namespace flux
 
 		dd::Services::Register(new ddc::EntityPrototypeManager());
 
-		ddr::ShaderManager& shader_manager = dd::Services::Register(new ddr::ShaderManager());
-		s_assetManager->Register(shader_manager);
-
 		ddr::TextureManager& texture_manager = dd::Services::Register(new ddr::TextureManager());
 		s_assetManager->Register(texture_manager);
 

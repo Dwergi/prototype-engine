@@ -3,15 +3,18 @@
 namespace dd
 {
 	// Example graph for an FSM, used for creating FSM instances.
+	template <typename T>
 	struct FSMPrototype
 	{
+		static_assert(std::is_enum_v<T>, "Type must be an enum!");
+
 		struct State
 		{
-			State( int id );
-			State( const State& other );
+			State(T id);
+			State(typename const FSMPrototype<T>::State& other);
 			~State();
 
-			int ID() const { return m_id; }
+			T ID() const { return m_id; }
 
 			void Enter() const;
 			void Exit() const;
@@ -19,44 +22,47 @@ namespace dd
 		private:
 			friend struct FSMPrototype;
 
-			int m_id { -1 };
+			T m_id;
 			std::function<void()> m_onEnter;
 			std::function<void()> m_onExit;
 		};
 
-		void AddTransition( int from, int to );
-		bool HasTransition( int from, int to ) const;
+		void AddTransition(T from, T to);
+		bool HasTransition(T from, T to) const;
 
-		void SetInitialState( int id );
-		int GetInitialState() const { return m_initial; }
-	
-		void AddState( int id );
+		void SetInitialState(T id);
+		T GetInitialState() const { return m_initial; }
 
-		State* AccessState( int id );
-		const State* GetState( int id ) const;
+		void AddState(T id);
 
-		void SetOnEnter( int id, std::function<void()> on_enter );
-		void SetOnExit( int id, std::function<void()> on_exit );
+		State* AccessState(T id);
+		const State* GetState(T id) const;
+
+		void SetOnEnter(T id, std::function<void()> on_enter);
+		void SetOnExit(T id, std::function<void()> on_exit);
 
 	private:
 
-		int m_initial { 0 };
+		T m_initial;
 
 		std::vector<State> m_states;
-		std::vector<std::pair<int, int>> m_transitions;
+		std::vector<std::pair<T, T>> m_transitions;
 	};
 
+	template <typename T>
 	struct FSM
 	{
-		FSM( const FSMPrototype& prototype );
-		FSM( const FSM& other );
+		FSM(const FSMPrototype<T>& prototype);
+		FSM(const FSM<T>& other);
 		~FSM();
-	
-		bool TransitionTo( int id );
-		bool operator==( int id ) const;
+
+		bool TransitionTo(T id);
+		bool operator==(T id) const;
 
 	private:
-		const FSMPrototype& m_prototype;
-		int m_current { -1 };
+		const FSMPrototype<T>& m_prototype;
+		T m_current;
 	};
 }
+
+#include "FSM.inl"

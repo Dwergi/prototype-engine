@@ -14,7 +14,6 @@
 #include "Frustum.h"
 #include "ICamera.h"
 #include "LinesComponent.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 namespace ddr
@@ -49,7 +48,7 @@ namespace ddr
 		m_vao.Create();
 		m_vao.Bind();
 
-		m_vboPosition.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboPosition.Create(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
 		m_vboPosition.Bind();
 		shader->BindPositions();
 		m_vboPosition.Unbind();

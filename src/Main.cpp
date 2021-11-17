@@ -25,7 +25,6 @@
 #include "InputKeyBindings.h"
 #include "Input.h"
 #include "JobSystem.h"
-#include "Services.h"
 #include "Timer.h"
 #include "IWindow.h"
 #include "SFMLInputSource.h"
@@ -49,7 +48,8 @@
 #include "phys2d/Physics2DGame.h"
 
 // GAME TO USE
-using TGame = flux::FluxGame;
+using TGame = neut::NeutrinoGame;
+//using TGame = flux::FluxGame;
 //using TGame = phys2d::Physics2DGame;
 //---------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ static void InitializeGame()
 	}
 
 	dd::Services::RegisterInterface<dd::IWindow>(new dd::SFMLWindow())
-		.SetSize(glm::ivec2(1024, 768))
+		.SetSize(glm::ivec2(1920, 1080))
 		.Initialize();
 
 	OpenGL::Initialize();
@@ -191,14 +191,14 @@ static void InitializeGame()
 
 	dd::Services::Register(new ddc::SystemsManager());
 
+	dd::Services::Register(new dd::AssetManager());
+
 	dd::Services::Register(new ddr::RenderManager());
 
 	dd::Services::Register(new dd::FrameTimer());
 	s_frameTimer->SetMaxFPS(60);
 
 	dd::Services::Register(new dd::EntityVisualizer());
-
-	dd::Services::Register(new dd::AssetManager());
 
 	{
 		dd::Services::RegisterInterface<dd::IGame>(new TGame());
@@ -254,8 +254,6 @@ static int GameMain()
 			s_startFrameProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 		}
 
-		s_assetManager->Update();
-
 		{
 			{
 				s_profilerTimer.Restart();
@@ -284,6 +282,8 @@ static int GameMain()
 				}
 				s_gameUpdateProfiler.SetValue(s_profilerTimer.TimeInMilliseconds());
 			}
+
+			s_assetManager->Update();
 
 			{
 				s_profilerTimer.Restart();

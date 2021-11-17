@@ -5,7 +5,7 @@
 //
 
 #include "PCH.h"
-#include "EntityLayer.h"
+#include "ddc/EntityLayer.h"
 
 DD_CLASS_CPP(ddc::Entity);
 
@@ -111,7 +111,7 @@ namespace ddc
 				entry.Create = false;
 
 				entry.Ownership.reset();
-				entry.Tags.reset();
+				entry.Tags.Clear();
 
 				m_free.push_back(id);
 			}
@@ -305,7 +305,7 @@ namespace ddc
 		}
 	}
 
-	void EntityLayer::FindAllWith(const dd::IArray<dd::ComponentID>& components, const TagBits& tags, std::vector<Entity>& out_entities) const
+	void EntityLayer::FindAllWith(const dd::IArray<dd::ComponentID>& components, const dd::EnumFlags<ddc::Tag>& tags, std::vector<Entity>& out_entities) const
 	{
 		ComponentBits required;
 		for (dd::ComponentID type : components)
@@ -317,11 +317,10 @@ namespace ddc
 		{
 			if (IsAlive(entry.Entity))
 			{
-				TagBits entity_tags = tags & entry.Tags;
 				ComponentBits entity_components = required & entry.Ownership;
 
-				if (entity_components.count() == required.count() &&
-					entity_tags.count() == tags.count())
+				if (entity_components.count() == required.count() && 
+					entry.Tags.HasAll(tags))
 				{
 					out_entities.push_back(entry.Entity);
 				}
@@ -334,7 +333,7 @@ namespace ddc
 		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
-		return m_entities[e.ID].Tags.test((uint) tag);
+		return m_entities[e.ID].Tags.Has(tag);
 	}
 
 	void EntityLayer::AddTag(Entity e, Tag tag)
@@ -342,7 +341,7 @@ namespace ddc
 		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
-		m_entities[e.ID].Tags.set((uint) tag);
+		m_entities[e.ID].Tags.Set(tag);
 	}
 
 	void EntityLayer::RemoveTag(Entity e, Tag tag)
@@ -350,17 +349,17 @@ namespace ddc
 		DD_ASSERT(IsAliveOrCreated(e));
 		DD_ASSERT(tag != Tag::None);
 
-		m_entities[e.ID].Tags.reset((uint) tag);
+		m_entities[e.ID].Tags.Unset(tag);
 	}
 
-	void EntityLayer::SetAllTags(Entity e, TagBits tags)
+	void EntityLayer::SetAllTags(Entity e, dd::EnumFlags<ddc::Tag> tags)
 	{
 		DD_ASSERT(IsAliveOrCreated(e));
 
 		m_entities[e.ID].Tags = tags;
 	}
 
-	TagBits EntityLayer::GetAllTags(Entity e) const
+	dd::EnumFlags<ddc::Tag> EntityLayer::GetAllTags(Entity e) const
 	{
 		DD_ASSERT(IsAliveOrCreated(e));
 
@@ -404,7 +403,7 @@ namespace ddc
 		return Layer()->HasTag(*this, tag);
 	}
 
-	TagBits Entity::GetAllTags() const
+	dd::EnumFlags<ddc::Tag> Entity::GetAllTags() const
 	{
 		return Layer()->GetAllTags(*this);
 	}

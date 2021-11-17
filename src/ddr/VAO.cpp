@@ -8,8 +8,8 @@ namespace ddr
 	GLint VAO::GetCurrentVAO()
 	{
 		GLint current = OpenGL::InvalidID;
-		
-		glGetIntegerv( GL_VERTEX_ARRAY_BINDING, &current );
+
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &current);
 		CheckOGLError();
 
 		return current;
@@ -17,7 +17,7 @@ namespace ddr
 
 	VAO::VAO()
 	{
-		
+
 	}
 
 	VAO::~VAO()
@@ -27,18 +27,18 @@ namespace ddr
 
 	void VAO::Create()
 	{
-		DD_ASSERT( !IsValid() );
+		DD_ASSERT(!IsValid());
 
-		glGenVertexArrays( 1, &m_id );
+		glGenVertexArrays(1, &m_id);
 		CheckOGLError();
 	}
 
 	void VAO::Destroy()
 	{
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( !m_bound );
+		DD_ASSERT(IsValid());
+		DD_ASSERT(!m_bound);
 
-		glDeleteVertexArrays( 1, &m_id );
+		glDeleteVertexArrays(1, &m_id);
 		CheckOGLError();
 
 		m_id = 0;
@@ -46,13 +46,11 @@ namespace ddr
 
 	void VAO::Bind()
 	{
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( !m_bound );
+		DD_ASSERT(IsValid());
+		DD_ASSERT(!m_bound);
+		DD_ASSERT(GetCurrentVAO() == 0, "Must unbind previous VAO!");
 
-		GLint current = GetCurrentVAO();
-		DD_ASSERT( current == 0, "Must unbind previous VAO!" );
-
-		glBindVertexArray( m_id );
+		glBindVertexArray(m_id);
 		CheckOGLError();
 
 		m_bound = true;
@@ -60,13 +58,11 @@ namespace ddr
 
 	void VAO::Unbind()
 	{
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( m_bound );
+		DD_ASSERT(IsValid());
+		DD_ASSERT(m_bound);
+		DD_ASSERT(GetCurrentVAO() == m_id, "Unbinding different VAO!");
 
-		GLint current = GetCurrentVAO();
-		DD_ASSERT( current == m_id, "Unbinding different VAO!" );
-
-		glBindVertexArray( 0 );
+		glBindVertexArray(0);
 		CheckOGLError();
 
 		m_bound = false;

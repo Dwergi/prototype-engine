@@ -95,7 +95,7 @@ namespace ddc
 	{
 	}
 
-	const dd::Span<Entity>& UpdateBufferView::Entities() const
+	dd::Span<Entity> UpdateBufferView::Entities() const
 	{
 		DD_TODO("This is too dangerous to expose, should probably be ScratchEntity.");
 		return m_entities;

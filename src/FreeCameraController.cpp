@@ -109,6 +109,11 @@ namespace dd
 	{
 		DD_PROFILE_SCOPED(FreeCameraController_Update);
 
+		if (s_input->GetCurrentMode() != "game")
+		{
+			return;
+		}
+
 		m_cameras.clear();
 
 		float dt = update_data.Delta();

@@ -371,6 +371,7 @@
     <ClInclude Include="src\ddc\System.h" />
     <ClInclude Include="src\ddc\SystemsManager.h" />
     <ClInclude Include="src\ddc\SystemsSorting.h" />
+    <ClInclude Include="src\ddc\Tags.h" />
     <ClInclude Include="src\ddc\UpdateBuffer.h" />
     <ClInclude Include="src\ddc\UpdateData.h" />
     <ClInclude Include="src\ddm\AABB.h" />
@@ -400,6 +401,7 @@
     <ClInclude Include="src\ddr\Uniforms.h" />
     <ClInclude Include="src\ddr\VAO.h" />
     <ClInclude Include="src\ddr\VBO.h" />
+    <ClInclude Include="src\EntityType.h" />
     <ClInclude Include="src\flux\FluxBulletComponent.h" />
     <ClInclude Include="src\flux\FluxBulletSystem.h" />
     <ClInclude Include="src\flux\FluxEnemyComponent.h" />
@@ -1180,6 +1182,7 @@
     <ClCompile Include="src\flux\FluxPlayerComponent.cpp" />
     <ClCompile Include="src\flux\FluxPlayerController.cpp" />
     <ClCompile Include="src\flux\FluxEnemyComponent.cpp" />
+    <ClCompile Include="src\FSM.cpp" />
     <ClCompile Include="src\IInputSource.cpp" />
     <ClCompile Include="src\ImGuiBinding.cpp" />
     <ClCompile Include="src\InputEvent.cpp" />
@@ -1240,7 +1243,9 @@
     <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCameraComponent.cpp" />
     <ClCompile Include="src\File.cpp" />
-    <ClCompile Include="src\FSM.cpp" />
+    <ClInclude Include="src\FSM.inl">
+      <FileType>Document</FileType>
+    </ClInclude>
     <ClCompile Include="src\HitResult.cpp" />
     <ClCompile Include="src\HitTestSystem.cpp" />
     <ClCompile Include="src\LightRenderer.cpp" />

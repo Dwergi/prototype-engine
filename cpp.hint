@@ -1,0 +1,6 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define DD_MEMBER(MemberName) typeInfo->RegisterMember<TClass, decltype(MemberName), &TClass::MemberName>( #MemberName )
+#define DD_BEGIN_CLASS(TypeName) static void RegisterMembers( dd::TypeInfo* typeInfo ) { using TClass = TypeName;
+#define DD_END_CLASS() }

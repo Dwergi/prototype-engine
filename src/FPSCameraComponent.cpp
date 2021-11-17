@@ -101,12 +101,11 @@ namespace dd
 		return m_aspectRatio;
 	}
 
-	void FPSCameraComponent::SetWindowSize(glm::ivec2 size)
+	void FPSCameraComponent::SetAspectRatio(float ratio)
 	{
-		float aspect_ratio = (float) size.x / (float) size.y;
-		if (aspect_ratio != m_aspectRatio)
+		if (ratio != m_aspectRatio)
 		{
-			m_aspectRatio = aspect_ratio;
+			m_aspectRatio = ratio;
 		}
 	}
 

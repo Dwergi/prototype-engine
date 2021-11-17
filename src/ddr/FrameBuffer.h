@@ -71,8 +71,8 @@ namespace ddr
 		float m_clearDepth { 0.0f };
 
 		glm::ivec2 m_previousSize { 0, 0 };
-		GLint m_previousDraw { -1 };
-		GLint m_previousRead { -1 };
+		GLint m_previousDraw { 0 };
+		GLint m_previousRead { 0 };
 
 		Texture* m_texColour { nullptr };
 		Texture* m_texDepth { nullptr };

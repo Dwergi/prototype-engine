@@ -35,8 +35,7 @@ namespace dd
 		void SetFar(float dist_far);
 
 		virtual float GetAspectRatio() const override;
-		
-		void SetWindowSize(glm::ivec2 size);
+		void SetAspectRatio(float ratio);
 
 		virtual float GetVerticalFOV() const override;
 		void SetVerticalFOV(float vfov);
@@ -65,7 +64,7 @@ namespace dd
 			DD_METHOD(GetFar);
 			DD_METHOD(SetFar);
 			DD_METHOD(GetAspectRatio);
-			DD_METHOD(SetWindowSize);
+			DD_METHOD(SetAspectRatio);
 			DD_METHOD(GetProjectionMatrix);
 			DD_METHOD(GetVerticalFOV);
 			DD_METHOD(SetVerticalFOV);

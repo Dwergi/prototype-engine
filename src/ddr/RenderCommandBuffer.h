@@ -12,6 +12,8 @@ namespace ddr
 	struct RenderCommand;
 	struct UniformStorage;
 
+	template <typename T> struct RenderCommandIterator;
+
 	template <typename T>
 	struct RenderCommandBuffer
 	{
@@ -25,18 +27,50 @@ namespace ddr
 		T& Allocate();
 
 		void Sort();
-		void Dispatch( UniformStorage& uniforms );
 
 		int Size() const { return (int) m_offsets.size(); }
 		const T& Get(int index) const;
 		T& Access(int index);
 
-	private:
+		RenderCommandIterator<T> begin() const { return RenderCommandIterator<T>(*this, 0); }
+		RenderCommandIterator<T> end() const { return RenderCommandIterator<T>(*this, Size()); }
 
-		friend struct Iterator;
+	private:
 
 		std::vector<byte> m_storage;
 		std::vector<size_t> m_offsets;
+	};
+
+	template <typename T>
+	struct RenderCommandIterator
+	{
+		RenderCommandIterator(const RenderCommandBuffer<T>& buffer, int index) :
+			m_buffer(&buffer),
+			m_index(index)
+		{
+		}
+
+		const T& operator*()
+		{
+			return m_buffer->Get(m_index);
+		}
+
+		RenderCommandIterator& operator++()
+		{
+			++m_index;
+			return *this;
+		}
+
+		bool operator==(const RenderCommandIterator<T>& other) const
+		{
+			return m_buffer == other.m_buffer && m_index == other.m_index;
+		}
+
+		bool operator!=(const RenderCommandIterator<T>& other) const { return !operator==(other); }
+
+	private:
+		const RenderCommandBuffer<T>* m_buffer;
+		int m_index;
 	};
 
 	template <typename T>

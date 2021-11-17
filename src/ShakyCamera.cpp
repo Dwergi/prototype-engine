@@ -14,9 +14,10 @@ namespace dd
 	float ShakyCamera::MaximumRoll = 5.0f;
 	float ShakyCamera::SpeedMultiplier = 25.0f;
 	
-	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, Input& input ) :
-		m_sourceCamera( camera )
+	ShakyCamera::ShakyCamera( const FPSCameraComponent& camera, Input& input )
 	{
+		m_sourceCamera = &camera;
+
 		input.AddHandler( dd::InputAction::ADD_MINOR_TRAUMA, [this]()
 		{ 
 			AddTrauma(0.25f); 
@@ -35,6 +36,8 @@ namespace dd
 
 	void ShakyCamera::Update( float delta_t )
 	{
+		DD_ASSERT(m_sourceCamera != nullptr);
+
 		m_time += delta_t * SpeedMultiplier;
 
 		if( m_trauma > 0 )
@@ -42,11 +45,11 @@ namespace dd
 			float shake = m_trauma * m_trauma;
 
 			float extraYaw = MaximumYaw * shake * glm::simplex( glm::vec2( m_time, Seed ) );
-			float yaw = m_sourceCamera.GetYaw() + glm::radians( extraYaw );
+			float yaw = m_sourceCamera->GetYaw() + glm::radians( extraYaw );
 			m_yaw = ddm::wrap( yaw, 0.0f, glm::two_pi<float>() );
 
 			float extraPitch = MaximumPitch * shake * glm::simplex( glm::vec2( m_time, Seed + 1 ) );
-			float pitch = m_sourceCamera.GetPitch() + glm::radians( extraPitch );
+			float pitch = m_sourceCamera->GetPitch() + glm::radians( extraPitch );
 
 			const float max_pitch = glm::half_pi<float>() - 0.00001f;
 
@@ -56,8 +59,8 @@ namespace dd
 		}
 		else
 		{
-			m_yaw = m_sourceCamera.GetYaw();
-			m_pitch = m_sourceCamera.GetPitch();
+			m_yaw = m_sourceCamera->GetYaw();
+			m_pitch = m_sourceCamera->GetPitch();
 			m_roll = 0;
 		}
 
@@ -86,48 +89,48 @@ namespace dd
 
 	float ShakyCamera::GetVerticalFOV() const
 	{
-		return m_sourceCamera.GetVerticalFOV();
+		return m_sourceCamera->GetVerticalFOV();
 	}
 
 	float ShakyCamera::GetAspectRatio() const
 	{
-		return m_sourceCamera.GetAspectRatio();
+		return m_sourceCamera->GetAspectRatio();
 	}
 
 	float ShakyCamera::GetNear() const
 	{
-		return m_sourceCamera.GetNear();
+		return m_sourceCamera->GetNear();
 	}
 
 	float ShakyCamera::GetFar() const
 	{
-		return m_sourceCamera.GetFar();
+		return m_sourceCamera->GetFar();
 	}
 
 	float ShakyCamera::GetYaw() const
 	{
-		return m_sourceCamera.GetYaw();
+		return m_sourceCamera->GetYaw();
 	}
 
 	float ShakyCamera::GetPitch() const
 	{
-		return m_sourceCamera.GetPitch();
+		return m_sourceCamera->GetPitch();
 	}
 
 	glm::vec3 ShakyCamera::GetPosition() const
 	{
-		return m_sourceCamera.GetPosition();
+		return m_sourceCamera->GetPosition();
 	}
 
 	glm::mat4 ShakyCamera::GetProjectionMatrix() const
 	{
-		return m_sourceCamera.GetProjectionMatrix();
+		return m_sourceCamera->GetProjectionMatrix();
 	}
 
 	glm::mat4 ShakyCamera::GetViewMatrix() const
 	{
 		glm::vec4 up = glm::rotate( m_roll, glm::vec3( 0, 0, 1 ) ) * glm::vec4( 0, 1, 0, 0 );
 
-		return glm::lookAt( m_sourceCamera.GetPosition(), m_sourceCamera.GetPosition() + m_sourceCamera.GetDirection(), up.xyz() );
+		return glm::lookAt( m_sourceCamera->GetPosition(), m_sourceCamera->GetPosition() + m_sourceCamera->GetDirection(), up.xyz() );
 	}
 }

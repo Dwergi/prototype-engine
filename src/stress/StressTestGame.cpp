@@ -199,7 +199,7 @@ namespace stress
 		s_camera = entity_layers[0]->CreateEntity<dd::TransformComponent, dd::FPSCameraComponent>();
 
 		dd::FPSCameraComponent* camera = s_camera.Access<dd::FPSCameraComponent>();
-		camera->SetWindowSize(s_window->GetSize());
+		camera->SetAspectRatio(s_window->GetAspectRatio());
 		camera->SetVerticalFOV(glm::radians(45.0f));
 
 		glm::vec3 cam_pos(MAX_POSITION, MAX_POSITION, MAX_POSITION);

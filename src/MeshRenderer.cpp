@@ -15,7 +15,6 @@
 #include "ICamera.h"
 #include "MeshComponent.h"
 #include "MeshUtils.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 #include "ddr/Material.h"
@@ -214,29 +213,11 @@ namespace ddr
 		MaterialHandle current_mat_h;
 		MeshHandle current_mesh_h;
 
-		for (int i = 0; i < m_commands.Size(); ++i)
+		for (const MeshRenderCommand& cmd : m_commands)
 		{
-			const MeshRenderCommand& cmd = m_commands.Get(i);
-			transforms.push_back(cmd.Transform);
-			colours.push_back(cmd.Colour);
-
-			// switch material if changed
-			if (cmd.Material != current_mat_h)
-			{
-				if (current_mat_h.IsValid())
-				{
-					Material* old_material = current_mat_h.Access();
-					old_material->Unbind(uniforms);
-				}
-
-				Material* new_material = cmd.Material.Access();
-				new_material->Bind(uniforms);
-
-				current_mat_h = cmd.Material;
-			}
-
-			// switch mesh and draw if changed
-			if (cmd.Mesh != current_mesh_h)
+			// switch material and draw if changed
+			if (cmd.Material != current_mat_h || 
+				cmd.Mesh != current_mesh_h)
 			{
 				if (current_mesh_h.IsValid())
 				{
@@ -246,7 +227,24 @@ namespace ddr
 				}
 
 				current_mesh_h = cmd.Mesh;
+
+				if (cmd.Material != current_mat_h)
+				{
+					if (current_mat_h.IsValid())
+					{
+						Material* old_material = current_mat_h.Access();
+						old_material->Unbind(uniforms);
+					}
+
+					Material* new_material = cmd.Material.Access();
+					new_material->Bind(uniforms);
+
+					current_mat_h = cmd.Material;
+				}
 			}
+
+			transforms.push_back(cmd.Transform);
+			colours.push_back(cmd.Colour);
 		}
 
 		if (current_mesh_h.IsValid())

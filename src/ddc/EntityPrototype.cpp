@@ -112,6 +112,6 @@ namespace ddc
 
 	void EntityPrototype::AddTag(ddc::Tag tag)
 	{
-		Tags.set((size_t) tag, true);
+		Tags.Set(tag);
 	}
 }

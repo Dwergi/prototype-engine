@@ -14,7 +14,6 @@
 #include "MeshComponent.h"
 #include "PlayerComponent.h"
 #include "Random.h"
-#include "Services.h"
 #include "TransformComponent.h"
 
 #include "ddc/ScratchEntity.h"
@@ -106,6 +105,8 @@ namespace neut
 
 	void TerrainSystem::Update(ddc::UpdateData& update_data)
 	{
+		m_activeCount = 0;
+
 		const auto& chunks_data = update_data.Data();
 
 		if (m_requiresRegeneration)
@@ -130,13 +131,15 @@ namespace neut
 			return;
 		}
 
+		dd::Job* root_job = s_jobsystem->Create();
+
 		glm::vec2 player_offset = player_transforms[0].Position.xz;
 
-		GenerateChunks(update_data, chunks_data, player_offset);
+		GenerateChunks(update_data, chunks_data, player_offset, root_job);
 
 		DD_TODO("Hmm, this means that the first generated chunks won't be updated/rendered the first frame.");
 
-		auto entities = chunks_data.Entities();
+		auto& entities = chunks_data.Entities();
 		auto chunks = chunks_data.Write<neut::TerrainChunkComponent>();
 		auto transforms = chunks_data.Write<dd::TransformComponent>();
 		auto bounds = chunks_data.Write<dd::BoundBoxComponent>();
@@ -153,8 +156,10 @@ namespace neut
 				entities[i].RemoveTag(ddc::Tag::Visible);
 			}
 
-			UpdateChunk(entities[i], chunks[i], bounds[i], transforms[i], colours[i], player_offset);
+			UpdateChunk(entities[i], chunks[i], bounds[i], transforms[i], colours[i], player_offset, root_job);
 		}
+
+		s_jobsystem->Wait(root_job);
 	}
 
 	int TerrainSystem::CalculateLOD(glm::vec2 chunk_pos, glm::vec2 camera_pos) const
@@ -177,7 +182,7 @@ namespace neut
 
 	void TerrainSystem::UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp,
 		dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
-		dd::ColourComponent& colour_cmp, glm::vec2 camera_pos)
+		dd::ColourComponent& colour_cmp, glm::vec2 camera_pos, dd::Job* root_job)
 	{
 		if (m_params.UseDebugColours)
 		{
@@ -193,7 +198,7 @@ namespace neut
 		glm::vec2 pos = chunk_cmp.Chunk->GetPosition();
 
 		chunk_cmp.Chunk->SwitchLOD(CalculateLOD(pos, camera_pos));
-		chunk_cmp.Chunk->Update();
+		chunk_cmp.Chunk->Update(root_job);
 
 		transform_cmp.Position = glm::vec3(pos.x, 0, pos.y);
 		transform_cmp.Update();
@@ -206,9 +211,11 @@ namespace neut
 				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
 			}
 		}
+
+		m_activeCount += chunk_cmp.Chunk->IsReady();
 	}
 
-	void TerrainSystem::GenerateChunks(ddc::UpdateData& update_data, const ddc::UpdateBufferView& data, glm::vec2 camera_pos)
+	void TerrainSystem::GenerateChunks(ddc::UpdateData& update_data, const ddc::UpdateBufferView& data, glm::vec2 camera_pos, dd::Job* root_job)
 	{
 		auto chunks = data.Write<TerrainChunkComponent>();
 		auto entities = data.Entities();
@@ -275,11 +282,11 @@ namespace neut
 		for (glm::vec2 pos : missing_chunks)
 		{
 			int lod = CalculateLOD(pos, camera_pos);
-			CreateChunk(update_data, pos, lod);
+			CreateChunk(update_data, pos, lod, root_job);
 		}
 	}
 
-	void TerrainSystem::CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod)
+	void TerrainSystem::CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod, dd::Job* root_job)
 	{
 		DD_PROFILE_SCOPED(TerrainSystem_CreateChunk);
 
@@ -297,7 +304,7 @@ namespace neut
 		neut::TerrainChunk* chunk = new neut::TerrainChunk(m_params, pos);
 		chunk->SwitchLOD(lod);
 		chunk_cmp->Chunk = chunk;
-		chunk->Update();
+		chunk->Update(root_job);
 
 		update_data.CreateEntity(std::move(scratch));
 	}
@@ -343,7 +350,7 @@ namespace neut
 
 		ImGui::Checkbox("Debug Colours", &m_params.UseDebugColours);
 
-		if (ImGui::TreeNodeEx("Parameters", ImGuiTreeNodeFlags_CollapsingHeader))
+		if (ImGui::CollapsingHeader("Parameters"))
 		{
 			if (ImGui::DragFloat("Chunk Size", &m_params.ChunkSize, 0.05f, 0.01f, 2.0f))
 			{
@@ -364,11 +371,9 @@ namespace neut
 			{
 				m_requiresRegeneration = true;
 			}
-
-			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("Height Colours", ImGuiTreeNodeFlags_CollapsingHeader))
+		if (ImGui::CollapsingHeader("Height Colours"))
 		{
 			float previous = 0;
 
@@ -376,20 +381,17 @@ namespace neut
 			{
 				std::string str = fmt::format("Height {}", i);
 
-				if (ImGui::TreeNodeEx(str.c_str(), ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(str.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					ImGui::ColorEdit3("Colour", glm::value_ptr(m_params.HeightColours[i]));
 					ImGui::DragFloat("Cutoff", &m_params.HeightCutoffs[i], 0.01f, previous, 1.0f);
 
 					previous = m_params.HeightCutoffs[i];
-
-					ImGui::TreePop();
 				}
 			}
-			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("Amplitudes", ImGuiTreeNodeFlags_CollapsingHeader))
+		if (ImGui::CollapsingHeader("Amplitudes"))
 		{
 			for (int i = 0; i < m_params.Noise.MaxOctaves; ++i)
 			{
@@ -400,11 +402,9 @@ namespace neut
 					m_requiresRegeneration = true;
 				}
 			}
-
-			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNodeEx("LODs", ImGuiTreeNodeFlags_CollapsingHeader))
+		if (ImGui::CollapsingHeader("LODs"))
 		{
 			float previous = 0;
 
@@ -419,8 +419,6 @@ namespace neut
 
 				previous = m_params.LODSwitchDistances[i];
 			}
-
-			ImGui::TreePop();
 		}
 
 		if (ImGui::Button("Randomize"))

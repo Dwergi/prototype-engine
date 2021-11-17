@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <atomic>
-
 #include "Random.h"
+
+// Enable this to have an explicit this pointer in the Job struct to help debug job systesm problems.
+//#define DD_USE_JOB_THIS_PTR
 
 namespace dd
 {
@@ -26,11 +27,18 @@ namespace dd
 
 		static constexpr size_t MaxSize = 128;
 		static constexpr size_t PayloadSize = sizeof(m_function) + sizeof(m_parent) + sizeof(m_pendingJobs);
-		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
 
+#ifdef DD_USE_JOB_THIS_PTR
+		static constexpr size_t PaddingBytes = MaxSize - PayloadSize - sizeof(void*);
+		void* m_this;
 		byte m_argument[PaddingBytes] { 0 };
+#else
+		static constexpr size_t PaddingBytes = MaxSize - PayloadSize;
+		byte m_argument[PaddingBytes] { 0 };
+#endif
 
 		template <typename T>
+		[[nodiscard]]
 		size_t SetArgument(size_t offset, T value)
 		{
 			std::memcpy(m_argument + offset, &value, sizeof(T));
@@ -38,6 +46,7 @@ namespace dd
 		}
 
 		template <typename T>
+		[[nodiscard]]
 		size_t GetArgument(size_t offset, T& value) const
 		{
 			value = *reinterpret_cast<const T*>(m_argument + offset);

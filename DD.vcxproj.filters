@@ -1323,6 +1323,15 @@
     <ClInclude Include="src\phys2d\Physics2DGame.h">
       <Filter>Games\Physics2D</Filter>
     </ClInclude>
+    <ClInclude Include="src\FSM.inl">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityType.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddc\Tags.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Recorder.cpp">
@@ -1490,9 +1499,6 @@
     </ClCompile>
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FSM.cpp">
-      <Filter>FSM</Filter>
     </ClCompile>
     <ClCompile Include="src\DDAssertHelpers.cpp">
       <Filter>Core</Filter>
@@ -2153,6 +2159,9 @@
     </ClCompile>
     <ClCompile Include="src\phys2d\Physics2DGame.cpp">
       <Filter>Games\Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FSM.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

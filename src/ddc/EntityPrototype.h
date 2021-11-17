@@ -47,7 +47,7 @@ namespace ddc
 		static const char* TypeName() { return "Prototype"; }
 
 	private:
-		TagBits Tags;
+		dd::EnumFlags<ddc::Tag> Tags;
 		std::vector<ComponentPrototype> Components;
 	};
 

@@ -48,6 +48,9 @@ namespace dd
 
 		void RegisterHit(float distance, glm::vec3 normal, ddc::Entity entity);
 
+		DD_BEGIN_CLASS(dd::HitResult)
+		DD_END_CLASS()
+
 	private:
 
 		float m_distance { FLT_MAX };

@@ -31,6 +31,12 @@ namespace dd
 	}
 #endif
 
+	char last(std::string_view str)
+	{
+		DD_ASSERT(str.length() > 0);
+		return str.at(str.length() - 1);
+	}
+
 	int SplitString(const std::string& to_split, dd::IArray<std::string>& out_parts, char split_on)
 	{
 		size_t start = 0;

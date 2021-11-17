@@ -8,6 +8,7 @@
 #include "HitResult.h"
 
 DD_CLASS_CPP(dd::HitHandle);
+DD_CLASS_CPP(dd::HitResult);
 
 namespace dd
 {

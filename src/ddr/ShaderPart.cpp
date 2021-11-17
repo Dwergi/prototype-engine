@@ -174,14 +174,14 @@ namespace ddr
 			}
 
 			include_source = ProcessIncludes(path, include_source);
-
-			std::string_view source_start = std::string_view(final_source).substr(0, include_start);
-			std::string_view source_rest = std::string_view(final_source).substr(file_end + 1);
+			if (dd::last(include_source) != '\n')
+			{
+				include_source += '\n';
+			}
 
 			final_source.reserve(final_source.size() + include_source.size());
-			final_source = std::string(source_start);
-			final_source += include_source;
-			final_source += source_rest;
+			final_source.erase(include_start, (file_end + 1) - include_start);
+			final_source.insert(include_start, include_source);
 
 			include_start += include_source.size();
 		}

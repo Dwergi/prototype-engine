@@ -8,7 +8,6 @@
 #include "ParticleSystemRenderer.h"
 
 #include "ICamera.h"
-#include "Services.h"
 
 #include "ddr/OpenGL.h"
 #include "ddr/RenderData.h"
@@ -22,11 +21,11 @@ namespace ddr
 
 	static const glm::vec2 s_screenFacingQuadVertices[] = {
 			glm::vec2(-0.5f,	-0.5f),
-			glm::vec2(0.5f,	-0.5f),
+			glm::vec2(0.5f,		-0.5f),
 			glm::vec2(-0.5f,	0.5f),
 			glm::vec2(-0.5f,	0.5f),
-			glm::vec2(0.5f,	-0.5f),
-			glm::vec2(0.5f,	0.5f)
+			glm::vec2(0.5f,		-0.5f),
+			glm::vec2(0.5f,		0.5f)
 	};
 
 	static const glm::vec2 s_screenFacingQuadUVs[] = {
@@ -65,15 +64,16 @@ namespace ddr
 		m_vaoParticle.Create();
 		m_vaoParticle.Bind();
 
-		s_vboQuad.Bind();
-
 		if (!s_vboQuad.IsValid())
 		{
 			s_vboQuad.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+			s_vboQuad.Bind();
 			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
 			s_vboQuad.CommitData();
+			s_vboQuad.Unbind();
 		}
 
+		s_vboQuad.Bind();
 		shader->BindAttributeVec2("Position", Normalized::No, Instanced::Yes);
 		s_vboQuad.Unbind();
 

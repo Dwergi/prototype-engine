@@ -11,9 +11,8 @@
 namespace dd
 {
 	template <typename T>
-	class IArray
+	struct IArray
 	{
-	public:
 		int Capacity() const { return m_data.Size(); }
 		int Size() const { return m_size; }
 
@@ -64,11 +63,9 @@ namespace dd
 	// Array is, as the name implies, a static array that is allocated on the stack. Useful for temporary passing around of values. 
 	//
 	template <typename T, int MaxCapacity>
-	class Array
+	struct Array
 		: public IArray<T>
 	{
-	public:
-
 		Array();
 		Array(const Array<T, MaxCapacity>& other);
 		Array(Array<T, MaxCapacity>&& other) noexcept;

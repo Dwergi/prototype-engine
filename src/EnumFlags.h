@@ -14,6 +14,8 @@ namespace dd
 		EnumFlags(const EnumFlags<T>& other) { m_flags = other.m_flags; }
 		EnumFlags(T flag); // intentionally implicit
 
+		uint Count() const;
+
 		void Clear();
 		void Fill();
 
@@ -29,6 +31,7 @@ namespace dd
 		TStorage Flags() const { return m_flags; }
 
 		bool operator==(const EnumFlags<T>& other) const { return m_flags == other.m_flags; }
+		bool operator!=(const EnumFlags<T>& other) const { return m_flags != other.m_flags; }
 
 	private:
 
@@ -91,5 +94,11 @@ namespace dd
 	void EnumFlags<T>::Fill()
 	{
 		m_flags = (TStorage) ~0;
+	}
+
+	template <typename T>
+	uint EnumFlags<T>::Count() const
+	{
+		return std::popcount(m_flags);
 	}
 }
