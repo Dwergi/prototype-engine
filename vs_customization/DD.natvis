@@ -1,40 +1,122 @@
-<AutoVisualizer>
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="dd::String" Inheritable="true">
-		<DisplayString>{m_buffer.m_ptr,s}</DisplayString>
-		<StringView>m_buffer.m_ptr,sb</StringView>
+		<DisplayString>{m_buffer,s8}</DisplayString>
+		<StringView>m_buffer,s8b</StringView>
 	</Type>
+
 	<Type Name="dd::SharedString" Inheritable="true">
-		<DisplayString>{m_ptr,s}</DisplayString>
-		<StringView>m_ptr,sb</StringView>
+		<DisplayString>{m_buffer,s}</DisplayString>
+		<StringView>m_buffer,sb</StringView>
 	</Type>
+
 	<Type Name="dd::TypeInfo">
-		<DisplayString Condition="m_namespace.m_ptr != 0">{m_namespace.m_ptr._Ptr,sb}::{m_name.m_ptr._Ptr,sb}</DisplayString>
-		<DisplayString Condition="m_namespace.m_ptr == 0">{m_name.m_ptr._Ptr,sb}</DisplayString>
+		<Intrinsic Name="IsBool" Expression="m_typeKind == dd::TypeKind::POD &amp;&amp; !strcmp(m_name.m_buffer,&quot;bool&quot;)"/>
+		<Intrinsic Name="IsInt" Expression="m_typeKind == dd::TypeKind::POD &amp;&amp; (strstr(m_name.m_buffer,&quot;int&quot;) || strstr(m_name.m_buffer,&quot;uint&quot;))"/>
+		<Intrinsic Name="IsFloat" Expression="m_typeKind == dd::TypeKind::POD &amp;&amp; strstr(m_name.m_buffer,&quot;float&quot;)"/>
+		<Intrinsic Name="IsDouble" Expression="m_typeKind == dd::TypeKind::POD &amp;&amp; strstr(m_name.m_buffer,&quot;double&quot;)"/>
+		<Intrinsic Name="IsString" Expression="strstr(m_name.m_buffer,&quot;String&quot;) &amp;&amp; strstr(m_namespace.m_buffer,&quot;dd&quot;)"/>
+		<Intrinsic Name="HasNamespace" Expression="m_namespace.m_length > 0"/>
+		
+		<DisplayString Condition="HasNamespace()">{m_namespace.m_buffer,s8b}::{m_name.m_buffer,s8b}</DisplayString>
+		<DisplayString>{m_name.m_buffer,s8b}</DisplayString>
 		<Expand>
-			<Item Name="Typename">m_name.m_ptr._Ptr,sb</Item>
-			<Item Name="Namespace">m_namespace.m_ptr._Ptr,sb</Item>
-			<Item Name="Size">m_size</Item>
-			<Item Name="Members">m_members</Item>
-			<Item Name="Methods">m_methods</Item>
+			<Item Name="[namespace]" Condition="m_namespace.m_length > 0">m_namespace</Item>
+			<Item Name="[name]">m_name</Item>
+			<Item Name="[size]">m_size</Item>
+			<Item Name="[members]">m_members</Item>
+			<Item Name="[methods]">m_methods</Item>
 		</Expand>
 	</Type>
+
 	<Type Name="dd::Variable">
-		<DisplayString>{m_typeInfo}</DisplayString>
+		<DisplayString Condition="m_typeInfo == 0">{{empty}}</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 1">
+			{{{*m_typeInfo}={*(int8*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 2">
+			{{{*m_typeInfo}={*(int16*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 4">
+			{{{*m_typeInfo}={*(int32*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 8">
+			{{{*m_typeInfo}={*(int64*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsString()">
+			{{{*m_typeInfo}={*(dd::String*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsFloat()">
+			{{{*m_typeInfo}={*(float*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsDouble()">
+			{{{*m_typeInfo}={*(double*) m_data}}}
+		</DisplayString>
+		<DisplayString Condition="m_typeInfo->IsBool()">
+			{{{*m_typeInfo}={*(bool*) m_data}}}
+		</DisplayString>
+		<DisplayString>{{{*m_typeInfo}}}</DisplayString> 
+		
 		<Expand>
-			<Item Name="Type">m_typeInfo</Item>
-			<Item Name="Ptr">m_data</Item>
+			<Item Name="[type]">*m_typeInfo</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 1">
+				*(int8*) m_data
+			</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 2">
+				*(int16*) m_data
+			</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 4">
+				*(int32*) m_data
+			</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsInt() &amp;&amp; m_typeInfo->m_size == 8">
+				*(int64*) m_data
+			</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsFloat()">*(float*) m_data</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsDouble()">*(double*) m_data</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsBool()">*(bool*) m_data</Item>
+			<Item Name="[value]" Condition="m_typeInfo->IsString()">*(dd::String*) m_data,s</Item>
+			<Item Name="[ptr]">m_data</Item>
+			<Synthetic Name="[Copy to Watch]">
+				<DisplayString Condition="m_typeInfo->HasNamespace()">
+					*({m_typeInfo->m_namespace.m_buffer,sb}::{m_typeInfo->m_name.m_buffer,sb}*) {m_data}
+				</DisplayString>
+				<DisplayString>
+					*({m_typeInfo->m_name.m_buffer,sb}*) {m_data}
+				</DisplayString>
+			</Synthetic>
 		</Expand>
 	</Type>
+
 	<Type Name="dd::Member">
-		<DisplayString>{m_name} ({m_typeInfo})</DisplayString>
+		<DisplayString Condition="m_typeInfo == 0">{{empty}}</DisplayString>
+		<DisplayString Condition="m_parent != 0">{*m_parent}::{m_name.m_buffer,sb} ({*m_typeInfo})</DisplayString>
+		<DisplayString>{m_name.m_buffer,sb} ({*m_typeInfo})</DisplayString>
 		<Expand>
-			<Item Name="Type">m_typeInfo</Item>
-			<Item Name="Parent">m_parent</Item>
-			<Item Name="Offset">m_offset</Item>
+			<Item Name="[type]">*m_typeInfo</Item>
+			<Item Name="[parent]">m_parent</Item>
+			<Item Name="[offset]">m_offset</Item>
 		</Expand>
 	</Type>
+
+	<Type Name="dd::Property">
+		<DisplayString>{m_name,sb}: {m_variable}</DisplayString>
+
+		<Expand>
+			<Item Name="[name]">m_name</Item>
+			<Item Name="[variable]">m_variable</Item>
+			<Synthetic Name="[Copy to Watch]">
+				<DisplayString Condition="m_variable.m_typeInfo->HasNamespace()">
+					*({m_variable.m_typeInfo->m_namespace.m_buffer,sb}::{m_variable.m_typeInfo->m_name.m_buffer,sb}*) {m_variable.m_data}
+				</DisplayString>
+				<DisplayString>
+					*({m_variable.m_typeInfo->m_name.m_buffer,sb}*) {m_variable.m_data}
+				</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+
 	<Type Name="dd::Vector&lt;*&gt;">
-		<DisplayString>[{m_size}/{m_capacity}]</DisplayString>
+		<DisplayString>{"$T1",sb} [{m_size}/{m_capacity}]</DisplayString>
 		<Expand>
 			<Item Name="[size]">m_size</Item>
 			<Item Name="[capacity]">m_capacity</Item>
