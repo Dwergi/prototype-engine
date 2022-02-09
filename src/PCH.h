@@ -94,7 +94,7 @@ namespace dd
 		T value = vec.front();
 		vec.erase(vec.begin());
 
-		return std::move(value);
+		return value;
 	}
 
 	template <typename T, typename Arg>

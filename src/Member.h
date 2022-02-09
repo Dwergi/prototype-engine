@@ -33,13 +33,13 @@ namespace dd
 		//
 		// The name of this member.
 		//
-		const String32& Name() const;
+		const String& Name() const;
 
 	private:
 		String32 m_name;
-		uintptr_t m_offset;
-		const TypeInfo* m_typeInfo;
-		const TypeInfo* m_parent;
+		uintptr_t m_offset { 0 };
+		const TypeInfo* m_typeInfo { nullptr };
+		const TypeInfo* m_parent { nullptr };
 		
 		friend struct TypeInfo;
 	};

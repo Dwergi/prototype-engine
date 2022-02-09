@@ -19,15 +19,17 @@ namespace dd
 		virtual ~IBuffer();
 
 		virtual const void* GetVoid() const = 0;
-		int SizeBytes() const;
-		int Size() const;
+		uint64 SizeBytes() const;
+		int SizeBytesInt() const;
+		uint64 Size() const;
+		int SizeInt() const;
 
 	protected:
 
 		IBuffer(uint element_size);
 
-		uint m_count { 0 };
-		uint m_elementSize { 0 };
+		uint64 m_count { 0 };
+		uint64 m_elementSize { 0 };
 	};
 
 	//
@@ -38,14 +40,8 @@ namespace dd
 	{
 		ConstBuffer();
 		ConstBuffer(const T* ptr, int count);
-		ConstBuffer(const T* ptr, size_t count);
-
-		template <size_t Size>
-		explicit ConstBuffer(const T(arr)[Size]) : IBuffer(sizeof(T))
-		{
-			m_ptr = arr;
-			m_size = (int) Size
-		}
+		ConstBuffer(const T* ptr, uint count);
+		ConstBuffer(const T* ptr, uint64 count);
 
 		explicit ConstBuffer(const std::vector<T>& vec);
 
@@ -58,12 +54,12 @@ namespace dd
 		ConstBuffer<T>& operator=(const ConstBuffer<T>& other);
 		ConstBuffer<T>& operator=(ConstBuffer<T>&& other);
 
-		const T& operator[](size_t idx) const;
+		const T& operator[](uint64 idx) const;
 
 		bool IsValid() const { return m_ptr != nullptr; }
 
 		void Set(const T* ptr, int count);
-		void Set(const T* ptr, size_t count);
+		void Set(const T* ptr, uint64 count);
 		const T* Get() const;
 		virtual const void* GetVoid() const override { return m_ptr; }
 
@@ -89,9 +85,10 @@ namespace dd
 	{
 		Buffer();
 		Buffer(T* ptr, int count);
-		Buffer(T* ptr, size_t count);
+		Buffer(T* ptr, uint count);
+		Buffer(T* ptr, uint64 count);
 
-		template <size_t Size>
+		template <uint64 Size>
 		explicit Buffer(T(arr)[Size]) : ConstBuffer(arr) {}
 
 		explicit Buffer(const IBuffer& buffer);
@@ -102,10 +99,10 @@ namespace dd
 		Buffer<T>& operator=(const Buffer<T>& other);
 		Buffer<T>& operator=(Buffer<T>&& other);
 
-		T& operator[](size_t idx) const;
+		T& operator[](uint64 idx) const;
 
 		void Set(T* ptr, int count);
-		void Set(T* ptr, size_t count);
+		void Set(T* ptr, uint64 count);
 		T* Access() const;
 
 		void Fill(const T& value);

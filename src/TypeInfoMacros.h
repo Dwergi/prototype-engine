@@ -41,9 +41,9 @@
 
 #define DD_PARENT( ParentType ) typeInfo->RegisterParentType<ParentType>()
 
-#define DD_MEMBER( MemberName ) typeInfo->RegisterMember<TClass, decltype(MemberName), &TClass::MemberName>( #MemberName )
+#define DD_MEMBER( MemberName ) typeInfo->RegisterMember<TClass, decltype(TClass::MemberName), &TClass::MemberName>( #MemberName )
 
-#define DD_METHOD( MethodName ) typeInfo->RegisterMethod<decltype(&MethodName), &MethodName>( #MethodName )
+#define DD_METHOD( MethodName ) typeInfo->RegisterMethod<decltype(&TClass::MethodName), &TClass::MethodName>( #MethodName )
 
 #define DD_BASIC_TYPE( TypeName ) static void RegisterMembers( dd::TypeInfo* ) {}
 

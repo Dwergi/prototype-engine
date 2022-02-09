@@ -24,7 +24,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -435,6 +435,9 @@
     <ClInclude Include="src\neutrino\WaterSystem.h" />
     <ClInclude Include="src\phys2d\Physics2DGame.h" />
     <ClInclude Include="src\ProfilerValue.h" />
+    <ClInclude Include="src\Property.h" />
+    <ClInclude Include="src\Scope.h" />
+    <ClInclude Include="src\UndoStack.h" />
     <ClInclude Include="src\stress\StressTestGame.h" />
     <ClInclude Include="src\EntityVisualizer.h" />
     <ClInclude Include="src\EnumFlags.h" />
@@ -522,7 +525,6 @@
     <ClInclude Include="src\PlayerComponent.h" />
     <ClInclude Include="src\PCH.h" />
     <ClInclude Include="src\Profiler.h" />
-    <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />
     <ClInclude Include="src\RemoveQualifiers.h" />
     <ClInclude Include="src\TestEntities.h" />
@@ -548,8 +550,8 @@
     <ClInclude Include="src\TypeInfoMacros.h" />
     <ClInclude Include="src\TransformComponent.h" />
     <ClInclude Include="src\Random.h" />
-    <ClInclude Include="src\Recorder.h" />
     <ClInclude Include="src\Variable.h" />
+    <ClInclude Include="src\Variant.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>
   <ItemGroup>
@@ -1230,6 +1232,8 @@
     <ClCompile Include="src\PlaneRenderer.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\ProfilerValue.cpp" />
+    <ClCompile Include="src\Property.cpp" />
+    <ClCompile Include="src\UndoStack.cpp" />
     <ClCompile Include="src\RenderCommandTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
@@ -1333,9 +1337,7 @@
     <ClCompile Include="src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
-    <ClCompile Include="src\Recorder.cpp" />
     <ClCompile Include="src\ScopedTimer.cpp" />
     <ClCompile Include="src\SharedString.cpp" />
     <ClCompile Include="src\String_dd.cpp" />
@@ -1363,7 +1365,7 @@
     <ClCompile Include="src\Tests\RandomTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Tests\RecorderTests.cpp">
+    <ClCompile Include="src\Tests\UndoStackTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Test'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Tests\SerializerTests.cpp">
@@ -1392,10 +1394,12 @@
     <None Include="src\DoubleBuffer.inl" />
     <None Include="src\HandleManager.inl" />
     <None Include="src\JobSystem.inl" />
-    <None Include="src\Recorder.inl" />
     <None Include="src\RingBuffer.inl" />
     <None Include="src\TypeInfo.inl" />
     <None Include="src\Vector.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="vs_customization\DD.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

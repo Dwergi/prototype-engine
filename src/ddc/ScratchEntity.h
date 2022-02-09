@@ -106,6 +106,6 @@ namespace ddc
 			0, (scratch.Add<TComponents>(), 0)...
 		};
 
-		return std::move(scratch);
+		return scratch;
 	}
 }

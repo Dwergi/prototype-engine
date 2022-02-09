@@ -24,17 +24,26 @@ namespace dd
 	template <typename T>
 	void TypeInfo::RegisterFunctions()
 	{
-		typedef std::conditional<std::is_default_constructible<T>::value, T, EmptyType<T>>::type DefaultCtorType;
-		typedef std::conditional<std::is_copy_constructible<T>::value, T, EmptyType<T>>::type CopyCtorType;
-		typedef std::conditional<std::is_copy_assignable<T>::value, T, EmptyType<T>>::type CopyAssignType;
-
-		New = SetFunc<std::is_default_constructible<T>::value, void* (*)(), &dd::New<DefaultCtorType>>::Get();
-		Copy = SetFunc<std::is_copy_assignable<T>::value, void (*)(void*, const void*), &dd::Copy<CopyAssignType>>::Get();
+		if constexpr (std::is_default_constructible_v<T>)
+		{
+			New = &dd::New<T>;
+		}
 		Delete = dd::Delete<T>;
-		PlacementNew = SetFunc<std::is_default_constructible<T>::value, void(*)(void*), &dd::PlacementNew<DefaultCtorType>>::Get();
-		PlacementCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void*, const void*), &dd::PlacementCopy<CopyCtorType>>::Get();
+
+		if constexpr (std::is_copy_assignable_v<T>)
+		{
+			Copy = &dd::Copy<T>;
+		}
+		else if constexpr (std::is_copy_constructible_v<T>)
+		{
+			Copy = &dd::PlacementCopy<T>;
+		}
+
+		if constexpr (std::is_default_constructible_v<T>)
+		{
+			PlacementNew = &dd::PlacementNew<T>;
+		}
 		PlacementDelete = dd::PlacementDelete<T>;
-		NewCopy = SetFunc<std::is_copy_constructible<T>::value, void (*)(void**, const void*), &dd::NewCopy<CopyCtorType>>::Get();
 	}
 
 	template <typename T>
@@ -46,7 +55,7 @@ namespace dd
 
 		typeInfo->m_typeKind = TypeKind::Class;
 
-		typeInfo->Init(name, sizeof(T));
+		typeInfo->Initialize(name, sizeof(T));
 
 		typeInfo->RegisterFunctions<T>();
 
@@ -57,13 +66,13 @@ namespace dd
 			String64 ptrName(name);
 			ptrName += "*";
 			TypeInfo* ptrInfo = AccessType<T*>();
-			ptrInfo->Init(ptrName.c_str(), sizeof(T*));
+			ptrInfo->Initialize(ptrName.c_str(), sizeof(T*));
 			sm_typeMap->insert(std::make_pair(String32(ptrName), ptrInfo));
 
 			String64 refName(name);
 			refName += "&";
 			TypeInfo* refInfo = AccessType<T&>();
-			refInfo->Init(refName.c_str(), sizeof(T&));
+			refInfo->Initialize(refName.c_str(), sizeof(T&));
 			sm_typeMap->insert(std::make_pair(String32(refName), refInfo));
 		}
 
@@ -79,15 +88,13 @@ namespace dd
 
 		typeInfo->m_typeKind = TypeKind::POD;
 
-		typeInfo->Init(name, sizeof(T));
+		typeInfo->Initialize(name, sizeof(T));
 
 		typeInfo->New = PODNew<T>;
 		typeInfo->Copy = PODCopy<T>;
-		typeInfo->NewCopy = PODNewCopy<T>;
 		typeInfo->Delete = PODDelete<T>;
 		typeInfo->PlacementNew = PODPlacementNew<T>;
 		typeInfo->PlacementDelete = PODPlacementDelete<T>;
-		typeInfo->PlacementCopy = PODPlacementCopy<T>;
 
 		sm_typeMap->insert(std::make_pair(String32(name), typeInfo));
 
@@ -115,7 +122,7 @@ namespace dd
 		finalName += itemType->Name().c_str();
 		finalName += ">";
 
-		typeInfo->Init(finalName.c_str(), sizeof(TContainer));
+		typeInfo->Initialize(finalName.c_str(), sizeof(TContainer));
 		typeInfo->m_containedType = itemType;
 
 		typeInfo->RegisterFunctions<TContainer>();
@@ -140,15 +147,13 @@ namespace dd
 
 		typeInfo->m_typeKind = TypeKind::Enum;
 
-		typeInfo->Init(name, sizeof(TEnum));
+		typeInfo->Initialize(name, sizeof(TEnum));
 
 		typeInfo->New = PODNew<TEnum>;
 		typeInfo->Copy = PODCopy<TEnum>;
-		typeInfo->NewCopy = PODNewCopy<TEnum>;
 		typeInfo->Delete = PODDelete<TEnum>;
 		typeInfo->PlacementNew = PODPlacementNew<TEnum>;
 		typeInfo->PlacementDelete = PODPlacementDelete<TEnum>;
-		typeInfo->PlacementCopy = PODPlacementCopy<TEnum>;
 
 		sm_typeMap->insert(std::make_pair(String32(name), typeInfo));
 

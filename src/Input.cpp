@@ -14,11 +14,11 @@
 
 #include <imgui/imgui.h>
 
-static dd::Service<dd::IWindow> s_window;
-static dd::Service<dd::InputKeyBindings> s_keybindings;
-
 namespace dd
 {
+	static Service<IWindow> s_window;
+	static Service<InputKeyBindings> s_keybindings;
+
 	Input::Input()
 	{
 	}
@@ -46,7 +46,7 @@ namespace dd
 
 		m_actions.clear();
 
-		dd::Array<InputEvent, 64> input_events;
+		Array<InputEvent, 64> input_events;
 		for (IInputSource* source : m_sources)
 		{
 			input_events.Clear();
@@ -107,26 +107,26 @@ namespace dd
 		return m_mouseScroll;
 	}
 
-	bool Input::GotInput(dd::InputAction action) const
+	bool Input::GotInput(InputAction action) const
 	{
 		return GotInput(action, InputType::Release);
 	}
 
-	bool Input::GotInput(dd::InputAction action, dd::InputType type) const
+	bool Input::GotInput(InputAction action, InputType type) const
 	{
 		InputReceived recv { action, type };
 		auto it = std::find(m_actions.begin(), m_actions.end(), recv);
 		return it != m_actions.end();
 	}
 
-	bool Input::IsHeld(dd::InputAction action) const
+	bool Input::IsHeld(InputAction action) const
 	{
 		auto it = m_held.find(action);
 		if (it == m_held.end())
 		{
 			return false;
 		}
-		
+
 		return it->second;
 	}
 
@@ -161,18 +161,16 @@ namespace dd
 
 	void Input::AddHandler(InputAction action, InputType type, InputHandler handler)
 	{
-		DD_TODO("Probably need a remove handler?");
-
 		InputReceived key { action, type };
 
 		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
 		{
-			auto result = m_handlers.insert(std::make_pair(key, std::vector<dd::InputHandler>()));
+			auto result = m_handlers.insert(std::make_pair(key, std::vector<InputHandler>()));
 			it = result.first;
 		}
 
-		std::vector<dd::InputHandler>& handlers = it->second;
+		std::vector<InputHandler>& handlers = it->second;
 		handlers.push_back(handler);
 	}
 
@@ -183,7 +181,7 @@ namespace dd
 		auto it = m_handlers.find(key);
 		if (it == m_handlers.end())
 		{
-			m_handlers.insert(std::make_pair(key, std::vector<dd::InputHandler>()));
+			m_handlers.insert(std::make_pair(key, std::vector<InputHandler>()));
 		}
 	}
 
@@ -197,8 +195,8 @@ namespace dd
 			return;
 		}
 
-		const std::vector<dd::InputHandler>& handlers = it->second;
-		for (const dd::InputHandler& handler : handlers)
+		const std::vector<InputHandler>& handlers = it->second;
+		for (const InputHandler& handler : handlers)
 		{
 			handler();
 		}
@@ -214,7 +212,7 @@ namespace dd
 				m_currentMode->ModeExited();
 			}
 
-			s_window->SetCursor(next_mode->ShouldShowCursor() ? dd::Cursor::Arrow : dd::Cursor::Hidden);
+			s_window->SetCursor(next_mode->ShouldShowCursor() ? Cursor::Arrow : Cursor::Hidden);
 
 			next_mode->ModeEntered();
 

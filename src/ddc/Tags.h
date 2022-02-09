@@ -5,10 +5,10 @@ namespace ddc
 	enum class Tag : uint
 	{
 		None = 0,
-		Visible = 1,
-		Focused = 2,
-		Selected = 3,
-		Static = 4,
-		Dynamic = 5
+		Visible = 1 << 0,
+		Focused = 1 << 1,
+		Selected = 1 << 2,
+		Static = 1 << 3,
+		Dynamic = 1 << 4
 	};
 }

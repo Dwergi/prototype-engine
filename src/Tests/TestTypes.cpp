@@ -20,4 +20,4 @@ int Test::SimpleStruct::Multiply( int x )
 bool Test::SimpleStruct::operator==( const Test::SimpleStruct& other ) const
 {
 	return Int == other.Int && Flt == other.Flt && Str == other.Str && Vec == other.Vec;
-}
+} 

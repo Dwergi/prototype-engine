@@ -90,7 +90,7 @@ namespace dd
 
 			BVHBucket() = default;
 			BVHBucket(const BVHBucket&) = delete;
-			BVHBucket(BVHBucket&&) = default;
+			BVHBucket(BVHBucket&&) noexcept = default;
 
 			// The region to use for comparisons.
 			ddm::AABB Region;

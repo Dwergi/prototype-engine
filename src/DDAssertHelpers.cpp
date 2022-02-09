@@ -53,7 +53,7 @@ namespace dd::Assert
 		}
 
 		char buffer[1024];
-		snprintf(buffer, 1024, ": \"%s\" in %s() (%s:%d)", expression, function, file, line);
+		snprintf(buffer, 1024, ": \"%s\" in %s() (%s:%d)\n", expression, function, file, line);
 
 		out += buffer;
 
@@ -131,6 +131,7 @@ namespace dd::Assert
 
 		dd::String256 s_message = s_assert.Info;
 		s_message += s_assert.Message;
+		s_message += "\n";
 
 		printf(s_message.c_str());
 		OutputDebugStringA(s_message.c_str());

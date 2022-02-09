@@ -17,9 +17,13 @@ struct TestDebugUI : dd::IDebugUI
 	void RenderDebugPanels() override {}
 
 	void SetDraw(bool draw) override {}
+	bool ShouldDraw() const override { return false; }
 
 	void StartFrame(float delta_t) override {}
 	void EndFrame() override {}
+
+	void SetMouseCapture(bool capture) override {}
+	bool HasMouseCapture() const override { return false; }
 
 	bool IsMidFrame() const override { return false; }
 	bool IsMidWindow() const override { return false; }

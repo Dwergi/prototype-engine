@@ -31,7 +31,15 @@ ConstBuffer<T>::ConstBuffer(const T* ptr, int count) :
 }
 
 template <typename T>
-ConstBuffer<T>::ConstBuffer(const T* ptr, size_t count) :
+ConstBuffer<T>::ConstBuffer(const T* ptr, uint count) :
+	IBuffer(sizeof(T))
+{
+	m_ptr = ptr;
+	m_count = count;
+}
+
+template <typename T>
+ConstBuffer<T>::ConstBuffer(const T* ptr, uint64 count) :
 	IBuffer(sizeof(T))
 {
 	m_ptr = ptr;
@@ -86,21 +94,12 @@ ConstBuffer<T>& ConstBuffer<T>::operator=(ConstBuffer<T>&& other)
 }
 
 template <typename T>
-void ConstBuffer<T>::Set(const T* ptr, int count)
+void ConstBuffer<T>::Set(const T* ptr, uint64 count)
 {
 	DD_ASSERT(m_ptr == nullptr, "Overwriting a ConstBuffer pointer! Call ReleaseConst first.");
 
 	m_ptr = ptr;
-	m_count = (uint) count;
-}
-
-template <typename T>
-void ConstBuffer<T>::Set(const T* ptr, size_t count)
-{
-	DD_ASSERT(m_ptr == nullptr, "Overwriting a ConstBuffer pointer! Call ReleaseConst first.");
-
-	m_ptr = ptr;
-	m_count = (uint) count;
+	m_count = (uint64) count;
 }
 
 template <typename T>
@@ -132,7 +131,7 @@ void ConstBuffer<T>::Delete()
 }
 
 template <typename T>
-const T& ConstBuffer<T>::operator[](size_t index) const
+const T& ConstBuffer<T>::operator[](uint64 index) const
 {
 	DD_ASSERT(index < m_count);
 
@@ -175,7 +174,14 @@ Buffer<T>::Buffer(T* ptr, int count) :
 }
 
 template <typename T>
-Buffer<T>::Buffer(T* ptr, size_t count) :
+Buffer<T>::Buffer(T* ptr, uint count) :
+	ConstBuffer(ptr, count)
+{
+
+}
+
+template <typename T>
+Buffer<T>::Buffer(T* ptr, uint64 count) :
 	ConstBuffer(ptr, count)
 {
 
@@ -233,12 +239,12 @@ void Buffer<T>::Set(T* ptr, int count)
 }
 
 template <typename T>
-void Buffer<T>::Set(T* ptr, size_t count)
+void Buffer<T>::Set(T* ptr, uint64 count)
 {
 	DD_ASSERT(m_ptr == nullptr, "Overwriting a Buffer pointer! Call Release first.");
 
 	m_ptr = ptr;
-	m_count = (uint) count;
+	m_count = count;
 }
 
 template <typename T>
@@ -265,14 +271,14 @@ void Buffer<T>::Fill(const T& value)
 
 	T* ptr = Access();
 
-	for (size_t i = 0; i < m_count; ++i)
+	for (uint64 i = 0; i < m_count; ++i)
 	{
 		ptr[i] = value;
 	}
 }
 
 template <typename T>
-T& Buffer<T>::operator[](size_t index) const
+T& Buffer<T>::operator[](uint64 index) const
 {
 	DD_ASSERT(m_ptr != nullptr);
 	DD_ASSERT(index < m_count);

@@ -17,69 +17,78 @@ namespace dd
 	{
 	protected:
 
-		String( char* stackBuffer, int stackCapacity );
+		String(uint capacity);
 
 	public:
 
-		String( const String& other ) = delete;
+		static const uint64 Invalid { ~0ull };
+
+		String(const String& other) = delete;
 		virtual ~String();
 
-		String& operator=( const char* other );
-		String& operator=( const String& other );
+		String& operator=(const char* other);
+		String& operator=(const String& other);
 
-		String& operator+=( const String& other );
-		String& operator+=( const char* other );
-		String& operator+=( char other );
-		String& operator+=( const std::string& other );
+		String& operator+=(const String& other);
+		String& operator+=(const char* other);
+		String& operator+=(char other);
+		String& operator+=(const std::string& other);
 
-		void Append( const char* other, int length );
+		void Append(const char* other, uint64 length);
 
-		bool operator==( const char* other ) const;
-		bool operator==( const String& other ) const;
+		bool operator==(const char* other) const;
+		bool operator==(const String& other) const;
 
-		bool operator!=( const char* other ) const;
-		bool operator!=( const String& other ) const;
+		bool operator!=(const char* other) const;
+		bool operator!=(const String& other) const;
 
-		bool EqualsCaseless( const char* other ) const;
-		bool EqualsCaseless( const String& other ) const;
+		bool EqualsCaseless(const char* other) const;
+		bool EqualsCaseless(const String& other) const;
 
-		int Find( const char* other, int offset = 0 ) const;
-		int Find( const String& other, int offset = 0 ) const;
+		uint64 Find(const char* other, uint64 offset = 0) const;
+		uint64 Find(const String& other, uint64 offset = 0) const;
 
-		void ReplaceAll( char src, char target );
+		void ReplaceAll(char src, char target);
 
 		void Clear() { m_length = 0; }
 
-		const char& operator[]( int index ) const { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[ index ]; }
-		char& operator[]( int index ) { DD_ASSERT( index >= 0 && index < m_length ); return m_buffer[index]; }
-		
+		char& operator[](int index) { DD_ASSERT(index >= 0 && (uint) index < m_length); return m_buffer[index]; }
+		const char& operator[](int index) const { DD_ASSERT(index >= 0 && (uint) index < m_length); return m_buffer[index]; }
+
+		char& operator[](uint64 index) { DD_ASSERT(index < m_length); return m_buffer[index]; }
+		const char& operator[](uint64 index) const { DD_ASSERT(index < m_length); return m_buffer[index]; }
+
 		const char* c_str() const;
 		char* data();
-		
+
 		// Get a wide copy of this string.
-		bool w_str( const Buffer<wchar_t>& buffer ) const;
+		bool w_str(const Buffer<wchar_t>& buffer) const;
 
-		int Length() const { return m_length; }
+		uint64 Length() const { return m_length; }
+		uint64 Capacity() const { return m_capacity - 1; /* null terminator */ }
 		bool IsEmpty() const { return m_length == 0; }
+
 		void ShrinkToFit();
-		bool IsOnHeap() const { return m_buffer.Get() != m_stack.Get(); }
 
-		bool StartsWith( const char* other ) const;
-		bool StartsWith( const String& other ) const;
+		bool IsOnHeap() const { return m_buffer != StackAddress(); }
+		char* StackAddress() const { return ((char*) this) + sizeof(dd::String); }
 
-		DD_BASIC_TYPE( String )
+		bool StartsWith(const char* other) const;
+		bool StartsWith(const String& other) const;
 
-		DD_DEFINE_ITERATORS( char, m_buffer.Get(), m_length )
+		DD_BASIC_TYPE(String)
+
+		DD_DEFINE_ITERATORS(char, m_buffer, m_length)
 
 	protected:
 
-		Buffer<char> m_buffer;
-		int m_length { 0 };
-		Buffer<char> m_stack;
-		
-		void Resize( int length );
-		void SetString( const char* data, int length );
-		bool Equals( const char* other, int length, bool caseless ) const;
+		char* m_buffer { nullptr };
+		uint m_length { 0 };
+		uint m_capacity { 0 };
+
+		void Resize(uint64 length);
+		void SetString(const char* data, uint64 length);
+		bool Equals(const char* other, uint64 length, bool caseless) const;
 
 		void NullTerminate();
 
@@ -89,77 +98,75 @@ namespace dd
 	//
 	// An in-place implementation of string which always allocates a fixed size buffer. 
 	//
-	template <int Size = 32>
+	template <uint64 Size = 32>
 	class InplaceString
 		: public String
 	{
 	public:
 
 		InplaceString()
-			: String( m_stackData, Size )
+			: String(Size)
 		{
-			m_stackData[ 0 ] = '\0';
 		}
 
-		explicit InplaceString( const char* str )
-			: String( m_stackData, Size )
+		InplaceString(const char* str)
+			: String(Size)
 		{
-			int length = str != nullptr ? (int) strlen(str) : 0;
+			uint64 length = str != nullptr ? strlen(str) : 0;
 			SetString(str, length);
 		}
 
-		InplaceString( const char* other, int length )
-			: String( m_stackData, Size )
+		InplaceString(const char* other, uint64 length)
+			: String(Size)
 		{
-			SetString( other, length );
+			SetString(other, length);
 		}
 
-		InplaceString( const String& other )
-			: String( m_stackData, Size )
+		InplaceString(const String& other)
+			: String(Size)
 		{
-			SetString( other.c_str(), other.Length() );
+			SetString(other.c_str(), other.Length());
 		}
 
-		InplaceString( const InplaceString<Size>& other )
-			: String( m_stackData, Size )
+		InplaceString(const InplaceString<Size>& other)
+			: String(Size)
 		{
-			SetString( other.c_str(), other.Length() );
+			SetString(other.c_str(), other.Length());
 		}
 
-		InplaceString( InplaceString<Size>&& other )
-			: String( m_stackData, Size )
+		template <uint64 OtherSize>
+		InplaceString(const InplaceString<OtherSize>& other)
+			: String(Size)
 		{
-			if( other.m_buffer.Get() == other.m_stackData )
+			SetString(other.c_str(), other.Length());
+		}
+		
+		InplaceString(InplaceString<Size>&& other) noexcept
+			: String(Size)
+		{
+			if (other.IsOnHeap())
 			{
-				SetString( other.c_str(), other.Length() );
+				m_buffer = other.m_buffer;
+				other.m_buffer = nullptr;
+
+				m_length = other.m_length;
+				m_capacity = other.m_capacity;
 			}
 			else
 			{
-				m_buffer.Release();
-
-				m_buffer = other.m_buffer;
-				other.m_buffer.Release();
-
-				m_length = other.m_length;
+				*this = other;
 			}
 		}
 
-		template <int OtherSize>
-		InplaceString( const InplaceString<OtherSize>& other )
-			: String( m_stackData, Size )
+		InplaceString<Size>& operator=(const InplaceString<Size>& other)
 		{
-			SetString( other.c_str(), other.Length() );
-		}
-
-		InplaceString<Size>& operator=( const InplaceString<Size>& other )
-		{
-			SetString( other.c_str(), other.Length() );
+			SetString(other.c_str(), other.Length());
 			return *this;
 		}
 
-		InplaceString<Size>& operator=( const char* other )
+		InplaceString<Size>& operator=(const char* other)
 		{
-			SetString( other, (int) strlen( other ) );
+			SetString(other, strlen(other));
 			return *this;
 		}
 
@@ -168,11 +175,11 @@ namespace dd
 
 		}
 
-		InplaceString<Size> Substring( int start, int count = INT_MAX ) const;
-		
+		InplaceString<Size> Substring(uint64 start, uint64 count = INT_MAX) const;
+
 	private:
 
-		char m_stackData[ Size ];
+		char m_stackData[Size] { 0 };
 	};
 
 	typedef InplaceString<8> String8;
@@ -182,27 +189,27 @@ namespace dd
 	typedef InplaceString<128> String128;
 	typedef InplaceString<256> String256;
 
-	template <int Size>
-	InplaceString<Size> InplaceString<Size>::Substring( int start, int count ) const
+	template <uint64 Size>
+	InplaceString<Size> InplaceString<Size>::Substring(uint64 start, uint64 count) const
 	{
-		DD_ASSERT( start <= m_length );
-		DD_ASSERT( count >= 0 );
+		DD_ASSERT(start <= m_length);
+		DD_ASSERT(count >= 0);
 
-		count = ddm::min( m_length - start, count );
+		count = ddm::min(m_length - start, count);
 
 		InplaceString<Size> substring;
-		substring.SetString( m_buffer.Get() + start, count );
+		substring.SetString(m_buffer + start, count);
 
 		return substring;
 	}
 
-	template<> inline uint64 Hash<String>( const String& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String8>( const String8& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String16>( const String16& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String32>( const String32& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String64>( const String64& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String128>( const String128& value ) { return HashString( value.c_str(), value.Length() ); }
-	template<> inline uint64 Hash<String256>( const String256& value ) { return HashString( value.c_str(), value.Length() ); }
+	template<> inline uint64 Hash<String>(const String& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String8>(const String8& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String16>(const String16& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String32>(const String32& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String64>(const String64& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String128>(const String128& value) { return HashString(value.c_str(), value.Length()); }
+	template<> inline uint64 Hash<String256>(const String256& value) { return HashString(value.c_str(), value.Length()); }
 }
 
 namespace std
@@ -210,9 +217,9 @@ namespace std
 	template <typename T>
 	struct string_hash
 	{
-		std::size_t operator()( const T& str ) const { return dd::HashString( str.c_str(), str.Length() ); }
+		std::size_t operator()(const T& str) const { return dd::HashString(str.c_str(), str.Length()); }
 	};
-	
+
 	template<> struct hash<dd::String> : string_hash<dd::String> {};
 	template<> struct hash<dd::String8> : string_hash<dd::String8> {};
 	template<> struct hash<dd::String16> : string_hash<dd::String16> {};

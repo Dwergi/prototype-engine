@@ -14,9 +14,11 @@ void operator delete(void* ptr) { _aligned_free(ptr); } \
 void operator delete[](void* ptr) { _aligned_free(ptr); } \
 void operator delete(void* ptr, void* place) {}
 
+[[nodiscard]]
 void* operator new(size_t size);
 void operator delete(void* ptr) noexcept;
 
+[[nodiscard]]
 void* operator new[](size_t size);
 void operator delete[](void* ptr) noexcept;
 

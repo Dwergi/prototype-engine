@@ -17,21 +17,21 @@ namespace dd
 	{
 		if (var.Type() == DD_FIND_TYPE(float))
 		{
-			ImGui::DragFloat(name.c_str(), &var.AccessValue<float>(), 0.001f);
+			ImGui::DragFloat(name.c_str(), &var.Access<float>(), 0.001f);
 		}
 		else if (var.Type() == DD_FIND_TYPE(int))
 		{
-			ImGui::DragInt(name.c_str(), &var.AccessValue<int>());
+			ImGui::DragInt(name.c_str(), &var.Access<int>());
 		}
 		else if (var.Type() == DD_FIND_TYPE(bool))
 		{
-			ImGui::Checkbox(name.c_str(), &var.AccessValue<bool>());
+			ImGui::Checkbox(name.c_str(), &var.Access<bool>());
 		}
 	}
 
 	static void AddEnum(const String& name, Variable& var)
 	{
-		int& current = var.AccessValue<int>();
+		int& current = var.Access<int>();
 
 		const Vector<EnumOption>& options = var.Type()->GetEnumOptions();
 
@@ -67,15 +67,15 @@ namespace dd
 		{
 			const TypeInfo* typeInfo = var.Type();
 
-			uint size = typeInfo->ContainerSize(var.Data());
-			for (uint i = 0; i < size; ++i)
+			uint64 size = typeInfo->ContainerSize(var.Data());
+			for (uint64 i = 0; i < size; ++i)
 			{
 				void* item = typeInfo->ElementAt(var.Data(), i);
 
 				Variable item_var(typeInfo->ContainedType(), item);
 
 				char buffer[8];
-				_itoa_s(i, buffer, 10);
+				_ui64toa_s(i, buffer, 8, 10);
 
 				String16 item_name;
 				item_name += "[";
@@ -93,7 +93,7 @@ namespace dd
 		{
 			for (const dd::Member& member : var.Type()->Members())
 			{
-				AddVariable(member.Name(), Variable(var, member));
+				AddVariable(member.Name(), Variable(member, var.Data()));
 			}
 		}
 	}

@@ -19,7 +19,7 @@ misrepresented as being the original software.
 Creator(s)    : Randy Gaul
 Creation Date : Wed Oct 09 23:58:36 2013
 File Name     : SELVariable.cpp
-Purpose       : 
+Purpose       :
 */
 
 #include "PCH.h"
@@ -28,27 +28,39 @@ Purpose       :
 namespace dd
 {
 	Variable::Variable()
-		: m_data( NULL )
-		, m_typeInfo( NULL )
+		: m_data(nullptr)
+		, m_typeInfo(nullptr)
 	{
 	}
 
-	Variable::Variable( const TypeInfo* typeInfo, void* data )
-		: m_data( data )
-		, m_typeInfo( typeInfo )
+	Variable::Variable(const TypeInfo* typeInfo, void* data)
+		: m_data(data)
+		, m_typeInfo(typeInfo)
 	{
 	}
 
-	Variable::Variable( Variable var, const Member& member )
+	Variable::Variable(const Member& member, void* base)
 	{
-		m_data = PointerAdd( var.Data(), member.Offset() );
+		m_data = PointerAdd(base, member.Offset());
 		m_typeInfo = member.Type();
 	}
 
-	Variable::Variable( const Variable& rhs )
+	Variable::Variable(const Variable& rhs)
 	{
 		m_data = rhs.m_data;
 		m_typeInfo = rhs.m_typeInfo;
+	}
+
+	Variable& Variable::operator=(const Variable& rhs)
+	{
+		Reset(rhs);
+		return *this;
+	}
+
+	void Variable::Reset(const Variable& other)
+	{
+		m_data = other.m_data;
+		m_typeInfo = other.m_typeInfo;
 	}
 
 	void* Variable::Data() const
@@ -63,30 +75,37 @@ namespace dd
 
 	bool Variable::IsValid() const
 	{
-		return m_typeInfo != NULL && m_data != NULL;
+		return m_typeInfo != nullptr && m_data != nullptr;
 	}
 
-	void Variable::PlacementNew()
+	void Variable::PlacementNew() const
 	{
-		m_typeInfo->PlacementNew( m_data );
+		m_typeInfo->PlacementNew(m_data);
 	}
 
-	void Variable::PlacementDelete()
+	void Variable::PlacementDelete() const
 	{
-		m_typeInfo->PlacementDelete( m_data );
+		m_typeInfo->PlacementDelete(m_data);
 	}
 
-	void Variable::Delete()
+	void Variable::Delete() const
 	{
-		m_typeInfo->PlacementDelete( m_data );
-		m_typeInfo->Delete( m_data );
+		m_typeInfo->PlacementDelete(m_data);
+		m_typeInfo->Delete(m_data);
 	}
 
-	Variable& Variable::operator=( const Variable& rhs )
+	void Variable::CopyTo(void* dst) const
 	{
-		m_data = rhs.m_data;
-		m_typeInfo = rhs.m_typeInfo;
+		m_typeInfo->Copy(dst, m_data);
+	}
 
-		return *this;
+	void Variable::SetFromVariable(const Variable& value) const
+	{
+		DD_ASSERT(value.Type() == m_typeInfo);
+
+		if (m_typeInfo->Copy != nullptr)
+		{
+			m_typeInfo->Copy(m_data, value.Data());
+		}
 	}
 }

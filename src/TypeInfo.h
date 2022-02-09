@@ -39,7 +39,7 @@ namespace dd
 	struct TypeInfo : public AutoList<TypeInfo>
 	{
 		TypeInfo();
-		void Init(const char* name, uint size);
+		void Initialize(const char* name, uint size);
 
 		TypeID ID() const { return m_id; }
 
@@ -80,22 +80,30 @@ namespace dd
 		//
 		// Creation and deletion through a TypeInfo object.
 		//
+
+		// Create a new object.
 		void* (*New)() { nullptr };
+		
+		// Copy from src to data using copy assignment or constructor copy if copy assignment is not allowed.
 		void (*Copy)(void* data, const void* src) { nullptr };
+
+		// Delete the given object.
 		void (*Delete)(void* data) { nullptr };
-		void (*NewCopy)(void** dest, const void* src) { nullptr };
+
+		// Placement new an object onto data.
 		void (*PlacementNew)(void* data) { nullptr };
+
+		// Placement delete an object from data.
 		void (*PlacementDelete)(void* data) { nullptr };
-		void (*PlacementCopy)(void* data, const void* src) { nullptr };
 
 		//
 		// Container type accessors.
 		//
 		inline const TypeInfo* ContainedType() const { return m_containedType; }
 
-		void (*InsertElement)(void* container, uint index, void* item) { nullptr };
-		void* (*ElementAt)(void* container, uint index) { nullptr };
-		uint(*ContainerSize)(void* container) { nullptr };
+		void (*InsertElement)(void* container, uint64 index, void* item) { nullptr };
+		void* (*ElementAt)(void* container, uint64 index) { nullptr };
+		uint64 (*ContainerSize)(void* container) { nullptr };
 
 		//
 		// Register a non-POD, non-container type (eg. a class).
@@ -208,6 +216,7 @@ namespace dd
 		{
 			dd::TypeInfo* type = dd::TypeInfo::RegisterType<T>(s_typeName.c_str());
 			T::RegisterMembers(type);
+
 			DD_ASSERT(type->IsComponent(), "Don't register non-components through DD_COMPONENT_CPP!");
 
 			return type;

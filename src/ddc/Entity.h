@@ -67,3 +67,15 @@ namespace ddc
 	// ASSUMPTION: Entity is included from EntityLayer.h, which is always included.
 	// All methods are defined in EntityLayer.h/cpp.
 }
+
+namespace std
+{
+	template <>
+	struct hash<ddc::Entity>
+	{
+		size_t operator()(ddc::Entity entity) const
+		{
+			return entity.Handle;
+		}
+	};
+}

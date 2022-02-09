@@ -198,7 +198,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 		dd::Variable var( ret );
 		fn( var );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( sm_executed );
 	}
@@ -211,7 +211,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 		dd::Variable var( ret );
 		fn( var, 1 );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( sm_executed );
 		REQUIRE( sm_firstArgument == 1 );
@@ -225,7 +225,7 @@ TEST_CASE( "[Functions] Loose Functions" )
 		dd::Variable var( ret );
 		fn( var, 1, 10.0f );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( sm_executed );
 		REQUIRE( sm_firstArgument == 1 );
@@ -316,7 +316,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 	}
@@ -330,7 +330,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var, 1 );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 		REQUIRE( Test::TestClass::sm_firstArgument == 1 );
@@ -345,7 +345,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var, 1, 10.0f );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 		REQUIRE( Test::TestClass::sm_firstArgument == 1 );
@@ -361,7 +361,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 	}
@@ -375,7 +375,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var, 1 );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 		REQUIRE( Test::TestClass::sm_firstArgument == 1 );
@@ -390,7 +390,7 @@ TEST_CASE( "[Functions] Methods" )
 		dd::Variable var( ret );
 		fn( var, 1, 10.0f );
 
-		REQUIRE( var.GetValue<int>() == 1 );
+		REQUIRE( var.Get<int>() == 1 );
 
 		REQUIRE( Test::TestClass::sm_executed );
 		REQUIRE( Test::TestClass::sm_firstArgument == 1 );

@@ -19,21 +19,21 @@ namespace dd
 	{
 		if (var.Type() == DD_FIND_TYPE(float))
 		{
-			json = var.GetValue<float>();
+			json = var.Get<float>();
 		}
 		else if (var.Type() == DD_FIND_TYPE(int))
 		{
-			json = var.GetValue<int>();
+			json = var.Get<int>();
 		}
 		else if (var.Type() == DD_FIND_TYPE(bool))
 		{
-			json = var.GetValue<bool>();
+			json = var.Get<bool>();
 		}
 	}
 
 	static void WriteEnum(nlohmann::json& json, Variable& var)
 	{
-		int current = var.GetValue<int>();
+		int current = var.Get<int>();
 
 		const Vector<EnumOption>& options = var.Type()->GetEnumOptions();
 
@@ -56,8 +56,8 @@ namespace dd
 	{
 		json = nlohmann::json::array();
 
-		uint size = var.Type()->ContainerSize(var.Data());
-		for (uint i = 0; i < size; ++i)
+		uint64 size = var.Type()->ContainerSize(var.Data());
+		for (uint64 i = 0; i < size; ++i)
 		{
 			void* item = var.Type()->ElementAt(var.Data(), i);
 
@@ -76,7 +76,7 @@ namespace dd
 
 		for (const Member& member : var.Type()->Members())
 		{
-			Variable member_var(var, member);
+			Variable member_var(member, var.Data());
 			nlohmann::json& member_json = json[member.Name().c_str()] = nlohmann::json();
 
 			WriteVariable(member_json, member_var);
@@ -111,19 +111,19 @@ namespace dd
 		{
 			DD_ASSERT(json.is_number_float());
 
-			var.AccessValue<float>() = json.get<float>();
+			var.Set(json.get<float>());
 		}
 		else if (var.Type() == DD_FIND_TYPE(int))
 		{
 			DD_ASSERT(json.is_number_integer());
 
-			var.AccessValue<int>() = json.get<int>();
+			var.Set(json.get<int>());
 		}
 		else if (var.Type() == DD_FIND_TYPE(bool))
 		{
 			DD_ASSERT(json.is_boolean());
 
-			var.AccessValue<bool>() = json.get<bool>();
+			var.Set(json.get<bool>());
 		}
 	}
 
@@ -138,7 +138,7 @@ namespace dd
 		{
 			if (o.Name == selected.c_str())
 			{
-				var.AccessValue<int>() = o.Value;
+				var.Set(o.Value);
 				break;
 			}
 		}
@@ -171,7 +171,7 @@ namespace dd
 
 		for (const Member& member : var.Type()->Members())
 		{
-			Variable member_var(var, member);
+			Variable member_var(member, var.Data());
 			const nlohmann::json& member_json = json.at(member.Name().c_str());
 
 			ReadVariable(member_json, member_var);

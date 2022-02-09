@@ -14,13 +14,13 @@ namespace dd
 	};
 
 	template <typename T>
-	inline T* Cast( void* data )
+	inline T* Cast(void* data)
 	{
 		return reinterpret_cast<T*>(data);
 	}
 
 	template <typename T>
-	inline const T* Cast( const void* data )
+	inline const T* Cast(const void* data)
 	{
 		return reinterpret_cast<const T*>(data);
 	}
@@ -28,7 +28,7 @@ namespace dd
 	template <typename T>
 	inline void* New()
 	{
-		T* data = (T*) malloc(sizeof( T ));
+		T* data = (T*)malloc(sizeof(T));
 		new (data) T;
 		return data;
 	}
@@ -36,84 +36,69 @@ namespace dd
 	template <typename T>
 	inline void* PODNew()
 	{
-		return malloc( sizeof( T ) );
+		return malloc(sizeof(T));
 	}
 
 	template <typename T>
-	inline void PlacementNew( void* data )
+	inline void PlacementNew(void* data)
 	{
 		new (data) T;
 	}
 
 	template <typename T>
-	inline void PODPlacementNew( void* data )
+	inline void PODPlacementNew(void* data)
 	{
 	}
 
 	template <typename T>
-	inline void Copy( void* dest, const void* src )
+	inline void Copy(void* dest, const void* src)
 	{
-		*(Cast<T>( dest )) = *(Cast<T>( src ));
+		*(Cast<T>(dest)) = *(Cast<T>(src));
 	}
 
 	template <typename T>
-	inline void PODCopy( void* dest, const void* src )
+	inline void PODCopy(void* dest, const void* src)
 	{
-		memcpy( dest, src, sizeof( T ) );
+		memcpy(dest, src, sizeof(T));
 	}
 
 	template <typename T>
-	inline void PlacementCopy( void* data, const void* src )
+	inline void PlacementCopy(void* data, const void* src)
 	{
-		new (data) T( *(Cast<T>( src )) );
+		new (data) T(*(Cast<T>(src)));
 	}
 
 	template <typename T>
-	inline void PODPlacementCopy( void* data, const void* src )
+	inline void PODPlacementCopy(void* data, const void* src)
 	{
-		memcpy( data, src, sizeof( T ) );
+		memcpy(data, src, sizeof(T));
 	}
 
 	template <typename T>
-	inline void NewCopy( void** dest, const void* src )
+	inline void Delete(void* data)
 	{
-		T* newData = (T*) malloc( sizeof( T ) );
-		new (newData) T( *Cast<T>( src ) );
-		*dest = newData;
+		Cast<T>(data)->~T();
+		free(data);
 	}
 
 	template <typename T>
-	inline void PODNewCopy( void** dest, const void* src )
+	inline void PODDelete(void* data)
 	{
-		*dest = malloc( sizeof( T ) );
-		memcpy( *dest, src, sizeof( T ) );
+		free(data);
 	}
 
 	template <typename T>
-	inline void Delete( void* data )
+	inline void PlacementDelete(void* data)
 	{
-		Cast<T>( data )->~T();
-		free( data );
+		Cast<T>(data)->~T();
 	}
 
 	template <typename T>
-	inline void PODDelete( void* data )
-	{
-		free( data );
-	}
-
-	template <typename T>
-	inline void PlacementDelete( void* data )
-	{
-		Cast<T>( data )->~T();
-	}
-
-	template <typename T>
-	inline void PODPlacementDelete( void* data )
+	inline void PODPlacementDelete(void* data)
 	{
 	}
 
-	template <bool, class T, T v>
+	template <bool, typename T, T v>
 	struct SetFunc
 	{
 		static T Get()
@@ -122,7 +107,7 @@ namespace dd
 		};
 	};
 
-	template <class T, T v>
+	template <typename T, T v>
 	struct SetFunc<false, T, v>
 	{
 		static T Get()
@@ -132,20 +117,20 @@ namespace dd
 	};
 
 	template <typename T>
-	inline void* ElementAt( void* container, uint index )
+	inline void* ElementAt(void* container, uint64 index)
 	{
-		return &(*(T*) container)[index];
+		return &(*(T*)container)[index];
 	}
 
 	template <typename T>
-	inline uint ContainerSize( void* container )
+	inline uint64 ContainerSize(void* container)
 	{
-		return ((T*) container)->Size();
+		return ((T*)container)->Size();
 	}
 
 	template <typename TContainer, typename TItem>
-	inline void InsertElement( void* container, uint index, void* elem )
+	inline void InsertElement(void* container, uint64 index, void* elem)
 	{
-		return ((TContainer*) container)->Insert( *(TItem*) elem, index );
+		return ((TContainer*)container)->Insert(*(TItem*)elem, index);
 	}
 }

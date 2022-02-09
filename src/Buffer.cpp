@@ -21,13 +21,29 @@ namespace dd
 		m_elementSize = 0;
 	}
 
-	int IBuffer::Size() const
+	uint64 IBuffer::Size() const
 	{
 		return m_count;
 	}
 
-	int IBuffer::SizeBytes() const
+	int IBuffer::SizeInt() const
+	{
+		DD_ASSERT(m_count <= std::numeric_limits<int>::max());
+
+		return (int) m_count;
+	}
+
+	uint64 IBuffer::SizeBytes() const
 	{
 		return m_count * m_elementSize;
+	}
+
+	int IBuffer::SizeBytesInt() const
+	{
+		uint64 byte_size = m_count * m_elementSize;
+		DD_ASSERT(byte_size <= std::numeric_limits<int>::max());
+
+		return (int) byte_size;
+
 	}
 }

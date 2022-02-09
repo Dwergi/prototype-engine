@@ -9,31 +9,35 @@
 #include "Property.h"
 #include "TypeInfo.h"
 #include "Vector.h"
+#include <optional>
 
 namespace dd
 {
 	class PropertyList
 	{
-	public: 
+	public:
 		template <typename T>
-		explicit PropertyList( T& host )
-			: m_base( &host )
+		explicit PropertyList(T& host) :
+			m_type(DD_FIND_TYPE(T)),
+			m_object(&host)
 		{
-			AddMembers( DD_FIND_TYPE( T ), &host );
+			AddMembers(m_type, m_object);
 		}
 
-		PropertyList( const PropertyList& other );
+		PropertyList(PropertyList&& other) noexcept;
 		~PropertyList();
 
-		Property* Find( const char* name );
+		std::optional<Property> Find(std::string_view name) const;
 
-		void* Instance() { return m_base; }
+		void* Instance() const { return m_object; }
+		const TypeInfo* Type() const { return m_type; }
+		uint64 Size() const { return m_properties.size(); }
 
 	protected:
-		Vector<Property> m_properties;
+		std::vector<Property> m_properties;
 		const TypeInfo* m_type { nullptr };
-		void* m_base { nullptr };
+		void* m_object { nullptr };
 
-		void AddMembers( const TypeInfo* typeInfo, void* base );
+		void AddMembers(const TypeInfo* typeInfo, void* base, const String& prefix = dd::String8());
 	};
 }

@@ -27,7 +27,7 @@ namespace dd
 		return m_offset;
 	}
 
-	const String32& Member::Name() const
+	const String& Member::Name() const
 	{
 		return m_name;
 	}

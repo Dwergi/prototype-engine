@@ -102,6 +102,14 @@ namespace dd
 	}
 
 	template <typename T>
+	T& IArray<T>::operator[](size_t index)
+	{
+		DD_ASSERT(index < m_size, "Indexing unallocated memory!");
+
+		return m_data[index];
+	}
+
+	template <typename T>
 	T& IArray<T>::Push(const T& value)
 	{
 		DD_ASSERT(m_size < m_data.Size());
@@ -163,6 +171,7 @@ namespace dd
 	void IArray<T>::Fill(const T& value)
 	{
 		m_data.Fill(value);
+		m_size = Capacity();
 	}
 
 	template <typename T>

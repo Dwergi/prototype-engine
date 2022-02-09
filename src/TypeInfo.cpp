@@ -23,11 +23,11 @@ namespace dd
 	void FindNamespace(const char* name, String& nameSpace, String& typeName)
 	{
 		String128 input(name);
-		uint offset = 0;
+		uint64 offset = 0;
 		while (true)
 		{
-			int found = input.Find("::", offset);
-			if (found < 0)
+			uint64 found = input.Find("::", offset);
+			if (found == String::Invalid)
 			{
 				break;
 			}
@@ -65,7 +65,7 @@ namespace dd
 		}
 	}
 
-	void TypeInfo::Init(const char* name, uint size)
+	void TypeInfo::Initialize(const char* name, uint size)
 	{
 		String128 typeName, nameSpace;
 		FindNamespace(name, nameSpace, typeName);
@@ -166,6 +166,13 @@ namespace dd
 
 	void TypeInfo::RegisterMemberInternal(const char* name, const TypeInfo* memberType, uintptr_t offset)
 	{
+		if (const Member* existing = GetMember(name))
+		{
+			DD_ASSERT(existing->Type() == memberType);
+			DD_ASSERT(existing->Offset() == offset);
+			return;
+		}
+
 		Member& member = m_members.Allocate();
 		member.m_name = name;
 		member.m_typeInfo = memberType;

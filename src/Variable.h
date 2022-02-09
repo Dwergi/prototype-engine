@@ -32,9 +32,9 @@ namespace dd
 	struct Variable
 	{
 		Variable();
-		Variable( const TypeInfo* typeInfo, void* data );
-		Variable( Variable var, const Member& member );
-		Variable( const Variable& rhs );
+		Variable(const TypeInfo* typeInfo, void* data);
+		Variable(const Member& member, void* object);
+		Variable(const Variable& rhs);
 
 		template <typename T>
 		explicit Variable( const T& rhs );
@@ -43,23 +43,36 @@ namespace dd
 		template <typename T>
 		explicit Variable( T* rhs );
 
+		// Reset this Variable to point at the values in the given variable
+		void Reset(const Variable& other);
+
+		Variable& operator=(const Variable& rhs);
+
 		void* Data() const;
 		const TypeInfo* Type() const;
 		bool IsValid() const;
 
 		template <typename T>
-		T& AccessValue();
+		T& Access() const;
 		template <typename T>
-		const T& GetValue() const;
+		const T& Get() const;
 
-		void PlacementNew();
-		void PlacementDelete();
-		void Delete();
-		Variable& operator=( const Variable& rhs );
+		template <typename T>
+		void Get(const T* out) const;
+		template <typename T>
+		void Set(const T& new_value) const;
+
+		void CopyTo(void* dst) const;
+		void SetFromVariable(const Variable& other) const;
+
+		void PlacementNew() const;
+		void PlacementDelete() const;
+		void Delete() const;
 
 	private:
 		void* m_data { nullptr };
 		const TypeInfo* m_typeInfo { nullptr };
+
 	};
 	
 	template <typename T>
@@ -121,19 +134,37 @@ namespace dd
 	};
 
 	template <typename T>
-	T& Variable::AccessValue()
+	void Variable::Set(const T& new_value) const
 	{
-		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
-		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_FIND_TYPE( T ) ) );
+		DD_ASSERT(m_typeInfo == DD_FIND_TYPE(T));
 
-		return CastHelper<T>::Cast( m_data );
+		T& value = CastHelper<T>::Cast(m_data);
+		value = new_value;
 	}
 
 	template <typename T>
-	const T& Variable::GetValue() const
+	T& Variable::Access() const
 	{
-		DD_ASSERT( m_typeInfo->IsDerivedFrom( DD_FIND_TYPE( T ) ) );
+		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
+		DD_ASSERT(m_typeInfo->IsDerivedFrom(DD_FIND_TYPE(T)));
+		return CastHelper<T>::Cast(m_data);
+	}
 
-		return CastHelper<T>::Cast( m_data );
+	template <typename T>
+	void Variable::Get(const T* out) const
+	{
+		DD_ASSERT(out != nullptr);
+		// allow casting only up the inheritance tree, eg. a TransformComponent can be retrieved as a Component
+		DD_ASSERT(m_typeInfo->IsDerivedFrom(DD_FIND_TYPE(T)));
+
+		out = CastHelper<const T>::Cast(m_data);
+	}
+
+	template <typename T>
+	const T& Variable::Get() const
+	{
+		DD_ASSERT(m_typeInfo->IsDerivedFrom(DD_FIND_TYPE(T)));
+
+		return CastHelper<const T>::Cast(m_data);
 	}
 }

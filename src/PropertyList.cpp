@@ -6,57 +6,69 @@
 #include "PCH.h"
 #include "PropertyList.h"
 
-namespace 
+namespace
 {
-	void* AddPointer( void* base, uint64 offset )
+	void* AddPointer(void* object, uint64 offset)
 	{
-		return (void*) (((byte*) base) + offset);
+		return (void*) (((byte*) object) + offset);
 	}
 }
 
 namespace dd
 {
-	PropertyList::PropertyList( const PropertyList& other )
+	PropertyList::PropertyList(PropertyList&& other) noexcept
 	{
-		DD_ASSERT( m_type == other.m_type );
-
-		m_base = other.m_base;
-		m_properties = other.m_properties;
+		m_properties = std::move(other.m_properties);
+		m_type = other.m_type;
+		m_object = other.m_object;
 	}
 
 	PropertyList::~PropertyList()
 	{
-		m_base = nullptr;
+		m_properties.clear();
 		m_type = nullptr;
-		m_properties.Clear();
+		m_object = nullptr;
 	}
 
-	Property* PropertyList::Find( const char* name )
+	std::optional<Property> PropertyList::Find(std::string_view name) const
 	{
-		for( Property& prop : m_properties )
+		for (const Property& prop : m_properties)
 		{
-			if( prop.Name() == name )
-				return &prop;
+			if (prop.Name() == name)
+			{
+				return std::optional<Property>(prop);
+			}
 		}
 
-		return nullptr;
+		return std::optional<Property>();
 	}
 
 	//
 	// Recursively add members to the property list.
 	//
-	void PropertyList::AddMembers( const TypeInfo* typeInfo, void* base )
+	void PropertyList::AddMembers(const TypeInfo* typeInfo, void* object, const String& prefix)
 	{
-		if( typeInfo == nullptr )
+		if (typeInfo == nullptr)
 			return;
 
-		for( Member& member : typeInfo->Members() )
+		for (Member& member : typeInfo->Members())
 		{
-			void* ptr = AddPointer( base, member.Offset() );
+			String128 member_name;
+			if (prefix.Length() > 0)
+			{
+				member_name = prefix;
+				member_name += ".";
+				member_name += member.Name();
+			}
+			else
+			{
+				member_name = member.Name();
+			}
 
-			m_properties.Allocate( Property( member, ptr ) );
+			m_properties.emplace_back(Variable(member, object), member_name.c_str());
 
-			AddMembers( member.Type(), ptr );
+			void* new_object = PointerAdd(object, member.Offset());
+			AddMembers(member.Type(), new_object, member_name);
 		}
-	} 
+	}
 }

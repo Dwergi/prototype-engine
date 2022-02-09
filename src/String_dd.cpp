@@ -11,11 +11,12 @@ namespace dd
 {
 	const float String::GrowthFactor = 2.0f;
 
-	String::String( char* stackBuffer, int stackCapacity )
-		: m_stack( stackBuffer, stackCapacity )
+	String::String(uint capacity) : 
+		m_buffer(StackAddress()),
+		m_capacity(capacity),
+		m_length(0)
 	{
-		m_length = 0;
-		m_buffer = m_stack;
+		DD_ASSERT(capacity > 0);
 
 		NullTerminate();
 	}
@@ -23,53 +24,49 @@ namespace dd
 	String::~String()
 	{
 		// delete heap buffer
-		if( m_buffer != m_stack )
+		if (IsOnHeap())
 		{
-			char* buf = m_buffer.Release();
-			delete[] buf;
+			delete[] m_buffer;
 		}
-
-		m_buffer.Release();
-		m_stack.Release();
 	}
 
 	const char* String::c_str() const
 	{
-		return m_buffer.Get();
+		return m_buffer;
 	}
 
 	char* String::data()
 	{
-		return m_buffer.Access();
+		return m_buffer;
 	}
 
-	bool String::w_str( const Buffer<wchar_t>& buffer ) const
+	bool String::w_str(const Buffer<wchar_t>& buffer) const
 	{
-		if( buffer.Size() <= m_length )
+		if (buffer.Size() <= m_length)
 			return false;
 
 		size_t count;
-		return mbstowcs_s( &count, buffer.Access(), buffer.Size() / 4, m_buffer.Get(), m_length ) > 0;
+		return mbstowcs_s(&count, buffer.Access(), buffer.Size() / 4, m_buffer, m_length) > 0;
 	}
 
-	bool String::Equals( const char* other, int length, bool caseless ) const
+	bool String::Equals(const char* other, uint64 length, bool caseless) const
 	{
-		if( m_length != length )
+		if (m_length != length)
 			return false;
 
-		for( int i = 0; i < m_length; ++i )
+		for (uint64 i = 0; i < m_length; ++i)
 		{
-			if( other[i] == '\0' )
+			if (other[i] == '\0')
 				return false;
 
-			if( caseless )
+			if (caseless)
 			{
-				if( tolower( m_buffer[i] ) != tolower( other[i] ) )
+				if (tolower(m_buffer[i]) != tolower(other[i]))
 					return false;
 			}
 			else
 			{
-				if( m_buffer[i] != other[i] )
+				if (m_buffer[i] != other[i])
 					return false;
 			}
 		}
@@ -77,131 +74,132 @@ namespace dd
 		return true;
 	}
 
-	bool String::EqualsCaseless( const String& other ) const
+	bool String::EqualsCaseless(const String& other) const
 	{
-		return Equals( other.m_buffer.Get(), other.m_length, true );
+		return Equals(other.m_buffer, other.m_length, true);
 	}
 
-	bool String::EqualsCaseless( const char* other ) const
+	bool String::EqualsCaseless(const char* other) const
 	{
-		size_t length = strlen( other );
-		return Equals( other, (int) length, true );
+		uint64 length = strlen(other);
+		return Equals(other, length, true);
 	}
 
-	bool String::operator==( const char* other ) const
+	bool String::operator==(const char* other) const
 	{
-		if( other == nullptr )
+		if (other == nullptr)
 		{
 			return false;
 		}
 
-		size_t length = strlen( other );
-
-		return Equals( other, (int) length, false );
+		uint64 length = strlen(other);
+		return Equals(other, length, false);
 	}
 
-	bool String::operator==( const String& other ) const
+	bool String::operator==(const String& other) const
 	{
-		return Equals( other.m_buffer.Get(), other.m_length, false );
+		return Equals(other.m_buffer, other.m_length, false);
 	}
 
-	bool String::operator!=( const char* other ) const
+	bool String::operator!=(const char* other) const
 	{
-		return !(operator==( other ));
+		return !(operator==(other));
 	}
 
-	bool String::operator!=( const String& other ) const
+	bool String::operator!=(const String& other) const
 	{
-		return !(operator==( other ));
+		return !(operator==(other));
 	}
 
-	String& String::operator=( const String& other )
+	String& String::operator=(const String& other)
 	{
-		SetString( other.m_buffer.Get(), other.m_length );
+		SetString(other.m_buffer, other.m_length);
 
 		return *this;
 	}
 
-	String& String::operator=( const char* other )
+	String& String::operator=(const char* other)
 	{
-		DD_ASSERT( other != nullptr );
+		DD_ASSERT(other != nullptr);
 
-		SetString( other, (int) strlen( other ) );
+		SetString(other, strlen(other));
 
 		return *this;
 	}
 
-	String& String::operator+=( const String& other )
+	String& String::operator+=(const String& other)
 	{
-		Append( other.m_buffer.Get(), other.m_length );
+		Append(other.m_buffer, other.m_length);
 
 		return *this;
 	}
 
-	String& String::operator+=( const char* other )
+	String& String::operator+=(const char* other)
 	{
-		Append( other, (int) strlen( other ) );
+		Append(other, strlen(other));
 
 		return *this;
 	}
 
-	String& String::operator+=( const std::string& other )
+	String& String::operator+=(const std::string& other)
 	{
-		Append( other.c_str(), (uint) other.length() );
+		Append(other.c_str(), other.length());
 
 		return *this;
 	}
 
-	int String::Find( const char* other, int offset ) const
+	uint64 String::Find(const char* other, uint64 offset) const
 	{
-		DD_ASSERT( m_buffer.Get() != nullptr );
-		DD_ASSERT( other != nullptr );
+		DD_ASSERT(m_buffer != nullptr);
+		DD_ASSERT(other != nullptr);
 
-		if( other == nullptr || offset >= m_length )
-			return -1;
+		if (other == nullptr || offset >= m_length)
+			return ~0ull;
 
-		const char* ptr = strstr( m_buffer.Get() + offset, other );
+		const char* ptr = strstr(m_buffer + offset, other);
 
-		if( ptr == nullptr )
-			return -1;
+		if (ptr == nullptr)
+			return ~0ull;
 
-		int location = (int) (ptr - m_buffer.Get());
+		uint64 location = (uint64) (ptr - m_buffer);
 
 		return location;
 	}
 
-	int String::Find( const String& other, int offset ) const
+	uint64 String::Find(const String& other, uint64 offset) const
 	{
-		DD_ASSERT( m_buffer.Get() != nullptr );
-		DD_ASSERT( other.m_buffer.Get() != nullptr );
+		DD_ASSERT(m_buffer != nullptr);
+		DD_ASSERT(other.m_buffer != nullptr);
 
-		if( offset >= m_length )
-			return -1;
+		if (offset >= m_length)
+			return ~0ull;
 
-		const char* ptr = strstr( m_buffer.Get(), other.m_buffer.Get() );
+		const char* ptr = strstr(m_buffer, other.m_buffer);
 
-		if( ptr == nullptr )
-			return -1;
+		if (ptr == nullptr)
+			return ~0ull;
 
-		int location = (int) (ptr - m_buffer.Get());
+		uint64 location = (uint64) (ptr - m_buffer);
 
 		return location;
 	}
 
-	void String::ReplaceAll( char src, char target )
+	void String::ReplaceAll(char src, char target)
 	{
-		DD_ASSERT( m_buffer.Get() != nullptr );
+		DD_ASSERT(m_buffer != nullptr);
 
-		for( int i = 0; i < m_length; ++i )
+		for (uint64 i = 0; i < m_length; ++i)
 		{
-			if( m_buffer[i] == src )
+			if (m_buffer[i] == src)
+			{
 				m_buffer[i] = target;
+			}
 		}
 	}
 
-	String& String::operator+=( char other )
+	String& String::operator+=(char other)
 	{
-		Resize( m_length + 1 );
+		Resize(m_length + 1);
 
 		m_buffer[m_length] = other;
 		++m_length;
@@ -211,48 +209,50 @@ namespace dd
 		return *this;
 	}
 
-	bool String::StartsWith( const char* other ) const
+	bool String::StartsWith(const char* other) const
 	{
-		size_t len = strlen( other );
+		size_t len = strlen(other);
 
-		for( size_t i = 0; i < len; ++i )
+		for (size_t i = 0; i < len; ++i)
 		{
-			if( m_buffer[(int) i] != other[i] )
+			if (m_buffer[i] != other[i])
+			{
 				return false;
+			}
 		}
 
 		return true;
 	}
 
-	bool String::StartsWith( const String& other ) const
+	bool String::StartsWith(const String& other) const
 	{
-		return StartsWith( other.c_str() );
+		return StartsWith(other.c_str());
 	}
 
-	void String::Append( const char* buffer, int other_length )
+	void String::Append(const char* buffer, uint64 other_length)
 	{
-		if( other_length == 0 )
+		if (other_length == 0)
 			return;
 
-		int new_length = m_length + other_length;
-		Resize( new_length );
+		uint64 new_length = m_length + other_length;
+		Resize(new_length);
 
-		memcpy( &m_buffer[m_length], buffer, other_length );
+		memcpy(&m_buffer[m_length], buffer, other_length);
 
-		m_length = new_length;
+		m_length = (uint) new_length;
 		NullTerminate();
 	}
 
-	void String::SetString( const char* data, int length )
+	void String::SetString(const char* data, uint64 length)
 	{
-		if( data == nullptr || length == 0 )
+		if (data == nullptr || length == 0)
 		{
-			if( m_buffer != m_stack )
+			if (IsOnHeap())
 			{
-				void* ptr = m_buffer.Release();
+				void* ptr = m_buffer;
 				delete[] ptr;
 
-				m_buffer = m_stack;
+				m_buffer = StackAddress();
 			}
 
 			m_length = 0;
@@ -260,10 +260,10 @@ namespace dd
 			return;
 		}
 
-		Resize( length );
+		Resize(length);
 
-		memcpy( m_buffer.Access(), data, length );
-		m_length = length;
+		memcpy(m_buffer, data, length);
+		m_length = (uint) length;
 
 		NullTerminate();
 	}
@@ -272,28 +272,35 @@ namespace dd
 	// Resize to contain a string of the given length. May expand to be larger than the given size.
 	// Never shrinks a string.
 	//
-	void String::Resize( int length )
+	void String::Resize(uint64 length)
 	{
+		DD_ASSERT(m_capacity > 0);
+
 		// keep growing string until we hit a size that fits
-		int new_capacity = m_buffer.Size();
-		while( length >= new_capacity )
+		uint new_capacity = m_capacity;
+		while (length >= new_capacity)
 		{
-			new_capacity = (int) (new_capacity * GrowthFactor);
+			new_capacity = (uint) (new_capacity * GrowthFactor);
 		}
 
-		if( m_buffer.Size() == new_capacity )
+		if (m_capacity == new_capacity)
+		{
 			return;
+		}
 
-		char* old_buffer = m_buffer.Release();
+		char* old_buffer = m_buffer;
 
-		m_buffer.Set( new char[new_capacity], new_capacity );
+		m_buffer = new char[new_capacity];
+		m_capacity = (uint) new_capacity;
 
 		// copy old data over if required
-		if( m_length > 0 )
-			SetString( old_buffer, m_length );
+		if (m_length > 0)
+		{
+			SetString(old_buffer, m_length);
+		}
 
 		// delete old buffer if not stack-allocated
-		if( old_buffer != m_stack.Get() )
+		if (old_buffer != StackAddress())
 		{
 			delete[] old_buffer;
 		}
@@ -301,34 +308,26 @@ namespace dd
 
 	void String::ShrinkToFit()
 	{
-		if( m_buffer == m_stack )
+		if (!IsOnHeap())
+		{
 			return;
-
-		// check if we could fit in the local array
-		if( (m_length + 1) < m_stack.Size() )
-		{
-			memcpy( m_stack.Access(), m_buffer.Get(), m_length );
-
-			void* ptr = m_buffer.Release();
-			delete[] ptr;
-			m_buffer = m_stack;
 		}
-		else
-		{
-			void* old_buffer = m_buffer.Release();
 
-			m_buffer.Set( new char[m_length + 1], m_length + 1 );
+		void* old_buffer = m_buffer;
 
-			memcpy( m_buffer.Access(), old_buffer, m_length );
+		m_buffer = new char[m_length + 1]; 
+		m_capacity = m_length + 1;
 
-			delete[] old_buffer;
-		}
+		memcpy(m_buffer, old_buffer, m_length);
+
+		delete[] old_buffer;
 
 		NullTerminate();
 	}
 
 	void String::NullTerminate()
 	{
+		DD_ASSERT(m_length < m_capacity);
 		m_buffer[m_length] = '\0';
 	}
 }

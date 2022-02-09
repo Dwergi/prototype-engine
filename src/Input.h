@@ -21,8 +21,8 @@ namespace dd
 
 	struct InputReceived
 	{
-		dd::InputAction Action;
-		dd::InputType Type;
+		InputAction Action;
+		InputType Type;
 
 		bool operator==(const InputReceived& other) const { return Action == other.Action && Type == other.Type; }
 	};
@@ -34,24 +34,24 @@ namespace dd
 		void Initialize();
 		void Shutdown();
 
-		void AddInputSource(dd::IInputSource& source);
+		void AddInputSource(IInputSource& source);
 
 		void Update(float delta_t);
 
 		// Did the given input occur in the last frame? If type is not given, assumes InputType::Release.
-		bool GotInput(dd::InputAction action) const;
-		bool GotInput(dd::InputAction action, dd::InputType type) const;
-		bool IsHeld(dd::InputAction action) const;
+		bool GotInput(InputAction action) const;
+		bool GotInput(InputAction action, InputType type) const;
+		bool IsHeld(InputAction action) const;
 		
 		MousePosition GetMousePosition() const;
 		MousePosition GetMouseScroll() const;
 		
 		// Add a handler, assumes Release as type.
-		void AddHandler(dd::InputAction action, dd::InputHandler handler);
-		void AddHandler(dd::InputAction action, dd::InputType type, dd::InputHandler handler);
+		void AddHandler(InputAction action, InputHandler handler);
+		void AddHandler(InputAction action, InputType type, InputHandler handler);
 
 		// Just mark the given action as being handled by IsHeld(). Requires manual checking of IsHeld().
-		void AddHeldHandler(dd::InputAction action);
+		void AddHeldHandler(InputAction action);
 
 		void SetCurrentMode(std::string_view mode_name);
 		std::string GetCurrentMode() const { return m_currentMode != nullptr ? m_currentMode->GetName() : std::string(); }
@@ -59,7 +59,7 @@ namespace dd
 		void EnableMouse(bool enabled) { m_mouseEnabled = enabled; }
 		void EnableKeyboard(bool enabled) { m_keyboardEnabled = enabled; }
 
-		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> GetText() const { return m_text; }
+		Array<uint32, InputEvent::MAX_EVENTS> GetText() const { return m_text; }
 
 	private:
 
@@ -75,7 +75,7 @@ namespace dd
 		InputModeConfig* m_currentMode { nullptr };
 		InputModeID m_nextMode { 0 };
 
-		dd::Array<uint32, dd::InputEvent::MAX_EVENTS> m_text;
+		Array<uint32, InputEvent::MAX_EVENTS> m_text;
 
 		MousePosition m_mousePosition;
 		MousePosition m_mouseScroll;

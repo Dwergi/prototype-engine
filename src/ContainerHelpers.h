@@ -9,47 +9,47 @@
 namespace dd
 {
 	// A temporary buffer for copying containers around.
-	const int BUFFER_SIZE = 2 * 1024 * 1024;
+	const uint64 BUFFER_SIZE = 2 * 1024 * 1024;
 	static __declspec(thread) char s_buffer[BUFFER_SIZE];
 
 	template <typename T>
-	std::enable_if_t<std::is_copy_constructible_v<T>, void> CopyRange(const T* src, T* dest, int count)
+	std::enable_if_t<std::is_copy_constructible_v<T>, void> CopyRange(const T* src, T* dest, uint64 count)
 	{
 		DD_ASSERT((count * sizeof(T)) <= BUFFER_SIZE);
 
 		T* temp = reinterpret_cast<T*>(s_buffer);
 
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			new (&temp[i]) T(src[i]);
 		}
 
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			new (&dest[i]) T(std::move(temp[i]));
 		}
 	}
 
 	template <typename T>
-	void ConstructRange(T* src, int count)
+	void ConstructRange(T* src, uint64 count)
 	{
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			new (&src[i]) T();
 		}
 	}
 
 	template <typename T>
-	void DestroyRange(T* src, int count)
+	void DestroyRange(T* src, uint64 count)
 	{
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			src[i].~T();
 		}
 	}
 
 	template <typename T>
-	std::enable_if_t<std::is_move_constructible_v<T>, void> MoveRange(T* src, T* dest, int count)
+	std::enable_if_t<std::is_move_constructible_v<T>, void> MoveRange(T* src, T* dest, uint64 count)
 	{
 		DD_ASSERT(src != nullptr && dest != nullptr);
 		DD_ASSERT(src != dest);
@@ -58,13 +58,13 @@ namespace dd
 
 		T* temp = reinterpret_cast<T*>(s_buffer);
 
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			new (&temp[i]) T(std::move(src[i]));
 			src[i].~T();
 		}
 
-		for (int i = 0; i < count; ++i)
+		for (uint64 i = 0; i < count; ++i)
 		{
 			new (&dest[i]) T(std::move(temp[i]));
 		}

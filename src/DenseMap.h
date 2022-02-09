@@ -17,9 +17,9 @@ namespace dd
 	template <typename TKey, typename TValue>
 	class DenseMap
 	{
-		static const int DefaultSize = 16;
+		static const uint64 DefaultSize = 16;
 		const float MaxOccupancy = 0.75f;
-		static const int OverflowSize = 16;
+		static const uint64 OverflowSize = 16;
 
 	public:
 
@@ -61,7 +61,7 @@ namespace dd
 	private:
 
 		friend class DenseMapIterator<TKey, TValue>;
-		static const int EntrySize = sizeof( Entry );
+		static const uint64 EntrySize = sizeof( Entry );
 
 		int m_entries { 0 };
 		Buffer<Entry> m_data;
@@ -80,7 +80,7 @@ namespace dd
 		bool IsEmpty( const Entry& entry ) const;
 
 		void Grow();
-		void Resize( int new_size );
+		void Resize( uint64 new_size );
 		void Rehash( const Buffer<Entry>& data );
 	};
 }

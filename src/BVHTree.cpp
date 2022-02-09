@@ -268,7 +268,6 @@ namespace dd
 		BVHBucket& parent = m_buckets[parent_index];
 		DD_ASSERT(parent.IsLeaf);
 		DD_ASSERT(parent.Region.IsValid());
-		DD_TODO("Might be better to make this stack-based?");
 
 		// recursion condition
 		if (parent.Count() <= MAX_ENTRIES)

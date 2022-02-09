@@ -13,7 +13,7 @@ namespace dd
 	template <typename T>
 	struct IArray
 	{
-		int Capacity() const { return m_data.Size(); }
+		int Capacity() const { return (int) m_data.Size(); }
 		int Size() const { return m_size; }
 
 		virtual ~IArray();
@@ -39,6 +39,8 @@ namespace dd
 		void Clear();
 
 		const T& operator[](size_t index) const;
+		T& operator[](size_t index);
+
 		bool Contains(const T& val);
 		int IndexOf(const T& val);
 

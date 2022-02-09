@@ -141,9 +141,6 @@
     <ClInclude Include="src\TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\Recorder.h">
-      <Filter>Properties</Filter>
-    </ClInclude>
     <ClInclude Include="src\OctreeComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -155,9 +152,6 @@
     </ClInclude>
     <ClInclude Include="src\Member.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Property.h">
-      <Filter>Properties</Filter>
     </ClInclude>
     <ClInclude Include="src\PropertyList.h">
       <Filter>Properties</Filter>
@@ -1332,20 +1326,26 @@
     <ClInclude Include="src\ddc\Tags.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\Property.h">
+      <Filter>Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UndoStack.h">
+      <Filter>Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scope.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Variant.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Recorder.cpp">
-      <Filter>Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\TypeInfo.cpp">
       <Filter>Types</Filter>
     </ClCompile>
     <ClCompile Include="src\Member.cpp">
       <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Property.cpp">
-      <Filter>Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyList.cpp">
       <Filter>Properties</Filter>
@@ -1356,7 +1356,7 @@
     <ClCompile Include="src\Tests\PropertyListTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tests\RecorderTests.cpp">
+    <ClCompile Include="src\Tests\UndoStackTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="src\ScopedTimer.cpp">
@@ -2163,6 +2163,12 @@
     <ClCompile Include="src\FSM.cpp">
       <Filter>FSM</Filter>
     </ClCompile>
+    <ClCompile Include="src\Property.cpp">
+      <Filter>Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UndoStack.cpp">
+      <Filter>Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Buffer.inl">
@@ -2176,9 +2182,6 @@
     </None>
     <None Include="src\Array.inl">
       <Filter>Containers</Filter>
-    </None>
-    <None Include="src\Recorder.inl">
-      <Filter>Properties</Filter>
     </None>
     <None Include="src\DenseMap.inl">
       <Filter>Containers</Filter>
@@ -2196,5 +2199,8 @@
     <None Include="src\JobSystem.inl">
       <Filter>Jobs</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="vs_customization\DD.natvis" />
   </ItemGroup>
 </Project>

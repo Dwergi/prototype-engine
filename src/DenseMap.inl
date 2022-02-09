@@ -231,9 +231,9 @@ namespace dd
 	}
 
 	template <typename TKey, typename TValue>
-	void DenseMap<TKey, TValue>::Resize(int new_capacity)
+	void DenseMap<TKey, TValue>::Resize(uint64 new_capacity)
 	{
-		int byte_size = new_capacity * sizeof(Entry);
+		uint64 byte_size = new_capacity * sizeof(Entry);
 		Entry* new_data = reinterpret_cast<Entry*>(new byte[byte_size]);
 		memset(new_data, 0, byte_size);
 
@@ -369,7 +369,7 @@ namespace dd
 	{
 		uint64 hash = m_hash(key);
 
-		int index = hash % m_data.Size();
+		uint64 index = hash % m_data.Size();
 
 		return m_data[index];
 	}
@@ -377,10 +377,12 @@ namespace dd
 	template <typename TKey, typename TValue>
 	DenseMapIterator<TKey, TValue> DenseMap<TKey, TValue>::begin() const
 	{
-		for (int i = 0; i < m_data.Size(); ++i)
+		for (uint64 i = 0; i < m_data.Size(); ++i)
 		{
 			if (!IsEmpty(m_data[i]))
+			{
 				return DenseMapIterator<TKey, TValue>(&m_data[i], *this);
+			}
 		}
 
 		return end();

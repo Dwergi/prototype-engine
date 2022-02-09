@@ -14,27 +14,33 @@ namespace dd
 	public:
 
 		RingBuffer();
-		explicit RingBuffer(uint size);
+		explicit RingBuffer(uint64 size);
+		RingBuffer(const RingBuffer& other);
+		RingBuffer(RingBuffer&& other);
 		~RingBuffer();
+
+		RingBuffer& operator=(const RingBuffer& other);
+		RingBuffer& operator=(RingBuffer&& other) noexcept;
 
 		void Push(const T& item);
 		void Push(T&& item);
+		T& Advance();
 
 		T Pop();
 
-		uint Size() const;
-		uint Capacity() const;
+		uint64 Size() const;
+		uint64 Capacity() const;
 
 	private:
-		const uint DefaultSize { 8 };
+		static const uint64 DefaultSize { 8 };
 
 		Buffer<T> m_storage;
-		uint m_head { 0 };
-		uint m_tail { 0 };
-		uint m_size { 0 };
+		uint64 m_head { 0 };
+		uint64 m_tail { 0 };
+		uint64 m_size { 0 };
 
 		void Grow();
-		void Allocate(uint size);
+		void Allocate(uint64 size);
 	};
 }
 

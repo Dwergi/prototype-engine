@@ -35,7 +35,7 @@ namespace dd
 				}
 
 				// check for no-modifier match, ie. A
-				if (binding.Actions[evt.Modifiers.Flags()] != InputAction::NONE)
+				if (binding.Actions[0] != InputAction::NONE)
 				{
 					out_action = binding.Actions[0];
 					return true;

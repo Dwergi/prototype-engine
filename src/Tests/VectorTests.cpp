@@ -7,9 +7,7 @@
 #include "PCH.h"
 #include "Tests.h"
 
-#include "String_dd.h"
 #include "Vector.h"
-
 #include "TestTypes.h"
 
 TEST_CASE( "[Vector] Add" )

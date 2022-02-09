@@ -38,7 +38,7 @@ namespace ddc
 		return it != m_layers.end();
 	}
 
-	void System::RequireTag( ddc::Tag tag, const char* name )
+	void System::RequireTag(ddc::Tag tag, const char* name)
 	{
 		ddc::UpdateBuffer& update_buffer = CreateBuffer(name);
 		update_buffer.RequireTag(tag);
