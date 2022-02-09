@@ -19,7 +19,7 @@ namespace dd
 	struct FreeCameraController : IDebugPanel, ddc::System
 	{
 		FreeCameraController();
-		FreeCameraController(FreeCameraController&& other);
+		FreeCameraController(FreeCameraController&& other) noexcept;
 		~FreeCameraController();
 
 		FreeCameraController(const FreeCameraController&) = delete;

@@ -157,10 +157,12 @@ namespace dd
 		static_assert(std::is_base_of<HandleTarget, T>::value);
 
 		Handle() {}
-		Handle(const char* name);
+		Handle(std::string_view name);
 		Handle(const Handle<T>& other) : m_handle(other.m_handle) {}
 
 		uint GetID() const { return m_handle; }
+		const std::string& GetName() const;
+
 		bool IsValid() const { return m_handle != ~0u; }
 		bool IsAlive() const { return m_manager->IsAlive(*this); }
 
@@ -196,5 +198,18 @@ namespace dd
 }
 
 template <typename T> dd::HandleManager<T>* dd::Handle<T>::m_manager = nullptr;
+
+namespace std
+{
+	template <typename T>
+	struct hash<dd::Handle<T>>
+	{
+		size_t operator()(const dd::Handle<T>& handle) const
+		{
+			return handle.GetID();
+		}
+	};
+};
+
 
 #include "HandleManager.inl"

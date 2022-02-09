@@ -212,11 +212,11 @@ namespace neut
 		s_keybindings->BindKey(dd::Key::S, dd::InputAction::BACKWARD);
 		s_keybindings->BindKey(dd::Key::A, dd::InputAction::LEFT);
 		s_keybindings->BindKey(dd::Key::D, dd::InputAction::RIGHT);
+		s_keybindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
+		s_keybindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
 		s_keybindings->BindKey(dd::Key::SPACE, dd::InputAction::UP);
 		s_keybindings->BindKey(dd::Key::R, dd::InputAction::ADD_MINOR_TRAUMA);
 		s_keybindings->BindKey(dd::Key::T, dd::InputAction::ADD_MAJOR_TRAUMA);
-		s_keybindings->BindKey(dd::Key::LCTRL, dd::InputAction::DOWN);
-		s_keybindings->BindKey(dd::Key::LSHIFT, dd::InputAction::BOOST);
 		s_keybindings->BindKey(dd::Key::KEY_1, dd::InputAction::CAMERA_POS_1);
 		s_keybindings->BindKey(dd::Key::KEY_2, dd::InputAction::CAMERA_POS_2);
 		s_keybindings->BindKey(dd::Key::KEY_3, dd::InputAction::CAMERA_POS_3);
@@ -230,6 +230,8 @@ namespace neut
 		s_keybindings->BindKey(dd::Key::MOUSE_LEFT, dd::InputAction::SHOOT, "game");
 		s_keybindings->BindKey(dd::Key::H, dd::InputAction::RESET_PHYSICS, "game");
 
+
+		s_input->AddHeldHandler(dd::InputAction::BOOST);
 		s_input->AddHandler(dd::InputAction::TOGGLE_FREECAM, &ToggleFreeCam);
 		s_input->AddHandler(dd::InputAction::CAMERA_POS_1, []() { SetCameraPos(CameraPos::One); });
 		s_input->AddHandler(dd::InputAction::CAMERA_POS_2, []() { SetCameraPos(CameraPos::Two); });

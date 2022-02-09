@@ -36,7 +36,7 @@ namespace dd
 		RequireWrite<TransformComponent>();
 	}
 
-	FreeCameraController::FreeCameraController(FreeCameraController&& other) :
+	FreeCameraController::FreeCameraController(FreeCameraController&& other) noexcept :
 		ddc::System("Free Camera"),
 		m_enabled(other.m_enabled),
 		m_invert(other.m_invert)

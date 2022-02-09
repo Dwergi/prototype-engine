@@ -104,6 +104,8 @@
 		<Expand>
 			<Item Name="[name]">m_name</Item>
 			<Item Name="[variable]">m_variable</Item>
+			<Item Name="[undo]">m_undo</Item>
+
 			<Synthetic Name="[Copy to Watch]">
 				<DisplayString Condition="m_variable.m_typeInfo->HasNamespace()">
 					*({m_variable.m_typeInfo->m_namespace.m_buffer,sb}::{m_variable.m_typeInfo->m_name.m_buffer,sb}*) {m_variable.m_data}
@@ -113,6 +115,10 @@
 				</DisplayString>
 			</Synthetic>
 		</Expand>
+	</Type>
+
+	<Type Name="dd::Variant&lt;*&gt;">
+		<DisplayString>{m_variable}</DisplayString>
 	</Type>
 
 	<Type Name="dd::Vector&lt;*&gt;">
@@ -126,4 +132,27 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+
+	<Type Name="dd::ConstBuffer&lt;*&gt;">
+		<DisplayString>{"$T1",sb} [{m_count}]</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<ArrayItems>
+				<Size>m_count</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="dd::Buffer&lt;*&gt;">
+		<DisplayString>{"$T1",sb} [{m_count}]</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<ArrayItems>
+				<Size>m_count</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	
 </AutoVisualizer>

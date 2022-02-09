@@ -52,12 +52,12 @@ namespace dd
 		//
 		// Get all entries containing the given point. Returns the number of entries found for convenience.
 		//
-		int GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
+		uint64 GetAllContaining( const glm::vec3& pt, Vector<OctreeEntry>& outResults ) const;
 
 		//
 		// Get all entries that intersect with the given bounds.
 		//
-		int GetAllIntersecting( const ddm::AABB& bounds, Vector<OctreeEntry>& outResults ) const;
+		uint64 GetAllIntersecting( const ddm::AABB& bounds, Vector<OctreeEntry>& outResults ) const;
 
 		//
 		// Get the bounds of the tree.
@@ -68,20 +68,20 @@ namespace dd
 		// Get the internal node count of the tree.
 		// Really just a diagnostic.
 		// 
-		int GetNodeCount() const { return m_nodes.Size(); }
+		uint64 GetNodeCount() const { return m_nodes.Size(); }
 
 		//
 		// Get the number of entries in this tree.
 		//
-		int GetEntryCount() const { return m_entries.Size() - m_free.Size(); }
+		uint64 GetEntryCount() const { return m_entries.Size() - m_free.Size(); }
 
 	private:
 
-		typedef int NodeHandle;
+		typedef uint64 NodeHandle;
 
 		struct Node
 		{
-			NodeHandle m_children { -1 };
+			NodeHandle m_children { ~0ull };
 			Vector<OctreeEntry> m_data;
 
 			Node();

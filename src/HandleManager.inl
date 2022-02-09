@@ -199,8 +199,20 @@ namespace dd
 	}
 
 	template <typename T>
-	Handle<T>::Handle(const char* name)
+	Handle<T>::Handle(std::string_view name)
 	{
 		m_handle = m_manager->Find(name).m_handle;
+	}
+
+	template <typename T>
+	const std::string& Handle<T>::GetName() const
+	{
+		HandleTarget* target = Access();
+		if (target != nullptr)
+		{
+			return target->Name();
+		}
+		static std::string s_empty;
+		return s_empty;
 	}
 }
