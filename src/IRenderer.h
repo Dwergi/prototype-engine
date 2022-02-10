@@ -7,11 +7,12 @@
 #pragma once
 
 #include "ddc/DataRequest.h"
-
 #include "ddr/RenderData.h"
 
 namespace ddr
 {
+	struct FrameBuffer;
+
 	struct IRenderer
 	{
 		IRenderer(const char* name) : m_name(name) {}
@@ -23,7 +24,7 @@ namespace ddr
 		virtual void Render(const RenderData& render_data) {}
 
 		virtual bool ShouldRenderDebug() const { return false; }
-		virtual void RenderDebug(const RenderData& render_data) {}
+		virtual void RenderDebug(const RenderData& render_data, FrameBuffer& dest) {}
 
 		virtual bool UsesAlpha() const { return false; }
 

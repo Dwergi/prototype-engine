@@ -18,24 +18,30 @@ namespace ddr
 	struct Texture;
 	struct UniformStorage;
 
-	struct FrameBuffer
+	struct IFrameBuffer
+	{
+		virtual bool IsValid() const = 0;
+		virtual GLuint ID() const = 0;
+		virtual glm::ivec2 GetSize() const = 0;
+	};
+
+	struct FrameBuffer : IFrameBuffer
 	{
 		FrameBuffer();
-		FrameBuffer( const FrameBuffer& other );
+		FrameBuffer(const FrameBuffer& other);
 		~FrameBuffer();
 
-		FrameBuffer& operator=( const FrameBuffer& other );
+		FrameBuffer& operator=(const FrameBuffer& other);
 
 		//
 		// Create a buffer that targets the given texture, with an optional depth texture.
 		//
-		bool Create( Texture& target, Texture* depth );
+		bool Create(Texture& target, Texture* depth);
 
 		//
 		// Destroy the framebuffer.
 		//
 		void Destroy();
-		
 		void BindRead();
 		void UnbindRead();
 
@@ -44,23 +50,25 @@ namespace ddr
 
 		void Clear();
 
-		bool IsValid() const { return m_valid; }
+		bool IsValid() const override { return m_valid; }
 
-		GLuint ID() const { return m_fbo; }
+		GLuint ID() const override { return m_fbo; }
+
+		glm::ivec2 GetSize() const override;
 
 		Texture* GetColourTexture() const { return m_texColour; }
 		Texture* GetDepthTexture() const { return m_texDepth; }
 
 		void Initialize();
 
-		void Render( ddr::UniformStorage& uniforms );
-		void RenderDepth( ddr::UniformStorage& uniforms, const ddr::ICamera& camera );
+		void Render(UniformStorage& uniforms);
+		void RenderDepth(UniformStorage& uniforms, const ICamera& camera);
 
-		void Blit();
-		void BlitTexture(ddr::UniformStorage& uniforms, ddr::Texture* texture);
+		void Blit(const IFrameBuffer& dest);
+		void BlitToTexture(UniformStorage& uniforms, Texture* texture);
 
-		void SetClearColour( glm::vec4 colour ) { m_clearColour = colour; }
-		void SetClearDepth( float depth ) { m_clearDepth = depth; }
+		void SetClearColour(glm::vec4 colour) { m_clearColour = colour; }
+		void SetClearDepth(float depth) { m_clearDepth = depth; }
 
 	private:
 
@@ -80,5 +88,12 @@ namespace ddr
 		static ShaderHandle m_blitShader;
 		static VBO m_vboFullscreen;
 		static VAO m_vaoFullscreen;
+	};
+
+	struct BackBuffer : IFrameBuffer
+	{
+		bool IsValid() const override { return true; }
+		GLuint ID() const override { return 0u; }
+		glm::ivec2 GetSize() const override;
 	};
 }

@@ -26,8 +26,8 @@
 
 static dd::Service<dd::JobSystem> s_jobsystem;
 static dd::Service<ddr::MeshManager> s_meshManager;
+static dd::Service<ddr::MeshRenderCommandBuffer> s_meshCommands;
 static dd::ProfilerValueRef s_meshesRendered("Meshes Rendered");
-static dd::Service<ddr::MeshRenderCommandBuffer> s_commands;
 
 namespace ddr
 {
@@ -49,10 +49,7 @@ namespace ddr
 		dd::MeshUtils::CreateUnitSphere();
 		dd::MeshUtils::CreateQuad();
 
-		m_vboTransforms.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-
-		dd::Services::Register(new MeshRenderCommandBuffer());
+		dd::Services::Register(new MeshRenderCommandBuffer);
 	}
 
 	void MeshRenderer::Update(ddr::RenderData& data)
@@ -125,21 +122,21 @@ namespace ddr
 
 		++m_unculledMeshCount;
 
-		glm::vec4 debug_multiplier(1, 1, 1, 1);
+		glm::vec4 debug_tint(0,0,0,1);
 
 		if (entities.HasTag(entity, ddc::Tag::Focused))
 		{
-			debug_multiplier.z = 1.5f;
+			debug_tint.z = 0.5f;
 		}
 
 		if (entities.HasTag(entity, ddc::Tag::Selected))
 		{
-			debug_multiplier.y = 1.5f;
+			debug_tint.y = 0.5f;
 		}
 
 		if (m_debugHighlightFrustumMeshes)
 		{
-			debug_multiplier.x = 1.5f;
+			debug_tint.x = 0.5f;
 		}
 
 		glm::vec4 colour(1);
@@ -149,39 +146,49 @@ namespace ddr
 			colour = colour_cmp->Colour;
 		}
 
-		const Mesh* mesh = mesh_cmp.Mesh.Get();
-
-		MeshRenderCommand& cmd = s_commands->Allocate();
+		MeshRenderCommand& cmd = s_meshCommands->Allocate();
 		cmd.Material = mesh_cmp.Material;
 		cmd.Mesh = mesh_cmp.Mesh;
-		cmd.Colour = colour * debug_multiplier;
+		cmd.Colour = colour + debug_tint;
 		cmd.Transform = transform_cmp.Transform();
 		cmd.InitializeKey(camera);
 	}
 
+	MeshRenderer::InstanceVBOs& MeshRenderer::FindCachedInstanceVBOs(MeshHandle mesh_h, MaterialHandle material_h)
+	{
+		uint64 key = mesh_h.GetID();
+		key = key << 32;
+		key = key | material_h.GetID();
+
+		auto it_pair = m_instanceCache.insert({ key, InstanceVBOs() });
+		return it_pair.first->second;
+	}
+
 	void MeshRenderer::DrawMeshInstances(MeshHandle mesh_h, MaterialHandle material_h, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours)
 	{
-		DD_ASSERT(mesh_h.IsAlive() && material_h.IsAlive());
 		DD_ASSERT(transforms.size() == colours.size());
 
-		Mesh& mesh = *mesh_h;
-		VAO& mesh_vao = mesh.AccessVAO();
-		mesh_vao.Bind();
+		Mesh* mesh = mesh_h.Access();
 
-		Material& material = *material_h;
-		Shader& shader = *material.Shader;
+		InstanceVBOs& instance_vbos = FindCachedInstanceVBOs(mesh_h, material_h);
+		if (instance_vbos.Transforms.IsValid())
+		{
+			instance_vbos.Transforms.Destroy();
+		}
+		instance_vbos.Transforms.Create(transforms);
+		mesh->VAO().BindVBO(instance_vbos.Transforms, 0, sizeof(transforms[0]));
 
-		mesh.BindToShader(shader);
+		if (instance_vbos.Colours.IsValid())
+		{
+			instance_vbos.Colours.Destroy();
+		}
+		instance_vbos.Colours.Create(colours);
+		mesh->VAO().BindVBO(instance_vbos.Colours, 0, sizeof(colours[0]));
 
-		m_vboTransforms.Bind();
-		m_vboTransforms.CommitData();
-		shader.BindAttributeMat4("TransformInstanced", Normalized::No, Instanced::Yes);
-		m_vboTransforms.Unbind();
+		Shader* shader = material_h->Shader.Access();
 
-		m_vboColours.Bind();
-		m_vboColours.CommitData();
-		shader.BindAttributeVec4("ColourInstanced", Normalized::No, Instanced::Yes);
-		m_vboColours.Unbind();
+		shader->BindAttributeMat4(mesh->VAO(), instance_vbos.Transforms, "TransformInstanced", Normalized::No, Instanced::Yes);
+		shader->BindAttributeVec4(mesh->VAO(), instance_vbos.Colours, "ColourInstanced", Normalized::No, Instanced::Yes);
 
 		if (mesh.GetIndices().IsValid())
 		{
@@ -191,76 +198,60 @@ namespace ddr
 		{
 			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, mesh.GetPositions().Size(), transforms.size());
 		}
-
-		mesh_vao.Unbind();
 	}
 
 	void MeshRenderer::ProcessCommands(ddr::UniformStorage& uniforms)
 	{
 		DD_PROFILE_SCOPED(ProcessCommands);
 
-		ddr::MeshRenderCommandBuffer& commands = *s_commands;
-		commands.Sort();
+		s_meshCommands->Sort();
 
-		m_commandCount = commands.Size();
+		static std::vector<glm::mat4> s_transforms;
+		s_transforms.reserve(s_meshCommands->Size());
 
-		static std::vector<glm::mat4> transforms;
-		transforms.reserve(commands.Size());
-		transforms.clear();
-
-		m_vboTransforms.Bind();
-		m_vboTransforms.SetData(transforms.data(), transforms.capacity());
-		m_vboTransforms.Unbind();
-
-		static std::vector<glm::vec4> colours;
-		colours.reserve(commands.Size());
-		colours.clear();
-
-		m_vboColours.Bind();
-		m_vboColours.SetData(colours.data(), colours.capacity());
-		m_vboColours.Unbind();
+		static std::vector<glm::vec4> s_colours;
+		s_colours.reserve(s_meshCommands->Size());
 
 		MaterialHandle current_mat_h;
 		MeshHandle current_mesh_h;
 
-		for (const MeshRenderCommand& cmd : commands)
+		ddr::MeshRenderCommandBuffer& command_buffer = *s_meshCommands;
+		for (const MeshRenderCommand& cmd : command_buffer)
 		{
-			DD_ASSERT(cmd.Mesh.IsAlive());
-			DD_ASSERT(cmd.Material.IsAlive());
-
-			// switch material and mesh and draw if changed
-			if (cmd.Mesh != current_mesh_h || 
-				cmd.Material != current_mat_h)
+			// switch material and draw if changed
+			if (cmd.Mesh != current_mesh_h)
 			{
 				if (current_mesh_h.IsValid())
 				{
-					DrawMeshInstances(current_mesh_h, current_mat_h, transforms, colours);
-					transforms.clear();
-					colours.clear();
+					if (cmd.Material != current_mat_h)
+					{
+						if (current_mat_h.IsValid())
+						{
+							Material* old_material = current_mat_h.Access();
+							old_material->Unbind(uniforms);
+						}
+
+						Material* new_material = cmd.Material.Access();
+						new_material->Bind(uniforms);
+
+						current_mat_h = cmd.Material;
+					}
+
+					DrawMeshInstances(current_mesh_h, current_mat_h, s_transforms, s_colours);
+					s_transforms.clear();
+					s_colours.clear();
 				}
 
 				current_mesh_h = cmd.Mesh;
 			}
 
-			// switch material
-			if (cmd.Material != current_mat_h)
-			{
-				if (current_mat_h.IsValid())
-				{
-					current_mat_h->Unbind(uniforms);
-				}
-
-				current_mat_h = cmd.Material;
-				current_mat_h->Bind(uniforms);
-			}
-
-			transforms.push_back(cmd.Transform);
-			colours.push_back(cmd.Colour);
+			s_transforms.push_back(cmd.Transform);
+			s_colours.push_back(cmd.Colour);
 		}
 
 		if (current_mesh_h.IsValid())
 		{
-			DrawMeshInstances(current_mesh_h, current_mat_h, transforms, colours);
+			DrawMeshInstances(current_mesh_h, current_mat_h, s_transforms, s_colours);
 		}
 
 		if (current_mat_h.IsValid())
@@ -268,14 +259,13 @@ namespace ddr
 			current_mat_h->Unbind(uniforms);
 		}
 
-		transforms.clear();
-		colours.clear();
-		commands.Clear();
+		s_transforms.clear();
+		s_colours.clear();
+		command_buffer.Clear();
 	}
 
 	void MeshRenderer::DrawDebugInternal()
 	{
-		ImGui::Value("Mesh Commands", m_commandCount);
 		ImGui::Value("Meshes", m_meshCount);
 		ImGui::Value("Unculled Meshes", m_unculledMeshCount);
 

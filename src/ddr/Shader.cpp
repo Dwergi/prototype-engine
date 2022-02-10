@@ -185,8 +185,6 @@ namespace ddr
 	{
 		std::string name_str(name);
 
-		AssertBeforeUse(name_str);
-
 		auto it = m_attributes.find(name_str);
 		if (it != m_attributes.end())
 		{
@@ -201,16 +199,12 @@ namespace ddr
 		return location;
 	}
 
-	bool Shader::EnableAttribute(std::string_view name)
+	bool Shader::EnableAttribute(VAO& vao, std::string_view name)
 	{
-		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
-
 		ShaderLocation loc = GetAttribute(name);
 		if (loc != InvalidLocation)
 		{
-			glEnableVertexAttribArray(loc);
-			CheckOGLError();
-
+			vao.EnableAttribute(loc);
 			return true;
 		}
 
@@ -218,16 +212,12 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::DisableAttribute(std::string_view name)
+	bool Shader::DisableAttribute(VAO& vao, std::string_view name)
 	{
-		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
-
 		ShaderLocation loc = GetAttribute(name);
 		if (loc != InvalidLocation)
 		{
-			glDisableVertexAttribArray(loc);
-			CheckOGLError();
-
+			vao.DisableAttribute(loc);
 			return true;
 		}
 
@@ -235,45 +225,43 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::BindPositions()
+	bool Shader::BindPositions(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec3("Position");
+		return BindAttributeVec3(vao, vbo, "Position");
 	}
 
-	bool Shader::BindNormals()
+	bool Shader::BindNormals(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec3("Normal", Normalized::Yes);
+		return BindAttributeVec3(vao, vbo, "Normal", Normalized::Yes);
 	}
 
-	bool Shader::BindUVs()
+	bool Shader::BindUVs(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec2("UV");
+		return BindAttributeVec2(vao, vbo, "UV");
 	}
 
-	bool Shader::BindVertexColours()
+	bool Shader::BindVertexColours(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec4("VertexColour");
+		return BindAttributeVec4(vao, vbo, "VertexColour");
 	}
 
-	bool Shader::BindAttributeVec2(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 2, normalized, instanced);
+		return BindAttributeFloat(vao, vbo, name, 2, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec3(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 3, normalized, instanced);
+		return BindAttributeFloat(vao, vbo, name, 3, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec4(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(name, 4, normalized, instanced);
+		return BindAttributeFloat(vao, vbo, name, 4, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeFloat(std::string_view name, uint components, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized, Instanced instanced)
 	{
-		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
-		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
 		DD_ASSERT(components > 0 && components <= 4);
 
 		ShaderLocation loc = GetAttribute(name);
@@ -296,23 +284,19 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::BindAttributeMatrix(std::string_view name, uint size, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized, Instanced instanced)
 	{
-		DD_ASSERT(VAO::GetCurrentVAO() != OpenGL::InvalidID, "No VAO is bound!");
-		DD_ASSERT(VBO::GetCurrentVBO(GL_ARRAY_BUFFER) != OpenGL::InvalidID, "No VBO is bound!");
-
 		ShaderLocation loc = GetAttribute(name);
 		if (loc != InvalidLocation)
 		{
-			size_t offset = sizeof(float) * size;
-			GLsizei stride = (GLsizei) (offset * size);
+			size_t row_offset = sizeof(float) * components;
 
-			for (uint i = 0; i < size; ++i)
+			for (int i = 0; i < components; ++i)
 			{
-				glEnableVertexAttribArray(loc + i);
-				CheckOGLError();
+				vao.EnableAttribute(loc + i);
 
-				glVertexAttribPointer(loc + i, size, GL_FLOAT, GL_FALSE, stride, (const void*) (i * offset));
+				vao.BindAttribute(vbo, loc + i, GL_FLOAT, normalized, components, i * row_offset);
+
 				CheckOGLError();
 
 				if (instanced == Instanced::Yes)
@@ -327,26 +311,24 @@ namespace ddr
 		return false;
 	}
 
-	bool Shader::BindAttributeMat2(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(name, 2, normalized, instanced);
+		return BindAttributeMatrix(vao, vbo, name, 2, normalized, instanced);
 	}
 	
-	bool Shader::BindAttributeMat3(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(name, 3, normalized, instanced);
+		return BindAttributeMatrix(vao, vbo, name, 3, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeMat4(std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::BindAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(name, 4, normalized, instanced);
+		return BindAttributeMatrix(vao, vbo, name, 4, normalized, instanced);
 	}
 
 	ShaderLocation Shader::GetUniform(std::string_view name)
 	{
 		std::string name_str(name);
-
-		AssertBeforeUse(name_str);
 
 		auto it = m_uniforms.find(name_str);
 		if (it != m_uniforms.end())
@@ -367,7 +349,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform1f(uniform, f);
+			glProgramUniform1f(m_id, uniform, f);
 			CheckOGLError();
 		}
 	}
@@ -377,7 +359,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform1i(uniform, i);
+			glProgramUniform1i(m_id, uniform, i);
 			CheckOGLError();
 		}
 	}
@@ -387,7 +369,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform1i(uniform, b);
+			glProgramUniform1i(m_id, uniform, b);
 			CheckOGLError();
 		}
 	}
@@ -397,7 +379,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform2fv(uniform, 1, glm::value_ptr(vec));
+			glProgramUniform2fv(m_id, uniform, 1, glm::value_ptr(vec));
 			CheckOGLError();
 		}
 	}
@@ -407,7 +389,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform3fv(uniform, 1, glm::value_ptr(vec));
+			glProgramUniform3fv(m_id, uniform, 1, glm::value_ptr(vec));
 			CheckOGLError();
 		}
 	}
@@ -417,7 +399,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform4fv(uniform, 1, glm::value_ptr(vec));
+			glProgramUniform4fv(m_id, uniform, 1, glm::value_ptr(vec));
 			CheckOGLError();
 		}
 	}
@@ -427,7 +409,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniformMatrix3fv(uniform, 1, false, glm::value_ptr(mat));
+			glProgramUniformMatrix3fv(m_id, uniform, 1, false, glm::value_ptr(mat));
 			CheckOGLError();
 		}
 	}
@@ -437,7 +419,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniformMatrix4fv(uniform, 1, false, glm::value_ptr(mat));
+			glProgramUniformMatrix4fv(m_id, uniform, 1, false, glm::value_ptr(mat));
 			CheckOGLError();
 		}
 	}
@@ -447,7 +429,7 @@ namespace ddr
 		ShaderLocation uniform = GetUniform(name);
 		if (uniform != InvalidLocation)
 		{
-			glUniform1i(uniform, texture.GetTextureUnit());
+			glProgramUniform1i(m_id, uniform, texture.GetTextureUnit());
 			CheckOGLError();
 		}
 	}
@@ -501,6 +483,7 @@ namespace ddr
 			program->SetShaders(shaders);
 		}
 
+		DD_ASSERT(shader_h.IsValid());
 		return shader_h;
 	}
 

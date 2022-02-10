@@ -68,6 +68,8 @@ namespace ddr
 		ddr::MeshManager* mesh_manager = new ddr::MeshManager();
 		dd::Services::Register(mesh_manager);
 		s_assetManager->Register(*mesh_manager);
+
+		dd::Services::Register(new ddr::VBOManager());
 	}
 
 	RenderManager::~RenderManager()
@@ -141,11 +143,7 @@ namespace ddr
 
 	void RenderManager::RenderDebug(const ddr::RenderData& data, ddr::IRenderer& debug_render)
 	{
-		m_framebuffer.BindDraw();
-
-		debug_render.RenderDebug(data);
-
-		m_framebuffer.UnbindDraw();
+		debug_render.RenderDebug(data, m_framebuffer);
 	}
 
 	void RenderManager::Render(ddc::EntityLayer& layer, float delta_t)
@@ -184,7 +182,7 @@ namespace ddr
 		{
 			if (renderer->ShouldRenderDebug())
 			{
-				renderer->RenderDebug(renderer->RenderData());
+				renderer->RenderDebug(renderer->RenderData(), m_framebuffer);
 			}
 		}
 
@@ -219,8 +217,6 @@ namespace ddr
 			m_previousSize = s_window->GetSize();
 		}
 
-		m_framebuffer.BindRead();
-		m_framebuffer.BindDraw();
 		m_framebuffer.Clear();
 
 		if (m_debugDrawDepth)
@@ -243,12 +239,8 @@ namespace ddr
 
 	void RenderManager::EndRender(ddr::UniformStorage& uniforms, const ddr::ICamera& camera)
 	{
-		m_framebuffer.BindRead();
-
 		glm::ivec2 window_size = s_window->GetSize();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glViewport(0, 0, window_size.x, window_size.y);
 		CheckOGLError();
 
@@ -259,10 +251,8 @@ namespace ddr
 		}
 		else
 		{
-			m_framebuffer.Blit();
+			m_framebuffer.Blit(m_backbuffer);
 			m_defaultState.Use(false);
 		}
-
-		m_framebuffer.UnbindRead();
 	}
 }

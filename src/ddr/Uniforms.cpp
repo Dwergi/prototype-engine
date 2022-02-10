@@ -84,7 +84,7 @@ namespace ddr
 		IUniform* created = Access(index);
 		created->Type = type;
 
-		m_uniforms.insert(std::make_pair(name, index));
+		m_uniforms.insert(std::make_pair(std::string(name), index));
 
 		return created;
 	}
@@ -110,16 +110,10 @@ namespace ddr
 
 		DD_ASSERT(uniform->Type == type);
 		SetValue(uniform, value);
-
-		if (m_shader != nullptr)
-		{
-			m_shader->SetUniform(name, value);
-		}
 	}
 
 	void UniformStorage::Set(std::string_view name, bool value)
 	{
-		DD_TODO("I think these strings are copying...");
 		SetHelper(name, value);
 	}
 
@@ -163,23 +157,14 @@ namespace ddr
 		IUniform* uniform = Find(name);
 		if (uniform == nullptr)
 		{
-			Create(name, UniformType::Sampler2);
-			uniform = Find(name);
+			uniform = Create(name, UniformType::Sampler2);
 		}
 
 		((Uniform<int>*) uniform)->Value = value.GetTextureUnit();
-
-		if (m_shader != nullptr)
-		{
-			m_shader->SetUniform(name, value);
-		}
 	}
 
-	void UniformStorage::Bind(Shader& shader)
+	void UniformStorage::Upload(Shader& shader)
 	{
-		DD_ASSERT(m_shader == nullptr, "UniformStorage already bound!");
-		DD_ASSERT(shader.InUse(), "Shader not in use!");
-
 		for (const auto& pair : m_uniforms)
 		{
 			std::string_view name = pair.first;
@@ -246,15 +231,6 @@ namespace ddr
 					DD_ASSERT(false, "Invalid uniform type!");
 			}
 		}
-
-		m_shader = &shader;
-	}
-
-	void UniformStorage::Unbind()
-	{
-		DD_ASSERT(m_shader != nullptr, "UniformStorage not bound!");
-
-		m_shader = nullptr;
 	}
 
 	void UniformStorage::CopyValue(IUniform* dst, const IUniform* src)

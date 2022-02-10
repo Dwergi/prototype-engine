@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "ddr/RenderState.h"
 #include "ddr/Shader.h"
 #include "ddr/VAO.h"
 #include "ddr/VBO.h"
@@ -72,6 +73,7 @@ namespace ddr
 		float m_far { 0.0f };
 
 		ShaderHandle m_shader;
+		RenderState m_renderState;
 
 		void UpdateFrustum( const ddr::ICamera& camera );
 	};

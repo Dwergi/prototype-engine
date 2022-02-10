@@ -57,16 +57,10 @@ namespace ddr
 		void SetPositions(const dd::ConstBuffer<glm::vec3>& positions);
 
 		//
-		// Access the currently set buffer for positions.
-		// Not guaranteed to be valid.
-		//
-		dd::Buffer<glm::vec3> AccessPositions() const { return dd::Buffer<glm::vec3>(m_vboPosition.GetData()); }
-
-		//
 		// Get the currently set buffer for positions.
 		// Not guaranteed to be valid.
 		//
-		dd::ConstBuffer<glm::vec3> GetPositions() const { return dd::ConstBuffer<glm::vec3>(m_vboPosition.GetData()); }
+		dd::ConstBuffer<glm::vec3> GetPositions() const { return m_positions; }
 
 		//
 		// Set the index buffer that the mesh will use.
@@ -78,13 +72,7 @@ namespace ddr
 		// Get the currently set buffer for indices.
 		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
 		//
-		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<uint>(m_vboIndex.GetData()); }
-
-		//
-		// Access the currently set buffer for indices.
-		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
-		//
-		dd::Buffer<uint> AccessIndices() const { return dd::Buffer<uint>(m_vboIndex.GetData()); }
+		dd::ConstBuffer<uint> GetIndices() const { return m_indices; }
 
 		//
 		// Set the normal buffer that the mesh will use.
@@ -97,6 +85,11 @@ namespace ddr
 		// The mesh does *NOT* take ownership of this.
 		//
 		void SetUVs(const dd::ConstBuffer<glm::vec2>& uvs);
+
+		//
+		// Bind this mesh's attributes to the given shader.
+		//
+		void BindToShader(Shader& shader);
 
 		//
 		// Create the mesh. Must be called on the render thread.
@@ -131,7 +124,7 @@ namespace ddr
 		//
 		// Get the VAO of this mesh.
 		// 
-		VAO& AccessVAO() { return m_vao; }
+		ddr::VAO& VAO() { return m_vao; }
 
 		void BindToShader(Shader& shader);
 
@@ -153,18 +146,21 @@ namespace ddr
 		dd::EnumFlags<MeshPart> m_dirty;
 
 		VBO m_vboPosition;
+		dd::ConstBuffer<glm::vec3> m_positions;
 		VBO m_vboNormal;
+		dd::ConstBuffer<glm::vec3> m_normals;
 		VBO m_vboIndex;
+		dd::ConstBuffer<uint> m_indices;
 		VBO m_vboUV;
+		dd::ConstBuffer<glm::vec2> m_uvs;
 
-		VAO m_vao;
+		ddr::VAO m_vao;
 
 		bool m_hasBounds { false };
 		ddm::AABB m_bounds;
 
 		bool m_enableBVH { true };
-
-		std::atomic<bool> m_rebuildingBVH { false };
+		std::atomic<bool> m_rebuilding { false };
 		dd::BVHTree* m_bvh { nullptr };
 
 		void RebuildBVH();

@@ -80,7 +80,7 @@ namespace ddm
 		glm::vec3 origin = (inv_transform * glm::vec4( ray.Origin(), 1 )).xyz;
 		glm::vec3 dir = (inv_transform * glm::vec4( ray.Direction(), 0 )).xyz;
 
-		dd::ConstTriangulator triangulator( mesh );
+		dd::Triangulator triangulator( mesh );
 
 		DD_ASSERT( triangulator.Size() > 0 );
 

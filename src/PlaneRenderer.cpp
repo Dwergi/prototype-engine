@@ -23,39 +23,39 @@ namespace ddr
 	static const glm::vec3 s_lines[] =
 	{
 		// direction
-		glm::vec3( 0, 0, 0 ),
-		glm::vec3( 0, 0, 1 ),
+		glm::vec3(0, 0, 0),
+		glm::vec3(0, 0, 1),
 
 		// bounds
-		glm::vec3( -1, -1, 0 ),
-		glm::vec3( 1, -1, 0 ),
-		glm::vec3( -1, 1, 0 ),
-		glm::vec3( 1, 1, 0 ),
-		glm::vec3( -1, -1, 0 ),
-		glm::vec3( -1, 1, 0 ),
-		glm::vec3( 1, -1, 0 ),
-		glm::vec3( 1, 1, 0 ),
+		glm::vec3(-1, -1, 0),
+		glm::vec3(1, -1, 0),
+		glm::vec3(-1, 1, 0),
+		glm::vec3(1, 1, 0),
+		glm::vec3(-1, -1, 0),
+		glm::vec3(-1, 1, 0),
+		glm::vec3(1, -1, 0),
+		glm::vec3(1, 1, 0),
 
 		// arrowhead
-		glm::vec3( 0, 0, 1 ),
-		glm::vec3( 0, 0.05, 0.95 ),
-		glm::vec3( 0, 0, 1 ),
-		glm::vec3( 0, -0.05, 0.95 ),
-		glm::vec3( 0, 0, 1 ),
-		glm::vec3( 0.05, 0, 0.95 ),
-		glm::vec3( 0, 0, 1 ),
-		glm::vec3( -0.05, 0, 0.95 )
+		glm::vec3(0, 0, 1),
+		glm::vec3(0, 0.05, 0.95),
+		glm::vec3(0, 0, 1),
+		glm::vec3(0, -0.05, 0.95),
+		glm::vec3(0, 0, 1),
+		glm::vec3(0.05, 0, 0.95),
+		glm::vec3(0, 0, 1),
+		glm::vec3(-0.05, 0, 0.95)
 	};
 
-	static const dd::ConstBuffer<glm::vec3> s_linesBuffer( s_lines, dd::ArrayLength( s_lines ) );
+	static const dd::ConstBuffer<glm::vec3> s_linesBuffer(s_lines, dd::ArrayLength(s_lines));
 
 	PlaneRenderer::PlaneRenderer() :
-		IRenderer( "Plane" )
+		IRenderer("Plane")
 	{
-		RequireTag( ddc::Tag::Visible );
+		RequireTag(ddc::Tag::Visible);
 		Require<dd::PlaneComponent>();
 		Optional<dd::TransformComponent>();
-		Optional<dd::ColourComponent>(); 
+		Optional<dd::ColourComponent>();
 
 		m_lineState.BackfaceCulling = false;
 		m_lineState.Blending = false;
@@ -70,35 +70,29 @@ namespace ddr
 
 	void PlaneRenderer::Initialize()
 	{
-		m_lineShader = s_shaderManager->Load( "line" );
-		DD_ASSERT( m_lineShader.IsValid() );
+		m_lineShader = s_shaderManager->Load("line");
+		DD_ASSERT(m_lineShader.IsValid());
 
 		Shader* line_shader = m_lineShader.Access();
-		DD_ASSERT( line_shader != nullptr );
+		DD_ASSERT(line_shader != nullptr);
 
-		line_shader->Use( true );
+		line_shader->Use(true);
 
 		m_vao.Create();
-		m_vao.Bind();
 
-		m_vbo.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
-		m_vbo.Bind();
-		m_vbo.SetData( s_linesBuffer );
-		m_vbo.CommitData();
+		m_vbo.Create(s_linesBuffer);
+		m_vao.BindVBO(m_vbo, 0, sizeof(s_linesBuffer[0]));
 
-		line_shader->BindPositions();
+		line_shader->BindPositions(m_vao, m_vbo);
 
-		m_vbo.Unbind();
-		m_vao.Unbind();
+		line_shader->Use(false);
 
-		line_shader->Use( false );
+		ShaderHandle mesh_shader = s_shaderManager->Load("mesh");
+		DD_ASSERT(mesh_shader.IsValid());
 
-		ShaderHandle mesh_shader = s_shaderManager->Load( "mesh" );
-		DD_ASSERT( mesh_shader.IsValid() );
+		m_mesh = ddr::MeshHandle("quad");
 
-		m_mesh = ddr::MeshHandle( "quad" );
-
-		m_meshMaterial = s_materialManager->Create( "plane" );
+		m_meshMaterial = s_materialManager->Create("plane");
 
 		Material* material = m_meshMaterial.Access();
 		material->Shader = mesh_shader;
@@ -108,17 +102,10 @@ namespace ddr
 		material->State.DepthWrite = false;
 	}
 
-	void PlaneRenderer::Render( const ddr::RenderData& data )
+	void PlaneRenderer::Render(const ddr::RenderData& data)
 	{
-		Shader* line_shader = m_lineShader.Access();
-		DD_ASSERT( line_shader != nullptr );
-
-		m_lineState.Use( true );
-
-		line_shader->Use( true );
-
-		m_vao.Bind();
-		m_vbo.Bind();
+		ScopedShader line_shader = m_lineShader.Access()->UseScoped();
+		ScopedRenderState render_state = m_lineState.UseScoped();
 
 		glm::mat4 view = data.Camera().GetViewMatrix();
 		glm::mat4 projection = data.Camera().GetViewMatrix();
@@ -128,44 +115,37 @@ namespace ddr
 		auto colours = data.Get<dd::ColourComponent>();
 		auto transforms = data.Get<dd::TransformComponent>();
 
-		for( size_t i = 0; i < data.Size(); ++i )
+		for (size_t i = 0; i < data.Size(); ++i)
 		{
 			const dd::PlaneComponent& plane = planes[i];
 
-			const dd::TransformComponent* transform_cmp = transforms.Get( i );
+			const dd::TransformComponent* transform_cmp = transforms.Get(i);
 
-			glm::mat4 transform( 1 );
-			if( transform_cmp != nullptr )
+			glm::mat4 transform(1);
+			if (transform_cmp != nullptr)
 			{
 				transform = transform_cmp->Transform();
 			}
 
-			const dd::ColourComponent* colour_cmp = colours.Get( i );
-			glm::vec4 colour( 1 );
-			if( colour_cmp != nullptr )
+			const dd::ColourComponent* colour_cmp = colours.Get(i);
+			glm::vec4 colour(1);
+			if (colour_cmp != nullptr)
 			{
 				colour = colour_cmp->Colour;
 			}
 
-			line_shader->SetUniform( "Colour", colour );
+			line_shader->SetUniform("Colour", colour);
 
-			glm::mat4 plane_transform = ddm::TransformFromOriginDir( glm::vec3( 0, 0, 1 ), plane.Plane.Normal() );
-			plane_transform[3] = glm::vec4( plane.Plane.Origin(), 1 );
+			glm::mat4 plane_transform = ddm::TransformFromOriginDir(glm::vec3(0, 0, 1), plane.Plane.Normal());
+			plane_transform[3] = glm::vec4(plane.Plane.Origin(), 1);
 
-			glm::mat4 model = transform * plane_transform * glm::scale( glm::vec3( m_scale ) );
+			glm::mat4 model = transform * plane_transform * glm::scale(glm::vec3(m_scale));
 
-			line_shader->SetUniform( "ModelViewProjection", view_projection * model );
+			line_shader->SetUniform("ModelViewProjection", view_projection * model);
 
-			OpenGL::DrawArrays(OpenGL::Primitive::Lines, m_vbo.GetDataSize());
+			OpenGL::DrawArrays(OpenGL::Primitive::Lines, dd::ArrayLength(s_lines));
 
 			colour.a = 0.3f;
 		}
-
-		m_vbo.Unbind();
-		m_vao.Unbind();
-
-		line_shader->Use( false );
-
-		m_lineState.Use( false );
 	}
 }

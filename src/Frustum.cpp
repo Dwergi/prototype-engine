@@ -155,56 +155,40 @@ namespace ddr
 	void Frustum::CreateRenderData()
 	{
 		m_shader = s_shaderManager->Load("mesh");
-		Shader* shader = m_shader.Access();
-		shader->Use(true);
-
 		m_vao.Create();
-		m_vao.Bind();
 
-		m_vboVertex.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboVertex.Bind();
-		m_vboVertex.SetData(m_corners);
-		m_vboVertex.CommitData();
+		m_renderState.BackfaceCulling = false;
+		m_renderState.Blending = true;
+		m_renderState.Depth = true;
+		m_renderState.DepthWrite = false;
 
-		shader->BindPositions();
-		m_vboVertex.Unbind();
-
-		m_vboIndex.Create(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboIndex.Bind();
-		m_vboIndex.SetData(s_indexBuffer);
-		m_vboIndex.CommitData();
-		m_vboIndex.Unbind();
-
-		m_vao.Unbind();
-
-		shader->Use(false);
+		m_dirty = true;
 	}
 
 	void Frustum::Render(const ddr::RenderData& data)
 	{
 		DD_ASSERT(m_vao.IsValid());
 
-		m_vao.Bind();
-
 		if (m_dirty)
 		{
-			m_vboVertex.CommitData();
+			ScopedShader shader = m_shader.Access()->UseScoped();
+
+			m_vboVertex.Destroy();
+
+			m_vboVertex.Create(m_corners);
+			m_vao.BindVBO(m_vboVertex, 0, sizeof(m_corners[0]));
+
+			shader->BindPositions(m_vao, m_vboVertex);
 
 			m_dirty = false;
 		}
 
 		UniformStorage& uniforms = data.Uniforms();
 
-		Shader* shader = m_shader.Access();
-		ScopedShader usage = shader->UseScoped();
+		ScopedShader shader = m_shader.Access()->UseScoped();
+		ScopedRenderState state = m_renderState.UseScoped();
 
 		uniforms.Set("Model", m_transform);
-
-		m_vboIndex.Bind();
-
-		DD_TODO("Add render state here.");
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		for (int i = 0; i < 6; ++i)
 		{
@@ -212,12 +196,6 @@ namespace ddr
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*)(6 * sizeof(GLushort) * i));
 		}
-
-		glDisable(GL_BLEND);
-
-		m_vboIndex.Unbind();
-
-		m_vao.Unbind();
 	}
 
 	void Frustum::UpdateFrustum(const ddr::ICamera& camera)
@@ -265,12 +243,12 @@ namespace ddr
 		m_corners[FAR_BL] = far_centre - far_up - far_right;
 		m_corners[FAR_BR] = far_centre - far_up + far_right;
 
-		m_planes[Planes::Top] = ddm::Plane(m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL]);
+		m_planes[Planes::Top]	 = ddm::Plane(m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL]);
 		m_planes[Planes::Bottom] = ddm::Plane(m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR]);
-		m_planes[Planes::Left] = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL]);
-		m_planes[Planes::Right] = ddm::Plane(m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR]);
-		m_planes[Planes::Near] = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR]);
-		m_planes[Planes::Far] = ddm::Plane(m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL]);
+		m_planes[Planes::Left]	 = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL]);
+		m_planes[Planes::Right]  = ddm::Plane(m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR]);
+		m_planes[Planes::Near]	 = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR]);
+		m_planes[Planes::Far]	 = ddm::Plane(m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL]);
 
 		m_dirty = true;
 	}

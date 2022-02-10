@@ -31,29 +31,25 @@ namespace ddr
 
 		g_materialChanged.Increment();
 
+		m_inUse = true;
+
 		uniforms.Set("Material.Shininess", Shininess);
 		uniforms.Set("Material.Specular", Specular);
 		uniforms.Set("Material.Diffuse", Diffuse);
 		uniforms.Set("Material.Ambient", Ambient);
 
+		uniforms.Upload(*Shader.Access());
+
+		Shader.Access()->Use(true);
+		
 		State.Use(true);
-
-		ddr::Shader* shader = Shader.Access();
-		shader->Use(true);
-
-		uniforms.Bind(*shader);
-
-		m_inUse = true;
 	}
 
 	void Material::Unbind(UniformStorage& uniforms)
 	{
 		DD_ASSERT(m_inUse, "Material not in use when unbound!");
 
-		uniforms.Unbind();
-
-		ddr::Shader* shader = Shader.Access();
-		shader->Use(false);
+		Shader.Access()->Use(false);
 
 		State.Use(false);
 

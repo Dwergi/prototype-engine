@@ -65,10 +65,7 @@ namespace ddr
 		void Set(std::string_view name, const glm::mat4& value);
 		void Set(std::string_view name, const ddr::Texture& value);
 
-		bool IsBound() const { return m_shader != nullptr; }
-
-		void Bind(Shader& shader);
-		void Unbind();
+		void Upload(Shader& shader);
 
 		IUniform* Find(std::string_view name);
 
@@ -84,8 +81,6 @@ namespace ddr
 
 		static const int MAX_UNIFORMS = 256;
 		static const int UNIFORM_SIZE = sizeof(Uniform<glm::mat4>);
-
-		Shader* m_shader { nullptr };
 
 		std::unordered_map<std::string, int> m_uniforms;
 		byte m_storage[MAX_UNIFORMS * UNIFORM_SIZE] { 0 };

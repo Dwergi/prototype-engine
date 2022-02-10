@@ -33,36 +33,31 @@ namespace ddr
 
 	void Mesh::SetPositions(const dd::ConstBuffer<glm::vec3>& positions)
 	{
-		m_vboPosition.SetData(positions);
-
+		m_positions = positions;
 		m_dirty.Set(MeshPart::Position);
 	}
 
 	void Mesh::SetNormals(const dd::ConstBuffer<glm::vec3>& normals)
 	{
-		m_vboNormal.SetData(normals);
-
+		m_normals = normals;
 		m_dirty.Set(MeshPart::Normal);
 	}
 
 	void Mesh::SetIndices(const dd::ConstBuffer<uint>& indices)
 	{
-		m_vboIndex.SetData(indices);
-
+		m_indices = indices;
 		m_dirty.Set(MeshPart::Index);
 	}
 
 	void Mesh::SetUVs(const dd::ConstBuffer<glm::vec2>& uvs)
 	{
-		m_vboUV.SetData(uvs);
-
+		m_uvs = uvs;
 		m_dirty.Set(MeshPart::UV);
 	}
 
 	void Mesh::Create()
 	{
 		DD_ASSERT(!m_vao.IsValid());
-
 		m_vao.Create();
 	}
 
@@ -80,62 +75,55 @@ namespace ddr
 	{
 		DD_ASSERT(m_vao.IsValid());
 
-		m_vao.Bind();
-
 		if (m_dirty.Has(MeshPart::Position))
 		{
-			if (!m_vboPosition.IsValid())
+			if (m_vboPosition.IsValid())
 			{
-				m_vboPosition.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+				m_vboPosition.Destroy();
 			}
 
-			m_vboPosition.Bind();
-			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
+			m_vboPosition.Create(m_positions);
+			m_vao.BindVBO(m_vboPosition, 0, sizeof(m_positions[0]));
 		}
 
 		if (m_dirty.Has(MeshPart::Normal))
 		{
-			if (!m_vboNormal.IsValid())
+			if (m_vboNormal.IsValid())
 			{
-				m_vboNormal.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+				m_vboNormal.Destroy();
 			}
 
-			m_vboNormal.Bind();
-			m_vboNormal.CommitData();
-			m_vboNormal.Unbind();
+			m_vboNormal.Create(m_normals);
+			m_vao.BindVBO(m_vboNormal, 0, sizeof(m_normals[0]));
 		}
 
 		if (m_dirty.Has(MeshPart::Index))
 		{
-			if (!m_vboIndex.IsValid())
+			if (m_vboIndex.IsValid())
 			{
-				m_vboIndex.Create(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
-				m_vboIndex.Bind();
+				m_vboIndex.Destroy();
 			}
-
-			m_vboIndex.CommitData();
+			
+			m_vboIndex.Create(m_indices);
+			m_vao.BindIndices(m_vboIndex);
 		}
 
 		if (m_dirty.Has(MeshPart::UV))
 		{
-			if (!m_vboUV.IsValid())
+			if (m_vboUV.IsValid())
 			{
-				m_vboUV.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+				m_vboUV.Destroy();
 			}
-
-			m_vboUV.Bind();
-			m_vboUV.CommitData();
-			m_vboUV.Unbind();
+			
+			m_vboUV.Create(m_uvs);
+			m_vao.BindVBO(m_vboUV, 0, sizeof(m_uvs[0]));
 		}
-
-		m_vao.Unbind();
 
 		// rebuild BVH only if positions or indices have changed
 		if (m_enableBVH &&
 			(m_dirty.Has(MeshPart::Position) || m_dirty.Has(MeshPart::Index)))
 		{
-			if (m_rebuildingBVH.exchange(true) == false)
+			if (m_rebuilding.exchange(true) == false)
 			{
 				if (m_bvh != nullptr)
 				{
@@ -152,33 +140,25 @@ namespace ddr
 
 	void Mesh::BindToShader(Shader& shader)
 	{
-		DD_ASSERT(shader.InUse());
-
 		if (m_vboPosition.IsValid())
 		{
-			m_vboPosition.Bind();
-			shader.BindPositions();
-			m_vboPosition.Unbind();
+			shader.BindPositions(m_vao, m_vboPosition);
 		}
 
 		if (m_vboNormal.IsValid())
 		{
-			m_vboNormal.Bind();
-			shader.BindNormals();
-			m_vboNormal.Unbind();
+			shader.BindNormals(m_vao, m_vboNormal);
 		}
 
 		if (m_vboUV.IsValid())
 		{
-			m_vboUV.Bind();
-			shader.BindUVs();
-			m_vboUV.Unbind();
+			shader.BindUVs(m_vao, m_vboUV);
 		}
 	}
 
 	void Mesh::RebuildBVH()
 	{
-		DD_ASSERT(m_rebuildingBVH);
+		DD_ASSERT(m_rebuilding);
 
 		m_bvh = new dd::BVHTree();
 
@@ -187,7 +167,7 @@ namespace ddr
 		const dd::ConstBuffer<glm::vec3>& positions = GetPositions();
 		const dd::ConstBuffer<uint>& indices = GetIndices();
 
-		dd::ConstTriangulator triangulator(positions, indices);
+		dd::Triangulator triangulator(positions, indices);
 		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
 			dd::ConstTriangle tri = triangulator[i];

@@ -32,25 +32,29 @@ namespace ddr
 	private:
 		RenderState m_renderState;
 
-		VAO m_vao;
+		struct InstanceVBOs
+		{
+			VAO VAO;
+			VBO Transforms;
+			VBO Colours;
+			VBO UVOffsets;
+			VBO UVScales;
+		};
+
+		std::unordered_map<ddr::SpriteHandle, InstanceVBOs> m_instanceCache;
+
+		InstanceVBOs& FindCachedInstanceVBOs(ddr::SpriteHandle sprite_h);
 
 		std::vector<glm::mat3> m_transforms;
-		VBO m_vboTransforms;
-
 		std::vector<glm::vec2> m_uvOffsets;
-		VBO m_vboUVOffsets;
-
 		std::vector<glm::vec2> m_uvScales;
-		VBO m_vboUVScales;
-
 		std::vector<glm::vec4> m_colours;
-		VBO m_vboColours;
 
 		std::vector<d2d::SpriteComponent> m_temp;
 
 		using SpriteIterator = std::vector<d2d::SpriteComponent>::iterator;
-		void DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
-		void DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms);
+		void DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms, ddr::Shader& shader);
+		void DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms, ddr::Shader& shader);
 
 		virtual const char* GetDebugTitle() const override { return "Sprites"; }
 		virtual void DrawDebugInternal() override;

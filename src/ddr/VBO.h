@@ -6,11 +6,33 @@
 
 #pragma once
 
-#include "OpenGL.h"
+#include "ddr/OpenGL.h"
 
 namespace ddr
 {
-	class VBO
+	struct VBO;
+
+	struct IVBODestroyedListener
+	{
+		virtual void OnVBODestroyed(const VBO& vbo) = 0;
+	};
+
+	struct VBOManager
+	{
+		void RegisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener);
+		void UnregisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener);
+
+		void UnregisterListenerFromAll(IVBODestroyedListener* listener);
+
+	private:
+		friend VBO;
+
+		std::unordered_map<uint, std::vector<IVBODestroyedListener*>> m_listeners;
+
+		void OnDestroyed(const VBO& vbo);
+	};
+
+	struct VBO
 	{
 	public:
 
@@ -19,42 +41,42 @@ namespace ddr
 		~VBO();
 
 		//
-		// Create a buffer with a target and usage. 
-		// Target is generally GL_ELEMENT_ARRAY_BUFFER for indices, and GL_ARRAY_BUFFER for everything else.
-		// Usage is generally GL_STATIC_DRAW.
+		// Create a buffer.
 		//
-		void Create(GLenum target, GLenum usage);
+		void Create(const dd::IBuffer& buffer);
+		
+		template <typename T>
+		void Create(const std::vector<T>& buffer) { Create(dd::ConstBuffer<T>(buffer.data(), buffer.size())); }
+
+		template <typename T, size_t Size>
+		void Create(T(&arr)[Size]) { Create(dd::ConstBuffer<T>(arr, Size)); }
+
 		void Destroy();
 
-		template <typename T>
-		void SetData(const T* ptr, size_t count) { SetData(dd::ConstBuffer<T>(ptr, count)); }
-
-		void SetData(const dd::IBuffer& buffer);
-
-		const dd::IBuffer& GetData() const { return m_buffer; }
-
-		uint64 GetDataSize() const { return m_buffer.SizeBytes(); }
-
-		void CommitData();
-
-		void Bind();
-		void Unbind();
-
 		bool IsValid() const { return m_id != OpenGL::InvalidID; }
-		bool IsBound() const;
 
-		GLuint ID() const { return m_id; }
+		uint ID() const { return m_id; }
+
+		uint64 SizeBytes() const { return m_dataSize; }
 
 		VBO& operator=(const VBO& other);
 
-		static GLint GetCurrentVBO(GLenum target);
-
 	private:
+		friend struct VAO;
 
-		GLuint m_id { OpenGL::InvalidID };
-		GLenum m_target { OpenGL::InvalidID };
-		GLenum m_usage { OpenGL::InvalidID };
+		uint m_id { OpenGL::InvalidID };
+		uint64 m_dataSize { 0 };
+	};
+}
 
-		dd::ConstBuffer<byte> m_buffer;
+namespace std
+{
+	template <>
+	struct hash<ddr::VBO>
+	{
+		size_t operator()(const ddr::VBO& vbo)
+		{
+			return vbo.ID();
+		}
 	};
 }

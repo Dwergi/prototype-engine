@@ -74,13 +74,13 @@ namespace ddr
 	{
 		auto handler = [this]()
 		{
-			int mode = (int) m_drawMode;
+			int mode = (int)m_drawMode;
 			++mode;
 
 			if (mode > 2)
 				mode = 0;
 
-			m_drawMode = (DrawMode) mode;
+			m_drawMode = (DrawMode)mode;
 			m_updateBuffers = true;
 		};
 
@@ -89,44 +89,42 @@ namespace ddr
 		m_shader = s_shaderManager->Load("line");
 		DD_ASSERT(m_shader.IsValid());
 
-		Shader* shader = m_shader.Access();
-		DD_ASSERT(shader != nullptr);
-
-		ScopedShader scoped_shader = shader->UseScoped();
-
 		m_vao.Create();
-		m_vao.Bind();
-
-		m_vboPosition.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-
-		m_vboPosition.Bind();
-		shader->BindPositions();
-		m_vboPosition.Unbind();
-
-		m_vboIndex.Create(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
-
-		m_vao.Unbind();
 
 		m_updateBuffers = true;
 	}
 
 	void BoundsRenderer::UpdateBuffers()
 	{
+		if (m_vboPosition.IsValid())
+		{
+			m_vboPosition.Destroy();
+		}
+
+		if (m_vboIndex.IsValid())
+		{
+			m_vboIndex.Destroy();
+		}
+
+		ScopedShader scoped_shader = m_shader.Access()->UseScoped();
+
 		if (m_drawMode == DrawMode::Box)
 		{
-			m_vboPosition.Bind();
-			m_vboPosition.SetData(s_cornersBuffer);
-			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
+			m_vboPosition.Create(s_cornersBuffer);
+			m_vao.BindVBO(m_vboPosition, 0, sizeof(s_cornersBuffer[0]));
+			scoped_shader->BindPositions(m_vao, m_vboPosition);
 
-			m_vboIndex.Bind();
-			m_vboIndex.SetData(s_indicesBuffer);
-			m_vboIndex.CommitData();
-			m_vboIndex.Unbind();
+			m_vboIndex.Create(s_indicesBuffer);
+			m_vao.BindIndices(m_vboIndex);
 		}
 		else if (m_drawMode == DrawMode::Sphere)
 		{
 			dd::MeshUtils::MakeIcosphereLines(m_vboPosition, m_vboIndex, m_subdivisions);
+
+			m_vao.BindVBO(m_vboPosition, 0, sizeof(glm::vec3));
+			scoped_shader->BindPositions(m_vao, m_vboPosition);
+
+			m_vao.BindIndices(m_vboIndex);
 		}
 
 		m_updateBuffers = false;
@@ -150,11 +148,6 @@ namespace ddr
 		DD_ASSERT(shader != nullptr);
 
 		ScopedShader scoped_shader = shader->UseScoped();
-
-		m_vao.Bind();
-
-		m_vboPosition.Bind();
-		m_vboIndex.Bind();
 
 		const ddc::EntityLayer& entity_space = data.Layer();
 
@@ -201,13 +194,8 @@ namespace ddr
 				shader->SetUniform("ModelViewProjection", view_projection * model);
 			}
 
-			OpenGL::DrawElements(OpenGL::Primitive::Lines, m_vboIndex.GetDataSize() / sizeof(uint));
+			OpenGL::DrawElements(OpenGL::Primitive::Lines, m_vboIndex.SizeBytes() / sizeof(uint));
 		}
-
-		m_vboIndex.Unbind();
-		m_vboPosition.Unbind();
-
-		m_vao.Unbind();
 	}
 
 	void BoundsRenderer::DrawDebugInternal()
@@ -216,10 +204,10 @@ namespace ddr
 
 		static const char* c_drawModes = "None\0Box\0Sphere\0";
 
-		int drawMode = ( int) m_drawMode;
+		int drawMode = (int) m_drawMode;
 		if (ImGui::Combo("Mode", &drawMode, c_drawModes))
 		{
-			m_drawMode = ( DrawMode) drawMode;
+			m_drawMode = (DrawMode) drawMode;
 			m_updateBuffers = true;
 		}
 
@@ -228,8 +216,7 @@ namespace ddr
 			m_updateBuffers = true;
 		}
 
-		uint64 triangles = (m_vboIndex.GetDataSize() / sizeof(uint)) / 6;
-
+		uint64 triangles = (m_vboIndex.SizeBytes() / sizeof(uint)) / 6;
 		ImGui::Value("Triangles", triangles);
 	}
 }

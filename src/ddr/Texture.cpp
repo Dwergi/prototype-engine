@@ -45,22 +45,17 @@ namespace ddr
 			return;
 		}
 
-		glGenTextures(1, &m_id);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
 		CheckOGLError();
 
-		glBindTexture(GL_TEXTURE_2D, m_id);
+		glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		CheckOGLError();
+		
 
-		glTexStorage2D(GL_TEXTURE_2D, m_mips, m_internalFormat, m_size.x, m_size.y);
-		CheckOGLError();
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		CheckOGLError();
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glTextureStorage2D(m_id, m_mips, m_internalFormat, m_size.x, m_size.y);
 		CheckOGLError();
 
 		m_valid = true;
@@ -75,16 +70,11 @@ namespace ddr
 		DD_ASSERT(data.SizeBytes() == expectedSize);
 		DD_ASSERT(mip >= 0);
 
-		glBindTexture(GL_TEXTURE_2D, m_id);
-		CheckOGLError();
-
 		glTextureSubImage2D(m_id, mip, 0, 0, m_size.x, m_size.y, dataFormat, dataType, data.GetVoid());
 		CheckOGLError();
 
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateTextureMipmap(m_id);
 		CheckOGLError();
-
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void Texture::GetData(dd::Buffer<byte>& data, int mip, GLenum dataFormat, GLenum dataType)

@@ -63,17 +63,27 @@ namespace ddr
 		return *this;
 	}
 
+	glm::ivec2 FrameBuffer::GetSize() const
+	{
+		if (m_texColour != nullptr)
+		{
+			return m_texColour->GetSize();
+		}
+		else if (m_texDepth != nullptr)
+		{
+			return m_texDepth->GetSize();
+		}
+		return glm::ivec2(0, 0);
+	}
+
 	bool FrameBuffer::Create(Texture& target, Texture* depth)
 	{
 		m_texColour = &target;
 
-		glGenFramebuffers(1, &m_fbo);
+		glCreateFramebuffers(1, &m_fbo);
 		CheckOGLError();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-		CheckOGLError();
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texColour->ID(), 0);
+		glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, m_texColour->ID(), 0);
 		CheckOGLError();
 
 		GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
@@ -84,18 +94,16 @@ namespace ddr
 		{
 			m_texDepth = depth;
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_texDepth->ID(), 0);
+			glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_texDepth->ID(), 0);
 			CheckOGLError();
 		}
 
-		GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		GLuint status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
 			DD_ASSERT(status != GL_FRAMEBUFFER_COMPLETE, "Failed to create framebuffer!");
 			return false;
 		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		m_valid = true;
 		return true;
@@ -107,24 +115,14 @@ namespace ddr
 		{
 			m_blitShader = s_shaderManager->Load("blit");
 
-			Shader* shader = m_blitShader.Access();
-			shader->Use(true);
+			ScopedShader shader = m_blitShader.Access()->UseScoped();
 
 			m_vaoFullscreen.Create();
-			m_vaoFullscreen.Bind();
 
-			m_vboFullscreen.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-			m_vboFullscreen.Bind();
-			m_vboFullscreen.SetData(s_fullScreenQuadBuffer);
-			m_vboFullscreen.CommitData();
+			m_vboFullscreen.Create(s_fullScreenQuadBuffer);
+			m_vaoFullscreen.BindVBO(m_vboFullscreen, 0, sizeof(s_fullScreenQuadBuffer[0]));
 
-			shader->BindPositions();
-
-			m_vboFullscreen.Unbind();
-
-			m_vaoFullscreen.Unbind();
-
-			shader->Use(false);
+			shader->BindPositions(m_vaoFullscreen, m_vboFullscreen);
 		}
 	}
 
@@ -133,8 +131,7 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_texDepth != nullptr);
 
-		Shader* shader = m_blitShader.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedShader shader = m_blitShader.Access()->UseScoped();
 
 		m_vaoFullscreen.Bind();
 		m_texDepth->Bind(0);
@@ -145,11 +142,9 @@ namespace ddr
 		uniforms.Set("Near", camera.GetNear());
 		uniforms.Set("DrawDepth", true);
 
-		uniforms.Bind(*shader);
+		uniforms.Upload(*shader);
 
 		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
-
-		uniforms.Unbind();
 
 		m_texDepth->Unbind();
 		m_vaoFullscreen.Unbind();
@@ -159,16 +154,15 @@ namespace ddr
 
 	void FrameBuffer::Render(ddr::UniformStorage& uniforms)
 	{
-		BlitTexture(uniforms, m_texColour);
+		BlitToTexture(uniforms, m_texColour);
 	}
 
-	void FrameBuffer::BlitTexture(ddr::UniformStorage& uniforms, ddr::Texture* texture)
+	void FrameBuffer::BlitToTexture(ddr::UniformStorage& uniforms, ddr::Texture* texture)
 	{
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_texColour != nullptr);
 
-		Shader* shader = m_blitShader.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedShader shader = m_blitShader.Access()->UseScoped();
 
 		m_vaoFullscreen.Bind();
 
@@ -177,43 +171,28 @@ namespace ddr
 		uniforms.Set("Texture", *texture);
 		uniforms.Set("DrawDepth", false);
 
-		uniforms.Bind(*shader);
+		uniforms.Upload(*shader);
 
 		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
-
-		uniforms.Unbind();
 
 		texture->Unbind();
 
 		m_vaoFullscreen.Unbind();
 	}
 
-	void FrameBuffer::Blit()
+	void FrameBuffer::Blit(const IFrameBuffer& dest)
 	{
-		GLint viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
+		glm::ivec2 dest_size = dest.GetSize();
 
-		glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_previousRead);
-		CheckOGLError();
-
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-		CheckOGLError();
-
-		glBlitFramebuffer(
-			0, 0, m_texColour->GetSize().x, m_texColour->GetSize().y,
-			0, 0, viewport[2], viewport[3],
+		glBlitNamedFramebuffer(ID(), dest.ID(),
+			0, 0, GetSize().x, GetSize().y,
+			0, 0, dest_size.x, dest_size.y,
 			GL_COLOR_BUFFER_BIT, GL_LINEAR);
-		CheckOGLError();
-
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_previousRead);
 		CheckOGLError();
 	}
 
 	void FrameBuffer::Destroy()
 	{
-		UnbindRead();
-		UnbindDraw();
-
 		if (m_fbo != OpenGL::InvalidID)
 		{
 			glDeleteBuffers(1, &m_fbo);
@@ -229,9 +208,8 @@ namespace ddr
 
 	void FrameBuffer::Clear()
 	{
-		glClearDepthf(m_clearDepth);
-		glClearColor(m_clearColour.r, m_clearColour.g, m_clearColour.b, m_clearColour.a);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearNamedFramebufferfv(m_fbo, GL_COLOR, 0, (const GLfloat*) &m_clearColour.data);
+		glClearNamedFramebufferfv(m_fbo, GL_DEPTH, 0, &m_clearDepth);
 		CheckOGLError();
 	}
 
@@ -279,5 +257,12 @@ namespace ddr
 		m_previousSize = { 0, 0 };
 
 		CheckOGLError();
+	}
+
+	glm::ivec2 BackBuffer::GetSize() const
+	{
+		static dd::Service<dd::IWindow> s_window;
+
+		return s_window->GetSize();
 	}
 }

@@ -5,43 +5,21 @@
 //
 
 #include "PCH.h"
-#include "VBO.h"
+#include "ddr/VBO.h"
 
-#include "GLError.h"
+#include "ddr/GLError.h"
 
 namespace ddr
 {
-	GLint VBO::GetCurrentVBO( GLenum m_target )
-	{
-		GLint current = OpenGL::InvalidID;
-
-		switch( m_target )
-		{
-		case GL_ARRAY_BUFFER:
-			glGetIntegerv( GL_ARRAY_BUFFER_BINDING, &current );
-			break;
-		case GL_ELEMENT_ARRAY_BUFFER:
-			glGetIntegerv( GL_ELEMENT_ARRAY_BUFFER_BINDING, &current );
-			break;
-		default:
-			DD_ASSERT( false, "Unknown target specified!" );
-			break;
-		}
-
-		CheckOGLError();
-
-		return current;
-	}
+	static dd::Service<ddr::VBOManager> s_vboManager;
 
 	VBO::VBO()
 	{
 
 	}
 
-	VBO::VBO( const VBO& other ) :
-		m_id( other.m_id ),
-		m_target( other.m_target ),
-		m_usage( other.m_usage )
+	VBO::VBO(const VBO& other) :
+		m_id(other.m_id)
 	{
 
 	}
@@ -49,92 +27,89 @@ namespace ddr
 	VBO::~VBO()
 	{
 		m_id = OpenGL::InvalidID;
-		m_target = OpenGL::InvalidID;
-		m_usage = OpenGL::InvalidID;
 	}
 
-	VBO& VBO::operator=( const VBO& other )
+	VBO& VBO::operator=(const VBO& other)
 	{
 		m_id = other.m_id;
-		m_target = other.m_target;
-		m_usage = other.m_usage;
-
 		return *this;
 	}
 
-	void VBO::Create( GLenum target, GLenum usage )
+	void VBO::Create(const dd::IBuffer& buffer)
 	{
-		DD_ASSERT( !IsValid() );
+		DD_ASSERT(!IsValid());
 
-		DD_ASSERT( target != OpenGL::InvalidID, "Invalid target in VBO::Create!" );
-		DD_ASSERT( usage != OpenGL::InvalidID, "Invalid usage in VBO::Create!" );
-
-		glGenBuffers( 1, &m_id );
+		glCreateBuffers(1, &m_id);
 		CheckOGLError();
 
-		m_target = target;
-		m_usage = usage;
+		glNamedBufferStorage(m_id, buffer.SizeBytes(), buffer.GetVoid(), GL_DYNAMIC_STORAGE_BIT);
+		CheckOGLError();
+
+		m_dataSize = buffer.SizeBytes();
 	}
 
 	void VBO::Destroy()
 	{
-		if( IsValid() )
+		if (IsValid())
 		{
-			glDeleteBuffers( 1, &m_id );
+			s_vboManager->OnDestroyed(*this);
+
+			glDeleteBuffers(1, &m_id);
 			CheckOGLError();
 		}
 
 		m_id = OpenGL::InvalidID;
-		m_target = OpenGL::InvalidID;
-		m_usage = OpenGL::InvalidID;
+		m_dataSize = 0;
 	}
 
-	bool VBO::IsBound() const
+	void VBOManager::OnDestroyed(const VBO& vbo)
 	{
-		GLint current = GetCurrentVBO( m_target );
-		return current == m_id;
-	}
-
-	void VBO::Bind()
-	{
-		DD_ASSERT( IsValid() );
-
-		GLint current = GetCurrentVBO( m_target );
-		DD_ASSERT( current == 0, "VBO already bound to given target, make sure you unbind your buffers!" );
-
-		glBindBuffer( m_target, m_id );
-		CheckOGLError();
-	}
-
-	void VBO::Unbind()
-	{
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( IsBound(), "Unbinding different buffer!" );
-
-		glBindBuffer( m_target, 0 );
-		CheckOGLError();
-	}
-
-	void VBO::CommitData()
-	{
-		DD_ASSERT( IsBound() );
-		DD_ASSERT( IsValid() );
-		DD_ASSERT( m_buffer.IsValid() );
-
-		glNamedBufferData( m_id, m_buffer.SizeBytes(), NULL, m_usage );
-		CheckOGLError();
-
-		glNamedBufferData( m_id, m_buffer.SizeBytes(), m_buffer.GetVoid(), m_usage );
-		CheckOGLError();
-	}
-
-	void VBO::SetData( const dd::IBuffer& buffer )
-	{
-		if( m_buffer.IsValid() )
+		auto it = m_listeners.find(vbo.ID());
+		if (it != m_listeners.end())
 		{
-			m_buffer.ReleaseConst();
+			for (IVBODestroyedListener* listener : it->second)
+			{
+				listener->OnVBODestroyed(vbo);
+			}
+
+			m_listeners.erase(it);
+		}
+	}
+
+	void VBOManager::RegisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener)
+	{
+		auto it = m_listeners.find(vbo.ID());
+		if (it == m_listeners.end())
+		{
+			auto it_pair = m_listeners.insert({ vbo.ID(), std::vector<IVBODestroyedListener*>() });
+			it = it_pair.first;
 		}
 
-		m_buffer.Set( (byte*) buffer.GetVoid(), buffer.SizeBytes() );
+		it->second.push_back(listener);
+	}
+
+	void VBOManager::UnregisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener)
+	{
+		auto it = m_listeners.find(vbo.ID());
+		if (it != m_listeners.end())
+		{
+			auto to_erase = std::find(it->second.begin(), it->second.end(), listener);
+			if (to_erase != it->second.end())
+			{
+				it->second.erase(to_erase);
+			}
+		}
+	}
+
+	void VBOManager::UnregisterListenerFromAll(IVBODestroyedListener* listener)
+	{
+		for (auto& pair : m_listeners)
+		{
+			std::vector<IVBODestroyedListener*>& listener_list = pair.second;
+			listener_list.erase(
+				std::remove(listener_list.begin(), listener_list.end(), listener),
+				listener_list.end()
+			);
+		}
 	}
 }

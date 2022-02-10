@@ -18,12 +18,17 @@ namespace ddr
 	struct UniformStorage;
 	struct Shader;
 	struct ShaderManager;
+	struct VAO;
+	struct VBO;
 
 	struct ScopedShader
 	{
 		ScopedShader(Shader& shader);
 		ScopedShader(ScopedShader&& other) noexcept : m_shader(other.m_shader) { other.m_shader = nullptr; }
 		~ScopedShader();
+
+		Shader* operator->() { DD_ASSERT(m_shader != nullptr); return m_shader; }
+		Shader& operator*() { DD_ASSERT(m_shader != nullptr); return *m_shader; }
 
 	private:
 		Shader* m_shader { nullptr };
@@ -51,23 +56,23 @@ namespace ddr
 		void SetUniform(std::string_view name, float flt);
 		void SetUniform(std::string_view name, const Texture& texture);
 
-		bool BindPositions();
-		bool BindNormals();
-		bool BindUVs();
-		bool BindVertexColours();
+		bool BindPositions(VAO& vao, const VBO& vbo);
+		bool BindNormals(VAO& vao, const VBO& vbo);
+		bool BindUVs(VAO& vao, const VBO& vbo);
+		bool BindVertexColours(VAO& vao, const VBO& vbo);
 
-		bool BindAttributeFloat(std::string_view name, uint components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec2(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec3(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec4(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
 
-		bool BindAttributeMatrix(std::string_view name, uint size, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat2(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat3(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat4(std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool BindAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
 
-		bool EnableAttribute(std::string_view name);
-		bool DisableAttribute(std::string_view name);
+		bool EnableAttribute(VAO& vao, std::string_view name);
+		bool DisableAttribute(VAO& vao, std::string_view name);
 
 		Shader();
 		~Shader();

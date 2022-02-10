@@ -20,21 +20,21 @@ namespace ddr
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	static const glm::vec2 s_screenFacingQuadVertices[] = {
-			glm::vec2(-0.5f,	-0.5f),
-			glm::vec2(0.5f,		-0.5f),
-			glm::vec2(-0.5f,	0.5f),
-			glm::vec2(-0.5f,	0.5f),
-			glm::vec2(0.5f,		-0.5f),
-			glm::vec2(0.5f,		0.5f)
+			glm::vec2(-0.5f,-0.5f),
+			glm::vec2(0.5f,	-0.5f),
+			glm::vec2(-0.5f,0.5f),
+			glm::vec2(-0.5f,0.5f),
+			glm::vec2(0.5f,	-0.5f),
+			glm::vec2(0.5f,	0.5f)
 	};
 
 	static const glm::vec2 s_screenFacingQuadUVs[] = {
-		glm::vec2(0,	0),
-		glm::vec2(1,	0),
-		glm::vec2(0,	1),
-		glm::vec2(0,	1),
-		glm::vec2(1,	0),
-		glm::vec2(1,	1)
+		glm::vec2(0,0),
+		glm::vec2(1,0),
+		glm::vec2(0,1),
+		glm::vec2(0,1),
+		glm::vec2(1,0),
+		glm::vec2(1,1)
 	};
 
 	static VBO s_vboQuad;
@@ -56,75 +56,65 @@ namespace ddr
 	{
 		s_shaderParticle = s_shaderManager->Load("particle");
 
-		Shader* shader = s_shaderParticle.Access();
-		DD_ASSERT(shader != nullptr);
-
-		ScopedShader scoped_state = shader->UseScoped();
-
-		m_vaoParticle.Create();
-		m_vaoParticle.Bind();
-
 		if (!s_vboQuad.IsValid())
 		{
-			s_vboQuad.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-			s_vboQuad.Bind();
-			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
-			s_vboQuad.CommitData();
-			s_vboQuad.Unbind();
+			s_vboQuad.Create(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
+		}
+	}
+
+	ParticleSystemRenderer::ParticleSystemRenderState ParticleSystemRenderer::GetParticleSystemRenderState(ddc::Entity entity)
+	{
+		auto it = m_systemRenderStates.find(entity);
+		if (it != m_systemRenderStates.end())
+		{
+			return it->second;
 		}
 
-		s_vboQuad.Bind();
-		shader->BindAttributeVec2("Position", Normalized::No, Instanced::Yes);
-		s_vboQuad.Unbind();
+		ParticleSystemRenderState new_state;
+		new_state.VAO.Create();
 
-		m_vboPosition.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboPosition.Bind();
-		m_vboPosition.SetData(dd::ConstBuffer<glm::vec3>(m_positions, dd::MAX_PARTICLES));
-		m_vboPosition.CommitData();
+		new_state.Positions.Create(m_positions);
+		new_state.VAO.BindVBO(new_state.Positions, 0, sizeof(glm::vec3));
+		
+		new_state.Sizes.Create(m_sizes);
+		new_state.VAO.BindVBO(new_state.Sizes, 0, sizeof(glm::vec3));
 
-		shader->BindAttributeVec3("PositionInstanced", Normalized::No, Instanced::Yes);
-		m_vboPosition.Unbind();
+		new_state.Colours.Create(m_colours);
+		new_state.VAO.BindVBO(new_state.Colours, 0, sizeof(glm::vec3));
 
-		m_vboSizes.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboSizes.Bind();
-		m_vboSizes.SetData(dd::ConstBuffer<glm::vec2>(m_sizes, dd::MAX_PARTICLES));
-		m_vboSizes.CommitData();
+		m_systemRenderStates.insert({ entity, new_state });
 
-		shader->BindAttributeVec2("ScaleInstanced", Normalized::No, Instanced::Yes);
-		m_vboSizes.Unbind();
+		return new_state;
+	}
 
-		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		m_vboColours.Bind();
-		m_vboColours.SetData(dd::ConstBuffer<glm::vec4>(m_colours, dd::MAX_PARTICLES));
-		m_vboColours.CommitData();
-
-		shader->BindAttributeVec4("ColourInstanced");
-		m_vboColours.Unbind();
-
-		m_vaoParticle.Unbind();
+	void ParticleSystemRenderer::BindSystemToShader(ParticleSystemRenderer::ParticleSystemRenderState render_state, ScopedShader& shader)
+	{
+		shader->BindAttributeVec2(render_state.VAO, s_vboQuad, "Position", Normalized::No, Instanced::Yes);
+		shader->BindAttributeVec3(render_state.VAO, render_state.Positions, "PositionInstanced", Normalized::No, Instanced::Yes);
+		shader->BindAttributeVec2(render_state.VAO, render_state.Sizes, "ScaleInstanced", Normalized::No, Instanced::Yes);
+		shader->BindAttributeVec4(render_state.VAO, render_state.Colours, "ColourInstanced");
 	}
 
 	void ParticleSystemRenderer::Render(const ddr::RenderData& data)
 	{
-		Shader* shader = s_shaderParticle.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedShader shader = s_shaderParticle.Access()->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
-		const ddc::EntityLayer& entities = data.Layer();
 
-		uniforms.Bind(*shader);
+		uniforms.Upload(*shader);
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
-
-		m_vaoParticle.Bind();
 
 		auto particle_systems = data.Get<dd::ParticleSystemComponent>();
 
-		glm::vec3 cam_pos = camera.GetPosition();
+		const glm::vec3 cam_pos = camera.GetPosition();
 
-		for (const dd::ParticleSystemComponent& system : particle_systems)
+		for (int i = 0; i < data.Size(); ++i)
 		{
-			memcpy(m_tempBuffer, system.Particles, sizeof(dd::Particle) * system.LiveCount);
+			const dd::ParticleSystemComponent& system = particle_systems[i];
+			ParticleSystemRenderState& system_render_state = GetParticleSystemRenderState(data.Entities()[i]);
+
+			std::memcpy(m_tempBuffer, system.Particles, sizeof(dd::Particle) * system.LiveCount);
 
 			for (dd::Particle& p : m_tempBuffer)
 			{
@@ -154,23 +144,7 @@ namespace ddr
 				++count;
 			}
 
-			m_vboPosition.Bind();
-			m_vboPosition.CommitData();
-			m_vboPosition.Unbind();
-
-			m_vboSizes.Bind();
-			m_vboSizes.CommitData();
-			m_vboSizes.Unbind();
-
-			m_vboColours.Bind();
-			m_vboColours.CommitData();
-			m_vboColours.Unbind();
-
-			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, m_vboPosition.GetDataSize(), count);
+			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, 6, count);
 		}
-
-		m_vaoParticle.Unbind();
-
-		uniforms.Unbind();
 	}
 }

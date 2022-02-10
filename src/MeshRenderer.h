@@ -25,7 +25,7 @@ namespace dd
 
 namespace ddr
 {
-	class MeshRenderer : public dd::IDebugPanel, public ddr::IRenderer
+	struct MeshRenderer : public dd::IDebugPanel, public ddr::IRenderer
 	{
 	public:
 		MeshRenderer();
@@ -36,7 +36,14 @@ namespace ddr
 
 	private:
 
-		int m_commandCount { 0 };
+		struct InstanceVBOs
+		{
+			VBO Transforms;
+			VBO Colours;
+		};
+
+		std::unordered_map<uint64, InstanceVBOs> m_instanceCache;
+
 		int m_meshCount { 0 };
 		int m_unculledMeshCount { 0 };
 
@@ -44,14 +51,13 @@ namespace ddr
 		bool m_debugHighlightFrustumMeshes { false };
 		bool m_drawNormals { false };
 
-		VBO m_vboTransforms;
-		VBO m_vboColours;
-
 		MeshHandle m_cube;
 
 		void RenderMesh(ddc::Entity entity, const dd::MeshComponent& mesh_cmp, const dd::TransformComponent& transform_cmp,
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data);
+
+		InstanceVBOs& FindCachedInstanceVBOs(MeshHandle mesh_h, MaterialHandle material_h);
 
 		void ProcessCommands(ddr::UniformStorage& uniforms);
 		void DrawMeshInstances(MeshHandle mesh_h, MaterialHandle material_h, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);

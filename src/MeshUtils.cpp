@@ -21,7 +21,7 @@ namespace dd
 		uint LOD;
 		uint VertexCount;
 
-		bool operator==(const GridKey& other) const
+		bool operator==(const GridKey& key) const
 		{
 			return LOD == other.LOD && VertexCount == other.VertexCount;
 		}
@@ -35,7 +35,7 @@ namespace std
 	{
 		size_t operator()(const dd::GridKey& key) const
 		{
-			return ((size_t) key.VertexCount << 32) | key.LOD;
+			return (size_t)(key.VertexCount << 16 | key.LOD);
 		}
 	};
 }
@@ -273,7 +273,7 @@ namespace dd
 		DD_ASSERT(out_normals.empty());
 		out_normals.resize(positions.size());
 
-		ConstTriangulator triangulator(positions, indices);
+		Triangulator triangulator(positions, indices);
 
 		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
@@ -428,9 +428,9 @@ namespace dd
 		std::vector<glm::vec3>* norm = nullptr;
 		CalculateIcosphere(pos, idx, norm, iterations);
 
-		positions.SetData(pos->data(), pos->size());
-		indices.SetData(idx->data(), idx->size());
-		normals.SetData(norm->data(), norm->size());
+		positions.Create(*pos);
+		indices.Create(*idx);
+		normals.Create(*norm);
 	}
 
 	void MeshUtils::GetLineIndicesFromTriangles(const std::vector<uint>& src, std::vector<uint>& dest)
@@ -466,15 +466,8 @@ namespace dd
 		std::vector<uint> line_indices;
 		GetLineIndicesFromTriangles(*idx, line_indices);
 
-		positions.Bind();
-		positions.SetData(pos->data(), pos->size());
-		positions.CommitData();
-		positions.Unbind();
-
-		indices.Bind();
-		indices.SetData(line_indices.data(), line_indices.size());
-		indices.CommitData();
-		indices.Unbind();
+		positions.Create(*pos);
+		indices.Create(line_indices);
 	}
 
 	void MeshUtils::MakeUnitCube(ddr::Mesh& mesh)
@@ -491,16 +484,16 @@ namespace dd
 
 	void MeshUtils::CreateDefaultMaterial()
 	{
-		ddr::ShaderHandle shader_h = s_shaderManager->Find("mesh");
-		DD_ASSERT(!shader_h.IsValid(), "Mesh material has already been created!");
+		ddr::MaterialHandle material_h = s_materialManager->Find("mesh");
+		DD_ASSERT(!material_h.IsValid(), "Mesh material has already been created!");
 
-		if (!shader_h.IsValid())
+		if (!material_h.IsValid())
 		{
-			shader_h = s_shaderManager->Load("mesh");
+			ddr::ShaderHandle shader_h = s_shaderManager->Load("mesh");
 			ddr::Shader* shader = shader_h.Access();
 			DD_ASSERT(shader != nullptr);
 
-			ddr::MaterialHandle material_h = s_materialManager->Create("mesh");
+			material_h = s_materialManager->Create("mesh");
 			ddr::Material* material = material_h.Access();
 			DD_ASSERT(material != nullptr);
 
@@ -510,6 +503,13 @@ namespace dd
 			material->State.Blending = false;
 			material->State.Depth = true;
 		}
+	}
+
+	ddr::MaterialHandle MeshUtils::GetDefaultMaterial()
+	{
+		ddr::MaterialHandle material_h = s_materialManager->Find("mesh"); 
+		DD_ASSERT(material_h.IsValid(), "Mesh material has not been created!");
+		return material_h;
 	}
 
 	ddr::MeshHandle MeshUtils::CreateUnitCube()
@@ -567,23 +567,23 @@ namespace dd
 	}
 
 	static const glm::vec3 s_quadPositions[] = {
-		glm::vec3(-1.0f,0.0f, -1.0f),
-		glm::vec3(-1.0f,0.0f, 1.0f),
-		glm::vec3(1.0f,	0.0f, -1.0f),
-		glm::vec3(1.0f,	0.0f, -1.0f),
-		glm::vec3(-1.0f,0.0f, 1.0f),
-		glm::vec3(1.0f,	0.0f, 1.0f)
+		glm::vec3(-1.0f,0.0f,-1.0f),
+		glm::vec3(-1.0f,0.0f,1.0f),
+		glm::vec3(1.0f,	0.0f,-1.0f),
+		glm::vec3(1.0f,	0.0f,-1.0f),
+		glm::vec3(-1.0f,0.0f,1.0f),
+		glm::vec3(1.0f,	0.0f,1.0f)
 	};
 
 	static const dd::ConstBuffer<glm::vec3> s_quadPositionsBuffer(s_quadPositions, ArrayLength(s_quadPositions));
 
 	static const glm::vec3 s_quadNormals[] = {
-		glm::vec3(0.0f,	1.0f, 0.0f),
-		glm::vec3(0.0f,	1.0f, 0.0f),
-		glm::vec3(0.0f,	1.0f, 0.0f),
-		glm::vec3(0.0f,	1.0f, 0.0f),
-		glm::vec3(0.0f,	1.0f, 0.0f),
-		glm::vec3(0.0f,	1.0f, 0.0f)
+		glm::vec3(0.0f,	1.0f,0.0f),
+		glm::vec3(0.0f,	1.0f,0.0f),
+		glm::vec3(0.0f,	1.0f,0.0f),
+		glm::vec3(0.0f,	1.0f,0.0f),
+		glm::vec3(0.0f,	1.0f,0.0f),
+		glm::vec3(0.0f,	1.0f,0.0f)
 	};
 
 	static const dd::ConstBuffer<glm::vec3> s_quadNormalsBuffer(s_quadNormals, ArrayLength(s_quadNormals));

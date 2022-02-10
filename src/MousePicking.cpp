@@ -215,9 +215,6 @@ namespace dd
 			CreateFrameBuffer(s_window->GetSize());
 		}
 
-		m_framebuffer.BindDraw();
-		m_framebuffer.BindRead();
-
 		m_framebuffer.Clear();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
@@ -236,9 +233,6 @@ namespace dd
 
 			DD_TODO("Removed mesh render command here.");
 		}
-
-		m_framebuffer.UnbindRead();
-		m_framebuffer.UnbindDraw();
 
 		m_idTexture.GetData(m_lastIDBuffer, 0, GL_RED_INTEGER, GL_INT);
 		m_depthTexture.GetData(m_lastDepthBuffer, 0, GL_DEPTH_COMPONENT, GL_FLOAT);
@@ -333,13 +327,17 @@ namespace dd
 		return entity;
 	}
 
-	void MousePicking::RenderDebug(const ddr::RenderData& data)
+	void MousePicking::RenderDebug(const ddr::RenderData& data, ddr::FrameBuffer& dest)
 	{
+		dest.BindDraw();
+
 		m_framebuffer.BindRead();
 
 		m_framebuffer.Render(data.Uniforms());
 
 		m_framebuffer.UnbindRead();
+
+		dest.UnbindDraw();
 	}
 
 	void MousePicking::DrawDebugInternal()

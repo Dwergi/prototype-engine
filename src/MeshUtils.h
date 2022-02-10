@@ -6,12 +6,13 @@
 
 #pragma once
 
+#include "ddr/Material.h"
 #include "ddr/Mesh.h"
 
 namespace ddr
 {
 	struct Mesh;
-	class VBO;
+	struct VBO;
 }
 
 namespace dd
@@ -19,6 +20,8 @@ namespace dd
 	struct MeshUtils
 	{
 		static void CreateDefaultMaterial();
+		static ddr::MaterialHandle GetDefaultMaterial();
+
 		static ddr::MeshHandle CreateUnitCube();
 		static ddr::MeshHandle CreateUnitSphere();
 		static ddr::MeshHandle CreateQuad();

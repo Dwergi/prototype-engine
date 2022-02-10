@@ -66,6 +66,7 @@ namespace ddr
 
 	private:
 
+		BackBuffer m_backbuffer;
 		FrameBuffer m_framebuffer;
 		Texture m_colourTexture;
 		Texture m_depthTexture;

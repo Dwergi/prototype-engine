@@ -52,82 +52,27 @@ namespace ddr
 	void SpriteRenderer::Initialize()
 	{
 		s_shader = s_shaderManager->Load("sprite");
-
-		Shader* shader = s_shader.Access();
-		DD_ASSERT(shader != nullptr);
-
-		ScopedShader scoped_state = shader->UseScoped();
-
-		m_vao.Create();
-		m_vao.Bind();
-
-		s_vboQuad.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			s_vboQuad.Bind();
-			s_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_quad, 6));
-			s_vboQuad.CommitData();
-
-			shader->BindAttributeVec2("Position");
-			shader->BindAttributeVec2("UV");
-			s_vboQuad.Unbind();
-		}
-
-		m_vboTransforms.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			m_vboTransforms.Bind();
-			shader->BindAttributeMat3("TransformInstanced", Normalized::No, Instanced::Yes);
-			m_vboTransforms.Unbind();
-		}
-
-		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			m_vboColours.Bind();
-			shader->BindAttributeVec4("ColourInstanced", Normalized::No, Instanced::Yes);
-			m_vboColours.Unbind();
-		}
-
-		m_vboUVOffsets.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			m_vboUVOffsets.Bind();
-			shader->BindAttributeVec2("UVOffsetInstanced", Normalized::No, Instanced::Yes);
-			m_vboUVOffsets.Unbind();
-		}
-
-		m_vboUVScales.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
-		{
-			m_vboUVScales.Bind();
-			shader->BindAttributeVec2("UVScaleInstanced", Normalized::No, Instanced::Yes);
-			m_vboUVScales.Unbind();
-		}
-
-		m_vao.Unbind();
+		s_vboQuad.Create(dd::ConstBuffer<glm::vec2>(s_quad, 6));
 	}
 
-	DD_OPTIMIZE_OFF()
-
-	void SpriteRenderer::DrawInstancedSprites(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms)
+	SpriteRenderer::InstanceVBOs& SpriteRenderer::FindCachedInstanceVBOs(ddr::SpriteHandle sprite_h)
 	{
-		const ddr::Sprite* sprite = start->Sprite.Get();
-		ddr::TextureHandle texture_h = sprite->Texture;
-		ddr::Texture* texture = texture_h.Access();
-		glm::vec2 tex_size = texture->GetSize();
+		auto it_pair = m_instanceCache.insert({ sprite_h, InstanceVBOs() });
+		return it_pair.first->second;
+	}
 
-		glActiveTexture(GL_TEXTURE0);
-		texture->Bind(0);
-		uniforms.Set("Texture", *texture);
+	void SpriteRenderer::DrawInstancedSprites(SpriteIterator start, SpriteIterator end, UniformStorage& uniforms, Shader& shader)
+	{
+		const Sprite* sprite = start->Sprite.Get();
 
 		m_transforms.clear();
+		m_colours.clear();
 		m_uvOffsets.clear();
 		m_uvScales.clear();
-		m_colours.clear();
 
 		int count = 0;
-
 		for (SpriteIterator it = start; it != end; ++it)
 		{
-			const ddr::Sprite* sprite = it->Sprite.Get();
-			DD_ASSERT(sprite->Texture == texture_h);
-
 			m_transforms.push_back(d2d::Calculate2DTransform(it->Position, it->Size, it->Rotation, it->Pivot));
 			m_colours.push_back(it->Colour);
 
@@ -137,21 +82,51 @@ namespace ddr
 			++count;
 		}
 
-		m_vboTransforms.Bind();
-		m_vboTransforms.CommitData();
-		m_vboTransforms.Unbind();
+		InstanceVBOs& cache = FindCachedInstanceVBOs(start->Sprite);
+		if (!cache.VAO.IsValid())
+		{
+			cache.VAO.Create();
 
-		m_vboUVOffsets.Bind();
-		m_vboUVOffsets.CommitData();
-		m_vboUVOffsets.Unbind();
+			shader.BindAttributeVec2(cache.VAO, s_vboQuad, "Position");
+			shader.BindAttributeVec2(cache.VAO, s_vboQuad, "UV");
+		}
+		
+		if (cache.Transforms.IsValid())
+		{
+			cache.Transforms.Destroy();
+		}
+		cache.Transforms.Create(m_transforms);
+		cache.VAO.BindVBO(cache.Transforms, 0, sizeof(m_transforms[0]));
+		shader.BindAttributeMat3(cache.VAO, cache.Transforms, "TransformInstanced", Normalized::No, Instanced::Yes);
 
-		m_vboUVScales.Bind();
-		m_vboUVScales.CommitData();
-		m_vboUVScales.Unbind();
+		if (cache.Colours.IsValid())
+		{
+			cache.Colours.Destroy();
+		}
+		cache.Colours.Create(m_colours);
+		cache.VAO.BindVBO(cache.Colours, 0, sizeof(m_colours[0]));
+		shader.BindAttributeMat3(cache.VAO, cache.Colours, "ColourInstanced", Normalized::No, Instanced::Yes);
 
-		m_vboColours.Bind();
-		m_vboColours.CommitData();
-		m_vboColours.Unbind();
+		if (cache.UVOffsets.IsValid())
+		{
+			cache.UVOffsets.Destroy();
+		}
+		cache.UVOffsets.Create(m_transforms);
+		cache.VAO.BindVBO(cache.UVOffsets, 0, sizeof(m_uvOffsets[0]));
+		shader.BindAttributeMat3(cache.VAO, cache.UVOffsets, "UVOffsetInstanced", Normalized::No, Instanced::Yes);
+
+		if (cache.UVScales.IsValid())
+		{
+			cache.UVScales.Destroy();
+		}
+		cache.UVScales.Create(m_uvScales);
+		cache.VAO.BindVBO(cache.UVScales, 0, sizeof(m_uvScales[0]));
+		shader.BindAttributeMat3(cache.VAO, cache.UVScales, "UVScaleInstanced", Normalized::No, Instanced::Yes);
+
+		Texture* texture = sprite->Texture.Access();
+
+		texture->Bind(0);
+		uniforms.Set("Texture", *texture);
 
 		OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, 6, count);
 		CheckOGLError();
@@ -159,7 +134,7 @@ namespace ddr
 		texture->Unbind();
 	}
 
-	void SpriteRenderer::DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms)
+	void SpriteRenderer::DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms, ddr::Shader& shader)
 	{
 		// sort by texture to get instanceable groups
 		std::sort(start, end, [](const auto& a, const auto& b)
@@ -178,7 +153,7 @@ namespace ddr
 					return x.Sprite->Texture == current_tex;
 				});
 
-			DrawInstancedSprites(tex_start, tex_end, uniforms);
+			DrawInstancedSprites(tex_start, tex_end, uniforms, shader);
 
 			tex_start = tex_end;
 		}
@@ -186,18 +161,15 @@ namespace ddr
 
 	void SpriteRenderer::Render(const ddr::RenderData& data)
 	{
-		Shader* shader = s_shader.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedShader shader = s_shader.Access()->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
 		const ddc::EntityLayer& entities = data.Layer();
 
-		uniforms.Bind(*shader);
+		uniforms.Upload(*shader);
 
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
-
-		m_vao.Bind();
 
 		auto sprite_cmps = data.Get<d2d::SpriteComponent>();
 		
@@ -211,22 +183,6 @@ namespace ddr
 		m_uvOffsets.reserve(m_temp.size());
 		m_uvScales.reserve(m_temp.size());
 		m_colours.reserve(m_temp.size());
-
-		m_vboTransforms.Bind();
-		m_vboTransforms.SetData(m_transforms.data(), m_transforms.capacity());
-		m_vboTransforms.Unbind();
-
-		m_vboUVOffsets.Bind();
-		m_vboUVOffsets.SetData(m_uvOffsets.data(), m_uvOffsets.capacity());
-		m_vboUVOffsets.Unbind();
-
-		m_vboUVScales.Bind();
-		m_vboUVScales.SetData(m_uvScales.data(), m_uvScales.capacity());
-		m_vboUVScales.Unbind();
-
-		m_vboColours.Bind();
-		m_vboColours.SetData(m_colours.data(), m_colours.capacity());
-		m_vboColours.Unbind();
 
 		// sort by z index
 		std::sort(m_temp.begin(), m_temp.end(), [](const auto& a, const auto& b)
@@ -245,14 +201,10 @@ namespace ddr
 					return x.ZIndex == layer_z_index;
 				});
 
-			DrawLayer(layer_start, layer_end, uniforms);
+			DrawLayer(layer_start, layer_end, uniforms, *shader);
 
 			layer_start = layer_end;
 		}
-
-		m_vao.Unbind();
-		
-		uniforms.Unbind();
 	}
 
 	void SpriteRenderer::DrawDebugInternal()

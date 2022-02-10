@@ -42,7 +42,7 @@ namespace dd
 	struct RayComponent;
 	struct TransformComponent;
 	struct Window;
-	
+
 	struct MousePicking : IDebugPanel, ddr::IRenderer
 	{
 		static const int DownScalingFactor = 2;
@@ -50,17 +50,17 @@ namespace dd
 		MousePicking();
 		~MousePicking();
 
-		int GetEntityIDAt( glm::vec2 mouse_pos ) const;
-		float GetDepthAt( glm::vec2 mouse_pos ) const;
+		int GetEntityIDAt(glm::vec2 mouse_pos) const;
+		float GetDepthAt(glm::vec2 mouse_pos) const;
 
 		virtual const char* GetDebugTitle() const override { return "Mouse Picking"; }
-		
+
 		virtual void Initialize() override;
 		virtual void Update(ddr::RenderData& data) override;
 		virtual void Render(const ddr::RenderData& render_data) override;
 
 		virtual bool ShouldRenderDebug() const override { return m_renderDebug; }
-		virtual void RenderDebug( const ddr::RenderData& data ) override;
+		virtual void RenderDebug(const ddr::RenderData& data, ddr::FrameBuffer& dest) override;
 
 	private:
 
@@ -77,7 +77,7 @@ namespace dd
 		ddr::MaterialHandle m_material;
 		ddr::Texture m_idTexture;
 		ddr::Texture m_depthTexture;
-		
+
 		ddr::FrameBuffer m_framebuffer;
 
 		Buffer<byte> m_lastIDBuffer;
@@ -95,11 +95,11 @@ namespace dd
 
 		virtual void DrawDebugInternal() override;
 
-		void CreateFrameBuffer( glm::ivec2 window_size );
+		void CreateFrameBuffer(glm::ivec2 window_size);
 
-		ddm::Ray GetScreenRay( const ddr::ICamera& camera, float length ) const;
+		ddm::Ray GetScreenRay(const ddr::ICamera& camera, float length) const;
 
-		ddc::Entity HitTestRender( const ddr::RenderData& data );
-		ddc::Entity HitTestRay( const ddr::RenderData& data, bool select);
+		ddc::Entity HitTestRender(const ddr::RenderData& data);
+		ddc::Entity HitTestRay(const ddr::RenderData& data, bool select);
 	};
 }

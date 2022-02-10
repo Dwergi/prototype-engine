@@ -21,7 +21,7 @@ namespace ddr
 	dd::Service<ddr::ShaderManager> s_shaderManager;
 
 	LinesRenderer::LinesRenderer() :
-		IRenderer( "Lines" )
+		IRenderer("Lines")
 	{
 		Require<dd::LinesComponent>();
 		Require<dd::TransformComponent>();
@@ -37,23 +37,10 @@ namespace ddr
 
 	void LinesRenderer::Initialize()
 	{
-		m_shader = s_shaderManager->Load( "line" );
-		DD_ASSERT( m_shader.IsValid() );
-
-		Shader* shader = m_shader.Access();
-		DD_ASSERT( shader != nullptr );
-
-		ScopedShader scoped_shader = shader->UseScoped();
+		m_shader = s_shaderManager->Load("line");
+		DD_ASSERT(m_shader.IsValid());
 
 		m_vao.Create();
-		m_vao.Bind();
-
-		m_vboPosition.Create(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-		m_vboPosition.Bind();
-		shader->BindPositions();
-		m_vboPosition.Unbind();
-
-		m_vao.Unbind();
 	}
 
 	void LinesRenderer::Render(const ddr::RenderData& render_data)
@@ -64,20 +51,57 @@ namespace ddr
 		auto bound_spheres = render_data.Get<dd::BoundSphereComponent>();
 		auto colours = render_data.Get<dd::ColourComponent>();
 
-		const ddr::ICamera& camera = render_data.Camera();
-
-		Shader* shader = m_shader.Access();
-		ScopedShader scoped_shader = shader->UseScoped();
-		ScopedRenderState scoped_state = m_renderState.UseScoped();
-
-		glm::mat4 view_projection = camera.GetProjectionMatrix() * camera.GetViewMatrix();
-
+		// calculate total size of buffer
+		uint64 total_size = 0;
 		for (size_t i = 0; i < render_data.Size(); ++i)
 		{
-			if (lines[i].Points.Size() == 0)
+			total_size += lines[i].Points.Size();
+		}
+
+		if (total_size == 0)
+		{
+			return;
+		}
+		
+		// copy data
+		std::vector<glm::vec3> line_data;
+		line_data.resize(total_size);
+
+		int64 offset = 0;
+		for (size_t i = 0; i < render_data.Size(); ++i)
+		{
+			std::memcpy(line_data.data() + offset, lines[i].Points.Data(), lines[i].Points.Size());
+		}
+
+		// recreate VBO
+		if (m_vboPosition.IsValid())
+		{
+			m_vboPosition.Destroy();
+		}
+
+		m_vboPosition.Create(line_data);
+		m_vao.BindVBO(m_vboPosition, 0, sizeof(line_data[0]));
+
+		ScopedShader shader = m_shader.Access()->UseScoped();
+		ScopedRenderState scoped_state = m_renderState.UseScoped();
+
+		shader->BindPositions(m_vao, m_vboPosition);
+
+		const ddr::ICamera& camera = render_data.Camera();
+		const glm::mat4 view_projection = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+
+		offset = 0;
+
+		// draw
+		for (uint64 i = 0; i < render_data.Size(); ++i)
+		{
+			const uint64 num_points = lines[i].Points.Size();
+			if (num_points == 0)
 			{
 				continue;
 			}
+
+			offset += num_points;
 
 			ddm::AABB aabb;
 			ddm::Sphere sphere;
@@ -102,17 +126,7 @@ namespace ddr
 			shader->SetUniform("Colour", colour);
 			shader->SetUniform("ModelViewProjection", view_projection * transforms[i].Transform());
 
-			m_vao.Bind();
-
-			m_vboPosition.Bind();
-			m_vboPosition.SetData(dd::ConstBuffer<glm::vec3>(lines[i].Points.Data(), lines[i].Points.Size()));
-			m_vboPosition.CommitData();
-
-			OpenGL::DrawArrays(OpenGL::Primitive::Lines, lines[i].Points.Size());
-
-			m_vboPosition.Unbind();
-
-			m_vao.Unbind();
+			OpenGL::DrawArrays(OpenGL::Primitive::Lines, num_points);
 		}
 	}
 }

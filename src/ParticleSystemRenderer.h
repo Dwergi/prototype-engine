@@ -29,17 +29,22 @@ namespace ddr
 		
 		RenderState m_renderState;
 
-		VAO m_vaoParticle;
+		struct ParticleSystemRenderState
+		{
+			VAO VAO;
+			VBO Positions;
+			VBO Sizes;
+			VBO Colours;
+		};
+
+		std::unordered_map<ddc::Entity, ParticleSystemRenderState> m_systemRenderStates;
 
 		glm::vec3 m_positions[dd::MAX_PARTICLES];
-		VBO m_vboPosition;
-
 		glm::vec2 m_sizes[dd::MAX_PARTICLES];
-		VBO m_vboSizes;
-
 		glm::vec4 m_colours[dd::MAX_PARTICLES];
-		VBO m_vboColours;
-
 		dd::Particle m_tempBuffer[dd::MAX_PARTICLES];
+
+		ParticleSystemRenderState GetParticleSystemRenderState(ddc::Entity entity);
+		void BindSystemToShader(ParticleSystemRenderState render_state, struct ScopedShader& shader);
 	};
 }
