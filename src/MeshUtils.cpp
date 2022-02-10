@@ -21,7 +21,7 @@ namespace dd
 		uint LOD;
 		uint VertexCount;
 
-		bool operator==(const GridKey& key) const
+		bool operator==(const GridKey& other) const
 		{
 			return LOD == other.LOD && VertexCount == other.VertexCount;
 		}
@@ -35,7 +35,7 @@ namespace std
 	{
 		size_t operator()(const dd::GridKey& key) const
 		{
-			return (size_t)(key.VertexCount << 16 | key.LOD);
+			return ((size_t) key.VertexCount << 32) | key.LOD;
 		}
 	};
 }
@@ -273,7 +273,7 @@ namespace dd
 		DD_ASSERT(out_normals.empty());
 		out_normals.resize(positions.size());
 
-		Triangulator triangulator(positions, indices);
+		ConstTriangulator triangulator(positions, indices);
 
 		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
