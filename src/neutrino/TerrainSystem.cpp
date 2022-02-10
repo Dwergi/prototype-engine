@@ -78,6 +78,7 @@ namespace neut
 		RequireWrite<dd::BoundBoxComponent>();
 		RequireWrite<dd::TransformComponent>();
 		RequireWrite<dd::ColourComponent>();
+		RequireWrite<dd::MeshComponent>();
 
 		RequireRead<dd::TransformComponent>("player");
 		RequireRead<dd::PlayerComponent>("player");
@@ -95,8 +96,7 @@ namespace neut
 		layer.ForAllWith<neut::TerrainChunkComponent>(
 			[](ddc::Entity e, neut::TerrainChunkComponent& chunk)
 			{
-				delete chunk.Chunk;
-				chunk.Chunk = nullptr;
+				chunk.Chunk.reset();
 			});
 	}
 
@@ -105,8 +105,6 @@ namespace neut
 		neut::TerrainChunk::InitializeShared();
 
 		m_material = s_materialManager->Create("terrain");
-
-		ddr::Material* material = m_material.Access();
 		m_material->Shader = s_shaderManager->Load("terrain");
 	}
 
@@ -149,6 +147,7 @@ namespace neut
 		auto& entities = chunks_data.Entities();
 		auto chunks = chunks_data.Write<neut::TerrainChunkComponent>();
 		auto transforms = chunks_data.Write<dd::TransformComponent>();
+		auto meshes = chunks_data.Write<dd::MeshComponent>();
 		auto bounds = chunks_data.Write<dd::BoundBoxComponent>();
 		auto colours = chunks_data.Write<dd::ColourComponent>();
 
@@ -163,7 +162,7 @@ namespace neut
 				entities[i].RemoveTag(ddc::Tag::Visible);
 			}
 
-			UpdateChunk(entities[i], chunks[i], bounds[i], transforms[i], colours[i], player_offset, root_job);
+			UpdateChunk(entities[i], chunks[i], meshes[i], bounds[i], transforms[i], colours[i], player_offset, root_job);
 		}
 
 		s_jobsystem->Wait(root_job);
@@ -187,8 +186,8 @@ namespace neut
 		return neut::TerrainParameters::LODs - 1;
 	}
 
-	void TerrainSystem::UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp,
-		dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
+	void TerrainSystem::UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, 
+		dd::MeshComponent& mesh_cmp, dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
 		dd::ColourComponent& colour_cmp, glm::vec2 camera_pos, dd::Job* root_job)
 	{
 		if (m_params.UseDebugColours)
@@ -212,12 +211,8 @@ namespace neut
 
 		if (chunk_cmp.Chunk->GetMesh().IsValid())
 		{
-			if (!e.Has<dd::MeshComponent>())
-			{
-				dd::MeshComponent& mesh_cmp = e.Add<dd::MeshComponent>();
-				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
-				mesh_cmp.Material = m_material;
-			}
+			mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
+			mesh_cmp.Material = m_material;
 		}
 
 		m_activeCount += chunk_cmp.Chunk->IsReady();
@@ -298,7 +293,7 @@ namespace neut
 	{
 		DD_PROFILE_SCOPED(TerrainSystem_CreateChunk);
 
-		ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<dd::TransformComponent, neut::TerrainChunkComponent, dd::BoundBoxComponent, dd::ColourComponent>();
+		ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<dd::TransformComponent, neut::TerrainChunkComponent, dd::BoundBoxComponent, dd::ColourComponent, dd::MeshComponent>();
 		scratch.AddTag(ddc::Tag::Visible);
 
 		dd::ColourComponent* colour_cmp = scratch.Access<dd::ColourComponent>();
@@ -309,10 +304,12 @@ namespace neut
 		transform_cmp->Update();
 
 		neut::TerrainChunkComponent* chunk_cmp = scratch.Access<neut::TerrainChunkComponent>();
-		neut::TerrainChunk* chunk = new neut::TerrainChunk(m_params, pos);
-		chunk->SwitchLOD(lod);
-		chunk_cmp->Chunk = chunk;
-		chunk->Update(root_job);
+		chunk_cmp->Chunk = std::make_unique<neut::TerrainChunk>(m_params, pos);
+		chunk_cmp->Chunk->SwitchLOD(lod);
+		chunk_cmp->Chunk->Update(root_job);
+
+		dd::MeshComponent* mesh_cmp = scratch.Access<dd::MeshComponent>();
+		mesh_cmp->Material = m_material;
 
 		update_data.CreateEntity(std::move(scratch));
 	}
@@ -325,8 +322,7 @@ namespace neut
 		for (size_t i = 0; i < chunks.Size(); ++i)
 		{
 			neut::TerrainChunkComponent& chunk = chunk_cmps[i];
-			delete chunk.Chunk;
-			chunk.Chunk = nullptr;
+			chunk.Chunk.reset();
 
 			update_data.DestroyEntity(chunks.Entities()[i]);
 		}

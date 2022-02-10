@@ -146,14 +146,11 @@ namespace neut
 				continue;
 			}
 
-			neut::TerrainChunk* terrain_chunk = terrain_chunks[i].Chunk;
-
-			ddm::Plane local_plane = water_plane.GetTransformed(terrain_transforms[i].Transform());
-
-			ddc::Entity water_entity = FindWater(terrain_chunk->GetPosition());
+			glm::vec2 position = terrain_chunks[i].Chunk->GetPosition();
+			ddc::Entity water_entity = FindWater(position);
 			if (!water_entity.IsValid())
 			{
-				CreateWaterEntity(update_data, terrain_chunk->GetPosition());
+				CreateWaterEntity(update_data, position);
 
 				++m_waterChunks;
 			}
@@ -193,6 +190,5 @@ namespace neut
 				}
 			}
 		}
-
 	}
 }

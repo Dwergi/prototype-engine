@@ -21,7 +21,7 @@
 
 namespace neut
 {
-	static dd::Service<ddr::RenderCommandBuffer<ddr::MeshRenderCommand>> s_meshCommands;
+	static dd::Service<ddr::MeshRenderCommandBuffer> s_meshCommands;
 	static dd::Service<dd::JobSystem> s_jobSystem;
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 	static dd::Service<ddr::MaterialManager> s_materialManager;

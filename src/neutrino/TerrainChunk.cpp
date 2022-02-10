@@ -281,7 +281,7 @@ namespace neut
 			else
 			{
 				ddr::Mesh* mesh = m_mesh.Access();
-				mesh->SetDirty(ddr::MeshPart::Position);
+				mesh->SetPositions(dd::ConstBuffer<glm::vec3>(m_vertices));
 				mesh->SetIndices(dd::ConstBuffer<uint>(s_indices[m_lod]));
 				mesh->SetBoundBox(m_bounds);
 			}

@@ -150,6 +150,32 @@ namespace ddr
 		m_dirty.Clear();
 	}
 
+	void Mesh::BindToShader(Shader& shader)
+	{
+		DD_ASSERT(shader.InUse());
+
+		if (m_vboPosition.IsValid())
+		{
+			m_vboPosition.Bind();
+			shader.BindPositions();
+			m_vboPosition.Unbind();
+		}
+
+		if (m_vboNormal.IsValid())
+		{
+			m_vboNormal.Bind();
+			shader.BindNormals();
+			m_vboNormal.Unbind();
+		}
+
+		if (m_vboUV.IsValid())
+		{
+			m_vboUV.Bind();
+			shader.BindUVs();
+			m_vboUV.Unbind();
+		}
+	}
+
 	void Mesh::RebuildBVH()
 	{
 		DD_ASSERT(m_rebuildingBVH);

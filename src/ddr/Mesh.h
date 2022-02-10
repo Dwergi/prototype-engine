@@ -133,6 +133,8 @@ namespace ddr
 		// 
 		VAO& AccessVAO() { return m_vao; }
 
+		void BindToShader(Shader& shader);
+
 		//
 		// Do not create directly, use MeshManager.
 		//

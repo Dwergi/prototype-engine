@@ -287,11 +287,11 @@ namespace neut
 		renderer.Register(light_renderer);
 		renderer.Register(terrain_renderer);
 		renderer.Register(particle_renderer);
+		renderer.Register(water_renderer);
 		renderer.Register(mesh_renderer);
 		renderer.Register(bounds_renderer);
 		renderer.Register(ray_renderer);
 		renderer.Register(lines_renderer);
-		renderer.Register(water_renderer);
 	}
 
 	void NeutrinoGame::RegisterSystems(ddc::SystemsManager& system_manager)

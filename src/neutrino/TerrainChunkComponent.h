@@ -12,7 +12,7 @@ namespace neut
 
 	struct TerrainChunkComponent
 	{
-		TerrainChunk* Chunk { nullptr };
+		std::unique_ptr<TerrainChunk> Chunk;
 
 		DD_BEGIN_CLASS(neut::TerrainChunkComponent )
 			DD_COMPONENT();

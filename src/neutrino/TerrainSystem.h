@@ -88,7 +88,7 @@ namespace neut
 
 		void CreateChunk(ddc::UpdateData& update_data, glm::vec2 pos, int lod, dd::Job* root_job);
 
-		void UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp,
+		void UpdateChunk(ddc::Entity e, neut::TerrainChunkComponent& chunk_cmp, dd::MeshComponent& mesh_cmp,
 			dd::BoundBoxComponent& bounds_cmp, dd::TransformComponent& transform_cmp,
 			dd::ColourComponent& colour_cmp, glm::vec2 camera_pos, dd::Job* root_job);
 
