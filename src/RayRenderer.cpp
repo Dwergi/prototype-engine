@@ -108,7 +108,7 @@ namespace ddr
 
 			shader->SetUniform( "ModelViewProjection", view_projection * model );
 
-			glDrawArrays( GL_LINES, 0, m_vbo.GetDataSize() );
+			OpenGL::DrawArrays(OpenGL::Primitive::Lines, s_linesBuffer.Size());
 		}
 
 		m_vbo.Unbind();

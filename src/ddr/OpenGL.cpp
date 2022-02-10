@@ -19,35 +19,55 @@ namespace OpenGL
 		return gl3wInit() == 0;
 	}
 
-	void DrawArrays(int verts)
+	GLenum GetGLPrimitive(Primitive primitive)
+	{
+		switch (primitive)
+		{
+			case Primitive::Triangles: return GL_TRIANGLES;
+			case Primitive::Lines: return GL_LINES;
+			default: DD_ASSERT(false, "Unknown primitive."); return GL_NONE;
+		};
+	}
+
+	void DrawArrays(Primitive primitive, uint64 verts)
 	{
 		DD_ASSERT(verts > 0);
 
 		s_drawCallProfiler.Increment();
 
-		glDrawArrays(GL_TRIANGLES, 0, verts);
+		glDrawArrays(GetGLPrimitive(primitive), 0, (GLsizei) verts);
 		CheckOGLError();
 	}
 
-	void DrawArraysInstanced(int verts, int instances)
+	void DrawElements(Primitive primitive, uint64 indices)
+	{
+		DD_ASSERT(indices > 0);
+
+		s_drawCallProfiler.Increment();
+
+		glDrawElements(GetGLPrimitive(primitive), (GLsizei) indices, GL_UNSIGNED_INT, 0);
+		CheckOGLError();
+	}
+
+	void DrawArraysInstanced(Primitive primitive, uint64 verts, uint64 instances)
 	{
 		DD_ASSERT(verts > 0);
 		DD_ASSERT(instances > 0);
 
 		s_drawCallProfiler.Increment();
 
-		glDrawArraysInstanced(GL_TRIANGLES, 0, verts, instances);
+		glDrawArraysInstanced(GetGLPrimitive(primitive), 0, (GLsizei) verts, (GLsizei) instances);
 		CheckOGLError();
 	}
 
-	void DrawElementsInstanced(int indices, int instances)
+	void DrawElementsInstanced(Primitive primitive, uint64 indices, uint64 instances)
 	{
 		DD_ASSERT(indices > 0);
 		DD_ASSERT(instances > 0);
 
 		s_drawCallProfiler.Increment();
 
-		glDrawElementsInstanced(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0, instances);
+		glDrawElementsInstanced(GetGLPrimitive(primitive), (GLsizei) indices, GL_UNSIGNED_INT, 0, (GLsizei)instances);
 		CheckOGLError();
 	}
 }

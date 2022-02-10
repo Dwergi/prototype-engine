@@ -58,7 +58,6 @@ namespace dd
 
 		bool IsValid() const { return m_ptr != nullptr; }
 
-		void Set(const T* ptr, int count);
 		void Set(const T* ptr, uint64 count);
 		const T* Get() const;
 		virtual const void* GetVoid() const override { return m_ptr; }

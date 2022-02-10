@@ -18,11 +18,18 @@ namespace OpenGL
 {
 	static const GLuint InvalidID = 0;
 
+	enum class Primitive
+	{
+		Triangles,
+		Lines
+	};
+
 	bool Initialize();
 
-	void DrawArrays(int verts);
-	void DrawArraysInstanced(int verts, int instances);
-	void DrawElementsInstanced(int indices, int instances);
+	void DrawArrays(Primitive primitive, uint64 verts);
+	void DrawElements(Primitive primitive, uint64 verts);
+	void DrawArraysInstanced(Primitive primitive, uint64 verts, uint64 instances);
+	void DrawElementsInstanced(Primitive primitive, uint64 indices, uint64 instances);
 }
 
 namespace ddr

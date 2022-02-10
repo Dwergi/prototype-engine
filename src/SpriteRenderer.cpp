@@ -153,7 +153,7 @@ namespace ddr
 		m_vboColours.CommitData();
 		m_vboColours.Unbind();
 
-		OpenGL::DrawArraysInstanced(6, count);
+		OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, 6, count);
 		CheckOGLError();
 
 		texture->Unbind();

@@ -108,7 +108,7 @@ namespace ddr
 			m_vboPosition.SetData(dd::ConstBuffer<glm::vec3>(lines[i].Points.Data(), lines[i].Points.Size()));
 			m_vboPosition.CommitData();
 
-			glDrawArrays( GL_LINES, 0, m_vboPosition.GetDataSize() );
+			OpenGL::DrawArrays(OpenGL::Primitive::Lines, lines[i].Points.Size());
 
 			m_vboPosition.Unbind();
 

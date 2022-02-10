@@ -201,7 +201,7 @@ namespace ddr
 				shader->SetUniform("ModelViewProjection", view_projection * model);
 			}
 
-			glDrawElements(GL_LINES, m_vboIndex.GetDataSize(), GL_UNSIGNED_INT, 0);
+			OpenGL::DrawElements(OpenGL::Primitive::Lines, m_vboIndex.GetDataSize() / sizeof(uint));
 		}
 
 		m_vboIndex.Unbind();
@@ -228,7 +228,7 @@ namespace ddr
 			m_updateBuffers = true;
 		}
 
-		int triangles = (m_vboIndex.GetDataSize() / sizeof(uint)) / 6;
+		uint64 triangles = (m_vboIndex.GetDataSize() / sizeof(uint)) / 6;
 
 		ImGui::Value("Triangles", triangles);
 	}

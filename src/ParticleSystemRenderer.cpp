@@ -166,7 +166,7 @@ namespace ddr
 			m_vboColours.CommitData();
 			m_vboColours.Unbind();
 
-			OpenGL::DrawArraysInstanced(m_vboPosition.GetDataSize(), count);
+			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, m_vboPosition.GetDataSize(), count);
 		}
 
 		m_vaoParticle.Unbind();

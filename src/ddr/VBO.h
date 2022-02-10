@@ -33,7 +33,7 @@ namespace ddr
 
 		const dd::IBuffer& GetData() const { return m_buffer; }
 
-		int GetDataSize() const { return m_buffer.SizeBytes(); }
+		uint64 GetDataSize() const { return m_buffer.SizeBytes(); }
 
 		void CommitData();
 

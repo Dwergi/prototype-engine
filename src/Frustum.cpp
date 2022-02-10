@@ -71,21 +71,21 @@ namespace ddr
 		NEAR_BR, FAR_BR, FAR_TR
 	};
 
-	static dd::ConstBuffer<GLushort> s_indexBuffer( const_cast<GLushort*>( s_indices ), dd::ArrayLength( s_indices ) );
+	static dd::ConstBuffer<GLushort> s_indexBuffer(s_indices, dd::ArrayLength(s_indices));
 
 	const glm::vec3 s_colours[] =
 	{
-		glm::vec3( 1, 0, 0 ),
-		glm::vec3( 0, 1, 0 ),
-		glm::vec3( 0, 0, 1 ),
-		glm::vec3( 1, 1, 0 ),
-		glm::vec3( 1, 0, 1 ),
-		glm::vec3( 0, 1, 1 )
+		glm::vec3(1, 0, 0),
+		glm::vec3(0, 1, 0),
+		glm::vec3(0, 0, 1),
+		glm::vec3(1, 1, 0),
+		glm::vec3(1, 0, 1),
+		glm::vec3(0, 1, 1)
 	};
 
 	Frustum::Frustum()
 	{
-		m_corners.Set( new glm::vec3[8], 8 );
+		m_corners.Set(new glm::vec3[8], 8);
 	}
 
 	Frustum::~Frustum()
@@ -94,28 +94,28 @@ namespace ddr
 		delete[] corners;
 	}
 
-	void Frustum::Update( const ddr::ICamera& camera )
+	void Frustum::Update(const ddr::ICamera& camera)
 	{
-		UpdateFrustum( camera );
+		UpdateFrustum(camera);
 
 		glm::mat4 camera_transform = camera.GetViewMatrix();
-		if( m_dirty || m_transform != camera_transform )
+		if (m_dirty || m_transform != camera_transform)
 		{
 			m_transform = camera_transform;
 		}
 	}
 
-	bool Frustum::Intersects( const ddm::Sphere& bounds ) const
+	bool Frustum::Intersects(const ddm::Sphere& bounds) const
 	{
-		for( const ddm::Plane& plane : m_planes )
+		for (const ddm::Plane& plane : m_planes)
 		{
-			float distance = plane.DistanceTo( bounds.Centre );
-			if( distance < -bounds.Radius )
+			float distance = plane.DistanceTo(bounds.Centre);
+			if (distance < -bounds.Radius)
 			{
 				return false;
 			}
 
-			if( abs( distance ) < bounds.Radius )
+			if (abs(distance) < bounds.Radius)
 			{
 				return true;
 			}
@@ -124,25 +124,25 @@ namespace ddr
 		return true;
 	}
 
-	bool Frustum::Intersects( const ddm::AABB& bounds ) const
+	bool Frustum::Intersects(const ddm::AABB& bounds) const
 	{
 		glm::vec3 corners[8];
-		bounds.GetCorners( corners );
+		bounds.GetCorners(corners);
 
-		for( const ddm::Plane& plane : m_planes )
+		for (const ddm::Plane& plane : m_planes)
 		{
 			bool inside = false;
 
-			for( const glm::vec3& corner : corners )
+			for (const glm::vec3& corner : corners)
 			{
-				if( plane.DistanceTo( corner ) > 0 )
+				if (plane.DistanceTo(corner) > 0)
 				{
 					inside = true;
 					break;
 				}
 			}
 
-			if( !inside )
+			if (!inside)
 			{
 				return false;
 			}
@@ -154,39 +154,39 @@ namespace ddr
 
 	void Frustum::CreateRenderData()
 	{
-		m_shader = s_shaderManager->Load( "mesh" );
+		m_shader = s_shaderManager->Load("mesh");
 		Shader* shader = m_shader.Access();
-		shader->Use( true );
+		shader->Use(true);
 
 		m_vao.Create();
 		m_vao.Bind();
 
-		m_vboVertex.Create( GL_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboVertex.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboVertex.Bind();
-		m_vboVertex.SetData( m_corners );
+		m_vboVertex.SetData(m_corners);
 		m_vboVertex.CommitData();
 
 		shader->BindPositions();
 		m_vboVertex.Unbind();
 
-		m_vboIndex.Create( GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
+		m_vboIndex.Create(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboIndex.Bind();
-		m_vboIndex.SetData( s_indexBuffer );
+		m_vboIndex.SetData(s_indexBuffer);
 		m_vboIndex.CommitData();
 		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
 
-		shader->Use( false );
+		shader->Use(false);
 	}
 
-	void Frustum::Render( const ddr::RenderData& data )
+	void Frustum::Render(const ddr::RenderData& data)
 	{
-		DD_ASSERT( m_vao.IsValid() );
+		DD_ASSERT(m_vao.IsValid());
 
 		m_vao.Bind();
 
-		if( m_dirty )
+		if (m_dirty)
 		{
 			m_vboVertex.CommitData();
 
@@ -198,36 +198,37 @@ namespace ddr
 		Shader* shader = m_shader.Access();
 		ScopedShader usage = shader->UseScoped();
 
-		uniforms.Set( "Model", m_transform );
+		uniforms.Set("Model", m_transform);
 
 		m_vboIndex.Bind();
 
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	
-		for( int i = 0; i < 6; ++i )
-		{
-			uniforms.Set( "ObjectColour", glm::vec4( s_colours[i], 0.5f ) );
+		DD_TODO("Add render state here.");
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*) (6 * sizeof(GLushort) * i) );
+		for (int i = 0; i < 6; ++i)
+		{
+			uniforms.Set("ObjectColour", glm::vec4(s_colours[i], 0.5f));
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*)(6 * sizeof(GLushort) * i));
 		}
 
-		glDisable( GL_BLEND );
+		glDisable(GL_BLEND);
 
 		m_vboIndex.Unbind();
 
 		m_vao.Unbind();
 	}
-	
-	void Frustum::UpdateFrustum( const ddr::ICamera& camera )
+
+	void Frustum::UpdateFrustum(const ddr::ICamera& camera)
 	{
 		m_vfov = camera.GetVerticalFOV();
 		m_aspectRatio = camera.GetAspectRatio();
 		m_near = camera.GetNear();
 		m_far = camera.GetFar();
-		
+
 		// Work out corners of the frustum
-		float tan_fov = std::tanf( m_vfov );
+		float tan_fov = std::tanf(m_vfov);
 
 		float near_height = tan_fov * m_near;
 		float near_width = near_height * m_aspectRatio;
@@ -241,10 +242,10 @@ namespace ddr
 		glm::vec3 near_centre = pos + dir * m_near;
 		glm::vec3 far_centre = pos + dir * m_far;
 
-		glm::vec3 up = glm::vec3( 0, 1, 0 );
-		glm::vec3 right = glm::normalize( glm::cross( dir, up ) );
+		glm::vec3 up = glm::vec3(0, 1, 0);
+		glm::vec3 right = glm::normalize(glm::cross(dir, up));
 
-		up = glm::normalize( glm::cross( right, dir ) );
+		up = glm::normalize(glm::cross(right, dir));
 
 		glm::vec3 near_up = up * near_height;
 		glm::vec3 near_right = right * near_width;
@@ -264,23 +265,23 @@ namespace ddr
 		m_corners[FAR_BL] = far_centre - far_up - far_right;
 		m_corners[FAR_BR] = far_centre - far_up + far_right;
 
-		m_planes[Planes::Top]	 = ddm::Plane( m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL] );
-		m_planes[Planes::Bottom] = ddm::Plane( m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR] );
-		m_planes[Planes::Left]	 = ddm::Plane( m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL] );
-		m_planes[Planes::Right]	 = ddm::Plane( m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR] );
-		m_planes[Planes::Near]	 = ddm::Plane( m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR] );
-		m_planes[Planes::Far]	 = ddm::Plane( m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL] );
+		m_planes[Planes::Top] = ddm::Plane(m_corners[NEAR_TR], m_corners[NEAR_TL], m_corners[FAR_TL]);
+		m_planes[Planes::Bottom] = ddm::Plane(m_corners[NEAR_BL], m_corners[NEAR_BR], m_corners[FAR_BR]);
+		m_planes[Planes::Left] = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_BL], m_corners[FAR_BL]);
+		m_planes[Planes::Right] = ddm::Plane(m_corners[NEAR_BR], m_corners[NEAR_TR], m_corners[FAR_BR]);
+		m_planes[Planes::Near] = ddm::Plane(m_corners[NEAR_TL], m_corners[NEAR_TR], m_corners[NEAR_BR]);
+		m_planes[Planes::Far] = ddm::Plane(m_corners[FAR_TR], m_corners[FAR_TL], m_corners[FAR_BL]);
 
 		m_dirty = true;
 	}
 
-	void* Frustum::operator new( size_t i )
+	void* Frustum::operator new(size_t i)
 	{
-		return _aligned_malloc( i, 16 );
+		return _aligned_malloc(i, 16);
 	}
 
-	void Frustum::operator delete( void* ptr )
+	void Frustum::operator delete(void* ptr)
 	{
-		_aligned_free( ptr );
+		_aligned_free(ptr);
 	}
 }

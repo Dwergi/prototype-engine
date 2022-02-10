@@ -96,7 +96,7 @@ namespace ddr
 		DD_ASSERT(data.SizeBytes() == expectedSize);
 		DD_ASSERT(mip >= 0);
 
-		glGetTextureImage(m_id, mip, dataFormat, dataType, data.SizeBytes(), data.Access());
+		glGetTextureImage(m_id, mip, dataFormat, dataType, data.SizeBytesInt(), data.Access());
 		CheckOGLError();
 	}
 

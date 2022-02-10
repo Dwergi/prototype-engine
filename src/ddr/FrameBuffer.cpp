@@ -147,8 +147,7 @@ namespace ddr
 
 		uniforms.Bind(*shader);
 
-		glDrawArrays(GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size());
-		CheckOGLError();
+		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
 
 		uniforms.Unbind();
 
@@ -180,8 +179,7 @@ namespace ddr
 
 		uniforms.Bind(*shader);
 
-		glDrawArrays(GL_TRIANGLES, 0, s_fullScreenQuadBuffer.Size());
-		CheckOGLError();
+		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
 
 		uniforms.Unbind();
 

@@ -44,6 +44,5 @@ namespace dd
 		DD_ASSERT(byte_size <= std::numeric_limits<int>::max());
 
 		return (int) byte_size;
-
 	}
 }

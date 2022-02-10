@@ -156,7 +156,7 @@ namespace ddr
 
 			line_shader->SetUniform( "ModelViewProjection", view_projection * model );
 
-			glDrawArrays( GL_LINES, 0, m_vbo.GetDataSize() );
+			OpenGL::DrawArrays(OpenGL::Primitive::Lines, m_vbo.GetDataSize());
 
 			colour.a = 0.3f;
 		}

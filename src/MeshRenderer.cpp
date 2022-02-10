@@ -178,11 +178,11 @@ namespace ddr
 
 		if (mesh->GetIndices().IsValid())
 		{
-			OpenGL::DrawElementsInstanced(mesh->GetIndices().Size(), (int) transforms.size());
+			OpenGL::DrawElementsInstanced(OpenGL::Primitive::Triangles, mesh->GetIndices().Size(), transforms.size());
 		}
 		else
 		{
-			OpenGL::DrawArraysInstanced(mesh->GetPositions().Size(), (int) transforms.size());
+			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, mesh->GetPositions().Size(), transforms.size());
 		}
 
 		mesh->AccessVAO().Unbind();
