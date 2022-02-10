@@ -27,6 +27,7 @@
 static dd::Service<dd::JobSystem> s_jobsystem;
 static dd::Service<ddr::MeshManager> s_meshManager;
 static dd::ProfilerValueRef s_meshesRendered("Meshes Rendered");
+static dd::Service<ddr::MeshRenderCommandBuffer> s_commands;
 
 namespace ddr
 {
@@ -268,6 +269,7 @@ namespace ddr
 
 	void MeshRenderer::DrawDebugInternal()
 	{
+		ImGui::Value("Mesh Commands", m_commandCount);
 		ImGui::Value("Meshes", m_meshCount);
 		ImGui::Value("Unculled Meshes", m_unculledMeshCount);
 

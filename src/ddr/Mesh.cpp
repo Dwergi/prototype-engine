@@ -167,7 +167,6 @@ namespace ddr
 		const dd::ConstBuffer<uint>& indices = GetIndices();
 
 		dd::Triangulator triangulator(positions, indices);
-		dd::ConstTriangulator triangulator(positions, indices);
 		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
 			dd::ConstTriangle tri = triangulator[i];
