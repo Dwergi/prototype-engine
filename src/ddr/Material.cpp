@@ -17,45 +17,45 @@ namespace ddr
 
 	Material::Material()
 	{
-		
+
 	}
 
 	Material::~Material()
 	{
-		
+
 	}
 
-	void Material::Bind( UniformStorage& uniforms )
+	void Material::Bind(UniformStorage& uniforms)
 	{
-		DD_ASSERT( !m_inUse, "Material already in use when bound!" );
+		DD_ASSERT(!m_inUse, "Material already in use when bound!");
 
 		g_materialChanged.Increment();
 
-		uniforms.Set( "Material.Shininess", Shininess );
-		uniforms.Set( "Material.Specular", Specular );
-		uniforms.Set( "Material.Diffuse", Diffuse );
-		uniforms.Set( "Material.Ambient", Ambient );
+		uniforms.Set("Material.Shininess", Shininess);
+		uniforms.Set("Material.Specular", Specular);
+		uniforms.Set("Material.Diffuse", Diffuse);
+		uniforms.Set("Material.Ambient", Ambient);
 
-		State.Use( true );
+		State.Use(true);
 
-		ddr::Shader* shader = Shader.Access(); 
-		shader->Use( true );
+		ddr::Shader* shader = Shader.Access();
+		shader->Use(true);
 
-		uniforms.Bind( *shader );
+		uniforms.Bind(*shader);
 
 		m_inUse = true;
 	}
 
-	void Material::Unbind( UniformStorage& uniforms )
+	void Material::Unbind(UniformStorage& uniforms)
 	{
-		DD_ASSERT( m_inUse, "Material not in use when unbound!" );
+		DD_ASSERT(m_inUse, "Material not in use when unbound!");
 
 		uniforms.Unbind();
 
 		ddr::Shader* shader = Shader.Access();
-		shader->Use( false );
+		shader->Use(false);
 
-		State.Use( false );
+		State.Use(false);
 
 		m_inUse = false;
 	}
