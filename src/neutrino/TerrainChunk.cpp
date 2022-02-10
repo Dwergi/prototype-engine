@@ -32,8 +32,6 @@ namespace neut
 	static dd::Service<dd::JobSystem> s_jobsystem;
 	static dd::Service<ddr::MeshManager> s_meshManager;
 
-	static ddr::MaterialHandle s_material;
-
 	static dd::FSMPrototype<TerrainChunkStates> s_fsmPrototype;
 
 	static std::vector<uint> s_indices[neut::TerrainParameters::LODs];
@@ -280,11 +278,6 @@ namespace neut
 
 	void TerrainChunk::RenderUpdate()
 	{
-		if (!s_material.IsValid())
-		{
-			s_material = ddr::MaterialHandle("terrain");
-		}
-
 		if (m_state == TerrainChunkStates::RenderUpdatePending)
 		{
 			if (!m_mesh.IsValid())
@@ -362,7 +355,6 @@ namespace neut
 		m_mesh = s_meshManager->Create(name.c_str());
 
 		ddr::Mesh* mesh = m_mesh.Access();
-		mesh->SetMaterial(s_material);
 		mesh->SetPositions(dd::ConstBuffer<glm::vec3>(m_vertices));
 		mesh->SetIndices(dd::ConstBuffer<uint>(s_indices[m_lod]));
 		mesh->SetBoundBox(m_bounds);
@@ -374,7 +366,8 @@ namespace neut
 		const int terrain_size = MaxVertices + 1;
 		const int image_size = (MaxVertices >> m_lod) + 1;
 
-		byte* pixels = new byte[image_size * image_size];
+		std::vector<byte> pixels;
+		pixels.resize(image_size * image_size);
 
 		const float range = m_bounds.Extents().y;
 		const float min = m_bounds.Min.y;
@@ -391,9 +384,7 @@ namespace neut
 			}
 		}
 
-		stbi_write_tga(filename, image_size, image_size, 1, pixels);
-
-		delete pixels;
+		stbi_write_tga(filename, image_size, image_size, 1, pixels.data());
 	}
 
 	static byte NormalToColour(float f)

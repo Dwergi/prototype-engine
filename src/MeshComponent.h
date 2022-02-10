@@ -15,11 +15,13 @@ namespace dd
 	public: 
 
 		ddr::MeshHandle Mesh;
+		ddr::MaterialHandle Material;
 
-		DD_BEGIN_CLASS( dd::MeshComponent )
+		DD_BEGIN_CLASS(dd::MeshComponent)
 			DD_COMPONENT();
 
-			DD_MEMBER( Mesh );
+			DD_MEMBER(Mesh);
+			DD_MEMBER(Material);
 		DD_END_CLASS()
 	};
 }

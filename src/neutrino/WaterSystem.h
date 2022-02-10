@@ -45,6 +45,6 @@ namespace neut
 		virtual const char* GetDebugTitle() const override { return "Water"; }
 		virtual void DrawDebugInternal() override;
 
-		ddc::ScratchEntity CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const;
+		void CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const;
 	};
 }

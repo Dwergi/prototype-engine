@@ -31,5 +31,6 @@ namespace neut
 
 	private:
 		ddr::RenderState m_renderState;
+		ddr::MaterialHandle m_material;
 	};
 }

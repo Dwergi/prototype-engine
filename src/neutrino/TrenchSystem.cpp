@@ -133,7 +133,6 @@ namespace dd
 		ddr::Mesh* mesh = m_chunkMesh.Access();
 		DD_ASSERT( mesh != nullptr );
 
-		mesh->SetMaterial( material_h );
 		mesh->SetPositions( s_trenchChunkPositionBuffer );
 		mesh->SetNormals( s_trenchChunkNormalBuffer );
 

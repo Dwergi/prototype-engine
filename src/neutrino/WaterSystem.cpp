@@ -12,7 +12,6 @@
 #include "BoundsHelpers.h"
 #include "ColourComponent.h"
 #include "TransformComponent.h"
-#include "Triangulator.h"
 
 #include "ddc/ScratchEntity.h"
 
@@ -44,7 +43,7 @@ namespace neut
 		m_noiseParams.Wavelength = 32;
 	}
 
-	ddc::ScratchEntity WaterSystem::CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const
+	void WaterSystem::CreateWaterEntity(ddc::UpdateData& update_data, glm::vec2 chunk_pos) const
 	{
 		ddc::ScratchEntity scratch = ddc::ScratchEntity::Create<dd::TransformComponent, neut::WaterComponent, dd::BoundBoxComponent, dd::ColourComponent>();
 		scratch.AddTag(ddc::Tag::Visible);
@@ -60,7 +59,6 @@ namespace neut
 		water->Mesh = s_meshManager->Create(mesh_name.c_str());
 
 		ddr::Mesh* mesh = water->Mesh.Access();
-		mesh->SetMaterial(ddr::MaterialHandle("water"));
 		mesh->UseBVH(false);
 
 		dd::ColourComponent* colour = scratch.Access<dd::ColourComponent>();
@@ -86,7 +84,7 @@ namespace neut
 
 		water->Dirty = true;
 
-		return scratch;
+		update_data.CreateEntity(std::move(scratch));
 	}
 
 	void WaterSystem::Initialize(ddc::EntityLayer& entities)

@@ -10,6 +10,8 @@
 
 #include "ddc/System.h"
 
+#include "ddr/Material.h"
+
 #include "neutrino/TerrainParameters.h"
 
 namespace ddr
@@ -77,6 +79,8 @@ namespace neut
 		glm::vec2 m_previousOffset { 0, 0 };
 
 		neut::TerrainParameters m_params;
+
+		ddr::MaterialHandle m_material;
 
 		int m_activeCount { 0 };
 

@@ -33,6 +33,8 @@
 namespace neut
 {
 	static dd::Service<dd::JobSystem> s_jobsystem;
+	static dd::Service<ddr::ShaderManager> s_shaderManager;
+	static dd::Service<ddr::MaterialManager> s_materialManager;
 
 	static glm::vec4 GetMeshColour(glm::vec2 pos, int lod)
 	{
@@ -101,6 +103,11 @@ namespace neut
 	void TerrainSystem::Initialize(ddc::EntityLayer& layer)
 	{
 		neut::TerrainChunk::InitializeShared();
+
+		m_material = s_materialManager->Create("terrain");
+
+		ddr::Material* material = m_material.Access();
+		m_material->Shader = s_shaderManager->Load("terrain");
 	}
 
 	void TerrainSystem::Update(ddc::UpdateData& update_data)
@@ -209,6 +216,7 @@ namespace neut
 			{
 				dd::MeshComponent& mesh_cmp = e.Add<dd::MeshComponent>();
 				mesh_cmp.Mesh = chunk_cmp.Chunk->GetMesh();
+				mesh_cmp.Material = m_material;
 			}
 		}
 

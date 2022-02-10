@@ -17,9 +17,6 @@
 
 namespace neut
 {
-	static dd::Service<ddr::ShaderManager> s_shaderManager;
-	static dd::Service<ddr::MaterialManager> s_materialManager;
-
 	struct Wireframe
 	{
 		bool Enabled { true };
@@ -52,15 +49,13 @@ namespace neut
 
 	void TerrainRenderer::Initialize()
 	{
-		ddr::MaterialHandle material_h = s_materialManager->Create("terrain");
-
-		ddr::Material* material = material_h.Access();
-		material->Shader = s_shaderManager->Load("terrain");
+		
 	}
 
 	void TerrainRenderer::Update(ddr::RenderData& data)
 	{
-		data.Layer().ForAllWith<neut::TerrainChunkComponent>([](ddc::Entity, neut::TerrainChunkComponent& chunk)
+		data.Layer().ForAllWith<neut::TerrainChunkComponent>(
+			[this](ddc::Entity, neut::TerrainChunkComponent& chunk)
 			{
 				chunk.Chunk->RenderUpdate();
 			});
