@@ -5,18 +5,75 @@
 //
 
 #include "PCH.h"
-#include "OpenGL.h"
+#include "ddr/OpenGL.h"
 
-#include "GLError.h"
+#include "ddr/GLError.h"
+#include "ddr/VAO.h"
+
 #include "Profiler.h"
+
+#include "fmt/format.h"
 
 static dd::ProfilerValueRef s_drawCallProfiler("Render/Draw Calls");
 
 namespace OpenGL
 {
+	void GLErrorCallback(GLenum src, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* msg, void const* user_param)
+	{
+		std::string src_str = [src]()
+		{
+			switch (src)
+			{
+				case GL_DEBUG_SOURCE_API: return "API";
+				case GL_DEBUG_SOURCE_WINDOW_SYSTEM: return "Window";
+				case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Shader Compiler";
+				case GL_DEBUG_SOURCE_THIRD_PARTY: return "Third Party";
+				case GL_DEBUG_SOURCE_APPLICATION: return "Application";
+				case GL_DEBUG_SOURCE_OTHER: return "Other";
+				default: return "<none>";
+			}
+		}();
+
+		std::string type_str = [type]()
+		{
+			switch (type)
+			{
+				case GL_DEBUG_TYPE_ERROR: return "Error";
+				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Deprecated";
+				case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: return "Undefined Behavior";
+				case GL_DEBUG_TYPE_PORTABILITY: return "Portability";
+				case GL_DEBUG_TYPE_PERFORMANCE: return "Performance";
+				case GL_DEBUG_TYPE_MARKER: return "Marker";
+				case GL_DEBUG_TYPE_OTHER: return "Other";
+				default: return "<none>";
+			}
+		}();
+
+		std::string severity_str = [severity]()
+		{
+			switch (severity)
+			{
+				case GL_DEBUG_SEVERITY_NOTIFICATION: return "Notification";
+				case GL_DEBUG_SEVERITY_LOW: return "Low";
+				case GL_DEBUG_SEVERITY_MEDIUM: return "Medium";
+				case GL_DEBUG_SEVERITY_HIGH: return "High";
+				default: return "<none>";
+			}
+		}();
+
+		std::string message = fmt::format("{} - {} ({}) (#{}): {}", src_str, type_str, severity_str, id, msg);
+		DD_ASSERT(false, message.c_str());
+	}
+
 	bool Initialize()
 	{
-		return gl3wInit() == 0;
+		bool success = gl3wInit() == 0;
+
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+		glDebugMessageCallback(&GLErrorCallback, nullptr);
+		return success;
 	}
 
 	GLenum GetGLPrimitive(Primitive primitive)
@@ -32,7 +89,7 @@ namespace OpenGL
 	void DrawArrays(Primitive primitive, uint64 verts)
 	{
 		DD_ASSERT(verts > 0);
-
+		
 		s_drawCallProfiler.Increment();
 
 		glDrawArrays(GetGLPrimitive(primitive), 0, (GLsizei) verts);
@@ -67,7 +124,7 @@ namespace OpenGL
 
 		s_drawCallProfiler.Increment();
 
-		glDrawElementsInstanced(GetGLPrimitive(primitive), (GLsizei) indices, GL_UNSIGNED_INT, 0, (GLsizei)instances);
+		glDrawElementsInstanced(GetGLPrimitive(primitive), (GLsizei) indices, GL_UNSIGNED_INT, 0, (GLsizei) instances);
 		CheckOGLError();
 	}
 }
