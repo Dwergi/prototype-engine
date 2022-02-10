@@ -77,8 +77,8 @@ namespace neut
 		bullet->Velocity = camera.GetDirection() * m_speed;
 
 		dd::MeshComponent* mesh = scratch.Access<dd::MeshComponent>();
-
 		mesh->Mesh = ddr::MeshHandle("sphere");
+		mesh->Material = ddr::MaterialHandle("mesh");
 
 		dd::ColourComponent* colour = scratch.Access<dd::ColourComponent>();
 		colour->Colour = glm::vec4(m_colour, 1);

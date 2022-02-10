@@ -50,6 +50,8 @@ namespace ddr
 
 		m_vboTransforms.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+
+		dd::Services::Register(new MeshRenderCommandBuffer());
 	}
 
 	void MeshRenderer::Update(ddr::RenderData& data)
@@ -149,21 +151,20 @@ namespace ddr
 		const Mesh* mesh = mesh_cmp.Mesh.Get();
 
 		MeshRenderCommand& cmd = m_commands.Allocate();
-		cmd.Material = mesh->GetMaterial();
+		cmd.Material = mesh_cmp.Material;
 		cmd.Mesh = mesh_cmp.Mesh;
 		cmd.Colour = colour * debug_multiplier;
 		cmd.Transform = transform_cmp.Transform();
 		cmd.InitializeKey(camera);
 	}
 
-	void MeshRenderer::DrawMeshInstances(Mesh* mesh, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours)
+	void MeshRenderer::DrawMeshInstances(Mesh* mesh, Material* material, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours)
 	{
 		DD_ASSERT(mesh != nullptr);
 		DD_ASSERT(transforms.size() == colours.size());
 
 		mesh->AccessVAO().Bind();
 
-		const Material* material = mesh->GetMaterial().Get();
 		Shader* shader = material->Shader.Access();
 
 		m_vboTransforms.Bind();
@@ -221,7 +222,7 @@ namespace ddr
 			{
 				if (current_mesh_h.IsValid())
 				{
-					DrawMeshInstances(current_mesh_h.Access(), transforms, colours);
+					DrawMeshInstances(current_mesh_h.Access(), current_mat_h.Access(), transforms, colours);
 					transforms.clear();
 					colours.clear();
 				}
@@ -249,7 +250,7 @@ namespace ddr
 
 		if (current_mesh_h.IsValid())
 		{
-			DrawMeshInstances(current_mesh_h.Access(), transforms, colours);
+			DrawMeshInstances(current_mesh_h.Access(), current_mat_h.Access(), transforms, colours);
 			transforms.clear();
 			colours.clear();
 		}

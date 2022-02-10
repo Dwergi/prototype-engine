@@ -20,6 +20,8 @@ namespace ddr
 
 	void MeshRenderCommand::InitializeKey(const ICamera& camera)
 	{
+		DD_ASSERT(Mesh.IsValid(), "Mesh is invalid.");
+		DD_ASSERT(Mesh.IsAlive(), "Mesh is dead.");
 		DD_ASSERT(Material.IsValid(), "Mesh has invalid material: %s", Mesh.GetName().c_str());
 		DD_ASSERT(Material.IsAlive(), "Mesh has dead material: %s", Mesh.GetName().c_str());
 

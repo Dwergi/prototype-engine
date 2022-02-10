@@ -55,7 +55,7 @@ namespace ddr
 			const ddr::RenderData& render_data);
 
 		void ProcessCommands(ddr::UniformStorage& uniforms);
-		void DrawMeshInstances(Mesh* mesh, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);
+		void DrawMeshInstances(Mesh* mesh, Material* material, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);
 
 		virtual void DrawDebugInternal() override;
 		virtual const char* GetDebugTitle() const override { return "Meshes"; }

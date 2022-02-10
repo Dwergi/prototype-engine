@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ddr/Mesh.h"
+#include "ddr/Material.h"
 
 namespace dd
 {

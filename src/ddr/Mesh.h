@@ -10,7 +10,6 @@
 
 #include "ddm/AABB.h"
 
-#include "ddr/Material.h"
 #include "ddr/VAO.h"
 #include "ddr/VBO.h"
 
