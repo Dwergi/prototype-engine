@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include "Mesh.h"
-#include "RenderCommand.h"
+#include "ddr/Mesh.h"
+#include "ddr/RenderCommand.h"
+#include "ddr/RenderCommandBuffer.h"
 
 namespace ddr
 {
-	struct UniformStorage;
-
 	struct MeshRenderCommand : RenderCommand
 	{
 		MeshHandle Mesh;
@@ -21,6 +20,8 @@ namespace ddr
 
 		MeshRenderCommand();
 
-		void InitializeKey( const ICamera& camera );
+		void InitializeKey(const ICamera& camera);
 	};
+
+	using MeshRenderCommandBuffer = RenderCommandBuffer<MeshRenderCommand>;
 }

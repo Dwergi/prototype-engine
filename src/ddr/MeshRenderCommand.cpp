@@ -14,20 +14,21 @@
 namespace ddr
 {
 	MeshRenderCommand::MeshRenderCommand() :
-		RenderCommand( ddr::CommandType::Mesh )
+		RenderCommand(ddr::CommandType::Mesh)
 	{
 	}
 
-	void MeshRenderCommand::InitializeKey( const ICamera& camera )
+	void MeshRenderCommand::InitializeKey(const ICamera& camera)
 	{
-		const ddr::Mesh* mesh = Mesh.Get();
-		const ddr::Material* material = Material.Get();
+		DD_ASSERT(Material.IsValid(), "Mesh has invalid material: %s", Mesh.GetName().c_str());
+		DD_ASSERT(Material.IsAlive(), "Mesh has dead material: %s", Mesh.GetName().c_str());
 
+		const ddr::Material* material = Material.Get();
 		Key.Opaque = material->State.Blending;
 
-		float depth = glm::distance( Transform[3].xyz(), camera.GetPosition() );
+		float depth = glm::distance(Transform[3].xyz(), camera.GetPosition());
 		Key.Depth = ddr::DistanceToDepth(depth, Key.Opaque);
-		Key.Mesh = Mesh.GetID() & 0xFFF;
-		Key.Material = Material.GetID() & 0xFFF;
+		Key.Mesh = dd::Hash(Mesh.GetID());
+		Key.Material = dd::Hash(Material.GetID());
 	}
 }

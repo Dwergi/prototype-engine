@@ -10,7 +10,7 @@
 
 namespace ddr
 {
-	uint DistanceToDepth( float distance, bool transparent );
+	uint DistanceToDepth(float distance, bool transparent);
 
 	enum class CommandType
 	{
@@ -54,6 +54,6 @@ namespace ddr
 		CommandType Type;
 		MaterialHandle Material;
 
-		RenderCommand( CommandType type );
+		RenderCommand(CommandType type);
 	};
 }
