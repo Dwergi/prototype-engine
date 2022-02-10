@@ -179,6 +179,9 @@ namespace dd
 
 		const T* operator->() const { return Get(); }
 		T* operator->() { return Access(); }
+		
+		const T& operator*() const { return *Get(); }
+		T& operator*() { return *Access(); }
 
 	private:
 		friend struct HandleManager<T>;
