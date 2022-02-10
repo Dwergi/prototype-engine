@@ -26,7 +26,6 @@
 
 static dd::Service<dd::JobSystem> s_jobsystem;
 static dd::Service<ddr::MeshManager> s_meshManager;
-static dd::Service<ddr::MeshRenderCommandBuffer> s_meshCommands;
 static dd::ProfilerValueRef s_meshesRendered("Meshes Rendered");
 
 namespace ddr
@@ -49,7 +48,10 @@ namespace ddr
 		dd::MeshUtils::CreateUnitSphere();
 		dd::MeshUtils::CreateQuad();
 
-		dd::Services::Register(new MeshRenderCommandBuffer);
+		m_vboTransforms.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+		m_vboColours.Create(GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+
+		dd::Services::Register(new MeshRenderCommandBuffer());
 	}
 
 	void MeshRenderer::Update(ddr::RenderData& data)
