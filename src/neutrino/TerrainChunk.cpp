@@ -11,13 +11,7 @@
 #include "JobSystem.h"
 #include "MeshUtils.h"
 
-#include "ddr/GLError.h"
-#include "ddr/Material.h"
 #include "ddr/Mesh.h"
-#include "ddr/OpenGL.h"
-#include "ddr/ShaderPart.h"
-#include "ddr/Shader.h"
-#include "ddr/Uniforms.h"
 
 #include "neutrino/TerrainParameters.h"
 
