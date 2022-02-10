@@ -33,7 +33,8 @@ namespace ddr
 		RenderState();
 
 		void Use( bool use );
-
+		
+		[[nodiscard]]
 		ScopedRenderState UseScoped();
 
 	private:

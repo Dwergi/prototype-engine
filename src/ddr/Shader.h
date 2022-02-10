@@ -29,22 +29,11 @@ namespace ddr
 		Shader* m_shader { nullptr };
 	};
 
-	enum class Normalized
-	{
-		Yes,
-		No
-	};
-
-	enum class Instanced
-	{
-		Yes,
-		No
-	};
-
 	struct Shader : dd::HandleTarget
 	{
 		bool Reload();
 
+		[[nodiscard]]
 		ScopedShader UseScoped();
 
 		void Use(bool use);
