@@ -10,6 +10,7 @@
 #include "IRenderer.h"
 
 #include "ddr/RenderState.h"
+#include "ddr/Shader.h"
 #include "ddr/VAO.h"
 #include "ddr/VBO.h"
 
@@ -44,7 +45,9 @@ namespace ddr
 		glm::vec4 m_colours[dd::MAX_PARTICLES];
 		dd::Particle m_tempBuffer[dd::MAX_PARTICLES];
 
-		ParticleSystemRenderState GetParticleSystemRenderState(ddc::Entity entity);
-		void BindSystemToShader(ParticleSystemRenderState render_state, struct ScopedShader& shader);
+		VBO m_vboQuad;
+		ShaderHandle m_shaderParticle;
+
+		ParticleSystemRenderState& GetParticleSystemRenderState(ddc::Entity entity, ddr::Shader& shader);
 	};
 }

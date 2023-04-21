@@ -35,17 +35,59 @@ namespace ddr
 		return *this;
 	}
 
-	void VBO::Create(const dd::IBuffer& buffer)
+	void VBO::SetData(const dd::IBuffer& buffer)
+	{
+		DD_ASSERT(IsValid());
+		DD_ASSERT(buffer.IsValid() && buffer.SizeBytes() > 0);
+		
+		// if the sizes match we can just write the data now
+		if (m_dataSize == buffer.SizeBytes())
+		{
+			OpenGL::BufferSubData(*this, buffer);
+			return;
+		}
+
+		// haven't allocated any storage yet
+		if (m_dataSize == 0)
+		{
+			OpenGL::BufferStorage(*this, buffer);
+			m_dataSize = buffer.SizeBytes();
+			return;
+		}
+		
+		// if we need more data, we need to recreate it
+		if (m_dataSize < buffer.SizeBytes())
+		{
+			Recreate(buffer);
+		}
+	}
+
+	void VBO::Recreate(const dd::IBuffer& buffer)
+	{
+		DD_ASSERT(IsValid());
+		
+		uint old_id = m_id;
+
+		OpenGL::DeleteBuffer(*this);
+
+		m_id = OpenGL::CreateBuffer();
+		glObjectLabel(GL_BUFFER, m_id, (GLsizei) m_name.length(), m_name.c_str());
+
+		OpenGL::BufferStorage(*this, buffer);
+
+		m_dataSize = buffer.SizeBytes();
+
+		s_vboManager->OnRenamed(*this, old_id);
+	}
+
+	void VBO::Create(std::string_view name)
 	{
 		DD_ASSERT(!IsValid());
 
-		glCreateBuffers(1, &m_id);
-		CheckOGLError();
+		m_name = name;
 
-		glNamedBufferStorage(m_id, buffer.SizeBytes(), buffer.GetVoid(), GL_DYNAMIC_STORAGE_BIT);
-		CheckOGLError();
-
-		m_dataSize = buffer.SizeBytes();
+		m_id = OpenGL::CreateBuffer();
+		glObjectLabel(GL_BUFFER, m_id, (GLsizei) m_name.length(), m_name.c_str());
 	}
 
 	void VBO::Destroy()
@@ -54,12 +96,29 @@ namespace ddr
 		{
 			s_vboManager->OnDestroyed(*this);
 
-			glDeleteBuffers(1, &m_id);
-			CheckOGLError();
+			OpenGL::DeleteBuffer(*this);
 		}
 
 		m_id = OpenGL::InvalidID;
 		m_dataSize = 0;
+	}
+
+	void VBOManager::OnRenamed(const VBO& vbo, uint old_id)
+	{
+		auto it = m_listeners.find(old_id);
+		if (it != m_listeners.end())
+		{
+			for (IVBOListener* listener : it->second)
+			{
+				listener->OnVBORenamed(vbo, old_id);
+			}
+
+			// move listeners over to the new ID
+			m_listeners.insert({ vbo.ID(), it->second});
+
+			// remove the old ID
+			m_listeners.erase(it);
+		}
 	}
 
 	void VBOManager::OnDestroyed(const VBO& vbo)
@@ -67,7 +126,7 @@ namespace ddr
 		auto it = m_listeners.find(vbo.ID());
 		if (it != m_listeners.end())
 		{
-			for (IVBODestroyedListener* listener : it->second)
+			for (IVBOListener* listener : it->second)
 			{
 				listener->OnVBODestroyed(vbo);
 			}
@@ -76,19 +135,19 @@ namespace ddr
 		}
 	}
 
-	void VBOManager::RegisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener)
+	void VBOManager::RegisterListenerFor(const VBO& vbo, IVBOListener* listener)
 	{
 		auto it = m_listeners.find(vbo.ID());
 		if (it == m_listeners.end())
 		{
-			auto it_pair = m_listeners.insert({ vbo.ID(), std::vector<IVBODestroyedListener*>() });
+			auto it_pair = m_listeners.insert({ vbo.ID(), std::vector<IVBOListener*>() });
 			it = it_pair.first;
 		}
 
 		it->second.push_back(listener);
 	}
 
-	void VBOManager::UnregisterListenerFor(const VBO& vbo, IVBODestroyedListener* listener)
+	void VBOManager::UnregisterListenerFor(const VBO& vbo, IVBOListener* listener)
 	{
 		auto it = m_listeners.find(vbo.ID());
 		if (it != m_listeners.end())
@@ -101,11 +160,11 @@ namespace ddr
 		}
 	}
 
-	void VBOManager::UnregisterListenerFromAll(IVBODestroyedListener* listener)
+	void VBOManager::UnregisterListenerFromAll(IVBOListener* listener)
 	{
 		for (auto& pair : m_listeners)
 		{
-			std::vector<IVBODestroyedListener*>& listener_list = pair.second;
+			std::vector<IVBOListener*>& listener_list = pair.second;
 			listener_list.erase(
 				std::remove(listener_list.begin(), listener_list.end(), listener),
 				listener_list.end()

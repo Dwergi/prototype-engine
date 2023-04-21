@@ -9,7 +9,7 @@
 
 namespace dd
 {
-	IBuffer::IBuffer(uint element_size) :
+	IBuffer::IBuffer(uint32 element_size) :
 		m_elementSize(element_size)
 	{
 

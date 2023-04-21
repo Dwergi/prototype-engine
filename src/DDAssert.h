@@ -57,3 +57,10 @@ namespace dd
 		Fatal = ppk::assert::implementation::AssertLevel::Fatal
 	};
 }
+
+namespace dd::Assert
+{
+	void Initialize();
+	void Shutdown();
+	void Check();
+}

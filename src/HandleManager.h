@@ -62,11 +62,13 @@ namespace dd
 		//
 		// Find a handle to an object with the given name.
 		//
+		[[nodiscard]]
 		Handle<T> Find(std::string_view name) const;
 
 		//
 		// Create (or retrieve) a handle to an object with the given name.
 		//
+		[[nodiscard]]
 		Handle<T> Create(std::string_view name);
 
 		//
@@ -79,22 +81,26 @@ namespace dd
 		// Get the object instance associated with the given handle.
 		// Returns null if the handle does not reference an object that still exists.
 		//
+		[[nodiscard]]
 		const T* Get(Handle<T> handle) const;
 
 		//
 		// Access the object instance associated with the given handle.
 		// Returns null if the handle does not reference an object that still exists.
 		//
+		[[nodiscard]]
 		T* Access(Handle<T> handle) const;
 
 		//
 		// Is the given handle pointing a valid, live object.
 		//
+		[[nodiscard]]
 		bool IsAlive(Handle<T> h) const;
 
 		//
 		// Get the number of valid handles.
 		//
+		[[nodiscard]]
 		virtual size_t LiveCount() const override;
 
 		//
@@ -110,6 +116,7 @@ namespace dd
 		//
 		// Access the handle at index i.
 		//
+		[[nodiscard]]
 		T* AccessNth(size_t i) const;
 
 		//
@@ -160,13 +167,19 @@ namespace dd
 		Handle(std::string_view name);
 		Handle(const Handle<T>& other) : m_handle(other.m_handle) {}
 
+		[[nodiscard]]
 		uint GetID() const { return m_handle; }
+		[[nodiscard]]
 		const std::string& GetName() const;
 
+		[[nodiscard]]
 		bool IsValid() const { return m_handle != ~0u; }
+		[[nodiscard]]
 		bool IsAlive() const { return m_manager->IsAlive(*this); }
 
+		[[nodiscard]]
 		const T* Get() const { return m_manager->Get(*this); }
+		[[nodiscard]]
 		T* Access() const { return m_manager->Access(*this); }
 
 		void Destroy() const { m_manager->Destroy(*this); }

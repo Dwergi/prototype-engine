@@ -24,7 +24,7 @@ namespace ddr
 
 	private:
 
-		ShaderHandle m_shader;
+		ddr::ShaderHandle m_shader;
 		VAO m_vao;
 		VBO m_vbo;
 	};

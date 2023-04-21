@@ -40,7 +40,15 @@ namespace ddr
 		m_shader = s_shaderManager->Load("line");
 		DD_ASSERT(m_shader.IsValid());
 
-		m_vao.Create();
+		m_vao.Create("line");
+		m_vao.Bind();
+		
+		m_vboPosition.Create("line");
+		m_vao.BindVBO(m_vboPosition, 0, sizeof(glm::vec3));
+
+		m_shader->BindPositions(m_vao, m_vboPosition);
+
+		m_vao.Unbind();
 	}
 
 	void LinesRenderer::Render(const ddr::RenderData& render_data)
@@ -73,19 +81,12 @@ namespace ddr
 			std::memcpy(line_data.data() + offset, lines[i].Points.Data(), lines[i].Points.Size());
 		}
 
-		// recreate VBO
-		if (m_vboPosition.IsValid())
-		{
-			m_vboPosition.Destroy();
-		}
-
-		m_vboPosition.Create(line_data);
-		m_vao.BindVBO(m_vboPosition, 0, sizeof(line_data[0]));
+		m_vboPosition.SetData(line_data);
 
 		ScopedShader shader = m_shader.Access()->UseScoped();
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
-
-		shader->BindPositions(m_vao, m_vboPosition);
+		
+		m_vao.Bind();
 
 		const ddr::ICamera& camera = render_data.Camera();
 		const glm::mat4 view_projection = camera.GetProjectionMatrix() * camera.GetViewMatrix();
@@ -126,7 +127,9 @@ namespace ddr
 			shader->SetUniform("Colour", colour);
 			shader->SetUniform("ModelViewProjection", view_projection * transforms[i].Transform());
 
-			OpenGL::DrawArrays(OpenGL::Primitive::Lines, num_points);
+			OpenGL::DrawArrays(ddr::Primitive::Lines, num_points);
 		}
+
+		m_vao.Unbind();
 	}
 }

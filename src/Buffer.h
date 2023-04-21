@@ -24,12 +24,14 @@ namespace dd
 		uint64 Size() const;
 		int SizeInt() const;
 
+		bool IsValid() const { return GetVoid() != nullptr; }
+
 	protected:
 
-		IBuffer(uint element_size);
+		IBuffer(uint32 element_size);
 
-		uint64 m_count { 0 };
-		uint64 m_elementSize { 0 };
+		uint64 m_count = 0;
+		uint32 m_elementSize = 0;
 	};
 
 	//
@@ -39,12 +41,9 @@ namespace dd
 	struct ConstBuffer : IBuffer
 	{
 		ConstBuffer();
-		ConstBuffer(const T* ptr, int count);
-		ConstBuffer(const T* ptr, uint count);
 		ConstBuffer(const T* ptr, uint64 count);
 
 		explicit ConstBuffer(const std::vector<T>& vec);
-
 		explicit ConstBuffer(const IBuffer& buffer);
 
 		ConstBuffer(const ConstBuffer<T>& other);
@@ -55,8 +54,6 @@ namespace dd
 		ConstBuffer<T>& operator=(ConstBuffer<T>&& other);
 
 		const T& operator[](uint64 idx) const;
-
-		bool IsValid() const { return m_ptr != nullptr; }
 
 		void Set(const T* ptr, uint64 count);
 		const T* Get() const;
@@ -73,7 +70,7 @@ namespace dd
 		const T* end() const { return Get() + Size(); }
 
 	protected:
-		const T* m_ptr { nullptr };
+		const T* m_ptr = nullptr;
 	};
 
 	//
@@ -83,12 +80,7 @@ namespace dd
 	struct Buffer : ConstBuffer<T>
 	{
 		Buffer();
-		Buffer(T* ptr, int count);
-		Buffer(T* ptr, uint count);
 		Buffer(T* ptr, uint64 count);
-
-		template <uint64 Size>
-		explicit Buffer(T(arr)[Size]) : ConstBuffer(arr) {}
 
 		explicit Buffer(const IBuffer& buffer);
 		Buffer(const Buffer<T>& other);

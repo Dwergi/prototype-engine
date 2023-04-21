@@ -86,6 +86,7 @@ namespace ddr
 		}
 
 		m_shaders = shaders;
+		glObjectLabel(GL_PROGRAM, m_id, (GLsizei) m_name.length(), m_name.c_str());
 	}
 
 	dd::String256 Shader::Link()
@@ -199,131 +200,86 @@ namespace ddr
 		return location;
 	}
 
-	bool Shader::EnableAttribute(VAO& vao, std::string_view name)
-	{
-		ShaderLocation loc = GetAttribute(name);
-		if (loc != InvalidLocation)
-		{
-			vao.EnableAttribute(loc);
-			return true;
-		}
-
-		DD_ASSERT(false, "Attribute '%s' not found!", std::string(name).c_str());
-		return false;
-	}
-
-	bool Shader::DisableAttribute(VAO& vao, std::string_view name)
-	{
-		ShaderLocation loc = GetAttribute(name);
-		if (loc != InvalidLocation)
-		{
-			vao.DisableAttribute(loc);
-			return true;
-		}
-
-		DD_ASSERT(false, "Attribute '%s' not found!", std::string(name).c_str());
-		return false;
-	}
-
 	bool Shader::BindPositions(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec3(vao, vbo, "Position");
+		return CreateAttributeVec3(vao, vbo, "Position", Normalized::No, Instanced::No);
 	}
 
 	bool Shader::BindNormals(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec3(vao, vbo, "Normal", Normalized::Yes);
+		return CreateAttributeVec3(vao, vbo, "Normal", Normalized::Yes, Instanced::No);
 	}
 
 	bool Shader::BindUVs(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec2(vao, vbo, "UV");
+		return CreateAttributeVec2(vao, vbo, "UV", Normalized::No, Instanced::No);
 	}
 
 	bool Shader::BindVertexColours(VAO& vao, const VBO& vbo)
 	{
-		return BindAttributeVec4(vao, vbo, "VertexColour");
+		return CreateAttributeVec4(vao, vbo, "VertexColour", Normalized::No, Instanced::No);
 	}
 
-	bool Shader::BindAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(vao, vbo, name, 2, normalized, instanced);
+		return CreateAttributeFloat(vao, vbo, name, 2, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(vao, vbo, name, 3, normalized, instanced);
+		return CreateAttributeFloat(vao, vbo, name, 3, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeFloat(vao, vbo, name, 4, normalized, instanced);
+		return CreateAttributeFloat(vao, vbo, name, 4, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized, Instanced instanced)
 	{
 		DD_ASSERT(components > 0 && components <= 4);
 
 		ShaderLocation loc = GetAttribute(name);
-		if (loc != InvalidLocation)
+		if (loc == InvalidLocation)
 		{
-			glEnableVertexAttribArray(loc);
-			CheckOGLError();
-
-			glVertexAttribPointer(loc, components, GL_FLOAT, normalized == Normalized::Yes ? GL_TRUE : GL_FALSE, 0, nullptr);
-			CheckOGLError();
-
-			if (instanced == Instanced::Yes)
-			{
-				glVertexAttribDivisor(loc, 1);
-			}
-
-			return true;
+			return false;
 		}
 
-		return false;
+		vao.CreateAttribute(name, loc, vbo, Format::Float, components, normalized, instanced, 0);
+		return true;
 	}
 
-	bool Shader::BindAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized, Instanced instanced)
 	{
 		ShaderLocation loc = GetAttribute(name);
-		if (loc != InvalidLocation)
+		if (loc == InvalidLocation)
 		{
-			size_t row_offset = sizeof(float) * components;
-
-			for (int i = 0; i < components; ++i)
-			{
-				vao.EnableAttribute(loc + i);
-
-				vao.BindAttribute(vbo, loc + i, GL_FLOAT, normalized, components, i * row_offset);
-
-				CheckOGLError();
-
-				if (instanced == Instanced::Yes)
-				{
-					glVertexAttribDivisor(loc + i, 1);
-				}
-			}
-
-			return true;
+			return false;
 		}
 
-		return false;
+		size_t row_offset = sizeof(float) * components;
+
+		for (int i = 0; i < components; ++i)
+		{
+			vao.CreateAttribute(name, loc + i, vbo, Format::Float, components, normalized, instanced, i * row_offset);
+		}
+
+		return true;
 	}
 
-	bool Shader::BindAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(vao, vbo, name, 2, normalized, instanced);
+		return CreateAttributeMatrix(vao, vbo, name, 2, normalized, instanced);
 	}
 	
-	bool Shader::BindAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(vao, vbo, name, 3, normalized, instanced);
+		return CreateAttributeMatrix(vao, vbo, name, 3, normalized, instanced);
 	}
 
-	bool Shader::BindAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
+	bool Shader::CreateAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced)
 	{
-		return BindAttributeMatrix(vao, vbo, name, 4, normalized, instanced);
+		return CreateAttributeMatrix(vao, vbo, name, 4, normalized, instanced);
 	}
 
 	ShaderLocation Shader::GetUniform(std::string_view name)

@@ -7,6 +7,7 @@
 #include "PCH.h"
 #include "NeutrinoGame.h"
 
+#include "BoundBoxComponent.h"
 #include "BoundsRenderer.h"
 #include "BulletSystem.h"
 #include "DebugUI.h"
@@ -132,6 +133,10 @@ namespace neut
 			camera->SetAspectRatio(s_window->GetAspectRatio());
 			camera->SetVerticalFOV(glm::radians(45.0f));
 
+			dd::TransformComponent* transform = s_player.Access<dd::TransformComponent>();
+			transform->Position = glm::vec3(0, 1000, 0);
+			transform->Rotation = glm::lookAt(transform->Position, glm::vec3(0, 0, 100), glm::vec3(0, 1, 0));
+
 			s_renderer->SetCamera(*camera);
 		}
 
@@ -171,7 +176,7 @@ namespace neut
 		}
 
 		// particle system
-		/*{
+		{
 			ddc::Entity entity = entities.CreateEntity<dd::ParticleSystemComponent, dd::TransformComponent, dd::BoundBoxComponent>();
 			entities.AddTag( entity, ddc::Tag::Visible );
 			entities.AddTag( entity, ddc::Tag::Dynamic );
@@ -186,7 +191,7 @@ namespace neut
 			dd::ParticleSystemComponent* particle = entities.Access<dd::ParticleSystemComponent>( entity );
 			particle->Age = 0;
 			particle->Lifetime = 1000;
-		}*/
+		}
 
 		// axes
 		dd::TestEntities::CreateAxes(entities);

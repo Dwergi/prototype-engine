@@ -73,7 +73,6 @@ namespace dd
 
 	void Profiler::BeginFrame()
 	{
-		DD_ASSERT(!s_inFrame);
 		s_inFrame = true;
 
 		for (dd::ProfilerValue* value : s_instances)

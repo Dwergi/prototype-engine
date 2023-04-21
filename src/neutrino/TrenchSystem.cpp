@@ -13,7 +13,6 @@
 #include "PlayerComponent.h"
 
 #include "ddr/Material.h"
-#include "ddr/Mesh.h"
 #include "ddr/ShaderPart.h"
 #include "ddr/Shader.h"
 
@@ -29,61 +28,61 @@ namespace dd
 	{
 		//  X  Y  Z       
 		// bottom
-		glm::vec3( 0.5f,	0.0f,	0.0f ),   
-		glm::vec3( -0.5f,	0.0f,	0.0f ),  
-		glm::vec3( -0.5f,	0.0f,	1.0f ),  
-		glm::vec3( 0.5f,	0.0f,	1.0f ),   
-		glm::vec3( 0.5f,	0.0f,	0.0f ),   
-		glm::vec3( -0.5f,	0.0f,	1.0f ),  
+		glm::vec3(0.5f,	0.0f,	0.0f),
+		glm::vec3(-0.5f,	0.0f,	0.0f),
+		glm::vec3(-0.5f,	0.0f,	1.0f),
+		glm::vec3(0.5f,	0.0f,	1.0f),
+		glm::vec3(0.5f,	0.0f,	0.0f),
+		glm::vec3(-0.5f,	0.0f,	1.0f),
 
 		// left
-		glm::vec3( -0.5f,	1.0f,	0.0f ),
-		glm::vec3( -0.5f,	0.0f,	1.0f ),
-		glm::vec3( -0.5f,	0.0f,	0.0f ),
-		glm::vec3( -0.5f,	1.0f,	1.0f ),
-		glm::vec3( -0.5f,	0.0f	,1.0f ),
-		glm::vec3( -0.5f,	1.0f,	0.0f ),
+		glm::vec3(-0.5f,	1.0f,	0.0f),
+		glm::vec3(-0.5f,	0.0f,	1.0f),
+		glm::vec3(-0.5f,	0.0f,	0.0f),
+		glm::vec3(-0.5f,	1.0f,	1.0f),
+		glm::vec3(-0.5f,	0.0f	,1.0f),
+		glm::vec3(-0.5f,	1.0f,	0.0f),
 
 		// right
-		glm::vec3( 0.5f,	0.0f,	0.0f ),
-		glm::vec3( 0.5f,	0.0f,	1.0f ),
-		glm::vec3( 0.5f,	1.0f,	0.0f ),
-		glm::vec3( 0.5f,	1.0f,	0.0f ),
-		glm::vec3( 0.5f,	0.0f,	1.0f ),
-		glm::vec3( 0.5f,	1.0f,	1.0f ),
+		glm::vec3(0.5f,	0.0f,	0.0f),
+		glm::vec3(0.5f,	0.0f,	1.0f),
+		glm::vec3(0.5f,	1.0f,	0.0f),
+		glm::vec3(0.5f,	1.0f,	0.0f),
+		glm::vec3(0.5f,	0.0f,	1.0f),
+		glm::vec3(0.5f,	1.0f,	1.0f),
 	};
 
-	static const ConstBuffer<glm::vec3> s_trenchChunkPositionBuffer( s_trenchChunkPositions, ArrayLength( s_trenchChunkPositions ) );
+	static const ConstBuffer<glm::vec3> s_trenchChunkPositionBuffer(s_trenchChunkPositions, ArrayLength(s_trenchChunkPositions));
 
 	static const glm::vec3 s_trenchChunkNormals[] =
 	{
 		// X	Y     Z
 		// bottom
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
-		glm::vec3( 0.0f,	1.0f,	0.0f ),
+		glm::vec3(0.0f,	1.0f,	0.0f),
+		glm::vec3(0.0f,	1.0f,	0.0f),
+		glm::vec3(0.0f,	1.0f,	0.0f),
+		glm::vec3(0.0f,	1.0f,	0.0f),
+		glm::vec3(0.0f,	1.0f,	0.0f),
+		glm::vec3(0.0f,	1.0f,	0.0f),
 
 		// left
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
-		glm::vec3( 1.0f,	0.0f,	0.0f ),
+		glm::vec3(1.0f,	0.0f,	0.0f),
+		glm::vec3(1.0f,	0.0f,	0.0f),
+		glm::vec3(1.0f,	0.0f,	0.0f),
+		glm::vec3(1.0f,	0.0f,	0.0f),
+		glm::vec3(1.0f,	0.0f,	0.0f),
+		glm::vec3(1.0f,	0.0f,	0.0f),
 
 		// right
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
-		glm::vec3( -1.0f,	0.0f,	0.0f ),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
+		glm::vec3(-1.0f,	0.0f,	0.0f),
 	};
 
-	static const ConstBuffer<glm::vec3> s_trenchChunkNormalBuffer( s_trenchChunkNormals, ArrayLength( s_trenchChunkNormals ) );
+	static const ConstBuffer<glm::vec3> s_trenchChunkNormalBuffer(s_trenchChunkNormals, ArrayLength(s_trenchChunkNormals));
 
 	/*
 	DATA:
@@ -103,9 +102,9 @@ namespace dd
 	*/
 
 	TrenchSystem::TrenchSystem() :
-		ddc::System( "Trench System" ),
-		m_trenchDirection( 0.0f, 0.0f, 1.0f ),
-		m_trenchOrigin( 0.0f, 0.0f, 0.0f )
+		ddc::System("Trench System"),
+		m_trenchDirection(0.0f, 0.0f, 1.0f),
+		m_trenchOrigin(0.0f, 0.0f, 0.0f)
 	{
 
 	}
@@ -117,59 +116,59 @@ namespace dd
 
 	void TrenchSystem::CreateRenderResources()
 	{
-		m_shader = s_shaderManager->Load( "terrain" );
+		m_shader = s_shaderManager->Load("terrain");
 		ddr::Shader* shader = m_shader.Access();
-		DD_ASSERT( shader != nullptr );
+		DD_ASSERT(shader != nullptr);
 
-		ddr::MaterialHandle material_h = s_materialManager->Create( "trench_chunk" );
+		ddr::MaterialHandle material_h = s_materialManager->Create("trench_chunk");
 		ddr::Material* material = material_h.Access();
-		DD_ASSERT( material != nullptr );
+		DD_ASSERT(material != nullptr);
 
 		material->Shader = m_shader;
 
-		shader->Use( true );
+		shader->Use(true);
 
-		m_chunkMesh = s_meshManager->Create( "trench_chunk" );
+		m_chunkMesh = s_meshManager->Create("trench_chunk");
 		ddr::Mesh* mesh = m_chunkMesh.Access();
-		DD_ASSERT( mesh != nullptr );
+		DD_ASSERT(mesh != nullptr);
 
-		mesh->SetPositions( s_trenchChunkPositionBuffer );
-		mesh->SetNormals( s_trenchChunkNormalBuffer );
+		mesh->SetPositions(s_trenchChunkPositionBuffer);
+		mesh->SetNormals(s_trenchChunkNormalBuffer);
 
-		shader->Use( false );
+		shader->Use(false);
 
 		ddm::AABB bounds;
-		bounds.Expand( glm::vec3( -0.5, 0, 0 ) );
-		bounds.Expand( glm::vec3( 0.5, 1, 1 ) );
-		mesh->SetBoundBox( bounds );
+		bounds.Expand(glm::vec3(-0.5, 0, 0));
+		bounds.Expand(glm::vec3(0.5, 1, 1));
+		mesh->SetBoundBox(bounds);
 	}
 
-	ddc::Entity TrenchSystem::CreateTrenchChunk( glm::vec3 position, ddc::EntityLayer& entities )
+	ddc::Entity TrenchSystem::CreateTrenchChunk(glm::vec3 position, ddc::EntityLayer& entities)
 	{
 		ddc::Entity entity = entities.CreateEntity<TransformComponent, MeshComponent, ColourComponent>();
 
-		TransformComponent* transform_cmp = entities.Access<TransformComponent>( entity );
+		TransformComponent* transform_cmp = entities.Access<TransformComponent>(entity);
 		transform_cmp->Position = position;
-		transform_cmp->Scale = glm::vec3( TRENCH_CHUNK_LENGTH );
+		transform_cmp->Scale = glm::vec3(TRENCH_CHUNK_LENGTH);
 		transform_cmp->Update();
 
-		MeshComponent* mesh_cmp = entities.Access<MeshComponent>( entity );
+		MeshComponent* mesh_cmp = entities.Access<MeshComponent>(entity);
 		mesh_cmp->Mesh = m_chunkMesh;
 
-		ColourComponent* colour_cmp = entities.Access<ColourComponent>( entity );
-		colour_cmp->Colour = glm::vec4( 0.5f, 0.5f, 0.7f, 1.0f );
+		ColourComponent* colour_cmp = entities.Access<ColourComponent>(entity);
+		colour_cmp->Colour = glm::vec4(0.5f, 0.5f, 0.7f, 1.0f);
 
-		entities.AddTag( entity, ddc::Tag::Visible );
+		entities.AddTag(entity, ddc::Tag::Visible);
 		return entity;
 	}
 
-	void TrenchSystem::Update( ddc::UpdateData& data )
+	void TrenchSystem::Update(ddc::UpdateData& data)
 	{
 		/*// cache these here to avoid recalculating for all components
 		glm::vec3 player_pos = m_camera.Position;
 
 		int chunk_index = (int) (player_pos / (m_trenchDirection * TRENCH_CHUNK_LENGTH)).z;
-		
+
 		const int chunk_count = (int) (m_camera.GetFar() / TRENCH_CHUNK_LENGTH);
 
 		for( int i = 0; i < chunk_count; ++i )

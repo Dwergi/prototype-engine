@@ -27,7 +27,7 @@ namespace ddr
 	private:
 
 		MeshHandle m_mesh;
-		ShaderHandle m_shader;
+		ddr::ShaderHandle m_shader;
 
 		bool m_createLight { false };
 		ddc::Entity m_deleteLight;

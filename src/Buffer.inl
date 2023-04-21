@@ -23,22 +23,6 @@ ConstBuffer<T>::ConstBuffer(const IBuffer& buffer) :
 }
 
 template <typename T>
-ConstBuffer<T>::ConstBuffer(const T* ptr, int count) :
-	IBuffer(sizeof(T))
-{
-	m_ptr = ptr;
-	m_count = count;
-}
-
-template <typename T>
-ConstBuffer<T>::ConstBuffer(const T* ptr, uint count) :
-	IBuffer(sizeof(T))
-{
-	m_ptr = ptr;
-	m_count = count;
-}
-
-template <typename T>
 ConstBuffer<T>::ConstBuffer(const T* ptr, uint64 count) :
 	IBuffer(sizeof(T))
 {
@@ -164,20 +148,6 @@ Buffer<T>::Buffer(const IBuffer& buffer)
 {
 	m_ptr = (T*) buffer.GetVoid();
 	m_count = buffer.SizeBytes() / m_elementSize;
-}
-
-template <typename T>
-Buffer<T>::Buffer(T* ptr, int count) :
-	ConstBuffer(ptr, count)
-{
-
-}
-
-template <typename T>
-Buffer<T>::Buffer(T* ptr, uint count) :
-	ConstBuffer(ptr, count)
-{
-
 }
 
 template <typename T>

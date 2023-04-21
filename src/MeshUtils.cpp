@@ -35,7 +35,7 @@ namespace std
 	{
 		size_t operator()(const dd::GridKey& key) const
 		{
-			return ((size_t) key.VertexCount << 32) | key.LOD;
+			return (size_t)(key.VertexCount << 16 | key.LOD);
 		}
 	};
 }
@@ -273,7 +273,7 @@ namespace dd
 		DD_ASSERT(out_normals.empty());
 		out_normals.resize(positions.size());
 
-		ConstTriangulator triangulator(positions, indices);
+		Triangulator triangulator(positions, indices);
 
 		for (size_t i = 0; i < triangulator.Size(); ++i)
 		{
@@ -428,9 +428,9 @@ namespace dd
 		std::vector<glm::vec3>* norm = nullptr;
 		CalculateIcosphere(pos, idx, norm, iterations);
 
-		positions.Create(*pos);
-		indices.Create(*idx);
-		normals.Create(*norm);
+		positions.SetData(*pos);
+		indices.SetData(*idx);
+		normals.SetData(*norm);
 	}
 
 	void MeshUtils::GetLineIndicesFromTriangles(const std::vector<uint>& src, std::vector<uint>& dest)
@@ -466,8 +466,8 @@ namespace dd
 		std::vector<uint> line_indices;
 		GetLineIndicesFromTriangles(*idx, line_indices);
 
-		positions.Create(*pos);
-		indices.Create(line_indices);
+		positions.SetData(*pos);
+		indices.SetData(line_indices);
 	}
 
 	void MeshUtils::MakeUnitCube(ddr::Mesh& mesh)

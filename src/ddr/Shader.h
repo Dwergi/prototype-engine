@@ -42,8 +42,10 @@ namespace ddr
 		ScopedShader UseScoped();
 
 		void Use(bool use);
-		bool InUse() const;
 
+		[[nodiscard]]
+		bool InUse() const;
+		[[nodiscard]]
 		bool IsValid() const { return m_valid; }
 
 		void SetUniform(std::string_view name, const glm::mat3& mat);
@@ -61,18 +63,15 @@ namespace ddr
 		bool BindUVs(VAO& vao, const VBO& vbo);
 		bool BindVertexColours(VAO& vao, const VBO& vbo);
 
-		bool BindAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
+		bool CreateAttributeFloat(VAO& vao, const VBO& vbo, std::string_view name, uint components, Normalized normalized, Instanced instanced);
+		bool CreateAttributeVec2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
+		bool CreateAttributeVec3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
+		bool CreateAttributeVec4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
 
-		bool BindAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-		bool BindAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized = Normalized::No, Instanced instanced = Instanced::No);
-
-		bool EnableAttribute(VAO& vao, std::string_view name);
-		bool DisableAttribute(VAO& vao, std::string_view name);
+		bool CreateAttributeMatrix(VAO& vao, const VBO& vbo, std::string_view name, int components, Normalized normalized, Instanced instanced);
+		bool CreateAttributeMat2(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
+		bool CreateAttributeMat3(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
+		bool CreateAttributeMat4(VAO& vao, const VBO& vbo, std::string_view name, Normalized normalized, Instanced instanced);
 
 		Shader();
 		~Shader();
@@ -82,6 +81,7 @@ namespace ddr
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) = delete;
 
+		[[nodiscard]]
 		static const char* TypeName() { return "Shader"; }
 
 	private:
@@ -114,6 +114,7 @@ namespace ddr
 		// Load a shader of the given name, assuming that it uses standard extensions. 
 		// For anything more advanced, use Create.
 		//
+		[[nodiscard]]
 		ShaderHandle Load(std::string_view name);
 
 		//

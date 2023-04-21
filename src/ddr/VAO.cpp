@@ -29,7 +29,7 @@ namespace ddr
 
 	VAO::VAO(const VAO& other)
 	{
-		DD_ASSERT(!m_bound, "Bound VAO shouldn't be copied!");
+		DD_ASSERT(!other.IsValid() || !other.IsBound(), "Bound VAO shouldn't be copied!");
 
 		m_id = other.m_id;
 		m_vbos = other.m_vbos;
@@ -37,24 +37,26 @@ namespace ddr
 
 	VAO::~VAO()
 	{
-		DD_ASSERT(!IsValid(), "VAO should be destroyed before destructor!");
+		DD_ASSERT(!IsValid(), "VAO should be Destroy() before destructor!");
 	}
 
-	void VAO::Create()
+	void VAO::Create(std::string_view name)
 	{
 		DD_ASSERT(!IsValid());
 
-		glCreateVertexArrays(1, &m_id);
-		CheckOGLError();
+		m_id = OpenGL::CreateVertexArray();
+		DD_ASSERT(m_id != OpenGL::InvalidID);
+
+		m_name = name;
+		glObjectLabel(GL_VERTEX_ARRAY, m_id, (GLsizei) m_name.length(), m_name.c_str());
 	}
 
 	void VAO::Destroy()
 	{
 		DD_ASSERT(IsValid());
-		DD_ASSERT(!m_bound);
+		DD_ASSERT(!IsBound(), "Bound VAO shouldn't be destroyed!");
 
-		glDeleteVertexArrays(1, &m_id);
-		CheckOGLError();
+		OpenGL::DeleteVertexArray(*this);
 
 		m_id = OpenGL::InvalidID;
 	}
@@ -63,16 +65,36 @@ namespace ddr
 	{
 		DD_ASSERT(IsValid());
 
-		glEnableVertexArrayAttrib(m_id, loc);
-		CheckOGLError();
+		OpenGL::EnableVertexArrayAttribute(*this, loc);
 	}
 
 	void VAO::DisableAttribute(ShaderLocation loc)
 	{ 
 		DD_ASSERT(IsValid());
 
-		glDisableVertexArrayAttrib(m_id, loc);
-		CheckOGLError();
+		OpenGL::DisableVertexArrayAttribute(*this, loc);
+	}
+
+	void VAO::OnVBORenamed(const VBO& vbo, uint old_id)
+	{
+		DD_ASSERT(IsValid());
+
+		bool first = true;
+
+		if (old_id == m_indices)
+		{
+			OpenGL::SetVertexArrayIndices(*this, vbo);
+		}
+		else
+		{
+			// update the ID of the binding
+			int index = IndexOf(old_id);
+			DD_ASSERT(index != -1, "VBO not bound!");
+			BufferBinding& binding = m_vbos[index];
+			DD_ASSERT(binding.VBO == &vbo);
+
+			OpenGL::SetVertexArrayBuffer(*this, index, vbo, binding.Offset, binding.Stride);
+		}
 	}
 
 	void VAO::OnVBODestroyed(const VBO& vbo)
@@ -91,18 +113,33 @@ namespace ddr
 		}
 	}
 
+	int VAO::IndexOf(uint vbo_id) const
+	{
+		for (int i = 0; i < m_vbos.Size(); ++i)
+		{
+			if (m_vbos[i].VBO->ID() == vbo_id)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	void VAO::BindVBO(const VBO& vbo, uint offset, uint stride)
 	{
 		DD_ASSERT(IsValid());
-		DD_ASSERT(m_vbos.IndexOf(vbo.ID()) == -1, "Duplicate VBO bound!");
+		DD_ASSERT(IndexOf(vbo.ID()) == -1, "VBO already bound!");
 		DD_ASSERT(m_vbos.Size() < m_vbos.Capacity(), "Too many VBOs bound.");
 
 		int index = m_vbos.Size();
 
-		glVertexArrayVertexBuffer(m_id, index, vbo.ID(), offset, stride);
-		CheckOGLError();
+		BufferBinding binding;
+		binding.VBO = &vbo;
+		binding.Offset = offset;
+		binding.Stride = stride;
+		m_vbos.Add(binding);
 
-		m_vbos.Add(vbo.ID());
+		OpenGL::SetVertexArrayBuffer(*this, index, vbo, offset, stride);
 
 		s_vboManager->RegisterListenerFor(vbo, this);
 	}
@@ -111,11 +148,10 @@ namespace ddr
 	{
 		DD_ASSERT(IsValid());
 
-		int index = m_vbos.IndexOf(vbo.ID());
+		int index = IndexOf(vbo.ID());
 		DD_ASSERT(index != -1, "VBO is not bound.");
 
-		glVertexArrayVertexBuffer(m_id, index, 0, 0, 0);
-		CheckOGLError();
+		OpenGL::ClearVertexArrayBuffer(*this, index);
 
 		m_vbos.RemoveAt(index);
 
@@ -127,8 +163,7 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_indices == OpenGL::InvalidID);
 
-		glVertexArrayElementBuffer(m_id, vbo.ID());
-		CheckOGLError();
+		OpenGL::SetVertexArrayIndices(*this, vbo);
 
 		m_indices = vbo.ID();
 
@@ -140,26 +175,33 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_indices != OpenGL::InvalidID);
 
-		glVertexArrayElementBuffer(m_id, 0);
-		CheckOGLError();
+		OpenGL::ClearVertexArrayIndices(*this);
 
 		m_indices = OpenGL::InvalidID;
 
 		s_vboManager->UnregisterListenerFor(vbo, this);
 	}
 
-	void VAO::BindAttribute(const VBO& vbo, ShaderLocation loc, GLenum format, Normalized normalized, int components, uint64 offset)
+	void VAO::CreateAttribute(std::string_view name, ShaderLocation loc, const VBO& vbo, Format format, int components, Normalized normalized, Instanced instanced, uint64 offset)
 	{
 		DD_ASSERT(IsValid());
-
-		glVertexArrayAttribFormat(m_id, loc, components, format, normalized == Normalized::Yes ? GL_TRUE : GL_FALSE, (GLuint) offset);
-		CheckOGLError();
-
-		int vbo_index = m_vbos.IndexOf(vbo.ID());
+		int vbo_index = IndexOf(vbo.ID());
 		DD_ASSERT(vbo_index != -1, "VBO not bound!");
 
-		glVertexArrayAttribBinding(m_id, loc, vbo_index);
-		CheckOGLError();
+		BufferBinding& binding = m_vbos[vbo_index];
+		binding.BoundTo.Add(loc);
+
+		Attribute attribute;
+		attribute.Name = name;
+		attribute.Location = loc;
+		attribute.VBO = &vbo;
+		attribute.Offset = offset;
+		m_attributes.Add(attribute);
+
+		OpenGL::SetVertexArrayAttributeFormat(*this, loc, format, components, normalized, offset);
+		OpenGL::BindVertexArrayAttribute(*this, loc, vbo_index);
+		OpenGL::SetVertexArrayBindingDivisor(*this, vbo_index, instanced == Instanced::Yes ? 1 : 0);
+		OpenGL::EnableVertexArrayAttribute(*this, loc);
 	}
 
 	void VAO::Bind()
@@ -167,16 +209,19 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(GetCurrentVAO() == 0, "Must unbind previous VAO!");
 
-		glBindVertexArray(m_id);
-		CheckOGLError();
+		OpenGL::BindVertexArray(*this);
 	}
 
 	void VAO::Unbind()
 	{
 		DD_ASSERT(IsValid());
-		DD_ASSERT(GetCurrentVAO() == m_id, "Unbinding different VAO!");
+		DD_ASSERT(IsBound(), "Unbinding different VAO!");
 
-		glBindVertexArray(0);
-		CheckOGLError();
+		OpenGL::UnbindVertexArray();
+	}
+
+	bool VAO::IsBound() const
+	{
+		return GetCurrentVAO() == m_id;
 	}
 }

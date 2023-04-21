@@ -155,7 +155,13 @@ namespace ddr
 	void Frustum::CreateRenderData()
 	{
 		m_shader = s_shaderManager->Load("mesh");
-		m_vao.Create();
+		ScopedShader shader = m_shader.Access()->UseScoped();
+
+		m_vao.Create("frustum");
+
+		m_vboVertex.Create("frustum");
+		m_vao.BindVBO(m_vboVertex, 0, sizeof(m_corners[0]));
+		shader->BindPositions(m_vao, m_vboVertex);
 
 		m_renderState.BackfaceCulling = false;
 		m_renderState.Blending = true;
@@ -171,14 +177,7 @@ namespace ddr
 
 		if (m_dirty)
 		{
-			ScopedShader shader = m_shader.Access()->UseScoped();
-
-			m_vboVertex.Destroy();
-
-			m_vboVertex.Create(m_corners);
-			m_vao.BindVBO(m_vboVertex, 0, sizeof(m_corners[0]));
-
-			shader->BindPositions(m_vao, m_vboVertex);
+			m_vboVertex.SetData(m_corners);
 
 			m_dirty = false;
 		}
@@ -188,6 +187,8 @@ namespace ddr
 		ScopedShader shader = m_shader.Access()->UseScoped();
 		ScopedRenderState state = m_renderState.UseScoped();
 
+		m_vao.Bind();
+
 		uniforms.Set("Model", m_transform);
 
 		for (int i = 0; i < 6; ++i)
@@ -196,6 +197,8 @@ namespace ddr
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*)(6 * sizeof(GLushort) * i));
 		}
+
+		m_vao.Unbind();
 	}
 
 	void Frustum::UpdateFrustum(const ddr::ICamera& camera)

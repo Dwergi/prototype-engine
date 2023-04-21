@@ -36,13 +36,17 @@ namespace ddr
 
 	private:
 
-		struct InstanceVBOs
+		struct InstanceData
 		{
-			VBO Transforms;
-			VBO Colours;
+			VAO VAO;
+			std::vector<glm::mat4> Transforms;
+			VBO TransformVBO;
+			std::vector<glm::vec4> Colours;
+			VBO ColourVBO;
+			std::string Name;
 		};
 
-		std::unordered_map<uint64, InstanceVBOs> m_instanceCache;
+		std::unordered_map<uint64, InstanceData> m_instanceCache;
 
 		int m_meshCount { 0 };
 		int m_unculledMeshCount { 0 };
@@ -57,7 +61,11 @@ namespace ddr
 			const dd::BoundBoxComponent* bound_box, const dd::BoundSphereComponent* bound_sphere, const dd::ColourComponent* colour_cmp,
 			const ddr::RenderData& render_data);
 
-		InstanceVBOs& FindCachedInstanceVBOs(MeshHandle mesh_h, MaterialHandle material_h);
+		// 
+		// Find or add an instance data to the cache.
+		// Returns true if a new instance was added.
+		//
+		InstanceData& FindOrAddInstanceData(MeshHandle mesh_h, MaterialHandle material_h, bool& out_added);
 
 		void ProcessCommands(ddr::UniformStorage& uniforms);
 		void DrawMeshInstances(MeshHandle mesh_h, MaterialHandle material_h, const std::vector<glm::mat4>& transforms, const std::vector<glm::vec4>& colours);

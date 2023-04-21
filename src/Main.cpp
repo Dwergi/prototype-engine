@@ -14,7 +14,6 @@
 
 #include "AssetManager.h"
 #include "CommandLine.h"
-#include "DDAssertHelpers.h"
 #include "DebugConsole.h"
 #include "DebugUI.h"
 #include "EntityVisualizer.h"
@@ -235,6 +234,8 @@ static void GameShutdown()
 	s_game->Shutdown();
 }
 
+static long s_frame = -1;
+
 static int GameMain()
 {
 	InitializeGame();
@@ -248,6 +249,7 @@ static int GameMain()
 
 		{
 			s_profilerTimer.Restart();
+			++s_frame;
 
 			StartFrame();
 

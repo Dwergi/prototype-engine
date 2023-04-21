@@ -10,6 +10,7 @@
 #include "IRenderer.h"
 
 #include "ddr/RenderState.h"
+#include "ddr/Shader.h"
 #include "ddr/VAO.h"
 #include "ddr/VBO.h"
 
@@ -49,6 +50,9 @@ namespace ddr
 		std::vector<glm::vec2> m_uvOffsets;
 		std::vector<glm::vec2> m_uvScales;
 		std::vector<glm::vec4> m_colours;
+
+		VBO m_vboQuad;
+		ddr::ShaderHandle m_shader;
 
 		std::vector<d2d::SpriteComponent> m_temp;
 

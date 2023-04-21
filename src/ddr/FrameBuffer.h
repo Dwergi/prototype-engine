@@ -59,7 +59,7 @@ namespace ddr
 		Texture* GetColourTexture() const { return m_texColour; }
 		Texture* GetDepthTexture() const { return m_texDepth; }
 
-		void Initialize();
+		void Initialize(std::string_view name);
 
 		void Render(UniformStorage& uniforms);
 		void RenderDepth(UniformStorage& uniforms, const ICamera& camera);
@@ -72,6 +72,7 @@ namespace ddr
 
 	private:
 
+		std::string m_name;
 		bool m_valid { false };
 		GLuint m_fbo { OpenGL::InvalidID };
 
@@ -84,10 +85,6 @@ namespace ddr
 
 		Texture* m_texColour { nullptr };
 		Texture* m_texDepth { nullptr };
-
-		static ShaderHandle m_blitShader;
-		static VBO m_vboFullscreen;
-		static VAO m_vaoFullscreen;
 	};
 
 	struct BackBuffer : IFrameBuffer

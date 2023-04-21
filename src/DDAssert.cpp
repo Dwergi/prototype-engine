@@ -1,11 +1,11 @@
 //
-// DDAssertHelpers.cpp - Wrappers to display an ImGui assert dialog.
+// DDAssert.cpp - Wrappers to display an ImGui assert dialog.
 // Copyright (C) Sebastian Nordgren 
 // January 14th 2018
 //
 
 #include "PCH.h"
-#include "DDAssertHelpers.h"
+#include "DDAssert.h"
 
 #include "DebugUI.h"
 #include "FrameTimer.h"
@@ -115,10 +115,8 @@ namespace dd::Assert
 
 	static bool g_initialized = false;
 
-	static ppk::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression,
-		int level, const char* message)
+	static ppk::assert::implementation::AssertAction::AssertAction OnAssert(const char* file, int line, const char* function, const char* expression, int level, const char* message)
 	{
-		s_assert.Open = true;
 		s_assert.Info = FormatAssert(level, file, line, function, expression);
 		s_assert.Message = String256();
 		s_assert.Action = AssertAction::None;
@@ -136,10 +134,13 @@ namespace dd::Assert
 		printf(s_message.c_str());
 		OutputDebugStringA(s_message.c_str());
 
-		if (!g_initialized)
+		// not ready or already showing an assert, just ignore
+		if (!g_initialized || s_assert.Open)
 		{
 			return ppk::assert::implementation::AssertAction::Ignore;
 		}
+
+		s_assert.Open = true;
 
 		do
 		{

@@ -469,7 +469,6 @@
     <ClInclude Include="src\BoundSphereComponent.h" />
     <ClInclude Include="src\BoundsRenderer.h" />
     <ClInclude Include="src\BVHTree.h" />
-    <ClInclude Include="src\DDAssertHelpers.h" />
     <ClInclude Include="src\FPSCameraComponent.h" />
     <ClInclude Include="src\CommandLine.h" />
     <ClInclude Include="src\DDAssert.h" />
@@ -1140,6 +1139,7 @@
     <ClCompile Include="src\d2d\SpriteComponent.cpp" />
     <ClCompile Include="src\d2d\SpriteTileSystem.cpp" />
     <ClCompile Include="src\d2d\Transform2DComponent.cpp" />
+    <ClCompile Include="src\DDAssert.cpp" />
     <ClCompile Include="src\ddc\ComponentBuffer.cpp" />
     <ClCompile Include="src\ddc\DataRequest.cpp" />
     <ClCompile Include="src\ddc\EntityLayer.cpp" />
@@ -1244,7 +1244,6 @@
     <ClCompile Include="src\BoundsRenderer.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\BVHTree.cpp" />
-    <ClCompile Include="src\DDAssertHelpers.cpp" />
     <ClCompile Include="src\FPSCameraComponent.cpp" />
     <ClCompile Include="src\File.cpp" />
     <ClInclude Include="src\FSM.inl">

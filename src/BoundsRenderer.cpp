@@ -89,42 +89,33 @@ namespace ddr
 		m_shader = s_shaderManager->Load("line");
 		DD_ASSERT(m_shader.IsValid());
 
-		m_vao.Create();
+		m_vao.Create("bounds");
+		m_vao.Bind();
+
+		m_vboPosition.Create("bounds");
+		m_vao.BindVBO(m_vboPosition, 0, sizeof(s_cornersBuffer[0]));
+		m_shader->BindPositions(m_vao, m_vboPosition);
+
+		m_vboIndex.Create("bounds.index");
+		m_vao.BindIndices(m_vboIndex);
+
+		m_vao.Unbind();
 
 		m_updateBuffers = true;
 	}
 
 	void BoundsRenderer::UpdateBuffers()
 	{
-		if (m_vboPosition.IsValid())
-		{
-			m_vboPosition.Destroy();
-		}
-
-		if (m_vboIndex.IsValid())
-		{
-			m_vboIndex.Destroy();
-		}
-
-		ScopedShader scoped_shader = m_shader.Access()->UseScoped();
+		ScopedShader scoped_shader = m_shader->UseScoped();
 
 		if (m_drawMode == DrawMode::Box)
 		{
-			m_vboPosition.Create(s_cornersBuffer);
-			m_vao.BindVBO(m_vboPosition, 0, sizeof(s_cornersBuffer[0]));
-			scoped_shader->BindPositions(m_vao, m_vboPosition);
-
-			m_vboIndex.Create(s_indicesBuffer);
-			m_vao.BindIndices(m_vboIndex);
+			m_vboPosition.SetData(s_cornersBuffer);
+			m_vboIndex.SetData(s_indicesBuffer);
 		}
 		else if (m_drawMode == DrawMode::Sphere)
 		{
 			dd::MeshUtils::MakeIcosphereLines(m_vboPosition, m_vboIndex, m_subdivisions);
-
-			m_vao.BindVBO(m_vboPosition, 0, sizeof(glm::vec3));
-			scoped_shader->BindPositions(m_vao, m_vboPosition);
-
-			m_vao.BindIndices(m_vboIndex);
 		}
 
 		m_updateBuffers = false;
@@ -144,10 +135,9 @@ namespace ddr
 
 		ScopedRenderState scoped_state = m_renderState.UseScoped();
 
-		Shader* shader = m_shader.Access();
-		DD_ASSERT(shader != nullptr);
+		DD_ASSERT(m_shader.IsValid());
 
-		ScopedShader scoped_shader = shader->UseScoped();
+		ScopedShader scoped_shader = m_shader->UseScoped();
 
 		const ddc::EntityLayer& entity_space = data.Layer();
 
@@ -159,19 +149,21 @@ namespace ddr
 
 		const std::vector<ddc::Entity> entities = data.Entities();
 
+		m_vao.Bind();
+
 		for (size_t i = 0; i < data.Size(); ++i)
 		{
 			if (entities[i].HasTag(ddc::Tag::Selected))
 			{
-				shader->SetUniform("Colour", glm::vec4(0, 1, 0, 1));
+				scoped_shader->SetUniform("Colour", glm::vec4(0, 1, 0, 1));
 			}
 			else if (entities[i].HasTag(ddc::Tag::Focused))
 			{
-				shader->SetUniform("Colour", glm::vec4(1, 1, 0, 1));
+				scoped_shader->SetUniform("Colour", glm::vec4(1, 1, 0, 1));
 			}
 			else
 			{
-				shader->SetUniform("Colour", glm::vec4(1, 1, 1, 0.5));
+				scoped_shader->SetUniform("Colour", glm::vec4(1, 1, 1, 0.5));
 			}
 
 			ddm::AABB bound_box;
@@ -181,21 +173,23 @@ namespace ddr
 				continue;
 			}
 
+			glm::mat4 model;
+
 			if (m_drawMode == DrawMode::Box)
 			{
-				glm::mat4 model = glm::translate(bound_box.Min) * glm::scale(bound_box.Max - bound_box.Min);
-
-				shader->SetUniform("ModelViewProjection", view_projection * model);
+				model = glm::translate(bound_box.Min) * glm::scale(bound_box.Max - bound_box.Min);
 			}
 			else if (m_drawMode == DrawMode::Sphere)
 			{
-				glm::mat4 model = glm::translate(bound_sphere.Centre) * glm::scale(glm::vec3(bound_sphere.Radius));
-
-				shader->SetUniform("ModelViewProjection", view_projection * model);
+				model = glm::translate(bound_sphere.Centre) * glm::scale(glm::vec3(bound_sphere.Radius));
 			}
 
-			OpenGL::DrawElements(OpenGL::Primitive::Lines, m_vboIndex.SizeBytes() / sizeof(uint));
+			scoped_shader->SetUniform("ModelViewProjection", view_projection * model);
+
+			OpenGL::DrawElements(ddr::Primitive::Lines, m_vboIndex.SizeBytes() / sizeof(uint));
 		}
+
+		m_vao.Unbind();
 	}
 
 	void BoundsRenderer::DrawDebugInternal()

@@ -16,7 +16,7 @@ namespace ddr
 
 	struct VBO;
 
-	struct VAO : IVBODestroyedListener
+	struct VAO : IVBOListener
 	{
 	public:
 
@@ -24,7 +24,7 @@ namespace ddr
 		VAO(const VAO& other);
 		~VAO();
 
-		void Create();
+		void Create(std::string_view name);
 		void Destroy();
 
 		void EnableAttribute(ShaderLocation loc);
@@ -36,10 +36,11 @@ namespace ddr
 		void BindIndices(const VBO& vbo);
 		void UnbindIndices(const VBO& vbo);
 
-		void BindAttribute(const VBO& vbo, ShaderLocation loc, GLenum format, Normalized normalized, int components, uint64 offset);
+		void CreateAttribute(std::string_view name, ShaderLocation loc, const VBO& vbo, Format format, int components, Normalized normalized, Instanced instanced, uint64 offset);
 
 		void Bind();
 		void Unbind();
+		bool IsBound() const;
 
 		bool IsValid() const { return m_id != OpenGL::InvalidID; }
 		GLuint ID() const { return m_id; }
@@ -48,12 +49,33 @@ namespace ddr
 
 	private:
 
+		std::string m_name;
+
 		GLuint m_id { OpenGL::InvalidID };
 		GLuint m_indices { OpenGL::InvalidID };
-		dd::Array<GLuint, 8> m_vbos;
 
-		bool m_bound { false };
+		struct BufferBinding
+		{
+			const VBO* VBO = nullptr;
+			uint Offset = 0;
+			uint Stride = 0;
+			dd::Array<ShaderLocation, 8> BoundTo;
+		};
+		
+		struct Attribute
+		{
+			std::string Name;
+			ShaderLocation Location = ddr::InvalidLocation;
+			const VBO* VBO = nullptr;
+			uint64 Offset;
+		};
 
+		dd::Array<BufferBinding, 8> m_vbos;
+		dd::Array<Attribute, 8> m_attributes;
+
+		int IndexOf(uint vbo) const;
+
+		void OnVBORenamed(const VBO& vbo, uint old_id) override;
 		void OnVBODestroyed(const VBO& vbo) override;
 	};
 }

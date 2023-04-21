@@ -19,8 +19,8 @@ namespace ddr
 		//
 		// Set the current values of the material's properties to the uniform storage.
 		//
-		void Bind( UniformStorage& uniforms );
-		void Unbind( UniformStorage& uniforms );
+		void Bind(UniformStorage& uniforms);
+		void Unbind(UniformStorage& uniforms);
 
 		//
 		// Material properties - Phong shading model.
@@ -31,15 +31,15 @@ namespace ddr
 		float Ambient { 1 };
 
 		RenderState State;
-		ShaderHandle Shader;
+		ddr::ShaderHandle Shader;
 
 		Material();
 		~Material();
 
-		Material& operator=( const Material& ) = delete;
-		Material& operator=( Material&& ) = delete;
-		Material( const Material& ) = delete;
-		Material( Material&& ) = delete;
+		Material& operator=(const Material&) = delete;
+		Material& operator=(Material&&) = delete;
+		Material(const Material&) = delete;
+		Material(Material&&) = delete;
 
 		static const char* TypeName() { return "Material"; }
 

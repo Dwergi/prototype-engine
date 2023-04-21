@@ -315,9 +315,6 @@
     <ClInclude Include="src\FunctionView.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="src\DDAssertHelpers.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Span.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -1500,9 +1497,6 @@
     <ClCompile Include="src\Buffer.cpp">
       <Filter>Containers</Filter>
     </ClCompile>
-    <ClCompile Include="src\DDAssertHelpers.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tests\EntityTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -2168,6 +2162,9 @@
     </ClCompile>
     <ClCompile Include="src\UndoStack.cpp">
       <Filter>Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DDAssert.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

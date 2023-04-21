@@ -126,7 +126,7 @@ namespace dd
 		m_framebuffer.SetClearDepth(0.0f);
 		m_framebuffer.SetClearColour(glm::vec4(1));
 		m_framebuffer.Create(m_idTexture, &m_depthTexture);
-		m_framebuffer.Initialize();
+		m_framebuffer.Initialize("mousepicking");
 	}
 
 	void MousePicking::Update(ddr::RenderData& data)

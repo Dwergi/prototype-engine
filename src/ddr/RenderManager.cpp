@@ -118,7 +118,7 @@ namespace ddr
 		m_framebuffer.SetClearColour(glm::vec4(0));
 		m_framebuffer.SetClearDepth(0.0f);
 		m_framebuffer.Create(m_colourTexture, &m_depthTexture);
-		m_framebuffer.Initialize();
+		m_framebuffer.Initialize("backbuffer");
 	}
 
 	void RenderManager::DrawDebugInternal()
@@ -177,21 +177,21 @@ namespace ddr
 			}
 		}
 
-		// render debug
-		for (ddr::IRenderer* renderer : m_renderers)
-		{
-			if (renderer->ShouldRenderDebug())
-			{
-				renderer->RenderDebug(renderer->RenderData(), m_framebuffer);
-			}
-		}
-
 		// render alpha
 		for (ddr::IRenderer* renderer : m_renderers)
 		{
 			if (renderer->UsesAlpha())
 			{
 				renderer->Render(renderer->RenderData());
+			}
+		}
+
+		// render debug
+		for (ddr::IRenderer* renderer : m_renderers)
+		{
+			if (renderer->ShouldRenderDebug())
+			{
+				renderer->RenderDebug(renderer->RenderData(), m_framebuffer);
 			}
 		}
 
@@ -218,6 +218,9 @@ namespace ddr
 		}
 
 		m_framebuffer.Clear();
+		m_framebuffer.BindRead();
+		// THIS LINE ENABLES RENDERING BUT FUCKS UP IMGUI
+		m_framebuffer.BindDraw();
 
 		if (m_debugDrawDepth)
 		{
@@ -254,5 +257,8 @@ namespace ddr
 			m_framebuffer.Blit(m_backbuffer);
 			m_defaultState.Use(false);
 		}
+
+		m_framebuffer.UnbindRead();
+		m_framebuffer.UnbindDraw();
 	}
 }

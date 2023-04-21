@@ -72,7 +72,7 @@ namespace ddr
 		float m_near { 0.0f };
 		float m_far { 0.0f };
 
-		ShaderHandle m_shader;
+		ddr::ShaderHandle m_shader;
 		RenderState m_renderState;
 
 		void UpdateFrustum( const ddr::ICamera& camera );

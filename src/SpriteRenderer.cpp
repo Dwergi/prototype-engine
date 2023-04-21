@@ -33,10 +33,6 @@ namespace ddr
 			glm::vec2(1, 1)
 	};
 
-	static VBO s_vboQuad;
-
-	static ShaderHandle s_shader;
-
 	SpriteRenderer::SpriteRenderer() :
 		ddr::IRenderer("Sprites")
 	{
@@ -51,8 +47,9 @@ namespace ddr
 
 	void SpriteRenderer::Initialize()
 	{
-		s_shader = s_shaderManager->Load("sprite");
-		s_vboQuad.Create(dd::ConstBuffer<glm::vec2>(s_quad, 6));
+		m_shader = s_shaderManager->Load("sprite");
+		m_vboQuad.Create("sprite.quad");
+		m_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_quad, 6));
 	}
 
 	SpriteRenderer::InstanceVBOs& SpriteRenderer::FindCachedInstanceVBOs(ddr::SpriteHandle sprite_h)
@@ -85,53 +82,49 @@ namespace ddr
 		InstanceVBOs& cache = FindCachedInstanceVBOs(start->Sprite);
 		if (!cache.VAO.IsValid())
 		{
-			cache.VAO.Create();
+			cache.VAO.Create("sprite");
+			cache.VAO.Bind();
 
-			shader.BindAttributeVec2(cache.VAO, s_vboQuad, "Position");
-			shader.BindAttributeVec2(cache.VAO, s_vboQuad, "UV");
+			shader.CreateAttributeVec2(cache.VAO, m_vboQuad, "Position", Normalized::No, Instanced::No);
+			shader.CreateAttributeVec2(cache.VAO, m_vboQuad, "UV", Normalized::No, Instanced::No);
+
+			cache.Transforms.Create("sprite.transform");
+			cache.VAO.BindVBO(cache.Transforms, 0, sizeof(m_transforms[0]));
+			shader.CreateAttributeMat3(cache.VAO, cache.Transforms, "TransformInstanced", Normalized::No, Instanced::Yes);
+
+			cache.Colours.Create("sprite.colour");
+			cache.VAO.BindVBO(cache.Colours, 0, sizeof(m_colours[0]));
+			shader.CreateAttributeMat3(cache.VAO, cache.Colours, "ColourInstanced", Normalized::No, Instanced::Yes);
+
+			cache.UVOffsets.Create("sprite.uv_offset");
+			cache.VAO.BindVBO(cache.UVOffsets, 0, sizeof(m_uvOffsets[0]));
+			shader.CreateAttributeMat3(cache.VAO, cache.UVOffsets, "UVOffsetInstanced", Normalized::No, Instanced::Yes);
+
+			cache.UVScales.Create("sprite.uv_scale");
+			cache.VAO.BindVBO(cache.UVScales, 0, sizeof(m_uvScales[0]));
+			shader.CreateAttributeMat3(cache.VAO, cache.UVScales, "UVScaleInstanced", Normalized::No, Instanced::Yes);
+
+			cache.VAO.Unbind();
 		}
 		
-		if (cache.Transforms.IsValid())
-		{
-			cache.Transforms.Destroy();
-		}
-		cache.Transforms.Create(m_transforms);
-		cache.VAO.BindVBO(cache.Transforms, 0, sizeof(m_transforms[0]));
-		shader.BindAttributeMat3(cache.VAO, cache.Transforms, "TransformInstanced", Normalized::No, Instanced::Yes);
-
-		if (cache.Colours.IsValid())
-		{
-			cache.Colours.Destroy();
-		}
-		cache.Colours.Create(m_colours);
-		cache.VAO.BindVBO(cache.Colours, 0, sizeof(m_colours[0]));
-		shader.BindAttributeMat3(cache.VAO, cache.Colours, "ColourInstanced", Normalized::No, Instanced::Yes);
-
-		if (cache.UVOffsets.IsValid())
-		{
-			cache.UVOffsets.Destroy();
-		}
-		cache.UVOffsets.Create(m_transforms);
-		cache.VAO.BindVBO(cache.UVOffsets, 0, sizeof(m_uvOffsets[0]));
-		shader.BindAttributeMat3(cache.VAO, cache.UVOffsets, "UVOffsetInstanced", Normalized::No, Instanced::Yes);
-
-		if (cache.UVScales.IsValid())
-		{
-			cache.UVScales.Destroy();
-		}
-		cache.UVScales.Create(m_uvScales);
-		cache.VAO.BindVBO(cache.UVScales, 0, sizeof(m_uvScales[0]));
-		shader.BindAttributeMat3(cache.VAO, cache.UVScales, "UVScaleInstanced", Normalized::No, Instanced::Yes);
+		cache.Transforms.SetData(m_transforms);
+		cache.Colours.SetData(m_colours);
+		cache.UVOffsets.SetData(m_transforms);
+		cache.UVScales.SetData(m_uvScales);
 
 		Texture* texture = sprite->Texture.Access();
+
+		cache.VAO.Bind();
 
 		texture->Bind(0);
 		uniforms.Set("Texture", *texture);
 
-		OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, 6, count);
+		OpenGL::DrawArraysInstanced(ddr::Primitive::Triangles, 6, count);
 		CheckOGLError();
 
 		texture->Unbind();
+
+		cache.VAO.Unbind();
 	}
 
 	void SpriteRenderer::DrawLayer(SpriteIterator start, SpriteIterator end, ddr::UniformStorage& uniforms, ddr::Shader& shader)
@@ -161,7 +154,7 @@ namespace ddr
 
 	void SpriteRenderer::Render(const ddr::RenderData& data)
 	{
-		ScopedShader shader = s_shader.Access()->UseScoped();
+		ScopedShader shader = m_shader.Access()->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();

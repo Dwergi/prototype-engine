@@ -28,7 +28,7 @@ namespace ddr
 	private:
 
 		RenderState m_lineState;
-		ShaderHandle m_lineShader;
+		ddr::ShaderHandle m_lineShader;
 		VAO m_vao;
 		VBO m_vbo;
 

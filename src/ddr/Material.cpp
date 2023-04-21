@@ -17,7 +17,6 @@ namespace ddr
 
 	Material::Material()
 	{
-
 	}
 
 	Material::~Material()
@@ -38,9 +37,9 @@ namespace ddr
 		uniforms.Set("Material.Diffuse", Diffuse);
 		uniforms.Set("Material.Ambient", Ambient);
 
-		uniforms.Upload(*Shader.Access());
+		uniforms.Upload(*Shader);
 
-		Shader.Access()->Use(true);
+		Shader->Use(true);
 		
 		State.Use(true);
 	}
@@ -49,7 +48,7 @@ namespace ddr
 	{
 		DD_ASSERT(m_inUse, "Material not in use when unbound!");
 
-		Shader.Access()->Use(false);
+		Shader->Use(false);
 
 		State.Use(false);
 

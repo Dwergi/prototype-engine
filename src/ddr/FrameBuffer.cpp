@@ -18,9 +18,9 @@
 
 namespace ddr
 {
-	VAO FrameBuffer::m_vaoFullscreen;
-	VBO FrameBuffer::m_vboFullscreen;
-	ShaderHandle FrameBuffer::m_blitShader;
+	static ddr::ShaderHandle s_blitShader;
+	static VBO s_vboFullscreen;
+	static VAO s_vaoFullscreen;
 
 	static dd::Service<ddr::ShaderManager> s_shaderManager;
 
@@ -109,21 +109,28 @@ namespace ddr
 		return true;
 	}
 
-	void FrameBuffer::Initialize()
+	void FrameBuffer::Initialize(std::string_view name)
 	{
-		if (!m_blitShader.IsValid())
+		if (!s_blitShader.IsValid())
 		{
-			m_blitShader = s_shaderManager->Load("blit");
+			s_blitShader = s_shaderManager->Load("blit");
+		
+			ScopedShader shader = s_blitShader->UseScoped();
 
-			ScopedShader shader = m_blitShader.Access()->UseScoped();
+			s_vaoFullscreen.Create("blit");
+			s_vaoFullscreen.Bind();
+		
+			s_vboFullscreen.Create("blit");
+			s_vaoFullscreen.BindVBO(s_vboFullscreen, 0, sizeof(s_fullScreenQuadBuffer[0]));
+			shader->BindPositions(s_vaoFullscreen, s_vboFullscreen);
 
-			m_vaoFullscreen.Create();
+			s_vboFullscreen.SetData(s_fullScreenQuadBuffer);
 
-			m_vboFullscreen.Create(s_fullScreenQuadBuffer);
-			m_vaoFullscreen.BindVBO(m_vboFullscreen, 0, sizeof(s_fullScreenQuadBuffer[0]));
-
-			shader->BindPositions(m_vaoFullscreen, m_vboFullscreen);
+			s_vaoFullscreen.Unbind();
 		}
+
+		m_name = name;
+		glObjectLabel(GL_FRAMEBUFFER, m_fbo, (GLsizei) m_name.length(), m_name.c_str());
 	}
 
 	void FrameBuffer::RenderDepth(ddr::UniformStorage& uniforms, const ddr::ICamera& camera)
@@ -131,9 +138,9 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_texDepth != nullptr);
 
-		ScopedShader shader = m_blitShader.Access()->UseScoped();
+		ScopedShader shader = s_blitShader->UseScoped();
 
-		m_vaoFullscreen.Bind();
+		s_vaoFullscreen.Bind();
 		m_texDepth->Bind(0);
 
 		CheckOGLError();
@@ -144,10 +151,10 @@ namespace ddr
 
 		uniforms.Upload(*shader);
 
-		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
+		OpenGL::DrawArrays(Primitive::Triangles, s_fullScreenQuadBuffer.Size());
 
 		m_texDepth->Unbind();
-		m_vaoFullscreen.Unbind();
+		s_vaoFullscreen.Unbind();
 
 		CheckOGLError();
 	}
@@ -162,9 +169,9 @@ namespace ddr
 		DD_ASSERT(IsValid());
 		DD_ASSERT(m_texColour != nullptr);
 
-		ScopedShader shader = m_blitShader.Access()->UseScoped();
+		ScopedShader shader = s_blitShader->UseScoped();
 
-		m_vaoFullscreen.Bind();
+		s_vaoFullscreen.Bind();
 
 		texture->Bind(0);
 
@@ -173,11 +180,11 @@ namespace ddr
 
 		uniforms.Upload(*shader);
 
-		OpenGL::DrawArrays(OpenGL::Primitive::Triangles, s_fullScreenQuadBuffer.Size());
+		OpenGL::DrawArrays(Primitive::Triangles, s_fullScreenQuadBuffer.Size());
 
 		texture->Unbind();
 
-		m_vaoFullscreen.Unbind();
+		s_vaoFullscreen.Unbind();
 	}
 
 	void FrameBuffer::Blit(const IFrameBuffer& dest)

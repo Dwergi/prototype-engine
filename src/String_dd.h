@@ -17,7 +17,7 @@ namespace dd
 	{
 	protected:
 
-		String(uint capacity);
+		String(uint32 capacity);
 
 	public:
 
@@ -83,8 +83,8 @@ namespace dd
 	protected:
 
 		char* m_buffer { nullptr };
-		uint m_length { 0 };
-		uint m_capacity { 0 };
+		uint32 m_length { 0 };
+		uint32 m_capacity { 0 };
 
 		void Resize(uint64 length);
 		void SetString(const char* data, uint64 length);

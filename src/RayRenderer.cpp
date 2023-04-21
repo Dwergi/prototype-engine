@@ -54,16 +54,22 @@ namespace ddr
 
 		Shader* shader = m_shader.Access();
 
-		m_vao.Create();
-		m_vbo.Create(s_linesBuffer);
+		m_vao.Create("ray");
+		m_vao.Bind();
+
+		m_vbo.Create("ray");
+		m_vbo.SetData(s_linesBuffer);
 		m_vao.BindVBO(m_vbo, 0, sizeof(s_linesBuffer[0]));
 
 		shader->BindPositions(m_vao, m_vbo);
+
+		m_vao.Unbind();
 	}
 
 	void RayRenderer::Render(const ddr::RenderData& data)
 	{
 		ScopedShader shader = m_shader.Access()->UseScoped();
+		m_vao.Bind();
 
 		glm::mat4 view_projection = data.Camera().GetProjectionMatrix() * data.Camera().GetViewMatrix();
 
@@ -89,7 +95,9 @@ namespace ddr
 
 			shader->SetUniform("ModelViewProjection", view_projection * model);
 
-			OpenGL::DrawArrays(OpenGL::Primitive::Lines, s_linesBuffer.Size());
+			OpenGL::DrawArrays(ddr::Primitive::Lines, s_linesBuffer.Size());
 		}
+
+		m_vao.Unbind();
 	}
 }

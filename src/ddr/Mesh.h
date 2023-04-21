@@ -57,16 +57,10 @@ namespace ddr
 		void SetPositions(const dd::ConstBuffer<glm::vec3>& positions);
 
 		//
-		// Access the currently set buffer for positions.
-		// Not guaranteed to be valid.
-		//
-		dd::Buffer<glm::vec3> AccessPositions() const { return dd::Buffer<glm::vec3>(m_vboPosition.GetData()); }
-
-		//
 		// Get the currently set buffer for positions.
 		// Not guaranteed to be valid.
 		//
-		dd::ConstBuffer<glm::vec3> GetPositions() const { return dd::ConstBuffer<glm::vec3>(m_vboPosition.GetData()); }
+		dd::ConstBuffer<glm::vec3> GetPositions() const { return m_positions; }
 
 		//
 		// Set the index buffer that the mesh will use.
@@ -78,13 +72,7 @@ namespace ddr
 		// Get the currently set buffer for indices.
 		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
 		//
-		dd::ConstBuffer<uint> GetIndices() const { return dd::ConstBuffer<uint>(m_vboIndex.GetData()); }
-
-		//
-		// Access the currently set buffer for indices.
-		// Not guaranteed to be valid. If the mesh does not use indices, then this will never be valid.
-		//
-		dd::Buffer<uint> AccessIndices() const { return dd::Buffer<uint>(m_vboIndex.GetData()); }
+		dd::ConstBuffer<uint> GetIndices() const { return m_indices; }
 
 		//
 		// Set the normal buffer that the mesh will use.
@@ -93,10 +81,22 @@ namespace ddr
 		void SetNormals(const dd::ConstBuffer<glm::vec3>& normals);
 
 		//
+		// Get the currently set buffer for normals.
+		// Not guaranteed to be valid. If the mesh does not use normals, then this will never be valid.
+		//
+		dd::ConstBuffer<glm::vec3> GetNormals() const { return m_normals; }
+
+		//
 		// Set the UV buffer that the mesh will use.
 		// The mesh does *NOT* take ownership of this.
 		//
 		void SetUVs(const dd::ConstBuffer<glm::vec2>& uvs);
+
+		//
+		// Get the currently set buffer for UVs.
+		// Not guaranteed to be valid. If the mesh does not use UVs, then this will never be valid.
+		//
+		dd::ConstBuffer<glm::vec2> GetUVs() const { return m_uvs; }
 
 		//
 		// Create the mesh. Must be called on the render thread.
@@ -129,11 +129,9 @@ namespace ddr
 		const dd::BVHTree* GetBVH() const { return m_bvh; }
 
 		//
-		// Get the VAO of this mesh.
+		// Initialize a given VAO and shader to render this mesh.
 		// 
-		ddr::VAO& VAO() { return m_vao; }
-
-		void BindToShader(Shader& shader);
+		void Bind(ddr::VAO& vao, ddr::Shader& shader);
 
 		//
 		// Do not create directly, use MeshManager.
@@ -160,8 +158,6 @@ namespace ddr
 		dd::ConstBuffer<uint> m_indices;
 		VBO m_vboUV;
 		dd::ConstBuffer<glm::vec2> m_uvs;
-
-		VAO m_vao;
 
 		bool m_hasBounds { false };
 		ddm::AABB m_bounds;

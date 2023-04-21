@@ -133,6 +133,18 @@
 		</Expand>
 	</Type>
 
+	<Type Name="dd::Array&lt;*&gt;">
+		<DisplayString>{"$T1",sb} [{m_size}/{m_data.m_count}]</DisplayString>
+		<Expand>
+			<Item Name="[size]">m_size</Item>
+			<Item Name="[capacity]">m_data.m_count</Item>
+			<ArrayItems>
+				<Size>m_size</Size>
+				<ValuePointer>m_data.m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
 	<Type Name="dd::ConstBuffer&lt;*&gt;">
 		<DisplayString>{"$T1",sb} [{m_count}]</DisplayString>
 		<Expand>
@@ -153,6 +165,20 @@
 				<ValuePointer>m_ptr</ValuePointer>
 			</ArrayItems>
 		</Expand>
+	</Type>
+
+	<Type Name="ddr::VAO">
+		<DisplayString>{m_name,sb} [{m_id}]</DisplayString>
+	</Type>
+
+	<Type Name="ddr::VBO">
+		<DisplayString>{m_name,sb} [{m_id}]</DisplayString>
+	</Type>
+
+	<Type Name="ddr::VAO::BufferBinding">
+		<DisplayString Condition="VBO == 0">{{invalid}}</DisplayString>
+		<DisplayString Condition="VBO->m_dataSize == 0">{VBO->m_name,sb} [{VBO->m_id}] (empty)</DisplayString>
+		<DisplayString>{VBO->m_name,sb} [{VBO->m_id}] ({(VBO->m_dataSize - Offset) / Stride} elements)</DisplayString>
 	</Type>
 	
 </AutoVisualizer>

@@ -48,7 +48,7 @@ namespace ddr
 		VBO m_vboIndex;
 
 		RenderState m_renderState;
-		ShaderHandle m_shader;
+		ddr::ShaderHandle m_shader;
 
 		virtual const char* GetDebugTitle() const override { return "Bounds"; }
 		virtual void DrawDebugInternal() override;

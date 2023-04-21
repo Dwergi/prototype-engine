@@ -41,6 +41,7 @@ namespace ddr
 		m_type(type)
 	{
 		m_id = glCreateShader(GetOpenGLShaderType(type));
+		glObjectLabel(GL_SHADER, m_id, (GLsizei) m_path.length(), m_path.c_str());
 
 		DD_ASSERT_ERROR(m_id != OpenGL::InvalidID, "Failed to create shader!");
 	}

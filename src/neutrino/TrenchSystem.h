@@ -17,6 +17,7 @@
 namespace ddr
 {
 	struct ICamera;
+	struct Shader;
 }
 
 namespace dd

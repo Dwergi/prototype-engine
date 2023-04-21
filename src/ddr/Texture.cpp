@@ -53,7 +53,6 @@ namespace ddr
 		glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		CheckOGLError();
-		
 
 		glTextureStorage2D(m_id, m_mips, m_internalFormat, m_size.x, m_size.y);
 		CheckOGLError();

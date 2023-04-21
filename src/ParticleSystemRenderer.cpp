@@ -37,10 +37,6 @@ namespace ddr
 		glm::vec2(1,1)
 	};
 
-	static VBO s_vboQuad;
-
-	static ShaderHandle s_shaderParticle;
-
 	ParticleSystemRenderer::ParticleSystemRenderer() :
 		ddr::IRenderer("Particle Systems")
 	{
@@ -54,15 +50,13 @@ namespace ddr
 
 	void ParticleSystemRenderer::Initialize()
 	{
-		s_shaderParticle = s_shaderManager->Load("particle");
+		m_shaderParticle = s_shaderManager->Load("particle");
 
-		if (!s_vboQuad.IsValid())
-		{
-			s_vboQuad.Create(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
-		}
+		m_vboQuad.Create("particle.quad");
+		m_vboQuad.SetData(dd::ConstBuffer<glm::vec2>(s_screenFacingQuadVertices, 6));
 	}
 
-	ParticleSystemRenderer::ParticleSystemRenderState ParticleSystemRenderer::GetParticleSystemRenderState(ddc::Entity entity)
+	ParticleSystemRenderer::ParticleSystemRenderState& ParticleSystemRenderer::GetParticleSystemRenderState(ddc::Entity entity, ddr::Shader& shader)
 	{
 		auto it = m_systemRenderStates.find(entity);
 		if (it != m_systemRenderStates.end())
@@ -70,34 +64,32 @@ namespace ddr
 			return it->second;
 		}
 
-		ParticleSystemRenderState new_state;
-		new_state.VAO.Create();
+		auto it_pair = m_systemRenderStates.insert({ entity, ParticleSystemRenderState() });
 
-		new_state.Positions.Create(m_positions);
+		ParticleSystemRenderState& new_state = it_pair.first->second;
+		new_state.VAO.Create("particle");
+
+		new_state.VAO.BindVBO(m_vboQuad, 0, sizeof(glm::vec2));
+		shader.CreateAttributeVec2(new_state.VAO, m_vboQuad, "Position", Normalized::No, Instanced::Yes);
+
+		new_state.Positions.Create("particle.position");
 		new_state.VAO.BindVBO(new_state.Positions, 0, sizeof(glm::vec3));
-		
-		new_state.Sizes.Create(m_sizes);
+		shader.CreateAttributeVec3(new_state.VAO, new_state.Positions, "PositionInstanced", Normalized::No, Instanced::Yes);
+
+		new_state.Sizes.Create("particle.scale");
 		new_state.VAO.BindVBO(new_state.Sizes, 0, sizeof(glm::vec3));
+		shader.CreateAttributeVec2(new_state.VAO, new_state.Sizes, "ScaleInstanced", Normalized::No, Instanced::Yes);
 
-		new_state.Colours.Create(m_colours);
+		new_state.Colours.Create("particle.colour");
 		new_state.VAO.BindVBO(new_state.Colours, 0, sizeof(glm::vec3));
-
-		m_systemRenderStates.insert({ entity, new_state });
+		shader.CreateAttributeVec4(new_state.VAO, new_state.Colours, "ColourInstanced", Normalized::No, Instanced::No);
 
 		return new_state;
 	}
 
-	void ParticleSystemRenderer::BindSystemToShader(ParticleSystemRenderer::ParticleSystemRenderState render_state, ScopedShader& shader)
-	{
-		shader->BindAttributeVec2(render_state.VAO, s_vboQuad, "Position", Normalized::No, Instanced::Yes);
-		shader->BindAttributeVec3(render_state.VAO, render_state.Positions, "PositionInstanced", Normalized::No, Instanced::Yes);
-		shader->BindAttributeVec2(render_state.VAO, render_state.Sizes, "ScaleInstanced", Normalized::No, Instanced::Yes);
-		shader->BindAttributeVec4(render_state.VAO, render_state.Colours, "ColourInstanced");
-	}
-
 	void ParticleSystemRenderer::Render(const ddr::RenderData& data)
 	{
-		ScopedShader shader = s_shaderParticle.Access()->UseScoped();
+		ScopedShader shader = m_shaderParticle->UseScoped();
 
 		ddr::UniformStorage& uniforms = data.Uniforms();
 		const ddr::ICamera& camera = data.Camera();
@@ -112,7 +104,7 @@ namespace ddr
 		for (int i = 0; i < data.Size(); ++i)
 		{
 			const dd::ParticleSystemComponent& system = particle_systems[i];
-			ParticleSystemRenderState& system_render_state = GetParticleSystemRenderState(data.Entities()[i]);
+			ParticleSystemRenderState& render_state = GetParticleSystemRenderState(data.Entities()[i], *shader);
 
 			std::memcpy(m_tempBuffer, system.Particles, sizeof(dd::Particle) * system.LiveCount);
 
@@ -144,7 +136,15 @@ namespace ddr
 				++count;
 			}
 
-			OpenGL::DrawArraysInstanced(OpenGL::Primitive::Triangles, 6, count);
+			render_state.Positions.SetData(m_positions);
+			render_state.Sizes.SetData(m_sizes);
+			render_state.Colours.SetData(m_colours);
+
+			render_state.VAO.Bind();
+
+			OpenGL::DrawArraysInstanced(ddr::Primitive::Triangles, 6, count);
+
+			render_state.VAO.Unbind();
 		}
 	}
 }
